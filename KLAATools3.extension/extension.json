@@ -1,0 +1,11 @@
+{
+    "builtin": "False",
+    "default_enabled": "True",
+    "type": "extension",
+    "rocket_mode_compatible": "True",
+    "name": "KL&A Tools",
+    "description": "Includes all revit tools developed in house by KL&A",
+    "url": "https://github.com/KLAA-Eng/Pyrevit_Dev",
+    "image": "",
+    "dependencies": []
+}

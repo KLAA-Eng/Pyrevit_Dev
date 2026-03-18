@@ -1,0 +1,7 @@
+engine: 
+  clean: true
+title:
+  en_us: Dynamo Script
+
+tooltip:
+  en_us: Launches a Dynamo Script
