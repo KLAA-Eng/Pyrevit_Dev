@@ -4,4 +4,4 @@ __author__ = "Your Name"
 
 from pyrevit import forms
 
-forms.alert("Hello World", title="Hello World", ok=True)
+forms.alert("Hello World, modify your code as you see fit!", title="Hello World", ok=True)
