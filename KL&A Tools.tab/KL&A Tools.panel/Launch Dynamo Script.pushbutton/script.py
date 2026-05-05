@@ -161,6 +161,89 @@
 #         warn_icon=True
 #     )
 
+
+
+
+
+
+
+# # -*- coding: utf-8 -*-
+# from __future__ import print_function
+# import clr
+# clr.AddReference("RevitAPI")
+# clr.AddReference("RevitAPIUI")
+
+# from Autodesk.Revit.DB import (
+#     FilteredElementCollector,
+#     BuiltInCategory,
+#     BuiltInParameter,
+#     Transaction,
+#     View,
+#     ViewType,
+#     ElementId,
+# )
+# from System.Collections.Generic import List
+# from pyrevit import script, forms, HOST_APP
+
+# __title__ = "Engineer\nNotes"
+# __doc__ = "DEBUG MODE - reports type names found in model."
+
+# doc = HOST_APP.doc
+
+# # -------------------------------------------------------------------
+# # Collect all TextNote elements
+# # -------------------------------------------------------------------
+# all_text_notes = list(
+#     FilteredElementCollector(doc)
+#     .OfCategory(BuiltInCategory.OST_TextNotes)
+#     .WhereElementIsNotElementType()
+#     .ToElements()
+# )
+
+# total_count = len(all_text_notes)
+
+# # -------------------------------------------------------------------
+# # Gather ALL unique type names so we can see exactly what is in model
+# # -------------------------------------------------------------------
+# unique_type_names = {}  # name -> count
+
+# for tn in all_text_notes:
+#     try:
+#         type_el = doc.GetElement(tn.GetTypeId())
+#         if type_el is None:
+#             name = "<<No Type Element>>"
+#         else:
+#             name = type_el.Name
+#             if not name:
+#                 # fallback to parameter
+#                 p = type_el.get_Parameter(BuiltInParameter.ALL_MODEL_TYPE_NAME)
+#                 name = p.AsString() if (p and p.HasValue) else "<<Empty Name>>"
+#     except Exception as ex:
+#         name = "<<Error: {}>>".format(str(ex))
+
+#     unique_type_names[name] = unique_type_names.get(name, 0) + 1
+
+# # -------------------------------------------------------------------
+# # Build a readable report for the alert popup
+# # -------------------------------------------------------------------
+# lines = ["Total TextNote elements: {}\n".format(total_count)]
+# lines.append("Unique Type Names found:")
+# for name, cnt in sorted(unique_type_names.items()):
+#     lines.append("  [{}x]  {}".format(cnt, name))
+
+# report = "\n".join(lines)
+
+# forms.alert(
+#     report,
+#     title="Debug: TextNote Type Names",
+#     warn_icon=False
+# )
+
+
+
+
+
+
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import clr
@@ -170,23 +253,14 @@ clr.AddReference("RevitAPIUI")
 from Autodesk.Revit.DB import (
     FilteredElementCollector,
     BuiltInCategory,
-    BuiltInParameter,
-    Transaction,
-    View,
-    ViewType,
-    ElementId,
 )
-from System.Collections.Generic import List
-from pyrevit import script, forms, HOST_APP
+from pyrevit import forms, HOST_APP
 
 __title__ = "Engineer\nNotes"
-__doc__ = "DEBUG MODE - reports type names found in model."
+__doc__ = "DEBUG MODE - reports all unique TextNote type names."
 
 doc = HOST_APP.doc
 
-# -------------------------------------------------------------------
-# Collect all TextNote elements
-# -------------------------------------------------------------------
 all_text_notes = list(
     FilteredElementCollector(doc)
     .OfCategory(BuiltInCategory.OST_TextNotes)
@@ -196,39 +270,24 @@ all_text_notes = list(
 
 total_count = len(all_text_notes)
 
-# -------------------------------------------------------------------
-# Gather ALL unique type names so we can see exactly what is in model
-# -------------------------------------------------------------------
-unique_type_names = {}  # name -> count
-
+# Collect every unique type name with instance count
+unique_type_names = {}
 for tn in all_text_notes:
     try:
         type_el = doc.GetElement(tn.GetTypeId())
         if type_el is None:
             name = "<<No Type Element>>"
         else:
-            name = type_el.Name
-            if not name:
-                # fallback to parameter
-                p = type_el.get_Parameter(BuiltInParameter.ALL_MODEL_TYPE_NAME)
-                name = p.AsString() if (p and p.HasValue) else "<<Empty Name>>"
+            name = type_el.Name or "<<Empty Name>>"
     except Exception as ex:
         name = "<<Error: {}>>".format(str(ex))
 
     unique_type_names[name] = unique_type_names.get(name, 0) + 1
 
-# -------------------------------------------------------------------
-# Build a readable report for the alert popup
-# -------------------------------------------------------------------
+# Build popup report
 lines = ["Total TextNote elements: {}\n".format(total_count)]
-lines.append("Unique Type Names found:")
+lines.append("All unique type names:")
 for name, cnt in sorted(unique_type_names.items()):
-    lines.append("  [{}x]  {}".format(cnt, name))
+    lines.append("  [{}x]  '{}'".format(cnt, name))
 
-report = "\n".join(lines)
-
-forms.alert(
-    report,
-    title="Debug: TextNote Type Names",
-    warn_icon=False
-)
+forms.alert("\n".join(lines), title="Debug: TextNote Type Names")
