@@ -23,19 +23,17 @@ from Autodesk.Revit.DB import (
 from pyrevit import script, forms
 from pyrevit import HOST_APP
 
-# ── State tracking ─────────────────────────────────────────────────────────────
+# State Tracking
 STATE_KEY   = "engineer_notes_hidden"
 current_raw = script.get_envvar(STATE_KEY)
 is_hidden   = current_raw == "1"          # True  = notes are currently hidden
 going_hidden = not is_hidden              # what we're about to do
 
-# ── Revit document ─────────────────────────────────────────────────────────────
+# Bring in Revit file
 doc   = HOST_APP.doc
 uidoc = HOST_APP.uidoc
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Collect all TextNote elements whose Type Name contains "ENGINEER"
-# ──────────────────────────────────────────────────────────────────────────────
 all_text_notes = (
     FilteredElementCollector(doc)
     .OfCategory(BuiltInCategory.OST_TextNotes)
@@ -63,9 +61,7 @@ if not engineer_notes:
     # Don't flip state — nothing happened
     raise SystemExit
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Collect all views that support Hide in View
-# ──────────────────────────────────────────────────────────────────────────────
 UNSUPPORTED_VIEW_TYPES = {
     ViewType.Schedule,
     ViewType.ColumnSchedule,
@@ -90,9 +86,7 @@ target_views = [
     and not v.IsCallout          # callouts share parent view overrides
 ]
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Hide or Unhide across all target views in a single transaction
-# ──────────────────────────────────────────────────────────────────────────────
 note_ids    = [n.Id for n in engineer_notes]
 hidden_count = 0
 error_views  = []
@@ -111,18 +105,14 @@ with Transaction(doc, "Toggle Engineer Notes Visibility") as t:
             continue
     t.Commit()
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Flip state + update button highlight
-# ──────────────────────────────────────────────────────────────────────────────
+# Flip state and update button graphically
 script.set_envvar(STATE_KEY, "1" if going_hidden else "0")
 
 this_script = script.get_script_bundle()
 if this_script:
     this_script.set_highlight(going_hidden)   # color ON when hidden
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Confirmation prompt
-# ──────────────────────────────────────────────────────────────────────────────
 note_count = len(engineer_notes)
 
 if going_hidden:
