@@ -1,39 +1,34 @@
-"""
-Toggle visibility of engineering note elements across all views.
-Identifies elements where the Type Name parameter contains 'ENGINEER'.
-"""
-__title__ = "Engineer\nNotes"
-__doc__ = "Hides or unhides all engineering note text elements across all views."
-
+# -*- coding: utf-8 -*-
+from __future__ import print_function
 import clr
 clr.AddReference("RevitAPI")
 clr.AddReference("RevitAPIUI")
-
-from System.Collections.Generic import List
-from Autodesk.Revit.DB import ElementId
 
 from Autodesk.Revit.DB import (
     FilteredElementCollector,
     TextNote,
     BuiltInCategory,
+    BuiltInParameter,
     Transaction,
     View,
     ViewType,
+    ElementId,
 )
-from pyrevit import script, forms
-from pyrevit import HOST_APP
+from System.Collections.Generic import List
+from pyrevit import script, forms, HOST_APP
 
-# State Tracking
-STATE_KEY   = "engineer_notes_hidden"
-current_raw = script.get_envvar(STATE_KEY)
-is_hidden   = current_raw == "1"          # True  = notes are currently hidden
-going_hidden = not is_hidden              # what we're about to do
+__title__ = "Engineer\nNotes"
+__doc__ = "Hides or unhides all engineering note text elements across all views."
 
-# Bring in Revit file
+STATE_KEY    = "engineer_notes_hidden"
+current_raw  = script.get_envvar(STATE_KEY)
+is_hidden    = current_raw == "1"
+going_hidden = not is_hidden
+
 doc   = HOST_APP.doc
 uidoc = HOST_APP.uidoc
 
-# Collect all TextNote elements whose Type Name contains "ENGINEER"
+# Collect all TextNote elements
 all_text_notes = (
     FilteredElementCollector(doc)
     .OfCategory(BuiltInCategory.OST_TextNotes)
@@ -41,28 +36,63 @@ all_text_notes = (
     .ToElements()
 )
 
+# Debug: report total count so we know collector is working
+print("Total text notes found in model: {}".format(len(list(all_text_notes))))
+
 engineer_notes = []
 for tn in all_text_notes:
     try:
-        type_el   = doc.GetElement(tn.GetTypeId())
-        type_name = type_el.get_Parameter(
-            Autodesk.Revit.DB.BuiltInParameter.ALL_MODEL_TYPE_NAME
-        ).AsString()
-        if "ENGINEER" in type_name.upper():
+        type_el = doc.GetElement(tn.GetTypeId())
+        if type_el is None:
+            continue
+
+        # Try the standard type name parameter first
+        param = type_el.get_Parameter(BuiltInParameter.ALL_MODEL_TYPE_NAME)
+
+        # Fallback: try SYMBOL_NAME_PARAM
+        if param is None or not param.HasValue:
+            param = type_el.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM)
+
+        # Fallback: check the element Name property directly
+        if param is None or not param.HasValue:
+            type_name = type_el.Name
+        else:
+            type_name = param.AsString()
+
+        if type_name and "ENGINEER" in type_name.upper():
             engineer_notes.append(tn)
-    except Exception:
+
+    except Exception as e:
+        print("Error on element {}: {}".format(tn.Id, str(e)))
         continue
 
+print("Engineer notes matched: {}".format(len(engineer_notes)))
+
 if not engineer_notes:
+    # Show a sample of type names so we can see what the actual values are
+    sample_names = []
+    count = 0
+    for tn in FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_TextNotes).WhereElementIsNotElementType().ToElements():
+        if count >= 10:
+            break
+        try:
+            type_el = doc.GetElement(tn.GetTypeId())
+            sample_names.append(type_el.Name if type_el else "None")
+            count += 1
+        except:
+            continue
+
     forms.alert(
-        "No text elements with 'ENGINEER' in the type name were found.",
-        title="Engineer Notes"
+        "No elements with 'ENGINEER' in type name found.\n\n"
+        "Sample type names from your text notes:\n{}".format(
+            "\n".join(sample_names)
+        ),
+        title="Debug Info"
     )
-# dont change any visibilty and exit
     raise SystemExit
 
-# Collect all views that support Hide in View
-UNSUPPORTED_VIEW_TYPES = {
+# Collect valid views
+UNSUPPORTED = {
     ViewType.Schedule,
     ViewType.ColumnSchedule,
     ViewType.PanelSchedule,
@@ -82,11 +112,9 @@ all_views = (
 target_views = [
     v for v in all_views
     if not v.IsTemplate
-    and v.ViewType not in UNSUPPORTED_VIEW_TYPES
-    and not v.IsCallout          # callouts share parent view overrides
+    and v.ViewType not in UNSUPPORTED
 ]
 
-# Hide or Unhide across all target views in a single transaction
 note_ids    = [n.Id for n in engineer_notes]
 hidden_count = 0
 error_views  = []
@@ -105,36 +133,29 @@ with Transaction(doc, "Toggle Engineer Notes Visibility") as t:
             continue
     t.Commit()
 
-# Flip state and update button graphically
 script.set_envvar(STATE_KEY, "1" if going_hidden else "0")
 
 this_script = script.get_script_bundle()
 if this_script:
-    this_script.set_highlight(going_hidden)   # color ON when hidden
+    this_script.set_highlight(going_hidden)
 
-# Confirmation prompt
 note_count = len(engineer_notes)
-
 if going_hidden:
-    msg = "{} engineer note{} hidden across {} view{}.".format(
-        note_count,
-        "s" if note_count != 1 else "",
-        hidden_count,
-        "s" if hidden_count != 1 else "",
-    )
-    forms.alert(msg, title="Engineer Notes Hidden")
-else:
     forms.alert(
-        "Engineering notes active.",
-        title="Engineer Notes Visible"
+        "{} engineer note{} hidden across {} view{}.".format(
+            note_count, "s" if note_count != 1 else "",
+            hidden_count, "s" if hidden_count != 1 else "",
+        ),
+        title="Engineer Notes Hidden"
     )
+else:
+    forms.alert("Engineering notes active.", title="Engineer Notes Visible")
 
-# report any views that threw errors
 if error_views:
     forms.alert(
         "Could not process {} view(s):\n{}".format(
             len(error_views),
-            "\n".join(error_views[:20])   # cap at 20 to avoid giant dialog
+            "\n".join(error_views[:20])
         ),
         title="Some Views Skipped",
         warn_icon=True
