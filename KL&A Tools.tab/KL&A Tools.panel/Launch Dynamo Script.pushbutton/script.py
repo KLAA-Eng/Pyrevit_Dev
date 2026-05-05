@@ -58,7 +58,7 @@ if not engineer_notes:
         "No text elements with 'ENGINEER' in the type name were found.",
         title="Engineer Notes"
     )
-    # Don't flip state — nothing happened
+# dont change any visibilty and exit
     raise SystemExit
 
 # Collect all views that support Hide in View
