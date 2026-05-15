@@ -1,46 +1,43 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 import os
 import clr
 
-from pyrevit import forms, script, HOST_APP, UI
+from Autodesk.Revit.UI import Result
+from pyrevit import revit, forms
 
-logger = script.get_logger()
 bundle_dir = os.path.dirname(__file__)
-dyn_file = os.path.join(bundle_dir, "MyGraph.dyn")
+dyn_path = os.path.join(bundle_dir, 'script.dyn')
 
-if not os.path.exists(dyn_file):
-    forms.alert("Graph not found:\n{}".format(dyn_file), exitscript=True)
-
-def run_graph(graph_path):
-    clr.AddReference('PyRevitLoader')
-    from pyrevit.runtime.types import DynamoBIMEngine, ScriptData, ScriptRuntime, ScriptRuntimeConfigs
-
-    scriptdata = ScriptData()
-    scriptdata.ScriptPath = graph_path
-
-    config = ScriptRuntimeConfigs()
-    runtime = ScriptRuntime(scriptdata, config)
-
-    engine = DynamoBIMEngine()
-    engine.Execute(runtime)
+if not os.path.exists(dyn_path):
+    forms.alert('Could not find script.dyn:\n{}'.format(dyn_path), exitscript=True)
 
 try:
-    run_graph(dyn_file)
+    clr.AddReference('DynamoRevitDS')
+except:
+    try:
+        clr.AddReference('DynamoRevit')
+    except Exception as ex:
+        forms.alert('Could not load DynamoRevit assembly.\n\n{}'.format(ex), exitscript=True)
 
-except Exception as ex:
-    msg = str(ex)
-    logger.error(msg)
+from Dynamo.Applications import DynamoRevit, DynamoRevitCommandData, JournalKeys
 
-    forms.alert(
-        "Dynamo failed while initializing inside Revit.\n\n"
-        "This usually means Dynamo itself cannot start cleanly in this session,\n"
-        "not that the graph path is wrong.\n\n"
-        "Try:\n"
-        "1. Open Dynamo manually in Revit\n"
-        "2. Disable Dynamo packages/custom nodes\n"
-        "3. Update/Reboot Revit\n"
-        "4. Test again\n\n"
-        "Error:\n{}".format(msg),
-        exitscript=True
-    )
+cmd_data = DynamoRevitCommandData()
+cmd_data.Application = __revit__
+
+journal_data = {
+    JournalKeys.ShowUiKey: 'False',
+    JournalKeys.AutomationModeKey: 'True',
+    JournalKeys.DynPathKey: dyn_path,
+    JournalKeys.DynPathExecuteKey: 'True',
+    JournalKeys.ForceManualRunKey: 'False',
+    JournalKeys.ModelShutDownKey: 'True',
+    JournalKeys.ModelNodesInfo: 'False'
+}
+
+cmd_data.JournalData = journal_data
+
+dynamo = DynamoRevit()
+result = dynamo.ExecuteCommand(cmd_data)
+
+if result != Result.Succeeded:
+    forms.alert('Dynamo did not return Result.Succeeded.\nReturned: {}'.format(result))
