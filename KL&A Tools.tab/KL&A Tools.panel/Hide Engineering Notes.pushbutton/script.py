@@ -147,9 +147,7 @@
 __title__ = "Hide/Unhide Engineer Notes"
 
 from pyrevit import revit, DB, forms, script
-from pyrevit.coreutils import ribbon
 import clr
-import os
 
 clr.AddReference("System")
 from System.Collections.Generic import List
@@ -165,31 +163,10 @@ TARGET_VIEW_TYPES = {
     DB.ViewType.Schedule,
 }
 
-ICON_NOT_HIDDEN = "icon.png"
-ICON_HIDDEN = "icon_hidden.png"
-
-
-def get_bundle_dir():
-    return os.path.dirname(__file__)
-
-
-def get_icon_path(hidden_state):
-    bundle_dir = get_bundle_dir()
-    icon_name = ICON_HIDDEN if hidden_state else ICON_NOT_HIDDEN
-    return os.path.join(bundle_dir, icon_name)
-
 
 def set_button_icon(hidden_state):
     try:
-        cmd_info = script.get_info()
-        cmd_uid = cmd_info.command_uniqueid
-        ui_button = ribbon.get_uibutton(cmd_uid)
-        if not ui_button:
-            return
-
-        icon_path = get_icon_path(hidden_state)
-        if os.path.exists(icon_path):
-            ui_button.set_icon(icon_path, icon_size=ribbon.ICON_LARGE)
+        script.toggle_icon(hidden_state)
     except:
         pass
 
@@ -260,13 +237,19 @@ def is_any_matching_note_hidden(view_note_map):
         view = item["view"]
         ids = item["ids"]
 
-        for eid in ids:
-            try:
-                hidden_ids = view.GetHiddenElementIds()
-                if hidden_ids and hidden_ids.Contains(eid):
-                    return True
-            except:
-                pass
+        try:
+            hidden_ids = view.GetHiddenElementIds()
+            if not hidden_ids:
+                continue
+
+            for eid in ids:
+                try:
+                    if hidden_ids.Contains(eid):
+                        return True
+                except:
+                    pass
+        except:
+            pass
 
     return False
 
@@ -282,7 +265,7 @@ def get_current_hidden_state():
     return is_any_matching_note_hidden(view_note_map)
 
 
-# Set icon at script start to reflect current model state
+# Set icon at script start based on actual current state
 set_button_icon(get_current_hidden_state())
 
 hide_elements = forms.alert(
@@ -299,6 +282,7 @@ target_views = collect_target_views(doc)
 matching_notes = collect_matching_textnotes(doc)
 
 if not target_views:
+    set_button_icon(False)
     forms.alert("No target views found.", exitscript=True)
 
 if not matching_notes:
@@ -343,12 +327,9 @@ with revit.Transaction("Hide/Unhide Engineer Notes"):
 
     doc.Regenerate()
 
-# Update icon after action
-if hide_elements:
-    set_button_icon(True)
-else:
-    # Re-check because some views may still have hidden notes
-    set_button_icon(get_current_hidden_state())
+# Refresh icon after action based on actual resulting state
+final_hidden_state = get_current_hidden_state()
+set_button_icon(final_hidden_state)
 
 msg = (
     "Done.\n\n"
@@ -356,13 +337,15 @@ msg = (
     "Matched text notes: {1}\n"
     "Views processed: {2}\n"
     "Views changed: {3}\n"
-    "Note actions attempted: {4}"
+    "Note actions attempted: {4}\n"
+    "Button state: {5}"
 ).format(
     "Hide" if hide_elements else "Unhide",
     matched_count,
     processed_views,
     changed_views,
-    changed_notes
+    changed_notes,
+    "Green (hidden)" if final_hidden_state else "Orange (not hidden)"
 )
 
 if failed:
