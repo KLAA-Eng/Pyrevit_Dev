@@ -226,8 +226,7 @@
 # forms.alert(msg)
 
 # -*- coding: utf-8 -*-
-__title__ = "Hide/Unhide KLAA Notes"
-
+__title__ = "Hide/Unhide KLAA Text Notes"
 from pyrevit import revit, DB, forms
 import clr
 clr.AddReference("System")
@@ -235,14 +234,7 @@ from System.Collections.Generic import List
 
 doc = revit.doc
 
-GENERIC_ANNOTATION_PREFIXES = [
-    "KLAA_",
-    "BGA",
-    "ZTBA"
-]
-
 TEXTNOTE_TYPE_PREFIX = "KLAA - ENGINEER'S NOTE"
-
 TARGET_VIEW_TYPES = {
     DB.ViewType.EngineeringPlan,
     DB.ViewType.Legend,
@@ -252,7 +244,7 @@ TARGET_VIEW_TYPES = {
 }
 
 hide_elements = forms.alert(
-    "Choose action:\n\nYes = Hide elements\nNo = Unhide elements",
+    "Choose action:\n\nYes = Hide text notes\nNo = Unhide text notes",
     yes=True,
     no=True,
     ok=False
@@ -263,93 +255,55 @@ if hide_elements is None:
 
 
 def get_type_name(element, document):
-    type_id = element.GetTypeId()
-    if type_id == DB.ElementId.InvalidElementId:
+    etype = document.GetElement(element.GetTypeId())
+    if not etype:
         return None
-    etype = document.GetElement(type_id)
-    if etype:
-        p = etype.get_Parameter(DB.BuiltInParameter.SYMBOL_NAME_PARAM)
-        if p and p.HasValue:
-            return p.AsString()
-        return etype.Name
-    return None
+    p = etype.get_Parameter(DB.BuiltInParameter.SYMBOL_NAME_PARAM)
+    if p and p.HasValue:
+        return p.AsString()
+    return etype.Name
 
 
-def starts_with_any(value, prefixes):
-    if not value:
-        return False
-    value_upper = value.upper()
-    return any(value_upper.startswith(p.upper()) for p in prefixes)
+textnotes = (
+    DB.FilteredElementCollector(doc)
+    .OfClass(DB.TextNote)
+    .WhereElementIsNotElementType()
+    .ToElements()
+)
 
+view_to_ids = {}
+match_count = 0
 
-def collect_target_views(document):
-    views = DB.FilteredElementCollector(document).OfClass(DB.View).ToElements()
-    result = []
-    for v in views:
-        if v.IsTemplate:
-            continue
-        if v.ViewType in TARGET_VIEW_TYPES:
-            result.append(v)
-    return result
+for note in textnotes:
+    type_name = get_type_name(note, doc)
+    if not type_name:
+        continue
+    if not type_name.upper().startswith(TEXTNOTE_TYPE_PREFIX.upper()):
+        continue
 
+    owner_view = doc.GetElement(note.OwnerViewId)
+    if not owner_view or owner_view.IsTemplate:
+        continue
+    if owner_view.ViewType not in TARGET_VIEW_TYPES:
+        continue
 
-def collect_generic_annotation_instances(document):
-    elems = (
-        DB.FilteredElementCollector(document)
-        .OfCategory(DB.BuiltInCategory.OST_GenericAnnotation)
-        .WhereElementIsNotElementType()
-        .ToElements()
-    )
+    match_count += 1
+    key = owner_view.Id.IntegerValue
+    if key not in view_to_ids:
+        view_to_ids[key] = {"view": owner_view, "ids": List[DB.ElementId]()}
+    view_to_ids[key]["ids"].Add(note.Id)
 
-    matches = []
-    for elem in elems:
-        type_name = get_type_name(elem, document)
-        if starts_with_any(type_name, GENERIC_ANNOTATION_PREFIXES):
-            matches.append(elem)
-    return matches
+processed = 0
+failed = []
 
+with revit.Transaction("Hide/Unhide KLAA text notes by owner view"):
+    for item in view_to_ids.values():
+        view = item["view"]
+        ids_in_view = item["ids"]
 
-def collect_textnote_instances_by_type_prefix(document):
-    textnotes = (
-        DB.FilteredElementCollector(document)
-        .OfClass(DB.TextNote)
-        .WhereElementIsNotElementType()
-        .ToElements()
-    )
-
-    matches = []
-    for note in textnotes:
-        type_name = get_type_name(note, document)
-        if type_name and type_name.upper().startswith(TEXTNOTE_TYPE_PREFIX.upper()):
-            matches.append(note)
-    return matches
-
-
-ga_elements = collect_generic_annotation_instances(doc)
-textnote_elements = collect_textnote_instances_by_type_prefix(doc)
-target_views = collect_target_views(doc)
-
-all_element_ids = {}
-for e in ga_elements + textnote_elements:
-    all_element_ids[e.Id.IntegerValue] = e.Id
-
-all_element_ids = list(all_element_ids.values())
-
-if not all_element_ids:
-    forms.alert("No matching elements found.", exitscript=True)
-
-if not target_views:
-    forms.alert("No matching target views found.", exitscript=True)
-
-processed_views = 0
-failed_views = []
-
-with revit.Transaction("Hide/Unhide targeted annotation elements in views"):
-    for view in target_views:
         try:
             ids_to_process = List[DB.ElementId]()
-
-            for eid in all_element_ids:
+            for eid in ids_in_view:
                 try:
                     is_hidden = view.IsElementHidden(eid)
                     if hide_elements and not is_hidden:
@@ -365,27 +319,17 @@ with revit.Transaction("Hide/Unhide targeted annotation elements in views"):
                 else:
                     view.UnhideElements(ids_to_process)
 
-            processed_views += 1
-
+            processed += 1
         except Exception as ex:
-            failed_views.append("{}: {}".format(view.Name, str(ex)))
+            failed.append("{}: {}".format(view.Name, str(ex)))
 
-msg = (
-    "Done.\n\n"
-    "Action: {0}\n"
-    "Target views processed: {1}\n"
-    "Generic annotations matched: {2}\n"
-    "Text notes matched: {3}\n"
-    "Total unique elements targeted: {4}"
-).format(
+msg = "Done.\n\nAction: {0}\nMatched text notes: {1}\nViews processed: {2}".format(
     "Hide" if hide_elements else "Unhide",
-    processed_views,
-    len(ga_elements),
-    len(textnote_elements),
-    len(all_element_ids)
+    match_count,
+    processed
 )
 
-if failed_views:
-    msg += "\n\nViews with issues:\n- " + "\n- ".join(failed_views[:20])
+if failed:
+    msg += "\n\nViews with issues:\n- " + "\n- ".join(failed[:20])
 
 forms.alert(msg)
