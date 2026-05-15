@@ -1,0 +1,7 @@
+engine: 
+  clean: true
+title:
+  en_us: Hide/Unhide Engineering Notes
+
+tooltip:
+  en_us: Changes Engineering Note Visibility
