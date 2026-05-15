@@ -300,54 +300,196 @@
 
 #TRY JUST A SINGLE SELECTED NOTE
 # -*- coding: utf-8 -*-
+# from pyrevit import revit, DB, forms
+# import clr
+# clr.AddReference("System")
+# from System.Collections.Generic import List
+
+# uidoc = revit.uidoc
+# doc = revit.doc
+# view = doc.ActiveView
+
+# sel_ids = list(uidoc.Selection.GetElementIds())
+# if len(sel_ids) != 1:
+#     forms.alert("Select exactly one text note in the active view first.", exitscript=True)
+
+# eid = sel_ids[0]
+# el = doc.GetElement(eid)
+
+# lines = []
+# lines.append("Element class: {}".format(el.GetType().Name))
+# lines.append("Element id: {}".format(eid.IntegerValue))
+# lines.append("Active view: {}".format(view.Name))
+# lines.append("OwnerViewId: {}".format(el.OwnerViewId.IntegerValue if hasattr(el, "OwnerViewId") else "n/a"))
+
+# try:
+#     lines.append("CanBeHidden(active view): {}".format(el.CanBeHidden(view)))
+# except Exception as ex:
+#     lines.append("CanBeHidden error: {}".format(str(ex)))
+
+# try:
+#     lines.append("Before hidden: {}".format(view.IsElementHidden(eid)))
+# except Exception as ex:
+#     lines.append("Before hidden check error: {}".format(str(ex)))
+
+# hide_error = None
+# try:
+#     with revit.Transaction("Test Hide One Text Note"):
+#         ids = List[DB.ElementId]()
+#         ids.Add(eid)
+#         view.HideElements(ids)
+#         doc.Regenerate()
+# except Exception as ex:
+#     hide_error = str(ex)
+
+# if hide_error:
+#     lines.append("HideElements error: {}".format(hide_error))
+# else:
+#     try:
+#         lines.append("After hidden: {}".format(view.IsElementHidden(eid)))
+#     except Exception as ex:
+#         lines.append("After hidden check error: {}".format(str(ex)))
+
+# forms.alert("\n".join(lines))
+
+# -*- coding: utf-8 -*-
+__title__ = "Hide/Unhide Engineer Notes"
+
 from pyrevit import revit, DB, forms
 import clr
 clr.AddReference("System")
 from System.Collections.Generic import List
 
-uidoc = revit.uidoc
 doc = revit.doc
-view = doc.ActiveView
 
-sel_ids = list(uidoc.Selection.GetElementIds())
-if len(sel_ids) != 1:
-    forms.alert("Select exactly one text note in the active view first.", exitscript=True)
+TEXTNOTE_TYPE_PREFIX = "KLAA - ENGINEER'S NOTE"
+TARGET_VIEW_TYPES = {
+    DB.ViewType.EngineeringPlan,
+    DB.ViewType.Legend,
+    DB.ViewType.DraftingView,
+    DB.ViewType.Detail,
+    DB.ViewType.Schedule,
+}
 
-eid = sel_ids[0]
-el = doc.GetElement(eid)
+hide_elements = forms.alert(
+    "Choose action:\n\nYes = Hide engineer notes\nNo = Unhide engineer notes",
+    yes=True,
+    no=True,
+    ok=False
+)
 
-lines = []
-lines.append("Element class: {}".format(el.GetType().Name))
-lines.append("Element id: {}".format(eid.IntegerValue))
-lines.append("Active view: {}".format(view.Name))
-lines.append("OwnerViewId: {}".format(el.OwnerViewId.IntegerValue if hasattr(el, "OwnerViewId") else "n/a"))
+if hide_elements is None:
+    forms.alert("Operation cancelled.", exitscript=True)
 
-try:
-    lines.append("CanBeHidden(active view): {}".format(el.CanBeHidden(view)))
-except Exception as ex:
-    lines.append("CanBeHidden error: {}".format(str(ex)))
 
-try:
-    lines.append("Before hidden: {}".format(view.IsElementHidden(eid)))
-except Exception as ex:
-    lines.append("Before hidden check error: {}".format(str(ex)))
+def get_textnote_type_name(note):
+    note_type = doc.GetElement(note.GetTypeId())
+    if note_type is None:
+        return None
 
-hide_error = None
-try:
-    with revit.Transaction("Test Hide One Text Note"):
-        ids = List[DB.ElementId]()
-        ids.Add(eid)
-        view.HideElements(ids)
-        doc.Regenerate()
-except Exception as ex:
-    hide_error = str(ex)
+    p = note_type.get_Parameter(DB.BuiltInParameter.SYMBOL_NAME_PARAM)
+    if p and p.HasValue:
+        return p.AsString()
 
-if hide_error:
-    lines.append("HideElements error: {}".format(hide_error))
-else:
-    try:
-        lines.append("After hidden: {}".format(view.IsElementHidden(eid)))
-    except Exception as ex:
-        lines.append("After hidden check error: {}".format(str(ex)))
+    return note_type.Name
 
-forms.alert("\n".join(lines))
+
+def collect_target_views(document):
+    views = DB.FilteredElementCollector(document).OfClass(DB.View).ToElements()
+    result = []
+    for v in views:
+        if v.IsTemplate:
+            continue
+        if v.ViewType in TARGET_VIEW_TYPES:
+            result.append(v)
+    return result
+
+
+def collect_matching_textnotes(document):
+    notes = (
+        DB.FilteredElementCollector(document)
+        .OfClass(DB.TextNote)
+        .WhereElementIsNotElementType()
+        .ToElements()
+    )
+
+    matches = []
+    for note in notes:
+        type_name = get_textnote_type_name(note)
+        if type_name and type_name.upper().startswith(TEXTNOTE_TYPE_PREFIX.upper()):
+            matches.append(note)
+    return matches
+
+
+target_views = collect_target_views(doc)
+matching_notes = collect_matching_textnotes(doc)
+
+if not target_views:
+    forms.alert("No target views found.", exitscript=True)
+
+if not matching_notes:
+    forms.alert("No matching engineer notes found.", exitscript=True)
+
+matched_count = len(matching_notes)
+processed_views = 0
+changed_views = 0
+changed_notes = 0
+failed = []
+
+with revit.Transaction("Hide/Unhide Engineer Notes"):
+    for view in target_views:
+        try:
+            ids_for_view = []
+
+            for note in matching_notes:
+                try:
+                    # Only attempt on notes that can be hidden in this view
+                    if note.CanBeHidden(view):
+                        ids_for_view.append(note.Id)
+                except:
+                    pass
+
+            if not ids_for_view:
+                processed_views += 1
+                continue
+
+            net_ids = List[DB.ElementId](ids_for_view)
+
+            if hide_elements:
+                view.HideElements(net_ids)
+            else:
+                try:
+                    view.UnhideElements(net_ids)
+                except:
+                    # Some views may have none of these hidden; ignore
+                    pass
+
+            changed_views += 1
+            changed_notes += len(ids_for_view)
+            processed_views += 1
+
+        except Exception as ex:
+            failed.append("{}: {}".format(view.Name, str(ex)))
+            processed_views += 1
+
+    doc.Regenerate()
+
+msg = (
+    "Done.\n\n"
+    "Action: {0}\n"
+    "Matched text notes: {1}\n"
+    "Views processed: {2}\n"
+    "Views changed: {3}\n"
+    "Note actions attempted: {4}"
+).format(
+    "Hide" if hide_elements else "Unhide",
+    matched_count,
+    processed_views,
+    changed_views,
+    changed_notes
+)
+
+if failed:
+    msg += "\n\nViews with issues:\n- " + "\n- ".join(failed[:20])
+
+forms.alert(msg)
