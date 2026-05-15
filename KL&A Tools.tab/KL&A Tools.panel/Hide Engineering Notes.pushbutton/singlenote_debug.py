@@ -10,7 +10,7 @@ view = doc.ActiveView
 
 sel_ids = list(uidoc.Selection.GetElementIds())
 if len(sel_ids) != 1:
-    forms.alert("Select exactly one text note in the active view first.", exitscript=True)
+    forms.alert("Select a single text note in the active view first.", exitscript=True)
 
 eid = sel_ids[0]
 el = doc.GetElement(eid)
