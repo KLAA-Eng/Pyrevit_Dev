@@ -43,8 +43,119 @@
 # forms.alert('Dynamo launch returned: {}'.format(result))
 
 
+###LAST SEMI WORKING ATTEMPT
+#
+# __title__ = "Hide/Unhide KLAA Text Notes"
+# from pyrevit import revit, DB, forms
+# import clr
+# clr.AddReference("System")
+# from System.Collections.Generic import List
 
+# doc = revit.doc
+
+# TEXTNOTE_TYPE_PREFIX = "KLAA - ENGINEER'S NOTE"
+# TARGET_VIEW_TYPES = {
+#     DB.ViewType.EngineeringPlan,
+#     DB.ViewType.Legend,
+#     DB.ViewType.DraftingView,
+#     DB.ViewType.Detail,
+#     DB.ViewType.Schedule,
+# }
+
+# hide_elements = forms.alert(
+#     "Choose action:\n\nYes = Hide text notes\nNo = Unhide text notes",
+#     yes=True,
+#     no=True,
+#     ok=False
+# )
+
+# if hide_elements is None:
+#     forms.alert("Operation cancelled.", exitscript=True)
+
+
+# def get_type_name(element, document):
+#     etype = document.GetElement(element.GetTypeId())
+#     if not etype:
+#         return None
+#     p = etype.get_Parameter(DB.BuiltInParameter.SYMBOL_NAME_PARAM)
+#     if p and p.HasValue:
+#         return p.AsString()
+#     return etype.Name
+
+
+# textnotes = (
+#     DB.FilteredElementCollector(doc)
+#     .OfClass(DB.TextNote)
+#     .WhereElementIsNotElementType()
+#     .ToElements()
+# )
+
+# view_to_ids = {}
+# match_count = 0
+
+# for note in textnotes:
+#     type_name = get_type_name(note, doc)
+#     if not type_name:
+#         continue
+#     if not type_name.upper().startswith(TEXTNOTE_TYPE_PREFIX.upper()):
+#         continue
+
+#     owner_view = doc.GetElement(note.OwnerViewId)
+#     if not owner_view or owner_view.IsTemplate:
+#         continue
+#     if owner_view.ViewType not in TARGET_VIEW_TYPES:
+#         continue
+
+#     match_count += 1
+#     key = owner_view.Id.IntegerValue
+#     if key not in view_to_ids:
+#         view_to_ids[key] = {"view": owner_view, "ids": List[DB.ElementId]()}
+#     view_to_ids[key]["ids"].Add(note.Id)
+
+# processed = 0
+# failed = []
+
+# with revit.Transaction("Hide/Unhide KLAA text notes by owner view"):
+#     for item in view_to_ids.values():
+#         view = item["view"]
+#         ids_in_view = item["ids"]
+
+#         try:
+#             ids_to_process = List[DB.ElementId]()
+#             for eid in ids_in_view:
+#                 try:
+#                     is_hidden = view.IsElementHidden(eid)
+#                     if hide_elements and not is_hidden:
+#                         ids_to_process.Add(eid)
+#                     elif not hide_elements and is_hidden:
+#                         ids_to_process.Add(eid)
+#                 except:
+#                     pass
+
+#             if ids_to_process.Count > 0:
+#                 if hide_elements:
+#                     view.HideElements(ids_to_process)
+#                 else:
+#                     view.UnhideElements(ids_to_process)
+
+#             processed += 1
+#         except Exception as ex:
+#             failed.append("{}: {}".format(view.Name, str(ex)))
+
+# msg = "Done.\n\nAction: {0}\nMatched text notes: {1}\nViews processed: {2}".format(
+#     "Hide" if hide_elements else "Unhide",
+#     match_count,
+#     processed
+# )
+
+# if failed:
+#     msg += "\n\nViews with issues:\n- " + "\n- ".join(failed[:20])
+
+# forms.alert(msg)
+
+# -*- coding: utf-8 -*-
 __title__ = "Hide/Unhide KLAA Text Notes"
+
 from pyrevit import revit, DB, forms
 import clr
 clr.AddReference("System")
@@ -72,14 +183,16 @@ if hide_elements is None:
     forms.alert("Operation cancelled.", exitscript=True)
 
 
-def get_type_name(element, document):
-    etype = document.GetElement(element.GetTypeId())
-    if not etype:
+def get_textnote_type_name(note):
+    note_type = doc.GetElement(note.GetTypeId())
+    if not note_type:
         return None
-    p = etype.get_Parameter(DB.BuiltInParameter.SYMBOL_NAME_PARAM)
+
+    p = note_type.get_Parameter(DB.BuiltInParameter.SYMBOL_NAME_PARAM)
     if p and p.HasValue:
         return p.AsString()
-    return etype.Name
+
+    return note_type.Name
 
 
 textnotes = (
@@ -89,62 +202,91 @@ textnotes = (
     .ToElements()
 )
 
-view_to_ids = {}
-match_count = 0
+view_map = {}
+matched = 0
 
 for note in textnotes:
-    type_name = get_type_name(note, doc)
+    type_name = get_textnote_type_name(note)
     if not type_name:
         continue
     if not type_name.upper().startswith(TEXTNOTE_TYPE_PREFIX.upper()):
         continue
 
     owner_view = doc.GetElement(note.OwnerViewId)
-    if not owner_view or owner_view.IsTemplate:
+    if owner_view is None or owner_view.IsTemplate:
         continue
     if owner_view.ViewType not in TARGET_VIEW_TYPES:
         continue
 
-    match_count += 1
+    try:
+        if not note.CanBeHidden(owner_view):
+            continue
+    except:
+        continue
+
     key = owner_view.Id.IntegerValue
-    if key not in view_to_ids:
-        view_to_ids[key] = {"view": owner_view, "ids": List[DB.ElementId]()}
-    view_to_ids[key]["ids"].Add(note.Id)
+    if key not in view_map:
+        view_map[key] = {
+            "view": owner_view,
+            "ids": []
+        }
+
+    view_map[key]["ids"].append(note.Id)
+    matched += 1
 
 processed = 0
+changed = 0
 failed = []
 
-with revit.Transaction("Hide/Unhide KLAA text notes by owner view"):
-    for item in view_to_ids.values():
+with revit.Transaction("Hide/Unhide KLAA text notes"):
+    for item in view_map.values():
         view = item["view"]
-        ids_in_view = item["ids"]
+        raw_ids = item["ids"]
 
         try:
-            ids_to_process = List[DB.ElementId]()
-            for eid in ids_in_view:
+            valid_ids = []
+            for eid in raw_ids:
                 try:
-                    is_hidden = view.IsElementHidden(eid)
-                    if hide_elements and not is_hidden:
-                        ids_to_process.Add(eid)
-                    elif not hide_elements and is_hidden:
-                        ids_to_process.Add(eid)
+                    el = doc.GetElement(eid)
+                    if el is None:
+                        continue
+                    if hide_elements:
+                        if not view.IsElementHidden(eid):
+                            valid_ids.append(eid)
+                    else:
+                        if view.IsElementHidden(eid):
+                            valid_ids.append(eid)
                 except:
                     pass
 
-            if ids_to_process.Count > 0:
+            if valid_ids:
+                net_ids = List[DB.ElementId](valid_ids)
+
                 if hide_elements:
-                    view.HideElements(ids_to_process)
+                    view.HideElements(net_ids)
                 else:
-                    view.UnhideElements(ids_to_process)
+                    view.UnhideElements(net_ids)
+
+                changed += len(valid_ids)
 
             processed += 1
+
         except Exception as ex:
             failed.append("{}: {}".format(view.Name, str(ex)))
 
-msg = "Done.\n\nAction: {0}\nMatched text notes: {1}\nViews processed: {2}".format(
+    doc.Regenerate()
+
+msg = (
+    "Done.\n\n"
+    "Action: {0}\n"
+    "Matched text notes: {1}\n"
+    "Views processed: {2}\n"
+    "Notes changed: {3}"
+).format(
     "Hide" if hide_elements else "Unhide",
-    match_count,
-    processed
+    matched,
+    processed,
+    changed
 )
 
 if failed:
