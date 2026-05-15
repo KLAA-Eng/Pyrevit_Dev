@@ -15,7 +15,7 @@ uiapp = HOST_APP.uiapp
 uidoc = uiapp.ActiveUIDocument
 
 if uidoc is None or uidoc.Document is None:
-    forms.alert('Open a Revit project or family document first, then run the button.', exitscript=True)
+    forms.alert('Open a Revit model or family first.', exitscript=True)
 
 try:
     clr.AddReference('DynamoRevitDS')
@@ -24,22 +24,20 @@ except:
 
 from Dynamo.Applications import DynamoRevit, DynamoRevitCommandData, JournalKeys
 
-jrnl = {
-    JournalKeys.ShowUiKey: 'False',
+journal_data = {
+    JournalKeys.ShowUiKey: 'True',
     JournalKeys.AutomationModeKey: 'True',
     JournalKeys.DynPathKey: dyn_path,
     JournalKeys.DynPathExecuteKey: 'True',
     JournalKeys.ForceManualRunKey: 'False',
-    JournalKeys.ModelShutDownKey: 'True',
-    JournalKeys.ModelNodesInfo: 'False'
+    JournalKeys.ModelShutDownKey: 'False',
+    JournalKeys.ModelNodesInfo: 'True'
 }
 
 cmd = DynamoRevitCommandData()
 cmd.Application = uiapp
-cmd.JournalData = jrnl
+cmd.JournalData = journal_data
 
-dynamo = DynamoRevit()
-result = dynamo.ExecuteCommand(cmd)
+result = DynamoRevit().ExecuteCommand(cmd)
 
-if result != Result.Succeeded:
-    forms.alert('Dynamo returned: {}'.format(result))
+forms.alert('Dynamo launch returned: {}'.format(result))
