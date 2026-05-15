@@ -164,9 +164,16 @@ TARGET_VIEW_TYPES = {
 }
 
 
-def set_button_icon(hidden_state):
+def set_button_green_hidden():
     try:
-        script.toggle_icon(hidden_state)
+        script.toggle_icon(True)   # uses on.png
+    except:
+        pass
+
+
+def set_button_orange_not_hidden():
+    try:
+        script.toggle_icon(False)  # uses off.png
     except:
         pass
 
@@ -232,42 +239,6 @@ def build_view_note_map(target_views, matching_notes):
     return view_note_map
 
 
-def is_any_matching_note_hidden(view_note_map):
-    for item in view_note_map.values():
-        view = item["view"]
-        ids = item["ids"]
-
-        try:
-            hidden_ids = view.GetHiddenElementIds()
-            if not hidden_ids:
-                continue
-
-            for eid in ids:
-                try:
-                    if hidden_ids.Contains(eid):
-                        return True
-                except:
-                    pass
-        except:
-            pass
-
-    return False
-
-
-def get_current_hidden_state():
-    target_views = collect_target_views(doc)
-    matching_notes = collect_matching_textnotes(doc)
-
-    if not target_views or not matching_notes:
-        return False
-
-    view_note_map = build_view_note_map(target_views, matching_notes)
-    return is_any_matching_note_hidden(view_note_map)
-
-
-# Set icon at script start based on actual current state
-set_button_icon(get_current_hidden_state())
-
 hide_elements = forms.alert(
     "Choose action:\n\nYes = Hide engineer notes\nNo = Unhide engineer notes",
     yes=True,
@@ -282,17 +253,16 @@ target_views = collect_target_views(doc)
 matching_notes = collect_matching_textnotes(doc)
 
 if not target_views:
-    set_button_icon(False)
     forms.alert("No target views found.", exitscript=True)
 
 if not matching_notes:
-    set_button_icon(False)
+    set_button_orange_not_hidden()
     forms.alert("No matching engineer notes found.", exitscript=True)
 
 view_note_map = build_view_note_map(target_views, matching_notes)
 
 if not view_note_map:
-    set_button_icon(False)
+    set_button_orange_not_hidden()
     forms.alert("No hideable matching engineer notes found in target views.", exitscript=True)
 
 matched_count = len(matching_notes)
@@ -327,9 +297,11 @@ with revit.Transaction("Hide/Unhide Engineer Notes"):
 
     doc.Regenerate()
 
-# Refresh icon after action based on actual resulting state
-final_hidden_state = get_current_hidden_state()
-set_button_icon(final_hidden_state)
+# Set icon directly from the action that just happened
+if hide_elements:
+    set_button_green_hidden()
+else:
+    set_button_orange_not_hidden()
 
 msg = (
     "Done.\n\n"
@@ -338,14 +310,14 @@ msg = (
     "Views processed: {2}\n"
     "Views changed: {3}\n"
     "Note actions attempted: {4}\n"
-    "Button state: {5}"
+    "Button state set to: {5}"
 ).format(
     "Hide" if hide_elements else "Unhide",
     matched_count,
     processed_views,
     changed_views,
     changed_notes,
-    "Green (hidden)" if final_hidden_state else "Orange (not hidden)"
+    "Green (on.png)" if hide_elements else "Orange (off.png)"
 )
 
 if failed:
