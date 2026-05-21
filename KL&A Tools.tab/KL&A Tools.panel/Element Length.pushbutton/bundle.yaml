@@ -1,0 +1,7 @@
+engine: 
+  clean: true
+title:
+  en_us: "Element\nTakeoff"
+
+tooltip:
+  en_us: Computes cumulative length and volume of seleted elements
