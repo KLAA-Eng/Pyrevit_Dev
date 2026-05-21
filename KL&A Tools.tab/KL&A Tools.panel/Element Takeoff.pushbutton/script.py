@@ -2,7 +2,7 @@
 from pyrevit import revit, DB, forms, script
 
 # ---------------------------------------------------------------------------
-# Functions
+# functions
 # ---------------------------------------------------------------------------
 
 def get_element_length_ft(element):
@@ -37,7 +37,7 @@ def ft_to_str(decimal_feet):
     if remainder == 0:
         frac_str = ""
     else:
-        # Reduce fraction
+        #rounding
         from math import gcd
         g = gcd(remainder, 16)
         frac_str = ' {}/{}"'.format(remainder // g, 16 // g)
@@ -55,9 +55,8 @@ def ft_to_str(decimal_feet):
 # ---------------------------------------------------------------------------
 
 output = script.get_output()
-logger = script.get_logger()
 
-#Prompt user to pick elements
+#element selectin prompt
 with revit.ErrorSwallower():
     try:
         picked_refs = revit.pick_elements(
@@ -74,10 +73,8 @@ if not picked_refs:
     )
     script.exit()
 
-# Resolve element references
-doc = revit.doc
-elements = [doc.GetElement(ref) for ref in picked_refs if ref is not None]
-elements = [e for e in elements if e is not None]
+#revit.pick_elements() returns element objects
+elements = [e for e in picked_refs if e is not None]
 
 count = len(elements)
 if count == 0:
@@ -88,7 +85,7 @@ if count == 0:
     )
     script.exit()
 
-# append lengths and filter out elements without length parameter
+#append lengths to list, filter elements with no length parameter
 total_ft = 0.0
 no_length = []   # (id, category) for elements without a length param
 
@@ -106,7 +103,6 @@ output.print_md("---")
 output.print_md("**Elements selected:** {}".format(count))
 
 if total_ft > 0:
-    # Feet-inches display
     fi_str = ft_to_str(total_ft)
     output.print_md(
         "**Total cumulative length:** {}  *(= {:.0f} mm / {:.3f} m)*".format(fi_str)
@@ -115,11 +111,11 @@ else:
     output.print_md("no length parameters found")
 
 if no_length:
-    output.print_md("\n### Elements with no length parameter ({})".format(len(no_length)))
+    output.print_md("\n###Elements with no length parameter ({})".format(len(no_length)))
     output.print_md(
         "These elements were counted but excluded from the length total:"
     )
-    #group by category for readability
+    #group by category
     from collections import defaultdict
     by_cat = defaultdict(list)
     for eid, cat in no_length:
