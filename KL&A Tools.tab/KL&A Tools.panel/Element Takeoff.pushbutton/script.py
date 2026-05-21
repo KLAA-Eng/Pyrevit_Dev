@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 from pyrevit import revit, DB, forms, script
+from collections import defaultdict
 
 # ---------------------------------------------------------------------------
 # functions
 # ---------------------------------------------------------------------------
 
+def _gcd(a, b):
+    """Euclidean GCD — IronPython 2.7 does not expose math.gcd."""
+    while b:
+        a, b = b, a % b
+    return a
+
+
 def get_element_length_ft(element):
     """
     Return the length of *element* in internal Revit units (decimal feet),
     or None if the element has no usable length parameter.
-
-    Priority order:
-      1. Built-in CURVE_ELEM_LENGTH  (framing, walls, MEP runs …)
-      2. Built-in CURVE_ELEM_LENGTH on the host (shouldn't be needed often)
     """
     param = element.get_Parameter(DB.BuiltInParameter.CURVE_ELEM_LENGTH)
     if param and param.HasValue and param.StorageType == DB.StorageType.Double:
@@ -21,13 +25,13 @@ def get_element_length_ft(element):
 
 
 def ft_to_str(decimal_feet):
-    """Format a decimal-feet value as  X'-Y  Y/Z\"  (feet-inches-fractions)."""
+    """Format a decimal-feet value as  X'- Y Y/Z\"  (feet-inches-fractions)."""
     total_inches = decimal_feet * 12.0
     feet = int(total_inches // 12)
     inches = total_inches - feet * 12
 
     # Round to nearest 1/16"
-    sixteenths = round(inches * 16)
+    sixteenths = int(round(inches * 16))
     whole_inches = sixteenths // 16
     remainder = sixteenths % 16
 
@@ -37,9 +41,7 @@ def ft_to_str(decimal_feet):
     if remainder == 0:
         frac_str = ""
     else:
-        #rounding
-        from math import gcd
-        g = gcd(remainder, 16)
+        g = _gcd(remainder, 16)
         frac_str = ' {}/{}"'.format(remainder // g, 16 // g)
 
     if feet and whole_inches:
@@ -47,7 +49,7 @@ def ft_to_str(decimal_feet):
     elif feet:
         return "{}'- 0{}".format(feet, frac_str)
     else:
-        return '0\'- {}{}'.format(whole_inches, frac_str)
+        return "0'- {}{}".format(whole_inches, frac_str)
 
 
 # ---------------------------------------------------------------------------
@@ -56,7 +58,7 @@ def ft_to_str(decimal_feet):
 
 output = script.get_output()
 
-#element selectin prompt
+# Element selection prompt
 with revit.ErrorSwallower():
     try:
         picked_refs = revit.pick_elements(
@@ -73,7 +75,7 @@ if not picked_refs:
     )
     script.exit()
 
-#revit.pick_elements() returns element objects
+# revit.pick_elements() returns Element objects directly
 elements = [e for e in picked_refs if e is not None]
 
 count = len(elements)
@@ -85,9 +87,9 @@ if count == 0:
     )
     script.exit()
 
-#append lengths to list, filter elements with no length parameter
+# Accumulate lengths; track elements with no length parameter
 total_ft = 0.0
-no_length = []   # (id, category) for elements without a length param
+no_length = []
 
 for elem in elements:
     length = get_element_length_ft(elem)
@@ -97,32 +99,23 @@ for elem in elements:
         cat_name = elem.Category.Name if elem.Category else "Unknown"
         no_length.append((elem.Id.IntegerValue, cat_name))
 
-#print output
+# Print output
 output.print_md("# Selection Length Report")
 output.print_md("---")
 output.print_md("**Elements selected:** {}".format(count))
 
 if total_ft > 0:
-    fi_str = ft_to_str(total_ft)
-    output.print_md(
-        "**Total cumulative length:** {}  *(= {:.0f} mm / {:.3f} m)*".format(fi_str)
-    )
+    output.print_md("**Total cumulative length:** {}".format(ft_to_str(total_ft)))
 else:
-    output.print_md("no length parameters found")
+    output.print_md("**Total cumulative length:** N/A *(no length parameters found)*")
 
 if no_length:
-    output.print_md("\n###Elements with no length parameter ({})".format(len(no_length)))
-    output.print_md(
-        "These elements were counted but excluded from the length total:"
-    )
-    #group by category
-    from collections import defaultdict
+    output.print_md("\n### Elements with no length parameter ({})".format(len(no_length)))
+    output.print_md("These elements were counted but excluded from the length total:")
     by_cat = defaultdict(list)
     for eid, cat in no_length:
         by_cat[cat].append(eid)
     for cat, ids in sorted(by_cat.items()):
-        output.print_md(
-            "- **{}** — {} element(s)".format(cat, len(ids))
-        )
+        output.print_md("- **{}** — {} element(s)".format(cat, len(ids)))
 
 output.print_md("\n---\n*Lengths read from the CURVE\\_ELEM\\_LENGTH built-in parameter.*")
