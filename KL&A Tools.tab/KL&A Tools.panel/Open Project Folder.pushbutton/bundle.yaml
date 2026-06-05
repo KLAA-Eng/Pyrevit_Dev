@@ -1,6 +1,6 @@
 title:
-  en_us: Revit Standards Onenote
+  en_us: Link Project Folder
 tooltip:
-  en_us: Launches KL&A's Revit Standards Onenote Notebook.
+  en_us: Creates a quick link to the project folder on our shared server.
 
 context: zero-doc
