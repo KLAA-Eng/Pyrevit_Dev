@@ -1,7 +1,7 @@
 engine: 
   clean: true
 title:
-  en_us: Dynamo Script
+  en_us: "Dynamo\n Script"
 
 tooltip:
   en_us: Launches a Dynamo Script
