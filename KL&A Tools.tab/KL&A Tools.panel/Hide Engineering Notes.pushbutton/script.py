@@ -143,11 +143,11 @@ def ask_hide_or_unhide():
     result = dlg.Show()
 
     if result == TaskDialogResult.CommandLink1:
-        return True
+        return True, "Hide", "hidden"
     elif result == TaskDialogResult.CommandLink2:
-        return False
+        return False, "Unhide", "unhidden"
     else:
-        return None
+        return None, None, None
 
 hide_elements, action_label, action_word = ask_hide_or_unhide()
 
@@ -220,8 +220,10 @@ with revit.Transaction("Hide/Unhide Engineer Notes"):
 
             if view.ViewType == DB.ViewType.DrawingSheet:
                 sheet_views_changed += 1
+                sheet_notes_changed += len(valid,ids)
             else:
                 non_sheet_views_changed += 1
+                view_notes_changed += len(valid_ids)
 
         except Exception as ex:
             failed.append("{}: {}".format(view.Name, str(ex)))
