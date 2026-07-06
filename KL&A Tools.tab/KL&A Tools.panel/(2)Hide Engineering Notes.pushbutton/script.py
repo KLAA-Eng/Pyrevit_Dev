@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__title__ = "Hide/Unhide Engineer Notes"
+# __title__ = "Hide/Unhide Engineer Notes"
 
 from pyrevit import revit, DB, forms, script
 import clr

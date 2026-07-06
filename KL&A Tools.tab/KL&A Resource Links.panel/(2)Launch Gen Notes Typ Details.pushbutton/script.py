@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__title__ = "(2)Launch Gen Notes Typ Details"
+# __title__ = "(2)Launch Gen Notes Typ Details"
 
 import subprocess
 

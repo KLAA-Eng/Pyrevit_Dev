@@ -2,7 +2,7 @@
 Toggle visibility of engineering note elements across all views.
 Identifies elements where the Type Name parameter contains 'ENGINEER'.
 """
-__title__ = "Engineer\nNotes"
+#__title__ = "Engineer\nNotes"
 __doc__ = "Hides or unhides all engineering note text elements across all views."
 
 import clr
