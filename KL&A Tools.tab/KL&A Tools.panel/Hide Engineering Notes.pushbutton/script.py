@@ -6,6 +6,7 @@ import clr
 
 clr.AddReference("System")
 from System.Collections.Generic import List
+from Autodesk.Revit.UI import TaskDialog, TaskDialogCommandLinkId, TaskDialogCommonButtons, TaskDialogResult
 
 doc = revit.doc
 
@@ -126,12 +127,40 @@ def build_view_note_map(target_views, matching_notes):
     return view_note_map
 
 
-hide_elements = forms.alert(
-    "Choose action:\n\nYes = Hide engineer notes\nNo = Unhide engineer notes",
-    yes=True,
-    no=True,
-    ok=False
-)
+# hide_elements = forms.alert(
+#     "Choose action:\n\nYes = Hide engineer notes\nNo = Unhide engineer notes",
+#     yes=True,
+#     no=True,
+#     ok=False
+# )
+
+# if hide_elements is None:
+#     forms.alert("Operation cancelled.", exitscript=True)
+
+def ask_hide_or_unhide():
+    dlg = TaskDialog("Hide Engineering Notes")
+    dlg.TitleAutoPrefix = False
+    dlg.MainInstruction = "Choose action"
+    dlg.MainContent = "Select whether to hide or unhide engineer notes."
+    dlg.AddCommandLink(
+        TaskDialogCommandLinkId.CommandLink1,
+        "Hide engineer notes"
+    )
+    dlg.AddCommandLink(
+        TaskDialogCommandLinkId.CommandLink2,
+        "Unhide engineer notes"
+    )
+    dlg.CommonButtons = TaskDialogCommonButtons.Cancel
+    result = dlg.Show()
+
+    if result == TaskDialogResult.CommandLink1:
+        return True
+    elif result == TaskDialogResult.CommandLink2:
+        return False
+    else:
+        return None
+
+hide_elements = ask_hide_or_unhide()
 
 if hide_elements is None:
     forms.alert("Operation cancelled.", exitscript=True)
