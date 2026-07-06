@@ -126,17 +126,6 @@ def build_view_note_map(target_views, matching_notes):
 
     return view_note_map
 
-
-# hide_elements = forms.alert(
-#     "Choose action:\n\nYes = Hide engineer notes\nNo = Unhide engineer notes",
-#     yes=True,
-#     no=True,
-#     ok=False
-# )
-
-# if hide_elements is None:
-#     forms.alert("Operation cancelled.", exitscript=True)
-
 def ask_hide_or_unhide():
     dlg = TaskDialog("Hide Engineering Notes")
     dlg.TitleAutoPrefix = False
@@ -181,12 +170,15 @@ if not view_note_map:
     set_button_orange_not_hidden()
     forms.alert("No hideable matching engineer notes found in target views/sheets.", exitscript=True)
 
+# counters
 matched_count = len(matching_notes)
 processed_views = 0
 changed_views = 0
 changed_notes = 0
 sheet_views_changed = 0
 non_sheet_views_changed = 0
+view_notes_changed = 0
+sheet_notes_changed = 0
 failed = []
 
 with revit.Transaction("Hide/Unhide Engineer Notes"):
@@ -238,33 +230,44 @@ with revit.Transaction("Hide/Unhide Engineer Notes"):
 
     doc.Regenerate()
 
+# after transaction
 if hide_elements:
     set_button_green_hidden()
 else:
     set_button_orange_not_hidden()
 
+# DEBUG REPORT
+# msg = (
+#     "Done.\n\n"
+#     "Action: {0}\n"
+#     "Matched text notes: {1}\n"
+#     "Views/Sheets processed: {2}\n"
+#     "Views/Sheets changed: {3}\n"
+#     " - Regular views changed: {4}\n"
+#     " - Sheets changed: {5}\n"
+#     "Note actions completed: {6}\n"
+#     "Button state set to: {7}"
+# ).format(
+#     "Hide" if hide_elements else "Unhide",
+#     matched_count,
+#     processed_views,
+#     changed_views,
+#     non_sheet_views_changed,
+#     sheet_views_changed,
+#     changed_notes,
+#     "Green (on.png)" if hide_elements else "Orange (off.png)"
+# )
+
 msg = (
-    "Done.\n\n"
-    "Action: {0}\n"
-    "Matched text notes: {1}\n"
-    "Views/Sheets processed: {2}\n"
-    "Views/Sheets changed: {3}\n"
-    " - Regular views changed: {4}\n"
-    " - Sheets changed: {5}\n"
-    "Note actions completed: {6}\n"
-    "Button state set to: {7}"
+    "Number of engineer's notes {0} in views: {1}\n"
+    "Number of engineer's notes {0} on sheets: {2}"
 ).format(
-    "Hide" if hide_elements else "Unhide",
-    matched_count,
-    processed_views,
-    changed_views,
-    non_sheet_views_changed,
-    sheet_views_changed,
-    changed_notes,
-    "Green (on.png)" if hide_elements else "Orange (off.png)"
+    action_word,
+    view_notes_changed,
+    sheet_notes_changed
 )
 
 if failed:
-    msg += "\n\nViews/Sheets with issues:\n- " + "\n- ".join(failed[:20])
+    msg += "\n\nItems with issues:\n- " + "\n- ".join(failed[:20])
 
 forms.alert(msg)
