@@ -6,7 +6,12 @@ import clr
 
 clr.AddReference("System")
 from System.Collections.Generic import List
-from Autodesk.Revit.UI import TaskDialog, TaskDialogCommandLinkId, TaskDialogCommonButtons, TaskDialogResult
+from Autodesk.Revit.UI import (
+    TaskDialog,
+    TaskDialogCommandLinkId,
+    TaskDialogCommonButtons,
+    TaskDialogResult
+)
 
 doc = revit.doc
 
@@ -23,20 +28,19 @@ TARGET_VIEW_TYPES = {
 
 def set_button_green_hidden():
     try:
-        script.toggle_icon(True)   # uses on.png
+        script.toggle_icon(True)
     except:
         pass
 
 
 def set_button_orange_not_hidden():
     try:
-        script.toggle_icon(False)  # uses off.png
+        script.toggle_icon(False)
     except:
         pass
 
 
 def get_elementid_value(eid):
-    """Revit 2024/2025/2026-compatible ElementId numeric value."""
     if eid is None:
         return None
 
@@ -126,11 +130,13 @@ def build_view_note_map(target_views, matching_notes):
 
     return view_note_map
 
+
 def ask_hide_or_unhide():
     dlg = TaskDialog("Hide Engineering Notes")
     dlg.TitleAutoPrefix = False
     dlg.MainInstruction = "Choose action"
     dlg.MainContent = "Select whether to hide or unhide engineer notes."
+
     dlg.AddCommandLink(
         TaskDialogCommandLinkId.CommandLink1,
         "Hide engineer notes"
@@ -139,6 +145,7 @@ def ask_hide_or_unhide():
         TaskDialogCommandLinkId.CommandLink2,
         "Unhide engineer notes"
     )
+
     dlg.CommonButtons = TaskDialogCommonButtons.Cancel
     result = dlg.Show()
 
@@ -148,6 +155,7 @@ def ask_hide_or_unhide():
         return False, "Unhide", "unhidden"
     else:
         return None, None, None
+
 
 hide_elements, action_label, action_word = ask_hide_or_unhide()
 
@@ -170,13 +178,7 @@ if not view_note_map:
     set_button_orange_not_hidden()
     forms.alert("No hideable matching engineer notes found in target views/sheets.", exitscript=True)
 
-# counters
-matched_count = len(matching_notes)
 processed_views = 0
-changed_views = 0
-changed_notes = 0
-sheet_views_changed = 0
-non_sheet_views_changed = 0
 view_notes_changed = 0
 sheet_notes_changed = 0
 failed = []
@@ -215,14 +217,9 @@ with revit.Transaction("Hide/Unhide Engineer Notes"):
             else:
                 view.UnhideElements(net_ids)
 
-            changed_views += 1
-            changed_notes += len(valid_ids)
-
             if view.ViewType == DB.ViewType.DrawingSheet:
-                sheet_views_changed += 1
-                sheet_notes_changed += len(valid,ids)
+                sheet_notes_changed += len(valid_ids)
             else:
-                non_sheet_views_changed += 1
                 view_notes_changed += len(valid_ids)
 
         except Exception as ex:
@@ -232,7 +229,6 @@ with revit.Transaction("Hide/Unhide Engineer Notes"):
 
     doc.Regenerate()
 
-# after transaction
 if hide_elements:
     set_button_green_hidden()
 else:
@@ -242,22 +238,15 @@ else:
 # msg = (
 #     "Done.\n\n"
 #     "Action: {0}\n"
-#     "Matched text notes: {1}\n"
-#     "Views/Sheets processed: {2}\n"
-#     "Views/Sheets changed: {3}\n"
-#     " - Regular views changed: {4}\n"
-#     " - Sheets changed: {5}\n"
-#     "Note actions completed: {6}\n"
-#     "Button state set to: {7}"
+#     "Views/Sheets processed: {1}\n"
+#     "Notes {2} in views: {3}\n"
+#     "Notes {2} on sheets: {4}"
 # ).format(
-#     "Hide" if hide_elements else "Unhide",
-#     matched_count,
+#     action_label,
 #     processed_views,
-#     changed_views,
-#     non_sheet_views_changed,
-#     sheet_views_changed,
-#     changed_notes,
-#     "Green (on.png)" if hide_elements else "Orange (off.png)"
+#     action_word,
+#     view_notes_changed,
+#     sheet_notes_changed
 # )
 
 msg = (
