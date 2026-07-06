@@ -149,7 +149,7 @@ def ask_hide_or_unhide():
     else:
         return None
 
-hide_elements = ask_hide_or_unhide()
+hide_elements, action_label, action_word = ask_hide_or_unhide()
 
 if hide_elements is None:
     forms.alert("Operation cancelled.", exitscript=True)
