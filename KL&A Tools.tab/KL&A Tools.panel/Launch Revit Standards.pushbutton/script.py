@@ -7,4 +7,4 @@ onenote_uri = r"onenote:https://klaa.sharepoint.com/Shared%20Documents/Revit%20N
 
 subprocess.Popen(['cmd', '/c', 'start', '', onenote_uri], shell=False)
 
-##NOTES
+##NOTESgit
