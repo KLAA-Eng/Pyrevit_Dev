@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__title__ = "Open\n KL&A Revit Standards Onenote Notebook"
+__title__ = "(1)Launch Revit Standards"
 
 import subprocess
 

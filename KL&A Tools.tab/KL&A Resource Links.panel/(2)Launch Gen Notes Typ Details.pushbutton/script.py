@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__title__ = "Open\n KL&A General notes, Typical Details, Graphic Style Guide Bluebeam Session"
+__title__ = "(2)Launch Gen Notes Typ Details"
 
 import subprocess
 
