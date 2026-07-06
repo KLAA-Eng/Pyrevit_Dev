@@ -1,4 +1,4 @@
 layout:
-- "Launch\nDynamo Script"
-- "Hide/Unhide\nEngineering Notes"
-- "Element\nTakeoff"
+  - Launch Dynamo Script
+  - Hide Engineering Notes
+  - "Element Takeoff"
