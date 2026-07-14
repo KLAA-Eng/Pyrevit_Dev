@@ -1,5 +1,8 @@
 layout:
+  - Rename
+  - Revision
+  - Override 2D
+  - duplicate_sheets
+  - ViewRange
   - Copy Legends to Other Documents
-  - Highlight 2D
-  - Show View Range
-  - Who did that??
+  - Who Did That
