@@ -293,20 +293,20 @@ if hide_elements:
 else:
     set_button_orange_not_hidden()
 
-# DEBUG REPORT
-# msg = (
-#     "Done.\n\n"
-#     "Action: {0}\n"
-#     "Views/Sheets processed: {1}\n"
-#     "Notes {2} in views placed on eligible sheets: {3}\n"
-#     "Notes {2} on eligible sheets: {4}"
-# ).format(
-#     action_label,
-#     processed_views,
-#     action_word,
-#     view_notes_changed,
-#     sheet_notes_changed
-# )
+DEBUG REPORT
+msg = (
+    "Done.\n\n"
+    "Action: {0}\n"
+    "Views/Sheets processed: {1}\n"
+    "Notes {2} in views placed on eligible sheets: {3}\n"
+    "Notes {2} on eligible sheets: {4}"
+).format(
+    action_label,
+    processed_views,
+    action_word,
+    view_notes_changed,
+    sheet_notes_changed
+)
 
 msg = (
     "Number of engineer's notes {0} in views: {1}\n"
