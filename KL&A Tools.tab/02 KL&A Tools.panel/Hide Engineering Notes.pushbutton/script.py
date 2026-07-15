@@ -21,6 +21,7 @@ SCRIPT_VERSION = "2.0-debug"
 # ---------------------------------------------------------------------------
 # DEBUG: True  -> full diagnostic funnel printed to the pyRevit output window
 #         False -> quiet (only the summary alert)
+# You can also hold SHIFT while clicking the button to force debug mode.
 # ---------------------------------------------------------------------------
 DEBUG = True
 try:
@@ -38,7 +39,10 @@ TARGET_VIEW_TYPES = {
     DB.ViewType.Detail,
     DB.ViewType.Schedule,
     DB.ViewType.DrawingSheet,
-
+    # NOTE: Only *Structural Plans* are ViewType.EngineeringPlan.
+    # Mech/Plumb/Arch plan views are ViewType.FloorPlan, RCPs are CeilingPlan.
+    # If the diagnostic report shows notes being skipped in those view types,
+    # uncomment the lines below:
     # DB.ViewType.FloorPlan,
     # DB.ViewType.CeilingPlan,
     # DB.ViewType.Section,
@@ -220,7 +224,7 @@ def build_view_note_map(document, target_views, matching_notes,
 
         view = target_view_dict.get(key)
         if view is None:
-            # Diagnostic
+            # Diagnose WHY the owner view isn't a target
             owner = document.GetElement(owner_view_id)
             if owner is None:
                 label = u"<owner view not found>"
@@ -410,7 +414,7 @@ view_note_map = build_view_note_map(
     allowed_sheet_ids, placed_view_ids, diag
 )
 
-# --- Execute ---
+# --- Execute (only if there is something to do) ---
 processed_views = 0
 failed = diag["hide_failures"]
 
