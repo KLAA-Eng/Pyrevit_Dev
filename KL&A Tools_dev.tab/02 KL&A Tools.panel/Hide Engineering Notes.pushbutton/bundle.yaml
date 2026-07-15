@@ -1,7 +1,7 @@
 engine: 
   clean: true
 title:
-  en_us: "Hide/Unhide\nEngineering Notes"
+  en_us: "Hide/Unhide\nEng Notes"
 
 tooltip:
-  en_us: Changes Engineering Note Visibility
+  en_us: Changes Engineering Note Visibility on Sheet
