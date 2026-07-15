@@ -293,7 +293,7 @@ if hide_elements:
 else:
     set_button_orange_not_hidden()
 
-DEBUG REPORT
+#DEBUG REPORT
 msg = (
     "Done.\n\n"
     "Action: {0}\n"
