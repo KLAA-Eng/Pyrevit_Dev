@@ -553,9 +553,10 @@ if DEBUG:
 total_changed = diag["view_notes_changed"] + diag["sheet_notes_changed"]
 
 msg = (
-    u"Action: {0}  (script v{1})\n\n"
+    u"Action: {0}\n"
+#    u"Action: {0}  (script v{1})\n\n"
     u"Notes {2} in views: {3}\n"
-    u"  ...of which in dependent views: {4}\n"
+#    u"  ...of which in dependent views: {4}\n"
     u"Notes {2} on sheets: {5}"
 ).format(action_label, SCRIPT_VERSION, action_word,
          diag["view_notes_changed"], diag["dependent_notes_changed"],
