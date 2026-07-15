@@ -23,7 +23,7 @@ SCRIPT_VERSION = "2.1-dependents"
 #         False -> quiet (only the summary alert)
 # You can also hold SHIFT while clicking the button to force debug mode.
 # ---------------------------------------------------------------------------
-DEBUG = True
+DEBUG = False
 try:
     if __shiftclick__:
         DEBUG = True
