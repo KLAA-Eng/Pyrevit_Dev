@@ -6,28 +6,23 @@ from pyrevit import forms, revit, script
 from Autodesk.Revit.DB import ModelPathUtils
 
 
-# Replace these placeholders with the real Microsoft Form URL and field keys.
-# The field key names should match the query string keys from a prefilled link.
-FORM_BASE_URL = "https://forms.office.com/Pages/ResponsePage.aspx?id=REPLACE_ME"
+# Base ResponsePage URL only. Keep sample values out of this string.
+FORM_BASE_URL = "https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
 FIELD_MAP = {
-    "report_type": "REPORT_TYPE_FIELD",
-    "summary": "SUMMARY_FIELD",
-    "user_name": "USER_FIELD",
-    "revit_version": "REVIT_VERSION_FIELD",
-    "revit_build": "REVIT_BUILD_FIELD",
-    "document_title": "DOCUMENT_TITLE_FIELD",
-    "document_path": "DOCUMENT_PATH_FIELD",
-    "is_workshared": "WORKSHARED_FIELD",
-    "machine_name": "MACHINE_FIELD",
+    "report_type": "rd238bee241134be78f2f0f21eab8b1f3",
+    "subject": "r9ce9687c26eb4eeda8e9cfa798fe4188",
+    "user_name": "re12656beea964a95a038244508ce903f",
+    "revit_build": "r57d7fb02c8e34ef69930b3bef1230fa2",
+    "is_workshared": "rfdefb4c8c0ad4daa883dd1cbd40a2da0",
 }
 
 
 def has_form_configuration():
-    if "REPLACE_ME" in FORM_BASE_URL:
+    if not FORM_BASE_URL or "ResponsePage.aspx?id=" not in FORM_BASE_URL:
         return False
 
     return all(
-        field_key and "FIELD" not in field_key
+        field_key and field_key.startswith("r")
         for field_key in FIELD_MAP.values()
     )
 
@@ -75,16 +70,16 @@ def prompt_for_user_input():
     if not report_type or report_type == "Cancel":
         script.exit()
 
-    summary = forms.ask_for_string(
+    subject = forms.ask_for_string(
         default="",
-        prompt="Add a short summary for the form subject line.",
-        title="Feedback Summary"
+        prompt="Add a short subject for the form subject line.",
+        title="Feedback subject"
     )
 
-    if summary is None:
+    if subject is None:
         script.exit()
 
-    return report_type, summary.strip()
+    return report_type, subject.strip()
 
 
 def build_form_url(payload):
@@ -115,11 +110,11 @@ def main():
         )
         script.exit()
 
-    report_type, summary = prompt_for_user_input()
+    report_type, subject = prompt_for_user_input()
 
     payload = collect_context()
     payload["report_type"] = report_type
-    payload["summary"] = summary or "<no summary provided>"
+    payload["subject"] = subject or "<no subject provided>"
 
     os.startfile(build_form_url(payload))
 

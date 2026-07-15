@@ -1,7 +1,7 @@
 title:
-  en_us: "Suggestions\nFeedback"
+  en_us: "Suggestions/Bugs\nFeedback"
 
 tooltip:
-  en_us: Opens the KL&A feedback form with the current Revit and user context prefilled.
+  en_us: Opens the KL&A feedback form for bug reporting, tool suggestions, or general feedback.
 
 context: zero-doc
