@@ -16,13 +16,14 @@ from Autodesk.Revit.UI import (
 doc = revit.doc
 output = script.get_output()
 
-SCRIPT_VERSION = "2.0-debug"
+SCRIPT_VERSION = "2.1-dependents"
 
 # ---------------------------------------------------------------------------
 # DEBUG: True  -> full diagnostic funnel printed to the pyRevit output window
 #         False -> quiet (only the summary alert)
+# You can also hold SHIFT while clicking the button to force debug mode.
 # ---------------------------------------------------------------------------
-DEBUG = True
+DEBUG = False
 try:
     if __shiftclick__:
         DEBUG = True
@@ -38,7 +39,9 @@ TARGET_VIEW_TYPES = {
     DB.ViewType.Detail,
     DB.ViewType.Schedule,
     DB.ViewType.DrawingSheet,
-
+    # NOTE: Only *Structural Plans* are ViewType.EngineeringPlan.
+    # Mech/Plumb/Arch plan views are ViewType.FloorPlan, RCPs are CeilingPlan.
+    # Uncomment as needed:
     # DB.ViewType.FloorPlan,
     # DB.ViewType.CeilingPlan,
     # DB.ViewType.Section,
@@ -95,6 +98,22 @@ def get_textnote_type_name(note):
     return note_type.Name
 
 
+def is_dependent_view(view):
+    """True if the view is a dependent (has a primary view)."""
+    try:
+        return view.GetPrimaryViewId() != DB.ElementId.InvalidElementId
+    except:
+        return False
+
+
+def get_dependent_view_ids(view):
+    """Returns the ElementIds of this view's dependent views (empty if none)."""
+    try:
+        return list(view.GetDependentViewIds())
+    except:
+        return []
+
+
 def collect_target_views(document):
     views = DB.FilteredElementCollector(document).OfClass(DB.View).ToElements()
     result = []
@@ -109,8 +128,7 @@ def collect_target_views(document):
 def collect_matching_textnotes(document):
     """Returns (matches, type_name_census).
     type_name_census maps every distinct textnote type name found in the
-    model -> [instance_count, matched_bool]. Used by the diagnostic report
-    to expose curly apostrophes / renamed types."""
+    model -> [instance_count, matched_bool]."""
     notes = (
         DB.FilteredElementCollector(document)
         .OfClass(DB.TextNote)
@@ -140,8 +158,7 @@ def collect_matching_textnotes(document):
 
 
 def sheet_appears_in_sheet_list(sheet, diag):
-    """Uses the built-in parameter (locale-proof). Falls back to the display
-    name lookup. Returns True/False; records missing-parameter events."""
+    """Uses the built-in parameter (locale-proof), falls back to name lookup."""
     p = None
     try:
         p = sheet.get_Parameter(DB.BuiltInParameter.SHEET_SCHEDULED)
@@ -197,6 +214,22 @@ def collect_allowed_sheet_ids_and_placed_view_ids(document, diag):
     return allowed_sheet_ids, placed_view_ids
 
 
+def get_placed_dependents(document, view, placed_view_ids, target_view_dict):
+    """For a (primary) view, returns [(key, dependent_view), ...] for every
+    dependent view that is placed on an eligible sheet."""
+    placed = []
+    for did in get_dependent_view_ids(view):
+        dkey = get_elementid_value(did)
+        if dkey is None or dkey not in placed_view_ids:
+            continue
+        dv = target_view_dict.get(dkey)
+        if dv is None:
+            dv = document.GetElement(did)
+        if dv is not None:
+            placed.append((dkey, dv))
+    return placed
+
+
 def build_view_note_map(document, target_views, matching_notes,
                         allowed_sheet_ids, placed_view_ids, diag):
     target_view_dict = {}
@@ -206,6 +239,16 @@ def build_view_note_map(document, target_views, matching_notes,
             target_view_dict[key] = v
 
     view_note_map = {}
+    dependent_view_keys = set()
+
+    def add_note_to_view(key, view, note_id, via_dependent=False):
+        if key not in view_note_map:
+            view_note_map[key] = {"view": view, "ids": []}
+            if via_dependent:
+                dependent_view_keys.add(key)
+        # avoid duplicate ids per view
+        if note_id not in view_note_map[key]["ids"]:
+            view_note_map[key]["ids"].append(note_id)
 
     for note in matching_notes:
         owner_view_id = note.OwnerViewId
@@ -220,7 +263,7 @@ def build_view_note_map(document, target_views, matching_notes,
 
         view = target_view_dict.get(key)
         if view is None:
-            # Diagnostic
+            # Diagnose WHY the owner view isn't a target
             owner = document.GetElement(owner_view_id)
             if owner is None:
                 label = u"<owner view not found>"
@@ -233,14 +276,27 @@ def build_view_note_map(document, target_views, matching_notes,
                 diag["notes_owner_not_target"].get(label, 0) + 1
             continue
 
+        placed_dependents = []
+
         if view.ViewType == DB.ViewType.DrawingSheet:
             if key not in allowed_sheet_ids:
                 diag["notes_sheet_not_in_list"] += 1
                 continue
         else:
-            if key not in placed_view_ids:
+            owner_placed = key in placed_view_ids
+
+            # NEW: a view also qualifies if any of its DEPENDENT views is
+            # placed on an eligible sheet (typical dependent-view workflow:
+            # notes live in the primary, only dependents go on sheets).
+            placed_dependents = get_placed_dependents(
+                document, view, placed_view_ids, target_view_dict)
+
+            if not owner_placed and not placed_dependents:
                 diag["notes_view_not_placed"] += 1
                 continue
+
+            if not owner_placed and placed_dependents:
+                diag["notes_qualified_via_dependents"] += 1
 
         try:
             if not note.CanBeHidden(view):
@@ -251,11 +307,19 @@ def build_view_note_map(document, target_views, matching_notes,
                 u"View '{}': {}".format(view.Name, ex))
             continue
 
-        if key not in view_note_map:
-            view_note_map[key] = {"view": view, "ids": []}
-        view_note_map[key]["ids"].append(note.Id)
         diag["notes_eligible"] += 1
 
+        # Hide in the owner view (primary). Element hiding generally
+        # propagates from a primary to its dependents...
+        add_note_to_view(key, view, note.Id)
+
+        # ...but also hide explicitly in each placed dependent view to be
+        # bulletproof. If propagation already hid it there, the IsHidden
+        # check in the execution loop just skips it.
+        for dkey, dv in placed_dependents:
+            add_note_to_view(dkey, dv, note.Id, via_dependent=True)
+
+    diag["dependent_views_targeted"] = len(dependent_view_keys)
     return view_note_map
 
 
@@ -297,23 +361,24 @@ def print_diagnostics(diag, census, target_views, matching_notes,
     for name in sorted(census.keys()):
         count, matched = census[name]
         flag = u"MATCH" if matched else u"skip "
-        # repr() exposes curly quotes, non-breaking spaces, trailing spaces
         lines.append(u"  [{}] x{:<4} {}".format(flag, count, repr(name)))
     lines.append(u"  Matching note instances: {}".format(len(matching_notes)))
     if not matching_notes:
         lines.append(u"  >> ROOT CAUSE LIKELY HERE: no type name matched the prefix.")
-        lines.append(u"     Compare the repr() strings above against the prefix -")
-        lines.append(u"     look for \\u2019 (curly apostrophe), extra spaces, or renames.")
 
     lines.append(u"")
     lines.append(u"--- STAGE 2: Target views ---")
     by_type = {}
+    dependents_in_targets = 0
     for v in target_views:
         t = str(v.ViewType)
         by_type[t] = by_type.get(t, 0) + 1
+        if is_dependent_view(v):
+            dependents_in_targets += 1
     lines.append(u"  Target views found: {}".format(len(target_views)))
     for t in sorted(by_type.keys()):
         lines.append(u"    {}: {}".format(t, by_type[t]))
+    lines.append(u"  Of which dependent views: {}".format(dependents_in_targets))
 
     lines.append(u"")
     lines.append(u"--- STAGE 3: Sheet eligibility ---")
@@ -325,7 +390,6 @@ def print_diagnostics(diag, census, target_views, matching_notes,
     if diag["sheets_param_missing"]:
         lines.append(u"  !! 'Appears In Sheet List' parameter NOT FOUND on {} sheets.".format(
             diag["sheets_param_missing"]))
-        lines.append(u"     >> ROOT CAUSE LIKELY HERE (localized Revit / param lookup).")
     if diag["sheets_param_unreadable"]:
         lines.append(u"  !! Parameter unreadable on {} sheets.".format(
             diag["sheets_param_unreadable"]))
@@ -340,14 +404,14 @@ def print_diagnostics(diag, census, target_views, matching_notes,
         for label in sorted(diag["notes_owner_not_target"].keys()):
             lines.append(u"    {} : {} note(s)".format(
                 label, diag["notes_owner_not_target"][label]))
-        lines.append(u"    >> If notes are landing in FloorPlan/CeilingPlan/Section,")
-        lines.append(u"       add those types to TARGET_VIEW_TYPES.")
     else:
         lines.append(u"  Owner view type not targeted: 0")
     lines.append(u"  On sheets excluded from sheet list: {}".format(
         diag["notes_sheet_not_in_list"]))
-    lines.append(u"  In views not placed on eligible sheets: {}".format(
+    lines.append(u"  In views not placed (and no placed dependents): {}".format(
         diag["notes_view_not_placed"]))
+    lines.append(u"  Qualified ONLY via placed dependent views: {}".format(
+        diag["notes_qualified_via_dependents"]))
     lines.append(u"  CanBeHidden() returned False: {}".format(
         diag["notes_cannot_be_hidden"]))
     for e in diag["notes_canbehidden_errors"][:10]:
@@ -358,11 +422,15 @@ def print_diagnostics(diag, census, target_views, matching_notes,
     lines.append(u"")
     lines.append(u"--- STAGE 5: Hide/Unhide execution ---")
     lines.append(u"  Views/sheets with eligible notes: {}".format(len(view_note_map)))
+    lines.append(u"  Dependent views explicitly targeted: {}".format(
+        diag["dependent_views_targeted"]))
     lines.append(u"  Skipped (already in requested state): {}".format(
         diag["notes_already_in_state"]))
     lines.append(u"  State-check exceptions (silently skipped notes): {}".format(
         diag["notes_state_check_errors"]))
     lines.append(u"  Changed in views: {}".format(diag["view_notes_changed"]))
+    lines.append(u"    ...of which in dependent views: {}".format(
+        diag["dependent_notes_changed"]))
     lines.append(u"  Changed on sheets: {}".format(diag["sheet_notes_changed"]))
     for f in diag["hide_failures"]:
         lines.append(u"  !! FAILED: {}".format(f))
@@ -390,13 +458,16 @@ diag = {
     "notes_owner_not_target": {},
     "notes_sheet_not_in_list": 0,
     "notes_view_not_placed": 0,
+    "notes_qualified_via_dependents": 0,
     "notes_cannot_be_hidden": 0,
     "notes_canbehidden_errors": [],
     "notes_eligible": 0,
     "notes_already_in_state": 0,
     "notes_state_check_errors": 0,
     "view_notes_changed": 0,
+    "dependent_notes_changed": 0,
     "sheet_notes_changed": 0,
+    "dependent_views_targeted": 0,
     "hide_failures": [],
 }
 
@@ -410,7 +481,7 @@ view_note_map = build_view_note_map(
     allowed_sheet_ids, placed_view_ids, diag
 )
 
-# --- Execute ---
+# --- Execute (only if there is something to do) ---
 processed_views = 0
 failed = diag["hide_failures"]
 
@@ -419,6 +490,7 @@ if view_note_map:
         for item in view_note_map.values():
             view = item["view"]
             ids_for_view = item["ids"]
+            view_is_dependent = is_dependent_view(view)
 
             try:
                 valid_ids = []
@@ -455,6 +527,8 @@ if view_note_map:
                     diag["sheet_notes_changed"] += len(valid_ids)
                 else:
                     diag["view_notes_changed"] += len(valid_ids)
+                    if view_is_dependent:
+                        diag["dependent_notes_changed"] += len(valid_ids)
 
             except Exception as ex:
                 failed.append(u"{}: {}".format(view.Name, ex))
@@ -479,14 +553,16 @@ if DEBUG:
 total_changed = diag["view_notes_changed"] + diag["sheet_notes_changed"]
 
 msg = (
-    u"Action: {0}  (script v{1})\n\n"
+    u"Action: {0}\n"
+#    u"Action: {0}  (script v{1})\n\n"
     u"Notes {2} in views: {3}\n"
-    u"Notes {2} on sheets: {4}"
+#    u"  ...of which in dependent views: {4}\n"
+    u"Notes {2} on sheets: {5}"
 ).format(action_label, SCRIPT_VERSION, action_word,
-         diag["view_notes_changed"], diag["sheet_notes_changed"])
+         diag["view_notes_changed"], diag["dependent_notes_changed"],
+         diag["sheet_notes_changed"])
 
 if total_changed == 0:
-    # Make silent failure LOUD, with the most likely reason inline.
     if not matching_notes:
         reason = (u"No text notes matched the type prefix.\n"
                   u"Check the diagnostic report for the exact type names "
@@ -502,7 +578,8 @@ if total_changed == 0:
                       diag["sheets_total"], diag["sheets_param_missing"])
     elif diag["notes_sheet_not_in_list"] or diag["notes_view_not_placed"]:
         reason = (u"Matching notes were found, but they are on excluded "
-                  u"sheets or in views not placed on eligible sheets.")
+                  u"sheets or in views (and dependents) not placed on "
+                  u"eligible sheets.")
     elif diag["notes_already_in_state"]:
         reason = u"All matching notes were already {}.".format(action_word)
     else:
