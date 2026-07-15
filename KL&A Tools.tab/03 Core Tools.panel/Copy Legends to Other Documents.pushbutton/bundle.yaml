@@ -2,7 +2,7 @@ help_url: '{{docpath}}ThzcRM_Tj8g'
 title:
   ru: Копировать легенды в другие документы
   fr_fr: Copier les légendes dans les autres documents
-  en_us: Copy legends to others documents
+  en_us: "Copy legends\nto others documents"
   de_de: Kopiere Legenden in ein anderes Projekt
 tooltip:
   ru: Копирует легенды в другие документы.
