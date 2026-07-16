@@ -1,0 +1,7 @@
+title:
+  en_us: "About\nKL&A Tools"
+
+tooltip:
+  en_us: Shows the loaded KL&A Tools extension version, build metadata, and extension path.
+
+context: zero-doc
