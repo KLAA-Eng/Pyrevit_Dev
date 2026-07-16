@@ -2,16 +2,9 @@
 """Show extension build and load-path details for support and release verification."""
 
 import os
+import sys
 
 from pyrevit import forms
-
-try:
-    import pyrevit
-except Exception:
-    pyrevit = None
-
-from lib import build_info
-
 
 def find_extension_root(path):
     current = os.path.abspath(path)
@@ -21,6 +14,20 @@ def find_extension_root(path):
             return os.path.abspath(path)
         current = parent
     return current
+
+
+EXTENSION_ROOT = find_extension_root(__file__)
+LIB_DIR = os.path.join(EXTENSION_ROOT, "lib")
+
+if LIB_DIR not in sys.path:
+    sys.path.insert(0, LIB_DIR)
+
+try:
+    import pyrevit
+except Exception:
+    pyrevit = None
+
+import build_info
 
 
 def get_pyrevit_version():
@@ -52,7 +59,6 @@ def get_revit_build():
 
 def main():
     app = __revit__.Application
-    extension_root = find_extension_root(__file__)
 
     lines = [
         "Extension: KL&A Tools",
@@ -62,7 +68,7 @@ def main():
         "Git Tag: {0}".format(getattr(build_info, "GIT_TAG", "unknown") or "unknown"),
         "Git SHA: {0}".format(getattr(build_info, "GIT_SHA", "unknown") or "unknown"),
         "Build Date: {0}".format(getattr(build_info, "BUILD_DATE", "unknown") or "unknown"),
-        "Loaded Extension Path: {0}".format(extension_root),
+        "Loaded Extension Path: {0}".format(EXTENSION_ROOT),
         "pyRevit Version: {0}".format(get_pyrevit_version()),
         "Revit Version: {0}".format(getattr(app, "VersionName", "unknown") or "unknown"),
         "Revit Build: {0}".format(get_revit_build()),
