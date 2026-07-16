@@ -23,19 +23,19 @@
 
             <SolidColorBrush x:Key="text_white"         Color="#E5E4E2" />
             <SolidColorBrush x:Key="text_gray"          Color="Gray" />
-            <SolidColorBrush x:Key="text_magenta"       Color="#EE82EE" />
+            <SolidColorBrush x:Key="text_magenta"       Color="#6FA287" />
 
             <SolidColorBrush x:Key="button_fg_normal"   Color="White" />
             <SolidColorBrush x:Key="button_bg_normal"   Color="#39385D" />
-            <SolidColorBrush x:Key="button_bg_hover"    Color="#FF4C70" />
+            <SolidColorBrush x:Key="button_bg_hover"    Color="#4C9566" />
 
-            <SolidColorBrush x:Key="border_magenta"     Color="#EE82EE" />
-            <SolidColorBrush x:Key="border_blue"     Color="DodgerBlue" />
+            <SolidColorBrush x:Key="border_magenta"     Color="#3F7F57" />
+            <SolidColorBrush x:Key="border_blue"     Color="#6FA287" />
 
             <SolidColorBrush x:Key="uncheckbox_checked_colour"     Color="Gray" />
-            <SolidColorBrush x:Key="checkbox_checked_colour"     Color="#EE82EE" />
+            <SolidColorBrush x:Key="checkbox_checked_colour"     Color="#3F7F57" />
 
-            <SolidColorBrush x:Key="footer_donate"     Color="#FF4C70" />
+            <SolidColorBrush x:Key="footer_donate"     Color="#4C9566" />
 
 
 
@@ -317,7 +317,7 @@
                                             Margin="3,3,23,3"
                                             Focusable="True"
                                             Background="#FF3F3F3F"
-                                            Foreground="Green"
+                                            Foreground="#7FB38F"
                                             Visibility="Hidden"
                                             IsReadOnly="{TemplateBinding IsReadOnly}"/>
 

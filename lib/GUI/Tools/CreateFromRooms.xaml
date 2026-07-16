@@ -25,19 +25,19 @@
 
             <SolidColorBrush x:Key="text_white"         Color="#E5E4E2" />
             <SolidColorBrush x:Key="text_gray"          Color="Gray" />
-            <SolidColorBrush x:Key="text_magenta"       Color="#EE82EE" />
+            <SolidColorBrush x:Key="text_magenta"       Color="#6FA287" />
 
             <SolidColorBrush x:Key="button_fg_normal"   Color="White" />
             <SolidColorBrush x:Key="button_bg_normal"   Color="#39385D" />
-            <SolidColorBrush x:Key="button_bg_hover"    Color="#FF4C70" />
+            <SolidColorBrush x:Key="button_bg_hover"    Color="#4C9566" />
 
-            <SolidColorBrush x:Key="border_magenta"     Color="#EE82EE" />
-            <SolidColorBrush x:Key="border_blue"     Color="DodgerBlue" />
+            <SolidColorBrush x:Key="border_magenta"     Color="#3F7F57" />
+            <SolidColorBrush x:Key="border_blue"     Color="#6FA287" />
 
             <SolidColorBrush x:Key="uncheckbox_checked_colour"     Color="Gray" />
-            <SolidColorBrush x:Key="checkbox_checked_colour"     Color="#EE82EE" />
+            <SolidColorBrush x:Key="checkbox_checked_colour"     Color="#3F7F57" />
 
-            <SolidColorBrush x:Key="footer_donate"     Color="#FF4C70" />
+            <SolidColorBrush x:Key="footer_donate"     Color="#4C9566" />
 
 
 
@@ -170,12 +170,12 @@
                                     <Border x:Name="Border" Width="15" Height="15" CornerRadius="2" BorderThickness="0">
                                         <Border.Background>
                                             <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                                                <GradientStop Color= "#88FC467B" Offset="1" />
-                                                <GradientStop Color= "#993F5EFB" Offset="0" />
+                                                <GradientStop Color= "#882E5C40" Offset="1" />
+                                                <GradientStop Color= "#996FA287" Offset="0" />
                                             </LinearGradientBrush>
                                         </Border.Background>
                                         <Path Width="9" Height="9" x:Name="CheckMark" SnapsToDevicePixels="False"
-                                              Stroke="Pink" StrokeThickness="2" Data="M 0 4 L 3 8 8 0" />
+                                              Stroke="#E5E4E2" StrokeThickness="2" Data="M 0 4 L 3 8 8 0" />
                                     </Border>
                                 </BulletDecorator.Bullet>
                                 <ContentPresenter Margin="4,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"
@@ -342,7 +342,7 @@
                                             Margin="3,3,23,3"
                                             Focusable="True"
                                             Background="#FF3F3F3F"
-                                            Foreground="Green"
+                                            Foreground="#7FB38F"
                                             Visibility="Hidden"
                                             IsReadOnly="{TemplateBinding IsReadOnly}"/>
 
@@ -497,8 +497,8 @@
     <Grid>
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                <GradientStop Color= "#33FC467B" Offset="0" />
-                <GradientStop Color="#333F5EFB" Offset="1" />
+                <GradientStop Color= "#332E5C40" Offset="0" />
+                <GradientStop Color="#336FA287" Offset="1" />
             </LinearGradientBrush>
         </Grid.Background>
 
@@ -661,7 +661,7 @@
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <CheckBox  Background="#EE82EE" Foreground="{StaticResource text_white}" IsChecked="{Binding IsChecked}"  Checked="UIe_ItemChecked" >
+                        <CheckBox  Background="#2E5C40" Foreground="{StaticResource text_white}" IsChecked="{Binding IsChecked}"  Checked="UIe_ItemChecked" >
                             <TextBlock Text="{Binding Name}"/>
                         </CheckBox>
                     </DataTemplate>
