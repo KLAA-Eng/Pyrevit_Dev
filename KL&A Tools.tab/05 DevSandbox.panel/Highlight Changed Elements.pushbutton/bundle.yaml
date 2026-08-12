@@ -1,0 +1,10 @@
+title:
+  en_us: "Highlight\nChanged Elements"
+tooltip:
+  en_us: >-
+    Prototype: compare the current host model with a local baseline RVT and
+    highlight changed or new elements visible in the active sheet's placed views.
+    Detects type and location changes. Revit 2024+; host model only.
+min_revit_version: 2024
+engine:
+  clean: true
