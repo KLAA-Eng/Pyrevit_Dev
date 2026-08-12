@@ -9,10 +9,20 @@ This repository is a pyRevit extension. User-facing commands live under
 ## Working conventions
 
 - Keep changes focused and preserve the existing pyRevit bundle layout and
-  `bundle.yaml` metadata.
+  `bundle.yaml` metadata. Add commands through the established
+  tab/panel/pulldown bundle hierarchy rather than inventing a parallel layout.
 - Match the repository's existing Python style and maintain compatibility with
   the IronPython/pyRevit environment unless a change explicitly updates that
-  target.
+  target. Do not use CPython-only language features or dependencies in command
+  paths.
+- Keep pyRevit command scripts as thin adapters over Revit/pyRevit APIs; place
+  deterministic, host-independent logic in `lib/` so it can be unit-tested
+  outside Revit.
+- Consult the installed pyRevit/Revit version and official API documentation
+  before relying on version-specific pyRevit or Revit APIs.
+- Treat the upstream pyRevit repository as a reference only. Do not copy its
+  code, packages, or assets without reviewing applicable license and
+  compatibility implications.
 - Do not edit generated `lib/build_info.py` by hand; use the generator in
   `scripts/` when it needs to change.
 - Treat Revit content files (such as `.rfa`) and binary assemblies as source

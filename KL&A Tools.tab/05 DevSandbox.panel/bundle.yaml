@@ -1,10 +1,9 @@
 layout:
   - About KL&A Tools
   - Element Takeoff
+  - PulldownExample
+  - Prototype
   - Launch Dynamo Script
-  - Highlight Changed Elements
-  - UI Gallery
   - PushbuttonExample
   - URLButtonExample
-  - PulldownExample
   - StackExample
