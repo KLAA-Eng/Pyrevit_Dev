@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Highlight changed host-model elements visible on the active sheet.
+"""Highlight changed host-model elements visible on selected sheets.
 
 This DevSandbox prototype compares a current local project with a local baseline
 RVT. It intentionally excludes links, view-specific annotations, and automatic
@@ -13,12 +13,14 @@ from Autodesk.Revit import Exceptions as RevitExceptions
 from pyrevit import DB, forms, revit, script
 
 from changed_elements.comparison import compare_fingerprints
+from GUI.forms import select_from_dict
 from graphics.overrides import create_red_projection_override
 
 
 COMMAND_TITLE = 'Highlight Changed Elements'
 MINIMUM_REVIT_VERSION = 2024
 COORDINATE_PRECISION = 6
+HIGHLIGHT_COLOR = DB.Color(255, 0, 0)
 
 
 def _stop(message):
@@ -44,6 +46,36 @@ def _select_baseline_path(current_doc):
     if current_path and normalized_path == current_path:
         _stop('The baseline must be a different RVT file from the active model.')
     return normalized_path
+
+
+def _sheet_label(sheet):
+    return '{} - {}'.format(sheet.SheetNumber, sheet.Name)
+
+
+def _select_sheets(doc):
+    sheets = [
+        sheet for sheet in
+        DB.FilteredElementCollector(doc)
+        .OfCategory(DB.BuiltInCategory.OST_Sheets)
+        .WhereElementIsNotElementType()
+        .ToElements()
+        if not sheet.IsPlaceholder
+    ]
+    if not sheets:
+        _stop('No project sheets were found in the active model.')
+
+    sheet_options = {_sheet_label(sheet): sheet for sheet in sheets}
+    selected_sheets = select_from_dict(
+        sheet_options,
+        title=COMMAND_TITLE,
+        label='Select sheets to highlight:',
+        button_name='Highlight Selected Sheets',
+        version='DevSandbox Prototype',
+        SelectMultiple=True,
+    )
+    if not selected_sheets:
+        _stop('Select at least one sheet.')
+    return selected_sheets
 
 
 def _open_baseline_document(app, baseline_path):
@@ -161,17 +193,32 @@ def _visible_changed_elements(doc, views, changed_ids):
     return visible, preserved
 
 
+def _is_highlight_override(override_settings):
+    colors = (
+        override_settings.ProjectionLineColor,
+        override_settings.CutLineColor,
+    )
+    for color in colors:
+        if color.IsValid and color.Red == 255 and color.Green == 0 and color.Blue == 0:
+            return True
+    return False
+
+
 def _red_override_settings():
     settings = create_red_projection_override(DB)
-    settings.SetCutLineColor(DB.Color(255, 0, 0))
+    settings.SetCutLineColor(HIGHLIGHT_COLOR)
     return settings
+
+
+def _clear_override_settings():
+    return DB.OverrideGraphicSettings()
 
 
 def _apply_highlights(doc, visible_elements):
     settings = _red_override_settings()
     highlighted = []
     skipped = []
-    with revit.Transaction('Highlight changed elements on active sheet', doc=doc):
+    with revit.Transaction('Highlight changed elements on selected sheets', doc=doc):
         for view, element in visible_elements:
             try:
                 view.SetElementOverrides(element.Id, settings)
@@ -181,18 +228,88 @@ def _apply_highlights(doc, visible_elements):
     return highlighted, skipped
 
 
-def _print_change_report(output, sheet, baseline_path, comparison, highlighted, skipped):
+def _clear_highlights(doc, visible_elements):
+    settings = _clear_override_settings()
+    cleared = []
+    skipped = []
+    with revit.Transaction('Clear changed element highlights on selected sheets', doc=doc):
+        for view, element in visible_elements:
+            try:
+                view.SetElementOverrides(element.Id, settings)
+                cleared.append((view, element))
+            except (RevitExceptions.ArgumentException, RevitExceptions.InvalidOperationException) as error:
+                skipped.append((view, element, str(error)))
+    return cleared, skipped
+
+
+def _changed_elements_in_views(doc, views, changed_ids):
+    changed = []
+    processed = set()
+    for view in views:
+        collector = DB.FilteredElementCollector(doc, view.Id).WhereElementIsNotElementType()
+        for element in collector:
+            pair = (view.Id.IntegerValue, element.Id.IntegerValue)
+            if pair in processed or element.UniqueId not in changed_ids:
+                continue
+            processed.add(pair)
+            changed.append((view, element))
+    return changed
+
+
+def _highlighted_changed_elements(doc, sheets, changed_ids):
+    highlighted = []
+    for sheet in sheets:
+        views = _placed_views(doc, sheet)
+        for view, element in _changed_elements_in_views(doc, views, changed_ids):
+            if _is_highlight_override(view.GetElementOverrides(element.Id)):
+                highlighted.append((view, element))
+    return highlighted
+
+
+def _highlight_sheet(doc, sheet, changed_ids, clear_existing):
+    views = _placed_views(doc, sheet)
+    if clear_existing:
+        red_elements = []
+        for view, element in _changed_elements_in_views(doc, views, changed_ids):
+            if _is_highlight_override(view.GetElementOverrides(element.Id)):
+                red_elements.append((view, element))
+        changed, skipped = _clear_highlights(doc, red_elements)
+    else:
+        visible_elements, preserved = _visible_changed_elements(doc, views, changed_ids)
+        changed, skipped = _apply_highlights(doc, visible_elements)
+        skipped.extend(preserved)
+    return {
+        'sheet': sheet,
+        'views': views,
+        'changed': changed,
+        'skipped': skipped,
+    }
+
+
+def _print_change_report(output, sheets, baseline_path, comparison, sheet_results, clear_existing):
+    action_label = 'Cleared' if clear_existing else 'Highlighted'
     output.print_md('# {}'.format(COMMAND_TITLE))
-    output.print_md('**Sheet:** {} — {}'.format(sheet.SheetNumber, sheet.Name))
+    output.print_md('**Action:** {}'.format(action_label))
+    output.print_md('**Sheets selected:** {}'.format(len(sheets)))
     output.print_md('**Baseline:** `{}`'.format(baseline_path))
     output.print_table([
         ['New', len(comparison['new'])],
         ['Modified', len(comparison['modified'])],
         ['Unchanged', len(comparison['unchanged'])],
         ['Deleted (report only)', len(comparison['deleted'])],
-        ['Highlighted in active sheet', len(highlighted)],
-        ['Skipped overrides', len(skipped)],
+        ['{} in selected sheets'.format(action_label), sum(len(r['changed']) for r in sheet_results)],
+        ['Skipped overrides', sum(len(r['skipped']) for r in sheet_results)],
     ], columns=['Result', 'Count'])
+    output.print_md('## Sheet results')
+    output.print_table([
+        [
+            _sheet_label(result['sheet']),
+            len(result['views']),
+            len(result['changed']),
+            len(result['skipped']),
+        ]
+        for result in sheet_results
+    ], columns=['Sheet', 'Placed views checked', action_label, 'Skipped'])
     if comparison['modified']:
         output.print_md('## Modified elements')
         rows = []
@@ -202,26 +319,35 @@ def _print_change_report(output, sheet, baseline_path, comparison, highlighted, 
     if comparison['deleted']:
         output.print_md('## Deleted baseline elements')
         output.print_table([[unique_id] for unique_id in comparison['deleted']], columns=['UniqueId'])
-    if skipped:
+
+    skipped_rows = []
+    for result in sheet_results:
+        for view, element, reason in result['skipped']:
+            skipped_rows.append([
+                _sheet_label(result['sheet']),
+                view.Name,
+                element.Id.IntegerValue,
+                reason,
+            ])
+    if skipped_rows:
         output.print_md('## Skipped overrides')
-        rows = [[view.Name, element.Id.IntegerValue, reason] for view, element, reason in skipped]
-        output.print_table(rows, columns=['View', 'ElementId', 'Reason'])
+        output.print_table(skipped_rows, columns=['Sheet', 'View', 'ElementId', 'Reason'])
     output.print_md(
         '> This prototype does not change the baseline RVT, compare linked '
-        'models, or clear highlights automatically.'
+        'models, or track highlight ownership outside current red element overrides.'
     )
 
 
 def main():
     output = script.get_output()
     doc = revit.doc
-    sheet = revit.active_view
 
     if not _is_supported_revit_version(doc.Application):
         _stop('This prototype requires Revit {} or newer.'.format(MINIMUM_REVIT_VERSION))
-    if doc.IsFamilyDocument or not isinstance(sheet, DB.ViewSheet):
-        _stop('Open a project sheet and run the command again.')
+    if doc.IsFamilyDocument:
+        _stop('Open a project model and run the command again.')
 
+    selected_sheets = _select_sheets(doc)
     baseline_path = _select_baseline_path(doc)
     if baseline_path is None:
         return
@@ -243,11 +369,12 @@ def main():
             baseline_doc.Close(False)
 
     changed_ids = set(comparison['new'] + comparison['modified'])
-    views = _placed_views(doc, sheet)
-    visible_elements, preserved = _visible_changed_elements(doc, views, changed_ids)
-    highlighted, skipped = _apply_highlights(doc, visible_elements)
-    skipped.extend(preserved)
-    _print_change_report(output, sheet, baseline_path, comparison, highlighted, skipped)
+    clear_existing = bool(_highlighted_changed_elements(doc, selected_sheets, changed_ids))
+    sheet_results = [
+        _highlight_sheet(doc, sheet, changed_ids, clear_existing)
+        for sheet in selected_sheets
+    ]
+    _print_change_report(output, selected_sheets, baseline_path, comparison, sheet_results, clear_existing)
 
 
 if __name__ == '__main__':
