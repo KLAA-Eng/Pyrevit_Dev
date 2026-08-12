@@ -84,6 +84,14 @@ def _open_baseline_document(app, baseline_path):
     return app.OpenDocumentFile(model_path, open_options)
 
 
+def _worksharing_conflict_message():
+    return (
+        'Revit cannot open a local model and its central model in the same '
+        'session. Select a detached/archive baseline RVT that is not connected '
+        'to the active model central/local pair, then run the command again.'
+    )
+
+
 def _is_host_model_element(element):
     if element is None or element.Category is None:
         return False
@@ -361,6 +369,8 @@ def main():
             _fingerprints_by_unique_id(baseline_doc),
             _fingerprints_by_unique_id(doc),
         )
+    except RevitExceptions.CannotOpenBothCentralAndLocalException:
+        _stop(_worksharing_conflict_message())
     except (RevitExceptions.ArgumentException, RevitExceptions.FileAccessException,
             RevitExceptions.FileNotFoundException, RevitExceptions.InvalidOperationException) as error:
         _stop('Could not open the baseline safely: {}'.format(error))

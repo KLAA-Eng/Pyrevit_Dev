@@ -25,6 +25,8 @@ The tool is sheet-focused. It does not highlight every changed element in the mo
 
 The baseline file must exist, must have the `.rvt` extension, must be a Revit project, and must not be the same file as the active model.
 
+For workshared projects, the baseline should be a detached or archive RVT that is not connected to the active model's central/local pair. Revit does not allow a local model and its central model to be opened in the same Revit session.
+
 ## What The Script Looks For
 
 The script compares model elements by `UniqueId`.
@@ -135,6 +137,7 @@ The script does not:
 - Restore prior element overrides after clearing.
 - Process placeholder sheets.
 - Process views that do not allow graphic overrides.
+- Open a central model and its local model together in the same Revit session.
 - Compare cloud models, central/local model metadata, or worksharing history.
 
 ## Output Report
