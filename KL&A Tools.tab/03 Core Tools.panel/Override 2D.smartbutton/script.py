@@ -5,6 +5,8 @@ from pyrevit.framework import List
 from pyrevit.revit import ui
 import pyrevit.extensions as exts
 
+from graphics.overrides import create_red_projection_override
+
 op = script.get_output()
 op.close_others()
 
@@ -30,20 +32,12 @@ def __selfinit__(script_cmp, ui_button_cmp, __rvt__):
     ui_button_cmp.set_icon(off_icon)
 
 
-def set_override(r=255, g=0, b=0):
-    src_style = DB.OverrideGraphicSettings()
-    # constructing RGB value from list
-    color = DB.Color(r, g, b)
-    src_style.SetProjectionLineColor(color)
-    return src_style
-
-
 @revit.carryout('Override 2D elements')
 def override_projection_lines(elements_set):
     count = 0
     if len(elements_set) > 0:
         try:
-            src_style = set_override()
+            src_style = create_red_projection_override(DB)
             for element in elements_set:
                 active_view.SetElementOverrides(element.Id, src_style)
                 count += 1

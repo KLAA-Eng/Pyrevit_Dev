@@ -1,0 +1,43 @@
+# Hide Engineering Notes
+
+## Purpose
+
+Documents the current command implementation and intended user-facing behavior.
+
+## Behavior
+
+This command is implemented by `script.py` in this pyRevit bundle. It runs in the Revit/pyRevit host and uses the active-document context required by its implementation. It must preserve unrelated model content and report unsupported or cancelled interactions without applying partial changes.
+
+## Validation boundary
+
+Validate this command against a representative Revit fixture, its empty or cancelled-input path, and its documented output or transaction effect before promotion beyond development use.
+
+## Implementation inventory
+
+- Entry point: `script.py`
+- Direct imports: from pyrevit import revit, DB, forms, script;import clr;from System.Collections.Generic import List;from Autodesk.Revit.UI import (;
+- Local helper functions: normalize_name,set_button_green_hidden,set_button_orange_not_hidden,get_elementid_value,get_textnote_type_name,is_dependent_view,get_dependent_view_ids,collect_target_views,collect_matching_textnotes,sheet_appears_in_sheet_list,collect_allowed_sheet_ids_and_placed_view_ids,get_placed_dependents,build_view_note_map,add_note_to_view,ask_hide_or_unhide,print_diagnostics,
+- Bundled external assets: None.
+
+## GUI and interaction
+
+Static UI/API references: TaskDialog,forms.alert,script.get_output,
+
+Use the command from its pyRevit button. Where it exposes a dialog or selection
+workflow, make the required selection and review the result before confirming.
+
+## Current execution logic
+
+pyRevit loads the bundle and executes its entry point. The implementation uses
+the imports and helper functions listed above; inspect `script.py` for the exact
+branching order and host API calls.
+
+## Model and external effects
+
+Detected mutation/external-effect patterns: revit.Transaction,
+
+## Current status
+
+This is a development-tab command. The inventory above is statically derived
+from the current bundle and must be confirmed inside the target Revit/pyRevit
+environment before promotion or behavior changes.

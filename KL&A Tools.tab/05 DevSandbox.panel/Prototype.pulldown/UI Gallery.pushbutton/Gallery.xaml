@@ -1,0 +1,28 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DevSandbox UI Gallery" Height="520" Width="980"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResize">
+    <DockPanel Margin="12">
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+            <TextBlock Text="Catalog only — opening this gallery does not run catalogued commands or modify the Revit document."
+                       TextWrapping="Wrap" Margin="0,0,0,6" />
+            <TextBox x:Name="FilterBox" Height="25" TextChanged="filter_changed"
+                     ToolTip="Filter by path, title, status, or reason" />
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+            <Button x:Name="InspectButton" Content="Inspect Source Path" Width="125" Margin="0,0,8,0" Click="inspect_source" />
+            <Button x:Name="PreviewButton" Content="Preview Fixture" Width="110" Margin="0,0,8,0" Click="preview_source" />
+            <Button Content="Close" Width="80" Click="close_window" />
+        </StackPanel>
+        <DataGrid x:Name="EntriesGrid" AutoGenerateColumns="False" IsReadOnly="True"
+                  SelectionChanged="selection_changed" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Source" Binding="{Binding RelativePath}" Width="2*" />
+                <DataGridTextColumn Header="Root" Binding="{Binding RootKind}" Width="85" />
+                <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="150" />
+                <DataGridTextColumn Header="Preview" Binding="{Binding PreviewStatus}" Width="100" />
+                <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="2*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>

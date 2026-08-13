@@ -15,43 +15,39 @@
     ResizeMode="NoResize"
 
 
-    Background="#181735"
+    Background="#0F0F2D"
     >
 
     <Window.Resources>
         <ResourceDictionary>
 
 
-            <Color x:Key="ButtonColor1" A="0" R="124" G="111" B="44"/>
-
-
-
             <SolidColorBrush x:Key="header_background"  Color="#0f0f2d" />
-            <SolidColorBrush x:Key="main_background"    Color="Aqua" />
+            <SolidColorBrush x:Key="main_background"    Color="#0f0f2d" />
 
-            <SolidColorBrush x:Key="checkbox_checked_colour"    Color="#FE6584" />
-            <SolidColorBrush x:Key="checkbox_unchecked_colour"    Color="Aqua" />
-
-
-            <SolidColorBrush x:Key="text_header_title"  Color="White" />
-            <SolidColorBrush x:Key="text_header_item"   Color="White" />
-
-            <SolidColorBrush x:Key="text_white"         Color="White" />
-            <SolidColorBrush x:Key="text_darkblue"      Color="#383660" />
-            <SolidColorBrush x:Key="text_red"           Color="#FE6584" />
-            <SolidColorBrush x:Key="text_magenta"       Color="#EE82EE" />
+            <SolidColorBrush x:Key="checkbox_checked_colour"    Color="#3F7F57" />
+            <SolidColorBrush x:Key="uncheckbox_checked_colour"  Color="Gray" />
 
 
-            <SolidColorBrush x:Key="input_box_darkblue"       Color="#383660" />
+            <SolidColorBrush x:Key="text_header_title"  Color="#E5E4E2" />
+            <SolidColorBrush x:Key="text_header_item"   Color="#E5E4E2" />
+
+            <SolidColorBrush x:Key="text_white"         Color="#E5E4E2" />
+            <SolidColorBrush x:Key="text_darkblue"      Color="Gray" />
+            <SolidColorBrush x:Key="text_red"           Color="#6FA287" />
+            <SolidColorBrush x:Key="text_magenta"       Color="#6FA287" />
+
+
+            <SolidColorBrush x:Key="input_box_darkblue"       Color="#0f0f2d" />
 
 
 
-            <SolidColorBrush x:Key="border_main"        Color="DodgerBlue" />
-            <SolidColorBrush x:Key="border_secondary"     Color="#EE82EE" />
+            <SolidColorBrush x:Key="border_main"        Color="#6FA287" />
+            <SolidColorBrush x:Key="border_secondary"   Color="#3F7F57" />
 
 
-            <SolidColorBrush x:Key="button_01_background_normal"     Color="#EE82EE" />
-            <SolidColorBrush x:Key="button_01_background_hover"     Color="#EE82EE" />
+            <SolidColorBrush x:Key="button_01_background_normal" Color="#39385D" />
+            <SolidColorBrush x:Key="button_01_background_hover"  Color="#4C9566" />
 
 
 
@@ -129,11 +125,11 @@
                 <Button.Style>
                     <Style TargetType="Button">
                         <Setter Property="TextElement.FontFamily" Value="Arial"/>
-                        <Setter Property="Background" Value="#39385D"/>
+                        <Setter Property="Background" Value="{StaticResource button_01_background_normal}"/>
                         <Setter Property="Cursor" Value="Hand"/>
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#FF4C70"/>
+                                <Setter Property="Background" Value="{StaticResource button_01_background_hover}"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -179,7 +175,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="Naming"
                            Margin="0, -25,0,0 "
-                           Background="#181735"
+                           Background="{StaticResource header_background}"
                            Foreground="{StaticResource text_red}"
                            Grid.ColumnSpan="2"/>
 
@@ -232,7 +228,7 @@
                                    FontWeight="Medium"
 
                                    Width="50"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                           Foreground="{DynamicResource text_white}"
                                            x:Name = "UI_view_replace"/>
                             </DockPanel>
@@ -244,7 +240,7 @@
                                    FontWeight="Medium"
 
                                    Width="50"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                           Foreground="{DynamicResource text_white}"
                                           x:Name = "UI_view_prefix"/>
                             </DockPanel>
@@ -256,7 +252,7 @@
                                    FontWeight="Medium"
 
                                    Width="50"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                           Foreground="{DynamicResource text_white}"
                                           x:Name = "UI_view_suffix"/>
                             </DockPanel>
@@ -281,7 +277,7 @@
                                    Width="50"/>
                                 <TextBox  
                                     x:Name = "UI_sheet_number_find"
-                                    Background="#383660"
+                                    Background="{StaticResource input_box_darkblue}"
                                           Foreground="{DynamicResource text_white}"
                                           />
                             </DockPanel>
@@ -296,7 +292,7 @@
                                 <TextBox  
                                     x:Name = "UI_sheet_number_replace"
                                     Foreground="{DynamicResource text_white}"
-                                    Background="#383660"/>
+                                    Background="{StaticResource input_box_darkblue}"/>
                             </DockPanel>
 
                             <DockPanel Margin="5,0,0,5">
@@ -306,7 +302,7 @@
                                    FontWeight="Medium"
 
                                    Width="50"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                           x:Name = "UI_sheet_number_prefix"
                                           Foreground="{DynamicResource text_white}"
                                           />
@@ -319,7 +315,7 @@
                                    FontWeight="Medium"
 
                                    Width="50"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                           Foreground="{DynamicResource text_white}"
                                            x:Name = "UI_sheet_number_suffix"
                                           />
@@ -344,7 +340,7 @@
                                    Foreground="{DynamicResource text_white}"
                                    FontWeight="Medium"
                                    Width="50"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                            x:Name = "UI_sheet_name_find"
                                           Foreground="{DynamicResource text_white}"
                                           />
@@ -357,7 +353,7 @@
                                    FontWeight="Medium"
 
                                    Width="50"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                           Foreground="{DynamicResource text_white}"
                                           x:Name = "UI_sheet_name_replace"
                                           />
@@ -370,7 +366,7 @@
                                    FontWeight="Medium"
 
                                    Width="50"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                           x:Name = "UI_sheet_name_prefix"
                                            Foreground="{DynamicResource text_white}"
                                           />
@@ -383,7 +379,7 @@
                                    FontWeight="Medium"
 
                                    Width="50"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                            x:Name = "UI_sheet_name_suffix"
                                           Foreground="{DynamicResource text_white}"
                                           />
@@ -452,7 +448,7 @@
                                    Foreground="{DynamicResource text_white}"
                                    FontWeight="Medium"
                                    Width="125"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                            Foreground="{DynamicResource text_white}"/>
                             </DockPanel>
 
@@ -462,7 +458,7 @@
                                    FontWeight="Medium"
 
                                    Width="125"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                            Foreground="{DynamicResource text_white}"/>
                             </DockPanel>
 
@@ -472,7 +468,7 @@
                                    FontWeight="Medium"
 
                                    Width="125"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                            Foreground="{DynamicResource text_white}"/>
                             </DockPanel>
 
@@ -482,7 +478,7 @@
                                    FontWeight="Medium"
 
                                    Width="125"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                            Foreground="{DynamicResource text_white}"/>
                             </DockPanel>
 
@@ -503,7 +499,7 @@
                                    Foreground="{DynamicResource text_white}"
                                    FontWeight="Medium"
                                    Width="125"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                            Foreground="{DynamicResource text_white}"/>
 
 
@@ -518,7 +514,7 @@
                                    FontWeight="Medium"
 
                                    Width="125"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                            Foreground="{DynamicResource text_white}"/>
                             </DockPanel>
 
@@ -530,7 +526,7 @@
                                     FontWeight="Medium"
                                     Width="125"/>
                                 <TextBox  
-                                    Background="#383660"
+                                    Background="{StaticResource input_box_darkblue}"
                                     Foreground="{DynamicResource text_white}"/>
                             </DockPanel>
 
@@ -540,7 +536,7 @@
                                    FontWeight="Medium"
 
                                    Width="125"/>
-                                <TextBox  Background="#383660"
+                                <TextBox  Background="{StaticResource input_box_darkblue}"
                                            Foreground="{DynamicResource text_white}"/>
                             </DockPanel>
 
@@ -813,7 +809,7 @@
                                     Content="Legends"
                                     IsChecked="True"
                                     Foreground="{DynamicResource text_white}"
-                                    Background="#EE82EE"
+                                    Background="{DynamicResource checkbox_checked_colour}"
                                     VerticalAlignment="Center"
                                     FontSize="12"
                                     FontWeight="Medium"
@@ -824,7 +820,7 @@
                                     Content="Schedules"
                                     IsChecked="True"
                                     Foreground="{DynamicResource text_white}"
-                                    Background="#EE82EE"
+                                    Background="{DynamicResource checkbox_checked_colour}"
                                     VerticalAlignment="Center"
                                     FontSize="12"
                                     FontWeight="Medium"
@@ -908,11 +904,11 @@
                 <Button.Style>
                     <Style TargetType="Button">
                         <Setter Property="TextElement.FontFamily" Value="Arial"/>
-                        <Setter Property="Background" Value="#39385D"/>
+                        <Setter Property="Background" Value="{StaticResource button_01_background_normal}"/>
                         <Setter Property="Cursor" Value="Hand"/>
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#FF4C70"/>
+                                <Setter Property="Background" Value="{StaticResource button_01_background_hover}"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -935,78 +931,8 @@
 
         </StackPanel>
 
-
-
-
-        <Grid Grid.Column="0"
-              Grid.RowSpan="2"
-              Margin="160,-365,-610,85"
-              Panel.ZIndex="-1"
-
-
-              >
-            <Grid.RenderTransform>
-                <RotateTransform Angle="135"/>
-            </Grid.RenderTransform>
-
-            <StackPanel Orientation="Horizontal"
-                        Margin="-675,-1000,0,0">
-
-                <StackPanel>
-                    <Border Width="700"
-                        Height="30"
-                        Background="#3DDDc2"
-                        Margin="100,0,0,0"
-                        CornerRadius="15"
-                        />
-                    <Border Width="700"
-                        Height="30"
-                        Background="#FC6586"
-                        Margin="0,15,0,0"
-                        CornerRadius="15"
-                        />
-                    <Border Width="700"
-                        Height="30"
-                        Background="#383660"
-                        Margin="100,15,0,0"
-                        CornerRadius="15"
-                        />
-                </StackPanel>
-                <StackPanel>
-                    <Border Width="700"
-                        Height="30"
-                        Background="#3DDDc2"
-                        Margin="50,0,0,0"
-                        CornerRadius="15"
-                        />
-                    <Border Width="700"
-                        Height="30"
-                        Background="#FC6586"
-                        Margin="0,15,0,0"
-                        CornerRadius="15"
-                        />
-                    <Border Width="700"
-                        Height="30"
-                        Background="#383660"
-                        Margin="50,15,0,0"
-                        CornerRadius="15"
-                        />
-
-                </StackPanel>
-
-
-
-
-
-            </StackPanel>
-
-        </Grid>
-
-
     </Grid>
 
 
 
 </Window>
-
-    

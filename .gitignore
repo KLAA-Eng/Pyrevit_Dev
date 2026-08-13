@@ -1,0 +1,8 @@
+# Local Codex workspace state (sessions, logs, and machine-specific settings)
+.codex/
+
+# Local Codex agent workspace state
+.agents/
+
+# Local ManaAi planning and delivery artifacts
+.local.manaai/
