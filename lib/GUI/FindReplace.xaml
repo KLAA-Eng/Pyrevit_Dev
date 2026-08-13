@@ -43,15 +43,12 @@
                         HorizontalAlignment="Left">
 
 
-                <TextBlock Margin="5,0,0,0">
-                    <Hyperlink  
-                        RequestNavigate="Hyperlink_RequestNavigate" 
-                        NavigateUri="https://erikfrits.com/blog/"
-                        FontSize="14px"
-                        FontWeight="Heavy"
-                        Foreground="{StaticResource text_white}">
-                        EF-Tools
-                    </Hyperlink>
+                <TextBlock
+                    Margin="5,0,0,0"
+                    FontSize="14px"
+                    FontWeight="Heavy"
+                    Foreground="{StaticResource text_white}">
+                    KLCode
                 </TextBlock>
             </DockPanel>
 

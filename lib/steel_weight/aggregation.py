@@ -8,19 +8,23 @@ def aggregate_steel_weight(steel_records, floor_area_records):
     category_weights = {}
     family_type_weights = {}
     floor_type_areas = {}
+    excluded_summaries = {}
     excluded = []
     for record in steel_records:
-        _add_steel_record(record, levels, category_weights, family_type_weights, excluded)
+        _add_steel_record(
+            record, levels, category_weights, family_type_weights,
+            excluded, excluded_summaries)
     for record in floor_area_records:
-        _add_floor_area_record(record, levels, floor_type_areas, excluded)
+        _add_floor_area_record(record, levels, floor_type_areas, excluded, excluded_summaries)
     rows = sorted([_row_for_level(level) for level in levels.values()], key=_row_sort_key)
     return {
         'rows': rows,
         'total': _total_for_rows(rows),
-        'categories': _summary_rows(category_weights, 'category', 'steel_weight_lb'),
-        'family_types': _summary_rows(family_type_weights, 'family_type', 'steel_weight_lb'),
-        'floor_types': _summary_rows(floor_type_areas, 'floor_type', 'floor_area_square_feet'),
+        'categories': _level_summary_rows(category_weights, 'category', 'steel_weight_lb'),
+        'family_types': _level_summary_rows(family_type_weights, 'family_type', 'steel_weight_lb'),
+        'floor_types': _level_summary_rows(floor_type_areas, 'floor_type', 'floor_area_square_feet'),
         'excluded': excluded,
+        'excluded_summaries': _excluded_summary_rows(excluded_summaries),
     }
 
 
@@ -32,36 +36,37 @@ def records_for_level_ids(records, level_ids):
     return [record for record in records if record.get('level_id') in selected_ids]
 
 
-def _add_steel_record(record, levels, category_weights, family_type_weights, excluded):
+def _add_steel_record(record, levels, category_weights, family_type_weights,
+                      excluded, excluded_summaries):
     level = _level_for_record(record, levels)
     if level is None:
-        _exclude(excluded, record, 'missing level')
+        _exclude(excluded, excluded_summaries, record, 'missing level')
         return
     length = _positive_number(record.get('length_feet'))
     if length is None:
-        _exclude(excluded, record, 'missing or zero usable length')
+        _exclude(excluded, excluded_summaries, record, 'missing or zero usable length')
         return
     nominal_weight = _positive_number(record.get('nominal_weight_lb_per_foot'))
     if nominal_weight is None:
-        _exclude(excluded, record, 'missing or zero nominal section weight')
+        _exclude(excluded, excluded_summaries, record, 'missing or zero nominal section weight')
         return
     pounds = length * nominal_weight
     level['steel_weight_lb'] += pounds
-    _add_summary_value(category_weights, record.get('category'), pounds, 'Unspecified')
-    _add_summary_value(family_type_weights, record.get('family_type'), pounds, 'Unspecified')
+    _add_level_summary_value(category_weights, record, 'category', pounds, 'Unspecified')
+    _add_level_summary_value(family_type_weights, record, 'family_type', pounds, 'Unspecified')
 
 
-def _add_floor_area_record(record, levels, floor_type_areas, excluded):
+def _add_floor_area_record(record, levels, floor_type_areas, excluded, excluded_summaries):
     level = _level_for_record(record, levels)
     if level is None:
-        _exclude(excluded, record, 'missing level')
+        _exclude(excluded, excluded_summaries, record, 'missing level')
         return
     area = _positive_number(record.get('area_square_feet'))
     if area is None:
-        _exclude(excluded, record, 'missing or zero floor area')
+        _exclude(excluded, excluded_summaries, record, 'missing or zero floor area')
         return
     level['floor_area_square_feet'] += area
-    _add_summary_value(floor_type_areas, record.get('floor_type'), area, 'Unspecified')
+    _add_level_summary_value(floor_type_areas, record, 'floor_type', area, 'Unspecified')
 
 
 def _level_for_record(record, levels):
@@ -82,17 +87,34 @@ def _level_for_record(record, levels):
 def _positive_number(value):
     try:
         number = float(value)
-    except (TypeError, ValueError):
+    except Exception:
         return None
     return number if number > 0.0 else None
 
 
-def _add_summary_value(summary, key, value, default_key):
-    summary[key or default_key] = summary.get(key or default_key, 0.0) + value
+def _add_level_summary_value(summary, record, key_field, value, default_key):
+    key = (
+        record.get('level_id'),
+        record.get('level_name') or 'Unspecified',
+        record.get(key_field) or default_key,
+    )
+    summary[key] = summary.get(key, 0.0) + value
 
 
-def _exclude(excluded, record, reason):
+def _exclude(excluded, summaries, record, reason):
     excluded.append({'element_id': record.get('element_id'), 'reason': reason})
+    length = _positive_number(record.get('length_feet')) or 0.0
+    key = (
+        reason,
+        record.get('level_id'),
+        record.get('level_name') or 'Unspecified',
+        record.get('category') or 'Unspecified',
+        record.get('family_type') or record.get('floor_type') or 'Unspecified',
+    )
+    if key not in summaries:
+        summaries[key] = {'count': 0, 'length_feet': 0.0}
+    summaries[key]['count'] += 1
+    summaries[key]['length_feet'] += length
 
 
 def _row_for_level(level):
@@ -116,5 +138,29 @@ def _total_for_rows(rows):
             'psf': weight / area if area > 0.0 else None}
 
 
-def _summary_rows(values, key_name, value_name):
-    return [{key_name: key, value_name: values[key]} for key in sorted(values, key=lambda item: item.lower())]
+def _level_summary_rows(values, key_name, value_name):
+    rows = []
+    for key in sorted(values, key=lambda item: (item[1].lower(), item[2].lower())):
+        unused_level_id, level_name, name = key
+        rows.append({
+            'level_name': level_name,
+            key_name: name,
+            value_name: values[key],
+        })
+    return rows
+
+
+def _excluded_summary_rows(values):
+    rows = []
+    for key in sorted(values, key=lambda item: (
+            item[2].lower(), item[4].lower(), item[0].lower())):
+        reason, unused_level_id, level_name, category, family_type = key
+        rows.append({
+            'reason': reason,
+            'level_name': level_name,
+            'category': category,
+            'family_type': family_type,
+            'count': values[key]['count'],
+            'length_feet': values[key]['length_feet'],
+        })
+    return rows

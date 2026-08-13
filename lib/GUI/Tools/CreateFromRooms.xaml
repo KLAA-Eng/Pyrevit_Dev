@@ -233,14 +233,11 @@
                       />
                                     <!--Source="https://www.erikfrits.com/media/images/LOGO.png"-->
 
-                                    <TextBlock>
-                    <Hyperlink  RequestNavigate="Hyperlink_RequestNavigate"
-                                NavigateUri="https://erikfrits.com/blog/"
+                                    <TextBlock
                                 FontSize="14px"
                                 FontWeight="Heavy"
                                 Foreground="{StaticResource text_white}">
-                                EF-Tools
-                    </Hyperlink>
+                                KLCode
                                     </TextBlock>
                                 </DockPanel>
 
@@ -532,15 +529,12 @@
                         HorizontalAlignment="Left">
 
 
-                <TextBlock Margin="5,0,0,0">
-                    <Hyperlink
-                        RequestNavigate="Hyperlink_RequestNavigate"
-                        NavigateUri="https://www.linkedin.com/company/80151029"
-                        FontSize="14px"
-                        FontWeight="Heavy"
-                        Foreground="{StaticResource text_white}">
-                        EF-Tools
-                    </Hyperlink>
+                <TextBlock
+                    Margin="5,0,0,0"
+                    FontSize="14px"
+                    FontWeight="Heavy"
+                    Foreground="{StaticResource text_white}">
+                    KLCode
                 </TextBlock>
             </DockPanel>
 
@@ -741,10 +735,10 @@
               Margin="0,0,10,0">
               <Hyperlink
                   RequestNavigate="Hyperlink_RequestNavigate"
-                  NavigateUri="https://www.ko-fi.com/ErikFrits"
+                  NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
                   FontWeight="Medium"
                   Foreground="{StaticResource button_bg_hover}">
-                  Support EF-Tools
+                  Outreach
               </Hyperlink>
             </TextBlock>
         </Grid>

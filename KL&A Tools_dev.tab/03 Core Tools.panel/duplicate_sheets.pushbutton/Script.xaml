@@ -88,15 +88,11 @@
 
 
                
-                <TextBlock>
-                    <Hyperlink  
-                        RequestNavigate="Hyperlink_RequestNavigate" 
-                        NavigateUri="https://erikfrits.com/blog/"
-                        FontSize="14px"
-                        FontWeight="Heavy"
-                        Foreground="{StaticResource text_white}">
-                        EF-Tools
-                    </Hyperlink>
+                <TextBlock
+                    FontSize="14px"
+                    FontWeight="Heavy"
+                    Foreground="{StaticResource text_white}">
+                    KLCode
                 </TextBlock>
             </DockPanel>
             

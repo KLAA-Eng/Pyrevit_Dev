@@ -19,17 +19,34 @@ class SteelWeightReportingTests(unittest.TestCase):
             'rows': [{'level_name': 'Level 1', 'steel_weight_lb': 100.0,
                       'floor_area_square_feet': 50.0, 'psf': 2.0}],
             'total': {'steel_weight_lb': 100.0, 'floor_area_square_feet': 50.0, 'psf': 2.0},
-            'categories': [{'category': 'Structural Framing', 'steel_weight_lb': 100.0}],
-            'family_types': [{'family_type': 'W12x26', 'steel_weight_lb': 100.0}],
-            'floor_types': [{'floor_type': 'Deck', 'floor_area_square_feet': 50.0}],
+            'categories': [{'level_name': 'Level 1', 'category': 'Structural Framing', 'steel_weight_lb': 100.0}],
+            'family_types': [{'level_name': 'Level 1', 'family_type': 'W12x26', 'steel_weight_lb': 100.0}],
+            'floor_types': [{'level_name': 'Level 1', 'floor_type': 'Deck', 'floor_area_square_feet': 50.0}],
             'excluded': [{'element_id': 10, 'reason': 'missing nominal weight'}],
+            'excluded_summaries': [{
+                'reason': 'missing nominal weight',
+                'level_name': 'Level 1',
+                'category': 'Structural Framing',
+                'family_type': 'Steel Joist: K-Series',
+                'count': 2,
+                'length_feet': 20.0,
+            }],
         }
 
         rows = summary_csv_rows(result, {'document_title': 'Sample'})
 
         self.assertIn(['Metadata', 'document_title', 'Sample'], rows)
         self.assertIn(['Level', 'Level 1', '100.000', '50.000', '2.000'], rows)
-        self.assertIn(['Exclusion', 'missing nominal weight', '1'], rows)
+        self.assertIn([
+            'Exclusion',
+            'Level 1 | Steel Joist: K-Series | missing nominal weight',
+            '',
+            '',
+            '',
+            '2',
+            '20.000',
+            'Structural Framing',
+        ], rows)
         self.assertFalse(any('element_id' in row or 'floor_id' in row for row in rows))
 
 

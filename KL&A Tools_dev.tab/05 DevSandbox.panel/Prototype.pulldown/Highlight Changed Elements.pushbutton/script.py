@@ -14,7 +14,11 @@ from pyrevit import DB, forms, revit, script
 
 from changed_elements.comparison import compare_fingerprints
 from GUI.forms import select_from_dict
-from graphics.overrides import create_red_projection_override
+from graphics.overrides import (
+    create_red_projection_override,
+    override_has_existing_graphics,
+    override_has_red_line,
+)
 
 
 COMMAND_TITLE = 'Highlight Changed Elements'
@@ -33,6 +37,17 @@ def _is_supported_revit_version(app):
         return int(app.VersionNumber) >= MINIMUM_REVIT_VERSION
     except (TypeError, ValueError):
         return False
+
+
+def _element_id_value(element_id):
+    if element_id is None:
+        return None
+    for property_name in ('Value', 'IntegerValue'):
+        try:
+            return int(getattr(element_id, property_name))
+        except Exception:
+            pass
+    return None
 
 
 def _select_baseline_path(current_doc):
@@ -97,7 +112,7 @@ def _is_supported_element(element):
         return False
     if isinstance(element, DB.RevitLinkInstance):
         return False
-    category_id = element.Category.Id.IntegerValue
+    category_id = _element_id_value(element.Category.Id)
     excluded = (int(DB.BuiltInCategory.OST_TitleBlocks), int(DB.BuiltInCategory.OST_RevisionClouds))
     if category_id in excluded:
         return False
@@ -157,7 +172,7 @@ def _parameter_value(parameter):
     if storage == DB.StorageType.Double:
         return str(_rounded_coordinate(parameter.AsDouble()))
     if storage == DB.StorageType.ElementId:
-        return str(parameter.AsElementId().IntegerValue)
+        return str(_element_id_value(parameter.AsElementId()))
     return ''
 
 
@@ -276,42 +291,7 @@ def _schedule_instances(doc, sheet):
 
 
 def _has_existing_overrides(override_settings):
-    colors = []
-    for property_name in (
-        'ProjectionLineColor',
-        'CutLineColor',
-        'SurfaceForegroundPatternColor',
-        'SurfaceBackgroundPatternColor',
-        'CutForegroundPatternColor',
-        'CutBackgroundPatternColor',
-    ):
-        color = getattr(override_settings, property_name, None)
-        if color is not None:
-            colors.append(color)
-    pattern_ids = []
-    for property_name in (
-        'ProjectionLinePatternId',
-        'CutLinePatternId',
-        'SurfaceForegroundPatternId',
-        'SurfaceBackgroundPatternId',
-        'CutForegroundPatternId',
-        'CutBackgroundPatternId',
-    ):
-        pattern_id = getattr(override_settings, property_name, None)
-        if pattern_id is not None:
-            pattern_ids.append(pattern_id)
-    if any(color.IsValid for color in colors):
-        return True
-    if any(pattern_id != DB.ElementId.InvalidElementId for pattern_id in pattern_ids):
-        return True
-    invalid_pen = getattr(DB.OverrideGraphicSettings, 'InvalidPenNumber', -1)
-    if getattr(override_settings, 'ProjectionLineWeight', invalid_pen) != invalid_pen:
-        return True
-    if getattr(override_settings, 'CutLineWeight', invalid_pen) != invalid_pen:
-        return True
-    if getattr(override_settings, 'DetailLevel', DB.ViewDetailLevel.Undefined) != DB.ViewDetailLevel.Undefined:
-        return True
-    return getattr(override_settings, 'Halftone', False) or getattr(override_settings, 'Transparency', 0) != 0
+    return override_has_existing_graphics(override_settings, DB)
 
 
 def _get_element_overrides(view, element):
@@ -326,7 +306,7 @@ def _visible_changed_elements(targets):
     preserved = []
     processed = set()
     for view, element, kind in targets:
-        pair = (view.Id.IntegerValue, element.Id.IntegerValue)
+        pair = (_element_id_value(view.Id), _element_id_value(element.Id))
         if pair in processed:
             continue
         processed.add(pair)
@@ -342,15 +322,7 @@ def _visible_changed_elements(targets):
 
 
 def _is_highlight_override(override_settings):
-    colors = []
-    for property_name in ('ProjectionLineColor', 'CutLineColor'):
-        color = getattr(override_settings, property_name, None)
-        if color is not None:
-            colors.append(color)
-    for color in colors:
-        if color.IsValid and color.Red == 255 and color.Green == 0 and color.Blue == 0:
-            return True
-    return False
+    return override_has_red_line(override_settings)
 
 
 def _red_override_settings():
@@ -418,7 +390,7 @@ def _append_changed_visible_elements(doc, view, kind, changed_ids, processed, ch
 
 
 def _append_target(view, element, kind, processed, changed):
-    pair = (view.Id.IntegerValue, element.Id.IntegerValue)
+    pair = (_element_id_value(view.Id), _element_id_value(element.Id))
     if pair not in processed:
         processed.add(pair)
         changed.append((view, element, kind))
@@ -500,7 +472,7 @@ def _print_change_report(output, sheets, baseline_path, comparison, sheet_result
                 _sheet_label(result['sheet']),
                 view.Name,
                 kind,
-                element.Id.IntegerValue,
+                _element_id_value(element.Id),
                 reason,
             ])
     if skipped_rows:

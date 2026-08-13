@@ -208,14 +208,11 @@
                       />
                                     <!--Source="https://www.erikfrits.com/media/images/LOGO.png"-->
 
-                                    <TextBlock>
-                    <Hyperlink  RequestNavigate="Hyperlink_RequestNavigate"
-                                NavigateUri="https://erikfrits.com/blog/"
+                                    <TextBlock
                                 FontSize="14px"
                                 FontWeight="Heavy"
                                 Foreground="{StaticResource text_white}">
-                                EF-Tools
-                    </Hyperlink>
+                                KLCode
                                     </TextBlock>
                                 </DockPanel>
 
@@ -496,15 +493,11 @@
                       />
                 <!--Source="https://www.erikfrits.com/media/images/LOGO.png"-->
 
-                <TextBlock>
-                    <Hyperlink
-                        RequestNavigate="Hyperlink_RequestNavigate"
-                        NavigateUri="https://erikfrits.com/blog/"
-                        FontSize="14px"
-                        FontWeight="Heavy"
-                        Foreground="{StaticResource text_white}">
-                        EF-Tools
-                    </Hyperlink>
+                <TextBlock
+                    FontSize="14px"
+                    FontWeight="Heavy"
+                    Foreground="{StaticResource text_white}">
+                    KLCode
                 </TextBlock>
             </DockPanel>
 
@@ -744,10 +737,10 @@
                         Margin="0,0,10,0">
                     <Hyperlink
                         RequestNavigate="Hyperlink_RequestNavigate"
-                        NavigateUri="https://www.patreon.com/ErikFrits"
+                        NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
                         FontWeight="Medium"
                         Foreground="{StaticResource button_bg_hover}">
-                        Donate
+                        Outreach
                     </Hyperlink>
             </TextBlock>
 
