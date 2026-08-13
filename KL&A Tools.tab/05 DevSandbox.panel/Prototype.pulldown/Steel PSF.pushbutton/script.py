@@ -52,6 +52,7 @@ LIB_DIR = os.path.join(EXTENSION_ROOT, 'lib')
 if LIB_DIR not in sys.path:
     sys.path.insert(0, LIB_DIR)
 
+from GUI.forms import select_from_dict
 from steel_weight.aggregation import aggregate_steel_weight
 from steel_weight.reporting import summary_csv_rows
 
@@ -113,25 +114,61 @@ def _family_type_label(doc, element):
     return '{}: {}'.format(family_name, type_name) if family_name else type_name
 
 
-def _steel_records(doc):
+def _level_label(level):
+    return _element_name(level)
+
+
+def _select_stories(doc):
+    levels = list(DB.FilteredElementCollector(doc).OfClass(DB.Level).WhereElementIsNotElementType())
+    if not levels:
+        forms.alert('No project levels were found in the active model.', title=COMMAND_TITLE, warn_icon=True)
+        script.exit()
+
+    level_options = {_level_label(level): level for level in levels}
+    selected_levels = select_from_dict(
+        level_options,
+        title=COMMAND_TITLE,
+        label='Select stories to review:',
+        button_name='Review Selected Stories',
+        version='DevSandbox Prototype',
+        SelectMultiple=True,
+    )
+    if not selected_levels:
+        forms.alert('Select at least one story.', title=COMMAND_TITLE, warn_icon=True)
+        script.exit()
+    return selected_levels
+
+
+def _selected_level_ids(levels):
+    return [level.Id.IntegerValue for level in levels]
+
+
+def _selected_level_names(levels):
+    return [_level_label(level) for level in levels]
+
+
+def _is_selected_level(level, selected_level_ids):
+    return level is not None and level['level_id'] in selected_level_ids
+
+
+def _steel_records(doc, selected_level_ids):
     records = []
     skipped = []
     categories = (DB.BuiltInCategory.OST_StructuralFraming, DB.BuiltInCategory.OST_StructuralColumns)
     for category in categories:
         for element in DB.FilteredElementCollector(doc).OfCategory(category).WhereElementIsNotElementType():
-            _collect_steel_record(doc, element, int(category), records, skipped)
+            _collect_steel_record(doc, element, int(category), selected_level_ids, records, skipped)
     return records, skipped
 
 
-def _collect_steel_record(doc, element, category_id, records, skipped):
+def _collect_steel_record(doc, element, category_id, selected_level_ids, records, skipped):
     if not isinstance(element, DB.FamilyInstance):
+        return
+    level = _assignment_level(doc, element, category_id)
+    if not _is_selected_level(level, selected_level_ids):
         return
     if element.StructuralMaterialType != DB.Structure.StructuralMaterialType.Steel:
         skipped.append((element.Id.IntegerValue, 'not a steel family instance'))
-        return
-    level = _assignment_level(doc, element, category_id)
-    if level is None:
-        skipped.append((element.Id.IntegerValue, 'assignment level unavailable'))
         return
     records.append({
         'element_id': element.Id.IntegerValue,
@@ -142,14 +179,13 @@ def _collect_steel_record(doc, element, category_id, records, skipped):
     })
 
 
-def _floor_area_records(doc):
+def _floor_area_records(doc, selected_level_ids):
     records = []
     skipped = []
     floors = DB.FilteredElementCollector(doc).OfCategory(DB.BuiltInCategory.OST_Floors).WhereElementIsNotElementType()
     for floor in floors:
         level = _level_record(doc, floor.LevelId)
-        if level is None:
-            skipped.append((floor.Id.IntegerValue, 'floor level unavailable'))
+        if not _is_selected_level(level, selected_level_ids):
             continue
         parameter = _first_parameter(floor, DB.BuiltInParameter.HOST_AREA_COMPUTED)
         floor_type = doc.GetElement(floor.GetTypeId())
@@ -213,13 +249,20 @@ def _export_summary_csv(result, metadata):
 def main():
     output = script.get_output()
     doc = revit.doc
-    steel_records, steel_skips = _steel_records(doc)
-    area_records, floor_skips = _floor_area_records(doc)
+    selected_levels = _select_stories(doc)
+    selected_level_ids = _selected_level_ids(selected_levels)
+    steel_records, steel_skips = _steel_records(doc, selected_level_ids)
+    area_records, floor_skips = _floor_area_records(doc, selected_level_ids)
     result = aggregate_steel_weight(steel_records, area_records)
-    metadata = {'document_title': doc.Title, 'weight_basis': 'length_ft x nominal_lb_per_ft'}
+    metadata = {
+        'document_title': doc.Title,
+        'selected_story_count': str(len(selected_levels)),
+        'selected_story_names': ', '.join(_selected_level_names(selected_levels)),
+        'weight_basis': 'length_ft x nominal_lb_per_ft',
+    }
     _print_report(output, result, steel_skips + floor_skips, metadata)
     if not result['rows']:
-        forms.alert('No eligible steel or floor data was found.', title=COMMAND_TITLE)
+        forms.alert('No eligible steel or floor data was found for the selected stories.', title=COMMAND_TITLE)
 
 
 if __name__ == '__main__':
