@@ -101,22 +101,24 @@ Known window backgrounds currently in use:
 
 ## Local GUI Overrides
 
-`KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/Script.xaml` defines command-local GUI resources instead of using only the shared style dictionary. Its local colors include:
+`KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/Script.xaml` defines command-local aliases for the shared GUI palette. The aliases below match the colors in `lib/GUI/Resources/WPF_styles.xaml`:
 
 | Token | Value | Plain English Color |
 | --- | --- | --- |
 | `header_background` | `#0F0F2D` | very dark navy |
-| `main_background` | `Aqua` | bright cyan |
-| `checkbox_checked_colour` | `#FE6584` | bright pink |
-| `checkbox_unchecked_colour` | `Aqua` | bright cyan |
-| `text_header_title` | `White` | white |
-| `text_header_item` | `White` | white |
-| `text_white` | `White` | white |
-| `text_darkblue` | `#383660` | muted indigo |
-| `text_red` | `#FE6584` | bright pink |
-| `text_magenta` | `#EE82EE` | violet |
-| `input_box_darkblue` | `#383660` | muted indigo |
-| `border_main` | `DodgerBlue` | bright blue |
-| `border_secondary` | `#EE82EE` | violet |
-| `button_01_background_normal` | `#EE82EE` | violet |
-| `button_01_background_hover` | `#EE82EE` | violet |
+| `main_background` | `#0F0F2D` | very dark navy |
+| `checkbox_checked_colour` | `#3F7F57` | deep green |
+| `uncheckbox_checked_colour` | `Gray` | medium gray |
+| `text_header_title` | `#E5E4E2` | warm off-white |
+| `text_header_item` | `#E5E4E2` | warm off-white |
+| `text_white` | `#E5E4E2` | warm off-white |
+| `text_darkblue` | `Gray` | medium gray |
+| `text_red` | `#6FA287` | muted green |
+| `text_magenta` | `#6FA287` | muted green |
+| `input_box_darkblue` | `#0F0F2D` | very dark navy |
+| `border_main` | `#6FA287` | muted green |
+| `border_secondary` | `#3F7F57` | deep green |
+| `button_01_background_normal` | `#39385D` | muted indigo |
+| `button_01_background_hover` | `#4C9566` | medium green |
+
+The window uses the plain `header_background` color. The decorative rotated color-band grid was removed.
