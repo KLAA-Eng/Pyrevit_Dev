@@ -4,7 +4,8 @@
 def compare_fingerprints(baseline, current):
     """Classify fingerprints without changing either input mapping.
 
-    Each mapping value is a two-item tuple: ``(type_key, location_key)``.
+    Values may be legacy two-item tuples, three-item tuples with a content
+    key, or mappings containing ``type``, ``location``, and ``content``.
     """
     result = {
         'new': [],
@@ -31,9 +32,28 @@ def compare_fingerprints(baseline, current):
 
 def _change_reasons(baseline_fingerprint, current_fingerprint):
     """Return stable labels for the fingerprint fields that changed."""
+    baseline_values = _fingerprint_values(baseline_fingerprint)
+    current_values = _fingerprint_values(current_fingerprint)
     reasons = []
-    if baseline_fingerprint[0] != current_fingerprint[0]:
+    if baseline_values['type'] != current_values['type']:
         reasons.append('type')
-    if baseline_fingerprint[1] != current_fingerprint[1]:
+    if baseline_values['location'] != current_values['location']:
         reasons.append('location')
+    if baseline_values['content'] != current_values['content']:
+        reasons.append('content')
     return reasons
+
+
+def _fingerprint_values(fingerprint):
+    """Normalize supported fingerprint forms without changing the input."""
+    if isinstance(fingerprint, dict):
+        return {
+            'type': fingerprint.get('type'),
+            'location': fingerprint.get('location'),
+            'content': fingerprint.get('content'),
+        }
+    return {
+        'type': fingerprint[0] if len(fingerprint) > 0 else None,
+        'location': fingerprint[1] if len(fingerprint) > 1 else None,
+        'content': fingerprint[2] if len(fingerprint) > 2 else None,
+    }

@@ -2,159 +2,64 @@
 
 ## Purpose
 
-`Highlight Changed Elements` is a DevSandbox pyRevit prototype for finding host-model elements that are new or materially changed compared with a separate baseline RVT file.
+`Highlight Changed Elements` is a DevSandbox pyRevit prototype for comparing
+selected sheets and their placed-view content with a separate local baseline
+RVT. It is a graphics-only review aid: it never saves either document.
 
-The tool is sheet-focused. It does not highlight every changed element in the model. It only highlights changed elements that are visible inside placed views on the sheets selected by the user.
+## Compared scope
 
-## User Flow
+For selected sheets, the command compares eligible content in placed views and
+direct sheet-owned content. This includes detail components, annotations, tags,
+text notes, keynotes, dimensions, and placed schedules. A fingerprint records
+type, location, and parameter/content values. Schedules additionally include
+available table header/body cells. Missing comparison data is reported as
+unsupported; it is never silently treated as unchanged.
 
-1. The user runs the command from pyRevit.
-2. The command verifies that the active document is a Revit project and that the Revit version is 2024 or newer.
-3. The command opens the green-themed multi-select sheet picker.
-4. The user selects one or more non-placeholder project sheets.
-5. The command asks the user to pick a local baseline `.rvt` file.
-6. The command compares the active project model against the baseline project model.
-7. The command either highlights changed elements or clears existing red highlights, depending on the current state of the selected sheets.
-8. The command prints a pyRevit output report with comparison totals and per-sheet results.
+Title blocks, revision clouds, Revit links, and deleted current-model elements
+are excluded from highlighting. Deleted baseline elements remain report-only.
 
-## Inputs
+## Highlight and clear behavior
 
-- Active Revit project document.
-- One or more selected non-placeholder sheets from the active document.
-- A local baseline `.rvt` file.
+New or modified eligible content is highlighted red in its placed view. A
+changed schedule definition/content is highlighted by overriding its
+`ScheduleSheetInstance` on every selected owning sheet. Existing overrides are
+preserved in highlight mode. Clear mode removes matching red element overrides
+only for currently changed targets. Unsupported override operations are reported
+per target and do not abort unrelated targets.
 
-The baseline file must exist, must have the `.rvt` extension, must be a Revit project, and must not be the same file as the active model.
+## Validation boundary
 
-For workshared projects, the baseline should be a detached or archive RVT that is not connected to the active model's central/local pair. Revit does not allow a local model and its central model to be opened in the same Revit session.
+This remains a Revit 2024+ DevSandbox prototype. A paired baseline/current RVT
+fixture must validate each requested annotation class, schedule content
+signature, schedule-instance graphics, preserved existing overrides, and
+read-only close-without-save behavior before the prototype is promoted.
 
-## What The Script Looks For
+## Implementation inventory
 
-The script compares model elements by `UniqueId`.
+- Entry point: `script.py`
+- Direct imports: from __future__ import print_function;import os;from Autodesk.Revit import Exceptions as RevitExceptions;from pyrevit import DB, forms, revit, script;from changed_elements.comparison import compare_fingerprints;from GUI.forms import select_from_dict;from graphics.overrides import create_red_projection_override;
+- Local helper functions: _stop,_is_supported_revit_version,_select_baseline_path,_sheet_label,_select_sheets,_open_baseline_document,_worksharing_conflict_message,_is_supported_element,_type_key,_rounded_coordinate,_location_key,_parameter_value,_content_key,_schedule_content_key,_fingerprint,_elements_owned_by_view,_elements_visible_in_view,_sheet_in_document,_fingerprints_for_sheets,_add_fingerprint,_placed_views,_schedule_instances,_has_existing_overrides,_visible_changed_elements,_is_highlight_override,_red_override_settings,_clear_override_settings,_apply_highlights,_clear_highlights,_changed_targets,_append_changed_owned_elements,_append_changed_visible_elements,_append_target,_highlighted_changed_elements,_highlight_sheet,_print_change_report,main,
+- Bundled external assets: None.
 
-For each host-model element in both the baseline model and the active model, it builds a fingerprint containing:
+## GUI and interaction
 
-- The element type identity, based on the element type `UniqueId`.
-- The element location.
+Static UI/API references: forms.alert,forms.pick_file,output.print_md,output.print_table,script.get_output,
 
-Location is reduced to a stable comparison key:
+Use the command from its pyRevit button. Where it exposes a dialog or selection
+workflow, make the required selection and review the result before confirming.
 
-- Point-based elements compare point `X`, `Y`, `Z`, and rotation.
-- Curve-based elements compare start point `X`, `Y`, `Z` and end point `X`, `Y`, `Z`.
-- Elements without a point or curve location use a generic `none` location key.
+## Current execution logic
 
-Coordinate values are rounded to 6 decimal places before comparison.
+pyRevit loads the bundle and executes its entry point. The implementation uses
+the imports and helper functions listed above; inspect `script.py` for the exact
+branching order and host API calls.
 
-## Change Categories
+## Model and external effects
 
-The comparison produces four categories:
+Detected mutation/external-effect patterns: .SetElementOverrides,revit.Transaction,
 
-- `New`: element exists in the active model but not in the baseline.
-- `Modified`: element exists in both models but its type or location fingerprint changed.
-- `Unchanged`: element exists in both models and its fingerprint matches.
-- `Deleted`: element exists in the baseline but not in the active model.
+## Current status
 
-Only `New` and `Modified` elements are candidates for highlighting or clearing.
-
-`Deleted` elements are report-only because they do not exist in the active model and cannot be highlighted.
-
-## Sheet Visibility Logic
-
-After the model comparison is complete, the script checks the selected sheets.
-
-For each selected sheet, it gathers placed views using `sheet.GetAllPlacedViews()`.
-
-Only placed views that allow graphic overrides are processed.
-
-Within each processable placed view, the script collects visible, non-type elements and checks whether each element's `UniqueId` is in the `New` or `Modified` result set.
-
-The same element can be processed once per placed view. If an element appears in multiple selected sheets or multiple views, each view-specific override is handled separately.
-
-## Highlight Mode
-
-If the selected sheets do not already contain a matching red highlight on any visible `New` or `Modified` element, the command runs in highlight mode.
-
-In highlight mode, the script applies a red element override to visible `New` and `Modified` elements.
-
-The override currently sets:
-
-- Red projection line color.
-- Red cut line color.
-
-Before applying a highlight, the script checks whether that element already has an element-level override in that view.
-
-If an existing override is found, the script does not overwrite it. The element is skipped and reported as `Existing element override preserved`.
-
-## Clear Mode
-
-If any visible `New` or `Modified` element on the selected sheets already has a red projection-line or cut-line override, the command runs in clear mode.
-
-Clear mode follows the same core reset behavior as `Override 2D.smartbutton`: it applies a fresh empty `DB.OverrideGraphicSettings()` to the matching elements.
-
-This removes the element-level override in that view.
-
-Clear mode only targets visible `New` or `Modified` elements whose current element override has:
-
-- Projection line color red, or
-- Cut line color red.
-
-The red match is exactly RGB `255, 0, 0`.
-
-## Important Clear-Mode Limitation
-
-Revit element overrides do not record which command created them.
-
-Because of that, the script cannot prove that a red override came from this tool. It treats matching red projection-line or cut-line overrides on currently changed elements as highlights to clear.
-
-This is practical for prototype behavior, but it is not command-owned state tracking.
-
-## What The Script Does Not Look For
-
-The script intentionally does not compare or process:
-
-- Linked models.
-- View-specific elements.
-- Revit link instances.
-- Annotation elements.
-- Detail items.
-- Tags.
-- Dimensions.
-- Revision clouds.
-- Sheet title blocks as sheet annotations.
-- Deleted active-model elements, because they no longer exist in the active model.
-- Parameter changes unrelated to element type or location.
-- Geometry changes that do not change the tracked type or location fingerprint.
-- Category-level, filter-level, view-template, or object-style graphic differences.
-
-## What The Script Does Not Do
-
-The script does not:
-
-- Modify the baseline RVT.
-- Save the active model.
-- Create revision clouds.
-- Create a persistent audit record.
-- Store command-owned highlight IDs.
-- Restore prior element overrides after clearing.
-- Process placeholder sheets.
-- Process views that do not allow graphic overrides.
-- Open a central model and its local model together in the same Revit session.
-- Compare cloud models, central/local model metadata, or worksharing history.
-
-## Output Report
-
-The command writes a pyRevit output report with:
-
-- The action performed: `Highlighted` or `Cleared`.
-- The number of selected sheets.
-- The baseline file path.
-- Counts for `New`, `Modified`, `Unchanged`, and `Deleted`.
-- Total highlighted or cleared element-view pairs across selected sheets.
-- Total skipped overrides.
-- A per-sheet table showing placed views checked, elements highlighted or cleared, and skips.
-- A modified-elements table with each modified element `UniqueId` and the detected reason.
-- A deleted-elements table for baseline elements missing from the active model.
-- A skipped-overrides table when applicable.
-
-## Current Status
-
-This command is still a DevSandbox prototype. It has been syntax-checked outside Revit, but full validation requires running it in Revit 2024 or newer with an active project model and a separate local baseline RVT.
+This is a development-tab command. The inventory above is statically derived
+from the current bundle and must be confirmed inside the target Revit/pyRevit
+environment before promotion or behavior changes.

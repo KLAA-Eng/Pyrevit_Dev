@@ -45,6 +45,31 @@ class CompareFingerprintsTests(unittest.TestCase):
         self.assertEqual({'item': ('type-a', ('point', 0.0, 0.0, 0.0, 0.0))}, baseline)
         self.assertEqual({'item': ('type-b', ('point', 1.0, 0.0, 0.0, 0.0))}, current)
 
+    def test_reports_content_only_changes_with_stable_reason_order(self):
+        baseline = {
+            'item': ('tag-type', ('point', 1.0, 2.0, 0.0, 0.0), 'Old mark'),
+        }
+        current = {
+            'item': ('tag-type', ('point', 1.0, 2.0, 0.0, 0.0), 'New mark'),
+        }
+
+        result = compare_fingerprints(baseline, current)
+
+        self.assertEqual(['item'], result['modified'])
+        self.assertEqual(['content'], result['reasons']['item'])
+
+    def test_accepts_matching_structured_fingerprints_as_unchanged(self):
+        fingerprint = {
+            'type': 'text-type',
+            'location': ('point', 1.0, 2.0, 0.0, 0.0),
+            'content': 'A101',
+        }
+
+        result = compare_fingerprints({'item': fingerprint}, {'item': dict(fingerprint)})
+
+        self.assertEqual(['item'], result['unchanged'])
+        self.assertEqual([], result['modified'])
+
 
 if __name__ == '__main__':
     unittest.main()

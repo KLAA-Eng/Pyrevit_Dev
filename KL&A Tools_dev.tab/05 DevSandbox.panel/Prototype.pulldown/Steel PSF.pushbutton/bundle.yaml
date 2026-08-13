@@ -1,0 +1,9 @@
+title:
+  en_us: "Steel PSF"
+tooltip:
+  en_us: >-
+    Prototype: reports summary-only host-model steel PSF. Structural framing and
+    columns use usable length times nominal section weight; PSF uses summed
+    computed Floor area by level. Includes an optional summary-only CSV export.
+engine:
+  clean: true

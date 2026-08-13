@@ -1,44 +1,49 @@
-"""Deterministic steel weight and floor-area aggregation rules."""
+"""Deterministic steel PSF aggregation rules."""
 from __future__ import unicode_literals
 
 
-POUNDS_PER_KILOGRAM = 2.20462262185
-
-
-def aggregate_steel_weight(material_records, floor_area_records):
-    """Return per-level and total steel-weight results without Revit objects."""
+def aggregate_steel_weight(steel_records, floor_area_records):
+    """Aggregate normalized records without retaining raw output rows."""
     levels = {}
+    category_weights = {}
+    family_type_weights = {}
+    floor_type_areas = {}
     excluded = []
-    for record in material_records:
-        _add_material_record(record, levels, excluded)
+    for record in steel_records:
+        _add_steel_record(record, levels, category_weights, family_type_weights, excluded)
     for record in floor_area_records:
-        _add_floor_area_record(record, levels, excluded)
-    rows = [_row_for_level(levels[level_id]) for level_id in levels]
-    rows.sort(key=_row_sort_key)
+        _add_floor_area_record(record, levels, floor_type_areas, excluded)
+    rows = sorted([_row_for_level(level) for level in levels.values()], key=_row_sort_key)
     return {
         'rows': rows,
         'total': _total_for_rows(rows),
+        'categories': _summary_rows(category_weights, 'category', 'steel_weight_lb'),
+        'family_types': _summary_rows(family_type_weights, 'family_type', 'steel_weight_lb'),
+        'floor_types': _summary_rows(floor_type_areas, 'floor_type', 'floor_area_square_feet'),
         'excluded': excluded,
     }
 
 
-def _add_material_record(record, levels, excluded):
+def _add_steel_record(record, levels, category_weights, family_type_weights, excluded):
     level = _level_for_record(record, levels)
     if level is None:
         _exclude(excluded, record, 'missing level')
         return
-    volume = _positive_number(record.get('volume_cubic_feet'))
-    if volume is None:
-        _exclude(excluded, record, 'missing or zero material volume')
+    length = _positive_number(record.get('length_feet'))
+    if length is None:
+        _exclude(excluded, record, 'missing or zero usable length')
         return
-    density = _positive_number(record.get('density_kg_per_cubic_foot'))
-    if density is None:
-        _exclude(excluded, record, 'missing or zero material density')
+    nominal_weight = _positive_number(record.get('nominal_weight_lb_per_foot'))
+    if nominal_weight is None:
+        _exclude(excluded, record, 'missing or zero nominal section weight')
         return
-    level['steel_weight_lb'] += volume * density * POUNDS_PER_KILOGRAM
+    pounds = length * nominal_weight
+    level['steel_weight_lb'] += pounds
+    _add_summary_value(category_weights, record.get('category'), pounds, 'Unspecified')
+    _add_summary_value(family_type_weights, record.get('family_type'), pounds, 'Unspecified')
 
 
-def _add_floor_area_record(record, levels, excluded):
+def _add_floor_area_record(record, levels, floor_type_areas, excluded):
     level = _level_for_record(record, levels)
     if level is None:
         _exclude(excluded, record, 'missing level')
@@ -48,6 +53,7 @@ def _add_floor_area_record(record, levels, excluded):
         _exclude(excluded, record, 'missing or zero floor area')
         return
     level['floor_area_square_feet'] += area
+    _add_summary_value(floor_type_areas, record.get('floor_type'), area, 'Unspecified')
 
 
 def _level_for_record(record, levels):
@@ -73,22 +79,20 @@ def _positive_number(value):
     return number if number > 0.0 else None
 
 
+def _add_summary_value(summary, key, value, default_key):
+    summary[key or default_key] = summary.get(key or default_key, 0.0) + value
+
+
 def _exclude(excluded, record, reason):
-    excluded.append({
-        'element_id': record.get('element_id'),
-        'material_id': record.get('material_id'),
-        'reason': reason,
-    })
+    excluded.append({'element_id': record.get('element_id'), 'reason': reason})
 
 
 def _row_for_level(level):
     area = level['floor_area_square_feet']
     weight = level['steel_weight_lb']
     return {
-        'level_id': level['level_id'],
-        'level_name': level['level_name'],
-        'steel_weight_lb': weight,
-        'floor_area_square_feet': area,
+        'level_id': level['level_id'], 'level_name': level['level_name'],
+        'steel_weight_lb': weight, 'floor_area_square_feet': area,
         'psf': weight / area if area > 0.0 else None,
     }
 
@@ -100,8 +104,9 @@ def _row_sort_key(row):
 def _total_for_rows(rows):
     weight = sum(row['steel_weight_lb'] for row in rows)
     area = sum(row['floor_area_square_feet'] for row in rows)
-    return {
-        'steel_weight_lb': weight,
-        'floor_area_square_feet': area,
-        'psf': weight / area if area > 0.0 else None,
-    }
+    return {'steel_weight_lb': weight, 'floor_area_square_feet': area,
+            'psf': weight / area if area > 0.0 else None}
+
+
+def _summary_rows(values, key_name, value_name):
+    return [{key_name: key, value_name: values[key]} for key in sorted(values, key=lambda item: item.lower())]

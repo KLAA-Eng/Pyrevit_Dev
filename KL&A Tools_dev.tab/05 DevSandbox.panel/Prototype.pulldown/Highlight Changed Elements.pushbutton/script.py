@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """Highlight changed host-model elements visible on selected sheets.
 
-This DevSandbox prototype compares a current local project with a local baseline
-RVT. It intentionally excludes links, view-specific annotations, and automatic
-revision-cloud generation.
+This DevSandbox prototype compares selected-sheet content with a local baseline
+RVT. It excludes links, title blocks, and revision clouds.
 """
 from __future__ import print_function
 
@@ -92,10 +91,14 @@ def _worksharing_conflict_message():
     )
 
 
-def _is_host_model_element(element):
+def _is_supported_element(element):
     if element is None or element.Category is None:
         return False
-    if element.ViewSpecific or isinstance(element, DB.RevitLinkInstance):
+    if isinstance(element, DB.RevitLinkInstance):
+        return False
+    category_id = element.Category.Id.IntegerValue
+    excluded = (int(DB.BuiltInCategory.OST_TitleBlocks), int(DB.BuiltInCategory.OST_RevisionClouds))
+    if category_id in excluded:
         return False
     return True
 
@@ -135,13 +138,93 @@ def _location_key(element):
     return ('none',)
 
 
-def _fingerprints_by_unique_id(doc):
+def _parameter_value(parameter):
+    value = parameter.AsValueString()
+    if value is not None:
+        return value
+    storage = parameter.StorageType
+    if storage == DB.StorageType.String:
+        return parameter.AsString() or ''
+    if storage == DB.StorageType.Integer:
+        return str(parameter.AsInteger())
+    if storage == DB.StorageType.Double:
+        return str(_rounded_coordinate(parameter.AsDouble()))
+    if storage == DB.StorageType.ElementId:
+        return str(parameter.AsElementId().IntegerValue)
+    return ''
+
+
+def _content_key(element):
+    values = []
+    try:
+        for parameter in element.Parameters:
+            if parameter.HasValue:
+                values.append((parameter.Definition.Name, _parameter_value(parameter)))
+    except RevitExceptions.InvalidOperationException as error:
+        return None, 'parameter content unavailable: {}'.format(error)
+    values.sort()
+    return tuple(values), None
+
+
+def _schedule_content_key(schedule):
+    try:
+        parameter_values, parameter_error = _content_key(schedule)
+        if parameter_error:
+            return None, parameter_error
+        values = list(parameter_values)
+        for section in (DB.SectionType.Header, DB.SectionType.Body):
+            section_data = schedule.GetTableData().GetSectionData(section)
+            for row in range(section_data.FirstRowNumber, section_data.LastRowNumber + 1):
+                for column in range(section_data.FirstColumnNumber, section_data.LastColumnNumber + 1):
+                    values.append((str(section), row, column, schedule.GetCellText(section, row, column)))
+        return tuple(values), None
+    except (RevitExceptions.ArgumentException, RevitExceptions.InvalidOperationException) as error:
+        return None, 'schedule content unavailable: {}'.format(error)
+
+
+def _fingerprint(doc, element, is_schedule=False):
+    content, unsupported = _schedule_content_key(element) if is_schedule else _content_key(element)
+    return (_type_key(doc, element), _location_key(element), content), unsupported
+
+
+def _elements_owned_by_view(doc, view_id):
+    return DB.FilteredElementCollector(doc).OwnedByView(view_id).WhereElementIsNotElementType()
+
+
+def _elements_visible_in_view(doc, view_id):
+    return DB.FilteredElementCollector(doc, view_id).WhereElementIsNotElementType()
+
+
+def _sheet_in_document(doc, sheet):
+    return doc.GetElement(sheet.UniqueId)
+
+
+def _fingerprints_for_sheets(doc, current_sheets):
     fingerprints = {}
-    elements = DB.FilteredElementCollector(doc).WhereElementIsNotElementType()
-    for element in elements:
-        if _is_host_model_element(element):
-            fingerprints[element.UniqueId] = (_type_key(doc, element), _location_key(element))
-    return fingerprints
+    unsupported = []
+    for current_sheet in current_sheets:
+        sheet = _sheet_in_document(doc, current_sheet)
+        if sheet is None:
+            continue
+        for view in _placed_views(doc, sheet):
+            for element in _elements_visible_in_view(doc, view.Id):
+                _add_fingerprint(doc, element, fingerprints, unsupported)
+        for element in _elements_owned_by_view(doc, sheet.Id):
+            _add_fingerprint(doc, element, fingerprints, unsupported)
+        for instance in _schedule_instances(doc, sheet):
+            schedule = doc.GetElement(instance.ScheduleId)
+            if schedule is not None:
+                _add_fingerprint(doc, schedule, fingerprints, unsupported, True)
+    return fingerprints, unsupported
+
+
+def _add_fingerprint(doc, element, fingerprints, unsupported, is_schedule=False):
+    if not _is_supported_element(element):
+        return
+    fingerprint, reason = _fingerprint(doc, element, is_schedule)
+    fingerprints[element.UniqueId] = fingerprint
+    if reason:
+        unsupported.append((element.UniqueId, reason))
 
 
 def _placed_views(doc, sheet):
@@ -151,6 +234,14 @@ def _placed_views(doc, sheet):
         if view is not None and view.AreGraphicsOverridesAllowed():
             views.append(view)
     return views
+
+
+def _schedule_instances(doc, sheet):
+    instances = []
+    for instance in DB.FilteredElementCollector(doc).OfClass(DB.ScheduleSheetInstance):
+        if instance.OwnerViewId == sheet.Id:
+            instances.append(instance)
+    return instances
 
 
 def _has_existing_overrides(override_settings):
@@ -183,21 +274,19 @@ def _has_existing_overrides(override_settings):
     return override_settings.Halftone or override_settings.Transparency != 0
 
 
-def _visible_changed_elements(doc, views, changed_ids):
+def _visible_changed_elements(targets):
     visible = []
     preserved = []
     processed = set()
-    for view in views:
-        collector = DB.FilteredElementCollector(doc, view.Id).WhereElementIsNotElementType()
-        for element in collector:
-            pair = (view.Id.IntegerValue, element.Id.IntegerValue)
-            if pair in processed or element.UniqueId not in changed_ids:
-                continue
-            processed.add(pair)
-            if _has_existing_overrides(view.GetElementOverrides(element.Id)):
-                preserved.append((view, element, 'Existing element override preserved'))
-                continue
-            visible.append((view, element))
+    for view, element, kind in targets:
+        pair = (view.Id.IntegerValue, element.Id.IntegerValue)
+        if pair in processed:
+            continue
+        processed.add(pair)
+        if _has_existing_overrides(view.GetElementOverrides(element.Id)):
+            preserved.append((view, element, kind, 'Existing element override preserved'))
+            continue
+        visible.append((view, element, kind))
     return visible, preserved
 
 
@@ -227,12 +316,12 @@ def _apply_highlights(doc, visible_elements):
     highlighted = []
     skipped = []
     with revit.Transaction('Highlight changed elements on selected sheets', doc=doc):
-        for view, element in visible_elements:
+        for view, element, kind in visible_elements:
             try:
                 view.SetElementOverrides(element.Id, settings)
-                highlighted.append((view, element))
+                highlighted.append((view, element, kind))
             except (RevitExceptions.ArgumentException, RevitExceptions.InvalidOperationException) as error:
-                skipped.append((view, element, str(error)))
+                skipped.append((view, element, kind, str(error)))
     return highlighted, skipped
 
 
@@ -241,49 +330,67 @@ def _clear_highlights(doc, visible_elements):
     cleared = []
     skipped = []
     with revit.Transaction('Clear changed element highlights on selected sheets', doc=doc):
-        for view, element in visible_elements:
+        for view, element, kind in visible_elements:
             try:
                 view.SetElementOverrides(element.Id, settings)
-                cleared.append((view, element))
+                cleared.append((view, element, kind))
             except (RevitExceptions.ArgumentException, RevitExceptions.InvalidOperationException) as error:
-                skipped.append((view, element, str(error)))
+                skipped.append((view, element, kind, str(error)))
     return cleared, skipped
 
 
-def _changed_elements_in_views(doc, views, changed_ids):
+def _changed_targets(doc, sheets, changed_ids):
     changed = []
     processed = set()
-    for view in views:
-        collector = DB.FilteredElementCollector(doc, view.Id).WhereElementIsNotElementType()
-        for element in collector:
-            pair = (view.Id.IntegerValue, element.Id.IntegerValue)
-            if pair in processed or element.UniqueId not in changed_ids:
-                continue
-            processed.add(pair)
-            changed.append((view, element))
+    for sheet in sheets:
+        for view in _placed_views(doc, sheet):
+            _append_changed_visible_elements(doc, view, 'placed-view element', changed_ids, processed, changed)
+        _append_changed_owned_elements(doc, sheet, sheet, 'sheet-owned element', changed_ids, processed, changed)
+        for instance in _schedule_instances(doc, sheet):
+            schedule = doc.GetElement(instance.ScheduleId)
+            if schedule is not None and schedule.UniqueId in changed_ids:
+                _append_target(sheet, instance, 'schedule placement', processed, changed)
     return changed
+
+
+def _append_changed_owned_elements(doc, owner, override_view, kind, changed_ids, processed, changed):
+    for element in _elements_owned_by_view(doc, owner.Id):
+        if _is_supported_element(element) and element.UniqueId in changed_ids:
+            _append_target(override_view, element, kind, processed, changed)
+
+
+def _append_changed_visible_elements(doc, view, kind, changed_ids, processed, changed):
+    for element in _elements_visible_in_view(doc, view.Id):
+        if _is_supported_element(element) and element.UniqueId in changed_ids:
+            _append_target(view, element, kind, processed, changed)
+
+
+def _append_target(view, element, kind, processed, changed):
+    pair = (view.Id.IntegerValue, element.Id.IntegerValue)
+    if pair not in processed:
+        processed.add(pair)
+        changed.append((view, element, kind))
 
 
 def _highlighted_changed_elements(doc, sheets, changed_ids):
     highlighted = []
-    for sheet in sheets:
-        views = _placed_views(doc, sheet)
-        for view, element in _changed_elements_in_views(doc, views, changed_ids):
-            if _is_highlight_override(view.GetElementOverrides(element.Id)):
-                highlighted.append((view, element))
+    for view, element, kind in _changed_targets(doc, sheets, changed_ids):
+        if _is_highlight_override(view.GetElementOverrides(element.Id)):
+            highlighted.append((view, element, kind))
     return highlighted
 
 
 def _highlight_sheet(doc, sheet, changed_ids, clear_existing):
     views = _placed_views(doc, sheet)
+    targets = _changed_targets(doc, [sheet], changed_ids)
     if clear_existing:
         red_elements = []
-        for view, element in _changed_elements_in_views(doc, views, changed_ids):
+        for view, element, kind in targets:
             if _is_highlight_override(view.GetElementOverrides(element.Id)):
-                red_elements.append((view, element))
+                red_elements.append((view, element, kind))
         changed, skipped = _clear_highlights(doc, red_elements)
     else:
-        visible_elements, preserved = _visible_changed_elements(doc, views, changed_ids)
+        visible_elements, preserved = _visible_changed_elements(targets)
         changed, skipped = _apply_highlights(doc, visible_elements)
         skipped.extend(preserved)
     return {
@@ -294,7 +401,7 @@ def _highlight_sheet(doc, sheet, changed_ids, clear_existing):
     }
 
 
-def _print_change_report(output, sheets, baseline_path, comparison, sheet_results, clear_existing):
+def _print_change_report(output, sheets, baseline_path, comparison, sheet_results, unsupported, clear_existing):
     action_label = 'Cleared' if clear_existing else 'Highlighted'
     output.print_md('# {}'.format(COMMAND_TITLE))
     output.print_md('**Action:** {}'.format(action_label))
@@ -330,16 +437,20 @@ def _print_change_report(output, sheets, baseline_path, comparison, sheet_result
 
     skipped_rows = []
     for result in sheet_results:
-        for view, element, reason in result['skipped']:
+        for view, element, kind, reason in result['skipped']:
             skipped_rows.append([
                 _sheet_label(result['sheet']),
                 view.Name,
+                kind,
                 element.Id.IntegerValue,
                 reason,
             ])
     if skipped_rows:
         output.print_md('## Skipped overrides')
-        output.print_table(skipped_rows, columns=['Sheet', 'View', 'ElementId', 'Reason'])
+        output.print_table(skipped_rows, columns=['Sheet', 'Target', 'Kind', 'ElementId', 'Reason'])
+    if unsupported:
+        output.print_md('## Unsupported comparison data')
+        output.print_table(unsupported, columns=['UniqueId', 'Reason'])
     output.print_md(
         '> This prototype does not change the baseline RVT, compare linked '
         'models, or track highlight ownership outside current red element overrides.'
@@ -365,10 +476,12 @@ def main():
         baseline_doc = _open_baseline_document(doc.Application, baseline_path)
         if baseline_doc.IsFamilyDocument:
             _stop('The selected baseline must be a Revit project, not a family.')
-        comparison = compare_fingerprints(
-            _fingerprints_by_unique_id(baseline_doc),
-            _fingerprints_by_unique_id(doc),
-        )
+        baseline_fingerprints, baseline_unsupported = _fingerprints_for_sheets(
+            baseline_doc, selected_sheets)
+        current_fingerprints, current_unsupported = _fingerprints_for_sheets(
+            doc, selected_sheets)
+        comparison = compare_fingerprints(baseline_fingerprints, current_fingerprints)
+        unsupported = baseline_unsupported + current_unsupported
     except RevitExceptions.CannotOpenBothCentralAndLocalException:
         _stop(_worksharing_conflict_message())
     except (RevitExceptions.ArgumentException, RevitExceptions.FileAccessException,
@@ -384,7 +497,7 @@ def main():
         _highlight_sheet(doc, sheet, changed_ids, clear_existing)
         for sheet in selected_sheets
     ]
-    _print_change_report(output, selected_sheets, baseline_path, comparison, sheet_results, clear_existing)
+    _print_change_report(output, selected_sheets, baseline_path, comparison, sheet_results, unsupported, clear_existing)
 
 
 if __name__ == '__main__':
