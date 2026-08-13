@@ -13,9 +13,9 @@ Level and column Base Level where available, and computed Floor area. It prints
 summary metadata plus groupings by level, category, family/type, and floor type.
 Missing level, length, nominal weight, or area is excluded with a reason.
 
-The optional CSV contains the same summaries and exclusion counts only. Neither
-the report nor CSV includes raw steel-element or floor-element rows. The command
-does not start a transaction, modify, save, or synchronize the Revit document.
+The current command only prints to the pyRevit output window. It does not export
+CSV from the active workflow. The command does not start a transaction, modify,
+save, or synchronize the Revit document.
 
 ## Validation boundary
 
@@ -52,3 +52,13 @@ Detected mutation/external-effect patterns: No Revit transaction or direct mutat
 This is a development-tab command. The inventory above is statically derived
 from the current bundle and must be confirmed inside the target Revit/pyRevit
 environment before promotion or behavior changes.
+
+## Future development
+
+- Wire the existing CSV projection into the active workflow with an explicit
+  user prompt and `forms.save_file()` save-location dialog after the report is
+  generated.
+- CSV export should contain the same summary-level data shown in the pyRevit
+  output, including level-split category, family/type, floor-type, and
+  excluded/unavailable length summaries. It should continue to exclude raw
+  steel-element and floor-element rows.
