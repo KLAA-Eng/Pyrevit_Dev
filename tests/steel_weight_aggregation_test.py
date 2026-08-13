@@ -10,10 +10,22 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 
-from lib.steel_weight.aggregation import aggregate_steel_weight
+from lib.steel_weight.aggregation import aggregate_steel_weight, records_for_level_ids
 
 
 class AggregateSteelWeightTests(unittest.TestCase):
+    def test_filters_records_to_selected_level_ids(self):
+        records = [
+            {'element_id': 1, 'level_id': 10, 'level_name': 'Level 1'},
+            {'element_id': 2, 'level_id': 20, 'level_name': 'Level 2'},
+            {'element_id': 3, 'level_id': None, 'level_name': ''},
+        ]
+
+        filtered = records_for_level_ids(records, [20])
+
+        self.assertEqual([2], [record['element_id'] for record in filtered])
+        self.assertEqual([], records_for_level_ids(records, []))
+
     def test_aggregates_length_times_nominal_weight_by_level_and_uses_total_denominator(self):
         records = [
             {

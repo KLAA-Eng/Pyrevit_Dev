@@ -24,6 +24,14 @@ def aggregate_steel_weight(steel_records, floor_area_records):
     }
 
 
+def records_for_level_ids(records, level_ids):
+    """Return records assigned to one of the selected level ids."""
+    selected_ids = set(level_ids or [])
+    if not selected_ids:
+        return []
+    return [record for record in records if record.get('level_id') in selected_ids]
+
+
 def _add_steel_record(record, levels, category_weights, family_type_weights, excluded):
     level = _level_for_record(record, levels)
     if level is None:
