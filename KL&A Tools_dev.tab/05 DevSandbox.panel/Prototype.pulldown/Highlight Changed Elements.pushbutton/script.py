@@ -7,6 +7,7 @@ RVT. It excludes links, title blocks, and revision clouds.
 from __future__ import print_function
 
 import os
+import traceback
 
 from Autodesk.Revit import Exceptions as RevitExceptions
 from pyrevit import DB, forms, revit, script
@@ -104,11 +105,14 @@ def _is_supported_element(element):
 
 
 def _type_key(doc, element):
-    type_id = element.GetTypeId()
-    if type_id == DB.ElementId.InvalidElementId:
+    try:
+        type_id = element.GetTypeId()
+        if type_id == DB.ElementId.InvalidElementId:
+            return ''
+        type_element = doc.GetElement(type_id)
+        return type_element.UniqueId if type_element else ''
+    except Exception:
         return ''
-    type_element = doc.GetElement(type_id)
-    return type_element.UniqueId if type_element else ''
 
 
 def _rounded_coordinate(value):
@@ -116,25 +120,28 @@ def _rounded_coordinate(value):
 
 
 def _location_key(element):
-    location = element.Location
-    if isinstance(location, DB.LocationPoint):
-        point = location.Point
-        return (
-            'point',
-            _rounded_coordinate(point.X),
-            _rounded_coordinate(point.Y),
-            _rounded_coordinate(point.Z),
-            _rounded_coordinate(location.Rotation),
-        )
-    if isinstance(location, DB.LocationCurve):
-        curve = location.Curve
-        start = curve.GetEndPoint(0)
-        end = curve.GetEndPoint(1)
-        return (
-            'curve',
-            _rounded_coordinate(start.X), _rounded_coordinate(start.Y), _rounded_coordinate(start.Z),
-            _rounded_coordinate(end.X), _rounded_coordinate(end.Y), _rounded_coordinate(end.Z),
-        )
+    try:
+        location = element.Location
+        if isinstance(location, DB.LocationPoint):
+            point = location.Point
+            return (
+                'point',
+                _rounded_coordinate(point.X),
+                _rounded_coordinate(point.Y),
+                _rounded_coordinate(point.Z),
+                _rounded_coordinate(location.Rotation),
+            )
+        if isinstance(location, DB.LocationCurve):
+            curve = location.Curve
+            start = curve.GetEndPoint(0)
+            end = curve.GetEndPoint(1)
+            return (
+                'curve',
+                _rounded_coordinate(start.X), _rounded_coordinate(start.Y), _rounded_coordinate(start.Z),
+                _rounded_coordinate(end.X), _rounded_coordinate(end.Y), _rounded_coordinate(end.Z),
+            )
+    except Exception:
+        return ('unavailable',)
     return ('none',)
 
 
@@ -158,9 +165,12 @@ def _content_key(element):
     values = []
     try:
         for parameter in element.Parameters:
-            if parameter.HasValue:
-                values.append((parameter.Definition.Name, _parameter_value(parameter)))
-    except RevitExceptions.InvalidOperationException as error:
+            try:
+                if parameter.HasValue:
+                    values.append((parameter.Definition.Name, _parameter_value(parameter)))
+            except Exception as error:
+                values.append(('unsupported parameter', str(error)))
+    except Exception as error:
         return None, 'parameter content unavailable: {}'.format(error)
     values.sort()
     return tuple(values), None
@@ -176,9 +186,12 @@ def _schedule_content_key(schedule):
             section_data = schedule.GetTableData().GetSectionData(section)
             for row in range(section_data.FirstRowNumber, section_data.LastRowNumber + 1):
                 for column in range(section_data.FirstColumnNumber, section_data.LastColumnNumber + 1):
-                    values.append((str(section), row, column, schedule.GetCellText(section, row, column)))
+                    try:
+                        values.append((str(section), row, column, schedule.GetCellText(section, row, column)))
+                    except Exception as error:
+                        values.append((str(section), row, column, 'unsupported cell: {}'.format(error)))
         return tuple(values), None
-    except (RevitExceptions.ArgumentException, RevitExceptions.InvalidOperationException) as error:
+    except Exception as error:
         return None, 'schedule content unavailable: {}'.format(error)
 
 
@@ -196,7 +209,18 @@ def _elements_visible_in_view(doc, view_id):
 
 
 def _sheet_in_document(doc, sheet):
-    return doc.GetElement(sheet.UniqueId)
+    matched_sheet = doc.GetElement(sheet.UniqueId)
+    if matched_sheet is not None:
+        return matched_sheet
+    for candidate in (
+        DB.FilteredElementCollector(doc)
+        .OfCategory(DB.BuiltInCategory.OST_Sheets)
+        .WhereElementIsNotElementType()
+        .ToElements()
+    ):
+        if not candidate.IsPlaceholder and candidate.SheetNumber == sheet.SheetNumber:
+            return candidate
+    return None
 
 
 def _fingerprints_for_sheets(doc, current_sheets):
@@ -205,16 +229,23 @@ def _fingerprints_for_sheets(doc, current_sheets):
     for current_sheet in current_sheets:
         sheet = _sheet_in_document(doc, current_sheet)
         if sheet is None:
+            unsupported.append((
+                current_sheet.UniqueId,
+                'matching sheet not found: {}'.format(_sheet_label(current_sheet)),
+            ))
             continue
-        for view in _placed_views(doc, sheet):
-            for element in _elements_visible_in_view(doc, view.Id):
+        try:
+            for view in _placed_views(doc, sheet):
+                for element in _elements_visible_in_view(doc, view.Id):
+                    _add_fingerprint(doc, element, fingerprints, unsupported)
+            for element in _elements_owned_by_view(doc, sheet.Id):
                 _add_fingerprint(doc, element, fingerprints, unsupported)
-        for element in _elements_owned_by_view(doc, sheet.Id):
-            _add_fingerprint(doc, element, fingerprints, unsupported)
-        for instance in _schedule_instances(doc, sheet):
-            schedule = doc.GetElement(instance.ScheduleId)
-            if schedule is not None:
-                _add_fingerprint(doc, schedule, fingerprints, unsupported, True)
+            for instance in _schedule_instances(doc, sheet):
+                schedule = doc.GetElement(instance.ScheduleId)
+                if schedule is not None:
+                    _add_fingerprint(doc, schedule, fingerprints, unsupported, True)
+        except Exception as error:
+            unsupported.append((sheet.UniqueId, 'sheet comparison unavailable: {}'.format(error)))
     return fingerprints, unsupported
 
 
@@ -245,33 +276,49 @@ def _schedule_instances(doc, sheet):
 
 
 def _has_existing_overrides(override_settings):
-    colors = (
-        override_settings.ProjectionLineColor,
-        override_settings.CutLineColor,
-        override_settings.SurfaceForegroundPatternColor,
-        override_settings.SurfaceBackgroundPatternColor,
-        override_settings.CutForegroundPatternColor,
-        override_settings.CutBackgroundPatternColor,
-    )
-    pattern_ids = (
-        override_settings.ProjectionLinePatternId,
-        override_settings.CutLinePatternId,
-        override_settings.SurfaceForegroundPatternId,
-        override_settings.SurfaceBackgroundPatternId,
-        override_settings.CutForegroundPatternId,
-        override_settings.CutBackgroundPatternId,
-    )
+    colors = []
+    for property_name in (
+        'ProjectionLineColor',
+        'CutLineColor',
+        'SurfaceForegroundPatternColor',
+        'SurfaceBackgroundPatternColor',
+        'CutForegroundPatternColor',
+        'CutBackgroundPatternColor',
+    ):
+        color = getattr(override_settings, property_name, None)
+        if color is not None:
+            colors.append(color)
+    pattern_ids = []
+    for property_name in (
+        'ProjectionLinePatternId',
+        'CutLinePatternId',
+        'SurfaceForegroundPatternId',
+        'SurfaceBackgroundPatternId',
+        'CutForegroundPatternId',
+        'CutBackgroundPatternId',
+    ):
+        pattern_id = getattr(override_settings, property_name, None)
+        if pattern_id is not None:
+            pattern_ids.append(pattern_id)
     if any(color.IsValid for color in colors):
         return True
     if any(pattern_id != DB.ElementId.InvalidElementId for pattern_id in pattern_ids):
         return True
-    if override_settings.ProjectionLineWeight != DB.OverrideGraphicSettings.InvalidPenNumber:
+    invalid_pen = getattr(DB.OverrideGraphicSettings, 'InvalidPenNumber', -1)
+    if getattr(override_settings, 'ProjectionLineWeight', invalid_pen) != invalid_pen:
         return True
-    if override_settings.CutLineWeight != DB.OverrideGraphicSettings.InvalidPenNumber:
+    if getattr(override_settings, 'CutLineWeight', invalid_pen) != invalid_pen:
         return True
-    if override_settings.DetailLevel != DB.ViewDetailLevel.Undefined:
+    if getattr(override_settings, 'DetailLevel', DB.ViewDetailLevel.Undefined) != DB.ViewDetailLevel.Undefined:
         return True
-    return override_settings.Halftone or override_settings.Transparency != 0
+    return getattr(override_settings, 'Halftone', False) or getattr(override_settings, 'Transparency', 0) != 0
+
+
+def _get_element_overrides(view, element):
+    try:
+        return view.GetElementOverrides(element.Id), None
+    except Exception as error:
+        return None, str(error)
 
 
 def _visible_changed_elements(targets):
@@ -283,7 +330,11 @@ def _visible_changed_elements(targets):
         if pair in processed:
             continue
         processed.add(pair)
-        if _has_existing_overrides(view.GetElementOverrides(element.Id)):
+        override_settings, override_error = _get_element_overrides(view, element)
+        if override_error:
+            preserved.append((view, element, kind, override_error))
+            continue
+        if _has_existing_overrides(override_settings):
             preserved.append((view, element, kind, 'Existing element override preserved'))
             continue
         visible.append((view, element, kind))
@@ -291,10 +342,11 @@ def _visible_changed_elements(targets):
 
 
 def _is_highlight_override(override_settings):
-    colors = (
-        override_settings.ProjectionLineColor,
-        override_settings.CutLineColor,
-    )
+    colors = []
+    for property_name in ('ProjectionLineColor', 'CutLineColor'):
+        color = getattr(override_settings, property_name, None)
+        if color is not None:
+            colors.append(color)
     for color in colors:
         if color.IsValid and color.Red == 255 and color.Green == 0 and color.Blue == 0:
             return True
@@ -375,7 +427,10 @@ def _append_target(view, element, kind, processed, changed):
 def _highlighted_changed_elements(doc, sheets, changed_ids):
     highlighted = []
     for view, element, kind in _changed_targets(doc, sheets, changed_ids):
-        if _is_highlight_override(view.GetElementOverrides(element.Id)):
+        override_settings, override_error = _get_element_overrides(view, element)
+        if override_error:
+            continue
+        if _is_highlight_override(override_settings):
             highlighted.append((view, element, kind))
     return highlighted
 
@@ -386,7 +441,10 @@ def _highlight_sheet(doc, sheet, changed_ids, clear_existing):
     if clear_existing:
         red_elements = []
         for view, element, kind in targets:
-            if _is_highlight_override(view.GetElementOverrides(element.Id)):
+            override_settings, override_error = _get_element_overrides(view, element)
+            if override_error:
+                continue
+            if _is_highlight_override(override_settings):
                 red_elements.append((view, element, kind))
         changed, skipped = _clear_highlights(doc, red_elements)
     else:
@@ -501,4 +559,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception:
+        output = script.get_output()
+        output.print_md('# {}'.format(COMMAND_TITLE))
+        output.print_md('## Runtime error')
+        output.print_md('```text\n{}\n```'.format(traceback.format_exc()))

@@ -1,6 +1,11 @@
 
 you can add information to the readme (probably shoudl migrate to a notion site eventually and reference that here)
 
+## Reference Links
+
+- [pyRevit Labs Notion](https://pyrevitlabs.notion.site/)
+- [Revit API Docs](https://www.revitapidocs.com/)
+
 Process for modifying code and comitting it to Git:
 
 Git checkout -b dev

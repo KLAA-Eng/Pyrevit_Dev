@@ -5,6 +5,7 @@ from __future__ import print_function
 import csv
 import os
 import sys
+import traceback
 from collections import defaultdict
 
 from Autodesk.Revit import Exceptions as RevitExceptions
@@ -12,6 +13,27 @@ from pyrevit import DB, forms, revit, script
 
 
 COMMAND_TITLE = 'Steel PSF'
+
+
+def _element_name(element, default='Unspecified'):
+    if element is None:
+        return default
+    try:
+        name = DB.Element.Name.GetValue(element)
+    except AttributeError:
+        try:
+            name = element.Name
+        except AttributeError:
+            name = None
+    return name or default
+
+
+def _pounds_force_per_foot_unit_id():
+    if hasattr(DB, 'UnitTypeId') and hasattr(DB.UnitTypeId, 'PoundsForcePerFoot'):
+        return DB.UnitTypeId.PoundsForcePerFoot
+    if hasattr(DB, 'DisplayUnitType') and hasattr(DB.DisplayUnitType, 'DUT_POUNDS_FORCE_PER_FOOT'):
+        return DB.DisplayUnitType.DUT_POUNDS_FORCE_PER_FOOT
+    return None
 
 
 def _extension_root(path):
@@ -40,7 +62,7 @@ def _level_record(doc, level_id):
     level = doc.GetElement(level_id)
     if not isinstance(level, DB.Level):
         return None
-    return {'level_id': level.Id.IntegerValue, 'level_name': level.Name}
+    return {'level_id': level.Id.IntegerValue, 'level_name': _element_name(level)}
 
 
 def _assignment_level(doc, element, category_id):
@@ -73,9 +95,11 @@ def _nominal_weight_lb_per_foot(doc, element):
         parameter = _first_parameter(type_element, parameter_id) if type_element else None
     if parameter is None:
         return None
+    unit_id = _pounds_force_per_foot_unit_id()
+    if unit_id is None:
+        return None
     try:
-        return DB.UnitUtils.ConvertFromInternalUnits(
-            parameter.AsDouble(), DB.UnitTypeId.PoundsForcePerFoot)
+        return DB.UnitUtils.ConvertFromInternalUnits(parameter.AsDouble(), unit_id)
     except (RevitExceptions.ArgumentException, RevitExceptions.InvalidOperationException):
         return None
 
@@ -85,7 +109,8 @@ def _family_type_label(doc, element):
     if type_element is None:
         return 'Unspecified'
     family_name = getattr(type_element, 'FamilyName', '')
-    return '{}: {}'.format(family_name, type_element.Name) if family_name else type_element.Name
+    type_name = _element_name(type_element)
+    return '{}: {}'.format(family_name, type_name) if family_name else type_name
 
 
 def _steel_records(doc):
@@ -132,7 +157,7 @@ def _floor_area_records(doc):
             'element_id': floor.Id.IntegerValue, 'level_id': level['level_id'],
             'level_name': level['level_name'],
             'area_square_feet': parameter.AsDouble() if parameter else None,
-            'floor_type': floor_type.Name if floor_type else 'Unspecified',
+            'floor_type': _element_name(floor_type),
         })
     return records, skipped
 
@@ -193,12 +218,15 @@ def main():
     result = aggregate_steel_weight(steel_records, area_records)
     metadata = {'document_title': doc.Title, 'weight_basis': 'length_ft x nominal_lb_per_ft'}
     _print_report(output, result, steel_skips + floor_skips, metadata)
-    csv_path = _export_summary_csv(result, metadata)
-    if csv_path:
-        output.print_md('Summary CSV: `{}`'.format(csv_path))
     if not result['rows']:
         forms.alert('No eligible steel or floor data was found.', title=COMMAND_TITLE)
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception:
+        output = script.get_output()
+        output.print_md('# {}'.format(COMMAND_TITLE))
+        output.print_md('## Runtime error')
+        output.print_md('    {}'.format(traceback.format_exc().replace('\n', '\n    ')))
