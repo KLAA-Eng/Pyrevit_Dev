@@ -215,14 +215,11 @@
                       />
                                     <!--Source="https://www.erikfrits.com/media/images/LOGO.png"-->
 
-                                    <TextBlock>
-                    <Hyperlink  RequestNavigate="Hyperlink_RequestNavigate"
-                                NavigateUri="https://erikfrits.com/blog/"
+                                    <TextBlock
                                 FontSize="14px"
                                 FontWeight="Heavy"
                                 Foreground="{StaticResource text_white}">
-                                EF-Tools
-                    </Hyperlink>
+                                KLCode
                                     </TextBlock>
                                 </DockPanel>
 

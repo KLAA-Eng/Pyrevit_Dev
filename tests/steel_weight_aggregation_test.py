@@ -13,6 +13,11 @@ if PROJECT_ROOT not in sys.path:
 from lib.steel_weight.aggregation import aggregate_steel_weight, records_for_level_ids
 
 
+class BadClrNumber(object):
+    def __float__(self):
+        raise SystemError('Object reference not set to an instance of an object.')
+
+
 class AggregateSteelWeightTests(unittest.TestCase):
     def test_filters_records_to_selected_level_ids(self):
         records = [
@@ -73,11 +78,19 @@ class AggregateSteelWeightTests(unittest.TestCase):
         self.assertEqual(350.0, result['total']['floor_area_square_feet'])
         self.assertAlmostEqual(550.0 / 350.0, result['total']['psf'])
         self.assertEqual(
-            [('Structural Columns', 50.0), ('Structural Framing', 500.0)],
-            [(row['category'], row['steel_weight_lb']) for row in result['categories']],
+            [
+                ('Level 1', 'Structural Columns', 50.0),
+                ('Level 1', 'Structural Framing', 200.0),
+                ('Level 2', 'Structural Framing', 300.0),
+            ],
+            [(row['level_name'], row['category'], row['steel_weight_lb'])
+             for row in result['categories']],
         )
-        self.assertEqual([('Deck', 250.0), ('Slab', 100.0)],
-                         [(row['floor_type'], row['floor_area_square_feet']) for row in result['floor_types']])
+        self.assertEqual([
+            ('Level 1', 'Deck', 250.0),
+            ('Level 2', 'Slab', 100.0),
+        ], [(row['level_name'], row['floor_type'], row['floor_area_square_feet'])
+            for row in result['floor_types']])
         self.assertEqual([], result['excluded'])
 
     def test_reports_invalid_length_or_nominal_weight_and_keeps_no_area_psf_unavailable(self):
@@ -138,6 +151,80 @@ class AggregateSteelWeightTests(unittest.TestCase):
         self.assertAlmostEqual(0.4, result['total']['psf'])
         self.assertEqual(['missing or zero floor area'],
                          [item['reason'] for item in result['excluded']])
+
+    def test_reports_clr_numeric_conversion_failures_as_exclusions(self):
+        records = [
+            {
+                'element_id': 51,
+                'level_id': 5,
+                'level_name': 'Level 5',
+                'length_feet': BadClrNumber(),
+                'nominal_weight_lb_per_foot': 20.0,
+            },
+            {
+                'element_id': 52,
+                'level_id': 5,
+                'level_name': 'Level 5',
+                'length_feet': 10.0,
+                'nominal_weight_lb_per_foot': BadClrNumber(),
+            },
+        ]
+        areas = [{
+            'element_id': 151,
+            'level_id': 5,
+            'level_name': 'Level 5',
+            'area_square_feet': BadClrNumber(),
+        }]
+
+        result = aggregate_steel_weight(records, areas)
+
+        self.assertEqual(['Level 5'], [row['level_name'] for row in result['rows']])
+        self.assertEqual(0.0, result['rows'][0]['steel_weight_lb'])
+        self.assertEqual(0.0, result['rows'][0]['floor_area_square_feet'])
+        self.assertEqual([
+            'missing or zero usable length',
+            'missing or zero nominal section weight',
+            'missing or zero floor area',
+        ], [item['reason'] for item in result['excluded']])
+
+    def test_summarizes_missing_nominal_weight_length_by_level_and_family(self):
+        records = [
+            {
+                'element_id': 61,
+                'level_id': 6,
+                'level_name': 'Level 6',
+                'length_feet': 12.0,
+                'nominal_weight_lb_per_foot': None,
+                'category': 'Structural Framing',
+                'family_type': 'Steel Joist: K-Series',
+            },
+            {
+                'element_id': 62,
+                'level_id': 6,
+                'level_name': 'Level 6',
+                'length_feet': 8.0,
+                'nominal_weight_lb_per_foot': None,
+                'category': 'Structural Framing',
+                'family_type': 'Steel Joist: K-Series',
+            },
+            {
+                'element_id': 63,
+                'level_id': 7,
+                'level_name': 'Roof',
+                'length_feet': 20.0,
+                'nominal_weight_lb_per_foot': None,
+                'category': 'Structural Framing',
+                'family_type': 'Steel Joist: K-Series',
+            },
+        ]
+
+        result = aggregate_steel_weight(records, [])
+
+        self.assertEqual([
+            ('Level 6', 'Steel Joist: K-Series', 2, 20.0),
+            ('Roof', 'Steel Joist: K-Series', 1, 20.0),
+        ], [(row['level_name'], row['family_type'], row['count'], row['length_feet'])
+            for row in result['excluded_summaries']])
 
 
 if __name__ == '__main__':

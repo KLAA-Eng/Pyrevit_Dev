@@ -36,6 +36,65 @@ def _pounds_force_per_foot_unit_id():
     return None
 
 
+def _square_feet_unit_id():
+    if hasattr(DB, 'UnitTypeId') and hasattr(DB.UnitTypeId, 'SquareFeet'):
+        return DB.UnitTypeId.SquareFeet
+    if hasattr(DB, 'DisplayUnitType') and hasattr(DB.DisplayUnitType, 'DUT_SQUARE_FEET'):
+        return DB.DisplayUnitType.DUT_SQUARE_FEET
+    return None
+
+
+def _element_id_value(element_id):
+    if element_id is None:
+        return None
+    for property_name in ('Value', 'IntegerValue'):
+        try:
+            return int(getattr(element_id, property_name))
+        except Exception:
+            pass
+    return None
+
+
+def _is_invalid_element_id(element_id):
+    invalid = DB.ElementId.InvalidElementId
+    try:
+        return element_id == invalid
+    except Exception:
+        return _element_id_value(element_id) == _element_id_value(invalid)
+
+
+def _number_value(value):
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except Exception:
+        return None
+
+
+def _parameter_double(parameter):
+    if parameter is None:
+        return None
+    try:
+        return _number_value(parameter.AsDouble())
+    except Exception:
+        return None
+
+
+def _convert_from_internal_units(value, unit_id):
+    number = _number_value(value)
+    if number is None:
+        return None
+    if unit_id is None:
+        return number
+    try:
+        return _number_value(DB.UnitUtils.ConvertFromInternalUnits(number, unit_id))
+    except (RevitExceptions.ArgumentException, RevitExceptions.InvalidOperationException):
+        return None
+    except Exception:
+        return None
+
+
 def _extension_root(path):
     current = os.path.abspath(path)
     while True:
@@ -58,12 +117,12 @@ from steel_weight.reporting import summary_csv_rows
 
 
 def _level_record(doc, level_id):
-    if level_id is None or level_id == DB.ElementId.InvalidElementId:
+    if level_id is None or _is_invalid_element_id(level_id):
         return None
     level = doc.GetElement(level_id)
     if not isinstance(level, DB.Level):
         return None
-    return {'level_id': level.Id.IntegerValue, 'level_name': _element_name(level)}
+    return {'level_id': _element_id_value(level.Id), 'level_name': _element_name(level)}
 
 
 def _assignment_level(doc, element, category_id):
@@ -71,21 +130,32 @@ def _assignment_level(doc, element, category_id):
     if category_id != int(DB.BuiltInCategory.OST_StructuralColumns):
         parameter_id = DB.BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM
     parameter = element.get_Parameter(parameter_id)
-    level_id = parameter.AsElementId() if parameter and parameter.HasValue else element.LevelId
+    level_id = element.LevelId
+    try:
+        if parameter and parameter.HasValue:
+            level_id = parameter.AsElementId()
+    except Exception:
+        pass
     return _level_record(doc, level_id)
 
 
 def _first_parameter(element, parameter_id):
-    parameter = element.get_Parameter(parameter_id)
-    return parameter if parameter and parameter.HasValue else None
+    try:
+        parameter = element.get_Parameter(parameter_id)
+        return parameter if parameter and parameter.HasValue else None
+    except Exception:
+        return None
 
 
 def _usable_length(element):
-    location = element.Location
-    if isinstance(location, DB.LocationCurve):
-        return location.Curve.Length
+    try:
+        location = element.Location
+        if isinstance(location, DB.LocationCurve):
+            return _number_value(location.Curve.Length)
+    except Exception:
+        pass
     parameter = _first_parameter(element, DB.BuiltInParameter.INSTANCE_LENGTH_PARAM)
-    return parameter.AsDouble() if parameter else None
+    return _parameter_double(parameter)
 
 
 def _nominal_weight_lb_per_foot(doc, element):
@@ -99,10 +169,11 @@ def _nominal_weight_lb_per_foot(doc, element):
     unit_id = _pounds_force_per_foot_unit_id()
     if unit_id is None:
         return None
-    try:
-        return DB.UnitUtils.ConvertFromInternalUnits(parameter.AsDouble(), unit_id)
-    except (RevitExceptions.ArgumentException, RevitExceptions.InvalidOperationException):
-        return None
+    return _convert_from_internal_units(_parameter_double(parameter), unit_id)
+
+
+def _floor_area_square_feet(parameter):
+    return _convert_from_internal_units(_parameter_double(parameter), _square_feet_unit_id())
 
 
 def _family_type_label(doc, element):
@@ -140,7 +211,7 @@ def _select_stories(doc):
 
 
 def _selected_level_ids(levels):
-    return [level.Id.IntegerValue for level in levels]
+    return [_element_id_value(level.Id) for level in levels]
 
 
 def _selected_level_names(levels):
@@ -168,10 +239,10 @@ def _collect_steel_record(doc, element, category_id, selected_level_ids, records
     if not _is_selected_level(level, selected_level_ids):
         return
     if element.StructuralMaterialType != DB.Structure.StructuralMaterialType.Steel:
-        skipped.append((element.Id.IntegerValue, 'not a steel family instance'))
+        skipped.append((_element_id_value(element.Id), 'not a steel family instance'))
         return
     records.append({
-        'element_id': element.Id.IntegerValue,
+        'element_id': _element_id_value(element.Id),
         'level_id': level['level_id'], 'level_name': level['level_name'],
         'length_feet': _usable_length(element),
         'nominal_weight_lb_per_foot': _nominal_weight_lb_per_foot(doc, element),
@@ -190,9 +261,9 @@ def _floor_area_records(doc, selected_level_ids):
         parameter = _first_parameter(floor, DB.BuiltInParameter.HOST_AREA_COMPUTED)
         floor_type = doc.GetElement(floor.GetTypeId())
         records.append({
-            'element_id': floor.Id.IntegerValue, 'level_id': level['level_id'],
+            'element_id': _element_id_value(floor.Id), 'level_id': level['level_id'],
             'level_name': level['level_name'],
-            'area_square_feet': parameter.AsDouble() if parameter else None,
+            'area_square_feet': _floor_area_square_feet(parameter),
             'floor_type': _element_name(floor_type),
         })
     return records, skipped
@@ -216,21 +287,40 @@ def _print_report(output, result, adapter_skips, metadata):
     total = result['total']
     level_rows.append(['TOTAL', _number(total['steel_weight_lb']), _number(total['floor_area_square_feet']), _number(total['psf'])])
     _print_summary(output, 'Level summaries', level_rows, ['Level', 'Steel Weight (lb)', 'Floor Area (sf)', 'PSF'])
-    _print_summary(output, 'Category summaries', [[row['category'], _number(row['steel_weight_lb'])] for row in result['categories']], ['Category', 'Steel Weight (lb)'])
-    _print_summary(output, 'Family/type summaries', [[row['family_type'], _number(row['steel_weight_lb'])] for row in result['family_types']], ['Family/type', 'Steel Weight (lb)'])
-    _print_summary(output, 'Floor-type summaries', [[row['floor_type'], _number(row['floor_area_square_feet'])] for row in result['floor_types']], ['Floor type', 'Floor Area (sf)'])
-    _print_exclusions(output, result['excluded'], adapter_skips)
+    _print_summary(output, 'Category summaries', [
+        [row['level_name'], row['category'], _number(row['steel_weight_lb'])]
+        for row in result['categories']
+    ], ['Level', 'Category', 'Steel Weight (lb)'])
+    _print_summary(output, 'Family/type summaries', [
+        [row['level_name'], row['family_type'], _number(row['steel_weight_lb'])]
+        for row in result['family_types']
+    ], ['Level', 'Family/type', 'Steel Weight (lb)'])
+    _print_summary(output, 'Floor-type summaries', [
+        [row['level_name'], row['floor_type'], _number(row['floor_area_square_feet'])]
+        for row in result['floor_types']
+    ], ['Level', 'Floor type', 'Floor Area (sf)'])
+    _print_exclusions(output, result, adapter_skips)
 
 
-def _print_exclusions(output, aggregation_skips, adapter_skips):
-    reasons = defaultdict(int)
-    for item in aggregation_skips:
-        reasons[item['reason']] += 1
+def _print_exclusions(output, result, adapter_skips):
+    rows = [[
+        item['reason'],
+        item['level_name'],
+        item['category'],
+        item['family_type'],
+        item['count'],
+        _number(item['length_feet']),
+    ] for item in result.get('excluded_summaries', [])]
+    adapter_reasons = defaultdict(int)
     for unused_id, reason in adapter_skips:
-        reasons[reason] += 1
-    if reasons:
+        adapter_reasons[reason] += 1
+    for reason, count in sorted(adapter_reasons.items()):
+        rows.append([reason, 'Unspecified', 'Unspecified', 'Unspecified', count, _number(0.0)])
+    if rows:
         output.print_md('## Excluded or unavailable data')
-        output.print_table([[reason, count] for reason, count in sorted(reasons.items())], columns=['Reason', 'Count'])
+        output.print_table(
+            rows,
+            columns=['Reason', 'Level', 'Category', 'Family/type', 'Count', 'Total Length (ft)'])
 
 
 def _export_summary_csv(result, metadata):
