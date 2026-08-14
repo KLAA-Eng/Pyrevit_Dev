@@ -13,9 +13,10 @@ Level and column Base Level where available, and computed Floor area. It prints
 summary metadata plus groupings by level, category, family/type, and floor type.
 Missing level, length, nominal weight, or area is excluded with a reason.
 
-The current command only prints to the pyRevit output window. It does not export
-CSV from the active workflow. The command does not start a transaction, modify,
-save, or synchronize the Revit document.
+The current command prints results and command messages through the default
+pyRevit output window and alert dialogs. It does not export CSV from the active
+workflow. The command does not start a transaction, modify, save, or synchronize
+the Revit document.
 
 ## Validation boundary
 
@@ -32,7 +33,7 @@ read-only behavior before quantity results are relied upon.
 
 ## GUI and interaction
 
-Static UI/API references: GUI.CustomAlert.show_alert,forms.save_file,output.print_md,output.print_table,script.get_output,
+Static UI/API references: forms.alert,forms.save_file,output.print_md,output.print_table,script.get_output,
 
 Use the command from its pyRevit button. Where it exposes a dialog or selection
 workflow, make the required selection and review the result before confirming.
@@ -62,3 +63,6 @@ environment before promotion or behavior changes.
   output, including level-split category, family/type, floor-type, and
   excluded/unavailable length summaries. It should continue to exclude raw
   steel-element and floor-element rows.
+- Revisit a custom KLCode green-themed report window as a future UI item after
+  the default pyRevit output workflow is validated and the desired table layout
+  is specified.

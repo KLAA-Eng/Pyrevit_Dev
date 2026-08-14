@@ -14,7 +14,8 @@ if PROJECT_ROOT not in sys.path:
 
 
 from lib.detail_view_deliverables import (
-    build_deliverable_plan, has_export_failures, is_direct_child_path)
+    build_deliverable_plan, build_revit_image_export_path,
+    has_export_failures, is_direct_child_path)
 
 
 class BuildDeliverablePlanTests(unittest.TestCase):
@@ -86,6 +87,13 @@ class BuildDeliverablePlanTests(unittest.TestCase):
         self.assertTrue(is_direct_child_path(self.folder['path'], generated))
         self.assertFalse(is_direct_child_path(
             self.folder['path'], os.path.join(self.folder['path'], '..', 'detail.jpg')))
+
+    def test_builds_revit_set_of_views_jpeg_path_from_the_export_prefix(self):
+        image_path = build_revit_image_export_path(
+            os.path.join(self.folder['path'], 'detail'), ' - Wall Detail')
+
+        self.assertEqual(
+            os.path.join(self.folder['path'], 'detail - Wall Detail.jpg'), image_path)
 
 
 if __name__ == '__main__':

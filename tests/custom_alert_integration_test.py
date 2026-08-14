@@ -15,15 +15,15 @@ STEEL_PSF_SCRIPT = os.path.join(
     'script.py')
 
 
-class CustomAlertIntegrationTests(unittest.TestCase):
-    def test_steel_psf_uses_the_reusable_custom_alert(self):
+class SteelPSFDefaultMessageTests(unittest.TestCase):
+    def test_steel_psf_uses_default_pyrevit_alerts_for_messages(self):
         with open(STEEL_PSF_SCRIPT, 'r') as script_file:
             source = script_file.read()
 
-        self.assertIn('from GUI.CustomAlert import show_alert', source)
-        self.assertNotIn('forms.alert(', source)
-        self.assertTrue(os.path.isfile(os.path.join(GUI_DIR, 'CustomAlert.py')))
-        self.assertTrue(os.path.isfile(os.path.join(GUI_DIR, 'CustomAlert.xaml')))
+        self.assertNotIn('from GUI.CustomAlert import show_alert', source)
+        self.assertNotIn('from GUI.SteelPSFReport import show_steel_psf_report', source)
+        self.assertIn('forms.alert(', source)
+        self.assertIn('script.get_output()', source)
 
 
 if __name__ == '__main__':

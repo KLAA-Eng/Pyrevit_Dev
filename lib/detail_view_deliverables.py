@@ -50,6 +50,13 @@ def is_direct_child_path(folder, candidate):
     return os.path.dirname(os.path.abspath(candidate)) == os.path.abspath(folder)
 
 
+def build_revit_image_export_path(file_path, generated_file_name):
+    """Return Revit's image path for a SetOfViews export with a JPEG prefix."""
+    if not _is_text(file_path) or not _is_text(generated_file_name):
+        return None
+    return os.path.abspath('{}{}.jpg'.format(file_path, generated_file_name))
+
+
 def _item_for_folder(root, folder):
     if not isinstance(folder, dict):
         return None, 'Folder plan is invalid.'

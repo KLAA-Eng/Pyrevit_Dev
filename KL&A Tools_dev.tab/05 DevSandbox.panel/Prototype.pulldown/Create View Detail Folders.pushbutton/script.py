@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import os
 import sys
+import traceback
 
 from pyrevit import DB, forms, revit, script
 from System.Collections.Generic import List
@@ -12,8 +13,8 @@ from System.Collections.Generic import List
 COMMAND_TITLE = 'Create View Detail Folders'
 MINIMUM_REVIT_VERSION = 2022
 JPEG_LONG_EDGE_PIXELS = 2400
-TARGET_VIEW_FAMILIES = (DB.ViewFamily.Detail, DB.ViewFamily.Drafting)
 TARGET_VIEW_TYPES = (DB.ViewType.Detail, DB.ViewType.DraftingView)
+TARGET_VIEW_FAMILY_NAMES = ('Detail', 'Drafting')
 
 
 def _extension_root(path):
@@ -34,7 +35,8 @@ if LIB_DIR not in sys.path:
 
 from GUI.forms import select_from_dict
 from detail_view_deliverables import (
-    build_deliverable_plan, has_export_failures, is_direct_child_path)
+    build_deliverable_plan, build_revit_image_export_path,
+    has_export_failures, is_direct_child_path)
 from detail_view_folders import build_folder_plan, create_folder_paths
 from detail_view_html import render_detail_html
 
@@ -50,16 +52,40 @@ def _element_id_value(element_id):
     return None
 
 
+def _element_name(element, default='Unnamed'):
+    if element is None:
+        return default
+    try:
+        name = DB.Element.Name.GetValue(element)
+    except Exception:
+        try:
+            name = element.Name
+        except Exception:
+            name = None
+    return name or default
+
+
+def _view_family_name(view_family):
+    try:
+        return str(view_family)
+    except Exception:
+        return ''
+
+
+def _is_target_view_family(view_type):
+    return _view_family_name(view_type.ViewFamily) in TARGET_VIEW_FAMILY_NAMES
+
+
 def _view_type_label(view_type):
-    family_name = 'Detail' if view_type.ViewFamily == DB.ViewFamily.Detail else 'Drafting'
-    return '{}: {}'.format(family_name, view_type.Name)
+    family_name = _view_family_name(view_type.ViewFamily)
+    return '{}: {}'.format(family_name, _element_name(view_type))
 
 
 def _view_type_options(document):
     options = {}
     view_types = DB.FilteredElementCollector(document).OfClass(DB.ViewFamilyType)
     for view_type in view_types:
-        if view_type.ViewFamily not in TARGET_VIEW_FAMILIES:
+        if not _is_target_view_family(view_type):
             continue
         label = _view_type_label(view_type)
         if label in options:
@@ -154,7 +180,7 @@ def _export_pdf(document, view, item):
     options.PaperFormat = DB.ExportPaperFormat.ANSI_A
     options.PaperOrientation = DB.PageOrientationType.Auto
     options.PaperPlacement = DB.PaperPlacementType.Center
-    options.ZoomType = DB.ZoomFitType.FitToPage
+    options.ZoomType = DB.ZoomType.FitToPage
     options.RasterQuality = DB.RasterQualityType.High
     document.Export(item['path'], _element_id_list(item['view_id']), options)
     if not os.path.isfile(item['artifacts']['pdf']):
@@ -176,16 +202,16 @@ def _export_jpeg(document, view, item):
     options.ExportRange = DB.ExportRange.SetOfViews
     options.FilePath = os.path.splitext(item['artifacts']['jpeg'])[0]
     options.FitDirection = _jpeg_fit_direction(view)
-    options.HLRandWFViewsFileType = DB.ImageFileType.JPEG
+    options.HLRandWFViewsFileType = DB.ImageFileType.JPEGLossless
     options.PixelSize = JPEG_LONG_EDGE_PIXELS
-    options.ShadowViewsFileType = DB.ImageFileType.JPEG
+    options.ShadowViewsFileType = DB.ImageFileType.JPEGLossless
     options.ShouldCreateWebSite = False
     options.ZoomType = DB.ZoomFitType.FitToPage
     options.SetViewsAndSheets(_element_id_list(item['view_id']))
-    generated_path = DB.ImageExportOptions.GetFileName(document, view.Id)
+    generated_file_name = DB.ImageExportOptions.GetFileName(document, view.Id)
     document.ExportImage(options)
-    if not os.path.isabs(generated_path):
-        generated_path = os.path.join(item['path'], generated_path)
+    generated_path = build_revit_image_export_path(
+        options.FilePath, generated_file_name)
     if not is_direct_child_path(item['path'], generated_path):
         raise IOError('Revit returned an image path outside the detail folder.')
     if os.path.abspath(generated_path) != item['artifacts']['jpeg']:
@@ -243,7 +269,7 @@ def _report(output, selected_view_types, records, result, export_results):
 
 def main():
     document = revit.doc
-    if not _has_supported_revit_version(revit.app):
+    if not _has_supported_revit_version(document.Application):
         forms.alert(
             'Revit {} or later is required for native PDF export.'.format(
                 MINIMUM_REVIT_VERSION),
@@ -281,10 +307,20 @@ def main():
         forms.alert('Folder creation stopped. Review the output for created folders.', title=COMMAND_TITLE, warn_icon=True)
     elif has_export_failures(export_results):
         forms.alert('Some deliverables failed. Review the output for details.', title=COMMAND_TITLE, warn_icon=True)
-    else:
-        forms.alert('Created {} detail deliverable packages.'.format(
-            len(result['created'])), title=COMMAND_TITLE)
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception:
+        output = script.get_output()
+        output.print_md('# {}'.format(COMMAND_TITLE))
+        output.print_md('The command stopped before it could finish.')
+        output.print_md('```')
+        output.print_md(traceback.format_exc())
+        output.print_md('```')
+        forms.alert(
+            'Create View Detail Folders stopped with an error. '
+            'Review the pyRevit output window for details.',
+            title=COMMAND_TITLE,
+            warn_icon=True)
