@@ -6,3 +6,8 @@
 
 # Local ManaAi planning and delivery artifacts
 .local.manaai/
+
+# Python bytecode caches
+__pycache__/
+*.py[cod]
+*$py.class
