@@ -32,7 +32,7 @@ read-only behavior before quantity results are relied upon.
 
 ## GUI and interaction
 
-Static UI/API references: forms.alert,forms.save_file,output.print_md,output.print_table,script.get_output,
+Static UI/API references: GUI.CustomAlert.show_alert,forms.save_file,output.print_md,output.print_table,script.get_output,
 
 Use the command from its pyRevit button. Where it exposes a dialog or selection
 workflow, make the required selection and review the result before confirming.

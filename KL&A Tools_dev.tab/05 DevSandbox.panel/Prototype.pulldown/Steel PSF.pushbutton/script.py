@@ -112,6 +112,7 @@ if LIB_DIR not in sys.path:
     sys.path.insert(0, LIB_DIR)
 
 from GUI.forms import select_from_dict
+from GUI.CustomAlert import show_alert
 from steel_weight.aggregation import aggregate_steel_weight
 from steel_weight.reporting import summary_csv_rows
 
@@ -192,7 +193,8 @@ def _level_label(level):
 def _select_stories(doc):
     levels = list(DB.FilteredElementCollector(doc).OfClass(DB.Level).WhereElementIsNotElementType())
     if not levels:
-        forms.alert('No project levels were found in the active model.', title=COMMAND_TITLE, warn_icon=True)
+        show_alert('No project levels were found in the active model.', title=COMMAND_TITLE,
+                   is_warning=True)
         script.exit()
 
     level_options = {_level_label(level): level for level in levels}
@@ -205,7 +207,7 @@ def _select_stories(doc):
         SelectMultiple=True,
     )
     if not selected_levels:
-        forms.alert('Select at least one story.', title=COMMAND_TITLE, warn_icon=True)
+        show_alert('Select at least one story.', title=COMMAND_TITLE, is_warning=True)
         script.exit()
     return selected_levels
 
@@ -331,7 +333,8 @@ def _export_summary_csv(result, metadata):
         with open(path, 'wb') as csv_file:
             csv.writer(csv_file).writerows(summary_csv_rows(result, metadata))
     except (IOError, OSError) as error:
-        forms.alert('Could not write CSV: {}'.format(error), title=COMMAND_TITLE, warn_icon=True)
+        show_alert('Could not write CSV: {}'.format(error), title=COMMAND_TITLE,
+                   is_warning=True)
         return None
     return path
 
@@ -352,7 +355,8 @@ def main():
     }
     _print_report(output, result, steel_skips + floor_skips, metadata)
     if not result['rows']:
-        forms.alert('No eligible steel or floor data was found for the selected stories.', title=COMMAND_TITLE)
+        show_alert('No eligible steel or floor data was found for the selected stories.',
+                   title=COMMAND_TITLE)
 
 
 if __name__ == '__main__':
