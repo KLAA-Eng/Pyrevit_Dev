@@ -21,6 +21,16 @@ The logo is a wide wordmark/banner with a dark blue-green background, white `KLC
 
 Default ribbon command icons are transparent-background PNGs with a single visible foreground color.
 
+Create standard ribbon icons as square `32 x 32 px` PNGs at `96 DPI`. This is
+the native large-ribbon size used by Revit; pyRevit scales the asset for
+smaller controls (including 16 px stacked buttons and the Quick Access
+Toolbar). Keep source assets at or below `96 x 96 px`, since pyRevit warns that
+larger icons increase ribbon load time.
+
+  - 16 × 16 — stacked/small controls and Quick Access Toolbar
+  - 24 × 24 — medium pyRevit use
+  - 32 × 32 — normal large ribbon buttons
+
 | Theme | File | Foreground | Plain English Color |
 | --- | --- | --- | --- |
 | Light | `icon.png` | `#34495E` | dark blue-gray |
