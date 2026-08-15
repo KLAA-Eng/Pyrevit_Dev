@@ -11,7 +11,7 @@ This file records the default visual properties used by the KLCode pyRevit exten
 | Dimensions | `1052 x 576` |
 | Format | transparent PNG, `Format32bppArgb` |
 | Primary background sample | `#1A252B` |
-| Primary green sample | `#307050` |
+| Primary green sample | `#33714F` |
 | Dark green sample | `#286048` |
 | Secondary green sample | `#407058` |
 
@@ -35,8 +35,13 @@ larger icons increase ribbon load time.
 | --- | --- | --- | --- |
 | Light | `icon.png` | `#34495E` | dark blue-gray |
 | Dark | `icon.dark.png` | `#EBEBEB` | light gray |
+| Default orange | `lib/_icons/square_1254px_orange.png` | `#FF8000` | KLCode orange |
+| Default green | `lib/_icons/square_1254px_green.png` | `#33714F` | logo green |
 
 For new or refreshed Core Tools icons, recolor every non-transparent pixel to the theme foreground while preserving each pixel's alpha channel.
+
+Use `#FF8000` as the default orange when an orange icon or accent is needed.
+Use `#33714F` as the default green when a green icon or accent is needed.
 
 ## Shared GUI Colors
 
@@ -47,12 +52,12 @@ Shared WPF GUI styling is defined in `lib/GUI/Resources/WPF_styles.xaml`.
 | `header_background` | `#1A252B` | logo charcoal |
 | `text_white` | `#E5E4E2` | warm off-white |
 | `text_gray` | `Gray` | medium gray |
-| `text_magenta` | `#307050` | logo green |
+| `text_magenta` | `#33714F` | logo green |
 | `button_fg_normal` | `White` | white |
 | `button_bg_normal` | `#286048` | dark logo green |
 | `button_bg_hover` | `#407058` | secondary logo green |
 | `border_magenta` | `#286048` | dark logo green |
-| `border_blue` | `#307050` | logo green |
+| `border_blue` | `#33714F` | logo green |
 | `uncheckbox_checked_colour` | `Gray` | medium gray |
 | `checkbox_checked_colour` | `#286048` | dark logo green |
 | `footer_donate` | `#407058` | secondary logo green |
@@ -142,10 +147,10 @@ Known window backgrounds currently in use:
 | `text_header_item` | `#E5E4E2` | warm off-white |
 | `text_white` | `#E5E4E2` | warm off-white |
 | `text_darkblue` | `Gray` | medium gray |
-| `text_red` | `#307050` | logo green |
-| `text_magenta` | `#307050` | logo green |
+| `text_red` | `#33714F` | logo green |
+| `text_magenta` | `#33714F` | logo green |
 | `input_box_darkblue` | `#1A252B` | logo charcoal |
-| `border_main` | `#307050` | logo green |
+| `border_main` | `#33714F` | logo green |
 | `border_secondary` | `#286048` | dark logo green |
 | `button_01_background_normal` | `#286048` | dark logo green |
 | `button_01_background_hover` | `#407058` | secondary logo green |

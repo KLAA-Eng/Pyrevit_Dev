@@ -34,15 +34,15 @@
 
             <SolidColorBrush x:Key="text_white"         Color="#E5E4E2" />
             <SolidColorBrush x:Key="text_darkblue"      Color="Gray" />
-            <SolidColorBrush x:Key="text_red"           Color="#307050" />
-            <SolidColorBrush x:Key="text_magenta"       Color="#307050" />
+            <SolidColorBrush x:Key="text_red"           Color="#33714F" />
+            <SolidColorBrush x:Key="text_magenta"       Color="#33714F" />
 
 
             <SolidColorBrush x:Key="input_box_darkblue"       Color="#1A252B" />
 
 
 
-            <SolidColorBrush x:Key="border_main"        Color="#307050" />
+            <SolidColorBrush x:Key="border_main"        Color="#33714F" />
             <SolidColorBrush x:Key="border_secondary"   Color="#286048" />
 
 
