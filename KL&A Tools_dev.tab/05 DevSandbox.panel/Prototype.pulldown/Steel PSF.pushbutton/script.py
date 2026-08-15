@@ -6,7 +6,6 @@ import csv
 import os
 import sys
 import traceback
-from collections import defaultdict
 
 from Autodesk.Revit import Exceptions as RevitExceptions
 from pyrevit import DB, forms, revit, script
@@ -113,7 +112,7 @@ if LIB_DIR not in sys.path:
 
 from GUI.forms import select_from_dict
 from steel_weight.aggregation import aggregate_steel_weight
-from steel_weight.reporting import summary_csv_rows
+from steel_weight.reporting import OUTPUT_INTRO, report_output_tables, summary_csv_rows
 
 
 def _level_record(doc, level_id):
@@ -270,10 +269,6 @@ def _floor_area_records(doc, selected_level_ids):
     return records, skipped
 
 
-def _number(value):
-    return '{:.3f}'.format(value) if value is not None else 'N/A'
-
-
 def _print_summary(output, title, rows, columns):
     if rows:
         output.print_md('## {}'.format(title))
@@ -282,46 +277,10 @@ def _print_summary(output, title, rows, columns):
 
 def _print_report(output, result, adapter_skips, metadata):
     output.print_md('# {}'.format(COMMAND_TITLE))
-    output.print_md('Read-only host-model structural framing and columns. Pounds = usable length (ft) × nominal section weight (lb/ft).')
+    output.print_md(OUTPUT_INTRO)
     output.print_table([[key, value] for key, value in sorted(metadata.items())], columns=['Metadata', 'Value'])
-    level_rows = [[row['level_name'], _number(row['steel_weight_lb']), _number(row['floor_area_square_feet']), _number(row['psf'])] for row in result['rows']]
-    total = result['total']
-    level_rows.append(['TOTAL', _number(total['steel_weight_lb']), _number(total['floor_area_square_feet']), _number(total['psf'])])
-    _print_summary(output, 'Level summaries', level_rows, ['Level', 'Steel Weight (lb)', 'Floor Area (sf)', 'PSF'])
-    _print_summary(output, 'Category summaries', [
-        [row['level_name'], row['category'], _number(row['steel_weight_lb'])]
-        for row in result['categories']
-    ], ['Level', 'Category', 'Steel Weight (lb)'])
-    _print_summary(output, 'Family/type summaries', [
-        [row['level_name'], row['family_type'], _number(row['steel_weight_lb'])]
-        for row in result['family_types']
-    ], ['Level', 'Family/type', 'Steel Weight (lb)'])
-    _print_summary(output, 'Floor-type summaries', [
-        [row['level_name'], row['floor_type'], _number(row['floor_area_square_feet'])]
-        for row in result['floor_types']
-    ], ['Level', 'Floor type', 'Floor Area (sf)'])
-    _print_exclusions(output, result, adapter_skips)
-
-
-def _print_exclusions(output, result, adapter_skips):
-    rows = [[
-        item['reason'],
-        item['level_name'],
-        item['category'],
-        item['family_type'],
-        item['count'],
-        _number(item['length_feet']),
-    ] for item in result.get('excluded_summaries', [])]
-    adapter_reasons = defaultdict(int)
-    for unused_id, reason in adapter_skips:
-        adapter_reasons[reason] += 1
-    for reason, count in sorted(adapter_reasons.items()):
-        rows.append([reason, 'Unspecified', 'Unspecified', 'Unspecified', count, _number(0.0)])
-    if rows:
-        output.print_md('## Excluded or unavailable data')
-        output.print_table(
-            rows,
-            columns=['Reason', 'Level', 'Category', 'Family/type', 'Count', 'Total Length (ft)'])
+    for table in report_output_tables(result, adapter_skips):
+        _print_summary(output, table['title'], table['rows'], table['columns'])
 
 
 def _export_summary_csv(result, metadata):
