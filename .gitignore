@@ -11,3 +11,43 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Windows Explorer cache files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+
+# macOS Finder metadata
+.DS_Store
+
+# Local environment and secret configuration
+.env
+.env.*
+!.env.example
+!.env.template
+.envrc
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python build and test artifacts
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py.cover
+
+# Local logs
+*.log
