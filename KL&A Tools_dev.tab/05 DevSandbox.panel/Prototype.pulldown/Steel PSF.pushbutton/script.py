@@ -118,11 +118,20 @@ from steel_weight.history import (
     RUN_APPEND,
     RUN_INITIALIZE,
     RUN_ONLY,
+    EXCLUSIONS_KEY,
+    EXCLUSION_SUMMARIES_KEY,
+    FLOORS_KEY,
+    FLOOR_TYPE_SUMMARIES_KEY,
+    FAMILY_TYPE_SUMMARIES_KEY,
+    CATEGORY_SUMMARIES_KEY,
+    LEVEL_SUMMARIES_KEY,
+    STEEL_KEY,
     HistoryCsvError,
-    history_csv_rows,
-    initialized_csv_path,
-    workbook_path_for_csv,
-    write_history_csv,
+    export_set_paths,
+    raw_history_csv_rows,
+    summary_history_csv_rows,
+    workbook_path_for_folder,
+    write_history_export_set,
 )
 from steel_weight.reporting import OUTPUT_INTRO, report_output_tables
 
@@ -362,16 +371,18 @@ def _print_report(output, result, adapter_skips, metadata):
         _print_summary(output, table['title'], table['rows'], table['columns'])
 
 
-def _export_history_csv_and_workbook(output, result, adapter_skips, metadata, export_mode):
-    path = _history_csv_path_for_mode(export_mode)
-    if not path:
+def _export_history_csv_and_workbook(output, result, steel_records, floor_records, adapter_skips, metadata, export_mode):
+    folder = _history_folder_for_mode(export_mode)
+    if not folder:
         return None
     now = datetime.datetime.now()
     run_timestamp = now.strftime('%Y-%m-%dT%H:%M:%S')
     run_id = now.strftime('%Y%m%d-%H%M%S')
-    rows = history_csv_rows(result, metadata, run_id, run_timestamp, adapter_skips)
+    rows_by_key = raw_history_csv_rows(
+        steel_records, floor_records, adapter_skips, metadata, run_id, run_timestamp)
+    rows_by_key.update(summary_history_csv_rows(result, metadata, run_id, run_timestamp))
     try:
-        row_count = write_history_csv(path, rows, export_mode)
+        row_counts = write_history_export_set(folder, rows_by_key, export_mode)
     except HistoryCsvError as error:
         forms.alert(str(error), title=COMMAND_TITLE, warn_icon=True)
         output.print_md('## CSV export stopped')
@@ -383,41 +394,54 @@ def _export_history_csv_and_workbook(output, result, adapter_skips, metadata, ex
         output.print_md('Could not write CSV: {}'.format(error))
         return None
 
-    output.print_md('## CSV History Export')
+    paths = export_set_paths(folder)
+    output.print_md('## CSV Raw Export')
     output.print_md('Mode: {}'.format('Append' if export_mode == RUN_APPEND else 'Initialize'))
-    output.print_md('Rows written: {}'.format(row_count))
-    output.print_md('CSV: `{}`'.format(path))
-    workbook_status = _ensure_history_workbook(path)
+    output.print_md('Steel rows written: {}'.format(row_counts.get(STEEL_KEY, 0)))
+    output.print_md('Floor rows written: {}'.format(row_counts.get(FLOORS_KEY, 0)))
+    output.print_md('Exclusion rows written: {}'.format(row_counts.get(EXCLUSIONS_KEY, 0)))
+    output.print_md('Level summary rows written: {}'.format(row_counts.get(LEVEL_SUMMARIES_KEY, 0)))
+    output.print_md('Category summary rows written: {}'.format(row_counts.get(CATEGORY_SUMMARIES_KEY, 0)))
+    output.print_md('Family/type summary rows written: {}'.format(row_counts.get(FAMILY_TYPE_SUMMARIES_KEY, 0)))
+    output.print_md('Floor-type summary rows written: {}'.format(row_counts.get(FLOOR_TYPE_SUMMARIES_KEY, 0)))
+    output.print_md('Excluded/unavailable summary rows written: {}'.format(row_counts.get(EXCLUSION_SUMMARIES_KEY, 0)))
+    output.print_md('Steel CSV: `{}`'.format(paths[STEEL_KEY]))
+    output.print_md('Floor CSV: `{}`'.format(paths[FLOORS_KEY]))
+    output.print_md('Exclusions CSV: `{}`'.format(paths[EXCLUSIONS_KEY]))
+    output.print_md('Level summaries CSV: `{}`'.format(paths[LEVEL_SUMMARIES_KEY]))
+    output.print_md('Category summaries CSV: `{}`'.format(paths[CATEGORY_SUMMARIES_KEY]))
+    output.print_md('Family/type summaries CSV: `{}`'.format(paths[FAMILY_TYPE_SUMMARIES_KEY]))
+    output.print_md('Floor-type summaries CSV: `{}`'.format(paths[FLOOR_TYPE_SUMMARIES_KEY]))
+    output.print_md('Excluded/unavailable summaries CSV: `{}`'.format(paths[EXCLUSION_SUMMARIES_KEY]))
+    workbook_status = _ensure_history_workbook(folder)
     if workbook_status['warning']:
         output.print_md('Workbook warning: {}'.format(workbook_status['warning']))
     elif workbook_status['created']:
         output.print_md('Workbook created: `{}`'.format(workbook_status['path']))
     else:
         output.print_md('Workbook already exists: `{}`'.format(workbook_status['path']))
-    return path
+    return folder
 
 
-def _history_csv_path_for_mode(export_mode):
-    if export_mode == RUN_INITIALIZE:
-        folder = forms.pick_folder(title='Select folder for Steel PSF history files')
-        if not folder:
-            return None
-        return initialized_csv_path(folder)
-    return forms.pick_file(file_ext='csv', title='Select Steel PSF history CSV to append')
+def _history_folder_for_mode(export_mode):
+    title = 'Select folder for Steel PSF raw CSV files'
+    if export_mode == RUN_APPEND:
+        title = 'Select Steel PSF raw CSV folder to append'
+    return forms.pick_folder(title=title)
 
 
-def _ensure_history_workbook(csv_path):
-    workbook_path = workbook_path_for_csv(csv_path)
+def _ensure_history_workbook(folder_path):
+    workbook_path = workbook_path_for_folder(folder_path)
     if os.path.exists(workbook_path):
         return {'path': workbook_path, 'created': False, 'warning': None}
     try:
-        _create_history_workbook(csv_path, workbook_path)
+        _create_history_workbook(folder_path, workbook_path)
     except Exception as error:
         return {'path': workbook_path, 'created': False, 'warning': str(error)}
     return {'path': workbook_path, 'created': True, 'warning': None}
 
 
-def _create_history_workbook(csv_path, workbook_path):
+def _create_history_workbook(folder_path, workbook_path):
     import clr
     try:
         clr.AddReference('Microsoft.Office.Interop.Excel')
@@ -428,35 +452,45 @@ def _create_history_workbook(csv_path, workbook_path):
     from Microsoft.Office.Interop import Excel
 
     max_chart_rows = 2000
-    data_sheet_name = 'Steel PSF Data'
+    paths = export_set_paths(folder_path)
     excel = Excel.ApplicationClass()
     excel.Visible = False
     excel.DisplayAlerts = False
     workbook = None
     try:
         workbook = excel.Workbooks.Add()
-        history_sheet = workbook.Worksheets[1]
-        history_sheet.Name = data_sheet_name
-        query_table = history_sheet.QueryTables.Add('TEXT;{}'.format(csv_path), history_sheet.Range('A1'))
-        query_table.Name = 'SteelPSFHistoryCsv'
-        query_table.TextFileParseType = 1
-        query_table.TextFileCommaDelimiter = True
-        query_table.RefreshOnFileOpen = True
-        query_table.Refresh(False)
-        try:
-            history_sheet.ListObjects.Add(1, history_sheet.UsedRange, None, 1).Name = 'SteelPSFHistory'
-        except Exception:
-            pass
+        steel_sheet = workbook.Worksheets[1]
+        _connect_csv_sheet(steel_sheet, 'Steel Raw', paths[STEEL_KEY], 'SteelPSFRawSteel')
+        floor_sheet = workbook.Worksheets.Add(After=steel_sheet)
+        _connect_csv_sheet(floor_sheet, 'Floor Raw', paths[FLOORS_KEY], 'SteelPSFRawFloors')
+        exclusion_sheet = workbook.Worksheets.Add(After=floor_sheet)
+        _connect_csv_sheet(exclusion_sheet, 'Exclusion Raw', paths[EXCLUSIONS_KEY], 'SteelPSFRawExclusions')
+        level_summary_sheet = workbook.Worksheets.Add(After=exclusion_sheet)
+        _connect_csv_sheet(level_summary_sheet, 'Level Summaries', paths[LEVEL_SUMMARIES_KEY], 'SteelPSFLevelSummaries')
+        category_summary_sheet = workbook.Worksheets.Add(After=level_summary_sheet)
+        _connect_csv_sheet(category_summary_sheet, 'Category Summaries', paths[CATEGORY_SUMMARIES_KEY], 'SteelPSFCategorySummaries')
+        family_type_summary_sheet = workbook.Worksheets.Add(After=category_summary_sheet)
+        _connect_csv_sheet(family_type_summary_sheet, 'Family Type Summaries', paths[FAMILY_TYPE_SUMMARIES_KEY], 'SteelPSFFamilyTypeSummaries')
+        floor_type_summary_sheet = workbook.Worksheets.Add(After=family_type_summary_sheet)
+        _connect_csv_sheet(floor_type_summary_sheet, 'Floor Type Summaries', paths[FLOOR_TYPE_SUMMARIES_KEY], 'SteelPSFFloorTypeSummaries')
+        exclusion_summary_sheet = workbook.Worksheets.Add(After=floor_type_summary_sheet)
+        _connect_csv_sheet(exclusion_summary_sheet, 'Excluded Unavailable', paths[EXCLUSION_SUMMARIES_KEY], 'SteelPSFExcludedUnavailable')
 
-        chart_data = workbook.Worksheets.Add(After=history_sheet)
-        chart_data.Name = 'Steel PSF Chart Data'
-        _populate_chart_data_sheet(chart_data, max_chart_rows, data_sheet_name)
+        pivot_sheet = workbook.Worksheets.Add(After=exclusion_summary_sheet)
+        pivot_sheet.Name = 'Pivot Tables'
+        _populate_pivot_tables(workbook, pivot_sheet, steel_sheet, floor_sheet, exclusion_sheet,
+                               level_summary_sheet, category_summary_sheet, family_type_summary_sheet,
+                               floor_type_summary_sheet, exclusion_summary_sheet)
 
-        charts = workbook.Worksheets.Add(After=chart_data)
+        summary_sheet = workbook.Worksheets.Add(After=pivot_sheet)
+        summary_sheet.Name = 'Pivot Summaries'
+        _populate_pivot_summary_sheet(summary_sheet, max_chart_rows)
+
+        charts = workbook.Worksheets.Add(After=summary_sheet)
         charts.Name = 'Steel PSF Charts'
-        _add_line_chart(charts, chart_data, 'Steel PSF - PSF History', 'A1:B{}'.format(max_chart_rows + 1), 20, 20)
-        _add_line_chart(charts, chart_data, 'Steel PSF - Steel Weight History', 'D1:E{}'.format(max_chart_rows + 1), 20, 260)
-        _add_line_chart(charts, chart_data, 'Steel PSF - Floor Area History', 'G1:H{}'.format(max_chart_rows + 1), 20, 500)
+        _add_line_chart(charts, summary_sheet, 'Steel PSF - PSF History', 'A1:C{}'.format(max_chart_rows + 1), 20, 20)
+        _add_line_chart(charts, summary_sheet, 'Steel PSF - Steel Weight History', 'E1:G{}'.format(max_chart_rows + 1), 20, 260)
+        _add_line_chart(charts, summary_sheet, 'Steel PSF - Floor Area History', 'I1:K{}'.format(max_chart_rows + 1), 20, 500)
         workbook.SaveAs(workbook_path)
     finally:
         if workbook is not None:
@@ -464,23 +498,112 @@ def _create_history_workbook(csv_path, workbook_path):
         excel.Quit()
 
 
-def _populate_chart_data_sheet(sheet, max_chart_rows, data_sheet_name):
+def _connect_csv_sheet(sheet, sheet_name, csv_path, table_name):
+    sheet.Name = sheet_name
+    query_table = sheet.QueryTables.Add('TEXT;{}'.format(csv_path), sheet.Range('A1'))
+    query_table.Name = table_name + 'Csv'
+    query_table.TextFileParseType = 1
+    query_table.TextFileCommaDelimiter = True
+    query_table.RefreshOnFileOpen = True
+    query_table.Refresh(False)
+    try:
+        sheet.ListObjects.Add(1, sheet.UsedRange, None, 1).Name = table_name
+    except Exception:
+        pass
+    sheet.Columns.AutoFit()
+
+
+def _populate_pivot_summary_sheet(sheet, max_chart_rows):
     headers = [
-        ('A1', 'PSF Timestamp'), ('B1', 'PSF'),
-        ('D1', 'Steel Weight Timestamp'), ('E1', 'Steel Weight'),
-        ('G1', 'Floor Area Timestamp'), ('H1', 'Floor Area'),
+        ('A1', 'Run Timestamp'), ('B1', 'Level'), ('C1', 'PSF'),
+        ('E1', 'Run Timestamp'), ('F1', 'Level'), ('G1', 'Steel Weight'),
+        ('I1', 'Run Timestamp'), ('J1', 'Level'), ('K1', 'Floor Area'),
+        ('M1', 'Run Timestamp'), ('N1', 'Reason'), ('O1', 'Family Type'), ('P1', 'Count'),
     ]
     for cell, value in headers:
         sheet.Range(cell).Value2 = value
-    quoted_data_sheet = "'{}'".format(data_sheet_name.replace("'", "''"))
     for row in range(2, max_chart_rows + 2):
-        sheet.Range('A{}'.format(row)).Formula = '=IF({}!$I{}="PSF",{}!$B{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
-        sheet.Range('B{}'.format(row)).Formula = '=IF({}!$I{}="PSF",{}!$J{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
-        sheet.Range('D{}'.format(row)).Formula = '=IF({}!$I{}="Steel Weight",{}!$B{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
-        sheet.Range('E{}'.format(row)).Formula = '=IF({}!$I{}="Steel Weight",{}!$J{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
-        sheet.Range('G{}'.format(row)).Formula = '=IF({}!$I{}="Floor Area",{}!$B{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
-        sheet.Range('H{}'.format(row)).Formula = '=IF({}!$I{}="Floor Area",{}!$J{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
+        sheet.Range('E{}'.format(row)).Formula = '=IF(\'Steel Raw\'!$N{}="Eligible",\'Steel Raw\'!$B{},NA())'.format(row, row)
+        sheet.Range('F{}'.format(row)).Formula = '=IF(\'Steel Raw\'!$N{}="Eligible",\'Steel Raw\'!$H{},NA())'.format(row, row)
+        sheet.Range('G{}'.format(row)).Formula = '=IF(\'Steel Raw\'!$N{}="Eligible",\'Steel Raw\'!$M{},NA())'.format(row, row)
+        sheet.Range('I{}'.format(row)).Formula = '=IF(\'Floor Raw\'!$K{}="Eligible",\'Floor Raw\'!$B{},NA())'.format(row, row)
+        sheet.Range('J{}'.format(row)).Formula = '=IF(\'Floor Raw\'!$K{}="Eligible",\'Floor Raw\'!$H{},NA())'.format(row, row)
+        sheet.Range('K{}'.format(row)).Formula = '=IF(\'Floor Raw\'!$K{}="Eligible",\'Floor Raw\'!$J{},NA())'.format(row, row)
+        sheet.Range('A{}'.format(row)).Formula = '=E{}'.format(row)
+        sheet.Range('B{}'.format(row)).Formula = '=F{}'.format(row)
+        sheet.Range('C{}'.format(row)).Formula = '=IFERROR(G{}/SUMIFS($K:$K,$I:$I,E{},$J:$J,F{}),NA())'.format(row, row, row)
+        sheet.Range('M{}'.format(row)).Formula = '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$B{},NA())'.format(row, row)
+        sheet.Range('N{}'.format(row)).Formula = '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$M{},NA())'.format(row, row)
+        sheet.Range('O{}'.format(row)).Formula = '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$K{},NA())'.format(row, row)
+        sheet.Range('P{}'.format(row)).Formula = '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$O{},NA())'.format(row, row)
     sheet.Columns.AutoFit()
+
+
+def _populate_pivot_tables(workbook, pivot_sheet, steel_sheet, floor_sheet, exclusion_sheet,
+                           level_summary_sheet, category_summary_sheet, family_type_summary_sheet,
+                           floor_type_summary_sheet, exclusion_summary_sheet):
+    pivot_sheet.Range('A1').Value2 = 'Steel Weight By Run And Level'
+    pivot_sheet.Range('A18').Value2 = 'Floor Area By Run And Level'
+    pivot_sheet.Range('A35').Value2 = 'Exclusions By Run, Reason, And Family Type'
+    pivot_sheet.Range('A52').Value2 = 'Output Level Summaries'
+    pivot_sheet.Range('A69').Value2 = 'Output Category Summaries'
+    pivot_sheet.Range('A86').Value2 = 'Output Family/Type Summaries'
+    pivot_sheet.Range('A103').Value2 = 'Output Floor-Type Summaries'
+    pivot_sheet.Range('A120').Value2 = 'Output Excluded Or Unavailable Summaries'
+    try:
+        _add_pivot_table(
+            workbook, steel_sheet, pivot_sheet.Range('A2'), 'SteelWeightPivot',
+            ['RunTimestamp', 'LevelName'], 'ComputedPounds', 'Sum of ComputedPounds',
+            'EligibilityStatus', 'Eligible')
+        _add_pivot_table(
+            workbook, floor_sheet, pivot_sheet.Range('A19'), 'FloorAreaPivot',
+            ['RunTimestamp', 'LevelName'], 'AreaSquareFeet', 'Sum of AreaSquareFeet',
+            'EligibilityStatus', 'Eligible')
+        _add_pivot_table(
+            workbook, exclusion_sheet, pivot_sheet.Range('A36'), 'ExclusionsPivot',
+            ['RunTimestamp', 'Reason', 'FamilyType'], 'Count', 'Count of Exclusions',
+            None, None)
+        _add_pivot_table(
+            workbook, level_summary_sheet, pivot_sheet.Range('A53'), 'OutputLevelSummariesPivot',
+            ['RunTimestamp', 'LevelName'], 'SteelWeightLb', 'Sum of SteelWeightLb',
+            None, None)
+        _add_pivot_table(
+            workbook, category_summary_sheet, pivot_sheet.Range('A70'), 'OutputCategorySummariesPivot',
+            ['RunTimestamp', 'LevelName', 'Category'], 'SteelWeightLb', 'Sum of SteelWeightLb',
+            None, None)
+        _add_pivot_table(
+            workbook, family_type_summary_sheet, pivot_sheet.Range('A87'), 'OutputFamilyTypeSummariesPivot',
+            ['RunTimestamp', 'LevelName', 'FamilyType'], 'SteelWeightLb', 'Sum of SteelWeightLb',
+            None, None)
+        _add_pivot_table(
+            workbook, floor_type_summary_sheet, pivot_sheet.Range('A104'), 'OutputFloorTypeSummariesPivot',
+            ['RunTimestamp', 'LevelName', 'FloorType'], 'FloorAreaSf', 'Sum of FloorAreaSf',
+            None, None)
+        _add_pivot_table(
+            workbook, exclusion_summary_sheet, pivot_sheet.Range('A121'), 'OutputExcludedUnavailablePivot',
+            ['RunTimestamp', 'Reason', 'LevelName', 'FamilyType'], 'Count', 'Sum of Count',
+            None, None)
+    except Exception:
+        pivot_sheet.Range('A138').Value2 = 'PivotTable creation failed. Refresh raw data tabs and build pivots from the CSV-backed tables.'
+    pivot_sheet.Columns.AutoFit()
+
+
+def _add_pivot_table(workbook, source_sheet, target_range, pivot_name,
+                     row_fields, data_field, data_caption, page_field, page_value):
+    pivot_cache = workbook.PivotCaches().Create(1, source_sheet.UsedRange)
+    pivot_table = pivot_cache.CreatePivotTable(target_range, pivot_name)
+    for field_name in row_fields:
+        field = pivot_table.PivotFields(field_name)
+        field.Orientation = 1
+    if page_field:
+        field = pivot_table.PivotFields(page_field)
+        field.Orientation = 3
+        try:
+            field.CurrentPage = page_value
+        except Exception:
+            pass
+    pivot_table.AddDataField(pivot_table.PivotFields(data_field), data_caption, -4157)
+    return pivot_table
 
 
 def _add_line_chart(sheet, source_sheet, title, source_range, left, top):
@@ -509,7 +632,7 @@ def main():
     _print_report(output, result, steel_skips + floor_skips, metadata)
     if export_mode != RUN_ONLY:
         _export_history_csv_and_workbook(
-            output, result, steel_skips + floor_skips, metadata, export_mode)
+            output, result, steel_records, area_records, steel_skips + floor_skips, metadata, export_mode)
     if not result['rows']:
         forms.alert('No eligible steel or floor data was found for the selected stories.',
                     title=COMMAND_TITLE)
