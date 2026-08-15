@@ -2,13 +2,15 @@
 """Report host-model steel PSF summaries without changing the Revit model."""
 from __future__ import print_function
 
-import csv
+import datetime
 import os
 import sys
 import traceback
 
 from Autodesk.Revit import Exceptions as RevitExceptions
 from pyrevit import DB, forms, revit, script
+from System.Collections.Generic import List
+import wpf
 
 
 COMMAND_TITLE = 'Steel PSF'
@@ -110,9 +112,92 @@ LIB_DIR = os.path.join(EXTENSION_ROOT, 'lib')
 if LIB_DIR not in sys.path:
     sys.path.insert(0, LIB_DIR)
 
-from GUI.forms import select_from_dict
+from GUI.forms import my_WPF
 from steel_weight.aggregation import aggregate_steel_weight
-from steel_weight.reporting import OUTPUT_INTRO, report_output_tables, summary_csv_rows
+from steel_weight.history import (
+    RUN_APPEND,
+    RUN_INITIALIZE,
+    RUN_ONLY,
+    HistoryCsvError,
+    history_csv_rows,
+    initialized_csv_path,
+    workbook_path_for_csv,
+    write_history_csv,
+)
+from steel_weight.reporting import OUTPUT_INTRO, report_output_tables
+
+
+class StoryListItem:
+    def __init__(self, name='Unnamed', element=None, checked=False):
+        self.Name = name
+        self.IsChecked = checked
+        self.element = element
+
+
+class SteelPsfDialog(my_WPF):
+    def __init__(self, items, title=COMMAND_TITLE):
+        self.given_dict_items = {key: value for key, value in items.items() if key}
+        self.items = self._generate_list_items()
+        self.selected_items = []
+        self.export_mode = RUN_ONLY
+        self.add_wpf_resource()
+        wpf.LoadComponent(self, os.path.join(os.path.dirname(__file__), 'SteelPsfDialog.xaml'))
+        self.main_title.Text = title
+        self.main_ListBox.ItemsSource = self.items
+        self.ShowDialog()
+
+    def _generate_list_items(self):
+        list_of_items = List[type(StoryListItem())]()
+        for name, element in sorted(self.given_dict_items.items()):
+            list_of_items.Add(StoryListItem(name, element, False))
+        return list_of_items
+
+    def text_filter_updated(self, sender, e):
+        filtered_list_of_items = List[type(StoryListItem())]()
+        filter_keyword = self.textbox_filter.Text
+        if not filter_keyword:
+            self.main_ListBox.ItemsSource = self.items
+            return
+        for item in self.items:
+            if filter_keyword.lower() in item.Name.lower():
+                filtered_list_of_items.Add(item)
+        self.main_ListBox.ItemsSource = filtered_list_of_items
+
+    def UIe_ItemChecked(self, sender, e):
+        return
+
+    def select_mode(self, mode):
+        list_of_items = List[type(StoryListItem())]()
+        checked = True if mode == 'all' else False
+        for item in self.main_ListBox.ItemsSource:
+            item.IsChecked = checked
+            list_of_items.Add(item)
+        self.main_ListBox.ItemsSource = list_of_items
+
+    def button_select_all(self, sender, e):
+        self.select_mode('all')
+
+    def button_select_none(self, sender, e):
+        self.select_mode('none')
+
+    def button_select(self, sender, e):
+        self._finish_selection(RUN_ONLY)
+
+    def button_initialize_csv(self, sender, e):
+        self._finish_selection(RUN_INITIALIZE)
+
+    def button_append_csv(self, sender, e):
+        self._finish_selection(RUN_APPEND)
+
+    def _finish_selection(self, export_mode):
+        selected_items = []
+        for item in self.main_ListBox.ItemsSource:
+            if item.IsChecked:
+                selected_items.append(item.element)
+        self.selected_items = selected_items
+        self.export_mode = export_mode
+        self.textbox_filter.Text = ''
+        self.Close()
 
 
 def _level_record(doc, level_id):
@@ -196,18 +281,12 @@ def _select_stories(doc):
         script.exit()
 
     level_options = {_level_label(level): level for level in levels}
-    selected_levels = select_from_dict(
-        level_options,
-        title=COMMAND_TITLE,
-        label='Select stories to review:',
-        button_name='Review Selected Stories',
-        version='DevSandbox Prototype',
-        SelectMultiple=True,
-    )
+    story_dialog = SteelPsfDialog(level_options)
+    selected_levels = story_dialog.selected_items
     if not selected_levels:
         forms.alert('Select at least one story.', title=COMMAND_TITLE, warn_icon=True)
         script.exit()
-    return selected_levels
+    return selected_levels, story_dialog.export_mode
 
 
 def _selected_level_ids(levels):
@@ -283,24 +362,140 @@ def _print_report(output, result, adapter_skips, metadata):
         _print_summary(output, table['title'], table['rows'], table['columns'])
 
 
-def _export_summary_csv(result, metadata):
-    path = forms.save_file(file_ext='csv', title='Save Steel PSF summary CSV')
+def _export_history_csv_and_workbook(output, result, adapter_skips, metadata, export_mode):
+    path = _history_csv_path_for_mode(export_mode)
     if not path:
         return None
+    now = datetime.datetime.now()
+    run_timestamp = now.strftime('%Y-%m-%dT%H:%M:%S')
+    run_id = now.strftime('%Y%m%d-%H%M%S')
+    rows = history_csv_rows(result, metadata, run_id, run_timestamp, adapter_skips)
     try:
-        with open(path, 'wb') as csv_file:
-            csv.writer(csv_file).writerows(summary_csv_rows(result, metadata))
-    except (IOError, OSError) as error:
-        forms.alert('Could not write CSV: {}'.format(error), title=COMMAND_TITLE,
-                    warn_icon=True)
+        row_count = write_history_csv(path, rows, export_mode)
+    except HistoryCsvError as error:
+        forms.alert(str(error), title=COMMAND_TITLE, warn_icon=True)
+        output.print_md('## CSV export stopped')
+        output.print_md(str(error))
         return None
+    except (IOError, OSError) as error:
+        forms.alert('Could not write CSV: {}'.format(error), title=COMMAND_TITLE, warn_icon=True)
+        output.print_md('## CSV export stopped')
+        output.print_md('Could not write CSV: {}'.format(error))
+        return None
+
+    output.print_md('## CSV History Export')
+    output.print_md('Mode: {}'.format('Append' if export_mode == RUN_APPEND else 'Initialize'))
+    output.print_md('Rows written: {}'.format(row_count))
+    output.print_md('CSV: `{}`'.format(path))
+    workbook_status = _ensure_history_workbook(path)
+    if workbook_status['warning']:
+        output.print_md('Workbook warning: {}'.format(workbook_status['warning']))
+    elif workbook_status['created']:
+        output.print_md('Workbook created: `{}`'.format(workbook_status['path']))
+    else:
+        output.print_md('Workbook already exists: `{}`'.format(workbook_status['path']))
     return path
+
+
+def _history_csv_path_for_mode(export_mode):
+    if export_mode == RUN_INITIALIZE:
+        folder = forms.pick_folder(title='Select folder for Steel PSF history files')
+        if not folder:
+            return None
+        return initialized_csv_path(folder)
+    return forms.pick_file(file_ext='csv', title='Select Steel PSF history CSV to append')
+
+
+def _ensure_history_workbook(csv_path):
+    workbook_path = workbook_path_for_csv(csv_path)
+    if os.path.exists(workbook_path):
+        return {'path': workbook_path, 'created': False, 'warning': None}
+    try:
+        _create_history_workbook(csv_path, workbook_path)
+    except Exception as error:
+        return {'path': workbook_path, 'created': False, 'warning': str(error)}
+    return {'path': workbook_path, 'created': True, 'warning': None}
+
+
+def _create_history_workbook(csv_path, workbook_path):
+    import clr
+    try:
+        clr.AddReference('Microsoft.Office.Interop.Excel')
+    except Exception:
+        clr.AddReferenceByName(
+            'Microsoft.Office.Interop.Excel, Version=11.0.0.0, '
+            'Culture=neutral, PublicKeyToken=71e9bce111e9429c')
+    from Microsoft.Office.Interop import Excel
+
+    max_chart_rows = 2000
+    data_sheet_name = 'Steel PSF Data'
+    excel = Excel.ApplicationClass()
+    excel.Visible = False
+    excel.DisplayAlerts = False
+    workbook = None
+    try:
+        workbook = excel.Workbooks.Add()
+        history_sheet = workbook.Worksheets[1]
+        history_sheet.Name = data_sheet_name
+        query_table = history_sheet.QueryTables.Add('TEXT;{}'.format(csv_path), history_sheet.Range('A1'))
+        query_table.Name = 'SteelPSFHistoryCsv'
+        query_table.TextFileParseType = 1
+        query_table.TextFileCommaDelimiter = True
+        query_table.RefreshOnFileOpen = True
+        query_table.Refresh(False)
+        try:
+            history_sheet.ListObjects.Add(1, history_sheet.UsedRange, None, 1).Name = 'SteelPSFHistory'
+        except Exception:
+            pass
+
+        chart_data = workbook.Worksheets.Add(After=history_sheet)
+        chart_data.Name = 'Steel PSF Chart Data'
+        _populate_chart_data_sheet(chart_data, max_chart_rows, data_sheet_name)
+
+        charts = workbook.Worksheets.Add(After=chart_data)
+        charts.Name = 'Steel PSF Charts'
+        _add_line_chart(charts, chart_data, 'Steel PSF - PSF History', 'A1:B{}'.format(max_chart_rows + 1), 20, 20)
+        _add_line_chart(charts, chart_data, 'Steel PSF - Steel Weight History', 'D1:E{}'.format(max_chart_rows + 1), 20, 260)
+        _add_line_chart(charts, chart_data, 'Steel PSF - Floor Area History', 'G1:H{}'.format(max_chart_rows + 1), 20, 500)
+        workbook.SaveAs(workbook_path)
+    finally:
+        if workbook is not None:
+            workbook.Close(False)
+        excel.Quit()
+
+
+def _populate_chart_data_sheet(sheet, max_chart_rows, data_sheet_name):
+    headers = [
+        ('A1', 'PSF Timestamp'), ('B1', 'PSF'),
+        ('D1', 'Steel Weight Timestamp'), ('E1', 'Steel Weight'),
+        ('G1', 'Floor Area Timestamp'), ('H1', 'Floor Area'),
+    ]
+    for cell, value in headers:
+        sheet.Range(cell).Value2 = value
+    quoted_data_sheet = "'{}'".format(data_sheet_name.replace("'", "''"))
+    for row in range(2, max_chart_rows + 2):
+        sheet.Range('A{}'.format(row)).Formula = '=IF({}!$I{}="PSF",{}!$B{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
+        sheet.Range('B{}'.format(row)).Formula = '=IF({}!$I{}="PSF",{}!$J{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
+        sheet.Range('D{}'.format(row)).Formula = '=IF({}!$I{}="Steel Weight",{}!$B{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
+        sheet.Range('E{}'.format(row)).Formula = '=IF({}!$I{}="Steel Weight",{}!$J{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
+        sheet.Range('G{}'.format(row)).Formula = '=IF({}!$I{}="Floor Area",{}!$B{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
+        sheet.Range('H{}'.format(row)).Formula = '=IF({}!$I{}="Floor Area",{}!$J{},NA())'.format(quoted_data_sheet, row, quoted_data_sheet, row)
+    sheet.Columns.AutoFit()
+
+
+def _add_line_chart(sheet, source_sheet, title, source_range, left, top):
+    chart_object = sheet.ChartObjects().Add(left, top, 560, 210)
+    chart = chart_object.Chart
+    chart.ChartType = 65
+    chart.SetSourceData(source_sheet.Range(source_range))
+    chart.HasTitle = True
+    chart.ChartTitle.Text = title
 
 
 def main():
     output = script.get_output()
     doc = revit.doc
-    selected_levels = _select_stories(doc)
+    selected_levels, export_mode = _select_stories(doc)
     selected_level_ids = _selected_level_ids(selected_levels)
     steel_records, steel_skips = _steel_records(doc, selected_level_ids)
     area_records, floor_skips = _floor_area_records(doc, selected_level_ids)
@@ -312,6 +507,9 @@ def main():
         'weight_basis': 'length_ft x nominal_lb_per_ft',
     }
     _print_report(output, result, steel_skips + floor_skips, metadata)
+    if export_mode != RUN_ONLY:
+        _export_history_csv_and_workbook(
+            output, result, steel_skips + floor_skips, metadata, export_mode)
     if not result['rows']:
         forms.alert('No eligible steel or floor data was found for the selected stories.',
                     title=COMMAND_TITLE)
