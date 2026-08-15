@@ -15,10 +15,9 @@ Missing level, length, nominal weight, or area is excluded with a reason.
 
 The current command prints results and command messages through the default
 pyRevit output window and alert dialogs. Its branded story-selection dialog can
-also initialize or append a summary-only CSV history file, then create a
-companion Excel workbook when Microsoft Excel COM automation is available. The
-command does not start a transaction, modify, save, or synchronize the Revit
-document.
+also initialize or append raw CSV export files, then create a companion Excel
+workbook when Microsoft Excel COM automation is available. The command does not
+start a transaction, modify, save, or synchronize the Revit document.
 
 ## Validation boundary
 
@@ -38,15 +37,15 @@ read-only behavior before quantity results are relied upon.
 
 ## GUI and interaction
 
-Static UI/API references: forms.alert,forms.pick_file,forms.pick_folder,output.print_md,output.print_table,script.get_output,wpf.LoadComponent,
+Static UI/API references: forms.alert,forms.pick_folder,output.print_md,output.print_table,script.get_output,wpf.LoadComponent,
 
 Use the command from its pyRevit button. Select stories in the branded dialog
 with the search box, `Select All`, and `Select None`. Click `Review Selected
-Stories` for a normal run, `Initialize CSV` to create/overwrite `SteelPSF.csv`
-in a selected folder after the report runs, or `Append CSV` to append to an
-existing history CSV after the report runs. Folder or file selection is
-prompted only after the report has been generated and only for
-initialize/append modes.
+Stories` for a normal run, `Initialize CSV` to create/overwrite the Steel PSF
+raw CSV set in a selected folder after the report runs, or `Append CSV` to
+append to the Steel PSF raw CSV set in a selected folder after the report runs.
+Folder selection is prompted only after the report has been generated and only
+for initialize/append modes.
 
 ## Current execution logic
 
@@ -66,18 +65,25 @@ environment before promotion or behavior changes.
 
 ## CSV and Excel history
 
-- `Run And Append CSV` prompts for an existing CSV and validates its header
-  before adding current run rows. If the header does not match the Steel PSF history format, the
-  append is stopped and the user must initialize a new file or choose another
-  file.
-- `Run And Initialize CSV` prompts for a folder, then overwrites
-  `SteelPSF.csv` in that folder with a fresh Steel PSF history header and
-  current run rows.
-- The history CSV is tidy and chart-ready, with one metric row per run, level,
-  section, group, and metric. It contains summary-level data only and excludes
-  raw steel-element and floor-element rows.
-- The companion workbook is created beside the CSV only when missing. Existing
-  workbooks are treated as user-owned and are not overwritten.
+- The export set is folder-based:
+  `SteelPSF_Steel.csv`, `SteelPSF_Floors.csv`, `SteelPSF_Exclusions.csv`,
+  `SteelPSF_LevelSummaries.csv`, `SteelPSF_CategorySummaries.csv`,
+  `SteelPSF_FamilyTypeSummaries.csv`, `SteelPSF_FloorTypeSummaries.csv`,
+  `SteelPSF_ExcludedUnavailableSummaries.csv`, and `SteelPSF.xlsx`.
+- `Run And Append CSV` prompts for the folder containing the raw CSV set and
+  validates each existing CSV header before adding current run rows. If any
+  header does not match the Steel PSF raw export format, append is stopped.
+- `Run And Initialize CSV` prompts for a folder, then overwrites the raw and summary
+  CSVs in that folder with fresh headers and current run rows.
+- Raw steel and floor CSVs include eligible and ineligible selected records.
+  The exclusions CSV records unavailable steel/floor rows and adapter skips for
+  audit pivots.
+- Each output-window summary table has its own CSV: level, category,
+  family/type, floor-type, and excluded/unavailable summaries.
+- The companion workbook is created beside the CSV set only when missing.
+  Existing workbooks are treated as user-owned and are not overwritten. New
+  workbooks connect to raw tabs plus individual CSV-backed tabs for each
+  output-window summary table.
 - Excel workbook creation depends on installed Microsoft Excel COM automation.
   CSV export remains successful if workbook creation fails.
 
