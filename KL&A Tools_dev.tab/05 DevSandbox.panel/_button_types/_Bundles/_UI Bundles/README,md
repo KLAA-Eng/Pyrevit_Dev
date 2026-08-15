@@ -1,0 +1,33 @@
+## All UI Bundles
+
+The requirements and conventions below are shared among all UI bundles
+
+
+requires:
+    - bundle.yaml         # includes bundle metadata e.g. tooltip message
+
+optional:
+    - icon.png            # for Revit UI icons
+    - icon.dark.png       # for Revit UI icons in **Dark mode**
+    - lib/                # can include a lib/ directory that hosts modules required by the commands inside this bundle
+    - bin/                # can include a bin/ directory that hosts binaries required by the commands inside this bundle
+
+### Bundle Layout Directives
+
+UI bundles can provide directives on how the child bundles should be ordered in Revit UI. Since pyRevit 4.7, the primary method to provide these directives is to use the Bundle File. These directives are defined in the bundle file and are limited to UI bundles only.
+
+<aside>
+<img src="https://s3-us-west-2.amazonaws.com/secure.notion-static.com/24882e62-94af-420b-a5ee-d45bba735534/ic_01_idea.png" alt="https://s3-us-west-2.amazonaws.com/secure.notion-static.com/24882e62-94af-420b-a5ee-d45bba735534/ic_01_idea.png" width="40px" /> See Bundle Layout for  more information about layout directives
+
+</aside>
+
+**Example**
+
+# layout directives are listed in order under `layout` key
+layout:
+  - Logs
+  - -----
+  - Unit Tests
+  - Bundle Tests
+  - Misc Tests[title:Third-Party\nUnit Tests]
+  - Debug Dialog Config
