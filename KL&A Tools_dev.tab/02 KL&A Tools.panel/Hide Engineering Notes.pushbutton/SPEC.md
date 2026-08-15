@@ -41,3 +41,5 @@ Detected mutation/external-effect patterns: revit.Transaction,
 This is a development-tab command. The inventory above is statically derived
 from the current bundle and must be confirmed inside the target Revit/pyRevit
 environment before promotion or behavior changes.
+
+Need to configure the smart button

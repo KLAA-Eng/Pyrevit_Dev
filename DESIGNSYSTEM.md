@@ -35,8 +35,14 @@ larger icons increase ribbon load time.
 | --- | --- | --- | --- |
 | Light | `icon.png` | `#34495E` | dark blue-gray |
 | Dark | `icon.dark.png` | `#EBEBEB` | light gray |
-| Default orange | `lib/_icons/square_1254px_orange.png` | `#FF8000` | KLCode orange |
-| Default green | `lib/_icons/square_1254px_green.png` | `#33714F` | logo green |
+| Default orange | `lib/_icons/square_96px_orange.png` | `#FF8000` | KLCode orange |
+| Default green | `lib/_icons/square_96px_green.png` | `#33714F` | logo green |
+
+### Icon Design Reference
+
+[Lucide Icons](https://lucide.dev/icons/) is the visual reference for new and
+refreshed ribbon icons. Use its simple, consistent icon language as design
+inspiration while creating the required pyRevit PNG assets described above.
 
 For new or refreshed Core Tools icons, recolor every non-transparent pixel to the theme foreground while preserving each pixel's alpha channel.
 
