@@ -1,0 +1,65 @@
+# bundle title
+title: "Make\nPattern"
+
+# title can also be in various locales
+# pyRevit pulls the correct name based on Revit language
+title:
+  en_us: Test Bundle (Custom Title)
+  chinese_s: 测试包
+
+
+# bundle tooltip
+tooltip: Create new patterns in Revit
+# tooltip can also be in various locales
+# pyRevit pulls the correct tooltip based on Revit language
+tooltip:
+  en_us: Create new patterns in Revit
+  chinese_s: 创建新模式
+
+# bundle highlighting ('new' or 'updated')
+# Revit UI will show a orange marker on the button and a border around the tooltip
+highlight: new      # highlight as new
+highlight: updated  # highlight as updated
+
+# bundle help url
+help_url: "https://www.youtube.com/watch?v=H7b8hjHbauE&t=8s&list=PLc_1PNcpnV57FWI6G8Cd09umHpSOzvamf"
+# help url can also be in various locales
+# pyRevit pulls the correct help url based on Revit langauge
+help_url:
+  en_us: "https://www.youtube.com/watch?v=H7b8hjHbauE&t=8s&list=PLc_1PNcpnV57FWI6G8Cd09umHpSOzvamf"
+  chinese_s: "https://www.youtube.com/watch?v=H7b8hjHbauE&t=8s&list=PLc_1PNcpnV57FWI6G8Cd09umHpSOzvamf"
+
+
+# bundle author
+author: Ehsan Iran-Nejad
+
+# bundle author can also be a list of authors
+authors:
+  - John Doe
+  - Ehsan Iran-Nejad
+
+# context directives are listed under `context` key, the order does not matter
+context:
+  - Walls
+  - Text Notes
+
+# minimium supported Revit version
+min_revit_version: 2015
+
+# maximum supported Revit version
+max_revit_version: 2018
+
+is_beta: false
+
+layout:
+  - Rename
+  - Revision[afterall:]
+  - PushButton A[title:Third-Party\nUnittests]
+  - PushButton B[before:PushButton A]
+  - PullDown A[beforeall:]
+  - ---                # see Separator Lines
+  - PullDown B
+  - - Stack3 A
+  - ">>>"              # see Slide-out Panel
+  - PushButton C[after:Pulldown C]
+  - PullDown C

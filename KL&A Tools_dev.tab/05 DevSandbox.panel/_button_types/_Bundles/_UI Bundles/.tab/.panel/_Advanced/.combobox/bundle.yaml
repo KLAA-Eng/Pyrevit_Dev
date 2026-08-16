@@ -1,0 +1,24 @@
+title: View Settings
+tooltip: Configure view settings
+tooltip_ext: |
+  Extended description that appears
+  after hovering for a moment.
+help_url: https://docs.example.com/view-settings
+
+members:
+  # Basic items (minimal configuration)
+  - id: option_a
+    text: Option A
+    group: Basic Options
+    tooltip: A basic option
+
+  # Rich items (full metadata)
+  - id: option_b
+    text: Option B
+    group: Rich Options
+    icon: option_b.png
+    tooltip: Option with all properties
+    tooltipImage: option_b_preview.png
+    longDescription: |
+      Extended tooltip description with
+      multiple lines of detail.
