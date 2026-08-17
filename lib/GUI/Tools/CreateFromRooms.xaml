@@ -13,7 +13,7 @@
     ShowInTaskbar="True"
     WindowStyle="None"
     AllowsTransparency="True"
-    Background="#080326">
+    Background="#1A252B">
 
     <Window.Resources>
         <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -21,23 +21,23 @@
                     xmlns:local="clr-namespace:Common.WPF_styles">
 
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[COLOURS]-->
-            <SolidColorBrush x:Key="header_background"  Color="#0f0f2d" />
+            <SolidColorBrush x:Key="header_background"  Color="#1A252B" />
 
             <SolidColorBrush x:Key="text_white"         Color="#E5E4E2" />
             <SolidColorBrush x:Key="text_gray"          Color="Gray" />
-            <SolidColorBrush x:Key="text_magenta"       Color="#6FA287" />
+            <SolidColorBrush x:Key="text_magenta"       Color="#33714F" />
 
             <SolidColorBrush x:Key="button_fg_normal"   Color="White" />
-            <SolidColorBrush x:Key="button_bg_normal"   Color="#39385D" />
-            <SolidColorBrush x:Key="button_bg_hover"    Color="#4C9566" />
+            <SolidColorBrush x:Key="button_bg_normal"   Color="#286048" />
+            <SolidColorBrush x:Key="button_bg_hover"    Color="#407058" />
 
-            <SolidColorBrush x:Key="border_magenta"     Color="#3F7F57" />
-            <SolidColorBrush x:Key="border_blue"     Color="#6FA287" />
+            <SolidColorBrush x:Key="border_magenta"     Color="#286048" />
+            <SolidColorBrush x:Key="border_blue"     Color="#33714F" />
 
             <SolidColorBrush x:Key="uncheckbox_checked_colour"     Color="Gray" />
-            <SolidColorBrush x:Key="checkbox_checked_colour"     Color="#3F7F57" />
+            <SolidColorBrush x:Key="checkbox_checked_colour"     Color="#286048" />
 
-            <SolidColorBrush x:Key="footer_donate"     Color="#4C9566" />
+            <SolidColorBrush x:Key="footer_donate"     Color="#407058" />
 
 
 
@@ -339,7 +339,7 @@
                                             Margin="3,3,23,3"
                                             Focusable="True"
                                             Background="#FF3F3F3F"
-                                            Foreground="#7FB38F"
+                                            Foreground="#E5E4E2"
                                             Visibility="Hidden"
                                             IsReadOnly="{TemplateBinding IsReadOnly}"/>
 
@@ -494,8 +494,8 @@
     <Grid>
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                <GradientStop Color= "#332E5C40" Offset="0" />
-                <GradientStop Color="#336FA287" Offset="1" />
+                <GradientStop Color= "#33286048" Offset="0" />
+                <GradientStop Color="#33307050" Offset="1" />
             </LinearGradientBrush>
         </Grid.Background>
 
@@ -566,13 +566,13 @@
         <DockPanel Grid.Row="1">
             <Label  Content="🔍"
                     VerticalAlignment="Top" Height="26"
-                    Foreground="{StaticResource text_magenta}"
+                    Foreground="{StaticResource text_white}"
                     Margin="5,5,5,5"/>
 
             <TextBox x:Name="textbox_filter"
                     Text=""
                      Height="22" VerticalAlignment="Top"
-                     Foreground="{StaticResource text_magenta}" Background="{StaticResource header_background}"
+                     Foreground="{StaticResource text_white}" Background="{StaticResource header_background}"
                      Margin="0,8,10,5" FontSize="14"
                      BorderBrush="{StaticResource border_magenta}"
                      TextChanged="text_filter_updated">
@@ -597,7 +597,7 @@
 
 
             <Label x:Name="text_label"  Content="Select Type:"
-                           Foreground="{StaticResource text_magenta}"/>
+                           Foreground="{StaticResource text_white}"/>
 
             <ListBox x:Name="main_ListBox"
                          Height="150" Grid.Row="0"
@@ -655,7 +655,7 @@
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <CheckBox  Background="#2E5C40" Foreground="{StaticResource text_white}" IsChecked="{Binding IsChecked}"  Checked="UIe_ItemChecked" >
+                        <CheckBox  Background="#286048" Foreground="{StaticResource text_white}" IsChecked="{Binding IsChecked}"  Checked="UIe_ItemChecked" >
                             <TextBlock Text="{Binding Name}"/>
                         </CheckBox>
                     </DataTemplate>

@@ -13,14 +13,14 @@
     ShowInTaskbar="True"
     WindowStyle="None"
     AllowsTransparency="True"
-    Background="#080326">
+    Background="#1A252B">
 
     <!--MAIN-->
     <Grid>
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                <GradientStop Color= "#332E5C40" Offset="0" />
-                <GradientStop Color="#336FA287" Offset="1" />
+                <GradientStop Color= "#33286048" Offset="0" />
+                <GradientStop Color="#33307050" Offset="1" />
             </LinearGradientBrush>
         </Grid.Background>
 
@@ -91,13 +91,13 @@
         <DockPanel Grid.Row="1">
             <Label  Content="🔍"
                     VerticalAlignment="Top" Height="26"
-                    Foreground="{StaticResource text_magenta}"
+                    Foreground="{StaticResource text_white}"
                     Margin="5,5,5,5"/>
 
             <TextBox x:Name="textbox_filter"
                     Text=""
                      Height="22" VerticalAlignment="Top"
-                     Foreground="{StaticResource text_magenta}" Background="{StaticResource header_background}"
+                     Foreground="{StaticResource text_white}" Background="{StaticResource header_background}"
                      Margin="0,8,10,5" FontSize="14"
                      BorderBrush="{StaticResource border_magenta}"
                      TextChanged="text_filter_updated">
@@ -123,7 +123,7 @@
             <Separator Background="{StaticResource border_magenta}"/>
 
             <Label x:Name="text_label"  Content="Select Elements:"
-                           Foreground="{StaticResource text_magenta}"/>
+                           Foreground="{StaticResource text_white}"/>
 
             <ListBox x:Name="main_ListBox"
                          Height="350" Grid.Row="0"
@@ -181,7 +181,7 @@
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <CheckBox  Background="#2E5C40" Foreground="{StaticResource text_white}" IsChecked="{Binding IsChecked}"  Checked="UIe_ItemChecked" >
+                        <CheckBox  Background="#286048" Foreground="{StaticResource text_white}" IsChecked="{Binding IsChecked}"  Checked="UIe_ItemChecked" >
                             <TextBlock Text="{Binding Name}"/>
                         </CheckBox>
                     </DataTemplate>

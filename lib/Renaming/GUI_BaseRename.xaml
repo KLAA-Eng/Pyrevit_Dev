@@ -11,7 +11,7 @@
     ShowInTaskbar="True"
     WindowStyle="None"
     ResizeMode="NoResize"
-    Background="#181735">
+    Background="#1A252B">
 
     <Window.Resources>
         <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -19,23 +19,23 @@
                     xmlns:local="clr-namespace:Common.WPF_styles">
 
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[COLOURS]-->
-            <SolidColorBrush x:Key="header_background"  Color="#0f0f2d" />
+            <SolidColorBrush x:Key="header_background"  Color="#1A252B" />
 
             <SolidColorBrush x:Key="text_white"         Color="#E5E4E2" />
             <SolidColorBrush x:Key="text_gray"          Color="Gray" />
-            <SolidColorBrush x:Key="text_magenta"       Color="#6FA287" />
+            <SolidColorBrush x:Key="text_magenta"       Color="#33714F" />
 
             <SolidColorBrush x:Key="button_fg_normal"   Color="White" />
-            <SolidColorBrush x:Key="button_bg_normal"   Color="#39385D" />
-            <SolidColorBrush x:Key="button_bg_hover"    Color="#4C9566" />
+            <SolidColorBrush x:Key="button_bg_normal"   Color="#286048" />
+            <SolidColorBrush x:Key="button_bg_hover"    Color="#407058" />
 
-            <SolidColorBrush x:Key="border_magenta"     Color="#3F7F57" />
-            <SolidColorBrush x:Key="border_blue"     Color="#6FA287" />
+            <SolidColorBrush x:Key="border_magenta"     Color="#286048" />
+            <SolidColorBrush x:Key="border_blue"     Color="#33714F" />
 
             <SolidColorBrush x:Key="uncheckbox_checked_colour"     Color="Gray" />
-            <SolidColorBrush x:Key="checkbox_checked_colour"     Color="#3F7F57" />
+            <SolidColorBrush x:Key="checkbox_checked_colour"     Color="#286048" />
 
-            <SolidColorBrush x:Key="footer_donate"     Color="#4C9566" />
+            <SolidColorBrush x:Key="footer_donate"     Color="#407058" />
 
 
 
@@ -314,7 +314,7 @@
                                             Margin="3,3,23,3"
                                             Focusable="True"
                                             Background="#FF3F3F3F"
-                                            Foreground="#7FB38F"
+                                            Foreground="#E5E4E2"
                                             Visibility="Hidden"
                                             IsReadOnly="{TemplateBinding IsReadOnly}"/>
 

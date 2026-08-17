@@ -5,6 +5,7 @@ you can add information to the readme (probably shoudl migrate to a notion site 
 
 - [pyRevit Labs Notion](https://pyrevitlabs.notion.site/)
 - [Revit API Docs](https://www.revitapidocs.com/)
+- [Lucide Icons](https://lucide.dev/icons/) — icon-design reference
 
 Process for modifying code and comitting it to Git:
 

@@ -1,0 +1,8 @@
+engine:
+  clean: true
+title:
+  en_us: "Launch\nDyn Player"
+tooltip:
+  en_us: >-
+    Prototype: opens Dynamo Player. SupportsRevit 2021's Playlist
+    command and Revit 2022 or later's Dynamo Player command.

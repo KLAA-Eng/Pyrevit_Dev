@@ -2,29 +2,38 @@
 
 ## Purpose
 
-Documents the current command implementation and intended user-facing behavior.
+Provides a safe launcher gallery for the pyRevit and KL&A dialog families used
+by this extension. Each preview uses fictional seeded data and never starts a
+Revit transaction or calls a document-changing command.
 
 ## Behavior
 
-This command is implemented by `script.py` in this pyRevit bundle. It runs in the Revit/pyRevit host and uses the active-document context required by its implementation. It must preserve unrelated model content and report unsupported or cancelled interactions without applying partial changes.
+This command is implemented by `script.py` in this pyRevit bundle. It runs in
+the Revit/pyRevit host without requiring active-model content. It must preserve
+unrelated model content and report unsupported or cancelled interactions without
+applying partial changes.
 
 ## Validation boundary
 
-Validate this command against a representative Revit fixture, its empty or cancelled-input path, and its documented output or transaction effect before promotion beyond development use.
+Validate every launcher against a representative Revit fixture and its
+cancelled-input path before promotion beyond development use. Confirm that no
+preview starts a Revit transaction or changes the document.
 
 ## Implementation inventory
 
 - Entry point: `script.py`
-- Direct imports: from __future__ import print_function;import os;import sys;from pyrevit import forms;from ui_gallery.catalog import catalog_xaml_sources;from ui_gallery.preview import can_preview;
-- Local helper functions: _extension_root,__init__,__init__,filter_changed,selection_changed,inspect_source,preview_source,close_window,_matches,_update_actions,
+- Direct imports: from __future__ import print_function;import os;import sys;from pyrevit import forms;from ui_gallery.launchers import gallery_launchers;
+- Local helper functions: _extension_root,__init__,__init__,filter_changed,selection_changed,launch_selected,close_window,_matches,_update_actions,_launch,_launch_dialog,_launch_find_replace_preview,_launch_steel_psf_preview,
 - Bundled external assets: None.
 
 ## GUI and interaction
 
-Static UI/API references: forms.WPFWindow,forms.alert,
+Static UI/API references: forms.WPFWindow,forms.alert,forms.ask_for_string,
+forms.CommandSwitchWindow,forms.SelectFromList,
 
-Use the command from its pyRevit button. Where it exposes a dialog or selection
-workflow, make the required selection and review the result before confirming.
+Use the command from its pyRevit button, select a row, and choose **Open
+Selected Window**. All lists and alerts contain fictional data. The gallery
+only opens dialog previews; it does not invoke the corresponding tool command.
 
 ## Current execution logic
 

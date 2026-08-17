@@ -1,0 +1,49 @@
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="KL&amp;A Tools"
+    Width="440" Height="255"
+    MinWidth="440" MaxWidth="440"
+    MinHeight="255" MaxHeight="255"
+    WindowStartupLocation="CenterScreen"
+    ShowInTaskbar="True"
+    WindowStyle="None"
+    AllowsTransparency="True"
+    Background="#080326">
+    <Border Background="#0F0F2D" BorderBrush="{StaticResource border_magenta}" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="55" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Background="{StaticResource header_background}" MouseDown="header_drag">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="60" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="main_title" Margin="12,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" />
+                <Button Grid.Column="1" Content="Close" Width="52" Height="20" Margin="0,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="10" Click="button_close" />
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="24,20,24,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Width="34" Height="34" CornerRadius="17" BorderBrush="{StaticResource border_magenta}" BorderThickness="2" VerticalAlignment="Top">
+                    <TextBlock x:Name="alert_icon" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" FontWeight="Bold" />
+                </Border>
+                <StackPanel Grid.Column="1">
+                    <TextBlock x:Name="alert_heading" FontSize="16" FontWeight="Bold" Foreground="{StaticResource text_magenta}" />
+                    <TextBlock x:Name="message_text" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{StaticResource text_white}" />
+                </StackPanel>
+            </Grid>
+
+            <Border Grid.Row="2" Background="{StaticResource header_background}" BorderBrush="{StaticResource border_magenta}" BorderThickness="0,1,0,0">
+                <Button Content="OK" Width="110" Height="28" HorizontalAlignment="Center" VerticalAlignment="Center" Click="button_ok" />
+            </Border>
+        </Grid>
+    </Border>
+</Window>
