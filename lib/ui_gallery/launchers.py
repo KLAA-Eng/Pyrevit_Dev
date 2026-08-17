@@ -16,10 +16,31 @@ _LAUNCHERS = (
         'uses_seed_data': True,
     },
     {
+        'id': 'kla-duplicate-sheets',
+        'category': 'KL&A custom',
+        'title': 'Duplicate sheets',
+        'description': 'Sheet duplication form with fictional selections.',
+        'uses_seed_data': True,
+    },
+    {
         'id': 'kla-find-replace',
         'category': 'KL&A custom',
         'title': 'Find and replace',
         'description': 'Branded rename form in safe preview mode.',
+        'uses_seed_data': True,
+    },
+    {
+        'id': 'kla-find-replace-sheets',
+        'category': 'KL&A custom',
+        'title': 'Find and replace sheets',
+        'description': 'Sheet rename form with fictional names and numbers.',
+        'uses_seed_data': True,
+    },
+    {
+        'id': 'kla-find-replace-views',
+        'category': 'KL&A custom',
+        'title': 'Find and replace views',
+        'description': 'View rename form with fictional drawing names.',
         'uses_seed_data': True,
     },
     {
@@ -34,6 +55,13 @@ _LAUNCHERS = (
         'category': 'KL&A custom',
         'title': 'Steel PSF story selection',
         'description': 'DevSandbox branded story selector with sample levels.',
+        'uses_seed_data': True,
+    },
+    {
+        'id': 'kla-view-range',
+        'category': 'KL&A custom',
+        'title': 'View range editor',
+        'description': 'View range form with fictional levels and elevations.',
         'uses_seed_data': True,
     },
     {

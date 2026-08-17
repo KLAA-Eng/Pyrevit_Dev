@@ -44,6 +44,40 @@ class GalleryRow(object):
         self.SampleData = 'Seeded sample data'
 
 
+class PreviewLevel(object):
+    def __init__(self, name, id_value):
+        self.Name = name
+        self.IdValue = id_value
+
+
+class ViewRangePreviewData(object):
+    def __init__(self):
+        from System.Windows.Media import Brushes
+        self.message = 'Fictional preview data. Changes cannot modify the model.'
+        self.unit_label = 'ft'
+        self.available_levels = [PreviewLevel('Level 01 - Lobby', 1),
+                                 PreviewLevel('Level 02 - Office', 2),
+                                 PreviewLevel('Roof - Mechanical', 3)]
+        self.can_modify_view = True
+        self.warning_message = ''
+        self.topplane_brush = Brushes.DodgerBlue
+        self.cutplane_brush = Brushes.Orange
+        self.bottomplane_brush = Brushes.SeaGreen
+        self.viewdepth_brush = Brushes.MediumPurple
+        self.topplane_elevation = "12' - 0\""
+        self.cutplane_elevation = "4' - 0\""
+        self.bottomplane_elevation = "0' - 0\""
+        self.viewdepth_elevation = "-4' - 0\""
+        self.topplane_new_value = "12' - 0\""
+        self.cutplane_new_value = "4' - 0\""
+        self.bottomplane_new_value = "0' - 0\""
+        self.viewdepth_new_value = "-4' - 0\""
+        self.topplane_level_id = 1
+        self.bottomplane_level_id = 1
+        self.viewdepth_level_id = 1
+        self.cutplane_level_name = 'Level 01 - Lobby'
+
+
 class Gallery(forms.WPFWindow):
     def __init__(self):
         forms.WPFWindow.__init__(self, XAML_PATH)
@@ -113,6 +147,12 @@ class Gallery(forms.WPFWindow):
                        title='KL&A Tools gallery preview')
         elif launcher_id == 'kla-find-replace':
             self._launch_find_replace_preview()
+        elif launcher_id == 'kla-find-replace-views':
+            self._launch_find_replace_views_preview()
+        elif launcher_id == 'kla-find-replace-sheets':
+            self._launch_find_replace_sheets_preview()
+        elif launcher_id == 'kla-duplicate-sheets':
+            self._launch_duplicate_sheets_preview()
         elif launcher_id == 'kla-select-from-dict':
             from SelectFromDict import select_from_dict
             select_from_dict(dict((name, name) for name in sample_names),
@@ -122,6 +162,8 @@ class Gallery(forms.WPFWindow):
                              version='UI Gallery')
         elif launcher_id == 'kla-steel-psf':
             self._launch_steel_psf_preview()
+        elif launcher_id == 'kla-view-range':
+            self._launch_view_range_preview()
         else:
             raise ValueError('Unsupported gallery launcher: {}'.format(launcher_id))
 
@@ -147,6 +189,104 @@ class Gallery(forms.WPFWindow):
                 self.Close()
 
         FindReplacePreview()
+
+    def _launch_find_replace_views_preview(self):
+        self._launch_rename_preview(
+            os.path.join(EXTENSION_ROOT, 'lib', 'Renaming', 'GUI_BaseRename.xaml'),
+            'Find and Replace Views — gallery preview',
+            {
+                'input_find': 'Office',
+                'input_replace': 'Studio',
+                'input_prefix': 'Sample - ',
+                'input_suffix': ' - Review',
+            })
+
+    def _launch_find_replace_sheets_preview(self):
+        self._launch_rename_preview(
+            os.path.join(EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
+                         'Rename.pulldown', 'FindReplace_Sheets.pushbutton', 'Script.xaml'),
+            'Find and Replace Sheets — gallery preview',
+            {
+                'input_sheet_number_find': 'A',
+                'input_sheet_number_replace': 'S',
+                'input_sheet_number_prefix': 'Sample-',
+                'input_sheet_number_suffix': '-R1',
+                'input_sheet_name_find': 'Office',
+                'input_sheet_name_replace': 'Studio',
+                'input_sheet_name_prefix': 'Sample - ',
+                'input_sheet_name_suffix': ' - Review',
+            })
+
+    def _launch_rename_preview(self, xaml_path, title, sample_values):
+        import wpf
+        from GUI.forms import my_WPF
+
+        class RenamePreview(my_WPF):
+            def __init__(self):
+                self.add_wpf_resource()
+                wpf.LoadComponent(self, xaml_path)
+                self.Title = title
+                self.main_title.Text = title
+                self.footer_version.Text = 'UI Gallery — fictional data only'
+                for control_name, value in sample_values.items():
+                    getattr(self, control_name).Text = value
+                self.ShowDialog()
+
+            def button_run(self, sender, args):
+                self.Close()
+
+            def Hyperlink_RequestNavigate(self, sender, args):
+                args.Handled = True
+
+        RenamePreview()
+
+    def _launch_duplicate_sheets_preview(self):
+        xaml_path = os.path.join(
+            EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
+            'duplicate_sheets.pushbutton', 'Script.xaml')
+        self._launch_static_preview(xaml_path,
+                                    'Duplicate Sheets — gallery preview')
+
+    def _launch_static_preview(self, xaml_path, title):
+        class StaticPreview(forms.WPFWindow):
+            def __init__(self):
+                forms.WPFWindow.__init__(self, xaml_path)
+                self.Title = title
+                self.main_title.Text = title
+                self.ShowDialog()
+
+            def button_close(self, sender, args):
+                self.Close()
+
+            def button_run(self, sender, args):
+                self.Close()
+
+            def header_drag(self, sender, args):
+                return None
+
+            def radiobutton_duplicate_option(self, sender, args):
+                return None
+
+        StaticPreview()
+
+    def _launch_view_range_preview(self):
+        xaml_path = os.path.join(
+            EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
+            'ViewRange.pushbutton', 'MainWindow.xaml')
+
+        class ViewRangePreview(forms.WPFWindow):
+            def __init__(self):
+                forms.WPFWindow.__init__(self, xaml_path)
+                self.DataContext = ViewRangePreviewData()
+                self.ShowDialog()
+
+            def apply_changes_click(self, sender, args):
+                self.warning.Text = 'Preview mode: no changes were applied.'
+
+            def reset_values_click(self, sender, args):
+                self.warning.Text = 'Preview values are already seeded.'
+
+        ViewRangePreview()
 
     def _launch_steel_psf_preview(self):
         import imp

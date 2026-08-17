@@ -26,6 +26,10 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         self.assertIn('kla-custom-alert', launcher_ids)
         self.assertIn('kla-find-replace', launcher_ids)
         self.assertIn('kla-steel-psf', launcher_ids)
+        self.assertIn('kla-find-replace-views', launcher_ids)
+        self.assertIn('kla-find-replace-sheets', launcher_ids)
+        self.assertIn('kla-duplicate-sheets', launcher_ids)
+        self.assertIn('kla-view-range', launcher_ids)
         self.assertTrue(all(launcher['uses_seed_data'] for launcher in launchers))
 
     def test_returns_a_copy_and_looks_up_by_id(self):
