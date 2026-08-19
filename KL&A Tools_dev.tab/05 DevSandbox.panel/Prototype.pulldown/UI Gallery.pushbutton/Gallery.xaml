@@ -16,10 +16,12 @@
         <DataGrid x:Name="EntriesGrid" AutoGenerateColumns="False" IsReadOnly="True"
                   SelectionChanged="selection_changed" CanUserAddRows="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Family" Binding="{Binding Category}" Width="140" />
-                <DataGridTextColumn Header="Window" Binding="{Binding Title}" Width="2*" />
-                <DataGridTextColumn Header="Data" Binding="{Binding SampleData}" Width="135" />
-                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="3*" />
+                <DataGridTextColumn Header="Family" Binding="{Binding Category}" Width="120" />
+                <DataGridTextColumn Header="Window" Binding="{Binding Title}" Width="170" />
+                <DataGridTextColumn Header="Relative Path" Binding="{Binding RelativePath}" Width="260" />
+                <DataGridTextColumn Header="Called By" Binding="{Binding CalledBy}" Width="260" />
+                <DataGridTextColumn Header="Data" Binding="{Binding SampleData}" Width="110" />
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="240" />
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>

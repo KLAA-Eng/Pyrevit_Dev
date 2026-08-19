@@ -1,0 +1,6 @@
+title:
+  en_us: "Hide Revision\nClouds"
+tooltip:
+  en_us: Permanently hides selected revisions' cloud elements in views placed on selected sheets.
+engine:
+  clean: true

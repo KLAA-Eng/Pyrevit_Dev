@@ -40,8 +40,18 @@ class GalleryRow(object):
         self.Launcher = launcher
         self.Category = launcher['category']
         self.Title = launcher['title']
+        self.RelativePath = launcher.get('relative_path') or 'pyRevit built-in'
+        self.CalledBy = launcher.get('called_by') or ''
         self.Description = launcher['description']
-        self.SampleData = 'Seeded sample data'
+        self.SampleData = 'Seeded sample data' if launcher.get('uses_seed_data') else 'Catalog only'
+        self.CanLaunch = launcher.get('can_launch', True)
+
+
+class PreviewListItem(object):
+    def __init__(self, name, element=None, checked=False):
+        self.Name = name
+        self.element = element
+        self.IsChecked = checked
 
 
 class PreviewLevel(object):
@@ -97,7 +107,7 @@ class Gallery(forms.WPFWindow):
 
     def launch_selected(self, sender, args):
         row = self.EntriesGrid.SelectedItem
-        if row:
+        if row and row.CanLaunch:
             self._launch(row.Launcher['id'])
 
     def close_window(self, sender, args):
@@ -106,11 +116,13 @@ class Gallery(forms.WPFWindow):
     def _matches(self, row, query):
         if not query:
             return True
-        values = (row.Category, row.Title, row.Description, row.SampleData)
+        values = (row.Category, row.Title, row.Description, row.SampleData,
+                  row.RelativePath, row.CalledBy)
         return any(query in value.lower() for value in values)
 
     def _update_actions(self):
-        self.LaunchButton.IsEnabled = self.EntriesGrid.SelectedItem is not None
+        row = self.EntriesGrid.SelectedItem
+        self.LaunchButton.IsEnabled = bool(row and row.CanLaunch)
 
     def _launch(self, launcher_id):
         try:
@@ -145,14 +157,22 @@ class Gallery(forms.WPFWindow):
             from CustomAlert import show_alert
             show_alert('Preview data is fictional and cannot modify this model.',
                        title='KL&A Tools gallery preview')
+        elif launcher_id == 'kla-create-from-rooms':
+            self._launch_create_from_rooms_preview()
         elif launcher_id == 'kla-find-replace':
             self._launch_find_replace_preview()
         elif launcher_id == 'kla-find-replace-views':
             self._launch_find_replace_views_preview()
+        elif launcher_id == 'kla-find-replace-views-proto':
+            self._launch_find_replace_views_proto_preview()
         elif launcher_id == 'kla-find-replace-sheets':
             self._launch_find_replace_sheets_preview()
+        elif launcher_id == 'kla-find-replace-sheets-proto':
+            self._launch_find_replace_sheets_proto_preview()
         elif launcher_id == 'kla-duplicate-sheets':
             self._launch_duplicate_sheets_preview()
+        elif launcher_id == 'kla-match-properties-recall':
+            self._launch_match_properties_recall_preview()
         elif launcher_id == 'kla-select-from-dict':
             from SelectFromDict import select_from_dict
             select_from_dict(dict((name, name) for name in sample_names),
@@ -164,8 +184,60 @@ class Gallery(forms.WPFWindow):
             self._launch_steel_psf_preview()
         elif launcher_id == 'kla-view-range':
             self._launch_view_range_preview()
+        elif launcher_id == 'ui-gallery':
+            Gallery().ShowDialog()
+        elif launcher_id == 'ui-gallery-preview-fixture':
+            self._launch_static_preview(
+                os.path.join(os.path.dirname(__file__), 'fixtures', 'PreviewFixture.xaml'),
+                'UI Gallery preview fixture')
         else:
             raise ValueError('Unsupported gallery launcher: {}'.format(launcher_id))
+
+    def _launch_create_from_rooms_preview(self):
+        import wpf
+        from GUI.forms import my_WPF
+
+        xaml_path = os.path.join(
+            EXTENSION_ROOT, 'lib', 'GUI', 'Tools', 'CreateFromRooms.xaml')
+
+        class CreateFromRoomsPreview(my_WPF):
+            def __init__(self):
+                self.add_wpf_resource()
+                wpf.LoadComponent(self, xaml_path)
+                self.main_title.Text = 'Create From Rooms — gallery preview'
+                self.text_label.Content = 'Select fictional room type:'
+                self.button_main.Content = 'Close preview'
+                self.footer_version.Text = 'UI Gallery — fictional data only'
+                self.UI_offset.Text = '15'
+                self._items = [
+                    PreviewListItem('Office Area Boundary', 'office', True),
+                    PreviewListItem('Conference Room Boundary', 'conference', False),
+                    PreviewListItem('Storage Room Boundary', 'storage', False),
+                ]
+                self.main_ListBox.ItemsSource = self._items
+                self.ShowDialog()
+
+            def text_filter_updated(self, sender, args):
+                query = (self.textbox_filter.Text or '').lower()
+                if not query:
+                    self.main_ListBox.ItemsSource = self._items
+                    return
+                self.main_ListBox.ItemsSource = [
+                    item for item in self._items if query in item.Name.lower()
+                ]
+
+            def UIe_ItemChecked(self, sender, args):
+                for item in self._items:
+                    item.IsChecked = item.Name == sender.Content.Text
+                self.main_ListBox.ItemsSource = list(self._items)
+
+            def NumberValidationTextBox(self, sender, args):
+                return None
+
+            def button_run(self, sender, args):
+                self.Close()
+
+        CreateFromRoomsPreview()
 
     def _launch_find_replace_preview(self):
         import wpf
@@ -201,11 +273,41 @@ class Gallery(forms.WPFWindow):
                 'input_suffix': ' - Review',
             })
 
+    def _launch_find_replace_views_proto_preview(self):
+        self._launch_rename_preview(
+            os.path.join(EXTENSION_ROOT, 'KL&A Tools_dev.tab', '05 DevSandbox.panel',
+                         'Prototype.pulldown', 'FindReplace - Views-proto.pushbutton',
+                         'Script.xaml'),
+            'Find and Replace Views Prototype — gallery preview',
+            {
+                'input_find': 'Office',
+                'input_replace': 'Studio',
+                'input_prefix': 'Sample - ',
+                'input_suffix': ' - Review',
+            })
+
     def _launch_find_replace_sheets_preview(self):
         self._launch_rename_preview(
             os.path.join(EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
                          'Rename.pulldown', 'FindReplace_Sheets.pushbutton', 'Script.xaml'),
             'Find and Replace Sheets — gallery preview',
+            {
+                'input_sheet_number_find': 'A',
+                'input_sheet_number_replace': 'S',
+                'input_sheet_number_prefix': 'Sample-',
+                'input_sheet_number_suffix': '-R1',
+                'input_sheet_name_find': 'Office',
+                'input_sheet_name_replace': 'Studio',
+                'input_sheet_name_prefix': 'Sample - ',
+                'input_sheet_name_suffix': ' - Review',
+            })
+
+    def _launch_find_replace_sheets_proto_preview(self):
+        self._launch_rename_preview(
+            os.path.join(EXTENSION_ROOT, 'KL&A Tools_dev.tab', '05 DevSandbox.panel',
+                         'Prototype.pulldown', 'FindReplace_Sheets-proto.pushbutton',
+                         'Script.xaml'),
+            'Find and Replace Sheets Prototype — gallery preview',
             {
                 'input_sheet_number_find': 'A',
                 'input_sheet_number_replace': 'S',
@@ -235,6 +337,12 @@ class Gallery(forms.WPFWindow):
             def button_run(self, sender, args):
                 self.Close()
 
+            def button_uppercase(self, sender, args):
+                self.Close()
+
+            def button_lowercase(self, sender, args):
+                self.Close()
+
             def Hyperlink_RequestNavigate(self, sender, args):
                 args.Handled = True
 
@@ -252,7 +360,8 @@ class Gallery(forms.WPFWindow):
             def __init__(self):
                 forms.WPFWindow.__init__(self, xaml_path)
                 self.Title = title
-                self.main_title.Text = title
+                if hasattr(self, 'main_title'):
+                    self.main_title.Text = title
                 self.ShowDialog()
 
             def button_close(self, sender, args):
@@ -268,6 +377,39 @@ class Gallery(forms.WPFWindow):
                 return None
 
         StaticPreview()
+
+    def _launch_match_properties_recall_preview(self):
+        from System.Windows import Thickness
+        from System.Windows.Controls import StackPanel, TextBlock, ListBox
+
+        xaml_path = os.path.join(EXTENSION_ROOT, 'lib', 'match', 'clipboard_window.xaml')
+
+        class MatchRecallPreview(forms.WPFWindow):
+            def __init__(self):
+                forms.WPFWindow.__init__(self, xaml_path)
+                self.Title = 'Match Properties Recall — gallery preview'
+                panel = StackPanel()
+                panel.Margin = Thickness(12)
+                heading = TextBlock()
+                heading.Text = 'Fictional saved match parameters'
+                heading.Margin = Thickness(0, 0, 0, 8)
+                panel.Children.Add(heading)
+                values = ListBox()
+                values.ItemsSource = [
+                    'Mark = A-101',
+                    'Comments = Coordination review',
+                    'Phase Created = Existing',
+                    'Detail Level = Fine',
+                ]
+                panel.Children.Add(values)
+                note = TextBlock()
+                note.Text = 'Preview only. No Revit elements are read or changed.'
+                note.Margin = Thickness(0, 8, 0, 0)
+                panel.Children.Add(note)
+                self.Content = panel
+                self.ShowDialog()
+
+        MatchRecallPreview()
 
     def _launch_view_range_preview(self):
         xaml_path = os.path.join(
