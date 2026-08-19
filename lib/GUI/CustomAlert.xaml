@@ -9,22 +9,41 @@
     ShowInTaskbar="True"
     WindowStyle="None"
     AllowsTransparency="True"
-    Background="#080326">
-    <Border Background="#0F0F2D" BorderBrush="{StaticResource border_magenta}" BorderThickness="1">
+    Background="#1A252B">
+    <Border Background="#1A252B" BorderBrush="{StaticResource border_magenta}" BorderThickness="1">
         <Grid>
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                    <GradientStop Color="#33286048" Offset="0" />
+                    <GradientStop Color="#33307050" Offset="1" />
+                </LinearGradientBrush>
+            </Grid.Background>
             <Grid.RowDefinitions>
-                <RowDefinition Height="30" />
+                <RowDefinition Height="25" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="55" />
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0" Background="{StaticResource header_background}" MouseDown="header_drag">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="75" />
                     <ColumnDefinition />
                     <ColumnDefinition Width="60" />
                 </Grid.ColumnDefinitions>
-                <TextBlock x:Name="main_title" Margin="12,0" VerticalAlignment="Center" HorizontalAlignment="Left" FontWeight="Bold" />
-                <Button Grid.Column="1" Content="Close" Width="52" Height="20" Margin="0,0,6,0" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="10" Click="button_close" />
+                <DockPanel Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <TextBlock Margin="5,0,0,0"
+                               FontSize="14px"
+                               FontWeight="Heavy"
+                               Foreground="{StaticResource text_white}">
+                        KLCode
+                    </TextBlock>
+                </DockPanel>
+                <TextBlock x:Name="main_title"
+                           Grid.Column="1"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Foreground="{StaticResource text_white}" />
+                <Button Grid.Column="2" Content="Close" Width="60" Height="20" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="10" Click="button_close" />
             </Grid>
 
             <Grid Grid.Row="1" Margin="24,20,24,10">

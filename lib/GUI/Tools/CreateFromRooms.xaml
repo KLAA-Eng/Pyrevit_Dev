@@ -170,8 +170,8 @@
                                     <Border x:Name="Border" Width="15" Height="15" CornerRadius="2" BorderThickness="0">
                                         <Border.Background>
                                             <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                                                <GradientStop Color= "#882E5C40" Offset="1" />
-                                                <GradientStop Color= "#996FA287" Offset="0" />
+                                                <GradientStop Color= "#88286048" Offset="1" />
+                                                <GradientStop Color= "#99307050" Offset="0" />
                                             </LinearGradientBrush>
                                         </Border.Background>
                                         <Path Width="9" Height="9" x:Name="CheckMark" SnapsToDevicePixels="False"
