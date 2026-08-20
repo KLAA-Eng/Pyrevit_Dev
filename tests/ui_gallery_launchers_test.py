@@ -11,6 +11,7 @@ if PROJECT_ROOT not in sys.path:
 
 
 from lib.ui_gallery.launchers import gallery_launchers, launcher_by_id
+from lib.ui_gallery.catalog import catalog_xaml_sources
 
 
 class UiGalleryLaunchersTests(unittest.TestCase):
@@ -30,7 +31,42 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         self.assertIn('kla-find-replace-sheets', launcher_ids)
         self.assertIn('kla-duplicate-sheets', launcher_ids)
         self.assertIn('kla-view-range', launcher_ids)
+        self.assertTrue(all('relative_path' in launcher for launcher in launchers))
+        self.assertTrue(all('called_by' in launcher for launcher in launchers))
+        self.assertTrue(all('can_launch' in launcher for launcher in launchers))
+        self.assertTrue(all(launcher['called_by'] for launcher in launchers))
         self.assertTrue(all(launcher['uses_seed_data'] for launcher in launchers))
+        self.assertTrue(all(launcher['can_launch'] for launcher in launchers))
+
+    def test_all_repo_window_xaml_files_are_accounted_for(self):
+        launchers = gallery_launchers()
+        launcher_paths = set(
+            launcher['relative_path']
+            for launcher in launchers
+            if launcher['relative_path']
+        )
+        window_paths = set(
+            entry['relative_path']
+            for entry in catalog_xaml_sources(PROJECT_ROOT)
+            if entry['root_kind'] == 'Window'
+        )
+
+        self.assertEqual(sorted(window_paths), sorted(launcher_paths))
+
+    def test_non_window_xaml_files_stay_catalog_only(self):
+        entries = catalog_xaml_sources(PROJECT_ROOT)
+        non_window_paths = set(
+            entry['relative_path']
+            for entry in entries
+            if entry['root_kind'] in ('Page', 'UserControl', 'ResourceDictionary')
+        )
+        launcher_paths = set(
+            launcher['relative_path']
+            for launcher in gallery_launchers()
+            if launcher['relative_path']
+        )
+
+        self.assertFalse(non_window_paths.intersection(launcher_paths))
 
     def test_returns_a_copy_and_looks_up_by_id(self):
         launchers = gallery_launchers()

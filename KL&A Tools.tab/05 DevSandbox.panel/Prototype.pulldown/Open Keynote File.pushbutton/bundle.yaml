@@ -1,0 +1,6 @@
+title:
+  en_us: "Open Keynote\nFile"
+tooltip:
+  en_us: Opens the keynote file connected to the active Revit project.
+engine:
+  clean: true

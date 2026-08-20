@@ -44,11 +44,6 @@ larger icons increase ribbon load time.
 refreshed ribbon icons. Use its simple, consistent icon language as design
 inspiration while creating the required pyRevit PNG assets described above.
 
-For new or refreshed Core Tools icons, recolor every non-transparent pixel to the theme foreground while preserving each pixel's alpha channel.
-
-Use `#FF8000` as the default orange when an orange icon or accent is needed.
-Use `#33714F` as the default green when a green icon or accent is needed.
-
 ## Shared GUI Colors
 
 Shared WPF GUI styling is defined in `lib/GUI/Resources/WPF_styles.xaml`.
@@ -138,6 +133,31 @@ Known window backgrounds currently in use:
 | --- | --- | --- |
 | `lib/GUI/FindReplace.xaml` | `#1A252B` | logo charcoal |
 | `lib/GUI/SelectFromDict.xaml` | `#1A252B` with a `#33286048` to `#33307050` gradient grid background | logo charcoal with translucent logo-green gradient |
+
+## UI Gallery Theme Audit
+
+The DevSandbox UI Gallery catalogs representative custom windows in `lib/ui_gallery/launchers.py`. For KL&A custom and DevSandbox entries, use `lib/GUI/SelectFromDict.xaml` as the visual reference: borderless dark chrome, KLCode text branding in the 25 px header, `#1A252B` charcoal window background, optional translucent logo-green gradient, `#286048`/`#33714F`/`#407058` accents, and readable `#E5E4E2` text.
+
+Standard pyRevit gallery entries are intentional external references and are not scored for KLCode theme consistency.
+
+| Gallery title | Category | XAML path | Theme status | Notable drift | Recommended future action |
+| --- | --- | --- | --- | --- | --- |
+| Create from rooms | KL&A custom | `lib/GUI/Tools/CreateFromRooms.xaml` | Reference/aligned | Local copy of the shared palette; checkbox gradient now matches the shared SelectFromDict values. | Keep layout and behavior; sync copied resource values with the shared dictionary when this local copy is refreshed. |
+| KL&A alert | KL&A custom | `lib/GUI/CustomAlert.xaml` | Reference/aligned | Alert-specific icon, heading, and OK button are preserved inside SelectFromDict-style dark chrome. | Keep aligned with the shared palette when alert states are expanded. |
+| Duplicate sheets | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/Script.xaml` | Mostly aligned with local overrides | Uses command-local aliases that match the shared palette, but has a larger tool-specific form and custom token names. | Keep local aliases documented; only normalize token naming if the window is later refactored. |
+| Find and replace | KL&A custom | `lib/GUI/FindReplace.xaml` | Reference/aligned | Compact rename form uses the charcoal header/body and shared KLCode resources; it does not use the SelectFromDict list gradient because it is not a selection window. | Keep as a compact aligned variant. |
+| Find and replace sheets | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml` | Mostly aligned with local overrides | Uses copied KLCode resources and command-specific fields; verify copied values before future palette changes. | Keep behavior; update copied resources only when syncing all rename windows. |
+| Find and replace sheets prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Mostly aligned with local overrides | Prototype copy follows the KLCode layout but may contain local resource drift from production copies. | Keep prototype-local XAML; sync palette deliberately when production rename windows are refreshed. |
+| Find and replace views | KL&A custom | `lib/Renaming/GUI_BaseRename.xaml` | Mostly aligned with local overrides | Shared rename base uses the KLCode header and footer but carries an embedded resource dictionary instead of relying only on `WPF_styles.xaml`. | Preserve as the rename base; consider dictionary deduplication only in a separate refactor. |
+| Find and replace views prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Mostly aligned with local overrides | Prototype-local copy intentionally avoids changing shared rename GUI behavior. | Keep prototype-local XAML and sync palette only when the prototype is intentionally refreshed. |
+| Match properties recall | KL&A custom | `lib/match/clipboard_window.xaml` | Reference/aligned | Modeless clipboard content is hosted inside SelectFromDict-style dark chrome. | Keep the content host pattern so command content does not replace the KLCode shell. |
+| KL&A list selection | KL&A custom | `lib/GUI/SelectFromDict.xaml` | Reference/aligned | This is the reference theme for list-selection windows. | Keep as the base for future selection-style custom windows. |
+| Steel PSF story selection | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | Reference/aligned | Closely follows SelectFromDict list-selection chrome and gradient; footer is prototype-specific. | Keep aligned with SelectFromDict when Steel PSF controls change. |
+| View range editor | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | Needs future theming | Uses default resizable WPF chrome, light table rows, and red warning text instead of KLCode dark chrome. | Restyle as a KLCode tool window while preserving the editable grid and data bindings. |
+| UI Gallery | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | Needs future theming | Uses default resizable WPF chrome and unthemed DataGrid controls. | Apply KLCode header/chrome and a dark, readable gallery table in a future UI pass. |
+| UI Gallery preview fixture | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | Needs future theming | Intentionally minimal self-contained fixture with default WPF chrome. | Leave plain unless the fixture is promoted to a visual-review artifact; document it as a test exception if unchanged. |
+
+Future KL&A custom windows should use the SelectFromDict chrome and palette by default. Exceptions must be explicit: standard pyRevit dialogs, test fixtures, and tool-specific windows may keep different chrome only when the reason is documented near the launcher or in this design system.
 
 ## Local GUI Overrides
 

@@ -3,4 +3,95 @@
         Title="Match Properties – Recall"
         Width="420"
         SizeToContent="Height"
-        ResizeMode="CanResizeWithGrip"/>
+        MinWidth="420"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="True"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="#1A252B">
+    <Window.Resources>
+        <SolidColorBrush x:Key="header_background" Color="#1A252B" />
+        <SolidColorBrush x:Key="text_white" Color="#E5E4E2" />
+        <SolidColorBrush x:Key="text_gray" Color="Gray" />
+        <SolidColorBrush x:Key="button_fg_normal" Color="White" />
+        <SolidColorBrush x:Key="button_bg_normal" Color="#286048" />
+        <SolidColorBrush x:Key="button_bg_hover" Color="#407058" />
+        <SolidColorBrush x:Key="border_magenta" Color="#286048" />
+
+        <Style TargetType="Button">
+            <Setter Property="TextElement.FontFamily" Value="Arial"/>
+            <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource button_fg_normal}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="8" Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource button_bg_hover}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="#1A252B" BorderBrush="{StaticResource border_magenta}" BorderThickness="1">
+        <Grid>
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                    <GradientStop Color="#33286048" Offset="0" />
+                    <GradientStop Color="#33307050" Offset="1" />
+                </LinearGradientBrush>
+            </Grid.Background>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="25" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Background="{StaticResource header_background}" MouseDown="header_drag">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="75" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="60" />
+                </Grid.ColumnDefinitions>
+                <DockPanel Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <TextBlock Margin="5,0,0,0"
+                               FontSize="14px"
+                               FontWeight="Heavy"
+                               Foreground="{StaticResource text_white}">
+                        KLCode
+                    </TextBlock>
+                </DockPanel>
+                <TextBlock Text="Match Properties Recall"
+                           Grid.Column="1"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Foreground="{StaticResource text_white}" />
+                <Button Content="Close"
+                        Grid.Column="2"
+                        Width="60" Height="20"
+                        FontSize="10"
+                        Click="button_close"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right" />
+            </Grid>
+
+            <ContentControl x:Name="content_host"
+                            Grid.Row="1"
+                            Margin="10" />
+
+            <Grid Grid.Row="2" Background="{StaticResource header_background}">
+                <TextBlock Text="KLCode"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Foreground="{StaticResource text_gray}" />
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

@@ -98,7 +98,10 @@ class UiGalleryCatalogTests(unittest.TestCase):
         external_path = os.path.join(self.external_dir, 'External.xaml')
         with open(external_path, 'w') as xaml_file:
             xaml_file.write(WINDOW)
-        os.symlink(external_path, os.path.join(self.temp_dir, 'Escaped.xaml'))
+        try:
+            os.symlink(external_path, os.path.join(self.temp_dir, 'Escaped.xaml'))
+        except (AttributeError, NotImplementedError, OSError) as error:
+            self.skipTest('Symlink creation is not available: {}'.format(error))
 
         self.assertEqual([], catalog_xaml_sources(self.temp_dir))
 

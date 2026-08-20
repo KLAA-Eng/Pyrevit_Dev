@@ -7,6 +7,8 @@ from pyrevit import DB
 from pyrevit.revit.events import execute_in_revit_context
 from pyrevit.framework import ComponentModel, wpf, Controls, Uri, UriKind, ResourceDictionary
 from pyrevit.compat import get_elementid_value_func
+from System.Windows.Input import MouseButtonState
+from System.Windows.Window import DragMove
 
 from match.match_utils import (
     PropKeyValue,
@@ -459,10 +461,17 @@ class RecallWindow(forms.WPFWindow):
             target_type=target_type,
             memfile=memfile,
         )
-        self.Content = self._content
+        self.content_host.Content = self._content
         self._content.populate(initial_props, all_selected=True)
         script.restore_window_position(self, "MatchPropertiesRecall")
         self.Closing += self._on_closing
+
+    def button_close(self, sender, e):
+        self.Close()
+
+    def header_drag(self, sender, e):
+        if e.LeftButton == MouseButtonState.Pressed:
+            DragMove(self)
 
     def _on_closing(self, sender, args):
         script.save_window_position(self, "MatchPropertiesRecall")
