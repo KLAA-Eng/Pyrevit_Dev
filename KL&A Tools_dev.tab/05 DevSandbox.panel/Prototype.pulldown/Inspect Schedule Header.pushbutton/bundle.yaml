@@ -1,0 +1,8 @@
+title:
+  en_us: "Inspect Schedule Header"
+tooltip:
+  en_us: >-
+    Prototype: exports selected Revit schedule header text, dimensions, and
+    accessible cell style metadata to JSON and CSV for formatter development.
+engine:
+  clean: true

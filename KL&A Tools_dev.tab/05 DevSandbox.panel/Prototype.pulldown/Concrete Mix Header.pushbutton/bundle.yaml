@@ -1,0 +1,8 @@
+title:
+  en_us: "Concrete Mix Header"
+tooltip:
+  en_us: >-
+    Prototype: imports a configured Excel range from the Concrete Mix Design
+    Requirements workbook into the header section of a selected Revit schedule.
+engine:
+  clean: true
