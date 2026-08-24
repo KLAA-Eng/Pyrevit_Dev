@@ -18,7 +18,6 @@ EXAMPLE_EXCEL_PATH = (
 # Prototype tuning values. These should be adjusted after inspecting the real workbook.
 EXCEL_TABLE_NAME = 'tblMixHistory'
 EXCEL_WORKSHEET_NAME = ''
-CLEAR_EXISTING_HEADER_TEXT = True
 IMPORT_START_ROW_OFFSET = 3
 IMPORT_START_COLUMN_OFFSET = 0
 TEMPLATE_MIX_ROW_COUNT = 30
@@ -59,9 +58,12 @@ from GUI.forms import select_from_dict
 from concrete_mix_schedule_header import (
     build_write_plan,
     build_mix_history_schedule_grid,
+    classify_template_reconciliation,
     element_match_key,
+    insertion_anchor_offset,
     non_empty_cell_count,
     normalize_grid,
+    template_element_key_map,
 )
 
 
@@ -278,17 +280,6 @@ def _ensure_header_size(header, row_count, column_count):
     return warnings
 
 
-def _clear_destination(header, row_count, column_count):
-    first_row = header.FirstRowNumber + IMPORT_START_ROW_OFFSET
-    first_column = header.FirstColumnNumber + IMPORT_START_COLUMN_OFFSET
-    for row_offset in range(row_count):
-        for column_offset in range(column_count):
-            try:
-                header.SetCellText(first_row + row_offset, first_column + column_offset, '')
-            except Exception:
-                pass
-
-
 def _clear_pair(header, row_offset):
     first_row = header.FirstRowNumber + IMPORT_START_ROW_OFFSET + row_offset
     first_column = header.FirstColumnNumber + IMPORT_START_COLUMN_OFFSET
@@ -310,17 +301,22 @@ def _cell_text(header, row, column):
 def _existing_mix_pairs(header):
     first_row = header.FirstRowNumber + IMPORT_START_ROW_OFFSET
     first_column = header.FirstColumnNumber + IMPORT_START_COLUMN_OFFSET
+    notes_anchor_offset = _notes_anchor_offset(header)
+    max_row_offset = notes_anchor_offset if notes_anchor_offset is not None else IMPORT_START_ROW_OFFSET + TEMPLATE_MIX_ROW_COUNT
     pairs = []
     by_key = {}
-    for row_offset in range(0, TEMPLATE_MIX_ROW_COUNT, 2):
-        element_text = _cell_text(header, first_row + row_offset, first_column)
+    template_keys = template_element_key_map()
+    for row_offset in range(0, max_row_offset - IMPORT_START_ROW_OFFSET, 2):
+        absolute_row = first_row + row_offset
+        element_text = _cell_text(header, absolute_row, first_column)
         record = {
             'row_offset': row_offset,
+            'absolute_row': absolute_row,
             'element': element_text,
             'key': element_match_key(element_text),
         }
         pairs.append(record)
-        if record['key'] and record['key'] not in by_key:
+        if record['key'] in template_keys and record['key'] not in by_key:
             by_key[record['key']] = record
     return pairs, by_key
 
@@ -342,8 +338,31 @@ def _mapped_grid_pairs(grid):
     return pairs
 
 
-def _empty_pairs(existing_pairs):
-    return [pair for pair in existing_pairs if not pair['key']]
+def _notes_anchor_offset(header):
+    first_row = header.FirstRowNumber
+    first_column = header.FirstColumnNumber + IMPORT_START_COLUMN_OFFSET
+    for absolute_row in range(header.FirstRowNumber, header.LastRowNumber + 1):
+        text = _cell_text(header, absolute_row, first_column)
+        if element_match_key(text) == element_match_key('TABLE FOOTNOTES'):
+            return absolute_row - first_row
+    return PRESERVE_NOTES_START_ROW_OFFSET
+
+
+def _delete_pair(header, row_offset):
+    absolute_top_row = header.FirstRowNumber + IMPORT_START_ROW_OFFSET + row_offset
+    for absolute_row in (absolute_top_row + 1, absolute_top_row):
+        try:
+            if hasattr(header, 'CanRemoveRow') and not header.CanRemoveRow(absolute_row):
+                raise RuntimeError('Revit reported row {} cannot be removed.'.format(absolute_row))
+            header.RemoveRow(absolute_row)
+        except AttributeError:
+            raise RuntimeError('This Revit TableSectionData API does not expose RemoveRow for header rows.')
+
+
+def _insert_pair_before_offset(header, row_offset):
+    absolute_top_row = header.FirstRowNumber + IMPORT_START_ROW_OFFSET + row_offset
+    header.InsertRow(absolute_top_row)
+    header.InsertRow(absolute_top_row + 1)
 
 
 def _write_pair(header, destination_row_offset, pair_grid):
@@ -371,32 +390,53 @@ def _set_column_widths(header):
     return warnings
 
 
-def _write_header(schedule, grid):
+def _reconciliation_preview(schedule, grid):
     table_data = schedule.GetTableData()
     header = table_data.GetSectionData(DB.SectionType.Header)
-    row_count = len(grid)
+    normalized_grid = normalize_grid(grid, TEMPLATE_MIX_ROW_COUNT, TEMPLATE_COLUMN_COUNT)
+    mapped_pairs = _mapped_grid_pairs(normalized_grid)
+    existing_pairs, _existing_by_key = _existing_mix_pairs(header)
+    return classify_template_reconciliation(mapped_pairs, existing_pairs)
+
+
+def _write_header(schedule, grid, remove_missing):
+    table_data = schedule.GetTableData()
+    header = table_data.GetSectionData(DB.SectionType.Header)
     column_count = max([len(row) for row in grid] or [0])
     if column_count > TEMPLATE_COLUMN_COUNT:
         raise RuntimeError(
             'Mapped tblMixHistory output has {} columns, but the inspected schedule template has {} header columns.'.format(
                 column_count, TEMPLATE_COLUMN_COUNT))
 
-    required_rows = IMPORT_START_ROW_OFFSET + TEMPLATE_MIX_ROW_COUNT
     required_columns = IMPORT_START_COLUMN_OFFSET + TEMPLATE_COLUMN_COUNT
-    warnings = _ensure_header_size(header, required_rows, required_columns)
-    if header.NumberOfRows < required_rows or header.NumberOfColumns < required_columns:
+    warnings = _ensure_header_size(header, IMPORT_START_ROW_OFFSET + 2, required_columns)
+    if header.NumberOfColumns < required_columns:
         raise RuntimeError('Schedule header is smaller than the concrete mix template import region.')
 
     normalized_grid = normalize_grid(grid, TEMPLATE_MIX_ROW_COUNT, TEMPLATE_COLUMN_COUNT)
     mapped_pairs = _mapped_grid_pairs(normalized_grid)
     existing_pairs, existing_by_key = _existing_mix_pairs(header)
-    empty_pairs = _empty_pairs(existing_pairs)
+    reconciliation = classify_template_reconciliation(mapped_pairs, existing_pairs)
+    if reconciliation['unknown_excel']:
+        raise RuntimeError(
+            'Excel contains elements that are not in the GN-03 concrete mix template: {}'.format(
+                ', '.join([pair['element'] for pair in reconciliation['unknown_excel']])))
+    if reconciliation['duplicate_excel']:
+        raise RuntimeError(
+            'Excel contains duplicate concrete mix template elements: {}'.format(
+                ', '.join([pair['element'] for pair in reconciliation['duplicate_excel']])))
+
+    removed = []
+    if remove_missing:
+        for pair in sorted(reconciliation['missing_from_excel'], key=lambda item: item['row_offset'], reverse=True):
+            _delete_pair(header, pair['row_offset'])
+            removed.append([pair['element'], pair['row_offset']])
 
     written = 0
     updated = []
     added = []
-    unmatched = []
-    for pair in mapped_pairs:
+    for pair in reconciliation['known_excel']:
+        existing_pairs, existing_by_key = _existing_mix_pairs(header)
         existing_pair = existing_by_key.get(pair['key'])
         if existing_pair:
             destination_row_offset = existing_pair['row_offset']
@@ -404,22 +444,16 @@ def _write_header(schedule, grid):
             written += _write_pair(header, destination_row_offset, pair['grid'])
             updated.append([pair['element'], destination_row_offset])
             continue
-        if empty_pairs:
-            empty_pair = empty_pairs.pop(0)
-            destination_row_offset = empty_pair['row_offset']
-            _clear_pair(header, destination_row_offset)
-            written += _write_pair(header, destination_row_offset, pair['grid'])
-            added.append([pair['element'], destination_row_offset])
-            continue
-        unmatched.append(pair['element'])
 
-    if unmatched:
-        raise RuntimeError(
-            'No matching or empty Revit schedule mix row was available for: {}'.format(
-                ', '.join(unmatched)))
+        notes_anchor_offset = _notes_anchor_offset(header) - IMPORT_START_ROW_OFFSET
+        destination_row_offset = insertion_anchor_offset(pair['key'], existing_pairs, notes_anchor_offset)
+        _insert_pair_before_offset(header, destination_row_offset)
+        _clear_pair(header, destination_row_offset)
+        written += _write_pair(header, destination_row_offset, pair['grid'])
+        added.append([pair['element'], destination_row_offset])
 
     warnings.extend(_set_column_widths(header))
-    return {'written': written, 'warnings': warnings, 'updated': updated, 'added': added}
+    return {'written': written, 'warnings': warnings, 'updated': updated, 'added': added, 'removed': removed}
 
 
 def _print_preview(output, excel_data, schedule, grid):
@@ -437,10 +471,38 @@ def _print_preview(output, excel_data, schedule, grid):
         IMPORT_START_ROW_OFFSET + TEMPLATE_MIX_ROW_COUNT - 1,
         PRESERVE_NOTES_START_ROW_OFFSET))
     output.print_md(
-        'Import mode: search existing mix rows by normalized Element text; update matches; add unmatched rows only into empty paired slots.')
+        'Import mode: reconcile Excel rows against the built-in GN-03 template element order.')
     output.print_md('Mapped output rows: {}  Columns: {}  Non-empty cells: {}'.format(
         len(grid), max([len(row) for row in grid] or [0]), non_empty_cell_count(grid)))
     output.print_table(grid, columns=['C{}'.format(index + 1) for index in range(max([len(row) for row in grid] or [0]))])
+
+
+def _print_reconciliation(output, reconciliation):
+    if reconciliation.get('to_update'):
+        output.print_md('## Template Rows To Update')
+        output.print_table(
+            [[pair['element']] for pair in reconciliation['to_update']],
+            columns=['Element'])
+    if reconciliation.get('to_add'):
+        output.print_md('## Template Rows To Add Back')
+        output.print_table(
+            [[pair['element']] for pair in reconciliation['to_add']],
+            columns=['Element'])
+    if reconciliation.get('missing_from_excel'):
+        output.print_md('## Current Template Rows Missing From Excel')
+        output.print_table(
+            [[pair['element'], pair['row_offset']] for pair in reconciliation['missing_from_excel']],
+            columns=['Element', 'Current Mix Row Offset'])
+    if reconciliation.get('unknown_excel'):
+        output.print_md('## Excel Rows Not In GN-03 Template')
+        output.print_table(
+            [[pair['element']] for pair in reconciliation['unknown_excel']],
+            columns=['Element'])
+    if reconciliation.get('duplicate_excel'):
+        output.print_md('## Duplicate Excel Template Rows')
+        output.print_table(
+            [[pair['element']] for pair in reconciliation['duplicate_excel']],
+            columns=['Element'])
 
 
 def main():
@@ -461,6 +523,24 @@ def main():
         excel_data['headers'], excel_data['grid'], TEMPLATE_MIX_ROW_COUNT)
     excel_data['column_map'] = column_map
     _print_preview(output, excel_data, schedule, grid)
+    reconciliation = _reconciliation_preview(schedule, grid)
+    _print_reconciliation(output, reconciliation)
+    if reconciliation['unknown_excel'] or reconciliation['duplicate_excel']:
+        forms.alert(
+            'Excel has concrete mix rows that cannot be reconciled. Review the pyRevit output window.',
+            title=COMMAND_TITLE,
+            warn_icon=True)
+        return
+
+    remove_missing = False
+    if reconciliation['missing_from_excel']:
+        remove_missing = forms.alert(
+            'Excel is missing {} current template row(s).\n\nDelete those paired schedule rows now?\n\nChoose No to keep them.'.format(
+                len(reconciliation['missing_from_excel'])),
+            title=COMMAND_TITLE,
+            ok=False,
+            yes=True,
+            no=True)
     if not forms.alert(
             'Write mapped output of {} rows x {} columns into the schedule header?'.format(
                 len(grid), max([len(row) for row in grid] or [0])),
@@ -472,7 +552,7 @@ def main():
         return
 
     with revit.Transaction('Import Concrete Mix Schedule Header'):
-        result = _write_header(schedule, grid)
+        result = _write_header(schedule, grid, remove_missing)
 
     output.print_md('## Import complete')
     output.print_md('Header cells written: {}'.format(result['written']))
@@ -480,8 +560,11 @@ def main():
         output.print_md('## Updated Existing Rows')
         output.print_table(result['updated'], columns=['Element', 'Revit Mix Row Offset'])
     if result.get('added'):
-        output.print_md('## Added To Empty Rows')
+        output.print_md('## Added Back')
         output.print_table(result['added'], columns=['Element', 'Revit Mix Row Offset'])
+    if result.get('removed'):
+        output.print_md('## Removed Missing Excel Rows')
+        output.print_table(result['removed'], columns=['Element', 'Previous Revit Mix Row Offset'])
     if result['warnings']:
         output.print_md('## Formatting warnings')
         output.print_table([[warning] for warning in result['warnings']], columns=['Warning'])

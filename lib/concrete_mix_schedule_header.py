@@ -3,9 +3,22 @@
 from __future__ import print_function
 
 import re
+from fractions import Fraction
 
 
 CELL_REF_RE = re.compile(r'^([A-Za-z]+)([0-9]+)$')
+SUPERSCRIPT_DIGITS = {
+    '⁰': '0',
+    '¹': '1',
+    '²': '2',
+    '³': '3',
+    '⁴': '4',
+    '⁵': '5',
+    '⁶': '6',
+    '⁷': '7',
+    '⁸': '8',
+    '⁹': '9',
+}
 MIX_HISTORY_ALIASES = {
     'element': 'element',
     'elements': 'element',
@@ -25,6 +38,111 @@ MIX_HISTORY_ALIASES = {
     'w': 'water',
     'c': 'corrosion',
 }
+TEMPLATE_ELEMENTS = [
+    'Drilled Piers',
+    'Pier Caps',
+    'Top of Piers in contact with concrete columns & pilasters',
+    'Footings',
+    'Grade beams, Tiebeams, Stem Walls',
+    'Foundation Walls not integral to pilasters & columns',
+    'Foundation Walls integral to pilasters or supporting concrete columns',
+    'Interior Slab on Grade (SOG)',
+    'Slab on Metal Deck',
+    'Exterior Slab on Grade, Garage Slab on Grade',
+    'Columns',
+    'Core, Shear, and Bearing Walls',
+    'PT Slab, and Non-PT Structural Slabs, Beams, and Joists',
+    'Garage Slabs/Beams and Slabs exposed to DeIcing Chemicals',
+    'Other ⁵',
+]
+
+
+def template_element_records():
+    records = []
+    for index, element in enumerate(TEMPLATE_ELEMENTS):
+        records.append({
+            'index': index,
+            'element': element,
+            'key': element_match_key(element),
+        })
+    return records
+
+
+def template_element_key_map():
+    return dict((record['key'], record) for record in template_element_records())
+
+
+def classify_template_reconciliation(excel_pairs, current_pairs):
+    """Classify Excel/header pairs against the built-in template element list."""
+    template_by_key = template_element_key_map()
+    current_by_key = dict(
+        (pair.get('key'), pair)
+        for pair in current_pairs
+        if pair.get('key') in template_by_key
+    )
+    excel_by_key = {}
+    duplicate_excel = []
+    unknown_excel = []
+    for pair in excel_pairs:
+        key = pair.get('key')
+        if not key:
+            continue
+        if key not in template_by_key:
+            unknown_excel.append(pair)
+            continue
+        if key in excel_by_key:
+            duplicate_excel.append(pair)
+            continue
+        excel_by_key[key] = pair
+
+    known_excel = []
+    to_update = []
+    to_add = []
+    for record in template_element_records():
+        key = record['key']
+        pair = excel_by_key.get(key)
+        if not pair:
+            continue
+        known_excel.append(pair)
+        if key in current_by_key:
+            to_update.append(pair)
+        else:
+            to_add.append(pair)
+
+    missing_from_excel = []
+    for record in template_element_records():
+        key = record['key']
+        if key in current_by_key and key not in excel_by_key:
+            missing_from_excel.append(current_by_key[key])
+
+    return {
+        'known_excel': known_excel,
+        'to_update': to_update,
+        'to_add': to_add,
+        'missing_from_excel': missing_from_excel,
+        'unknown_excel': unknown_excel,
+        'duplicate_excel': duplicate_excel,
+    }
+
+
+def insertion_anchor_offset(template_key, current_pairs, notes_start_offset):
+    """Return the row offset before which a missing template pair should be inserted."""
+    template_records = template_element_records()
+    template_index_by_key = dict((record['key'], record['index']) for record in template_records)
+    target_index = template_index_by_key.get(template_key)
+    if target_index is None:
+        return notes_start_offset
+
+    current_by_key = dict(
+        (pair.get('key'), pair)
+        for pair in current_pairs
+        if pair.get('key') in template_index_by_key
+    )
+    for record in template_records[target_index + 1:]:
+        next_pair = current_by_key.get(record['key'])
+        if next_pair:
+            return next_pair.get('row_offset', notes_start_offset)
+    return notes_start_offset
 
 
 def column_name_to_index(column_name):
@@ -87,6 +205,28 @@ def safe_cell_text(value):
     return text
 
 
+def format_fractional_inches(value, max_denominator=16):
+    """Format numeric inch values as fractions, leaving non-numeric text alone."""
+    text = safe_cell_text(value).strip()
+    if not text:
+        return ''
+    if '"' in text or '/' in text:
+        return text
+    try:
+        number = float(text)
+    except Exception:
+        return text
+
+    fraction = Fraction(number).limit_denominator(max_denominator)
+    whole = fraction.numerator // fraction.denominator
+    remainder = fraction.numerator % fraction.denominator
+    if remainder == 0:
+        return '{}"'.format(whole)
+    if whole:
+        return '{} {}/{}"'.format(whole, remainder, fraction.denominator)
+    return '{}/{}"'.format(remainder, fraction.denominator)
+
+
 def normalize_header_name(value):
     text = safe_cell_text(value).lower()
     text = text.replace('(%)', '%')
@@ -96,6 +236,8 @@ def normalize_header_name(value):
 
 def element_match_key(value):
     text = safe_cell_text(value).lower()
+    for superscript, digit in SUPERSCRIPT_DIGITS.items():
+        text = text.replace(superscript, digit)
     text = re.sub(r'\([^)]*\)', '', text)
     text = re.sub(r'[^a-z0-9]+', '', text)
     return text
@@ -155,7 +297,7 @@ def build_mix_history_schedule_grid(headers, rows, max_mix_rows):
         top[2] = mapped_value(row, column_map, 'strength')
         top[3] = mapped_value(row, column_map, 'cement_type')
         top[4] = mapped_value(row, column_map, 'max_wc')
-        top[5] = mapped_value(row, column_map, 'max_agg')
+        top[5] = format_fractional_inches(mapped_value(row, column_map, 'max_agg'))
         top[6] = mapped_value(row, column_map, 'air_content')
         top[7] = mapped_value(row, column_map, 'slump')
         top[8] = mapped_value(row, column_map, 'freeze_thaw')

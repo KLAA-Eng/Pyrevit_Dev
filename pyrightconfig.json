@@ -1,0 +1,25 @@
+{
+  "include": [
+    "checks",
+    "commands",
+    "KL&A Tools_dev.tab",
+    "lib",
+    "scripts",
+    "tests"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    ".venv",
+    "env",
+    "venv"
+  ],
+  "extraPaths": [
+    "lib"
+  ],
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none",
+  "reportUndefinedVariable": "none",
+  "reportOptionalMemberAccess": "warning",
+  "reportOptionalSubscript": "warning"
+}
