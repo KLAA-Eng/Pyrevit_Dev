@@ -51,9 +51,11 @@ class SelectFromDict(my_WPF):
                  label = "Select Elements:" ,
                  button_name = 'Select',
                  version = 'version= 1.0',
-                 SelectMultiple = True):
+                 SelectMultiple = True,
+                 initial_checked_names = None):
         self.SelectMultiple = SelectMultiple
         self.given_dict_items = {k:v for k,v in items.items() if k}
+        self.initial_checked_names = set(initial_checked_names or [])
 
         self.items          = self.generate_list_items()
         self.selected_items = []
@@ -84,9 +86,11 @@ class SelectFromDict(my_WPF):
         list_of_items = List[type(ListItem())]()
         first = True
         for type_name, floor_type in sorted(self.given_dict_items.items()):
-            checked = True if first else False
+            checked = True if type_name in self.initial_checked_names else False
+            if first and not self.initial_checked_names:
+                checked = True
             first = False
-            list_of_items.Add(ListItem(type_name, floor_type))
+            list_of_items.Add(ListItem(type_name, floor_type, checked))
         return list_of_items
 
 
@@ -181,7 +185,8 @@ def select_from_dict(elements_dict,
                      label          = "Select Elements:" ,
                      button_name    = 'Select',
                      version        = 'Version: 1.0',
-                     SelectMultiple = True):
+                     SelectMultiple = True,
+                     initial_checked_names = None):
     #type:(any, str,str,str,str,bool) -> list
     """Function to present a DialogBox to a user to select elements from the list based on the dict keys.
     :param elements_dict:   Dictonary or list of elements {name : element}.
@@ -202,5 +207,6 @@ def select_from_dict(elements_dict,
                                 label          = label,
                                 button_name    = button_name,
                                 version        = version,
-                                SelectMultiple = SelectMultiple)
+                                SelectMultiple = SelectMultiple,
+                                initial_checked_names = initial_checked_names)
     return list(GUI_select)

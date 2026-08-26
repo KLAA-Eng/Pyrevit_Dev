@@ -1,0 +1,8 @@
+engine:
+  clean: true
+title:
+  en_us: "Carbon\nGWP Pull"
+
+tooltip:
+  en_us: Exports material schedules to Excel and writes Carbon Pie GWP values back to Revit family types.
+
