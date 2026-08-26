@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>KLCode.FamilyStudio.Database</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../KLCode.FamilyStudio.Core/KLCode.FamilyStudio.Core.csproj" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.30" />
+  </ItemGroup>
+</Project>

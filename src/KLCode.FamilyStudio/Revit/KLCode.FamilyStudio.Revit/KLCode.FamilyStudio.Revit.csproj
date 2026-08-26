@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <RevitVersion Condition="'$(RevitVersion)' == ''">2024</RevitVersion>
+    <TargetFramework Condition="'$(RevitVersion)' == '2024'">net48</TargetFramework>
+    <TargetFramework Condition="'$(RevitVersion)' != '2024'">net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AssemblyName>KLCode.FamilyStudio.Revit</AssemblyName>
+    <RootNamespace>KLCode.FamilyStudio.Revit</RootNamespace>
+    <OutputPath>bin/Revit$(RevitVersion)/</OutputPath>
+    <PyRevitBundleBin>$(MSBuildProjectDirectory)/../../../../KL&amp;A Tools_dev.tab/05 DevSandbox.panel/Family Studio.invokebutton/bin</PyRevitBundleBin>
+    <PyRevitAssemblyFileName Condition="'$(RevitVersion)' == '2024'">$(AssemblyName)_2024.dll</PyRevitAssemblyFileName>
+    <PyRevitAssemblyFileName Condition="'$(RevitVersion)' != '2024'">$(AssemblyName).dll</PyRevitAssemblyFileName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Library/KLCode.FamilyStudio.Core/KLCode.FamilyStudio.Core.csproj" />
+    <ProjectReference Include="../../Library/KLCode.FamilyStudio.Database/KLCode.FamilyStudio.Database.csproj" />
+    <Reference Include="RevitAPI" HintPath="$(RevitApiDir)/RevitAPI.dll" Private="false" />
+    <Reference Include="RevitAPIUI" HintPath="$(RevitApiDir)/RevitAPIUI.dll" Private="false" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(RevitVersion)' == '2024'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+  <Target Name="ValidateRevitBuildInputs" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="'$(RevitVersion)' != '2024' and '$(RevitVersion)' != '2025' and '$(RevitVersion)' != '2026'"
+           Text="RevitVersion must be 2024, 2025, or 2026." />
+    <Error Condition="'$(RevitApiDir)' == ''"
+           Text="Revit API references are unavailable. Build on Windows with -p:RevitApiDir=&lt;installed Revit directory&gt;." />
+    <Error Condition="!Exists('$(RevitApiDir)/RevitAPI.dll') or !Exists('$(RevitApiDir)/RevitAPIUI.dll')"
+           Text="RevitAPI.dll and RevitAPIUI.dll were not found in RevitApiDir=$(RevitApiDir)." />
+  </Target>
+  <Target Name="PackagePyRevit" AfterTargets="Build" Condition="'$(PackagePyRevit)' == 'true'">
+    <ItemGroup>
+      <PyRevitRuntimeFile Include="$(TargetDir)**/*" Exclude="$(TargetPath)" />
+    </ItemGroup>
+    <MakeDir Directories="$(PyRevitBundleBin)" />
+    <Copy SourceFiles="@(PyRevitRuntimeFile)"
+          DestinationFiles="@(PyRevitRuntimeFile->'$(PyRevitBundleBin)/%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFiles="$(PyRevitBundleBin)/$(PyRevitAssemblyFileName)" />
+    <Error Condition="!Exists('$(PyRevitBundleBin)/$(PyRevitAssemblyFileName)')"
+           Text="pyRevit package verification failed: $(PyRevitAssemblyFileName) was not copied to the bundle bin directory." />
+  </Target>
+</Project>

@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>../../../KL&amp;A Tools_dev.tab/05 DevSandbox.panel/Startup Importer.invokebutton/bin/</OutputPath>
+    <RevitApiPath Condition="'$(RevitApiPath)' == ''">$(REVIT_API_PATH)</RevitApiPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
+    <AssemblyName>KLA.ModelStartupImporter.Revit_2024</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+    <AssemblyName>KLA.ModelStartupImporter.Revit</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KLA.ModelStartupImporter.Core\KLA.ModelStartupImporter.Core.csproj" />
+    <Reference Include="RevitAPI">
+      <HintPath>$(RevitApiPath)/RevitAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>$(RevitApiPath)/RevitAPIUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Target Name="ValidateRevitReferences" BeforeTargets="PrepareForBuild">
+    <Error
+      Condition="!Exists('$(RevitApiPath)/RevitAPI.dll') or !Exists('$(RevitApiPath)/RevitAPIUI.dll')"
+      Text="Revit API references were not found. Set RevitApiPath (or REVIT_API_PATH) to the installed Revit directory containing RevitAPI.dll and RevitAPIUI.dll." />
+  </Target>
+</Project>

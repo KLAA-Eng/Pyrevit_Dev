@@ -1,5 +1,29 @@
 # KLCode Family & View Studio V1 Plan
 
+## Execution amendment — 2026-08-26
+
+Repository and host evidence narrowed the approved source-level V1:
+
+- The owned launcher remains in `05 DevSandbox.panel` and is an
+  `.invokebutton`; compiled `assembly` / `command_class` metadata is not valid
+  for a scripted `.pushbutton`.
+- The desktop CLI scans `.rfa` files, makes deterministic change decisions,
+  writes filesystem-only records to SQLite, and reports per-file failures. It
+  does not call the Revit API or claim category/type/parameter extraction.
+- Revit metadata extraction, WPF browsing, and Load/Place are host adapters in
+  the separately gated Revit project. Their source is present, but compilation
+  and live behavior require Windows, installed Revit API assemblies, and Revit.
+- `.rvt` drafting views, FTS, production ribbon placement, deployment, and
+  generated binaries remain deferred. The V1 schema accepts only
+  `content_kind='family'`.
+- The shared DevSandbox `layout` now exposes the source-level Family Studio
+  bundle as an explicitly authorized development command. It remains
+  non-runnable until Windows packaging supplies the matching Revit DLL and
+  dependencies; live Revit verification is still required before promotion.
+- The macOS solution contains Core, Database, Indexer, and their tests. The
+  guarded Revit project is deliberately outside that solution so a successful
+  macOS build cannot be mistaken for a Revit host validation.
+
 ## Summary
 Yes, this is possible inside the KL&A pyRevit plugin, but it should not be built as IronPython. The clean V1 is a compiled C#/.NET product kept in this repo, surfaced through pyRevit metadata and also ship-ready as a native Revit `.addin`.
 

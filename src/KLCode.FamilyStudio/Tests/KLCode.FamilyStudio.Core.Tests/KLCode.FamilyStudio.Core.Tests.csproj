@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Library/KLCode.FamilyStudio.Core/KLCode.FamilyStudio.Core.csproj" />
+    <ProjectReference Include="../../Library/KLCode.FamilyStudio.Database/KLCode.FamilyStudio.Database.csproj" />
+    <ProjectReference Include="../../App/KLCode.FamilyStudio.Indexer/KLCode.FamilyStudio.Indexer.csproj" />
+    <PackageReference Include="MSTest" Version="4.3.3" />
+    <PackageReference Include="coverlet.collector" Version="10.0.1" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

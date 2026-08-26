@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>KLCode.FamilyStudio.Indexer</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Library/KLCode.FamilyStudio.Core/KLCode.FamilyStudio.Core.csproj" />
+    <ProjectReference Include="../../Library/KLCode.FamilyStudio.Database/KLCode.FamilyStudio.Database.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="appsettings.example.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

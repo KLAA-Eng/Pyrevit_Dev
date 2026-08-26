@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Name>KLCode Family Studio</Name>
+    <Assembly>C:\ProgramData\Autodesk\Revit\Addins\2024\KLCode.FamilyStudio\KLCode.FamilyStudio.Revit_2024.dll</Assembly>
+    <AddInId>AFD1225F-3514-4CCB-8A44-63AD55640B6A</AddInId>
+    <FullClassName>KLCode.FamilyStudio.Revit.Commands.FamilyStudioCommand</FullClassName>
+    <Text>Family Studio</Text>
+    <VendorId>KLAC</VendorId>
+    <VendorDescription>KL&amp;A</VendorDescription>
+  </AddIn>
+</RevitAddIns>

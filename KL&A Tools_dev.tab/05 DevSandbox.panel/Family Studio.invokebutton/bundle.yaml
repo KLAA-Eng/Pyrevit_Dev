@@ -1,0 +1,6 @@
+title: Family Studio
+tooltip: Browse the local Family Studio index and load or place Revit families.
+author: KL&A
+context: doc-project
+assembly: KLCode.FamilyStudio.Revit.dll
+command_class: KLCode.FamilyStudio.Revit.Commands.FamilyStudioCommand

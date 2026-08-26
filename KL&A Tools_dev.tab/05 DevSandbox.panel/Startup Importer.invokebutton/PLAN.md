@@ -1,5 +1,21 @@
 # KL&A Model Startup Importer
 
+## Execution Amendment — 2026-08-26
+
+Repository and pyRevit evidence changed the executable boundary of this plan:
+
+- Compiled `assembly` / `command_class` metadata belongs in a `.invokebutton`; the original `.pushbutton` placeholder is replaced accordingly.
+- The shared `05 DevSandbox.panel/bundle.yaml` now exposes `Startup Importer`
+  as an explicitly authorized development command. It remains non-runnable
+  until a Windows packaging build places the matching Revit DLL and dependencies
+  in the bundle's `bin` directory; live pyRevit/Revit validation is still a
+  promotion gate.
+- The source-level MVP implements deterministic `.docx` / `.xlsx` intake, hashing, catalog matching, and fail-safe import-plan classification. The provisional checklist schema and duplicate semantics are defined in `SPEC.md`.
+- The Revit command is a read-only preflight/report adapter. Actual seed-model copying and `Update Startup Links` are not implementation-ready because catalog/seed paths, Extensible Storage identity/version, and rebuild semantics are not yet owner-defined. No seed RVT, catalog, GUID, or update behavior is invented.
+- Local macOS gates cover the host-independent project. Windows builds against installed Revit 2024 and 2025+ references and live Revit behavior remain explicit promotion gates.
+
+This amendment is the safe stopping point for the approved DevSandbox MVP and takes precedence where the original plan describes unavailable model mutation or the invalid `.pushbutton` packaging.
+
 ## Summary
 Build a compiled C#/.NET importer surfaced inside the KL&A pyRevit extension. The first version will replace the current Bluebeam/PDF startup workflow with a structured Word/Excel startup checklist that tells the tool which standard KL&A details and general notes to import from a controlled seed RVT.
 
@@ -46,7 +62,8 @@ Add a compiled solution under a new repo folder such as `src/KLA.ModelStartupImp
 - `KLA.ModelStartupImporter.Tests`
   - host-independent tests for Word/Excel parsing, catalog matching, duplicate handling, and import-plan creation.
 
-Expose DevSandbox buttons under the existing pyRevit layout:
+The original proposal below is superseded by the root DevSandbox
+`Startup Importer.invokebutton` selected for this implementation:
 - `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Model Startup Import.pushbutton`
 - `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Update Startup Links.pushbutton`
 

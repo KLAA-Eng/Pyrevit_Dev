@@ -1,0 +1,25 @@
+<Project>
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+    <ImporterProject>$(MSBuildThisFileDirectory)KLA.ModelStartupImporter.Revit/KLA.ModelStartupImporter.Revit.csproj</ImporterProject>
+    <BundleBin>$(MSBuildThisFileDirectory)..\..\KL&amp;A Tools_dev.tab\05 DevSandbox.panel\Startup Importer.invokebutton\bin</BundleBin>
+  </PropertyGroup>
+
+  <Target Name="Package">
+    <Error Condition="'$(Revit2024ApiPath)' == ''" Text="Set Revit2024ApiPath to the installed Revit 2024 directory." />
+    <Error Condition="'$(Revit2025ApiPath)' == ''" Text="Set Revit2025ApiPath to the installed Revit 2025+ directory used for the .NET 8 build." />
+    <MSBuild
+      Projects="$(ImporterProject)"
+      Targets="Build"
+      Properties="Configuration=$(Configuration);TargetFramework=net48;RevitApiPath=$(Revit2024ApiPath)" />
+    <MSBuild
+      Projects="$(ImporterProject)"
+      Targets="Build"
+      Properties="Configuration=$(Configuration);TargetFramework=net8.0-windows;RevitApiPath=$(Revit2025ApiPath)" />
+    <Error Condition="!Exists('$(BundleBin)\KLA.ModelStartupImporter.Revit_2024.dll')" Text="Packaging did not produce KLA.ModelStartupImporter.Revit_2024.dll." />
+    <Error Condition="!Exists('$(BundleBin)\KLA.ModelStartupImporter.Revit.dll')" Text="Packaging did not produce KLA.ModelStartupImporter.Revit.dll." />
+    <Error Condition="!Exists('$(BundleBin)\KLA.ModelStartupImporter.Core.dll')" Text="Packaging did not copy KLA.ModelStartupImporter.Core.dll." />
+    <Error Condition="!Exists('$(BundleBin)\DocumentFormat.OpenXml.dll')" Text="Packaging did not copy DocumentFormat.OpenXml.dll." />
+    <Error Condition="!Exists('$(BundleBin)\DocumentFormat.OpenXml.Framework.dll')" Text="Packaging did not copy DocumentFormat.OpenXml.Framework.dll." />
+  </Target>
+</Project>
