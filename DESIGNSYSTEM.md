@@ -30,6 +30,7 @@ larger icons increase ribbon load time.
   - 16 × 16 — stacked/small controls and Quick Access Toolbar
   - 24 × 24 — medium pyRevit use
   - 32 × 32 — normal large ribbon buttons
+  - 96 × 96 — max icon size
 
 | Theme | File | Foreground | Plain English Color |
 | --- | --- | --- | --- |
