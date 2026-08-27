@@ -4,7 +4,7 @@ This file records the default visual properties used by the KLCode pyRevit exten
 
 ## Logo Asset
 
-`KLCodeLogo.png` at the repository root is the source KLCode logo asset.
+`KLCodeLogo.png` at 'lib\_logos' is the source KLCode logo asset.
 
 | Property | Value |
 | --- | --- |
