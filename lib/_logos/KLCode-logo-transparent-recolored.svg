@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2137" height="736" viewBox="0 0 2137 736" role="img" aria-labelledby="title">
+  <title id="title">KLCode logo</title>
+  <g id="logo" fill-rule="evenodd">
+    <path id="slash" fill="#33714F" d="M226 173h60L142 500H82z"/>
+    <path id="K" fill="#EBEBEB" d="M358 173h50v326h-50z M423 314 582 173h62L492 314l158 185h-64z"/>
+    <path id="L" fill="#EBEBEB" d="M692 173h50v275h185v51H744l-52-52z"/>
+    <path id="C" fill="#EBEBEB" d="M1031 173h199v51h-181l-31 31v162l31 31h181v51h-199l-64-64V237z"/>
+    <path id="o" fill="#EBEBEB" d="M1326 271h139l51 51v125l-51 51h-139l-50-51V322zm26 51-26 26v73l26 26h87l26-26v-73l-26-26z"/>
+    <path id="d" fill="#EBEBEB" d="M1734 173h50v325h-173l-50-50V322l50-50h123zm-97 149-26 26v74l26 26h97V322z"/>
+    <path id="e" fill="#EBEBEB" d="M1880 272h135l49 50v58l-48 49h-138v19h186v50h-184l-52-52V323zm-2 49v59h116l25-25v-10l-24-24z"/>
+  </g>
+</svg>

@@ -2,48 +2,85 @@
 
 This file records the default visual properties used by the KLCode pyRevit extension.
 
-## Logo Asset
+## Master Design Colors
 
-`KLCodeLogo.png` at 'lib\_logos' is the source KLCode logo asset.
+These are the named colors used across KLCode ribbon icons and WPF GUIs. This table defines the color names used throughout this document; usage guidance belongs in the relevant icon and GUI sections.
+
+| Name | Value | Description |
+| --- | --- | --- |
+| KLCharcoal | `#1A252B` | Dark blue-green charcoal. |
+| KLGreen | `#33714F` | Deep KLCode green. |
+| KLGreen-dark | `#286048` | Dark muted green. |
+| KLGreen-secondary | `#407058` | Muted medium green. |
+| KLOrange | `#FF8000` | Bright orange. |
+| KLWhite | `#E5E4E2` | Soft warm off-white. |
+| white | `#FFFFFF` | Pure white. |
+| KLGray-medium | `#808080` | Standard medium gray. |
+| KLGray-dark | `#FF3F3F3F` | Dark neutral gray. |
+| KLCharcoal-gray | `#FF4F4F4F` | Medium-dark charcoal gray. |
+| KLGray-scroll | `#505050` | Neutral dark gray. |
+| KLGray-disabled | `#888888` | Muted medium-light gray. |
+| KLGray-disabled-check | `#FF6C6C6C` | Muted gray. |
+| KLCharcoal-black | `#FF131313` | Nearly black charcoal. |
+| black | `#000000` | Pure black. |
+| KLGreen-transparent-a | `#33286048` | Transparent dark green. |
+| KLGreen-transparent-b | `#33307050` | Transparent muted green. |
+| KLGreen-checkbox-a | `#88286048` | Semi-transparent dark green. |
+| KLGreen-checkbox-b | `#99307050` | Semi-transparent muted green. |
+| warning-gold | `#DAA520` | Warm golden yellow. |
+| info-green | `#3CB371` | Medium sea green. |
+
+`lib/_logos/KLCodeLogo.png` is the source branding asset used to sample the primary charcoal and green colors.
 
 | Property | Value |
 | --- | --- |
-| Dimensions | `1052 x 576` |
-| Format | transparent PNG, `Format32bppArgb` |
-| Primary background sample | `#1A252B` |
-| Primary green sample | `#33714F` |
-| Dark green sample | `#286048` |
-| Secondary green sample | `#407058` |
+| KLCharcoal sample | `#1A252B` |
+| KLGreen sample | `#33714F` |
+| KLGreen-dark sample | `#286048` |
+| KLGreen-secondary sample | `#407058` |
 
-The logo is a wide wordmark/banner with a dark blue-green background, white `KLC` lettering, green accent mark, and green/gray pixel motif. Do not place this wide source asset directly into the standard 25 px GUI headers; create a cropped or header-safe logo variant before replacing the current text branding.
+## Icons
 
-## Ribbon Icons
+KLCode ribbon icons are transparent-background PNGs. Use a single foreground color unless the command clearly needs additional visual detail.
 
-Default ribbon command icons are transparent-background PNGs with a single visible foreground color.
+### Live Icon Conventions
 
-Create standard ribbon icons as square `32 x 32 px` PNGs at `96 DPI`. This is
-the native large-ribbon size used by Revit; pyRevit scales the asset for
-smaller controls (including 16 px stacked buttons and the Quick Access
-Toolbar). Keep source assets at or below `96 x 96 px`, since pyRevit warns that
-larger icons increase ribbon load time.
+| Context | File | Foreground |
+| --- | --- | --- |
+| Light UI | `icon.png` | `#1A252B` KLCharcoal |
+| Dark UI | `icon.dark.png` | `#E5E4E2` KLWhite |
 
-  - 16 × 16 — stacked/small controls and Quick Access Toolbar
-  - 24 × 24 — medium pyRevit use
-  - 32 × 32 — normal large ribbon buttons
-  - 96 × 96 — max icon size
+### Source Assets
 
-| Theme | File | Foreground | Plain English Color |
-| --- | --- | --- | --- |
-| Light | `icon.png` | `#34495E` | dark blue-gray |
-| Dark | `icon.dark.png` | `#EBEBEB` | light gray |
-| Default orange | `lib/_icons/square_96px_orange.png` | `#FF8000` | KLCode orange |
-| Default green | `lib/_icons/square_96px_green.png` | `#33714F` | logo green |
+Reusable source icons live in `lib/_icons/`. Keep source assets at `96 x 96 px` or smaller. Export command icons at the size needed by the bundle, usually `32 x 32 px` for large ribbon buttons.
 
-### Icon Design Reference
+Name reusable source icons with a descriptive lowercase icon name, size, and color: `<icon-name>_<size>px_<color>.png`, such as `drill_32px_orange.png`.
 
-[Lucide Icons](https://lucide.dev/icons/) is the visual reference for new and
-refreshed ribbon icons. Use its simple, consistent icon language as design
-inspiration while creating the required pyRevit PNG assets described above.
+### Palette References
+
+| Color name | Color | File reference |
+| --- | --- | --- |
+| KLOrange | `#FF8000` | `lib/_icons/square_96px_orange.png` |
+| KLGreen | `#33714F` | `lib/_icons/square_96px_green.png` |
+| KLWhite | `#EBEBEB` | `lib/_icons/square_96px_light.png` |
+| KLCharcoal | `#1A252B` | `lib/_icons/square_96px_dark.png` |
+
+### Standard Sizes
+
+| Size | Use |
+| --- | --- |
+| `16 x 16 px` | small/stacked controls |
+| `24 x 24 px` | medium controls |
+| `32 x 32 px` | normal command icons |
+| `96 x 96 px` | reusable source/max size |
+
+### Design Reference
+
+Use [Lucide Icons](https://lucide.dev/icons/) as the visual reference for new or refreshed ribbon icons: simple outline shapes, clear silhouettes, and consistent stroke weight.
+
+### Prototype Icons
+
+New prototype scripts should start with `lib/_icons/drill_32px_orange.png` as the default icon. Prototype-only exceptions should stay local to the prototype bundle until they are promoted.
 
 ## Shared GUI Colors
 
@@ -68,6 +105,8 @@ The charcoal and green values are sampled from `KLCodeLogo.png`. `#E5E4E2`, `Whi
 
 ## Shared GUI Properties
 
+These values describe the default styles in `lib/GUI/Resources/WPF_styles.xaml`. They apply to windows that load the shared dictionary through `my_WPF.add_wpf_resource()` unless the window defines local resources with the same keys.
+
 | Control | Property | Value | Plain English Color |
 | --- | --- | --- | --- |
 | `Button` | `TextElement.FontFamily` | `Arial` | N/A |
@@ -88,6 +127,7 @@ The charcoal and green values are sampled from `KLCodeLogo.png`. `#E5E4E2`, `Whi
 | `CheckBox` | `Foreground` | `White` | white |
 | `CheckBox` | checkbox size | `15 x 15` | N/A |
 | `CheckBox` | checkbox `CornerRadius` | `2` | N/A |
+| `CheckBox` | checkbox background | `#99307050` to `#88286048` gradient | translucent logo-green gradient |
 | `CheckBox` | checkmark stroke | `#E5E4E2` | warm off-white |
 | `CheckBox` | hover background | `#FF131313` | near black |
 | `DockPanel` | `Margin` | `2` | N/A |
@@ -112,7 +152,27 @@ The charcoal and green values are sampled from `KLCodeLogo.png`. `#E5E4E2`, `Whi
 | `ScrollBarThumbVertical` | `Background` | `Black` | black |
 | `ScrollBarThumbVertical` | `CornerRadius` | `8` | N/A |
 
-Selection-style branded windows, including `SelectFromDict` and the `CreateFromRooms` copy, use `text_white` for the filter magnifier icon, filter input text, and selection prompt label. Borders and separators remain on the logo-green accent colors so labels such as `Select stories to review:` stay readable against the dark logo-charcoal background.
+Selection-style branded windows use `text_white` for the filter label or icon, filter input text, and selection prompt label. Borders and separators remain on the logo-green accent colors so labels such as `Select stories to review:` stay readable against the dark logo-charcoal background.
+
+Windows that load these shared properties:
+
+| Window | XAML path | Loader path | Notes |
+| --- | --- | --- | --- |
+| KL&A list selection | `lib/GUI/SelectFromDict.xaml` | `lib/GUI/SelectFromDict.py` | Direct shared dictionary user. |
+| KL&A alert | `lib/GUI/CustomAlert.xaml` | `lib/GUI/CustomAlert.py` | Direct shared dictionary user. |
+| Find and replace | `lib/GUI/FindReplace.xaml` | `lib/GUI/FindReplace.py` | Direct shared dictionary user. |
+| Steel PSF story selection | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/script.py` | Direct shared dictionary user. |
+
+Related local copies:
+
+| Window | XAML path | Relationship |
+| --- | --- | --- |
+| Create from rooms | `lib/GUI/Tools/CreateFromRooms.xaml` | Loads the shared dictionary, then defines a local copy of the same palette and styles in `Window.Resources`; local values take precedence. |
+| Find and replace views | `lib/Renaming/GUI_BaseRename.xaml` | Uses an embedded resource dictionary that mirrors the shared palette. |
+| Find and replace sheets | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml` | Uses an embedded resource dictionary that mirrors the shared palette. |
+| Find and replace views prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Uses an embedded resource dictionary that mirrors the shared palette. |
+| Find and replace sheets prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Uses an embedded resource dictionary that mirrors the shared palette. |
+| Duplicate sheets | `KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/Script.xaml` | Uses command-local aliases documented under Local GUI Overrides. |
 
 ## Window Defaults Observed
 
