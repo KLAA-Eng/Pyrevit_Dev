@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="461" height="105" viewBox="0 0 461 105" role="img" aria-labelledby="title">
-  <title id="title">ETABS2Concept</title>
-  <text x="50%" y="68" text-anchor="middle" font-family="Bahnschrift, Segoe UI, Arial, sans-serif" font-size="50" font-weight="700" letter-spacing="0">
-    <tspan fill="#EBEBEB">ETABS</tspan><tspan fill="#33714F">2</tspan><tspan fill="#EBEBEB">Concept</tspan>
-  </text>
+  <title id="title">ETABS2Concept titlebar wordmark</title>
+  <defs>
+    <style>
+      @font-face {
+        font-family: "Audiowide";
+        src: url("_font_candidates/Audiowide-Regular.ttf") format("truetype");
+        font-weight: 400;
+        font-style: normal;
+      }
+    </style>
+  </defs>
+  <text id="wordmark" x="230.500" y="21.000" text-anchor="middle" font-family="Audiowide, sans-serif" font-size="43" font-weight="400" letter-spacing="0"><tspan fill="#EBEBEB">ETABS</tspan><tspan fill="#33714F">2</tspan><tspan fill="#EBEBEB">Concept</tspan></text>
 </svg>
