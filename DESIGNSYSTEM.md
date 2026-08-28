@@ -62,7 +62,7 @@ Name reusable source icons with a descriptive lowercase icon name, size, and col
 | --- | --- | --- |
 | KLOrange | `#FF8000` | `lib/_icons/square_96px_orange.png` |
 | KLGreen | `#33714F` | `lib/_icons/square_96px_green.png` |
-| KLWhite | `#EBEBEB` | `lib/_icons/square_96px_light.png` |
+| KLWhite | `#E5E4E2` | `lib/_icons/square_96px_light.png` |
 | KLCharcoal | `#1A252B` | `lib/_icons/square_96px_dark.png` |
 
 ### Standard Sizes
