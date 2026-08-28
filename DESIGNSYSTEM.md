@@ -56,14 +56,12 @@ Reusable source icons live in `lib/_icons/`. Keep source assets at `96 x 96 px` 
 
 Name reusable source icons with a descriptive lowercase icon name, size, and color: `<icon-name>_<size>px_<color>.png`, such as `drill_32px_orange.png`.
 
-### Palette References
-
 | Color name | Color | File reference |
 | --- | --- | --- |
-| KLOrange | `#FF8000` | `lib/_icons/square_96px_orange.png` |
-| KLGreen | `#33714F` | `lib/_icons/square_96px_green.png` |
-| KLWhite | `#E5E4E2` | `lib/_icons/square_96px_light.png` |
-| KLCharcoal | `#1A252B` | `lib/_icons/square_96px_dark.png` |
+| KLOrange | `#FF8000` |  `<icon-name>_<size>px_orange.png` |
+| KLGreen | `#33714F` |  `<icon-name>_<size>px_green.png` |
+| KLWhite | `#E5E4E2` |  `<icon-name>_<size>px_light.png` |
+| KLCharcoal | `#1A252B` |  `<icon-name>_<size>px_dark.png` |
 
 ### Standard Sizes
 
