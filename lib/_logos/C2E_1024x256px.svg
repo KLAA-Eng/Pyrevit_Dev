@@ -6,9 +6,12 @@
    role="img"
    aria-labelledby="title"
    version="1.1"
-   id="svg1"
-   sodipodi:docname="KLCode-logo-transparent-recolored.svg"
+   id="svg3"
+   sodipodi:docname="concept2etabs-titlebar-text.svg"
    inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   inkscape:export-filename="concept2etabs-titlebar-text.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -17,7 +20,7 @@
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:dc="http://purl.org/dc/elements/1.1/">
   <sodipodi:namedview
-     id="namedview1"
+     id="namedview3"
      pagecolor="#505050"
      bordercolor="#ffffff"
      borderopacity="1"
@@ -25,17 +28,17 @@
      inkscape:pageopacity="0"
      inkscape:pagecheckerboard="1"
      inkscape:deskcolor="#505050"
-     inkscape:zoom="1.1305569"
-     inkscape:cx="421.03146"
-     inkscape:cy="123.39052"
+     inkscape:zoom="0.67955717"
+     inkscape:cx="451.02902"
+     inkscape:cy="46.353716"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="2552"
      inkscape:window-y="346"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg1" />
+     inkscape:current-layer="svg3" />
   <title
-     id="title">KLCode logo</title>
+     id="title">Concept2ETABS titlebar wordmark</title>
   <defs
      id="defs1">
     <style
@@ -50,24 +53,29 @@
   </defs>
   <text
      id="wordmark"
-     x="23.898314"
-     y="201.29639"
-     text-anchor="start"
+     x="510.28607"
+     y="164.65154"
+     text-anchor="middle"
      font-family="Audiowide, sans-serif"
-     font-size="195.203px"
+     font-size="104.673px"
      font-weight="400"
      letter-spacing="0"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:195.203px;font-family:Audiowide, sans-serif;-inkscape-font-specification:'Audiowide, sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0;text-anchor:start;stroke-width:0.448736"><tspan
-       style="fill:#33714f;fill-opacity:1"
-       id="tspan2">/</tspan><tspan
-       style="fill:#e5e4e2;fill-opacity:1"
-       id="tspan3">KLCode</tspan></text>
+     style="stroke-width:2.434;stroke-dasharray:none"><tspan
+       fill="#ebebeb"
+       id="tspan1"
+       style="stroke-width:2.434;stroke-dasharray:none;fill:#e5e4e2;fill-opacity:1">Concept</tspan><tspan
+       fill="#33714f"
+       id="tspan2"
+       style="stroke-width:2.434;stroke-dasharray:none">2</tspan><tspan
+       fill="#ebebeb"
+       id="tspan3"
+       style="stroke-width:2.434;stroke-dasharray:none;fill:#e5e4e2;fill-opacity:1">ETABS</tspan></text>
   <metadata
-     id="metadata1">
+     id="metadata3">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
-        <dc:title>KLCode logo</dc:title>
+        <dc:title>Concept2ETABS titlebar wordmark</dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
