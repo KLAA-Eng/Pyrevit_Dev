@@ -83,19 +83,14 @@ from carbon_gwp.workflow import (
     DEFAULT_POST_PROCESSING_PATH,
     DEFAULT_SCHEDULE_NAMES,
     EXPORT_WORKSHEET_NAME,
+    has_exportable_cells,
     normalize_grid,
     parameter_value_pairs_from_export_rows,
+    safe_text as _safe_text,
     uniquify_worksheet_names,
     validate_parameter_value_pairs,
     worksheet_name_for_schedule,
 )
-
-
-# COMPAT: IronPython exposes ``unicode`` while CPython 3 exposes ``str``.
-try:
-    TEXT_TYPES = (unicode,)
-except NameError:
-    TEXT_TYPES = (str,)
 
 
 # ╔═╗╦ ╦╔╗╔╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
@@ -143,37 +138,6 @@ def _element_name(element, default='Unnamed'):
         except Exception:
             name = None
     return name or default
-
-def _safe_text(value):
-    """Normalize a host value for output or parameter writing.
-
-    Args:
-        value: Excel, Revit, or caller-provided value.
-    Returns:
-        Text with missing values blank and integral numbers without decimals.
-    """
-    if value is None:
-        return ''
-    # Preserve existing text. Parameter names and report labels can depend on
-    # their original spelling and whitespace.
-    if isinstance(value, TEXT_TYPES):
-        return value
-    # Normalize Excel numbers. Excel represents 5 as 5.0; remove that display
-    # decimal before the value reaches a Revit text parameter.
-    try:
-        if isinstance(value, float) and value.is_integer():
-            return str(int(value))
-    except Exception:
-        pass
-    # Normalize formatted cells. Excel can return 5.0 as text instead of a
-    # float, so repeat the whole-number cleanup after string conversion.
-    text = str(value)
-    if text.endswith('.0'):
-        try:
-            return str(int(float(text)))
-        except Exception:
-            pass
-    return text
 
 # Schedule selection and workbook export
 # ------------------------------------------------------------------
@@ -376,13 +340,16 @@ def _schedule_cell_text(schedule, section_type, section, row, column):
         pass
     # Fall back to section APIs when schedule-level reading is unavailable.
     # COMPAT: Revit table APIs expose different cell readers by release.
+    errors = []
     for method_name in ('GetCellText', 'GetCellCalculatedValue'):
         try:
             value = getattr(section, method_name)(row, column)
             return _safe_text(value)
-        except Exception:
-            pass
-    return ''
+        except Exception as error:
+            errors.append(_safe_text(error))
+    raise RuntimeError(
+        'Could not read schedule cell at row {}, column {}: {}'.format(
+            row, column, '; '.join(errors)))
 
 
 def _section_rows(schedule, section_type):
@@ -396,8 +363,8 @@ def _section_rows(schedule, section_type):
     """
     try:
         section = schedule.GetTableData().GetSectionData(section_type)
-    except Exception:
-        return []
+    except Exception as error:
+        raise RuntimeError('Could not access schedule table section: {}'.format(error))
     # Validate table bounds. Missing Revit bounds mean this section cannot be
     # exported safely.
     first_row = getattr(section, 'FirstRowNumber', None)
@@ -405,7 +372,7 @@ def _section_rows(schedule, section_type):
     first_column = getattr(section, 'FirstColumnNumber', None)
     last_column = getattr(section, 'LastColumnNumber', None)
     if None in (first_row, last_row, first_column, last_column):
-        return []
+        raise RuntimeError('Schedule table section has no readable bounds.')
 
     rows = []
     for row in range(int(first_row), int(last_row) + 1):
@@ -451,8 +418,8 @@ def _export_schedules_to_workbook(workbook_path, schedules):
     excel.DisplayAlerts = False
     workbook = None
     exports = []
-    # Open or create the container. Existing workbooks keep their formulas and
-    # unrelated tabs; missing workbooks are created at the chosen path.
+    # Open or create the container. Do not save a new workbook until every
+    # schedule has exported successfully.
     try:
         if not os.path.isfile(workbook_path):
             workbook = excel.Workbooks.Add()
@@ -466,6 +433,10 @@ def _export_schedules_to_workbook(workbook_path, schedules):
 
         for schedule, sheet_name in zip(schedules, sheet_names):
             grid = _schedule_table_grid(schedule)
+            if not has_exportable_cells(grid):
+                raise ValueError(
+                    'Selected schedule has no exportable cells: {}'.format(
+                        _element_name(schedule)))
             worksheet = _ensure_worksheet(workbook, sheet_name)
             _write_grid_to_worksheet(worksheet, grid)
             exports.append({
@@ -476,13 +447,19 @@ def _export_schedules_to_workbook(workbook_path, schedules):
             })
         # Save the completed export only after every selected schedule tab is
         # refreshed, avoiding a partial workbook on an earlier failure.
-        workbook.Save()
+        if os.path.isfile(workbook_path):
+            workbook.Save()
+        else:
+            workbook.SaveAs(workbook_path)
         return exports
     finally:
         # INVARIANT: This function owns the export workbook and must release
         # Excel so the file is not left locked for the post-processing workbook.
         if workbook is not None:
-            workbook.Close(True)
+            # The explicit Save/SaveAs above is the only persistence point.
+            # Closing without saving prevents a failed mid-export from writing
+            # a partially cleared container workbook.
+            workbook.Close(False)
         excel.Quit()
 
 

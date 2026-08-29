@@ -149,6 +149,18 @@ def normalize_grid(values):
     return rows
 
 
+def has_exportable_cells(grid):
+    """Return whether a schedule grid contains at least one cell.
+
+    An empty grid indicates that a required schedule could not provide table
+    data. A row containing blank cell text is still a valid table row.
+    """
+    for row in grid or []:
+        if row:
+            return True
+    return False
+
+
 def parameter_value_pairs_from_export_rows(rows):
     """Return parameter/value pairs from Excel Export worksheet rows.
 

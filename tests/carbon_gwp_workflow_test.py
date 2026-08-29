@@ -2,7 +2,9 @@ import unittest
 
 from lib.carbon_gwp.workflow import (
     clean_schedule_title,
+    has_exportable_cells,
     parameter_value_pairs_from_export_rows,
+    safe_text,
     uniquify_worksheet_names,
     validate_parameter_value_pairs,
     worksheet_name_for_schedule,
@@ -10,6 +12,14 @@ from lib.carbon_gwp.workflow import (
 
 
 class CarbonGwpWorkflowTests(unittest.TestCase):
+    def test_has_exportable_cells_requires_a_structural_cell(self):
+        self.assertFalse(has_exportable_cells([]))
+        self.assertFalse(has_exportable_cells([[], []]))
+        self.assertTrue(has_exportable_cells([['']]))
+
+    def test_safe_text_normalizes_excel_whole_numbers(self):
+        self.assertEqual('42', safe_text(42.0))
+
     def test_clean_schedule_title_removes_dynamo_prefix_artifacts(self):
         self.assertEqual('Concrete', clean_schedule_title('Schedule = Concrete'))
         self.assertEqual('Wood Wall', clean_schedule_title('Family(Type) Wood Wall'))
