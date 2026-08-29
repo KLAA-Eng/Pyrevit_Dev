@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Host-independent helpers for the Carbon GWP Pull prototype."""
+"""Transform Carbon GWP schedule and worksheet data outside Revit.
+
+The helpers preserve the worksheet naming and parameter-pair conventions used
+by the Carbon GWP Pull command without importing pyRevit or Excel COM APIs.
+"""
 from __future__ import print_function
 
 import re
@@ -22,6 +26,7 @@ EXPORT_WORKSHEET_NAME = 'Export'
 CARBON_PIE_FAMILY_NAME = 'Carbon Pie.JMP'
 
 
+# COMPAT: IronPython provides ``unicode`` while CPython 3 provides ``str``.
 try:
     TEXT_TYPES = (unicode,)
 except NameError:
@@ -32,7 +37,15 @@ INVALID_WORKSHEET_CHARS = re.compile(r'[:\\/\?\*\[\]]')
 
 
 def safe_text(value):
-    """Return a stable text value for Excel/Revit COM values."""
+    """Return a stable text value for Excel and Revit values.
+
+    Args:
+        value: A value returned by Excel, Revit, or a caller.
+
+    Returns:
+        Text with missing values represented by an empty string and whole
+        numbers represented without a trailing decimal point.
+    """
     if value is None:
         return ''
     if isinstance(value, TEXT_TYPES):
@@ -52,7 +65,15 @@ def safe_text(value):
 
 
 def clean_schedule_title(value):
-    """Match the Dynamo graph's visible cleanup of selected schedule titles."""
+    """Apply the schedule-title cleanup used by the existing Dynamo graph.
+
+    Args:
+        value: A selected schedule title or other value convertible to text.
+
+    Returns:
+        The trimmed title text after content through the final ``=`` and ``)``
+        marker has been removed.
+    """
     text = safe_text(value).strip()
     for marker in ('=', ')'):
         index = text.find(marker)
@@ -62,7 +83,15 @@ def clean_schedule_title(value):
 
 
 def worksheet_name_for_schedule(schedule_title):
-    """Return an Excel-safe worksheet name for a schedule export."""
+    """Return an Excel-safe name for a schedule export worksheet.
+
+    Args:
+        schedule_title: The visible Revit schedule title.
+
+    Returns:
+        A ``DYN Out -`` worksheet name with invalid characters replaced and
+        the Excel 31-character limit enforced.
+    """
     cleaned = clean_schedule_title(schedule_title)
     if not cleaned:
         cleaned = 'Schedule'
@@ -74,7 +103,15 @@ def worksheet_name_for_schedule(schedule_title):
 
 
 def uniquify_worksheet_names(names):
-    """Return Excel-safe unique worksheet names preserving the 31-char limit."""
+    """Return case-insensitively unique worksheet names within Excel limits.
+
+    Args:
+        names: An iterable of proposed worksheet names.
+
+    Returns:
+        A list of names no longer than 31 characters. Duplicate names receive
+        a numeric suffix while preserving that limit.
+    """
     used = set()
     result = []
     for name in names:
@@ -91,7 +128,14 @@ def uniquify_worksheet_names(names):
 
 
 def normalize_grid(values):
-    """Convert nested values to a rectangular text grid."""
+    """Convert nested values to a rectangular grid of text.
+
+    Args:
+        values: An iterable of row iterables, or ``None``.
+
+    Returns:
+        A list of text rows padded with empty strings to a shared width.
+    """
     rows = []
     max_columns = 0
     for row in values or []:
@@ -108,9 +152,16 @@ def normalize_grid(values):
 def parameter_value_pairs_from_export_rows(rows):
     """Return parameter/value pairs from Excel Export worksheet rows.
 
-    The Dynamo graph imports the sheet, transposes it, then uses index 0 for
-    parameter names and index 1 for values. That is equivalent to reading the
-    first two Excel columns row by row.
+    The existing Dynamo graph transposes the sheet before reading indexes zero
+    and one; this function preserves that behavior by reading the first two
+    worksheet columns row by row.
+
+    Args:
+        rows: An iterable of Export worksheet rows.
+
+    Returns:
+        A tuple ``(pairs, skipped)``, where ``pairs`` contains row, parameter
+        name, and value dictionaries, and ``skipped`` records blank names.
     """
     pairs = []
     skipped = []
@@ -133,7 +184,16 @@ def parameter_value_pairs_from_export_rows(rows):
 
 
 def validate_parameter_value_pairs(pairs):
-    """Classify duplicate or empty parameter/value pairs before Revit writes."""
+    """Classify parameter/value pairs before Revit writes.
+
+    Args:
+        pairs: An iterable of dictionaries with ``parameter_name`` and
+            ``value`` entries.
+
+    Returns:
+        A tuple ``(valid, skipped)``. Duplicate parameter names are compared
+        case-insensitively and recorded in ``skipped``.
+    """
     valid = []
     skipped = []
     seen = set()
@@ -152,4 +212,3 @@ def validate_parameter_value_pairs(pairs):
             'value': safe_text(pair.get('value')),
         })
     return valid, skipped
-

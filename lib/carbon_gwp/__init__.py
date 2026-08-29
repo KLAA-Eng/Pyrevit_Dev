@@ -1,2 +1,1 @@
-"""Helpers for Carbon GWP Pull prototype."""
-
+"""Support the Carbon GWP Pull command."""
