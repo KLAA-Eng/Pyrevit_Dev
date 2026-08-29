@@ -3,8 +3,11 @@ you can add information to the readme (probably shoudl migrate to a notion site 
 
 ## Reference Links
 
+- [Python Script Guide](SCRIPTS.md) - KLCode code organization and pyRevit script structure
+- [Comment and Docstring Guide](COMMENTS.md) - comments, docstrings, command metadata, and section dividers
 - [pyRevit Labs Notion](https://pyrevitlabs.notion.site/)
 - [Revit API Docs](https://www.revitapidocs.com/)
+- [RVTDocs](https://rvtdocs.com/) - searchable Revit API reference with version comparisons and Python examples
 - [Lucide Icons](https://lucide.dev/icons/) — icon-design reference
 
 Process for modifying code and comitting it to Git:
