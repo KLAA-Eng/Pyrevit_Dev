@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+__title__ = 'Carbon GWP Pull'
+__author__ = 'KL&A'
 __version__ = 'v0.0.0.proto'
 __doc__ = """Version: v0.0.0.proto
 _____________________________________________________________________
@@ -54,6 +56,7 @@ def _extension_root(path):
 
     Args:
         path: Path to the executing command script.
+
     Returns:
         The nearest ``.extension`` ancestor, or the absolute input path.
     """
@@ -104,6 +107,7 @@ def _element_id_value(element_id):
 
     Args:
         element_id: A Revit ``ElementId`` instance, or ``None``.
+
     Returns:
         The integer ID, or ``None`` when no ID value can be read.
     """
@@ -123,6 +127,7 @@ def _element_name(element, default='Unnamed'):
     Args:
         element: A Revit element, wrapper, or ``None``.
         default: Value returned if the element has no readable name.
+
     Returns:
         The element name or ``default``.
     """
@@ -146,6 +151,7 @@ def _schedule_options(document):
 
     Args:
         document: Active Revit project document.
+
     Returns:
         Unique display labels mapped to ``ViewSchedule`` instances.
     """
@@ -171,6 +177,7 @@ def _select_schedules(document):
 
     Args:
         document: Active Revit project document.
+
     Returns:
         Three selected schedules, or ``None`` after cancellation or rejection.
     """
@@ -213,6 +220,7 @@ def _pick_workbook(title, default_path):
     Args:
         title: Text to display in the file picker.
         default_path: Workbook path whose existing directory starts the picker.
+
     Returns:
         Chosen workbook path, or a falsey value after cancellation.
     """
@@ -228,8 +236,11 @@ def _pick_workbook(title, default_path):
 def _load_excel_application():
     """Start a caller-owned Microsoft Excel COM application.
 
+    The caller must close every workbook it opens and quit the returned Excel
+    application in a ``finally`` block.
+
     Returns:
-        Excel application that the caller must close with ``Quit``.
+        Excel application owned by the caller.
     """
     # COMPAT: Office installations resolve different Excel interop names.
     import clr
@@ -250,6 +261,7 @@ def _worksheet_by_name(workbook, worksheet_name):
     Args:
         workbook: Open Excel workbook to search.
         worksheet_name: Exact visible worksheet name.
+
     Returns:
         Matching worksheet, or ``None`` when absent.
     """
@@ -266,6 +278,7 @@ def _ensure_worksheet(workbook, worksheet_name):
     Args:
         workbook: Open Excel workbook to update.
         worksheet_name: Excel-safe export worksheet name.
+
     Returns:
         Existing worksheet or newly appended worksheet.
     """
@@ -331,6 +344,7 @@ def _schedule_cell_text(schedule, section_type, section, row, column):
         section: Revit table section containing the cell.
         row: Revit table row index.
         column: Revit table column index.
+
     Returns:
         Displayed cell text, or an empty string if it cannot be read.
     """
@@ -358,6 +372,7 @@ def _section_rows(schedule, section_type):
     Args:
         schedule: Source Revit ``ViewSchedule``.
         section_type: Revit table section type to extract.
+
     Returns:
         Cell-text rows, or an empty list when the section is unavailable.
     """
@@ -388,6 +403,7 @@ def _schedule_table_grid(schedule):
 
     Args:
         schedule: Revit ``ViewSchedule`` to export.
+
     Returns:
         Rectangular grid with header rows before body rows.
     """
@@ -408,6 +424,7 @@ def _export_schedules_to_workbook(workbook_path, schedules):
     Args:
         workbook_path: Path to the export container workbook.
         schedules: Selected Revit ``ViewSchedule`` instances.
+
     Returns:
         Export metadata dictionaries for the pyRevit report.
     """
@@ -418,12 +435,13 @@ def _export_schedules_to_workbook(workbook_path, schedules):
     excel.DisplayAlerts = False
     workbook = None
     exports = []
-    # Open or create the container. Do not save a new workbook until every
-    # schedule has exported successfully.
+    # Open or create the container. Keep a new workbook in memory until every
+    # schedule has exported successfully, so a failed export cannot leave an
+    # incomplete workbook at the user-selected path.
     try:
-        if not os.path.isfile(workbook_path):
+        is_new_workbook = not os.path.isfile(workbook_path)
+        if is_new_workbook:
             workbook = excel.Workbooks.Add()
-            workbook.SaveAs(workbook_path)
         else:
             workbook = excel.Workbooks.Open(workbook_path)
         # Plan worksheet names. Convert Revit titles to unique Excel names so
@@ -447,10 +465,10 @@ def _export_schedules_to_workbook(workbook_path, schedules):
             })
         # Save the completed export only after every selected schedule tab is
         # refreshed, avoiding a partial workbook on an earlier failure.
-        if os.path.isfile(workbook_path):
-            workbook.Save()
-        else:
+        if is_new_workbook:
             workbook.SaveAs(workbook_path)
+        else:
+            workbook.Save()
         return exports
     finally:
         # INVARIANT: This function owns the export workbook and must release
@@ -472,6 +490,7 @@ def _com_range_values_to_rows(values, row_count, column_count):
         values: Scalar or two-dimensional Excel COM range value.
         row_count: Excel range row count.
         column_count: Excel range column count.
+
     Returns:
         Rectangular grid of text values.
     """
@@ -517,6 +536,7 @@ def _read_export_rows(workbook_path):
 
     Args:
         workbook_path: Path to the post-processing Excel workbook.
+
     Returns:
         Rectangular grid of Export worksheet values.
 
@@ -574,6 +594,7 @@ def _family_symbols_by_family_name(document, family_name):
     Args:
         document: Active Revit project document.
         family_name: Target Revit family name.
+
     Returns:
         Matching Revit ``FamilySymbol`` instances.
     """
@@ -594,6 +615,7 @@ def _set_parameter_value(parameter, value):
     Args:
         parameter: Revit parameter to write, or ``None``.
         value: Excel value to convert for the storage type.
+
     Returns:
         Tuple ``(success, reason)``; ``reason`` is empty after success.
     """
@@ -629,6 +651,7 @@ def _write_family_type_parameters(symbols, pairs):
     Args:
         symbols: Target Revit ``FamilySymbol`` instances.
         pairs: Validated parameter/value dictionaries from the Export sheet.
+
     Returns:
         Tuple ``(successes, skips)`` of pyRevit report-table rows.
     """
@@ -654,6 +677,9 @@ def _write_family_type_parameters(symbols, pairs):
 # ------------------------------------------------------------------
 def _print_report(output, metadata, exports, valid_pairs, skipped_rows, successes, write_skips):
     """Render a Carbon GWP result summary in the pyRevit output window.
+
+    Writes report headings and tables to ``output`` without modifying the
+    Revit document or either workbook.
 
     Args:
         output: pyRevit output window for this command run.
@@ -700,6 +726,8 @@ def _print_report(output, metadata, exports, valid_pairs, skipped_rows, successe
 # ║║║╠═╣║║║║
 # ╩ ╩╩ ╩╩╝╚╝
 # ==================================================================
+# Main
+# ------------------------------------------------------------------
 def main():
     """Run the interactive Carbon GWP export and parameter-write workflow.
 

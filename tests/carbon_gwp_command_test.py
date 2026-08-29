@@ -55,6 +55,7 @@ class FakeWorkbook(object):
     def __init__(self):
         self.close_arguments = []
         self.save_count = 0
+        self.save_as_paths = []
 
     def Close(self, save_changes):
         self.close_arguments.append(save_changes)
@@ -62,12 +63,18 @@ class FakeWorkbook(object):
     def Save(self):
         self.save_count += 1
 
+    def SaveAs(self, path):
+        self.save_as_paths.append(path)
+
 
 class FakeWorkbooks(object):
     def __init__(self, workbook):
         self.workbook = workbook
 
     def Open(self, path):
+        return self.workbook
+
+    def Add(self):
         return self.workbook
 
 
@@ -94,6 +101,25 @@ class CarbonGwpCommandTests(unittest.TestCase):
 
         self.assertEqual([False], workbook.close_arguments)
         self.assertEqual(0, workbook.save_count)
+        self.assertTrue(excel.quit_called)
+
+    def test_failed_new_export_does_not_create_a_partial_workbook(self):
+        command = load_command_module()
+        workbook = FakeWorkbook()
+        excel = FakeExcel(workbook)
+        command._load_excel_application = lambda: excel
+        command._schedule_table_grid = lambda schedule: (_ for _ in ()).throw(RuntimeError('read failure'))
+        temporary_directory = tempfile.mkdtemp()
+        workbook_path = os.path.join(temporary_directory, 'Carbon GWP Export.xlsx')
+
+        try:
+            with self.assertRaises(RuntimeError):
+                command._export_schedules_to_workbook(workbook_path, [object()])
+        finally:
+            os.rmdir(temporary_directory)
+
+        self.assertEqual([], workbook.save_as_paths)
+        self.assertEqual([False], workbook.close_arguments)
         self.assertTrue(excel.quit_called)
 
 

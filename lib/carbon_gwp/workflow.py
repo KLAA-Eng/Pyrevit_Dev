@@ -2,7 +2,9 @@
 """Transform Carbon GWP schedule and worksheet data outside Revit.
 
 The helpers preserve the worksheet naming and parameter-pair conventions used
-by the Carbon GWP Pull command without importing pyRevit or Excel COM APIs.
+by the Carbon GWP Pull command without importing pyRevit, Revit, or Excel COM
+APIs. They accept ordinary Python values so their behavior can be tested outside
+the host applications.
 """
 from __future__ import print_function
 
@@ -71,8 +73,8 @@ def clean_schedule_title(value):
         value: A selected schedule title or other value convertible to text.
 
     Returns:
-        The trimmed title text after content through the final ``=`` and ``)``
-        marker has been removed.
+        The trimmed title text after Dynamo-style ``=`` and ``)`` markers have
+        been removed.
     """
     text = safe_text(value).strip()
     for marker in ('=', ')'):
