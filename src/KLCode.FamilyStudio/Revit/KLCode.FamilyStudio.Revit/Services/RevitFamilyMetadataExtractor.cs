@@ -7,6 +7,7 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using KLCode.FamilyStudio.Core.Indexing;
 using KLCode.FamilyStudio.Core.Models;
+using CatalogFamilyParameter = KLCode.FamilyStudio.Core.Models.FamilyParameter;
 
 namespace KLCode.FamilyStudio.Revit.Services;
 
@@ -51,10 +52,10 @@ internal sealed class RevitFamilyMetadataExtractor : IMetadataExtractor
             typeNames.Add(familyType.Name);
         }
 
-        List<FamilyParameter> parameters = new List<FamilyParameter>();
-        foreach (FamilyParameter parameter in document.FamilyManager.Parameters)
+        List<CatalogFamilyParameter> parameters = new List<CatalogFamilyParameter>();
+        foreach (Autodesk.Revit.DB.FamilyParameter parameter in document.FamilyManager.Parameters)
         {
-            parameters.Add(new FamilyParameter(
+            parameters.Add(new CatalogFamilyParameter(
                 parameter.Definition.Name,
                 null,
                 parameter.StorageType.ToString(),

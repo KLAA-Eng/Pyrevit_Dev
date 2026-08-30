@@ -25,7 +25,12 @@ class CompiledCommandBundlesTest(unittest.TestCase):
     def test_compiled_commands_are_exposed_in_dev_sandbox(self):
         panel_metadata = _read_text(os.path.join(PANEL_ROOT, "bundle.yaml"))
 
-        for command_name in ("Startup Importer", "Family Studio"):
+        command_classes = {
+            "Startup Importer": "StartupImportCommand",
+            "Family Studio": "FamilyStudioCommand",
+        }
+
+        for command_name, command_class in command_classes.items():
             bundle_root = os.path.join(
                 PANEL_ROOT, command_name + ".invokebutton"
             )
@@ -37,7 +42,10 @@ class CompiledCommandBundlesTest(unittest.TestCase):
 
             bundle_metadata = _read_text(bundle_metadata_path)
             self.assertTrue(_metadata_value(bundle_metadata, "assembly"))
-            self.assertTrue(_metadata_value(bundle_metadata, "command_class"))
+            self.assertEqual(
+                command_class,
+                _metadata_value(bundle_metadata, "command_class"),
+            )
             self.assertIn("  - " + command_name, panel_metadata)
 
 

@@ -5,6 +5,7 @@
     <TargetFramework Condition="'$(RevitVersion)' != '2024'">net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <AssemblyName>KLCode.FamilyStudio.Revit</AssemblyName>
     <RootNamespace>KLCode.FamilyStudio.Revit</RootNamespace>
     <OutputPath>bin/Revit$(RevitVersion)/</OutputPath>
@@ -13,8 +14,10 @@
     <PyRevitAssemblyFileName Condition="'$(RevitVersion)' != '2024'">$(AssemblyName).dll</PyRevitAssemblyFileName>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../Library/KLCode.FamilyStudio.Core/KLCode.FamilyStudio.Core.csproj" />
-    <ProjectReference Include="../../Library/KLCode.FamilyStudio.Database/KLCode.FamilyStudio.Database.csproj" />
+    <ProjectReference Include="../../Library/KLCode.FamilyStudio.Core/KLCode.FamilyStudio.Core.csproj"
+                      AdditionalProperties="FamilyStudioRevitHost=true" />
+    <ProjectReference Include="../../Library/KLCode.FamilyStudio.Database/KLCode.FamilyStudio.Database.csproj"
+                      AdditionalProperties="FamilyStudioRevitHost=true" />
     <Reference Include="RevitAPI" HintPath="$(RevitApiDir)/RevitAPI.dll" Private="false" />
     <Reference Include="RevitAPIUI" HintPath="$(RevitApiDir)/RevitAPIUI.dll" Private="false" />
   </ItemGroup>
@@ -35,9 +38,11 @@
     </ItemGroup>
     <MakeDir Directories="$(PyRevitBundleBin)" />
     <Copy SourceFiles="@(PyRevitRuntimeFile)"
-          DestinationFiles="@(PyRevitRuntimeFile->'$(PyRevitBundleBin)/%(RecursiveDir)%(Filename)%(Extension)')" />
+          DestinationFiles="@(PyRevitRuntimeFile->'$(PyRevitBundleBin)/%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(TargetPath)"
-          DestinationFiles="$(PyRevitBundleBin)/$(PyRevitAssemblyFileName)" />
+          DestinationFiles="$(PyRevitBundleBin)/$(PyRevitAssemblyFileName)"
+          SkipUnchangedFiles="true" />
     <Error Condition="!Exists('$(PyRevitBundleBin)/$(PyRevitAssemblyFileName)')"
            Text="pyRevit package verification failed: $(PyRevitAssemblyFileName) was not copied to the bundle bin directory." />
   </Target>

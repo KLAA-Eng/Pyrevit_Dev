@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -19,6 +20,7 @@ public sealed class FamilyStudioCommand : IExternalCommand
         if (uiDocument is null || uiDocument.Document.IsFamilyDocument)
         {
             message = "Family Studio requires an active project document.";
+            TaskDialog.Show("Family Studio", message);
             return Result.Cancelled;
         }
 
@@ -27,7 +29,16 @@ public sealed class FamilyStudioCommand : IExternalCommand
             string databasePath = GetDatabasePath();
             if (!File.Exists(databasePath))
             {
-                TaskDialog.Show("Family Studio", "No family index was found. Run the Family Studio indexer first.");
+                string indexDirectory = Path.GetDirectoryName(databasePath) ?? string.Empty;
+                string visibleFiles = Directory.Exists(indexDirectory)
+                    ? string.Join(", ", Directory.GetFiles(indexDirectory).Select(Path.GetFileName))
+                    : "<index folder is not visible>";
+                TaskDialog.Show(
+                    "Family Studio",
+                    "No family index was found.\n\n" +
+                    "Database path:\n" + databasePath +
+                    "\n\nFiles visible in the Family Studio index folder:\n" +
+                    visibleFiles);
                 return Result.Cancelled;
             }
 
@@ -40,14 +51,21 @@ public sealed class FamilyStudioCommand : IExternalCommand
         }
         catch (Exception exception)
         {
-            message = "Family Studio could not open: " + exception.Message;
-            return Result.Failed;
+            message = "Family Studio could not open:\n\n" + exception;
+            TaskDialog.Show("Family Studio", message);
+            return Result.Cancelled;
         }
     }
 
     private static string GetDatabasePath()
     {
-        string localData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        return Path.Combine(localData, "KLCode", "FamilyStudio", "family_studio.sqlite");
+        string configuredPath = Environment.GetEnvironmentVariable("KLCODE_FAMILY_STUDIO_DATABASE");
+        if (!string.IsNullOrWhiteSpace(configuredPath))
+        {
+            return configuredPath;
+        }
+
+        string applicationData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        return Path.Combine(applicationData, "KLCode", "FamilyStudio", "family_studio.sqlite");
     }
 }

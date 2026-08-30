@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using KLCode.FamilyStudio.Core.Indexing;
 using KLCode.FamilyStudio.Core.Models;
 using KLCode.FamilyStudio.Core.Repositories;
 using KLCode.FamilyStudio.Core.Search;
 using KLCode.FamilyStudio.Database.Migrations;
 using Microsoft.Data.Sqlite;
+using SQLitePCL;
 
 namespace KLCode.FamilyStudio.Database.Repositories;
 
@@ -16,6 +19,16 @@ public sealed class SqliteFamilyRepository : IFamilyRepository, IDisposable
 {
     private const int MaximumSearchLimit = 200;
     private readonly string _connectionString;
+
+    static SqliteFamilyRepository()
+    {
+        // Microsoft.Data.Sqlite does not choose a SQLite provider automatically
+        // when this library is loaded inside Revit's .NET Framework process.
+        AppDomain.CurrentDomain.AssemblyResolve += ResolveSqliteDependency;
+        LoadBundledSqliteNativeLibrary();
+        raw.SetProvider(new SQLite3Provider_e_sqlite3());
+        raw.FreezeProvider();
+    }
 
     public SqliteFamilyRepository(string databasePath)
     {
@@ -29,7 +42,8 @@ public sealed class SqliteFamilyRepository : IFamilyRepository, IDisposable
         _connectionString = new SqliteConnectionStringBuilder
         {
             DataSource = fullPath,
-            Mode = SqliteOpenMode.ReadWriteCreate
+            Mode = SqliteOpenMode.ReadWriteCreate,
+            Pooling = false
         }.ToString();
         using SqliteConnection connection = OpenConnection();
         SqliteMigrationRunner.Apply(connection);
@@ -123,6 +137,45 @@ FROM families WHERE file_path = $path AND is_deleted = 0;";
 
     public void Dispose()
     {
+    }
+
+    private static void LoadBundledSqliteNativeLibrary()
+    {
+        string nativeLibraryPath = Environment.GetEnvironmentVariable("KLCODE_FAMILY_STUDIO_NATIVE_SQLITE");
+        if (string.IsNullOrWhiteSpace(nativeLibraryPath))
+        {
+            return;
+        }
+
+        if (!File.Exists(nativeLibraryPath))
+        {
+            throw new FileNotFoundException("The bundled SQLite native library was not found.", nativeLibraryPath);
+        }
+
+        if (LoadLibrary(nativeLibraryPath) == IntPtr.Zero)
+        {
+            throw new InvalidOperationException(
+                "The bundled SQLite native library could not be loaded: " +
+                Marshal.GetLastWin32Error().ToString(CultureInfo.InvariantCulture));
+        }
+    }
+
+    [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern IntPtr LoadLibrary(string fileName);
+
+    private static Assembly? ResolveSqliteDependency(object sender, ResolveEventArgs args)
+    {
+        AssemblyName requestedAssembly = new AssemblyName(args.Name);
+        if (!string.Equals(requestedAssembly.Name, "System.Memory", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return AppDomain.CurrentDomain.GetAssemblies()
+            .FirstOrDefault(assembly => string.Equals(
+                assembly.GetName().Name,
+                requestedAssembly.Name,
+                StringComparison.OrdinalIgnoreCase));
     }
 
     private SqliteConnection OpenConnection()

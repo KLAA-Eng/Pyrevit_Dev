@@ -5,4 +5,4 @@ tooltip: >-
 author: KL&A
 context: doc-project
 assembly: KLA.ModelStartupImporter.Revit.dll
-command_class: KLA.ModelStartupImporter.Revit.StartupImportCommand
+command_class: StartupImportCommand

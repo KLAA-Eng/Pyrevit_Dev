@@ -3,7 +3,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>KLCode.FamilyStudio.Core</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
+  <PropertyGroup Condition="'$(FamilyStudioRevitHost)' == 'true'">
+    <OutputPath>bin/RevitHost/$(Configuration)/</OutputPath>
+    <IntermediateOutputPath>obj/RevitHost/$(Configuration)/$(TargetFramework)/</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(FamilyStudioRevitHost)' == 'true'">
+    <Compile Remove="Configuration/JsonLibraryConfigurationProvider.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(FamilyStudioRevitHost)' != 'true'">
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 </Project>

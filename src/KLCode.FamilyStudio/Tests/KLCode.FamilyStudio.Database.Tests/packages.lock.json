@@ -264,7 +264,8 @@
         "type": "Project",
         "dependencies": {
           "KLCode.FamilyStudio.Core": "[1.0.0, )",
-          "Microsoft.Data.Sqlite": "[8.0.30, )"
+          "Microsoft.Data.Sqlite": "[8.0.30, )",
+          "SQLitePCLRaw.provider.e_sqlite3": "[2.1.12, )"
         }
       }
     }
