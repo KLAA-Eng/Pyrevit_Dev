@@ -49,8 +49,15 @@ coverage.xml
 *.cover
 *.py.cover
 
+# .NET build and test artifacts
+/src/**/bin/
+/src/**/obj/
+/src/**/TestResults/
+
 # Local logs
 *.log
 
 .zed
 pyrightconfig.json
+
+.dotnet
