@@ -23,14 +23,14 @@
 
             <SolidColorBrush x:Key="text_white"         Color="#E5E4E2" />
             <SolidColorBrush x:Key="text_gray"          Color="Gray" />
-            <SolidColorBrush x:Key="text_magenta"       Color="#33714F" />
+            <SolidColorBrush x:Key="text_green"       Color="#33714F" />
 
             <SolidColorBrush x:Key="button_fg_normal"   Color="White" />
             <SolidColorBrush x:Key="button_bg_normal"   Color="#286048" />
             <SolidColorBrush x:Key="button_bg_hover"    Color="#407058" />
 
-            <SolidColorBrush x:Key="border_magenta"     Color="#286048" />
-            <SolidColorBrush x:Key="border_blue"     Color="#33714F" />
+            <SolidColorBrush x:Key="border_green_dark"     Color="#286048" />
+            <SolidColorBrush x:Key="border_green"     Color="#33714F" />
 
             <SolidColorBrush x:Key="uncheckbox_checked_colour"     Color="Gray" />
             <SolidColorBrush x:Key="checkbox_checked_colour"     Color="#286048" />
@@ -123,8 +123,8 @@
 
             <Style TargetType="TextBox">
                 <Setter Property="Background" Value="{StaticResource header_background}"/>
-                <Setter Property="Foreground" Value="{StaticResource text_magenta}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource border_blue}"/>
+                <Setter Property="Foreground" Value="{StaticResource text_green}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource border_green}"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
 
                 <Style.Resources>
@@ -135,7 +135,7 @@
             </Style>
 
             <!--
-                            <Border  BorderBrush="{DynamicResource border_magenta}"
+                            <Border  BorderBrush="{DynamicResource border_green_dark}"
                          BorderThickness="1"
                          CornerRadius="10" >
             -->
@@ -150,7 +150,7 @@
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[STYLE] - LABEL -->
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[STYLE] - LABEL -->
             <Style TargetType="Label">
-                <Setter Property="Foreground" Value="{StaticResource text_magenta}"/>
+                <Setter Property="Foreground" Value="{StaticResource text_green}"/>
             </Style>
 
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[STYLE] - CheckBox -->
@@ -158,7 +158,7 @@
             <Style TargetType="CheckBox">
 
                 <Setter Property="Foreground" Value="{StaticResource text_white}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource border_blue}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource border_green}"/>
                 <Setter Property="Cursor" Value="Hand"/>
                 <Setter Property="FontWeight" Value="Medium"/>
                 <Setter Property="FontSize" Value="12"/>
@@ -252,7 +252,7 @@
                             Grid.ColumnSpan="2"
                             CornerRadius="2"
                             Background="{StaticResource header_background}"
-                            BorderBrush="{StaticResource border_blue}"
+                            BorderBrush="{StaticResource border_green}"
                             BorderThickness="1" />
 
                     <!-- MAIN BOX-->
@@ -261,7 +261,7 @@
                             CornerRadius="0"
                             Margin="1"
                             Background="{StaticResource header_background}"
-                            BorderBrush="{StaticResource border_blue}"
+                            BorderBrush="{StaticResource border_green}"
                             BorderThickness="0,0,1,0" />
 
                     <!-- MAIN BOX-->
@@ -333,7 +333,7 @@
                                         <Border x:Name="DropDownBorder"
                                                 Background="{StaticResource header_background}"
                                                 BorderThickness="1"
-                                                BorderBrush="{StaticResource border_blue}"/>
+                                                BorderBrush="{StaticResource border_green}"/>
 
                                         <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
                                             <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
@@ -404,7 +404,7 @@
 
             <Style TargetType="ListBox">
                 <Setter Property="Background" Value="{StaticResource header_background}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource border_magenta}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource border_green_dark}"/>
                 <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Visible"/>
                 <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>
 
@@ -419,8 +419,8 @@
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[SCROLLBAR] -->
 
             <Style TargetType="ScrollBar">
-                <Setter Property="Background" Value="{StaticResource border_magenta}"/>
-                <Setter Property="Foreground" Value="{StaticResource border_magenta}"/>
+                <Setter Property="Background" Value="{StaticResource border_green_dark}"/>
+                <Setter Property="Foreground" Value="{StaticResource border_green_dark}"/>
                 <Setter Property="BorderBrush" Value="{StaticResource header_background}"/>
                 <Setter Property="Opacity" Value="0.9"/>
                 <Setter Property="Margin" Value="3"/>
@@ -537,9 +537,9 @@
                                     Margin="5" >
                     <Label Content="Renaming Parameters"
                            Margin="0, -25,0,0 "
-                           Foreground="{StaticResource text_magenta}"/>
+                           Foreground="{StaticResource text_green}"/>
                     <Border  Height="110"
-                          BorderBrush="{DynamicResource border_magenta}"
+                          BorderBrush="{DynamicResource border_green_dark}"
                          BorderThickness="1,1,1,1" CornerRadius="10" HorizontalAlignment="Stretch" Width="Auto">
 
 

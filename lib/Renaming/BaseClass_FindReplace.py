@@ -6,6 +6,7 @@
 #====================================================================================================
 from abc import ABCMeta, abstractmethod, abstractproperty
 from pyrevit import forms
+from GUI.forms import my_WPF
 
 # .NET IMPORTS
 from clr import AddReference
@@ -15,19 +16,21 @@ from System.Windows.Window import DragMove
 from System.Windows.Input import MouseButtonState
 
 import os
+import wpf
 
 # ╔╗ ╔═╗╔═╗╔═╗  ╔═╗╦  ╔═╗╔═╗╔═╗
 # ╠╩╗╠═╣╚═╗║╣   ║  ║  ╠═╣╚═╗╚═╗
 # ╚═╝╩ ╩╚═╝╚═╝  ╚═╝╩═╝╩ ╩╚═╝╚═╝ BASE CLASS
 #====================================================================================================
 
-class BaseRenaming(forms.WPFWindow):
+class BaseRenaming(my_WPF):
     """GUI for [Views: Find and Replace]"""
     def start(self, title, version="Version: _"):
-        xaml_dir_abs_path = os.path.abspath(os.path.dirname(__file__))
-        xaml_file_name = os.path.join(xaml_dir_abs_path,"GUI_BaseRename.xaml")
+        gui_dir_abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'GUI'))
+        xaml_file_name = os.path.join(gui_dir_abs_path, 'RenameViews.xaml')
 
-        self.form = forms.WPFWindow.__init__(self, xaml_file_name)
+        self.add_wpf_resource()
+        wpf.LoadComponent(self, xaml_file_name)
         self.main_title.Text     = title
         self.footer_version.Text = version
         self.selected_elements   = self.get_selected_elements()

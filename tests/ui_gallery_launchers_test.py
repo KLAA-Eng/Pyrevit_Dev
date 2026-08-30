@@ -15,7 +15,7 @@ from lib.ui_gallery.catalog import catalog_xaml_sources
 
 
 class UiGalleryLaunchersTests(unittest.TestCase):
-    def test_catalogs_supported_seeded_dialog_launchers(self):
+    def test_catalogs_supported_dialog_launchers(self):
         launchers = gallery_launchers()
         launcher_ids = [launcher['id'] for launcher in launchers]
 
@@ -31,12 +31,35 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         self.assertIn('kla-find-replace-sheets', launcher_ids)
         self.assertIn('kla-duplicate-sheets', launcher_ids)
         self.assertIn('kla-view-range', launcher_ids)
+        self.assertIn('pyrevit-ask-for-color', launcher_ids)
+        self.assertIn('pyrevit-pick-file', launcher_ids)
+        self.assertIn('pyrevit-pick-folder', launcher_ids)
+        self.assertIn('pyrevit-progress-bar', launcher_ids)
+        self.assertIn('pyrevit-show-balloon', launcher_ids)
+        self.assertIn('pyrevit-select-open-docs', launcher_ids)
+        self.assertIn('pyrevit-select-parameters', launcher_ids)
+        self.assertIn('pyrevit-select-revisions', launcher_ids)
+        self.assertIn('pyrevit-select-sheets', launcher_ids)
+        self.assertIn('pyrevit-select-views', launcher_ids)
+        self.assertIn('pyrevit-warning-bar', launcher_ids)
         self.assertTrue(all('relative_path' in launcher for launcher in launchers))
         self.assertTrue(all('called_by' in launcher for launcher in launchers))
         self.assertTrue(all('can_launch' in launcher for launcher in launchers))
+        self.assertTrue(all('sample_data_label' in launcher for launcher in launchers))
         self.assertTrue(all(launcher['called_by'] for launcher in launchers))
-        self.assertTrue(all(launcher['uses_seed_data'] for launcher in launchers))
-        self.assertTrue(all(launcher['can_launch'] for launcher in launchers))
+
+    def test_seeded_claim_only_applies_to_seeded_previews(self):
+        launchers = gallery_launchers()
+        by_id = dict((launcher['id'], launcher) for launcher in launchers)
+
+        self.assertTrue(by_id['kla-duplicate-sheets']['uses_seed_data'])
+        self.assertEqual('Seeded sample data', by_id['kla-duplicate-sheets']['sample_data_label'])
+        self.assertFalse(by_id['ui-gallery-preview-fixture']['uses_seed_data'])
+        self.assertEqual('Static fixture', by_id['ui-gallery-preview-fixture']['sample_data_label'])
+        self.assertFalse(by_id['pyrevit-select-views']['uses_seed_data'])
+        self.assertFalse(by_id['pyrevit-select-views']['can_launch'])
+        self.assertEqual('Host/model data required',
+                         by_id['pyrevit-select-views']['sample_data_label'])
 
     def test_all_repo_window_xaml_files_are_accounted_for(self):
         launchers = gallery_launchers()

@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="Views: Find and Replace"
-    Height="210" Width="350"
+    Height="235" Width="350"
     WindowStartupLocation="CenterScreen"
     HorizontalAlignment="Center"
     ShowInTaskbar="True"
@@ -14,12 +14,12 @@
     Background="#1A252B">
 
 
-
     <!--MAIN-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"></RowDefinition>
             <RowDefinition></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
@@ -31,7 +31,7 @@
                 Grid.ColumnSpan="2">
             <!--HEADER GRID-->
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="75"/>
+                <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="60"/>
             </Grid.ColumnDefinitions>
@@ -41,10 +41,11 @@
                         Grid.ColumnSpan="2"
                         VerticalAlignment="Center"
                         HorizontalAlignment="Left">
-
+                <Image Width="20" Height="20"
+                      />
+                <!--Source="https://www.erikfrits.com/media/images/LOGO.png"-->
 
                 <TextBlock
-                    Margin="5,0,0,0"
                     FontSize="14px"
                     FontWeight="Heavy"
                     Foreground="{StaticResource text_white}">
@@ -86,8 +87,7 @@
 
                 <StackPanel Grid.Column="0"
                                     Margin="5" >
-                    <Label x:Name="UI_label"
-                        Content="ViewName"
+                    <Label Content="Renaming Parameters"
                            Margin="0, -25,0,0 "
                            Foreground="{StaticResource text_green}"/>
                     <Border  Height="110"
@@ -162,17 +162,68 @@
                                          Foreground="{StaticResource text_white}"/>
                             </DockPanel>
 
+
                         </StackPanel>
                     </Border>
 
-                    <Button x:Name="UI_main_button"
-                        Click="button_run"
+                    <Button Click="button_run"
                             Content="Rename"
                             Margin="0,10,0,0"
                             Width="75"
                             Height="25"/>
+
+
+
+
+
                 </StackPanel>
+
+
+
+
             </Grid>
+
+
+
         </StackPanel>
+
+
+        <!--FOOTER START-->
+        <Grid   Grid.Row="2"
+                Background="{StaticResource header_background}">
+            <!--FOOTER GRID-->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <!--VERSION-->
+            <TextBlock x:Name="footer_version"
+                        Text="Version: 1.0"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Foreground="{StaticResource text_gray}"
+                />
+
+            <!--PATREON-->
+            <TextBlock  Grid.Column="2"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Margin="0,0,10,0">
+                    <Hyperlink
+                        RequestNavigate="Hyperlink_RequestNavigate"
+                        NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource footer_donate}">
+                        Outreach
+                    </Hyperlink>
+            </TextBlock>
+
+
+        </Grid>
+        <!--FOOTER END-->
+
     </Grid>
 </Window>

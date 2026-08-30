@@ -5,8 +5,10 @@ docstrings, command metadata, and ASCII-art section dividers. Apply it
 to new code and to code that is materially changed.
 
 The baseline is the [Google Python Style Guide][google-python-style],
-[PEP 8][pep-8], and [PEP 257][pep-257]. Where this guide adds a rule, it is
-for the pyRevit, Revit API, and IronPython context of this repository.
+[PEP 8][pep-8], and [PEP 257][pep-257]. The structure and progressive-detail
+approach are additionally informed by
+[Awesome Claude Skills][awesome-claude-skills]. Where this guide adds a rule,
+it is for the pyRevit, Revit API, and IronPython context of this repository.
 
 All examples use the fictional `Room Readiness Audit` command and illustrate
 style only.
@@ -14,6 +16,7 @@ style only.
 [google-python-style]: https://google.github.io/styleguide/pyguide.html
 [pep-8]: https://peps.python.org/pep-0008/#comments
 [pep-257]: https://peps.python.org/pep-0257/
+[awesome-claude-skills]: https://github.com/ComposioHQ/awesome-claude-skills
 
 ## Principles
 
@@ -140,30 +143,111 @@ command script solely to satisfy that rule.
 
 ## Inline and Block Comments
 
-Comments are a teaching aid in this repository. Add them liberally around
-unfamiliar Revit, pyRevit, Excel COM, and IronPython behavior, but make each
-comment answer a question the code cannot answer for a new maintainer:
+Choose one comment tier for the file or review scope. Higher tiers include the
+requirements of lower tiers; do not mix tiers arbitrarily within a cohesive
+command. Raise the tier for unfamiliar host APIs, new contributors, training
+code, or a complex workflow. Lower it only when the code and surrounding
+documentation already carry the needed context.
 
-- **Why is this necessary?** Explain a business rule, data assumption, or
-  non-obvious decision.
-- **What does the host API do here?** Explain a Revit, pyRevit, or Excel COM
-  behavior that differs from ordinary Python.
-- **What would break if this changed?** Explain resource ownership, a
-  transaction boundary, a workbook contract, or a correctness rule.
-- **What is this small step accomplishing?** Explain a transformation or
-  fallback when the variable names alone do not make it clear.
+| Tier | Audience and purpose | Required coverage |
+| --- | --- | --- |
+| **1 — Essential** | Experienced maintainers; keep production code easy to scan. | Required tagged comments, plus only the smallest effective block or trailing comments for non-obvious decisions, constraints, and host-API behavior. |
+| **2 — Default** | New developers and non-developers reading normal command code. | Tier 1 coverage plus descriptive workflow-phase, block, and short trailing comments that explain what each meaningful code block accomplishes and why it matters. |
+| **3 — Teaching** | A developer learning the command, API, or workflow. | Tier 2 coverage plus concise comments for each meaningful step, branch, transformation, and API call so a reader can follow the implementation from top to bottom. |
 
-Do not narrate ordinary Python syntax or repeat a clear name. For example,
-`for room in rooms:` does not need a comment; a comment is useful when the
-loop deliberately skips linked-model rooms, preserves order, or prepares data
-for a later Revit transaction.
+All tiers follow these shared rules:
 
-### Choosing a comment style
+- Use comments to explain context the code cannot express: a decision, business
+  rule, data assumption, compatibility detail, host-API behavior, or
+  correctness constraint.
+- Keep a comment next to the code it explains, and update or remove it when
+  that behavior changes.
+- Write complete, concise sentences. Do not narrate ordinary Python syntax or
+  repeat a clear name. For example, `for room in rooms:` needs no comment;
+  explain instead why the loop skips rooms, preserves order, or prepares a
+  later transaction.
+- Use the tagged-comment rules below whenever their condition exists, at every
+  tier. A tag records persistent risk or follow-up; it is not a substitute for
+  explaining the local code.
+
+### Tier 1 — Essential comments
+
+Tier 1 favors clear names and small helpers over prose. Add a comment only when
+removing it would hide a non-obvious reason, boundary, or consequence. Use a
+block comment for a multi-statement explanation and a trailing comment only
+for a short, single-statement constraint. The final line below is the Tier 1
+trailing-comment example.
+
+```python
+# Revit collectors are lazy. Materialize this result once so counting and
+# iterating use the same rooms.
+rooms = list(room_collector)
+
+first_excel_row = 1  # Excel COM collections use one-based indexes.
+```
+
+### Tier 2 — Default comments
+
+Tier 2 is the repository default. It is written for a reader who may know the
+task but not Python, pyRevit, Revit, or Excel COM. Comment each meaningful
+workflow phase and non-obvious block. State the result of the block first, then
+add the reason, host-API rule, or user-facing consequence when it is useful.
+Describe a function's purpose through its docstring; do not restate every
+function body in comments. The final line below is the Tier 2
+trailing-comment example: it explains the user-relevant difference between
+Excel and Python indexing.
+
+```python
+# Collect project rooms before calculating readiness. Materializing the lazy
+# Revit collector ensures the count and later loop use the same result set.
+rooms = list(room_collector)
+
+# Exclude rooms without a Department because early design phases leave that
+# value optional; they are not failures in the final readiness score.
+scored_rooms = [room for room in rooms if room.Department]
+
+first_excel_row = 1  # Excel starts worksheet rows at 1, not 0.
+```
+
+### Tier 3 — Teaching comments
+
+Tier 3 explains the implementation as a compact walkthrough. Comment every
+meaningful phase, transformation, branch, fallback, and host-API interaction.
+For each comment, say what the next step does and why it is needed, but avoid
+translating punctuation, loops, assignments, or clear names into English.
+Break a dense expression into named intermediate values before adding a long
+comment. Use a trailing comment for a compact fact that completes one statement
+without interrupting the walkthrough.
+
+```python
+# Materialize the lazy collector now. Revit otherwise re-runs the query when
+# this sequence is counted or iterated, which can produce inconsistent results.
+rooms = list(room_collector)
+
+# Keep only rooms that can be scored. A missing Department means the project is
+# still in an early design phase, not that the room failed the audit.
+scored_rooms = [room for room in rooms if room.Department]
+
+# Convert Revit's internal feet before comparing clearance to the office's
+# millimeter-based standard. The conversion changes both the unit and meaning.
+clearance_mm = DB.UnitUtils.ConvertFromInternalUnits(
+    clearance_feet,
+    DB.UnitTypeId.Millimeters)
+
+first_excel_column = 1  # Excel COM starts worksheet columns at 1, not 0.
+
+# Stop before opening a transaction when no rooms qualify. This leaves the
+# model unchanged and tells the user why no report was created.
+if not scored_rooms:
+    forms.alert("No rooms are ready to score.", exitscript=True)
+```
+
+### Comment forms and placement
 
 Use a block comment immediately above a related sequence of statements. Prefer
-it for a decision, an API limitation, a multi-step transformation, resource
-ownership, or failure handling. This is the default style for beginner-facing
-explanations.
+it for a decision, API limitation, multi-step transformation, resource
+ownership, or failure handling. Indent it to the same level as the code it
+explains; start every line with `# `.
 
 ```python
 # Revit collectors are lazy. Materialize this one before counting and iterating
@@ -180,7 +264,8 @@ Use an inline (trailing) comment when a single statement needs a short reason,
 unit, boundary, or external constraint. It MUST be separated from the code by
 at least two spaces, start with `# `, and remain short enough that the complete
 line is easy to scan. Use a block comment instead when the explanation needs
-more than one sentence or applies to more than one statement.
+more than one sentence or applies to more than one statement. In Tier 2 and
+Tier 3, make a trailing comment understandable to a non-developer.
 
 ```python
 COMMAND_TITLE = "Room Readiness Audit"  # User-facing report title.
@@ -204,9 +289,9 @@ if not room.Department:
     continue
 ```
 
-### Beginner-friendly placement rules
+### Tier 2 and Tier 3 placement rules
 
-Apply these rules while writing or reviewing command code:
+Apply these rules while writing or reviewing default or teaching-level code:
 
 1. Comment a meaningful block before its first statement, rather than adding a
    comment to every line inside it.
@@ -222,12 +307,13 @@ Apply these rules while writing or reviewing command code:
 6. Keep a comment next to the code it explains. Update or remove it whenever
    the related behavior changes.
 
-### Workflow-phase comments
+### Tier 2 and Tier 3 workflow-phase comments
 
 For a command with a multi-step workflow, add a short action-oriented comment
-before every meaningful phase. This style is inspired by EF-Tools' beginner
-examples, but uses plain text instead of emojis so comments remain searchable,
-accessible, and consistent in every editor.
+before every meaningful phase. Use it in Tier 2 to orient a new reader, and in
+Tier 3 as the starting point for the step-by-step walkthrough. This style is
+inspired by EF-Tools' beginner examples, but uses plain text instead of emojis
+so comments remain searchable, accessible, and consistent in every editor.
 
 Start with a verb that describes the result of the next block: **Collect**,
 **Filter**, **Validate**, **Transform**, **Select**, **Open**, **Write**,
@@ -251,10 +337,11 @@ with revit.Transaction("Copy View Filters"):
     _copy_filters(selected_templates)
 ```
 
-Use one workflow-phase comment per cohesive block, not one label per line.
-Subsequent comments inside the block should explain only a distinct API detail,
-conversion, fallback, or safety constraint. Keep the existing tagged-comment
-rules for persistent compatibility, workaround, and invariant information.
+Use one workflow-phase comment per cohesive block, not one label per line. In
+Tier 3, add subsequent comments only for a distinct API detail, conversion,
+fallback, safety constraint, or otherwise meaningful step. Keep the existing
+tagged-comment rules for persistent compatibility, workaround, and invariant
+information.
 
 Use these patterns as starting points:
 
@@ -282,9 +369,10 @@ except Exception:
     worksheet.UsedRange.Clear()
 ```
 
-Before adding a comment, ask: "Would a capable new maintainer know the reason
-for this line or block from the names and surrounding code?" If yes, omit the
-comment. If no, add the shortest complete explanation that gives the reason.
+Before adding a comment, ask: "Would the intended Tier 1, 2, or 3 reader know
+the reason for this line or block from the names and surrounding code?" If yes,
+omit the comment. If no, add the shortest complete explanation that gives the
+reason.
 
 ## Tagged Comments
 
@@ -346,6 +434,11 @@ name.
 - Are Revit transactions, external-resource ownership, and meaningful side
   effects documented where callers need to know them?
 - Does each tagged comment use an approved tag and include the required context?
+- Does the file consistently use one comment tier, with Tier 2 used unless a
+  reviewer intentionally selected Tier 1 or Tier 3?
+- Do Tier 1 comments remain minimal and effective; do Tier 2 comments explain
+  meaningful blocks for new readers; and do Tier 3 comments form a concise,
+  complete walkthrough without narrating obvious syntax?
 - Does each KLMetadata block use `__version__`, the ordered command card, and
   matching version strings?
 - Does every ASCII-art divider have an adjacent plain-text section label?

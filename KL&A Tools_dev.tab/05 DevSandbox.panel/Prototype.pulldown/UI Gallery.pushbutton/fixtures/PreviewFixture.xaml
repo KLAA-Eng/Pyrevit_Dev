@@ -1,6 +1,7 @@
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         Title="UI Gallery Preview Fixture" Height="160" Width="360"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="#1A252B">
     <Grid Margin="20">
         <TextBlock Text="This is a self-contained, noninteractive preview fixture."
                    TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center" />

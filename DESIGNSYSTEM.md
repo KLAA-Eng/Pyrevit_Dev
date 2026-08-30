@@ -8,27 +8,27 @@ These are the named colors used across KLCode ribbon icons and WPF GUIs. This ta
 
 | KLName | Value | Description |
 | --- | --- | --- |
-| KLCharcoal | `#1A252B` | Dark blue-green charcoal. |
-| KLGreen | `#33714F` | Deep KLCode green. |
-| KLGreen-dark | `#286048` | Dark muted green. |
-| KLGreen-secondary | `#407058` | Muted medium green. |
-| KLOrange | `#FF8000` | Bright orange. |
-| KLWhite | `#E5E4E2` | Soft warm off-white. |
-| white | `#FFFFFF` | Pure white. |
-| KLGray-medium | `#808080` | Standard medium gray. |
-| KLGray-dark | `#FF3F3F3F` | Dark neutral gray. |
-| KLCharcoal-gray | `#FF4F4F4F` | Medium-dark charcoal gray. |
-| KLGray-scroll | `#505050` | Neutral dark gray. |
-| KLGray-disabled | `#888888` | Muted medium-light gray. |
-| KLGray-disabled-check | `#FF6C6C6C` | Muted gray. |
-| KLCharcoal-black | `#FF131313` | Nearly black charcoal. |
-| black | `#000000` | Pure black. |
-| KLGreen-transparent-a | `#33286048` | Transparent dark green. |
-| KLGreen-transparent-b | `#33307050` | Transparent muted green. |
-| KLGreen-checkbox-a | `#88286048` | Semi-transparent dark green. |
-| KLGreen-checkbox-b | `#99307050` | Semi-transparent muted green. |
-| warning-gold | `#DAA520` | Warm golden yellow. |
-| info-green | `#3CB371` | Medium sea green. |
+| KLCharcoal | `#1A252B` | Dark blue-green charcoal |
+| KLGreen | `#33714F` | Deep KLCode green |
+| KLGreen-dark | `#286048` | Dark muted green |
+| KLGreen-secondary | `#407058` | Muted medium green |
+| KLOrange | `#FF8000` | Bright orange |
+| KLWhite | `#E5E4E2` | Soft warm off-white |
+| white | `#FFFFFF` | Pure white |
+| gray | `#808080` | medium gray |
+| KLGray-dark | `#FF3F3F3F` | Dark neutral gray |
+| KLCharcoal-gray | `#FF4F4F4F` | Medium-dark charcoal gray |
+| KLGray-scroll | `#505050` | Neutral dark gray |
+| KLGray-disabled | `#888888` | Muted medium-light gray |
+| KLGray-disabled-check | `#FF6C6C6C` | Muted gray |
+| KLCharcoal-black | `#FF131313` | Nearly black charcoal |
+| black | `#000000` | Pure black |
+| KLGreen-transparent-a | `#33286048` | Transparent dark green |
+| KLGreen-transparent-b | `#33307050` | Transparent muted green |
+| KLGreen-checkbox-a | `#88286048` | Semi-transparent dark green |
+| KLGreen-checkbox-b | `#99307050` | Semi-transparent muted green |
+| warning-gold | `#DAA520` | Warm golden yellow |
+| info-green | `#3CB371` | Medium sea green |
 
 `lib/_logos/KLCodeLogo.png` is the source branding asset used to sample the primary charcoal and green colors.
 
@@ -80,7 +80,7 @@ Use [Lucide Icons](https://lucide.dev/icons/) as the visual reference for new or
 
 New prototype scripts should start with `lib/_icons/drill_32px_orange.png` as the default icon. Prototype-only exceptions should stay local to the prototype bundle until they are promoted.
 
-## Shared GUI Colors
+## GUI Colors
 
 Shared WPF GUI styling is defined in `lib/GUI/Resources/WPF_styles.xaml`.
 
@@ -88,18 +88,18 @@ Shared WPF GUI styling is defined in `lib/GUI/Resources/WPF_styles.xaml`.
 | --- | --- | --- |
 | `header_background` | `#1A252B` | KLCharcoal |
 | `text_white` | `#E5E4E2` | KLWhite |
-| `text_gray` | `Gray` | KLGray-medium |
-| `text_magenta` | `#33714F` | KLGreen |
+| `text_gray` | `Gray` | gray |
+| `text_green` | `#33714F` | KLGreen |
 | `button_fg_normal` | `White` | white |
 | `button_bg_normal` | `#286048` | KLGreen-dark |
 | `button_bg_hover` | `#407058` | KLGreen-secondary |
-| `border_magenta` | `#286048` | KLGreen-dark |
-| `border_blue` | `#33714F` | KLGreen |
-| `uncheckbox_checked_colour` | `Gray` | KLGray-medium |
+| `border_green_dark` | `#286048` | KLGreen-dark |
+| `border_green` | `#33714F` | KLGreen |
+| `uncheckbox_checked_colour` | `Gray` | gray |
 | `checkbox_checked_colour` | `#286048` | KLGreen-dark |
 | `footer_donate` | `#407058` | KLGreen-secondary |
 
-## Shared GUI Properties
+## GUI Properties
 
 These values describe the default styles in `lib/GUI/Resources/WPF_styles.xaml`. They apply to windows that load the shared dictionary through `my_WPF.add_wpf_resource()` unless the window defines local resources with the same keys.
 
@@ -112,9 +112,9 @@ These values describe the default styles in `lib/GUI/Resources/WPF_styles.xaml`.
 | `Button` | hover state | `Background` | `button_bg_hover` | KLGreen-secondary |
 | `TextBlock` | default | `Foreground` | `text_white` | KLWhite |
 | `TextBox` | default | `Background` | `header_background` | KLCharcoal |
-| `TextBox` | default | `Foreground` | `text_magenta` | KLGreen |
-| `TextBox` | default | `BorderBrush` | `border_blue` | KLGreen |
-| `Label` | default | `Foreground` | `text_magenta` | KLGreen |
+| `TextBox` | default | `Foreground` | `text_green` | KLGreen |
+| `TextBox` | default | `BorderBrush` | `border_green` | KLGreen |
+| `Label` | default | `Foreground` | `text_green` | KLGreen |
 | `CheckBox` | label text | `Foreground` | `White` | white |
 | `CheckBox` | checkbox fill gradient start | `Background` | `#99307050` | KLGreen-checkbox-b |
 | `CheckBox` | checkbox fill gradient end | `Background` | `#88286048` | KLGreen-checkbox-a |
@@ -126,9 +126,9 @@ These values describe the default styles in `lib/GUI/Resources/WPF_styles.xaml`.
 | `ComboBoxItem` | default | `Foreground` | `White` | white |
 | `ComboBoxItem` | highlighted state | `Background` | `#FF4F4F4F` | KLCharcoal-gray |
 | `ListBox` | default | `Background` | `header_background` | KLCharcoal |
-| `ListBox` | default | `BorderBrush` | `border_magenta` | KLGreen-dark |
-| `ScrollBar` | default | `Background` | `border_magenta` | KLGreen-dark |
-| `ScrollBar` | default | `Foreground` | `border_magenta` | KLGreen-dark |
+| `ListBox` | default | `BorderBrush` | `border_green_dark` | KLGreen-dark |
+| `ScrollBar` | default | `Background` | `border_green_dark` | KLGreen-dark |
+| `ScrollBar` | default | `Foreground` | `border_green_dark` | KLGreen-dark |
 | `ScrollBar` | default | `BorderBrush` | `header_background` | KLCharcoal |
 | `ScrollBarThumbVertical` | default | `Background` | `Black` | black |
 
@@ -158,16 +158,7 @@ These values describe the default styles in `lib/GUI/Resources/WPF_styles.xaml`.
 
 Selection-style branded windows use `text_white` for the filter label or icon, filter input text, and selection prompt label. Borders and separators remain on KLGreen/KLGreen-dark accents so labels such as `Select stories to review:` stay readable against the KLCharcoal background.
 
-Windows that load shared properties without local resource copies:
-
-| Window | XAML path | Loader path | Notes |
-| --- | --- | --- | --- |
-| KL&A list selection | `lib/GUI/SelectFromDict.xaml` | `lib/GUI/SelectFromDict.py` | Loads the shared dictionary directly; no copied local palette. |
-| KL&A alert | `lib/GUI/CustomAlert.xaml` | `lib/GUI/CustomAlert.py` | Loads the shared dictionary directly; no copied local palette. |
-| Find and replace | `lib/GUI/FindReplace.xaml` | `lib/GUI/FindReplace.py` | Loads the shared dictionary directly; no copied local palette. |
-| Steel PSF story selection | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/script.py` | Loads the shared dictionary directly; no copied local palette. |
-
-## Window Defaults Observed
+### Window Defaults
 
 The shared GUI windows follow these conventions where present:
 
@@ -181,126 +172,84 @@ The shared GUI windows follow these conventions where present:
 | Header background | `header_background` | KLCharcoal |
 | Close button size | `60 x 20` | N/A |
 
-Known window backgrounds currently in use:
+## Windows
+
+**Canonical example:** KL&A list selection (`lib/GUI/SelectFromDict.xaml`) is the
+most typical KL&A window—the poster child for the shared custom-window design.
+Use its chrome, palette, and interaction pattern as the default reference for
+future selection-style windows.
+
+### Shared GUI Windows
+
+| Window | XAML path | Loader path | Tools |
+| --- | --- | --- | --- |
+| KL&A list selection | `lib/GUI/SelectFromDict.xaml` | `lib/GUI/SelectFromDict.py` | `Carbon GWP Pull.pushbutton`; `Concrete Mix Header.pushbutton`; `Create Detail Folders.pushbutton`; `Hide Revision Clouds.pushbutton`; `Highlight Changed Elements.pushbutton`; `Inspect Schedule Header.pushbutton`; `UI Gallery.pushbutton` |
+| KL&A alert | `lib/GUI/CustomAlert.xaml` | `lib/GUI/CustomAlert.py` | `UI Gallery.pushbutton` |
+| Find and replace | `lib/GUI/FindReplace.xaml` | `lib/GUI/FindReplace.py` | `UI Gallery.pushbutton` |
+| Find and replace views | `lib/GUI/RenameViews.xaml` | `lib/Renaming/BaseClass_FindReplace.py` | `FindReplace - Views.pushbutton`; `UI Gallery.pushbutton` |
+| Find and replace sheets | `lib/GUI/RenameSheets.xaml` | `lib/GUI/RenameSheets.py` | `FindReplace_Sheets.pushbutton`; `UI Gallery.pushbutton` |
+| Duplicate sheets | `lib/GUI/DuplicateSheets.xaml` | `lib/GUI/DuplicateSheets.py` | `duplicate_sheets.pushbutton`; `UI Gallery.pushbutton` |
+| Create from rooms | `lib/GUI/Tools/CreateFromRooms.xaml` | `lib/GUI/Tools/CreateFromRooms.py` | `UI Gallery.pushbutton` |
+
+### One-Off Windows
+
+| Window | XAML path | Loader path | Tools | Reason to remain outside `lib/GUI` |
+| --- | --- | --- | --- | --- |
+| Match properties recall | `lib/match/clipboard_window.xaml` | `lib/match/clipboard.py` | `UI Gallery.pushbutton` | A modeless content host coupled to the Match Properties workflow and its localized clipboard content. It uses the shared palette but is not a reusable dialog family. |
+| View range editor | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/script.py` | `ViewRange.pushbutton`; `UI Gallery.pushbutton` | A command-specific, data-bound editor that needs its own future theming pass before any extraction. |
+
+### Prototype Windows
+
+| Window | XAML path | Loader path | Tools |
+| --- | --- | --- | --- |
+| Find and replace views | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/script.py` | `FindReplace - Views-proto.pushbutton`; `UI Gallery.pushbutton` |
+| Find and replace sheets | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/script.py` | `FindReplace_Sheets-proto.pushbutton`; `UI Gallery.pushbutton` |
+| Steel PSF story selection | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/script.py` | `Steel PSF.pushbutton`; `UI Gallery.pushbutton` |
+| UI Gallery | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py` | `UI Gallery.pushbutton` |
+| UI Gallery preview fixture | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py` | `UI Gallery.pushbutton` |
+
+### Window Backgrounds
 
 | Window | Implementation value | KLName |
 | --- | --- | --- |
+| `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | `#1A252B` | KLCharcoal |
+| `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | `#1A252B` | KLCharcoal |
+| `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | `#1A252B` | KLCharcoal |
+| `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | `#1A252B` | KLCharcoal |
+| `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | `#1A252B` | KLCharcoal |
+| `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | `#1A252B` | KLCharcoal |
+| `lib/GUI/CustomAlert.xaml` | `#1A252B` | KLCharcoal |
+| `lib/GUI/DuplicateSheets.xaml` | `#1A252B` | KLCharcoal |
 | `lib/GUI/FindReplace.xaml` | `#1A252B` | KLCharcoal |
-| `lib/Renaming/GUI_BaseRename.xaml` | `#1A252B` | KLCharcoal |
-| `lib/GUI/SelectFromDict.xaml` | `#1A252B` with `#33286048` to `#33307050` gradient grid background | KLCharcoal with KLGreen-transparent-a to KLGreen-transparent-b |
-| `lib/GUI/CustomAlert.xaml` | `#1A252B` with `#33286048` to `#33307050` gradient grid background | KLCharcoal with KLGreen-transparent-a to KLGreen-transparent-b |
-| `lib/GUI/Tools/CreateFromRooms.xaml` | `#1A252B` with `#33286048` to `#33307050` gradient grid background | KLCharcoal with KLGreen-transparent-a to KLGreen-transparent-b |
-| `lib/match/clipboard_window.xaml` | `#1A252B` with `#33286048` to `#33307050` gradient grid background | KLCharcoal with KLGreen-transparent-a to KLGreen-transparent-b |
-| `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | `#1A252B` with `#33286048` to `#33307050` gradient grid background | KLCharcoal with KLGreen-transparent-a to KLGreen-transparent-b |
-| `KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/Script.xaml` | `header_background` and `main_background` both set to `#1A252B` | KLCharcoal |
+| `lib/GUI/RenameSheets.xaml` | `#1A252B` | KLCharcoal |
+| `lib/GUI/RenameViews.xaml` | `#1A252B` | KLCharcoal |
+| `lib/GUI/SelectFromDict.xaml` | `#1A252B` | KLCharcoal |
+| `lib/GUI/Tools/CreateFromRooms.xaml` | `#1A252B` | KLCharcoal |
+| `lib/match/clipboard_window.xaml` | `#1A252B` | KLCharcoal |
 
 ## UI Gallery Theme Audit
 
-The DevSandbox UI Gallery catalogs representative KL&A custom, DevSandbox, and standard pyRevit windows in `lib/ui_gallery/launchers.py`. For KL&A custom and DevSandbox entries, use `lib/GUI/SelectFromDict.xaml` as the visual reference: borderless dark chrome, KLCode text branding in the 25 px header, KLCharcoal window background, optional KLGreen-transparent-a to KLGreen-transparent-b gradient, KLGreen-dark/KLGreen/KLGreen-secondary accents, and readable KLWhite text.
+The DevSandbox UI Gallery catalogs representative KL&A custom, DevSandbox, and standard pyRevit windows in `lib/ui_gallery/launchers.py`. For KL&A custom and DevSandbox entries, use `lib/GUI/SelectFromDict.xaml` as the visual reference: borderless dark chrome, KLCode text branding in the 25 px header, KLCharcoal window background, KLGreen-dark/KLGreen/KLGreen-secondary accents, and readable KLWhite text.
 
 Standard pyRevit gallery entries are intentional external references and are not scored for KLCode theme consistency.
 
+Audit scope: all 14 window XAML files listed in the Shared GUI Windows, One-Off Windows, and Prototype Windows tables above. Each is represented once below.
+
 | Gallery title | Category | XAML path | Theme status | Notable drift | Recommended future action |
 | --- | --- | --- | --- | --- | --- |
-| Create from rooms | KL&A custom | `lib/GUI/Tools/CreateFromRooms.xaml` | Reference/aligned | Local copy of the shared palette; checkbox and window gradients match the shared SelectFromDict values. | Keep layout and behavior; sync copied resource values with the shared dictionary when this local copy is refreshed. |
+| Create from rooms | KL&A custom | `lib/GUI/Tools/CreateFromRooms.xaml` | Reference/aligned | Loads shared styles through `my_WPF` and uses a solid KLCharcoal window background. | Keep layout and behavior; update shared control values in `WPF_styles.xaml`. |
 | KL&A alert | KL&A custom | `lib/GUI/CustomAlert.xaml` | Reference/aligned | Alert-specific icon, heading, and OK button are preserved inside SelectFromDict-style dark chrome. | Keep aligned with the shared palette when alert states are expanded. |
-| Duplicate sheets | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/Script.xaml` | Mostly aligned with local overrides | Uses command-local aliases that match the shared palette, but has a larger tool-specific form and custom token names. | Keep local aliases documented; only normalize token naming if the window is later refactored. |
-| Find and replace | KL&A custom | `lib/GUI/FindReplace.xaml` | Reference/aligned | Compact rename form uses the charcoal header/body and shared KLCode resources; it does not use the SelectFromDict list gradient because it is not a selection window. | Keep as a compact aligned variant. |
-| Find and replace sheets | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml` | Mostly aligned with local overrides | Uses copied KLCode resources and command-specific fields; verify copied values before future palette changes. | Keep behavior; update copied resources only when syncing all rename windows. |
-| Find and replace sheets prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Mostly aligned with local overrides | Prototype copy follows the KLCode layout but may contain local resource drift from production copies. | Keep prototype-local XAML; sync palette deliberately when production rename windows are refreshed. |
-| Find and replace views | KL&A custom | `lib/Renaming/GUI_BaseRename.xaml` | Mostly aligned with local overrides | Shared rename base uses the KLCode header and footer but carries an embedded resource dictionary instead of relying only on `WPF_styles.xaml`. | Preserve as the rename base; consider dictionary deduplication only in a separate refactor. |
-| Find and replace views prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Mostly aligned with local overrides | Prototype-local copy intentionally avoids changing shared rename GUI behavior. | Keep prototype-local XAML and sync palette only when the prototype is intentionally refreshed. |
-| Match properties recall | KL&A custom | `lib/match/clipboard_window.xaml` | Reference/aligned | Modeless clipboard content is hosted inside SelectFromDict-style dark chrome. | Keep the content host pattern so command content does not replace the KLCode shell. |
+| Duplicate sheets | KL&A custom | `lib/GUI/DuplicateSheets.xaml` | Reference/aligned | Large command-specific form uses shared styles whose resource keys map to the named design tokens. | Keep command handlers in the bundle and presentation in `lib/GUI`. |
+| Find and replace | KL&A custom | `lib/GUI/FindReplace.xaml` | Reference/aligned | Compact rename form uses the solid KLCharcoal header/body and shared KLCode resources. | Keep as a compact aligned variant. |
+| Find and replace sheets | KL&A custom | `lib/GUI/RenameSheets.xaml` | Reference/aligned | Production sheet rename presentation loads the shared dictionary; command behavior remains in its bundle. | Keep handlers and Revit transactions in the command bundle. |
+| Find and replace sheets prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Explicit prototype exception | Prototype-local copy remains isolated while its experimental behavior is evaluated. | Promote deliberate changes into `lib/GUI/RenameSheets.xaml`; do not sync opportunistically. |
+| Find and replace views | KL&A custom | `lib/GUI/RenameViews.xaml` | Reference/aligned | Shared rename base now loads `WPF_styles.xaml` through `my_WPF`. | Keep production view rename presentation in `lib/GUI`. |
+| Find and replace views prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Explicit prototype exception | Prototype-local XAML remains isolated from the production rename base. | Promote deliberate changes into `lib/GUI/RenameViews.xaml`; do not sync opportunistically. |
+| Match properties recall | KL&A custom | `lib/match/clipboard_window.xaml` | Reference/aligned | Modeless clipboard content is hosted inside SelectFromDict-style dark chrome and loads the shared palette directly. | Keep the content host pattern so command content does not replace the KLCode shell. |
 | KL&A list selection | KL&A custom | `lib/GUI/SelectFromDict.xaml` | Reference/aligned | This is the reference theme for list-selection windows. | Keep as the base for future selection-style custom windows. |
-| Steel PSF story selection | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | Reference/aligned | Closely follows SelectFromDict list-selection chrome and gradient; footer is prototype-specific. | Keep aligned with SelectFromDict when Steel PSF controls change. |
-| View range editor | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | Needs future theming | Uses default resizable WPF chrome, light row/header styling, non-KL `#E8E8E8`, and WPF `Red` warning text instead of KLCode dark chrome. | Restyle as a KLCode tool window while preserving the editable grid and data bindings. |
-| UI Gallery | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | Needs future theming | Uses default resizable WPF chrome and unthemed DataGrid controls. | Apply KLCode header/chrome and a dark, readable gallery table in a future UI pass. |
-| UI Gallery preview fixture | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | Needs future theming | Intentionally minimal self-contained fixture with default WPF chrome. | Leave plain unless the fixture is promoted to a visual-review artifact; document it as a test exception if unchanged. |
+| Steel PSF story selection | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | Reference/aligned | Closely follows SelectFromDict list-selection chrome with a solid KLCharcoal background; footer is prototype-specific. | Keep aligned with SelectFromDict when Steel PSF controls change. |
+| View range editor | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | Needs future theming | Uses a KLCharcoal window background but retains default resizable WPF chrome, default text styling against that dark surface, light row/header styling, non-KL `#E8E8E8`, and WPF `Red` warning text. | Restyle controls, text, and chrome while preserving the editable grid and data bindings. |
+| UI Gallery | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | Needs future theming | Uses a KLCharcoal window background but retains default resizable WPF chrome, default text styling against that dark surface, and unthemed DataGrid controls. | Apply KLCode header/chrome, readable text, and a dark gallery table in a future UI pass. |
+| UI Gallery preview fixture | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | Needs future theming | Uses a KLCharcoal window background but remains an intentionally minimal fixture with default WPF chrome and text styling. | Leave plain unless the fixture is promoted to a visual-review artifact; document it as a test exception if unchanged. |
 
 Future KL&A custom windows should use the SelectFromDict chrome and palette by default. Exceptions must be explicit: standard pyRevit dialogs, test fixtures, and tool-specific windows may keep different chrome only when the reason is documented near the launcher or in this design system.
-
-## Local GUI Overrides
-
-Some windows use local resource dictionaries or local aliases instead of relying only on `lib/GUI/Resources/WPF_styles.xaml`. These should stay documented because shared palette changes may need to be copied manually.
-
-### Windows With Local Resources
-
-| Window | XAML path | Relationship |
-| --- | --- | --- |
-| Create from rooms | `lib/GUI/Tools/CreateFromRooms.xaml` | Loads the shared dictionary, then defines a local copy of the same palette and styles in `Window.Resources`; local values take precedence. |
-| Find and replace views | `lib/Renaming/GUI_BaseRename.xaml` | Uses an embedded resource dictionary that mirrors the shared palette. |
-| Find and replace sheets | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml` | Uses an embedded resource dictionary that mirrors the shared palette. |
-| Find and replace views prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Uses an embedded resource dictionary that mirrors the shared palette. |
-| Find and replace sheets prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Uses an embedded resource dictionary that mirrors the shared palette. |
-| Duplicate sheets | `KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/Script.xaml` | Uses command-local aliases documented below. |
-
-### Shared Palette Local Copies
-
-These windows currently carry the same local color-resource keys as `lib/GUI/Resources/WPF_styles.xaml`: `lib/GUI/Tools/CreateFromRooms.xaml`, `lib/Renaming/GUI_BaseRename.xaml`, `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml`, `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml`, and `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml`.
-
-| Token | Implementation value | KLName |
-| --- | --- | --- |
-| `header_background` | `#1A252B` | KLCharcoal |
-| `text_white` | `#E5E4E2` | KLWhite |
-| `text_gray` | `Gray` | KLGray-medium |
-| `text_magenta` | `#33714F` | KLGreen |
-| `button_fg_normal` | `White` | white |
-| `button_bg_normal` | `#286048` | KLGreen-dark |
-| `button_bg_hover` | `#407058` | KLGreen-secondary |
-| `border_magenta` | `#286048` | KLGreen-dark |
-| `border_blue` | `#33714F` | KLGreen |
-| `uncheckbox_checked_colour` | `Gray` | KLGray-medium |
-| `checkbox_checked_colour` | `#286048` | KLGreen-dark |
-| `footer_donate` | `#407058` | KLGreen-secondary |
-
-### Duplicate Sheets
-
-`KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/Script.xaml` defines command-local aliases for the shared GUI palette. The aliases below match the colors in `lib/GUI/Resources/WPF_styles.xaml`:
-
-| Token | Implementation value | KLName |
-| --- | --- | --- |
-| `header_background` | `#1A252B` | KLCharcoal |
-| `main_background` | `#1A252B` | KLCharcoal |
-| `checkbox_checked_colour` | `#286048` | KLGreen-dark |
-| `uncheckbox_checked_colour` | `Gray` | KLGray-medium |
-| `text_header_title` | `#E5E4E2` | KLWhite |
-| `text_header_item` | `#E5E4E2` | KLWhite |
-| `text_white` | `#E5E4E2` | KLWhite |
-| `text_darkblue` | `Gray` | KLGray-medium |
-| `text_red` | `#33714F` | KLGreen |
-| `text_magenta` | `#33714F` | KLGreen |
-| `input_box_darkblue` | `#1A252B` | KLCharcoal |
-| `border_main` | `#33714F` | KLGreen |
-| `border_secondary` | `#286048` | KLGreen-dark |
-| `button_01_background_normal` | `#286048` | KLGreen-dark |
-| `button_01_background_hover` | `#407058` | KLGreen-secondary |
-
-The window uses the plain `header_background` color. The decorative rotated color-band grid was removed.
-
-## Cleanup Roadmap
-
-The current local resource copies should be consolidated before more tools create their own standalone windows. The goal is to keep reusable KLCode windows in `lib/GUI` and keep tool folders focused on command logic.
-
-Priority cleanup items:
-
-| Priority | Item | Target outcome |
-| --- | --- | --- |
-| 1 | Remove copied shared palettes from local XAML files where possible. | Windows load `lib/GUI/Resources/WPF_styles.xaml` through `my_WPF.add_wpf_resource()` instead of carrying duplicated `SolidColorBrush` definitions. |
-| 2 | Move reusable KLCode windows into `lib/GUI`. | Shared or repeated windows live in the GUI library instead of individual tool bundles. |
-| 3 | Keep command bundles as thin launchers. | Tool folders call shared GUI classes and only pass tool-specific data, labels, and handlers. |
-| 4 | Define explicit one-off exceptions. | Tool-specific windows may remain local only when they are unique enough to justify it, and the exception should be documented here. |
-| 5 | Rename legacy color aliases when refactoring. | Names such as `text_magenta`, `border_blue`, `text_red`, and `input_box_darkblue` are replaced with clearer KLName-aligned resource names during a deliberate cleanup pass. |
-| 6 | Re-check the UI Gallery after each consolidation. | `lib/ui_gallery/launchers.py` stays current and continues to show representative windows without palette drift. |
-
-Initial consolidation candidates:
-
-| Window | Current path | Preferred direction |
-| --- | --- | --- |
-| Create from rooms | `lib/GUI/Tools/CreateFromRooms.xaml` | Move under `lib/GUI` or refactor to load shared styles without a local palette copy. |
-| Find and replace views | `lib/Renaming/GUI_BaseRename.xaml` | Move the reusable rename window into `lib/GUI` if it is intended as the shared rename base. |
-| Find and replace sheets | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml` | Replace local XAML copy with the shared rename GUI pattern where possible. |
-| Find and replace views prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Keep prototype-local while testing, then promote useful changes into the shared rename GUI. |
-| Find and replace sheets prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Keep prototype-local while testing, then promote useful changes into the shared rename GUI. |
-| Duplicate sheets | `KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/Script.xaml` | Evaluate whether the window can move to `lib/GUI`; keep only command-specific wiring in the tool bundle. |
-
-New KLCode windows should start in `lib/GUI` unless they are explicitly experimental, prototype-only, or tightly coupled to a single command.

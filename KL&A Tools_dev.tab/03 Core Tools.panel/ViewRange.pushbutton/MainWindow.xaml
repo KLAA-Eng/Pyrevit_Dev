@@ -1,6 +1,7 @@
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="View Range Editor" Height="380" Width="720" ResizeMode="CanResize">
+        Title="View Range Editor" Height="380" Width="720" ResizeMode="CanResize"
+        Background="#1A252B">
     <StackPanel Margin="10">
         <TextBlock Text="{Binding message}" Margin="0,0,0,10" FontSize="14" Height="40" TextWrapping="Wrap"/>
         <Separator/>
