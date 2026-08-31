@@ -61,3 +61,4 @@ coverage.xml
 pyrightconfig.json
 
 .dotnet
+.family-studio
