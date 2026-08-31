@@ -120,6 +120,51 @@ public sealed class SqliteFamilyRepositoryTests
         Assert.IsNotNull(_repository.GetIndexedFile("/library/b/unrelated.rfa"));
     }
 
+    [TestMethod]
+    public void DetailFavoritesAndRecentUse_AreLocalAndQueryable()
+    {
+        DateTimeOffset timestamp = new DateTimeOffset(2026, 8, 30, 12, 0, 0, TimeSpan.Zero);
+        FamilyMetadata metadata = new FamilyMetadata(
+            "/library/Desk.rfa",
+            "Desk",
+            "Furniture",
+            "2025",
+            new[] { "Standard" },
+            new[] { new FamilyParameter("Comments", null, "String", false) },
+            new[] { "office" },
+            "Approved",
+            "Interiors",
+            new[]
+            {
+                new FamilyTypeMetadata(
+                    "Standard",
+                    new[] { new FamilyParameter("Width", "60", "Length", true) })
+            });
+        _repository.Upsert(
+            metadata,
+            new LibraryFileCandidate(metadata.SourcePath, 100, timestamp),
+            ThumbnailResult.Created("/thumbs/desk.png"),
+            timestamp);
+        FamilySearchResult result = _repository.Search(new FamilySearchQuery("Desk", null, null, null, 25))[0];
+
+        _repository.SetFavorite(result.Id, true);
+        _repository.RecordUse(result.Id, FamilyUseAction.Placed, timestamp.AddMinutes(1));
+        FamilyDetail? detail = _repository.GetDetail(result.Id);
+
+        Assert.IsNotNull(detail);
+        Assert.IsTrue(detail!.IsFavorite);
+        Assert.AreEqual("Standard", detail.Types[0].Name);
+        Assert.AreEqual("Width", detail.Types[0].Parameters[0].Name);
+        Assert.AreEqual("60", detail.Types[0].Parameters[0].Value);
+        Assert.AreEqual("Comments", detail.Parameters[0].Name);
+        Assert.AreEqual("office", detail.Tags[0]);
+        Assert.AreEqual(1, _repository.GetFavorites(25).Count);
+        Assert.AreEqual(result.Id, _repository.GetRecent(25)[0].Id);
+
+        _repository.SetFavorite(result.Id, false);
+        Assert.AreEqual(0, _repository.GetFavorites(25).Count);
+    }
+
     private void UpsertMinimal(string path, DateTimeOffset timestamp)
     {
         FamilyMetadata metadata = new FamilyMetadata(

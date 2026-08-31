@@ -21,6 +21,36 @@ public sealed class FamilyParameter
     public bool IsTypeParameter { get; }
 }
 
+public sealed class FamilyTypeMetadata
+{
+    public FamilyTypeMetadata(string name, IReadOnlyList<FamilyParameter> parameters)
+    {
+        Name = string.IsNullOrWhiteSpace(name)
+            ? throw new ArgumentException("A family type name is required.", nameof(name))
+            : name.Trim();
+        Parameters = Copy(parameters, nameof(parameters));
+    }
+
+    public string Name { get; }
+    public IReadOnlyList<FamilyParameter> Parameters { get; }
+
+    private static IReadOnlyList<T> Copy<T>(IReadOnlyList<T> values, string parameterName)
+    {
+        if (values is null)
+        {
+            throw new ArgumentNullException(parameterName);
+        }
+
+        T[] copy = values.ToArray();
+        if (copy.Any(value => value is null))
+        {
+            throw new ArgumentException("Collection values cannot contain null entries.", parameterName);
+        }
+
+        return new ReadOnlyCollection<T>(copy);
+    }
+}
+
 public sealed class FamilyMetadata
 {
     public FamilyMetadata(
@@ -33,6 +63,31 @@ public sealed class FamilyMetadata
         IReadOnlyList<string> tags,
         string? status,
         string? discipline)
+        : this(
+            sourcePath,
+            displayName,
+            category,
+            revitVersion,
+            typeNames,
+            parameters,
+            tags,
+            status,
+            discipline,
+            Array.Empty<FamilyTypeMetadata>())
+    {
+    }
+
+    public FamilyMetadata(
+        string sourcePath,
+        string displayName,
+        string? category,
+        string? revitVersion,
+        IReadOnlyList<string> typeNames,
+        IReadOnlyList<FamilyParameter> parameters,
+        IReadOnlyList<string> tags,
+        string? status,
+        string? discipline,
+        IReadOnlyList<FamilyTypeMetadata> types)
     {
         SourcePath = sourcePath ?? throw new ArgumentNullException(nameof(sourcePath));
         DisplayName = displayName ?? throw new ArgumentNullException(nameof(displayName));
@@ -40,6 +95,7 @@ public sealed class FamilyMetadata
         RevitVersion = revitVersion;
         TypeNames = Copy(typeNames, nameof(typeNames));
         Parameters = Copy(parameters, nameof(parameters));
+        Types = Copy(types, nameof(types));
         Tags = Copy(tags, nameof(tags));
         Status = status;
         Discipline = discipline;
@@ -51,6 +107,7 @@ public sealed class FamilyMetadata
     public string? RevitVersion { get; }
     public IReadOnlyList<string> TypeNames { get; }
     public IReadOnlyList<FamilyParameter> Parameters { get; }
+    public IReadOnlyList<FamilyTypeMetadata> Types { get; }
     public IReadOnlyList<string> Tags { get; }
     public string? Status { get; }
     public string? Discipline { get; }

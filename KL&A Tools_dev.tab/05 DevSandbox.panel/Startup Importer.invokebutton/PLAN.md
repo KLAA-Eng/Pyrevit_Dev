@@ -151,3 +151,51 @@ Pipeline:
 - The startup document will contain stable item ids that map to catalog entries.
 - Automatic sheet placement is v2 unless a very small placement-hint proof of concept is needed during MVP testing.
 - The first implementation stays under DevSandbox until live Revit testing proves the workflow.
+
+## Wave 2 — Controlled seed import — 2026-08-30
+
+Wave 2 keeps Startup Importer in DevSandbox and replaces the read-only-only
+boundary with an operator-controlled seed import workflow. It does not add
+update/rebuild behavior or production deployment.
+
+### External configuration contract
+
+The operator selects a settings JSON after selecting the Word or Excel
+checklist. The settings file is not committed and contains:
+
+```json
+{
+  "seedModelPath": "C:\\Controlled Content\\KL&A Seed.rvt",
+  "catalogPath": "C:\\Controlled Content\\startup-catalog.json"
+}
+```
+
+The catalog is a separate, versioned JSON file. Each entry declares its stable
+checklist id, source view/schedule name in the seed, target name, and content
+type. `detail`, `general note`, and `schedule` are supported. Optional
+`requiredTextTypeNames` and `requiredLineStyleNames` remain available for the
+controlled catalog to declare prerequisites.
+
+### Import behavior
+
+- The review dialog reports selected, unchecked, matched, existing, unknown,
+  and duplicate items plus the catalog version, seed path, and checklist hash.
+- Unknown and duplicate selected ids block Import. Existing destination views
+  and schedules are skipped and reported; this wave never overwrites them.
+- Details and general notes must be seed drafting views. The command creates a
+  destination drafting view and copies its view-owned elements.
+- Schedules are recreated from the named seed schedule. Supported definitions
+  include regular fields, string filters, sort/group rules, headings, and grid
+  column widths. Key schedules, material takeoffs, embedded schedules,
+  calculated/combined fields, and non-string filters fail before model writes.
+- All source views/schedules are validated before a transaction group begins.
+  Any import failure rolls the entire group back.
+
+### Validation gates
+
+Source tests cover JSON settings/catalog validation and existing/unknown review
+classification. Live tests still require an owner-provided seed RVT, catalog,
+Word/Excel fixture, and disposable Revit 2024/2025 projects. Verify detail,
+general-note, and supported-schedule imports; duplicate skips; and a forced
+rollback. No generated package, seed model, catalog, or test document is
+committed.

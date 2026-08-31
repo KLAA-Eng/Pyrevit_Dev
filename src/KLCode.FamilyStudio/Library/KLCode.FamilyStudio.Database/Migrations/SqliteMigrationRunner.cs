@@ -5,7 +5,7 @@ namespace KLCode.FamilyStudio.Database.Migrations;
 
 internal static class SqliteMigrationRunner
 {
-    private const int CurrentVersion = 1;
+    private const int CurrentVersion = 2;
 
     public static void Apply(SqliteConnection connection)
     {
@@ -20,6 +20,12 @@ internal static class SqliteMigrationRunner
         if (version == 0)
         {
             ApplyVersionOne(connection);
+            version = 1;
+        }
+
+        if (version == 1)
+        {
+            ApplyVersionTwo(connection);
         }
     }
 
@@ -92,4 +98,25 @@ CREATE TABLE index_runs(
 CREATE INDEX ix_families_name ON families(family_name);
 CREATE INDEX ix_families_filters ON families(category, status, discipline, is_deleted);
 PRAGMA user_version = 1;";
+
+    private static void ApplyVersionTwo(SqliteConnection connection)
+    {
+        using SqliteTransaction transaction = connection.BeginTransaction();
+        using SqliteCommand command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = @"
+CREATE TABLE family_favorites(
+  family_id INTEGER PRIMARY KEY REFERENCES families(id) ON DELETE CASCADE,
+  created_utc TEXT NOT NULL
+);
+CREATE TABLE family_recent_use(
+  family_id INTEGER PRIMARY KEY REFERENCES families(id) ON DELETE CASCADE,
+  last_action TEXT NOT NULL,
+  last_used_utc TEXT NOT NULL
+);
+CREATE INDEX ix_family_recent_use_timestamp ON family_recent_use(last_used_utc DESC);
+PRAGMA user_version = 2;";
+        command.ExecuteNonQuery();
+        transaction.Commit();
+    }
 }

@@ -64,6 +64,57 @@ public sealed class LibraryIndexerTests
         Assert.IsFalse(repository.WasMarkMissingCalled);
     }
 
+    [TestMethod]
+    public async Task RunAsync_RetainsPriorPreviewWhenPreviewRefreshFails()
+    {
+        DateTimeOffset timestamp = new DateTimeOffset(2026, 8, 30, 12, 0, 0, TimeSpan.Zero);
+        LibraryFileCandidate changed = new LibraryFileCandidate("/library/changed.rfa", 11, timestamp);
+        FakeRepository repository = new FakeRepository();
+        repository.Existing[changed.FilePath] = new IndexedFileState(
+            changed.FilePath,
+            10,
+            timestamp.AddMinutes(-1),
+            null,
+            "/thumbs/known-good.png");
+        LibraryIndexer indexer = new LibraryIndexer(
+            new FakeScanner(new[] { changed }, Array.Empty<LibraryScanIssue>()),
+            new FileChangeDetector(),
+            new FakeMetadataExtractor(null),
+            new ThrowingThumbnailService(),
+            repository,
+            () => timestamp);
+
+        IndexRunSummary summary = await indexer.RunAsync(TestConfiguration(), CancellationToken.None);
+
+        Assert.AreEqual(1, summary.FilesUpdated);
+        Assert.AreEqual(1, summary.FilesFailed);
+        Assert.AreEqual("/thumbs/known-good.png", repository.Existing[changed.FilePath].ThumbnailPath);
+        StringAssert.Contains(summary.Errors[0].Message, "prior preview was retained");
+    }
+
+    [TestMethod]
+    public async Task RunAsync_IndexesFamilyWithoutPreviewWhenNewPreviewFails()
+    {
+        DateTimeOffset timestamp = new DateTimeOffset(2026, 8, 30, 12, 0, 0, TimeSpan.Zero);
+        LibraryFileCandidate changed = new LibraryFileCandidate("/library/new.rfa", 11, timestamp);
+        FakeRepository repository = new FakeRepository();
+        LibraryIndexer indexer = new LibraryIndexer(
+            new FakeScanner(new[] { changed }, Array.Empty<LibraryScanIssue>()),
+            new FileChangeDetector(),
+            new FakeMetadataExtractor(null),
+            new ThrowingThumbnailService(),
+            repository,
+            () => timestamp);
+
+        IndexRunSummary summary = await indexer.RunAsync(TestConfiguration(), CancellationToken.None);
+
+        Assert.AreEqual(1, summary.FilesUpdated);
+        Assert.AreEqual(1, summary.FilesFailed);
+        Assert.IsTrue(repository.Existing.ContainsKey(changed.FilePath));
+        Assert.IsNull(repository.Existing[changed.FilePath].ThumbnailPath);
+        StringAssert.Contains(summary.Errors[0].Message, "indexed without a preview");
+    }
+
     private static LibraryConfiguration TestConfiguration()
     {
         return new LibraryConfiguration(
@@ -127,6 +178,17 @@ public sealed class LibraryIndexerTests
         }
     }
 
+    private sealed class ThrowingThumbnailService : IThumbnailService
+    {
+        public Task<ThumbnailResult> EnsureThumbnailAsync(
+            FamilyMetadata metadata,
+            string thumbnailDirectory,
+            CancellationToken cancellationToken)
+        {
+            throw new InvalidOperationException("preview fixture failure");
+        }
+    }
+
     private sealed class FakeRepository : IFamilyRepository
     {
         public Dictionary<string, IndexedFileState> Existing { get; } = new Dictionary<string, IndexedFileState>();
@@ -144,10 +206,33 @@ public sealed class LibraryIndexerTests
             ThumbnailResult thumbnail,
             DateTimeOffset indexedUtc)
         {
-            Existing[file.FilePath] = new IndexedFileState(file.FilePath, file.FileSize, file.ModifiedUtc, null);
+            Existing[file.FilePath] = new IndexedFileState(file.FilePath, file.FileSize, file.ModifiedUtc, null, thumbnail.FilePath);
         }
 
         public IReadOnlyList<FamilySearchResult> Search(FamilySearchQuery query)
+        {
+            return Array.Empty<FamilySearchResult>();
+        }
+
+        public FamilyDetail? GetDetail(long familyId)
+        {
+            return null;
+        }
+
+        public void SetFavorite(long familyId, bool isFavorite)
+        {
+        }
+
+        public IReadOnlyList<FamilySearchResult> GetFavorites(int limit)
+        {
+            return Array.Empty<FamilySearchResult>();
+        }
+
+        public void RecordUse(long familyId, FamilyUseAction action, DateTimeOffset usedUtc)
+        {
+        }
+
+        public IReadOnlyList<FamilySearchResult> GetRecent(int limit)
         {
             return Array.Empty<FamilySearchResult>();
         }

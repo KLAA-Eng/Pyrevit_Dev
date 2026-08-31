@@ -53,12 +53,12 @@ public sealed class SqliteFamilyRepository : IFamilyRepository, IDisposable
     {
         using SqliteConnection connection = OpenConnection();
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = @"SELECT file_path, file_size, modified_utc, file_hash
+        command.CommandText = @"SELECT file_path, file_size, modified_utc, file_hash, thumbnail_path
 FROM families WHERE file_path = $path AND is_deleted = 0;";
         command.Parameters.AddWithValue("$path", ValidateFilePath(filePath));
         using SqliteDataReader reader = command.ExecuteReader();
         return reader.Read()
-            ? new IndexedFileState(reader.GetString(0), reader.GetInt64(1), ParseTimestamp(reader.GetString(2)), GetNullableString(reader, 3))
+            ? new IndexedFileState(reader.GetString(0), reader.GetInt64(1), ParseTimestamp(reader.GetString(2)), GetNullableString(reader, 3), GetNullableString(reader, 4))
             : null;
     }
 
@@ -98,6 +98,86 @@ FROM families WHERE file_path = $path AND is_deleted = 0;";
         }
 
         return results.AsReadOnly();
+    }
+
+    public FamilyDetail? GetDetail(long familyId)
+    {
+        ValidateFamilyId(familyId);
+        using SqliteConnection connection = OpenConnection();
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = @"SELECT f.id,f.family_name,f.file_path,f.category,f.status,f.discipline,f.thumbnail_path,
+EXISTS(SELECT 1 FROM family_favorites ff WHERE ff.family_id=f.id),
+(SELECT last_used_utc FROM family_recent_use fru WHERE fru.family_id=f.id)
+FROM families f WHERE f.id=$id AND f.is_deleted=0;";
+        command.Parameters.AddWithValue("$id", familyId);
+        using SqliteDataReader reader = command.ExecuteReader();
+        if (!reader.Read())
+        {
+            return null;
+        }
+
+        FamilySearchResult summary = ReadSearchResult(reader);
+        bool isFavorite = reader.GetInt64(7) == 1;
+        DateTimeOffset? lastUsedUtc = GetNullableString(reader, 8) is string timestamp ? ParseTimestamp(timestamp) : null;
+        return new FamilyDetail(
+            summary,
+            ReadTypeDetails(connection, familyId),
+            ReadParameters(connection, familyId, null),
+            ReadStringColumn(connection, @"SELECT t.name FROM tags t
+JOIN family_tags ft ON ft.tag_id=t.id WHERE ft.family_id=$id ORDER BY t.name COLLATE NOCASE;", familyId),
+            isFavorite,
+            lastUsedUtc);
+    }
+
+    public void SetFavorite(long familyId, bool isFavorite)
+    {
+        ValidateFamilyId(familyId);
+        using SqliteConnection connection = OpenConnection();
+        EnsureActiveFamilyExists(connection, familyId);
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = isFavorite
+            ? "INSERT OR IGNORE INTO family_favorites(family_id,created_utc) VALUES($id,$created);"
+            : "DELETE FROM family_favorites WHERE family_id=$id;";
+        command.Parameters.AddWithValue("$id", familyId);
+        if (isFavorite)
+        {
+            command.Parameters.AddWithValue("$created", FormatTimestamp(DateTimeOffset.UtcNow));
+        }
+
+        command.ExecuteNonQuery();
+    }
+
+    public IReadOnlyList<FamilySearchResult> GetFavorites(int limit)
+    {
+        return ReadPinnedResults(
+            @"SELECT f.id,f.family_name,f.file_path,f.category,f.status,f.discipline,f.thumbnail_path
+FROM families f JOIN family_favorites ff ON ff.family_id=f.id
+WHERE f.is_deleted=0 ORDER BY ff.created_utc DESC, f.family_name COLLATE NOCASE LIMIT $limit;",
+            limit);
+    }
+
+    public void RecordUse(long familyId, FamilyUseAction action, DateTimeOffset usedUtc)
+    {
+        ValidateFamilyId(familyId);
+        using SqliteConnection connection = OpenConnection();
+        EnsureActiveFamilyExists(connection, familyId);
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = @"INSERT INTO family_recent_use(family_id,last_action,last_used_utc)
+VALUES($id,$action,$timestamp)
+ON CONFLICT(family_id) DO UPDATE SET last_action=$action,last_used_utc=$timestamp;";
+        command.Parameters.AddWithValue("$id", familyId);
+        command.Parameters.AddWithValue("$action", action.ToString());
+        command.Parameters.AddWithValue("$timestamp", FormatTimestamp(usedUtc));
+        command.ExecuteNonQuery();
+    }
+
+    public IReadOnlyList<FamilySearchResult> GetRecent(int limit)
+    {
+        return ReadPinnedResults(
+            @"SELECT f.id,f.family_name,f.file_path,f.category,f.status,f.discipline,f.thumbnail_path
+FROM families f JOIN family_recent_use fru ON fru.family_id=f.id
+WHERE f.is_deleted=0 ORDER BY fru.last_used_utc DESC, f.family_name COLLATE NOCASE LIMIT $limit;",
+            limit);
     }
 
     public void MarkMissingFiles(
@@ -218,17 +298,29 @@ discipline=$discipline, indexed_utc=$indexed, last_error=NULL, is_deleted=0;";
         long familyId,
         FamilyMetadata metadata)
     {
-        Execute(connection, transaction, "DELETE FROM family_types WHERE family_id=$id;", ("$id", familyId));
         Execute(connection, transaction, "DELETE FROM parameters WHERE family_id=$id;", ("$id", familyId));
         Execute(connection, transaction, "DELETE FROM family_tags WHERE family_id=$id;", ("$id", familyId));
+        Execute(connection, transaction, "DELETE FROM family_types WHERE family_id=$id;", ("$id", familyId));
+        Dictionary<string, long> typeIds = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
         foreach (string typeName in metadata.TypeNames)
         {
-            Execute(connection, transaction, "INSERT OR IGNORE INTO family_types(family_id,type_name) VALUES($id,$name);", ("$id", familyId), ("$name", typeName));
+            typeIds[typeName] = InsertType(connection, transaction, familyId, typeName);
         }
 
         foreach (FamilyParameter parameter in metadata.Parameters)
         {
-            InsertParameter(connection, transaction, familyId, parameter);
+            InsertParameter(connection, transaction, familyId, null, parameter);
+        }
+
+        foreach (FamilyTypeMetadata type in metadata.Types)
+        {
+            long typeId = typeIds.TryGetValue(type.Name, out long existingTypeId)
+                ? existingTypeId
+                : InsertType(connection, transaction, familyId, type.Name);
+            foreach (FamilyParameter parameter in type.Parameters)
+            {
+                InsertParameter(connection, transaction, familyId, typeId, parameter);
+            }
         }
 
         foreach (string tag in metadata.Tags)
@@ -237,15 +329,31 @@ discipline=$discipline, indexed_utc=$indexed, last_error=NULL, is_deleted=0;";
         }
     }
 
+    private static long InsertType(
+        SqliteConnection connection,
+        SqliteTransaction transaction,
+        long familyId,
+        string typeName)
+    {
+        Execute(connection, transaction, "INSERT OR IGNORE INTO family_types(family_id,type_name) VALUES($id,$name);", ("$id", familyId), ("$name", typeName));
+        using SqliteCommand command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText = "SELECT id FROM family_types WHERE family_id=$id AND type_name=$name;";
+        command.Parameters.AddWithValue("$id", familyId);
+        command.Parameters.AddWithValue("$name", typeName);
+        return Convert.ToInt64(command.ExecuteScalar(), CultureInfo.InvariantCulture);
+    }
+
     private static void InsertParameter(
         SqliteConnection connection,
         SqliteTransaction transaction,
         long familyId,
+        long? typeId,
         FamilyParameter parameter)
     {
         Execute(connection, transaction, @"INSERT INTO parameters(
-family_id, parameter_name, parameter_value, storage_type, is_type_parameter)
-VALUES($id,$name,$value,$storage,$isType);", ("$id", familyId), ("$name", parameter.Name),
+family_id, type_id, parameter_name, parameter_value, storage_type, is_type_parameter)
+VALUES($id,$typeId,$name,$value,$storage,$isType);", ("$id", familyId), ("$typeId", typeId), ("$name", parameter.Name),
             ("$value", parameter.Value), ("$storage", parameter.StorageType),
             ("$isType", parameter.IsTypeParameter ? 1 : 0));
     }
@@ -289,6 +397,109 @@ ORDER BY f.family_name COLLATE NOCASE, f.file_path COLLATE NOCASE LIMIT $limit;"
             reader.GetInt64(0), reader.GetString(1), reader.GetString(2),
             GetNullableString(reader, 3), GetNullableString(reader, 4),
             GetNullableString(reader, 5), GetNullableString(reader, 6));
+    }
+
+    private IReadOnlyList<FamilySearchResult> ReadPinnedResults(string sql, int limit)
+    {
+        if (limit < 1 || limit > MaximumSearchLimit)
+        {
+            throw new ArgumentOutOfRangeException(nameof(limit), "Result limit must be between 1 and 200.");
+        }
+
+        using SqliteConnection connection = OpenConnection();
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = sql;
+        command.Parameters.AddWithValue("$limit", limit);
+        using SqliteDataReader reader = command.ExecuteReader();
+        List<FamilySearchResult> results = new List<FamilySearchResult>();
+        while (reader.Read())
+        {
+            results.Add(ReadSearchResult(reader));
+        }
+
+        return results.AsReadOnly();
+    }
+
+    private static IReadOnlyList<string> ReadStringColumn(SqliteConnection connection, string sql, long familyId)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = sql;
+        command.Parameters.AddWithValue("$id", familyId);
+        using SqliteDataReader reader = command.ExecuteReader();
+        List<string> values = new List<string>();
+        while (reader.Read())
+        {
+            values.Add(reader.GetString(0));
+        }
+
+        return values.AsReadOnly();
+    }
+
+    private static IReadOnlyList<FamilyTypeDetail> ReadTypeDetails(SqliteConnection connection, long familyId)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "SELECT id,type_name FROM family_types WHERE family_id=$id ORDER BY type_name COLLATE NOCASE;";
+        command.Parameters.AddWithValue("$id", familyId);
+        using SqliteDataReader reader = command.ExecuteReader();
+        List<(long Id, string Name)> types = new List<(long Id, string Name)>();
+        while (reader.Read())
+        {
+            types.Add((reader.GetInt64(0), reader.GetString(1)));
+        }
+
+        reader.Close();
+
+        return types
+            .Select(type => new FamilyTypeDetail(type.Name, ReadParameters(connection, familyId, type.Id)))
+            .ToArray();
+    }
+
+    private static IReadOnlyList<FamilyParameter> ReadParameters(
+        SqliteConnection connection,
+        long familyId,
+        long? typeId)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = @"SELECT parameter_name,parameter_value,storage_type,is_type_parameter
+FROM parameters WHERE family_id=$id AND " +
+            (typeId.HasValue ? "type_id=$typeId" : "type_id IS NULL") +
+            " ORDER BY parameter_name COLLATE NOCASE;";
+        command.Parameters.AddWithValue("$id", familyId);
+        if (typeId.HasValue)
+        {
+            command.Parameters.AddWithValue("$typeId", typeId.Value);
+        }
+        using SqliteDataReader reader = command.ExecuteReader();
+        List<FamilyParameter> values = new List<FamilyParameter>();
+        while (reader.Read())
+        {
+            values.Add(new FamilyParameter(
+                reader.GetString(0),
+                GetNullableString(reader, 1),
+                GetNullableString(reader, 2),
+                reader.GetInt64(3) == 1));
+        }
+
+        return values.AsReadOnly();
+    }
+
+    private static void EnsureActiveFamilyExists(SqliteConnection connection, long familyId)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM families WHERE id=$id AND is_deleted=0;";
+        command.Parameters.AddWithValue("$id", familyId);
+        if (Convert.ToInt32(command.ExecuteScalar(), CultureInfo.InvariantCulture) != 1)
+        {
+            throw new ArgumentException("The family does not exist or is deleted.", nameof(familyId));
+        }
+    }
+
+    private static void ValidateFamilyId(long familyId)
+    {
+        if (familyId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(familyId), "A positive family id is required.");
+        }
     }
 
     private static long GetFamilyId(SqliteConnection connection, SqliteTransaction transaction, string path)

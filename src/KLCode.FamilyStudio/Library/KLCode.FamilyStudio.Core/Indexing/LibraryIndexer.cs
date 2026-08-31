@@ -103,14 +103,15 @@ public sealed class LibraryIndexer
         foreach (LibraryFileCandidate file in scan.Files)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            IndexDecision decision = _changeDetector.Decide(file, _repository.GetIndexedFile(file.FilePath));
+            IndexedFileState? existing = _repository.GetIndexedFile(file.FilePath);
+            IndexDecision decision = _changeDetector.Decide(file, existing);
             if (decision == IndexDecision.Unchanged)
             {
                 skipped++;
                 continue;
             }
 
-            bool wasUpdated = await TryUpdateAsync(file, configuration, errors, cancellationToken).ConfigureAwait(false);
+            bool wasUpdated = await TryUpdateAsync(file, existing, configuration, errors, cancellationToken).ConfigureAwait(false);
             updated += wasUpdated ? 1 : 0;
         }
 
@@ -129,6 +130,7 @@ public sealed class LibraryIndexer
 
     private async Task<bool> TryUpdateAsync(
         LibraryFileCandidate file,
+        IndexedFileState? existing,
         LibraryConfiguration configuration,
         ICollection<IndexRunError> errors,
         CancellationToken cancellationToken)
@@ -138,9 +140,29 @@ public sealed class LibraryIndexer
             FamilyMetadata metadata = await _metadataExtractor
                 .ExtractAsync(file.FilePath, cancellationToken)
                 .ConfigureAwait(false);
-            ThumbnailResult thumbnail = await _thumbnailService
-                .EnsureThumbnailAsync(metadata, configuration.ThumbnailDirectory, cancellationToken)
-                .ConfigureAwait(false);
+            ThumbnailResult thumbnail;
+            try
+            {
+                thumbnail = await _thumbnailService
+                    .EnsureThumbnailAsync(metadata, configuration.ThumbnailDirectory, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                bool retainedPriorPreview = !string.IsNullOrWhiteSpace(existing?.ThumbnailPath);
+                thumbnail = retainedPriorPreview
+                    ? ThumbnailResult.Created(existing!.ThumbnailPath!)
+                    : ThumbnailResult.None;
+                errors.Add(new IndexRunError(
+                    file.FilePath,
+                    retainedPriorPreview
+                        ? "Preview refresh failed; the prior preview was retained. " + exception.Message
+                        : "Preview refresh failed; the family was indexed without a preview. " + exception.Message));
+            }
             _repository.Upsert(metadata, file, thumbnail, _utcNow());
             return true;
         }

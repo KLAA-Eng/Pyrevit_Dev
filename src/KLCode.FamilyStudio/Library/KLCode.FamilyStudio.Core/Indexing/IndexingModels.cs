@@ -21,18 +21,20 @@ public sealed class LibraryFileCandidate
 
 public sealed class IndexedFileState
 {
-    public IndexedFileState(string filePath, long fileSize, DateTimeOffset modifiedUtc, string? fileHash)
+    public IndexedFileState(string filePath, long fileSize, DateTimeOffset modifiedUtc, string? fileHash, string? thumbnailPath = null)
     {
         FilePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
         FileSize = fileSize;
         ModifiedUtc = modifiedUtc;
         FileHash = fileHash;
+        ThumbnailPath = thumbnailPath;
     }
 
     public string FilePath { get; }
     public long FileSize { get; }
     public DateTimeOffset ModifiedUtc { get; }
     public string? FileHash { get; }
+    public string? ThumbnailPath { get; }
 }
 
 public sealed class LibraryScanIssue

@@ -44,13 +44,28 @@ deduplicated case-insensitively. Missing-file reconciliation is limited to the
 enabled roots that completed the current scan; records from omitted or disabled
 roots are not changed.
 
+The Revit-hosted **Refresh Library** action accepts the same external JSON
+configuration, verifies it points at the database currently open in Family
+Studio, and performs the full metadata/preview refresh. It opens every
+discovered family file through the Revit API, records category/types/type
+parameter values, and renders a PNG preview from the first available type into
+the configured thumbnail cache.
+The refresh service accepts a cancellation token. If preview rendering fails
+for a family with an existing preview, that preview is retained and the issue
+is reported without stopping the rest of the run. A family with no prior
+preview is still indexed without one and appears in the refresh issues.
+
 ## Search and Revit behavior
 
 Search is parameterized and bounded to 1–200 results. It matches family name,
 category, type names, parameters, and tags, with optional exact category,
 status, and discipline filters. Deleted records are hidden.
 
-The current WPF shell supports bounded text search plus Load and Load & Place.
+The current WPF shell supports bounded text search, selected-family preview and
+detail, type selection with type-parameter values, Favorites, Recent, Copy
+Path, Open Folder, Load, and Load & Place.
+Favorites and recent Load/Place records are local SQLite data only; they are
+not shared approval, status, or tag curation.
 Duplicate-family handling keeps project parameter values. A load is accepted
 only when `LoadFamily` returns a non-null family and its transaction commits;
 there is no filename/name fallback that could select unrelated project content.
@@ -61,7 +76,13 @@ not accepted as live behavior until it passes the Windows/Revit gates below.
 
 The Revit command reads:
 
-`%LOCALAPPDATA%\KLCode\FamilyStudio\family_studio.sqlite`
+`%APPDATA%\KLCode\FamilyStudio\family_studio.sqlite`
+
+For DevSandbox, the pyRevit startup script may select a separate user-local
+database name. The repository never owns the active database. If the selected
+database does not yet exist, Family Studio creates and migrates an empty local
+database; **Refresh Library** then populates it from the operator-selected
+configuration.
 
 The CLI uses the explicit `databasePath` and `thumbnailDirectory` from its JSON
 configuration. Paths may be absolute or relative to the configuration file.

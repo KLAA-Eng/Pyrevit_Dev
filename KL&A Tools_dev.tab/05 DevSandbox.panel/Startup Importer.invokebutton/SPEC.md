@@ -1,10 +1,10 @@
 # KL&A Model Startup Importer — DevSandbox MVP Contract
 
-Status: provisional source-level MVP, approved for DevSandbox validation only.
+Status: provisional Wave 2 implementation, approved for DevSandbox validation only.
 
 ## Outcome
 
-The compiled command accepts a `.docx` or `.xlsx` KL&A startup checklist, validates and parses it deterministically, computes its SHA-256 hash, and reports selected and unchecked item counts. The command makes no Revit model changes in this slice.
+The compiled command accepts a `.docx` or `.xlsx` KL&A startup checklist, validates and parses it deterministically, computes its SHA-256 hash, and uses an operator-selected settings JSON to resolve a controlled seed RVT and versioned catalog. It presents a review before creating any model content.
 
 Host-independent code can match selected item ids to an in-memory content catalog and produce an import plan. Selected unknown ids and every occurrence of a selected duplicate id are excluded from actionable matches. Unchecked items are reported as skipped.
 
@@ -39,14 +39,58 @@ Word documents may contain other tables; only tables with the complete header co
 
 The catalog constructor rejects duplicate catalog ids case-insensitively.
 
+## Wave 2 import contract
+
+The settings JSON is external to the extension and names `seedModelPath` and
+`catalogPath`. The catalog JSON declares a non-empty `version` and maps each
+stable item id to `sourceViewName`, `targetName`, `contentType`, and optional
+resource requirements. The command validates all selected seed sources before
+opening a transaction group.
+
+`settings.json`
+
+```json
+{ "seedModelPath": "C:\\Controlled Content\\KL&A Seed.rvt", "catalogPath": "startup-catalog.json" }
+```
+
+`startup-catalog.json`
+
+```json
+{
+  "version": "2026.08",
+  "items": [{
+    "itemId": "D-001",
+    "sourceViewName": "D-001 Seed Detail",
+    "targetName": "D-001 Detail",
+    "contentType": "detail",
+    "requiredTextTypeNames": ["3/32 in Arial"],
+    "requiredLineStyleNames": ["Thin Lines"]
+  }]
+}
+```
+
+Details and general notes are imported from named seed drafting views into new
+destination drafting views. Schedules are recreated from named seed schedules
+only when their definitions use supported regular fields, string filters,
+sort/group rules, headings, and grid column widths. Unsupported schedule
+features fail closed before model writes.
+
+Selected unknown or duplicate ids block Import. Destination views/schedules
+already named by the catalog target are skipped and reported. This wave never
+overwrites, refreshes, rebuilds, or stores link metadata. Any failure after the
+transaction group starts rolls the full import back.
+
 ## Deferred contracts and live gates
 
-No seed RVT or content catalog file is invented by this slice. Actual Revit copying, resource/type mapping, transaction behavior, Extensible Storage GUID/version, created-element tracking, and update/rebuild semantics remain deferred until owners provide those contracts.
+No seed RVT or content catalog file is invented or committed by this slice. The
+controlled Revit copy/translation path is implemented, while resource/type
+mapping beyond the declared catalog requirements, Extensible Storage,
+created-element tracking, and update/rebuild semantics remain deferred.
 
 Before promotion beyond DevSandbox, validate on Windows with Revit 2024 and at least one Revit 2025+ version:
 
 - build both target frameworks against matching installed Revit references;
 - verify pyRevit selects the versioned 2024 assembly and .NET 8 fallback;
 - exercise cancel, valid, invalid, and zero-selected checklist paths;
-- approve a real catalog/seed fixture before adding model mutation;
+- approve a real catalog/seed fixture before live model mutation;
 - test model mutations and rollback in representative disposable Revit projects.

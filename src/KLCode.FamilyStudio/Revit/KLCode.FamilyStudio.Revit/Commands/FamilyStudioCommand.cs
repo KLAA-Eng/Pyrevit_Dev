@@ -1,12 +1,13 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Threading;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using KLCode.FamilyStudio.Database.Repositories;
 using KLCode.FamilyStudio.Revit.Services;
 using KLCode.FamilyStudio.Revit.Views;
+using Microsoft.Win32;
 
 namespace KLCode.FamilyStudio.Revit.Commands;
 
@@ -16,8 +17,9 @@ public sealed class FamilyStudioCommand : IExternalCommand
 {
     public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
     {
-        UIDocument? uiDocument = commandData?.Application?.ActiveUIDocument;
-        if (uiDocument is null || uiDocument.Document.IsFamilyDocument)
+        UIApplication? revitApplication = commandData?.Application;
+        UIDocument? uiDocument = revitApplication?.ActiveUIDocument;
+        if (revitApplication is null || uiDocument is null || uiDocument.Document.IsFamilyDocument)
         {
             message = "Family Studio requires an active project document.";
             TaskDialog.Show("Family Studio", message);
@@ -27,26 +29,12 @@ public sealed class FamilyStudioCommand : IExternalCommand
         try
         {
             string databasePath = GetDatabasePath();
-            if (!File.Exists(databasePath))
-            {
-                string indexDirectory = Path.GetDirectoryName(databasePath) ?? string.Empty;
-                string visibleFiles = Directory.Exists(indexDirectory)
-                    ? string.Join(", ", Directory.GetFiles(indexDirectory).Select(Path.GetFileName))
-                    : "<index folder is not visible>";
-                TaskDialog.Show(
-                    "Family Studio",
-                    "No family index was found.\n\n" +
-                    "Database path:\n" + databasePath +
-                    "\n\nFiles visible in the Family Studio index folder:\n" +
-                    visibleFiles);
-                return Result.Cancelled;
-            }
-
             using SqliteFamilyRepository repository = new SqliteFamilyRepository(databasePath);
             RevitFamilyLoadService loadService = new RevitFamilyLoadService(uiDocument);
             FamilyStudioWindow window = new FamilyStudioWindow(
                 repository,
-                loadService);
+                loadService,
+                () => RefreshLibrary(revitApplication.Application, databasePath));
             window.ShowDialog();
 
             if (window.PlacementFamily is not null)
@@ -54,6 +42,7 @@ public sealed class FamilyStudioCommand : IExternalCommand
                 try
                 {
                     loadService.LoadAndPlace(window.PlacementFamily);
+                    repository.RecordUse(window.PlacementFamily.Id, KLCode.FamilyStudio.Core.Search.FamilyUseAction.Placed, DateTimeOffset.UtcNow);
                 }
                 catch (Autodesk.Revit.Exceptions.OperationCanceledException)
                 {
@@ -82,5 +71,24 @@ public sealed class FamilyStudioCommand : IExternalCommand
 
         string applicationData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         return Path.Combine(applicationData, "KLCode", "FamilyStudio", "family_studio.sqlite");
+    }
+
+    private static KLCode.FamilyStudio.Core.Indexing.IndexRunSummary? RefreshLibrary(
+        Autodesk.Revit.ApplicationServices.Application application,
+        string databasePath)
+    {
+        OpenFileDialog dialog = new OpenFileDialog
+        {
+            Title = "Select Family Studio library configuration",
+            Filter = "Family Studio configuration (*.json)|*.json",
+            CheckFileExists = true,
+            Multiselect = false,
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return null;
+        }
+
+        return new RevitLibraryIndexService(application).Refresh(dialog.FileName, databasePath, CancellationToken.None);
     }
 }

@@ -327,3 +327,59 @@ Future `.rvt` detail-library workflow:
 - Company metadata can initially come from folder rules, filename conventions, a sidecar JSON/CSV file, or manual DB tags; no live source of truth is assumed yet.
 - V1 indexes `.rfa` only, while the data model leaves room for `.rvt` drafting-view libraries.
 - The current pyRevit extension remains the delivery shell; the actual Studio code is compiled C# so WPF, SQLite, and Revit API behavior are maintainable.
+
+## Wave 2 — Library workflow and Simpson research — 2026-08-30
+
+Family Studio remains a DevSandbox tool. Wave 2 adds a Revit-hosted full refresh
+path and a richer local browsing workflow; it does not add shared curation,
+production deployment, or a Simpson downloader.
+
+### Revit-backed refresh and previews
+
+- The existing JSON library configuration remains the operator-owned source of
+  truth. The Revit refresh command requires it to point at the same local
+  Family Studio database that is currently open.
+- `Refresh Library` is the explicit full Revit metadata/preview pass: it scans
+  every discovered `.rfa`, extracts Revit metadata, and renders a PNG preview
+  from the first available family type. Previews are cached in the configured
+  thumbnail directory using a stable source-path hash. The separate desktop
+  indexer remains the lightweight changed-files-only path.
+- The desktop indexer remains filesystem-only. Only the explicit Revit refresh
+  opens family documents and creates previews.
+- Refresh accepts cancellation through its service contract. A preview failure
+  retains an existing preview when one exists, still updates available
+  metadata, and is shown in the refresh summary. Families with no prior preview
+  are indexed without one as a per-file issue, without stopping the remaining
+  scan.
+
+### Browser workflow
+
+- Search results now expose a selected-family detail panel with preview,
+  category, status, discipline, path, types, tags, and parameters. Selecting a
+  family type shows the values of that type's Revit type parameters; instance
+  parameter definitions remain visibly separate.
+- Favorites and recent Load/Place actions are stored only in the local SQLite
+  database. The UI provides Favorites, Recent, favorite toggle, Copy Path, and
+  Open Folder actions while preserving Load and Load & Place.
+- SQLite schema version 2 owns `family_favorites` and `family_recent_use`.
+  These tables are user-local and are never a company approval/tagging system.
+
+### Simpson Drawing Finder research appendix
+
+The Simpson track is research-only. Official pages confirm that Drawing Finder
+pulls current content from Simpson's website and provide maintained Revit
+plugin releases, but they do not publish a supported catalog API endpoint.
+Research may inspect user-observed browser requests from a manual search or an
+officially obtained, user-supplied plugin package. Record endpoint host,
+request/response shape, authentication, result metadata, and license/terms
+evidence. Do not bulk crawl, download RFAs, bypass controls, capture
+credentials, redistribute content, or add Simpson results to Family Studio.
+
+### Validation gates
+
+Source tests cover SQLite migration/detail/favorites/recent behavior and
+thumbnail-retention logic. Live validation requires a non-production pilot
+library and configuration on Revit 2024 and 2025: refresh, preview creation,
+preview failure retention, detail display, favorites/recent, path actions,
+Load, Load & Place, and placement cancel. Pilot libraries, databases,
+thumbnails, configurations, and generated packages remain uncommitted.

@@ -10,7 +10,8 @@
       "KLCode.FamilyStudio.Revit/1.0.0": {
         "dependencies": {
           "KLCode.FamilyStudio.Core": "1.0.0",
-          "KLCode.FamilyStudio.Database": "1.0.0"
+          "KLCode.FamilyStudio.Database": "1.0.0",
+          "System.Drawing.Common": "8.0.0"
         },
         "runtime": {
           "KLCode.FamilyStudio.Revit.dll": {}
@@ -33,6 +34,7 @@
           }
         }
       },
+      "Microsoft.Win32.SystemEvents/8.0.0": {},
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.12": {
         "dependencies": {
           "SQLitePCLRaw.lib.e_sqlite3": "2.1.12",
@@ -74,8 +76,17 @@
           }
         }
       },
+      "System.Drawing.Common/8.0.0": {
+        "dependencies": {
+          "Microsoft.Win32.SystemEvents": "8.0.0"
+        }
+      },
       "System.Memory/4.5.3": {},
+      "System.Text.Json/8.0.5": {},
       "KLCode.FamilyStudio.Core/1.0.0": {
+        "dependencies": {
+          "System.Text.Json": "8.0.5"
+        },
         "runtime": {
           "KLCode.FamilyStudio.Core.dll": {
             "assemblyVersion": "1.0.0",
@@ -118,6 +129,13 @@
       "path": "microsoft.data.sqlite.core/8.0.30",
       "hashPath": "microsoft.data.sqlite.core.8.0.30.nupkg.sha512"
     },
+    "Microsoft.Win32.SystemEvents/8.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-9opKRyOKMCi2xJ7Bj7kxtZ1r9vbzosMvRrdEhVhDz8j8MoBGgB+WmC94yH839NPH+BclAjtQ/pyagvi/8gDLkw==",
+      "path": "microsoft.win32.systemevents/8.0.0",
+      "hashPath": "microsoft.win32.systemevents.8.0.0.nupkg.sha512"
+    },
     "SQLitePCLRaw.bundle_e_sqlite3/2.1.12": {
       "type": "package",
       "serviceable": true,
@@ -146,12 +164,26 @@
       "path": "sqlitepclraw.provider.e_sqlite3/2.1.12",
       "hashPath": "sqlitepclraw.provider.e_sqlite3.2.1.12.nupkg.sha512"
     },
+    "System.Drawing.Common/8.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-JkbHJjtI/dWc5dfmEdJlbe3VwgZqCkZRtfuWFh5GOv0f+gGCfBtzMpIVkmdkj2AObO9y+oiOi81UGwH3aBYuqA==",
+      "path": "system.drawing.common/8.0.0",
+      "hashPath": "system.drawing.common.8.0.0.nupkg.sha512"
+    },
     "System.Memory/4.5.3": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-3oDzvc/zzetpTKWMShs1AADwZjQ/36HnsufHRPcOjyRAAMLDlu2iD33MBI2opxnezcVUtXyqDXXjoFMOU9c7SA==",
       "path": "system.memory/4.5.3",
       "hashPath": "system.memory.4.5.3.nupkg.sha512"
+    },
+    "System.Text.Json/8.0.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-0f1B50Ss7rqxXiaBJyzUu9bWFOO2/zSlifZ/UNMdiIpDYe4cY4LQQicP4nirK1OS31I43rn062UIJ1Q9bpmHpg==",
+      "path": "system.text.json/8.0.5",
+      "hashPath": "system.text.json.8.0.5.nupkg.sha512"
     },
     "KLCode.FamilyStudio.Core/1.0.0": {
       "type": "project",

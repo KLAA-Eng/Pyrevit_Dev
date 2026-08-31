@@ -11,6 +11,11 @@ public interface IFamilyRepository
     IndexedFileState? GetIndexedFile(string filePath);
     void Upsert(FamilyMetadata metadata, LibraryFileCandidate file, ThumbnailResult thumbnail, DateTimeOffset indexedUtc);
     IReadOnlyList<FamilySearchResult> Search(FamilySearchQuery query);
+    FamilyDetail? GetDetail(long familyId);
+    void SetFavorite(long familyId, bool isFavorite);
+    IReadOnlyList<FamilySearchResult> GetFavorites(int limit);
+    void RecordUse(long familyId, FamilyUseAction action, DateTimeOffset usedUtc);
+    IReadOnlyList<FamilySearchResult> GetRecent(int limit);
     void MarkMissingFiles(
         IReadOnlyCollection<string> seenPaths,
         IReadOnlyCollection<string> scannedRootPaths);

@@ -29,9 +29,14 @@ if HOST_APP.version in ("2024", "2025", "2026"):
     _family_studio_bin = os.path.join(
         os.path.dirname(__file__), "KL&A Tools_dev.tab", "05 DevSandbox.panel",
         "Family Studio.invokebutton", "bin")
+    _family_studio_data_root = os.path.join(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "KLCode", "FamilyStudio")
+    if not os.path.isdir(_family_studio_data_root):
+        os.makedirs(_family_studio_data_root)
     Environment.SetEnvironmentVariable(
         "KLCODE_FAMILY_STUDIO_DATABASE",
-        os.path.join(os.path.dirname(__file__), ".family-studio", "family_studio.sqlite"))
+        os.path.join(_family_studio_data_root, "family_studio-devsandbox.sqlite"))
     if File.Exists(os.path.join(_family_studio_bin, "e_sqlite3.dll")):
         Environment.SetEnvironmentVariable(
             "KLCODE_FAMILY_STUDIO_NATIVE_SQLITE",
