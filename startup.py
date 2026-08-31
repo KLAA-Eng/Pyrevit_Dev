@@ -22,7 +22,7 @@ def _load_dependency(relative_path):
         print("Could not preload {}: {}".format(relative_path, error))
 
 
-if HOST_APP.version == "2024":
+if HOST_APP.version in ("2024", "2025", "2026"):
     # Invoke Button loads the command assembly from bytes. Revit provides its
     # own API assemblies, but managed companions in each package must be loaded
     # into the AppDomain before the command resolves them.

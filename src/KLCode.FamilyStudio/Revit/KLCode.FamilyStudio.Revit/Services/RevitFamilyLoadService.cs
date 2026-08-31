@@ -53,6 +53,18 @@ internal sealed class RevitFamilyLoadService : IFamilyLoadService
             }
         }
 
+        Family? existingFamily = new FilteredElementCollector(document)
+            .OfClass(typeof(Family))
+            .Cast<Family>()
+            .FirstOrDefault(candidate => string.Equals(
+                candidate.Name,
+                family.FamilyName,
+                StringComparison.OrdinalIgnoreCase));
+        if (existingFamily is not null)
+        {
+            return existingFamily;
+        }
+
         throw new InvalidOperationException("Revit did not load the selected family into the project.");
     }
 

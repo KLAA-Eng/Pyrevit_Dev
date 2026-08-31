@@ -3,6 +3,8 @@
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
     <ImporterProject>$(MSBuildThisFileDirectory)KLA.ModelStartupImporter.Revit/KLA.ModelStartupImporter.Revit.csproj</ImporterProject>
     <BundleBin>$(MSBuildThisFileDirectory)..\..\KL&amp;A Tools_dev.tab\05 DevSandbox.panel\Startup Importer.invokebutton\bin</BundleBin>
+    <PackageIntermediateDirectory>$(MSBuildThisFileDirectory)obj\$(Configuration)\package</PackageIntermediateDirectory>
+    <Revit2024CommandStagingPath>$(PackageIntermediateDirectory)\KLA.ModelStartupImporter.Revit_2024.dll</Revit2024CommandStagingPath>
   </PropertyGroup>
 
   <Target Name="Package">
@@ -12,10 +14,17 @@
       Projects="$(ImporterProject)"
       Targets="Build"
       Properties="Configuration=$(Configuration);TargetFramework=net48;RevitApiPath=$(Revit2024ApiPath)" />
+    <MakeDir Directories="$(PackageIntermediateDirectory)" />
+    <Copy
+      SourceFiles="$(BundleBin)\KLA.ModelStartupImporter.Revit_2024.dll"
+      DestinationFiles="$(Revit2024CommandStagingPath)" />
     <MSBuild
       Projects="$(ImporterProject)"
       Targets="Build"
       Properties="Configuration=$(Configuration);TargetFramework=net8.0-windows;RevitApiPath=$(Revit2025ApiPath)" />
+    <Copy
+      SourceFiles="$(Revit2024CommandStagingPath)"
+      DestinationFiles="$(BundleBin)\KLA.ModelStartupImporter.Revit_2024.dll" />
     <Error Condition="!Exists('$(BundleBin)\KLA.ModelStartupImporter.Revit_2024.dll')" Text="Packaging did not produce KLA.ModelStartupImporter.Revit_2024.dll." />
     <Error Condition="!Exists('$(BundleBin)\KLA.ModelStartupImporter.Revit.dll')" Text="Packaging did not produce KLA.ModelStartupImporter.Revit.dll." />
     <Error Condition="!Exists('$(BundleBin)\KLA.ModelStartupImporter.Core.dll')" Text="Packaging did not copy KLA.ModelStartupImporter.Core.dll." />

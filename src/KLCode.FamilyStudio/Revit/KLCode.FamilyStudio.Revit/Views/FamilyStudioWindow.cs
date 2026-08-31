@@ -15,6 +15,8 @@ internal sealed class FamilyStudioWindow : Window
     private readonly TextBox _searchBox = new TextBox { MinWidth = 320, Margin = new Thickness(4) };
     private readonly ListBox _results = new ListBox { MinHeight = 300, Margin = new Thickness(4) };
 
+    internal FamilySearchResult? PlacementFamily { get; private set; }
+
     public FamilyStudioWindow(IFamilyRepository repository, IFamilyLoadService loadService)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -74,12 +76,15 @@ internal sealed class FamilyStudioWindow : Window
         {
             if (shouldPlace)
             {
-                _loadService.LoadAndPlace(family);
+                // Revit's placement prompt must run after this modal window
+                // closes. Otherwise Revit returns to the window after the user
+                // finishes or cancels placement.
+                PlacementFamily = family;
+                DialogResult = true;
+                return;
             }
-            else
-            {
-                _loadService.Load(family);
-            }
+
+            _loadService.Load(family);
         }
         catch (Exception exception)
         {

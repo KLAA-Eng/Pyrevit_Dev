@@ -75,11 +75,7 @@
         }
       },
       "System.Memory/4.5.3": {},
-      "System.Text.Json/8.0.5": {},
       "KLCode.FamilyStudio.Core/1.0.0": {
-        "dependencies": {
-          "System.Text.Json": "8.0.5"
-        },
         "runtime": {
           "KLCode.FamilyStudio.Core.dll": {
             "assemblyVersion": "1.0.0",
@@ -90,7 +86,8 @@
       "KLCode.FamilyStudio.Database/1.0.0": {
         "dependencies": {
           "KLCode.FamilyStudio.Core": "1.0.0",
-          "Microsoft.Data.Sqlite": "8.0.30"
+          "Microsoft.Data.Sqlite": "8.0.30",
+          "SQLitePCLRaw.provider.e_sqlite3": "2.1.12"
         },
         "runtime": {
           "KLCode.FamilyStudio.Database.dll": {
@@ -155,13 +152,6 @@
       "sha512": "sha512-3oDzvc/zzetpTKWMShs1AADwZjQ/36HnsufHRPcOjyRAAMLDlu2iD33MBI2opxnezcVUtXyqDXXjoFMOU9c7SA==",
       "path": "system.memory/4.5.3",
       "hashPath": "system.memory.4.5.3.nupkg.sha512"
-    },
-    "System.Text.Json/8.0.5": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-0f1B50Ss7rqxXiaBJyzUu9bWFOO2/zSlifZ/UNMdiIpDYe4cY4LQQicP4nirK1OS31I43rn062UIJ1Q9bpmHpg==",
-      "path": "system.text.json/8.0.5",
-      "hashPath": "system.text.json.8.0.5.nupkg.sha512"
     },
     "KLCode.FamilyStudio.Core/1.0.0": {
       "type": "project",

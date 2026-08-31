@@ -43,10 +43,25 @@ public sealed class FamilyStudioCommand : IExternalCommand
             }
 
             using SqliteFamilyRepository repository = new SqliteFamilyRepository(databasePath);
+            RevitFamilyLoadService loadService = new RevitFamilyLoadService(uiDocument);
             FamilyStudioWindow window = new FamilyStudioWindow(
                 repository,
-                new RevitFamilyLoadService(uiDocument));
+                loadService);
             window.ShowDialog();
+
+            if (window.PlacementFamily is not null)
+            {
+                try
+                {
+                    loadService.LoadAndPlace(window.PlacementFamily);
+                }
+                catch (Autodesk.Revit.Exceptions.OperationCanceledException)
+                {
+                    // Esc ends Revit's placement prompt without creating an
+                    // instance. It is an expected user action, not an error.
+                }
+            }
+
             return Result.Succeeded;
         }
         catch (Exception exception)
@@ -59,7 +74,7 @@ public sealed class FamilyStudioCommand : IExternalCommand
 
     private static string GetDatabasePath()
     {
-        string configuredPath = Environment.GetEnvironmentVariable("KLCODE_FAMILY_STUDIO_DATABASE");
+        string? configuredPath = Environment.GetEnvironmentVariable("KLCODE_FAMILY_STUDIO_DATABASE");
         if (!string.IsNullOrWhiteSpace(configuredPath))
         {
             return configuredPath;
