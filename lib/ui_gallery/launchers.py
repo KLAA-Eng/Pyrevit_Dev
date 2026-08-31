@@ -32,7 +32,7 @@ _LAUNCHERS = (
         'id': 'kla-duplicate-sheets',
         'category': 'KL&A custom',
         'title': 'Duplicate sheets',
-        'relative_path': 'KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/Script.xaml',
+        'relative_path': 'lib/GUI/DuplicateSheets.xaml',
         'called_by': 'KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/script.py',
         'description': 'Sheet duplication form with fictional selections.',
         'uses_seed_data': True,
@@ -52,7 +52,7 @@ _LAUNCHERS = (
         'id': 'kla-find-replace-sheets',
         'category': 'KL&A custom',
         'title': 'Find and replace sheets',
-        'relative_path': 'KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml',
+        'relative_path': 'lib/GUI/RenameSheets.xaml',
         'called_by': 'KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/script.py',
         'description': 'Sheet rename form with fictional names and numbers.',
         'uses_seed_data': True,
@@ -72,7 +72,7 @@ _LAUNCHERS = (
         'id': 'kla-find-replace-views',
         'category': 'KL&A custom',
         'title': 'Find and replace views',
-        'relative_path': 'lib/Renaming/GUI_BaseRename.xaml',
+        'relative_path': 'lib/GUI/RenameViews.xaml',
         'called_by': 'KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/script.py via BaseRenaming.start()',
         'description': 'View rename form with fictional drawing names.',
         'uses_seed_data': True,
@@ -139,6 +139,17 @@ _LAUNCHERS = (
         'can_launch': True,
     },
     {
+        'id': 'pyrevit-ask-for-color',
+        'category': 'pyRevit standard',
+        'title': 'Color picker',
+        'relative_path': '',
+        'called_by': 'pyrevit.forms.ask_for_color()',
+        'description': 'Standard pyRevit color picker used by palette workflows.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Host picker',
+        'can_launch': True,
+    },
+    {
         'id': 'pyrevit-ask-for-string',
         'category': 'pyRevit standard',
         'title': 'Text input',
@@ -155,6 +166,38 @@ _LAUNCHERS = (
         'relative_path': '',
         'called_by': 'pyrevit.forms.CommandSwitchWindow.show()',
         'description': 'Standard pyRevit action picker with sample commands.',
+        'uses_seed_data': True,
+        'can_launch': True,
+    },
+    {
+        'id': 'pyrevit-pick-file',
+        'category': 'pyRevit standard',
+        'title': 'File picker',
+        'relative_path': '',
+        'called_by': 'pyrevit.forms.pick_file()',
+        'description': 'Standard pyRevit file picker used by workbook and RVT import prompts.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Host picker',
+        'can_launch': True,
+    },
+    {
+        'id': 'pyrevit-pick-folder',
+        'category': 'pyRevit standard',
+        'title': 'Folder picker',
+        'relative_path': '',
+        'called_by': 'pyrevit.forms.pick_folder()',
+        'description': 'Standard pyRevit folder picker used by export and folder creation prompts.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Host picker',
+        'can_launch': True,
+    },
+    {
+        'id': 'pyrevit-progress-bar',
+        'category': 'pyRevit standard',
+        'title': 'Progress bar',
+        'relative_path': '',
+        'called_by': 'pyrevit.forms.ProgressBar()',
+        'description': 'Standard pyRevit progress window with sample progress updates.',
         'uses_seed_data': True,
         'can_launch': True,
     },
@@ -179,6 +222,82 @@ _LAUNCHERS = (
         'can_launch': True,
     },
     {
+        'id': 'pyrevit-select-open-docs',
+        'category': 'pyRevit standard',
+        'title': 'Open document selector',
+        'relative_path': '',
+        'called_by': 'pyrevit.forms.select_open_docs()',
+        'description': 'Standard pyRevit selector for currently open Revit documents.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Host/model data required',
+        'can_launch': False,
+    },
+    {
+        'id': 'pyrevit-select-parameters',
+        'category': 'pyRevit standard',
+        'title': 'Parameter selector',
+        'relative_path': '',
+        'called_by': 'pyrevit.forms.select_parameters()',
+        'description': 'Standard pyRevit parameter selector that requires Revit elements.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Host/model data required',
+        'can_launch': False,
+    },
+    {
+        'id': 'pyrevit-select-revisions',
+        'category': 'pyRevit standard',
+        'title': 'Revision selector',
+        'relative_path': '',
+        'called_by': 'pyrevit.forms.select_revisions()',
+        'description': 'Standard pyRevit selector backed by active-model revisions.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Host/model data required',
+        'can_launch': False,
+    },
+    {
+        'id': 'pyrevit-select-sheets',
+        'category': 'pyRevit standard',
+        'title': 'Sheet selector',
+        'relative_path': '',
+        'called_by': 'pyrevit.forms.select_sheets()',
+        'description': 'Standard pyRevit selector backed by active-model sheets.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Host/model data required',
+        'can_launch': False,
+    },
+    {
+        'id': 'pyrevit-select-views',
+        'category': 'pyRevit standard',
+        'title': 'View selector',
+        'relative_path': '',
+        'called_by': 'pyrevit.forms.select_views()',
+        'description': 'Standard pyRevit selector backed by active-model views.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Host/model data required',
+        'can_launch': False,
+    },
+    {
+        'id': 'pyrevit-show-balloon',
+        'category': 'pyRevit standard',
+        'title': 'Balloon notification',
+        'relative_path': '',
+        'called_by': 'pyrevit.forms.show_balloon()',
+        'description': 'Standard pyRevit balloon notification with a sample message.',
+        'uses_seed_data': True,
+        'can_launch': True,
+    },
+    {
+        'id': 'pyrevit-warning-bar',
+        'category': 'pyRevit standard',
+        'title': 'Warning bar',
+        'relative_path': '',
+        'called_by': 'pyrevit.forms.WarningBar()',
+        'description': 'Standard pyRevit selection warning bar used during interactive picks.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Interactive pick required',
+        'can_launch': False,
+    },
+    {
         'id': 'ui-gallery',
         'category': 'DevSandbox',
         'title': 'UI Gallery',
@@ -195,20 +314,31 @@ _LAUNCHERS = (
         'relative_path': 'KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml',
         'called_by': 'tests/ui_gallery_catalog_test.py fixture allowlist',
         'description': 'Safe test fixture for catalog preview checks.',
-        'uses_seed_data': True,
+        'uses_seed_data': False,
+        'sample_data_label': 'Static fixture',
         'can_launch': True,
     },
 )
 
 
+def _with_sample_data_label(launcher):
+    row = dict(launcher)
+    if 'sample_data_label' not in row:
+        if row.get('uses_seed_data'):
+            row['sample_data_label'] = 'Seeded sample data'
+        else:
+            row['sample_data_label'] = 'Catalog only'
+    return row
+
+
 def gallery_launchers():
     """Return independent launcher dictionaries ordered by identifier."""
-    return [dict(launcher) for launcher in _LAUNCHERS]
+    return [_with_sample_data_label(launcher) for launcher in _LAUNCHERS]
 
 
 def launcher_by_id(launcher_id):
     """Return a launcher definition for an exact identifier, if available."""
     for launcher in _LAUNCHERS:
         if launcher['id'] == launcher_id:
-            return dict(launcher)
+            return _with_sample_data_label(launcher)
     return None

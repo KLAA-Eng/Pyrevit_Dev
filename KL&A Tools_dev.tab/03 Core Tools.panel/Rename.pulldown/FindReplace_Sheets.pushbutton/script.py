@@ -30,11 +30,10 @@ Author: Erik Frits"""
 # ==================================================================
 from Autodesk.Revit.DB import *
 from Autodesk.Revit.Exceptions import ArgumentException
-
-#pyRevit
-from pyrevit import forms
+import os
 
 # CUSTOM
+from GUI.RenameSheets import RenameSheets
 from Snippets._selection        import get_selected_sheets
 
 # .NET IMPORTS
@@ -43,6 +42,7 @@ AddReference("System")
 from System.Diagnostics.Process import Start
 from System.Windows.Window      import DragMove
 from System.Windows.Input       import MouseButtonState
+import wpf
 
 # ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
 # ╚╗╔╝╠═╣╠╦╝║╠═╣╠╩╗║  ║╣ ╚═╗
@@ -72,11 +72,10 @@ def update_project_browser():
 # ╚═╝╩═╝╩ ╩╚═╝╚═╝╚═╝╚═╝ CLASSES
 # ==================================================================
 
-class MyWindow(forms.WPFWindow):
+class MyWindow(RenameSheets):
     """GUI for ViewSheet renaming tool."""
-    def __init__(self, xaml_file_name):
-        self.form = forms.WPFWindow.__init__(self, xaml_file_name)
-        self.main_title.Text = __title__
+    def __init__(self):
+        RenameSheets.__init__(self, __title__, self.rename)
 
 
     def rename(self):
@@ -124,62 +123,10 @@ class MyWindow(forms.WPFWindow):
                     sheet_number_new += "_"
 
 
-    ### GUI PROPERTIES
-    # SHEETNUMBER PROPERTIES
-    @property
-    def sheet_number_find(self):
-        return self.input_sheet_number_find.Text
-
-    @property
-    def sheet_number_replace(self):
-        return self.input_sheet_number_replace.Text
-
-    @property
-    def sheet_number_prefix(self):
-        return self.input_sheet_number_prefix.Text
-
-    @property
-    def sheet_number_suffix(self):
-        return self.input_sheet_number_suffix.Text
-
-    # SHEETNAME PROPERTIES
-    @property
-    def sheet_name_find(self):
-        return self.input_sheet_name_find.Text
-
-    @property
-    def sheet_name_replace(self):
-        return self.input_sheet_name_replace.Text
-
-    @property
-    def sheet_name_prefix(self):
-        return self.input_sheet_name_prefix.Text
-
-    @property
-    def sheet_name_suffix(self):
-        return self.input_sheet_name_suffix.Text
-
-    # GUI EVENT HANDLERS:
-    def button_close(self,sender,e):
-        """Stop application by clicking on a <Close> button in the top right corner."""
-        self.Close()
-
-    def Hyperlink_RequestNavigate(self, sender, e):
-        """Forwarding for a Hyperlink"""
-        Start(e.Uri.AbsoluteUri)
-
-    def header_drag(self,sender,e):
-        """Drag window by holding LeftButton on the header."""
-        if e.LeftButton == MouseButtonState.Pressed:
-            DragMove(self)
-
-    def button_run(self, sender, e):
-        """Button action: Rename view with given """
-        self.rename()
 
 # ╔╦╗╔═╗╦╔╗╔
 # ║║║╠═╣║║║║
 # ╩ ╩╩ ╩╩╝╚╝ MAIN
 # ==================================================================
 if __name__ == '__main__':
-    MyWindow("Script.xaml").ShowDialog()
+    MyWindow().ShowDialog()

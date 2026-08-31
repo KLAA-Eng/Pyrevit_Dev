@@ -89,9 +89,9 @@
                     <Label x:Name="UI_label"
                         Content="ViewName"
                            Margin="0, -25,0,0 "
-                           Foreground="{StaticResource text_magenta}"/>
+                           Foreground="{StaticResource text_green}"/>
                     <Border  Height="110"
-                          BorderBrush="{DynamicResource border_magenta}"
+                          BorderBrush="{DynamicResource border_green_dark}"
                          BorderThickness="1,1,1,1" CornerRadius="10" HorizontalAlignment="Stretch" Width="Auto">
 
 

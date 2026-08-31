@@ -9,45 +9,9 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="#1A252B">
-    <Window.Resources>
-        <SolidColorBrush x:Key="header_background" Color="#1A252B" />
-        <SolidColorBrush x:Key="text_white" Color="#E5E4E2" />
-        <SolidColorBrush x:Key="text_gray" Color="Gray" />
-        <SolidColorBrush x:Key="button_fg_normal" Color="White" />
-        <SolidColorBrush x:Key="button_bg_normal" Color="#286048" />
-        <SolidColorBrush x:Key="button_bg_hover" Color="#407058" />
-        <SolidColorBrush x:Key="border_magenta" Color="#286048" />
 
-        <Style TargetType="Button">
-            <Setter Property="TextElement.FontFamily" Value="Arial"/>
-            <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
-            <Setter Property="Foreground" Value="{StaticResource button_fg_normal}"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border CornerRadius="8" Background="{TemplateBinding Background}">
-                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource button_bg_hover}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
-
-    <Border Background="#1A252B" BorderBrush="{StaticResource border_magenta}" BorderThickness="1">
-        <Grid>
-            <Grid.Background>
-                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                    <GradientStop Color="#33286048" Offset="0" />
-                    <GradientStop Color="#33307050" Offset="1" />
-                </LinearGradientBrush>
-            </Grid.Background>
+    <Border Background="#1A252B" BorderBrush="{StaticResource border_green_dark}" BorderThickness="1">
+        <Grid Background="#1A252B">
             <Grid.RowDefinitions>
                 <RowDefinition Height="25" />
                 <RowDefinition Height="*" />

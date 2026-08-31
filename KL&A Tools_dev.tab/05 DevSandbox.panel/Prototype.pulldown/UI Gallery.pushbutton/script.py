@@ -43,7 +43,7 @@ class GalleryRow(object):
         self.RelativePath = launcher.get('relative_path') or 'pyRevit built-in'
         self.CalledBy = launcher.get('called_by') or ''
         self.Description = launcher['description']
-        self.SampleData = 'Seeded sample data' if launcher.get('uses_seed_data') else 'Catalog only'
+        self.SampleData = launcher.get('sample_data_label') or 'Catalog only'
         self.CanLaunch = launcher.get('can_launch', True)
 
 
@@ -137,6 +137,8 @@ class Gallery(forms.WPFWindow):
         if launcher_id == 'pyrevit-alert':
             forms.alert('This is a safe gallery preview. No model data is changed.',
                         title='Sample pyRevit alert')
+        elif launcher_id == 'pyrevit-ask-for-color':
+            forms.ask_for_color()
         elif launcher_id == 'pyrevit-ask-for-string':
             forms.ask_for_string(default='Sample project note',
                                  prompt='Enter a preview value:',
@@ -145,6 +147,12 @@ class Gallery(forms.WPFWindow):
             forms.CommandSwitchWindow.show(
                 ['Open sample report', 'Review sample warnings', 'Cancel preview'],
                 message='Choose a safe gallery action')
+        elif launcher_id == 'pyrevit-pick-file':
+            forms.pick_file(file_ext='rvt', title='Sample pyRevit file picker')
+        elif launcher_id == 'pyrevit-pick-folder':
+            forms.pick_folder(title='Sample pyRevit folder picker')
+        elif launcher_id == 'pyrevit-progress-bar':
+            self._launch_pyrevit_progress_bar_preview()
         elif launcher_id == 'pyrevit-select-list':
             forms.SelectFromList.show(sample_names, multiselect=True,
                                       title='Sample pyRevit list selection',
@@ -153,6 +161,9 @@ class Gallery(forms.WPFWindow):
             forms.SelectFromList.show(sample_names, multiselect=False,
                                       title='Sample pyRevit list selection',
                                       button_name='Select sample')
+        elif launcher_id == 'pyrevit-show-balloon':
+            forms.show_balloon('UI Gallery preview',
+                               'Sample pyRevit balloon notification.')
         elif launcher_id == 'kla-custom-alert':
             from CustomAlert import show_alert
             show_alert('Preview data is fictional and cannot modify this model.',
@@ -192,6 +203,12 @@ class Gallery(forms.WPFWindow):
                 'UI Gallery preview fixture')
         else:
             raise ValueError('Unsupported gallery launcher: {}'.format(launcher_id))
+
+    def _launch_pyrevit_progress_bar_preview(self):
+        with forms.ProgressBar(title='Sample pyRevit progress',
+                               cancellable=False) as progress_bar:
+            for value in range(0, 11):
+                progress_bar.update_progress(value, 10)
 
     def _launch_create_from_rooms_preview(self):
         import wpf
@@ -264,7 +281,7 @@ class Gallery(forms.WPFWindow):
 
     def _launch_find_replace_views_preview(self):
         self._launch_rename_preview(
-            os.path.join(EXTENSION_ROOT, 'lib', 'Renaming', 'GUI_BaseRename.xaml'),
+            os.path.join(EXTENSION_ROOT, 'lib', 'GUI', 'RenameViews.xaml'),
             'Find and Replace Views — gallery preview',
             {
                 'input_find': 'Office',
@@ -288,8 +305,7 @@ class Gallery(forms.WPFWindow):
 
     def _launch_find_replace_sheets_preview(self):
         self._launch_rename_preview(
-            os.path.join(EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
-                         'Rename.pulldown', 'FindReplace_Sheets.pushbutton', 'Script.xaml'),
+            os.path.join(EXTENSION_ROOT, 'lib', 'GUI', 'RenameSheets.xaml'),
             'Find and Replace Sheets — gallery preview',
             {
                 'input_sheet_number_find': 'A',
@@ -349,19 +365,38 @@ class Gallery(forms.WPFWindow):
         RenamePreview()
 
     def _launch_duplicate_sheets_preview(self):
-        xaml_path = os.path.join(
-            EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
-            'duplicate_sheets.pushbutton', 'Script.xaml')
+        xaml_path = os.path.join(EXTENSION_ROOT, 'lib', 'GUI', 'DuplicateSheets.xaml')
         self._launch_static_preview(xaml_path,
-                                    'Duplicate Sheets — gallery preview')
+                                    'Duplicate Sheets — gallery preview',
+                                    {
+                                        'UI_view_find': 'Office',
+                                        'UI_view_replace': 'Studio',
+                                        'UI_view_prefix': 'Sample - ',
+                                        'UI_view_suffix': ' - Review',
+                                        'UI_sheet_number_find': 'A',
+                                        'UI_sheet_number_replace': 'S',
+                                        'UI_sheet_number_prefix': 'Sample-',
+                                        'UI_sheet_number_suffix': '-R1',
+                                        'UI_sheet_name_find': 'Office',
+                                        'UI_sheet_name_replace': 'Studio',
+                                        'UI_sheet_name_prefix': 'Sample - ',
+                                        'UI_sheet_name_suffix': ' - Review',
+                                    })
 
-    def _launch_static_preview(self, xaml_path, title):
-        class StaticPreview(forms.WPFWindow):
+    def _launch_static_preview(self, xaml_path, title, sample_values=None):
+        import wpf
+        from GUI.forms import my_WPF
+
+        class StaticPreview(my_WPF):
             def __init__(self):
-                forms.WPFWindow.__init__(self, xaml_path)
+                self.add_wpf_resource()
+                wpf.LoadComponent(self, xaml_path)
                 self.Title = title
                 if hasattr(self, 'main_title'):
                     self.main_title.Text = title
+                for control_name, value in (sample_values or {}).items():
+                    if hasattr(self, control_name):
+                        getattr(self, control_name).Text = value
                 self.ShowDialog()
 
             def button_close(self, sender, args):
@@ -379,14 +414,17 @@ class Gallery(forms.WPFWindow):
         StaticPreview()
 
     def _launch_match_properties_recall_preview(self):
+        import wpf
+        from GUI.forms import my_WPF
         from System.Windows import Thickness
         from System.Windows.Controls import StackPanel, TextBlock, ListBox
 
         xaml_path = os.path.join(EXTENSION_ROOT, 'lib', 'match', 'clipboard_window.xaml')
 
-        class MatchRecallPreview(forms.WPFWindow):
+        class MatchRecallPreview(my_WPF):
             def __init__(self):
-                forms.WPFWindow.__init__(self, xaml_path)
+                self.add_wpf_resource()
+                wpf.LoadComponent(self, xaml_path)
                 self.Title = 'Match Properties Recall — gallery preview'
                 panel = StackPanel()
                 panel.Margin = Thickness(12)

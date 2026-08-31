@@ -10,14 +10,8 @@
     WindowStyle="None"
     AllowsTransparency="True"
     Background="#1A252B">
-    <Border Background="#1A252B" BorderBrush="{StaticResource border_magenta}" BorderThickness="1">
-        <Grid>
-            <Grid.Background>
-                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                    <GradientStop Color="#33286048" Offset="0" />
-                    <GradientStop Color="#33307050" Offset="1" />
-                </LinearGradientBrush>
-            </Grid.Background>
+    <Border Background="#1A252B" BorderBrush="{StaticResource border_green_dark}" BorderThickness="1">
+        <Grid Background="#1A252B">
             <Grid.RowDefinitions>
                 <RowDefinition Height="25" />
                 <RowDefinition Height="*" />
@@ -51,16 +45,16 @@
                     <ColumnDefinition Width="48" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Border Width="34" Height="34" CornerRadius="17" BorderBrush="{StaticResource border_magenta}" BorderThickness="2" VerticalAlignment="Top">
+                <Border Width="34" Height="34" CornerRadius="17" BorderBrush="{StaticResource border_green_dark}" BorderThickness="2" VerticalAlignment="Top">
                     <TextBlock x:Name="alert_icon" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22" FontWeight="Bold" />
                 </Border>
                 <StackPanel Grid.Column="1">
-                    <TextBlock x:Name="alert_heading" FontSize="16" FontWeight="Bold" Foreground="{StaticResource text_magenta}" />
+                    <TextBlock x:Name="alert_heading" FontSize="16" FontWeight="Bold" Foreground="{StaticResource text_green}" />
                     <TextBlock x:Name="message_text" Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{StaticResource text_white}" />
                 </StackPanel>
             </Grid>
 
-            <Border Grid.Row="2" Background="{StaticResource header_background}" BorderBrush="{StaticResource border_magenta}" BorderThickness="0,1,0,0">
+            <Border Grid.Row="2" Background="{StaticResource header_background}" BorderBrush="{StaticResource border_green_dark}" BorderThickness="0,1,0,0">
                 <Button Content="OK" Width="110" Height="28" HorizontalAlignment="Center" VerticalAlignment="Center" Click="button_ok" />
             </Border>
         </Grid>

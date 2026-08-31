@@ -16,13 +16,7 @@
     Background="#1A252B">
 
     <!--MAIN-->
-    <Grid>
-        <Grid.Background>
-            <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                <GradientStop Color= "#33286048" Offset="0" />
-                <GradientStop Color="#33307050" Offset="1" />
-            </LinearGradientBrush>
-        </Grid.Background>
+    <Grid Background="#1A252B">
 
 
         <Grid.RowDefinitions>
@@ -99,7 +93,7 @@
                      Height="22" VerticalAlignment="Top"
                      Foreground="{StaticResource text_white}" Background="{StaticResource header_background}"
                      Margin="0,8,10,5" FontSize="14"
-                     BorderBrush="{StaticResource border_magenta}"
+                     BorderBrush="{StaticResource border_green_dark}"
                      TextChanged="text_filter_updated">
 
                 <TextBox.Style>
@@ -120,7 +114,7 @@
                     VerticalAlignment="Top"
                     Margin="10,5,10,5">
 
-            <Separator Background="{StaticResource border_magenta}"/>
+            <Separator Background="{StaticResource border_green_dark}"/>
 
             <Label x:Name="text_label"  Content="Select Elements:"
                            Foreground="{StaticResource text_white}"/>
@@ -131,13 +125,13 @@
                          SelectionMode="Single"
                          ScrollViewer.VerticalScrollBarVisibility="Visible"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         BorderBrush="{StaticResource border_magenta}"
+                         BorderBrush="{StaticResource border_green_dark}"
                          >
 
                 <ListBox.Resources>
                     <Style TargetType="ScrollBar">
-                        <Setter Property="Background" Value="{StaticResource border_magenta}"/>
-                        <Setter Property="Foreground" Value="{StaticResource border_magenta}"/>
+                        <Setter Property="Background" Value="{StaticResource border_green_dark}"/>
+                        <Setter Property="Foreground" Value="{StaticResource border_green_dark}"/>
                         <Setter Property="BorderBrush" Value="{StaticResource header_background}"/>
                         <Setter Property="Opacity" Value="0.9"/>
                         <Setter Property="Margin" Value="3"/>

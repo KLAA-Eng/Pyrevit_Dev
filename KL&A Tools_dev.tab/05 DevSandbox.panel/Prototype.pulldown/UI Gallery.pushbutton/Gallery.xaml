@@ -1,10 +1,11 @@
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="DevSandbox UI Gallery" Height="520" Width="900"
-        WindowStartupLocation="CenterScreen" ResizeMode="CanResize">
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResize"
+        Background="#1A252B">
     <DockPanel Margin="12">
         <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
-            <TextBlock Text="Open representative pyRevit and KL&amp;A dialogs with fictional sample data. Gallery previews never modify the Revit document."
+            <TextBlock Text="Open KL&amp;A dialogs and repo-used pyRevit form patterns. Seeded previews use fictional data; host/model-dependent forms are cataloged but disabled. Gallery previews never modify the Revit document."
                        TextWrapping="Wrap" Margin="0,0,0,6" />
             <TextBox x:Name="FilterBox" Height="25" TextChanged="filter_changed"
                      ToolTip="Filter by dialog family, title, or description" />
@@ -20,7 +21,7 @@
                 <DataGridTextColumn Header="Window" Binding="{Binding Title}" Width="170" />
                 <DataGridTextColumn Header="Relative Path" Binding="{Binding RelativePath}" Width="260" />
                 <DataGridTextColumn Header="Called By" Binding="{Binding CalledBy}" Width="260" />
-                <DataGridTextColumn Header="Data" Binding="{Binding SampleData}" Width="110" />
+                <DataGridTextColumn Header="Data" Binding="{Binding SampleData}" Width="160" />
                 <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="240" />
             </DataGrid.Columns>
         </DataGrid>

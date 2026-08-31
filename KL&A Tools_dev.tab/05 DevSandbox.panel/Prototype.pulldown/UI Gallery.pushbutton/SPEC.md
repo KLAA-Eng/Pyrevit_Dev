@@ -3,8 +3,9 @@
 ## Purpose
 
 Provides a safe launcher gallery for the pyRevit and KL&A dialog families used
-by this extension. Each preview uses fictional seeded data and never starts a
-Revit transaction or calls a document-changing command.
+by this extension. Seeded previews use fictional data and never start a Revit
+transaction or call a document-changing command. pyRevit forms that require
+active model state or an interactive Revit pick are cataloged but disabled.
 
 ## Behavior
 
@@ -28,12 +29,16 @@ preview starts a Revit transaction or changes the document.
 
 ## GUI and interaction
 
-Static UI/API references: forms.WPFWindow,forms.alert,forms.ask_for_string,
-forms.CommandSwitchWindow,forms.SelectFromList,
+Static UI/API references: forms.WPFWindow,forms.alert,forms.ask_for_color,
+forms.ask_for_string,forms.CommandSwitchWindow,forms.pick_file,
+forms.pick_folder,forms.ProgressBar,forms.SelectFromList,forms.show_balloon,
 
 Use the command from its pyRevit button, select a row, and choose **Open
-Selected Window**. All lists and alerts contain fictional data. The gallery
-only opens dialog previews; it does not invoke the corresponding tool command.
+Selected Window**. Rows marked `Seeded sample data` contain fictional values.
+Rows marked `Host picker` open the native host picker. Rows marked
+`Host/model data required` or `Interactive pick required` are visible in the
+catalog but cannot be launched from the safe gallery. The gallery only opens
+dialog previews; it does not invoke the corresponding tool command.
 
 ## Current execution logic
 
