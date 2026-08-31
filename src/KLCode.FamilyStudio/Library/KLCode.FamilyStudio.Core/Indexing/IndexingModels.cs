@@ -7,16 +7,18 @@ namespace KLCode.FamilyStudio.Core.Indexing;
 
 public sealed class LibraryFileCandidate
 {
-    public LibraryFileCandidate(string filePath, long fileSize, DateTimeOffset modifiedUtc)
+    public LibraryFileCandidate(string filePath, long fileSize, DateTimeOffset modifiedUtc, string? fileHash = null)
     {
         FilePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
         FileSize = fileSize >= 0 ? fileSize : throw new ArgumentOutOfRangeException(nameof(fileSize));
         ModifiedUtc = modifiedUtc;
+        FileHash = fileHash;
     }
 
     public string FilePath { get; }
     public long FileSize { get; }
     public DateTimeOffset ModifiedUtc { get; }
+    public string? FileHash { get; }
 }
 
 public sealed class IndexedFileState
@@ -86,21 +88,60 @@ public enum IndexDecision
 
 public sealed class ThumbnailResult
 {
-    private ThumbnailResult(string? filePath)
+    private ThumbnailResult(string? filePath, IReadOnlyList<FamilyPreview> previews)
     {
         FilePath = filePath;
+        Previews = Copy(previews, nameof(previews));
     }
 
-    public static ThumbnailResult None { get; } = new ThumbnailResult(null);
+    public static ThumbnailResult None { get; } = new ThumbnailResult(null, Array.Empty<FamilyPreview>());
     public string? FilePath { get; }
+    public IReadOnlyList<FamilyPreview> Previews { get; }
 
     public static ThumbnailResult Created(string filePath)
     {
-        if (string.IsNullOrWhiteSpace(filePath))
+        return FromPreviews(new[] { new FamilyPreview(null, filePath) });
+    }
+
+    public static ThumbnailResult FromPreviews(IReadOnlyList<FamilyPreview> previews)
+    {
+        IReadOnlyList<FamilyPreview> copy = Copy(previews, nameof(previews));
+        if (copy.Count == 0)
         {
-            throw new ArgumentException("A thumbnail path is required.", nameof(filePath));
+            return None;
         }
 
-        return new ThumbnailResult(filePath);
+        FamilyPreview primary = copy.FirstOrDefault(preview => preview.TypeName is null) ?? copy[0];
+        return new ThumbnailResult(primary.FilePath, copy);
     }
+
+    private static IReadOnlyList<T> Copy<T>(IReadOnlyList<T> values, string parameterName)
+    {
+        if (values is null)
+        {
+            throw new ArgumentNullException(parameterName);
+        }
+
+        T[] copy = values.ToArray();
+        if (copy.Any(value => value is null))
+        {
+            throw new ArgumentException("Collection values cannot contain null entries.", parameterName);
+        }
+
+        return new ReadOnlyCollection<T>(copy);
+    }
+}
+
+public sealed class FamilyPreview
+{
+    public FamilyPreview(string? typeName, string filePath)
+    {
+        TypeName = string.IsNullOrWhiteSpace(typeName) ? null : typeName!.Trim();
+        FilePath = string.IsNullOrWhiteSpace(filePath)
+            ? throw new ArgumentException("A preview path is required.", nameof(filePath))
+            : filePath;
+    }
+
+    public string? TypeName { get; }
+    public string FilePath { get; }
 }

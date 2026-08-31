@@ -58,12 +58,18 @@ preview is still indexed without one and appears in the refresh issues.
 ## Search and Revit behavior
 
 Search is parameterized and bounded to 1–200 results. It matches family name,
-category, type names, parameters, and tags, with optional exact category,
-status, and discipline filters. Deleted records are hidden.
+category, type names, parameter names and values, and tags. The catalog browser
+also provides exact category, type, parameter, configured-library-root, and
+duplicates/variants filters. Deleted records are hidden. Library roots remain
+operator-owned JSON settings: Refresh Library synchronizes their local display
+list, but Family Studio never changes the settings file.
 
-The current WPF shell supports bounded text search, selected-family preview and
-detail, type selection with type-parameter values, Favorites, Recent, Copy
-Path, Open Folder, Load, and Load & Place.
+The current WPF shell is a catalog browser with search, faceted filters,
+selected-family preview and detail, type selection with type-parameter values,
+Favorites, Recent, Copy Path, Open Folder, Load, and Load & Place. Results flag
+exact byte-identical copies by SHA-256 and same-name variants with distinct
+content. Detection is informational only: Family Studio never deletes,
+renames, merges, or selects a duplicate automatically.
 Favorites and recent Load/Place records are local SQLite data only; they are
 not shared approval, status, or tag curation.
 Duplicate-family handling keeps project parameter values. A load is accepted
@@ -86,6 +92,13 @@ configuration.
 
 The CLI uses the explicit `databasePath` and `thumbnailDirectory` from its JSON
 configuration. Paths may be absolute or relative to the configuration file.
+
+## Deferred preview refinement
+
+Preview export is usable for DevSandbox validation but needs a later dedicated
+quality round. That round will revisit Revit crop/extents behavior, output
+sharpness, 2D and 3D framing consistency, and multi-type visual confirmation;
+it is deliberately not expanded as part of the catalog-browser work.
 
 ## Validation boundary
 

@@ -14,16 +14,18 @@ public enum FamilyUseAction
 
 public sealed class FamilyTypeDetail
 {
-    public FamilyTypeDetail(string name, IReadOnlyList<FamilyParameter> parameters)
+    public FamilyTypeDetail(string name, IReadOnlyList<FamilyParameter> parameters, string? thumbnailPath)
     {
         Name = string.IsNullOrWhiteSpace(name)
             ? throw new ArgumentException("A family type name is required.", nameof(name))
             : name.Trim();
         Parameters = Copy(parameters, nameof(parameters));
+        ThumbnailPath = thumbnailPath;
     }
 
     public string Name { get; }
     public IReadOnlyList<FamilyParameter> Parameters { get; }
+    public string? ThumbnailPath { get; }
 
     private static IReadOnlyList<T> Copy<T>(IReadOnlyList<T> values, string parameterName)
     {

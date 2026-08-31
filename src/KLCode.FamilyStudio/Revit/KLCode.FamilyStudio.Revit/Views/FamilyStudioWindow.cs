@@ -21,10 +21,17 @@ internal sealed class FamilyStudioWindow : Window
     private readonly IFamilyLoadService _loadService;
     private readonly Func<IndexRunSummary?>? _refreshIndex;
     private readonly TextBox _searchBox = new TextBox { MinWidth = 300, Margin = new Thickness(4) };
-    private readonly ListBox _results = new ListBox { MinHeight = 300, Margin = new Thickness(4), DisplayMemberPath = nameof(FamilySearchResult.FamilyName) };
-    private readonly Image _thumbnail = new Image { Width = 260, Height = 180, Margin = new Thickness(4), Stretch = System.Windows.Media.Stretch.Uniform };
+    private readonly ComboBox _categoryFilter = new ComboBox { Width = 150, Margin = new Thickness(4) };
+    private readonly ComboBox _typeFilter = new ComboBox { Width = 150, Margin = new Thickness(4) };
+    private readonly ComboBox _parameterFilter = new ComboBox { Width = 150, Margin = new Thickness(4) };
+    private readonly ComboBox _rootFilter = new ComboBox { Width = 260, Margin = new Thickness(4) };
+    private readonly CheckBox _duplicatesOnly = new CheckBox { Content = "Duplicates / variants", Margin = new Thickness(8, 4, 4, 4) };
+    private readonly TextBlock _resultCount = new TextBlock { Margin = new Thickness(8), VerticalAlignment = VerticalAlignment.Center };
+    private readonly ListBox _results = new ListBox { MinHeight = 300, Margin = new Thickness(4), DisplayMemberPath = nameof(FamilySearchResult.DisplayLabel) };
+    private readonly Image _thumbnail = new Image { Width = 400, Height = 300, Margin = new Thickness(4), Stretch = System.Windows.Media.Stretch.Uniform };
     private readonly ComboBox _types = new ComboBox { Margin = new Thickness(4), DisplayMemberPath = nameof(FamilyTypeDetail.Name) };
     private readonly TextBlock _detail = new TextBlock { Margin = new Thickness(4), TextWrapping = TextWrapping.Wrap };
+    private bool _suppressFilterRefresh;
     private FamilyDetail? _selectedDetail;
 
     internal FamilySearchResult? PlacementFamily { get; private set; }
@@ -38,10 +45,11 @@ internal sealed class FamilyStudioWindow : Window
         _loadService = loadService ?? throw new ArgumentNullException(nameof(loadService));
         _refreshIndex = refreshIndex;
         Title = "KLCode Family Studio";
-        Width = 980;
-        Height = 640;
+        Width = 1120;
+        Height = 720;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         Content = BuildContent();
+        LoadFilterOptions();
         Search();
     }
 
@@ -54,8 +62,29 @@ internal sealed class FamilyStudioWindow : Window
         searchRow.Children.Add(CreateButton("Favorites", (_, _) => ShowFavorites()));
         searchRow.Children.Add(CreateButton("Recent", (_, _) => ShowRecent()));
         searchRow.Children.Add(CreateButton("Refresh Library", (_, _) => RefreshIndex()));
-        DockPanel.SetDock(searchRow, Dock.Top);
-        root.Children.Add(searchRow);
+        searchRow.Children.Add(_resultCount);
+        StackPanel filters = new StackPanel { Orientation = Orientation.Horizontal };
+        filters.Children.Add(CreateFilterLabel("Category"));
+        filters.Children.Add(_categoryFilter);
+        filters.Children.Add(CreateFilterLabel("Type"));
+        filters.Children.Add(_typeFilter);
+        filters.Children.Add(CreateFilterLabel("Parameter"));
+        filters.Children.Add(_parameterFilter);
+        filters.Children.Add(CreateFilterLabel("Library root"));
+        filters.Children.Add(_rootFilter);
+        filters.Children.Add(_duplicatesOnly);
+        filters.Children.Add(CreateButton("Clear Filters", (_, _) => ClearFilters()));
+        _categoryFilter.SelectionChanged += (_, _) => RefreshForFilterChange();
+        _typeFilter.SelectionChanged += (_, _) => RefreshForFilterChange();
+        _parameterFilter.SelectionChanged += (_, _) => RefreshForFilterChange();
+        _rootFilter.SelectionChanged += (_, _) => RefreshForFilterChange();
+        _duplicatesOnly.Checked += (_, _) => RefreshForFilterChange();
+        _duplicatesOnly.Unchecked += (_, _) => RefreshForFilterChange();
+        StackPanel header = new StackPanel();
+        header.Children.Add(searchRow);
+        header.Children.Add(filters);
+        DockPanel.SetDock(header, Dock.Top);
+        root.Children.Add(header);
 
         StackPanel actions = new StackPanel { Orientation = Orientation.Horizontal };
         actions.Children.Add(CreateButton("Load", (_, _) => RunSelected(false)));
@@ -68,7 +97,7 @@ internal sealed class FamilyStudioWindow : Window
 
         Grid content = new Grid();
         content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(360) });
+        content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(480) });
         _results.SelectionChanged += (_, _) => UpdateDetail();
         Grid.SetColumn(_results, 0);
         content.Children.Add(_results);
@@ -93,9 +122,74 @@ internal sealed class FamilyStudioWindow : Window
         return button;
     }
 
+    private static TextBlock CreateFilterLabel(string label)
+    {
+        return new TextBlock { Text = label + ":", Margin = new Thickness(6, 4, 0, 4), VerticalAlignment = VerticalAlignment.Center };
+    }
+
+    private void LoadFilterOptions()
+    {
+        _suppressFilterRefresh = true;
+        try
+        {
+            FamilyCatalogFilterOptions options = _repository.GetFilterOptions();
+            SetFilterItems(_categoryFilter, "All categories", options.Categories);
+            SetFilterItems(_typeFilter, "All types", options.TypeNames);
+            SetFilterItems(_parameterFilter, "All parameters", options.ParameterNames);
+            SetFilterItems(_rootFilter, "All configured roots", options.RootPaths);
+        }
+        finally
+        {
+            _suppressFilterRefresh = false;
+        }
+    }
+
+    private static void SetFilterItems(ComboBox box, string allLabel, IReadOnlyList<string> values)
+    {
+        List<string> options = new List<string> { allLabel };
+        options.AddRange(values);
+        box.ItemsSource = options;
+        box.SelectedIndex = 0;
+    }
+
+    private void ClearFilters()
+    {
+        _suppressFilterRefresh = true;
+        _searchBox.Clear();
+        _categoryFilter.SelectedIndex = 0;
+        _typeFilter.SelectedIndex = 0;
+        _parameterFilter.SelectedIndex = 0;
+        _rootFilter.SelectedIndex = 0;
+        _duplicatesOnly.IsChecked = false;
+        _suppressFilterRefresh = false;
+        Search();
+    }
+
+    private void RefreshForFilterChange()
+    {
+        if (!_suppressFilterRefresh)
+        {
+            Search();
+        }
+    }
+
     private void Search()
     {
-        SetResults(_repository.Search(new FamilySearchQuery(_searchBox.Text, null, null, null, 100)));
+        SetResults(_repository.Search(new FamilySearchQuery(
+            _searchBox.Text,
+            SelectedFilterValue(_categoryFilter),
+            null,
+            null,
+            SelectedFilterValue(_typeFilter),
+            SelectedFilterValue(_parameterFilter),
+            SelectedFilterValue(_rootFilter),
+            _duplicatesOnly.IsChecked == true,
+            100)));
+    }
+
+    private static string? SelectedFilterValue(ComboBox box)
+    {
+        return box.SelectedIndex <= 0 ? null : box.SelectedItem as string;
     }
 
     private void ShowFavorites()
@@ -112,6 +206,7 @@ internal sealed class FamilyStudioWindow : Window
     {
         _results.ItemsSource = families;
         _results.SelectedIndex = families.Count > 0 ? 0 : -1;
+        _resultCount.Text = families.Count + (families.Count == 1 ? " family" : " families");
         UpdateDetail();
     }
 
@@ -137,7 +232,6 @@ internal sealed class FamilyStudioWindow : Window
         }
 
         _selectedDetail = detail;
-        _thumbnail.Source = LoadThumbnail(detail.Summary.ThumbnailPath);
         _types.ItemsSource = detail.Types;
         _types.SelectedIndex = detail.Types.Count > 0 ? 0 : -1;
         UpdateTypeDetail();
@@ -155,17 +249,27 @@ internal sealed class FamilyStudioWindow : Window
         text.AppendLine("Category: " + (_selectedDetail.Summary.Category ?? "<unavailable>"));
         text.AppendLine("Status: " + (_selectedDetail.Summary.Status ?? "<unavailable>"));
         text.AppendLine("Discipline: " + (_selectedDetail.Summary.Discipline ?? "<unavailable>"));
+        text.AppendLine("Catalog check: " + _selectedDetail.Summary.DuplicateLabel);
+        text.AppendLine("Modified: " + (_selectedDetail.Summary.ModifiedUtc.HasValue
+            ? _selectedDetail.Summary.ModifiedUtc.Value.LocalDateTime.ToString("g")
+            : "<unavailable>"));
+        text.AppendLine("Revit version: " + (_selectedDetail.Summary.RevitVersion ?? "<unavailable>"));
         text.AppendLine("Favorite: " + (_selectedDetail.IsFavorite ? "Yes" : "No"));
         text.AppendLine("Path: " + _selectedDetail.Summary.FilePath);
         text.AppendLine("Tags: " + (_selectedDetail.Tags.Count == 0 ? "<none>" : string.Join(", ", _selectedDetail.Tags)));
         if (_types.SelectedItem is FamilyTypeDetail type)
         {
+            _thumbnail.Source = LoadThumbnail(type.ThumbnailPath ?? _selectedDetail.Summary.ThumbnailPath);
             text.AppendLine("Selected type: " + type.Name);
             text.AppendLine("Type parameters:");
             foreach (FamilyParameter parameter in type.Parameters)
             {
                 text.AppendLine("- " + parameter.Name + ": " + (parameter.Value ?? "<no value>"));
             }
+        }
+        else
+        {
+            _thumbnail.Source = LoadThumbnail(_selectedDetail.Summary.ThumbnailPath);
         }
 
         if (_selectedDetail.Parameters.Count > 0)
@@ -280,6 +384,7 @@ internal sealed class FamilyStudioWindow : Window
                 Title,
                 MessageBoxButton.OK,
                 summary.FilesFailed == 0 ? MessageBoxImage.Information : MessageBoxImage.Warning);
+            LoadFilterOptions();
             Search();
         }
         catch (Exception exception)

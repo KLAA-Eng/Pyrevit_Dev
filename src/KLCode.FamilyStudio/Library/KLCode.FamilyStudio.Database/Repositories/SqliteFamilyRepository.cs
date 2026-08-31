@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using KLCode.FamilyStudio.Core.Configuration;
 using KLCode.FamilyStudio.Core.Indexing;
 using KLCode.FamilyStudio.Core.Models;
 using KLCode.FamilyStudio.Core.Repositories;
@@ -18,6 +19,12 @@ namespace KLCode.FamilyStudio.Database.Repositories;
 public sealed class SqliteFamilyRepository : IFamilyRepository, IDisposable
 {
     private const int MaximumSearchLimit = 200;
+    private const string SearchResultColumns = @"f.id,f.family_name,f.file_path,f.category,f.status,f.discipline,f.thumbnail_path,
+(SELECT COUNT(*) FROM families exact_copy
+ WHERE exact_copy.is_deleted=0 AND f.file_hash IS NOT NULL AND exact_copy.file_hash=f.file_hash),
+(SELECT COUNT(DISTINCT COALESCE(name_variant.file_hash,name_variant.file_path)) FROM families name_variant
+ WHERE name_variant.is_deleted=0 AND name_variant.family_name=f.family_name),
+f.file_hash,f.modified_utc,f.revit_version";
     private readonly string _connectionString;
 
     static SqliteFamilyRepository()
@@ -72,7 +79,30 @@ FROM families WHERE file_path = $path AND is_deleted = 0;";
         using SqliteConnection connection = OpenConnection();
         using SqliteTransaction transaction = connection.BeginTransaction();
         long familyId = UpsertFamily(connection, transaction, metadata, file, thumbnail, indexedUtc);
-        ReplaceDetails(connection, transaction, familyId, metadata);
+        ReplaceDetails(connection, transaction, familyId, metadata, thumbnail);
+        transaction.Commit();
+    }
+
+    public void SyncLibraryRoots(IReadOnlyList<LibraryRoot> roots)
+    {
+        if (roots is null)
+        {
+            throw new ArgumentNullException(nameof(roots));
+        }
+
+        using SqliteConnection connection = OpenConnection();
+        using SqliteTransaction transaction = connection.BeginTransaction();
+        Execute(connection, transaction, "DELETE FROM library_roots;");
+        foreach (LibraryRoot root in roots)
+        {
+            Execute(connection, transaction, @"INSERT INTO library_roots(root_path,enabled,discipline,default_status)
+VALUES($path,$enabled,$discipline,$status);",
+                ("$path", NormalizeRootPath(root.Path)),
+                ("$enabled", root.IsEnabled ? 1 : 0),
+                ("$discipline", root.Discipline),
+                ("$status", root.DefaultStatus));
+        }
+
         transaction.Commit();
     }
 
@@ -100,12 +130,26 @@ FROM families WHERE file_path = $path AND is_deleted = 0;";
         return results.AsReadOnly();
     }
 
+    public FamilyCatalogFilterOptions GetFilterOptions()
+    {
+        using SqliteConnection connection = OpenConnection();
+        return new FamilyCatalogFilterOptions(
+            ReadDistinctStrings(connection, @"SELECT DISTINCT category FROM families
+WHERE is_deleted=0 AND category IS NOT NULL ORDER BY category COLLATE NOCASE;"),
+            ReadDistinctStrings(connection, @"SELECT DISTINCT ft.type_name FROM family_types ft
+JOIN families f ON f.id=ft.family_id WHERE f.is_deleted=0 ORDER BY ft.type_name COLLATE NOCASE;"),
+            ReadDistinctStrings(connection, @"SELECT DISTINCT p.parameter_name FROM parameters p
+JOIN families f ON f.id=p.family_id WHERE f.is_deleted=0 ORDER BY p.parameter_name COLLATE NOCASE;"),
+            ReadDistinctStrings(connection, @"SELECT root_path FROM library_roots WHERE enabled=1
+ORDER BY root_path COLLATE NOCASE;"));
+    }
+
     public FamilyDetail? GetDetail(long familyId)
     {
         ValidateFamilyId(familyId);
         using SqliteConnection connection = OpenConnection();
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = @"SELECT f.id,f.family_name,f.file_path,f.category,f.status,f.discipline,f.thumbnail_path,
+        command.CommandText = "SELECT " + SearchResultColumns + @",
 EXISTS(SELECT 1 FROM family_favorites ff WHERE ff.family_id=f.id),
 (SELECT last_used_utc FROM family_recent_use fru WHERE fru.family_id=f.id)
 FROM families f WHERE f.id=$id AND f.is_deleted=0;";
@@ -117,8 +161,8 @@ FROM families f WHERE f.id=$id AND f.is_deleted=0;";
         }
 
         FamilySearchResult summary = ReadSearchResult(reader);
-        bool isFavorite = reader.GetInt64(7) == 1;
-        DateTimeOffset? lastUsedUtc = GetNullableString(reader, 8) is string timestamp ? ParseTimestamp(timestamp) : null;
+        bool isFavorite = reader.GetInt64(12) == 1;
+        DateTimeOffset? lastUsedUtc = GetNullableString(reader, 13) is string timestamp ? ParseTimestamp(timestamp) : null;
         return new FamilyDetail(
             summary,
             ReadTypeDetails(connection, familyId),
@@ -150,7 +194,7 @@ JOIN family_tags ft ON ft.tag_id=t.id WHERE ft.family_id=$id ORDER BY t.name COL
     public IReadOnlyList<FamilySearchResult> GetFavorites(int limit)
     {
         return ReadPinnedResults(
-            @"SELECT f.id,f.family_name,f.file_path,f.category,f.status,f.discipline,f.thumbnail_path
+            "SELECT " + SearchResultColumns + @"
 FROM families f JOIN family_favorites ff ON ff.family_id=f.id
 WHERE f.is_deleted=0 ORDER BY ff.created_utc DESC, f.family_name COLLATE NOCASE LIMIT $limit;",
             limit);
@@ -174,7 +218,7 @@ ON CONFLICT(family_id) DO UPDATE SET last_action=$action,last_used_utc=$timestam
     public IReadOnlyList<FamilySearchResult> GetRecent(int limit)
     {
         return ReadPinnedResults(
-            @"SELECT f.id,f.family_name,f.file_path,f.category,f.status,f.discipline,f.thumbnail_path
+            "SELECT " + SearchResultColumns + @"
 FROM families f JOIN family_recent_use fru ON fru.family_id=f.id
 WHERE f.is_deleted=0 ORDER BY fru.last_used_utc DESC, f.family_name COLLATE NOCASE LIMIT $limit;",
             limit);
@@ -277,15 +321,15 @@ WHERE f.is_deleted=0 ORDER BY fru.last_used_utc DESC, f.family_name COLLATE NOCA
         DateTimeOffset indexedUtc)
     {
         const string sql = @"INSERT INTO families(
-family_name, category, file_path, file_size, modified_utc, revit_version,
+family_name, category, file_path, file_hash, file_size, modified_utc, revit_version,
 thumbnail_path, status, discipline, indexed_utc, is_deleted)
-VALUES($name, $category, $path, $size, $modified, $version, $thumbnail, $status, $discipline, $indexed, 0)
+VALUES($name, $category, $path, $hash, $size, $modified, $version, $thumbnail, $status, $discipline, $indexed, 0)
 ON CONFLICT(file_path) DO UPDATE SET family_name=$name, category=$category, file_size=$size,
-modified_utc=$modified, revit_version=$version, thumbnail_path=$thumbnail, status=$status,
+file_hash=$hash, modified_utc=$modified, revit_version=$version, thumbnail_path=$thumbnail, status=$status,
 discipline=$discipline, indexed_utc=$indexed, last_error=NULL, is_deleted=0;";
         Execute(connection, transaction, sql,
             ("$name", metadata.DisplayName), ("$category", metadata.Category), ("$path", file.FilePath),
-            ("$size", file.FileSize), ("$modified", FormatTimestamp(file.ModifiedUtc)),
+            ("$hash", file.FileHash), ("$size", file.FileSize), ("$modified", FormatTimestamp(file.ModifiedUtc)),
             ("$version", metadata.RevitVersion), ("$thumbnail", thumbnail.FilePath),
             ("$status", metadata.Status), ("$discipline", metadata.Discipline),
             ("$indexed", FormatTimestamp(indexedUtc)));
@@ -296,10 +340,12 @@ discipline=$discipline, indexed_utc=$indexed, last_error=NULL, is_deleted=0;";
         SqliteConnection connection,
         SqliteTransaction transaction,
         long familyId,
-        FamilyMetadata metadata)
+        FamilyMetadata metadata,
+        ThumbnailResult thumbnail)
     {
         Execute(connection, transaction, "DELETE FROM parameters WHERE family_id=$id;", ("$id", familyId));
         Execute(connection, transaction, "DELETE FROM family_tags WHERE family_id=$id;", ("$id", familyId));
+        Execute(connection, transaction, "DELETE FROM family_previews WHERE family_id=$id;", ("$id", familyId));
         Execute(connection, transaction, "DELETE FROM family_types WHERE family_id=$id;", ("$id", familyId));
         Dictionary<string, long> typeIds = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
         foreach (string typeName in metadata.TypeNames)
@@ -326,6 +372,26 @@ discipline=$discipline, indexed_utc=$indexed, last_error=NULL, is_deleted=0;";
         foreach (string tag in metadata.Tags)
         {
             InsertTag(connection, transaction, familyId, tag);
+        }
+
+        foreach (FamilyPreview preview in thumbnail.Previews)
+        {
+            long? typeId = null;
+            if (preview.TypeName is not null)
+            {
+                if (!typeIds.TryGetValue(preview.TypeName, out long foundTypeId))
+                {
+                    continue;
+                }
+
+                typeId = foundTypeId;
+            }
+
+            Execute(connection, transaction, @"INSERT INTO family_previews(family_id,type_id,preview_path)
+VALUES($familyId,$typeId,$path);",
+                ("$familyId", familyId),
+                ("$typeId", typeId),
+                ("$path", preview.FilePath));
         }
     }
 
@@ -372,11 +438,18 @@ SELECT $id,id FROM tags WHERE name=$name;", ("$id", familyId), ("$name", tag));
     private static SqliteCommand CreateSearchCommand(SqliteConnection connection, FamilySearchQuery query)
     {
         SqliteCommand command = connection.CreateCommand();
-        command.CommandText = @"SELECT f.id,f.family_name,f.file_path,f.category,f.status,f.discipline,f.thumbnail_path
+        command.CommandText = "SELECT " + SearchResultColumns + @"
 FROM families f WHERE f.is_deleted=0
 AND ($category IS NULL OR f.category=$category)
 AND ($status IS NULL OR f.status=$status)
 AND ($discipline IS NULL OR f.discipline=$discipline)
+AND ($typeName IS NULL OR EXISTS(SELECT 1 FROM family_types ft_filter WHERE ft_filter.family_id=f.id AND ft_filter.type_name=$typeName))
+AND ($parameterName IS NULL OR EXISTS(SELECT 1 FROM parameters p_filter WHERE p_filter.family_id=f.id AND p_filter.parameter_name=$parameterName))
+AND ($rootPrefix IS NULL OR f.file_path LIKE $rootPrefix ESCAPE '\')
+AND ($duplicatesOnly=0 OR
+ EXISTS(SELECT 1 FROM families exact_match WHERE exact_match.is_deleted=0 AND f.file_hash IS NOT NULL AND exact_match.file_hash=f.file_hash AND exact_match.id<>f.id)
+ OR EXISTS(SELECT 1 FROM families name_match WHERE name_match.is_deleted=0 AND name_match.family_name=f.family_name AND name_match.id<>f.id
+           AND COALESCE(name_match.file_hash,name_match.file_path)<>COALESCE(f.file_hash,f.file_path)))
 AND ($text IS NULL OR f.family_name LIKE $text ESCAPE '\'
  OR COALESCE(f.category,'') LIKE $text ESCAPE '\'
  OR EXISTS(SELECT 1 FROM family_types ft WHERE ft.family_id=f.id AND ft.type_name LIKE $text ESCAPE '\')
@@ -386,6 +459,10 @@ ORDER BY f.family_name COLLATE NOCASE, f.file_path COLLATE NOCASE LIMIT $limit;"
         command.Parameters.AddWithValue("$category", DatabaseValue(query.Category));
         command.Parameters.AddWithValue("$status", DatabaseValue(query.Status));
         command.Parameters.AddWithValue("$discipline", DatabaseValue(query.Discipline));
+        command.Parameters.AddWithValue("$typeName", DatabaseValue(query.TypeName));
+        command.Parameters.AddWithValue("$parameterName", DatabaseValue(query.ParameterName));
+        command.Parameters.AddWithValue("$rootPrefix", DatabaseValue(CreateRootLikePattern(query.RootPath)));
+        command.Parameters.AddWithValue("$duplicatesOnly", query.DuplicatesOnly ? 1 : 0);
         command.Parameters.AddWithValue("$text", DatabaseValue(CreateLikePattern(query.Text)));
         command.Parameters.AddWithValue("$limit", query.Limit);
         return command;
@@ -396,7 +473,12 @@ ORDER BY f.family_name COLLATE NOCASE, f.file_path COLLATE NOCASE LIMIT $limit;"
         return new FamilySearchResult(
             reader.GetInt64(0), reader.GetString(1), reader.GetString(2),
             GetNullableString(reader, 3), GetNullableString(reader, 4),
-            GetNullableString(reader, 5), GetNullableString(reader, 6));
+            GetNullableString(reader, 5), GetNullableString(reader, 6),
+            Convert.ToInt32(reader.GetInt64(7), CultureInfo.InvariantCulture),
+            Convert.ToInt32(reader.GetInt64(8), CultureInfo.InvariantCulture),
+            GetNullableString(reader, 9),
+            ParseTimestamp(reader.GetString(10)),
+            GetNullableString(reader, 11));
     }
 
     private IReadOnlyList<FamilySearchResult> ReadPinnedResults(string sql, int limit)
@@ -435,22 +517,38 @@ ORDER BY f.family_name COLLATE NOCASE, f.file_path COLLATE NOCASE LIMIT $limit;"
         return values.AsReadOnly();
     }
 
+    private static IReadOnlyList<string> ReadDistinctStrings(SqliteConnection connection, string sql)
+    {
+        using SqliteCommand command = connection.CreateCommand();
+        command.CommandText = sql;
+        using SqliteDataReader reader = command.ExecuteReader();
+        List<string> values = new List<string>();
+        while (reader.Read() && !reader.IsDBNull(0))
+        {
+            values.Add(reader.GetString(0));
+        }
+
+        return values.AsReadOnly();
+    }
+
     private static IReadOnlyList<FamilyTypeDetail> ReadTypeDetails(SqliteConnection connection, long familyId)
     {
         using SqliteCommand command = connection.CreateCommand();
-        command.CommandText = "SELECT id,type_name FROM family_types WHERE family_id=$id ORDER BY type_name COLLATE NOCASE;";
+        command.CommandText = @"SELECT ft.id,ft.type_name,fp.preview_path
+FROM family_types ft LEFT JOIN family_previews fp ON fp.type_id=ft.id
+WHERE ft.family_id=$id ORDER BY ft.type_name COLLATE NOCASE;";
         command.Parameters.AddWithValue("$id", familyId);
         using SqliteDataReader reader = command.ExecuteReader();
-        List<(long Id, string Name)> types = new List<(long Id, string Name)>();
+        List<(long Id, string Name, string? ThumbnailPath)> types = new List<(long Id, string Name, string? ThumbnailPath)>();
         while (reader.Read())
         {
-            types.Add((reader.GetInt64(0), reader.GetString(1)));
+            types.Add((reader.GetInt64(0), reader.GetString(1), GetNullableString(reader, 2)));
         }
 
         reader.Close();
 
         return types
-            .Select(type => new FamilyTypeDetail(type.Name, ReadParameters(connection, familyId, type.Id)))
+            .Select(type => new FamilyTypeDetail(type.Name, ReadParameters(connection, familyId, type.Id), type.ThumbnailPath))
             .ToArray();
     }
 
@@ -611,5 +709,16 @@ FROM parameters WHERE family_id=$id AND " +
 
         string escaped = value!.Trim().Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
         return "%" + escaped + "%";
+    }
+
+    private static string? CreateRootLikePattern(string? rootPath)
+    {
+        if (string.IsNullOrWhiteSpace(rootPath))
+        {
+            return null;
+        }
+
+        string root = NormalizeRootPath(rootPath!) + Path.DirectorySeparatorChar;
+        return root.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_") + "%";
     }
 }

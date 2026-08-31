@@ -67,9 +67,11 @@ internal sealed class RevitFamilyMetadataExtractor : IMetadataExtractor
 
         List<FamilyTypeMetadata> types = new List<FamilyTypeMetadata>();
         List<string> typeNames = new List<string>();
+        int unnamedTypeCount = 0;
         foreach (FamilyType familyType in document.FamilyManager.Types)
         {
-            typeNames.Add(familyType.Name);
+            string typeName = ReadTypeName(familyType, ref unnamedTypeCount);
+            typeNames.Add(typeName);
             List<CatalogFamilyParameter> typeParameters = new List<CatalogFamilyParameter>();
             foreach (Autodesk.Revit.DB.FamilyParameter parameter in familyParameters)
             {
@@ -83,7 +85,7 @@ internal sealed class RevitFamilyMetadataExtractor : IMetadataExtractor
                 }
             }
 
-            types.Add(new FamilyTypeMetadata(familyType.Name, typeParameters.AsReadOnly()));
+            types.Add(new FamilyTypeMetadata(typeName, typeParameters.AsReadOnly()));
         }
 
         string? category = document.OwnerFamily?.FamilyCategory?.Name;
@@ -98,6 +100,27 @@ internal sealed class RevitFamilyMetadataExtractor : IMetadataExtractor
             "Draft",
             null,
             types.AsReadOnly());
+    }
+
+    private static string ReadTypeName(FamilyType familyType, ref int unnamedTypeCount)
+    {
+        string? name = null;
+        try
+        {
+            name = familyType.Name;
+        }
+        catch (Exception)
+        {
+            // A legacy type can still expose parameter values but not its label.
+        }
+
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            return name!.Trim();
+        }
+
+        unnamedTypeCount++;
+        return "<unnamed type " + unnamedTypeCount + ">";
     }
 
     private static string? ReadValue(FamilyType familyType, Autodesk.Revit.DB.FamilyParameter parameter)

@@ -383,3 +383,73 @@ library and configuration on Revit 2024 and 2025: refresh, preview creation,
 preview failure retention, detail display, favorites/recent, path actions,
 Load, Load & Place, and placement cancel. Pilot libraries, databases,
 thumbnails, configurations, and generated packages remain uncommitted.
+
+## Wave 3 — Catalog browser and library quality — 2026-08-31
+
+### Deferred preview-export refinement
+
+- The Revit-native 2D preview crop/export path is usable for the DevSandbox
+  pilot but needs one additional quality pass before production promotion.
+  That pass will establish a repeatable 400 x 300 framing check across a
+  broader 2D family set and tune the native Revit crop calibration without
+  raster resizing after export.
+- 3D previews continue to respect the source family view's camera framing.
+  Do not spend further pilot time on preview composition unless a new test
+  family demonstrates a functional failure.
+
+### Catalog workflow
+
+- Keep the operator-owned JSON configuration as the source of truth for one
+  or more enabled roots. Surface the configured roots in the browser and make
+  root selection a searchable filter; do not invent shared root administration
+  or put operator paths in Git.
+- Add faceted filters for category, type, parameter name, and root, alongside
+  full-text matching over family name, category, type names, parameter names,
+  parameter values, and existing local tags.
+- Detect and clearly label two non-destructive review states: exact duplicate
+  bytes (same SHA-256 in multiple paths) and same-name variants (same family
+  name with different bytes). Surface source path, modified time, Revit version,
+  and sibling count so an operator can decide which is authoritative. This
+  wave never deletes, renames, overwrites, or auto-selects a version.
+- Evolve the WPF window into a catalog browser with faceted controls, result
+  cards/list rows, selected-family/type detail, preview, parameters, local
+  favorite/recent actions, path actions, and the existing Load/Load & Place
+  behavior.
+
+### Validation gates
+
+- Unit-test filter composition, root scoping, hash duplicate classification,
+  same-name variant classification, and database migration/query behavior.
+- Live-test a disposable multi-root library in Revit 2024 and 2025: root
+  filters, category/type/parameter filters, duplicate labels, variant labels,
+  detail/type preview switching, favorites/recent, Load, Load & Place, and
+  canceled placement.
+
+## Next after Wave 3 validation — Deferred catalog refinement
+
+Start this backlog only after the multi-root and duplicate/version live tests
+have passed. It is intentionally separate from the current DevSandbox
+acceptance gate.
+
+1. **Catalog-browser polish**
+   - Add a thumbnail card/grid view alongside the compact list, sortable
+     results, clearer empty states, keyboard navigation, and more legible
+     duplicate/version indicators.
+
+2. **Root configuration experience**
+   - Keep the external JSON as the source of truth, but provide an in-app
+     configuration view/editor with pre-refresh root validation. It must not
+     introduce shared root administration or store operator paths in Git.
+
+3. **Refresh reliability and feedback**
+   - Add per-root progress, changed/skipped counts, and an actionable issue
+     report that can be copied or opened without obscuring successful results.
+
+4. **Preview-export quality round**
+   - Return to the deferred 2D/3D framing, sharpness, crop/extents, and
+     per-type visual-confirmation work described above.
+
+5. **Larger-library performance evidence**
+   - Measure indexing and search behavior against a representative
+     multi-folder library, then add caching, pagination, or indexing safeguards
+     only where measurements demonstrate a need.

@@ -206,12 +206,22 @@ public sealed class LibraryIndexerTests
             ThumbnailResult thumbnail,
             DateTimeOffset indexedUtc)
         {
-            Existing[file.FilePath] = new IndexedFileState(file.FilePath, file.FileSize, file.ModifiedUtc, null, thumbnail.FilePath);
+            Existing[file.FilePath] = new IndexedFileState(file.FilePath, file.FileSize, file.ModifiedUtc, file.FileHash, thumbnail.FilePath);
+        }
+
+        public void SyncLibraryRoots(IReadOnlyList<LibraryRoot> roots)
+        {
         }
 
         public IReadOnlyList<FamilySearchResult> Search(FamilySearchQuery query)
         {
             return Array.Empty<FamilySearchResult>();
+        }
+
+        public FamilyCatalogFilterOptions GetFilterOptions()
+        {
+            return new FamilyCatalogFilterOptions(
+                Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>());
         }
 
         public FamilyDetail? GetDetail(long familyId)

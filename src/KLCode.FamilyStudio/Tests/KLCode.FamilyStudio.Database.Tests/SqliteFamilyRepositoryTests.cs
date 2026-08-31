@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using KLCode.FamilyStudio.Core.Configuration;
 using KLCode.FamilyStudio.Core.Indexing;
 using KLCode.FamilyStudio.Core.Models;
 using KLCode.FamilyStudio.Core.Search;
@@ -143,7 +144,10 @@ public sealed class SqliteFamilyRepositoryTests
         _repository.Upsert(
             metadata,
             new LibraryFileCandidate(metadata.SourcePath, 100, timestamp),
-            ThumbnailResult.Created("/thumbs/desk.png"),
+            ThumbnailResult.FromPreviews(new[]
+            {
+                new FamilyPreview("Standard", "/thumbs/desk-standard.png")
+            }),
             timestamp);
         FamilySearchResult result = _repository.Search(new FamilySearchQuery("Desk", null, null, null, 25))[0];
 
@@ -156,6 +160,7 @@ public sealed class SqliteFamilyRepositoryTests
         Assert.AreEqual("Standard", detail.Types[0].Name);
         Assert.AreEqual("Width", detail.Types[0].Parameters[0].Name);
         Assert.AreEqual("60", detail.Types[0].Parameters[0].Value);
+        Assert.AreEqual("/thumbs/desk-standard.png", detail.Types[0].ThumbnailPath);
         Assert.AreEqual("Comments", detail.Parameters[0].Name);
         Assert.AreEqual("office", detail.Tags[0]);
         Assert.AreEqual(1, _repository.GetFavorites(25).Count);
@@ -163,6 +168,36 @@ public sealed class SqliteFamilyRepositoryTests
 
         _repository.SetFavorite(result.Id, false);
         Assert.AreEqual(0, _repository.GetFavorites(25).Count);
+    }
+
+    [TestMethod]
+    public void CatalogFiltersAndDuplicateSignals_AreRootAwareAndNonDestructive()
+    {
+        DateTimeOffset timestamp = new DateTimeOffset(2026, 8, 31, 12, 0, 0, TimeSpan.Zero);
+        _repository.SyncLibraryRoots(new[]
+        {
+            new LibraryRoot("/library/a", true, "Structures", "Draft"),
+            new LibraryRoot("/library/b", true, "Structures", "Draft")
+        });
+        UpsertCatalogFamily("/library/a/Desk.rfa", "Desk", "same-bytes", timestamp);
+        UpsertCatalogFamily("/library/b/Desk.rfa", "Desk", "same-bytes", timestamp.AddMinutes(1));
+        UpsertCatalogFamily("/library/b/Desk Variant.rfa", "Desk", "different-bytes", timestamp.AddMinutes(2));
+
+        FamilyCatalogFilterOptions filters = _repository.GetFilterOptions();
+        CollectionAssert.Contains(new List<string>(filters.Categories), "Furniture");
+        CollectionAssert.Contains(new List<string>(filters.TypeNames), "Standard");
+        CollectionAssert.Contains(new List<string>(filters.ParameterNames), "Width");
+        CollectionAssert.AreEqual(new[] { Path.GetFullPath("/library/a"), Path.GetFullPath("/library/b") }, new List<string>(filters.RootPaths));
+
+        IReadOnlyList<FamilySearchResult> rootDuplicates = _repository.Search(new FamilySearchQuery(
+            null, "Furniture", null, null, "Standard", "Width", "/library/a", true, 25));
+
+        Assert.AreEqual(1, rootDuplicates.Count);
+        Assert.IsTrue(rootDuplicates[0].HasExactDuplicates);
+        Assert.IsTrue(rootDuplicates[0].HasNameVariants);
+        Assert.AreEqual(2, rootDuplicates[0].ExactDuplicateCount);
+        Assert.AreEqual(2, rootDuplicates[0].NameVariantCount);
+        StringAssert.Contains(rootDuplicates[0].DuplicateLabel, "Exact copy");
     }
 
     private void UpsertMinimal(string path, DateTimeOffset timestamp)
@@ -178,5 +213,29 @@ public sealed class SqliteFamilyRepositoryTests
             "Draft",
             null);
         _repository.Upsert(metadata, new LibraryFileCandidate(path, 10, timestamp), ThumbnailResult.None, timestamp);
+    }
+
+    private void UpsertCatalogFamily(string path, string displayName, string hash, DateTimeOffset timestamp)
+    {
+        string fullPath = Path.GetFullPath(path);
+        FamilyMetadata metadata = new FamilyMetadata(
+            fullPath,
+            displayName,
+            "Furniture",
+            "2025",
+            new[] { "Standard" },
+            Array.Empty<FamilyParameter>(),
+            Array.Empty<string>(),
+            "Draft",
+            "Structures",
+            new[]
+            {
+                new FamilyTypeMetadata("Standard", new[] { new FamilyParameter("Width", "60", "Length", true) })
+            });
+        _repository.Upsert(
+            metadata,
+            new LibraryFileCandidate(fullPath, 10, timestamp, hash),
+            ThumbnailResult.None,
+            timestamp);
     }
 }

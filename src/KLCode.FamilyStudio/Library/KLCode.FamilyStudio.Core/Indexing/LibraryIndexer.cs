@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using KLCode.FamilyStudio.Core.Configuration;
@@ -97,6 +99,7 @@ public sealed class LibraryIndexer
         }
 
         LibraryScanResult scan = _scanner.Scan(configuration);
+        _repository.SyncLibraryRoots(configuration.LibraryRoots);
         List<IndexRunError> errors = new List<IndexRunError>();
         int updated = 0;
         int skipped = 0;
@@ -137,6 +140,11 @@ public sealed class LibraryIndexer
     {
         try
         {
+            LibraryFileCandidate indexedFile = new LibraryFileCandidate(
+                file.FilePath,
+                file.FileSize,
+                file.ModifiedUtc,
+                CreateSha256(file.FilePath));
             FamilyMetadata metadata = await _metadataExtractor
                 .ExtractAsync(file.FilePath, cancellationToken)
                 .ConfigureAwait(false);
@@ -163,7 +171,7 @@ public sealed class LibraryIndexer
                         ? "Preview refresh failed; the prior preview was retained. " + exception.Message
                         : "Preview refresh failed; the family was indexed without a preview. " + exception.Message));
             }
-            _repository.Upsert(metadata, file, thumbnail, _utcNow());
+            _repository.Upsert(metadata, indexedFile, thumbnail, _utcNow());
             return true;
         }
         catch (OperationCanceledException)
@@ -175,5 +183,20 @@ public sealed class LibraryIndexer
             errors.Add(new IndexRunError(file.FilePath, exception.Message));
             return false;
         }
+    }
+
+    private static string? CreateSha256(string filePath)
+    {
+        // Test doubles and failed network files can be represented by a scan
+        // candidate without an accessible local stream. Metadata extraction
+        // remains responsible for reporting those failures.
+        if (!File.Exists(filePath))
+        {
+            return null;
+        }
+
+        using FileStream stream = File.OpenRead(filePath);
+        using SHA256 hash = SHA256.Create();
+        return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", string.Empty);
     }
 }
