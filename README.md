@@ -192,7 +192,7 @@ For repository-specific contributor requirements, see [AGENTS.md](AGENTS.md).
 The tests focus on logic that can run outside Revit. From the repository root:
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests -p "*_test.py"
+.\.venv-rvt26\Scripts\python.exe -m unittest discover -s tests -p "*_test.py"
 ```
 
 This does not replace testing commands in Revit. Validate model changes,
