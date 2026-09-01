@@ -29,6 +29,17 @@ _LAUNCHERS = (
         'can_launch': True,
     },
     {
+        'id': 'kla-design-system-smoke',
+        'category': 'DevSandbox',
+        'title': 'Compiled design-system smoke window',
+        'relative_path': 'src/KLCode.Wpf/Views/DesignSystemSmokeWindow.xaml',
+        'called_by': 'KL&A Tools_dev.tab/05 DevSandbox.panel/Design System Smoke.invokebutton',
+        'description': 'Compiled WPF host check for shared palette, chrome, and locale resources.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Windows package and Revit host required',
+        'can_launch': False,
+    },
+    {
         'id': 'kla-duplicate-sheets',
         'category': 'KL&A custom',
         'title': 'Duplicate sheets',

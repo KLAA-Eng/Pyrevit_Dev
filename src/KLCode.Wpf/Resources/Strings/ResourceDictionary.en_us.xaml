@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <system:String x:Key="DesignSystemSmokeTitle">KLCode Design System</system:String>
+    <system:String x:Key="BrandSlash">/</system:String>
+    <system:String x:Key="BrandName">KLCode</system:String>
+    <system:String x:Key="CloseLabel">Close</system:String>
+    <system:String x:Key="DesignSystemSmokeBody">Compiled WPF theme resources loaded.</system:String>
+    <system:String x:Key="PrototypeLabel">Prototype</system:String>
+    <system:String x:Key="VersionLabel">Version: 2.0</system:String>
+    <system:String x:Key="OutreachLabel">Outreach</system:String>
+</ResourceDictionary>

@@ -86,6 +86,9 @@
           "Microsoft.Data.Sqlite": "[8.0.30, )",
           "SQLitePCLRaw.provider.e_sqlite3": "[2.1.12, )"
         }
+      },
+      "klcode.wpf": {
+        "type": "Project"
       }
     },
     "net8.0-windows7.0/win-x64": {

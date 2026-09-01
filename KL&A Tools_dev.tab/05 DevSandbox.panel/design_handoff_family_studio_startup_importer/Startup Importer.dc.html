@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<script src="./ds-base.js"></script>
+<style>
+  *{scrollbar-width:thin;scrollbar-color:#000 #286048}
+  ::-webkit-scrollbar{width:12px;height:12px}
+  ::-webkit-scrollbar-track{background:#286048;border-radius:10px;margin:3px}
+  ::-webkit-scrollbar-thumb{background:#000;border-radius:8px}
+  .si-desk a{color:#407058}
+  .si-desk a:hover{color:#33714F}
+</style>
+</helmet>
+<div class="si-desk" style="min-height:100vh;background:#6E6E6E;padding:56px;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif;display:flex;flex-wrap:wrap;gap:64px;align-items:flex-start">
+
+<!-- ============ SI-1: FILE & SETTINGS PICKER ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:12px;color:#E5E4E2;background:#33714F;padding:2px 8px;border-radius:8px">SI-1</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Checklist &amp; Settings Picker</span>
+    <span style="font-size:12px;color:#3a3a3a">replaces the two native OpenFileDialogs</span>
+  </div>
+  <div style="width:560px;height:470px;background:#1A252B;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)" data-screen-label="Importer Picker">
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+      <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+      <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">Startup Importer</span>
+      <button style="grid-column:3;grid-row:1;justify-self:center;width:60px;height:18px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:10px;cursor:pointer" style-hover="background:#407058">Close</button>
+    </div>
+    <div style="flex:1;padding:10px 14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto">
+      <!-- checklist field -->
+      <div style="border:1px solid #286048;border-radius:10px;padding:10px;position:relative">
+        <div style="font-size:12px;color:#33714F;position:absolute;top:-9px;left:10px;background:#1A252B;padding:0 5px">Startup Checklist</div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:2px">
+          <div style="flex:1;height:22px;background:#1A252B;border:1px solid #33714F;border-radius:5px;display:flex;align-items:center;padding:0 8px;font-size:12px;color:#E5E4E2;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">2601-Startup-Checklist.xlsx</div>
+          <button style="width:70px;height:22px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:11px;cursor:pointer" style-hover="background:#407058">Browse…</button>
+        </div>
+        <div style="font-size:11px;color:#3CB371;margin-top:6px;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:#3CB371"></span>Valid · 6-column contract found on sheet "Checklist" · SHA-256 4a9f…c2</div>
+      </div>
+      <!-- settings field -->
+      <div style="border:1px solid #286048;border-radius:10px;padding:10px;position:relative">
+        <div style="font-size:12px;color:#33714F;position:absolute;top:-9px;left:10px;background:#1A252B;padding:0 5px">Settings JSON</div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:2px">
+          <div style="flex:1;height:22px;background:#1A252B;border:1px solid #33714F;border-radius:5px;display:flex;align-items:center;padding:0 8px;font-size:12px;color:#E5E4E2;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">C:\Controlled Content\startup-settings.json</div>
+          <button style="width:70px;height:22px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:11px;cursor:pointer" style-hover="background:#407058">Browse…</button>
+        </div>
+        <div style="font-size:11px;color:#808080;margin-top:8px;line-height:1.7">
+          <div>Seed model: <span style="color:#9db3a8">C:\Controlled Content\KL&amp;A Seed.rvt</span> <span style="color:#3CB371">· reachable</span></div>
+          <div>Catalog: <span style="color:#9db3a8">startup-catalog.json</span> · version <span style="color:#E5E4E2">2026.08</span></div>
+        </div>
+      </div>
+      <!-- destination -->
+      <div style="border:1px solid #286048;border-radius:10px;padding:10px;position:relative">
+        <div style="font-size:12px;color:#33714F;position:absolute;top:-9px;left:10px;background:#1A252B;padding:0 5px">Destination</div>
+        <div style="font-size:12px;color:#E5E4E2;margin-top:2px">Active project: <span style="color:#9db3a8">2601 — Riverside Tower.rvt</span></div>
+      </div>
+    </div>
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:8px 14px">
+      <span style="font-size:11px;color:#808080;flex:1">Nothing is created until you review.</span>
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#9db3a8;font-family:Arial;font-size:12px;cursor:pointer">Cancel</button>
+      <button style="width:150px;height:30px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Review Import →</button>
+    </div>
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;font-size:12px">
+      <a href="#" style="justify-self:start;margin-left:10px;font-weight:500;text-decoration:underline">Prototype</a>
+      <span style="justify-self:center;color:#808080">Version: 2.0</span>
+      <a href="#" style="justify-self:end;margin-right:10px;font-weight:500;text-decoration:underline">Outreach</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SI-2: REVIEW DIALOG (healthy, importable) ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:12px;color:#E5E4E2;background:#33714F;padding:2px 8px;border-radius:8px">SI-2</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Review — item picker with live preview</span>
+    <span style="font-size:12px;color:#3a3a3a">replaces the TaskDialog · healthy / importable</span>
+  </div>
+  <div style="width:860px;height:640px;background:#1A252B;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)" data-screen-label="Importer Review">
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+      <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+      <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">Review Startup Import</span>
+      <button style="grid-column:3;grid-row:1;justify-self:center;width:60px;height:18px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:10px;cursor:pointer" style-hover="background:#407058">Close</button>
+    </div>
+    <!-- summary strip -->
+    <div style="display:flex;gap:6px;padding:8px 12px 4px;flex-wrap:wrap">
+      <span style="font-size:11px;color:#3CB371;border:1px solid #3CB371;border-radius:8px;padding:2px 8px">6 matched for import</span>
+      <span style="font-size:11px;color:#808080;border:1px solid #3d5049;border-radius:8px;padding:2px 8px">2 already present · skipped</span>
+      <span style="font-size:11px;color:#808080;border:1px solid #3d5049;border-radius:8px;padding:2px 8px">3 unchecked</span>
+      <span style="font-size:11px;color:#9db3a8;border:1px solid #3d5049;border-radius:8px;padding:2px 8px;margin-left:auto">Catalog 2026.08 · SHA 4a9f…c2</span>
+    </div>
+    <!-- split: table + preview -->
+    <div style="flex:1;min-height:0;display:grid;grid-template-columns:1fr 300px;gap:10px;padding:4px 12px">
+      <!-- table -->
+      <div style="min-height:0;display:flex;flex-direction:column;border:1px solid #286048;border-radius:10px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:26px 78px 1fr 96px 104px;gap:6px;padding:6px 8px;background:#22303a;font-size:11px;color:#33714F;font-weight:600">
+          <span></span><span>Item ID</span><span>Title</span><span>Category</span><span>Status</span>
+        </div>
+        <div style="flex:1;overflow-y:auto">
+          <sc-for list="{{ rows }}" as="r" hint-placeholder-count="11">
+            <div style="{{ r.rowStyle }}">
+              <span style="{{ r.boxStyle }}">{{ r.mark }}</span>
+              <span style="font-size:11px;color:#E5E4E2;font-family:Consolas,monospace">{{ r.id }}</span>
+              <span style="font-size:11px;color:#FFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.title }}</span>
+              <span style="font-size:11px;color:#808080">{{ r.cat }}</span>
+              <span style="{{ r.statusStyle }}">{{ r.status }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <!-- preview / targeting -->
+      <div style="min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;color:#33714F">Selected · D-001</div>
+        <div style="aspect-ratio:4/3;background:#10171b;border:1px solid #286048;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+          <span style="font-family:Consolas,monospace;font-size:11px;color:#3f5a4c">seed drafting view</span>
+          <span style="font-size:11px;color:#5c6d64">D-001 Seed Detail · 4:3</span>
+        </div>
+        <div style="font-size:12px;color:#E5E4E2">Typ. Anchor Bolt Detail</div>
+        <div style="border:1px solid #286048;border-radius:10px;padding:8px;position:relative">
+          <div style="font-size:12px;color:#33714F;position:absolute;top:-9px;left:10px;background:#1A252B;padding:0 5px">Placement target</div>
+          <div style="display:flex;border:1px solid #286048;border-radius:8px;overflow:hidden;margin-top:4px">
+            <div style="flex:1;text-align:center;padding:4px 0;font-size:11px;background:#286048;color:#FFF">Drafting View</div>
+            <div style="flex:1;text-align:center;padding:4px 0;font-size:11px;color:#9db3a8">Sheet</div>
+          </div>
+          <div style="font-size:11px;color:#808080;margin-top:8px;line-height:1.6">New view: <span style="color:#E5E4E2">D-001 Detail</span><br>Source scale &amp; content preserved · native, editable</div>
+        </div>
+        <div style="font-size:11px;color:#808080;line-height:1.6">Requires: <span style="color:#9db3a8">3/32" Arial</span> text type, <span style="color:#9db3a8">Thin Lines</span> style — <span style="color:#3CB371">both present</span></div>
+      </div>
+    </div>
+    <!-- action bar -->
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:8px 12px">
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Select All</button>
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Select None</button>
+      <span style="font-size:11px;color:#808080;margin-left:6px">6 will be created · full rollback on any failure</span>
+      <div style="flex:1"></div>
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#9db3a8;font-family:Arial;font-size:12px;cursor:pointer">Cancel</button>
+      <button style="width:180px;height:30px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Import 6 Items</button>
+    </div>
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;font-size:12px">
+      <a href="#" style="justify-self:start;margin-left:10px;font-weight:500;text-decoration:underline">Prototype</a>
+      <span style="justify-self:center;color:#808080">Version: 2.0</span>
+      <a href="#" style="justify-self:end;margin-right:10px;font-weight:500;text-decoration:underline">Outreach</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SI-3: REVIEW DIALOG (blocking) ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:12px;color:#E5E4E2;background:#33714F;padding:2px 8px;border-radius:8px">SI-3</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Review — blocking issues</span>
+    <span style="font-size:12px;color:#3a3a3a">unknown + duplicate ids · import disabled</span>
+  </div>
+  <div style="width:560px;height:520px;background:#1A252B;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)">
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+      <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+      <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">Review Startup Import</span>
+      <button style="grid-column:3;grid-row:1;justify-self:center;width:60px;height:18px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:10px;cursor:pointer" style-hover="background:#407058">Close</button>
+    </div>
+    <div style="padding:8px 12px 4px">
+      <div style="border:1px solid #DAA520;border-radius:8px;padding:8px 10px;display:flex;gap:10px;align-items:flex-start">
+        <span style="color:#DAA520;font-size:16px;font-weight:bold;line-height:1">!</span>
+        <span style="font-size:12px;color:#E5E4E2;line-height:1.5">Resolve the checklist issues before importing. Fix or clear the blocking items, then reopen Review.</span>
+      </div>
+    </div>
+    <div style="flex:1;min-height:0;overflow-y:auto;padding:4px 12px;display:flex;flex-direction:column;gap:8px">
+      <div style="border:1px solid #FF8000;border-radius:10px;padding:10px">
+        <div style="font-size:12px;color:#FF8000;font-weight:600;margin-bottom:6px">2 unknown ids — not in catalog 2026.08</div>
+        <div style="font-size:11px;color:#E5E4E2;font-family:Consolas,monospace;line-height:1.8">D-097 &nbsp;·&nbsp; Custom Grid Detail<br>N-014 &nbsp;·&nbsp; Special Inspection Note</div>
+      </div>
+      <div style="border:1px solid #DAA520;border-radius:10px;padding:10px">
+        <div style="font-size:12px;color:#DAA520;font-weight:600;margin-bottom:6px">1 duplicate id — selected 3× in the checklist</div>
+        <div style="font-size:11px;color:#E5E4E2;font-family:Consolas,monospace;line-height:1.8">D-001 &nbsp;·&nbsp; rows 4, 19, 33 — all excluded from matches</div>
+      </div>
+      <div style="border:1px solid #286048;border-radius:10px;padding:10px">
+        <div style="font-size:12px;color:#3CB371;font-weight:600;margin-bottom:4px">4 items still importable</div>
+        <div style="font-size:11px;color:#808080">You can cancel, or import only the clean matches after clearing the blockers above.</div>
+      </div>
+    </div>
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:8px 12px">
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Copy Issue Report</button>
+      <div style="flex:1"></div>
+      <button style="width:180px;height:30px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:default;opacity:.45">Import blocked</button>
+    </div>
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;font-size:12px">
+      <a href="#" style="justify-self:start;margin-left:10px;font-weight:500;text-decoration:underline">Prototype</a>
+      <span style="justify-self:center;color:#808080">Version: 2.0</span>
+      <a href="#" style="justify-self:end;margin-right:10px;font-weight:500;text-decoration:underline">Outreach</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SI-4: PLACEMENT & SPLIT + LIVE EXTENTS ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:12px;color:#E5E4E2;background:#33714F;padding:2px 8px;border-radius:8px">SI-4</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Placement &amp; Split — live extents</span>
+    <span style="font-size:12px;color:#3a3a3a">multi-column / multi-sheet · from Axiom Office Importer</span>
+  </div>
+  <div style="width:720px;height:520px;background:#1A252B;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)">
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+      <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+      <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">Place: General Structural Notes</span>
+      <button style="grid-column:3;grid-row:1;justify-self:center;width:60px;height:18px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:10px;cursor:pointer" style-hover="background:#407058">Close</button>
+    </div>
+    <div style="flex:1;min-height:0;display:grid;grid-template-columns:250px 1fr;gap:12px;padding:10px 12px">
+      <!-- controls -->
+      <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto">
+        <div style="border:1px solid #286048;border-radius:10px;padding:10px;position:relative">
+          <div style="font-size:12px;color:#33714F;position:absolute;top:-9px;left:10px;background:#1A252B;padding:0 5px">Target</div>
+          <div style="display:flex;border:1px solid #286048;border-radius:8px;overflow:hidden;margin-top:4px">
+            <div style="flex:1;text-align:center;padding:4px 0;font-size:11px;background:#286048;color:#FFF">Sheet</div>
+            <div style="flex:1;text-align:center;padding:4px 0;font-size:11px;color:#9db3a8">Drafting View</div>
+          </div>
+          <div style="height:22px;margin-top:8px;background:#1A252B;border:1px solid #33714F;border-radius:2px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;font-size:11px;color:#E5E4E2;cursor:pointer">S-001 General Notes<span style="color:#33714F">▾</span></div>
+        </div>
+        <div style="border:1px solid #286048;border-radius:10px;padding:10px;position:relative">
+          <div style="font-size:12px;color:#33714F;position:absolute;top:-9px;left:10px;background:#1A252B;padding:0 5px">Split</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;font-size:11px;color:#E5E4E2">Columns<span style="color:#E5E4E2;background:#22303a;border:1px solid #286048;border-radius:5px;padding:1px 10px">3</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;font-size:11px;color:#E5E4E2">Spill to sheets<span style="color:#E5E4E2;background:#22303a;border:1px solid #286048;border-radius:5px;padding:1px 10px">Auto</span></div>
+          <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:#E5E4E2;cursor:pointer"><span style="width:14px;height:14px;border-radius:2px;background:linear-gradient(to top right,rgba(48,112,80,.9),rgba(40,96,72,.85))"></span>Keep link to source doc</label>
+        </div>
+        <div style="border:1px solid #286048;border-radius:10px;padding:10px;position:relative">
+          <div style="font-size:12px;color:#33714F;position:absolute;top:-9px;left:10px;background:#1A252B;padding:0 5px">Text mapping</div>
+          <div style="font-size:11px;color:#808080;line-height:1.7;margin-top:2px">Word 10 pt → <span style="color:#E5E4E2">3/32"</span><br>Word 12 pt → <span style="color:#E5E4E2">1/8"</span><br>Bold / italic / underline preserved</div>
+        </div>
+      </div>
+      <!-- live extents preview -->
+      <div style="border:1px solid #286048;border-radius:10px;background:#0d1418;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center">
+        <div style="position:absolute;top:8px;left:10px;font-size:11px;color:#5c6d64;font-family:Consolas,monospace">S-001 · live extents</div>
+        <!-- sheet -->
+        <div style="width:300px;height:390px;background:#131c21;border:1px solid #3d5049;position:relative;display:flex;flex-direction:column">
+          <div style="position:absolute;inset:8px;border:1px dashed #33714F;pointer-events:none"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:16px;flex:1">
+            <div style="border:1px solid #407058;background:rgba(51,113,79,.15);border-radius:2px"></div>
+            <div style="border:1px solid #407058;background:rgba(51,113,79,.15);border-radius:2px"></div>
+            <div style="border:1px solid #FF8000;background:rgba(255,128,0,.12);border-radius:2px;position:relative"><span style="position:absolute;bottom:2px;left:2px;font-size:8px;color:#FF8000;font-family:Consolas,monospace">spills →</span></div>
+          </div>
+          <div style="height:26px;border-top:1px solid #3d5049;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:8px;color:#5c6d64">TITLE BLOCK</div>
+        </div>
+        <div style="position:absolute;bottom:8px;left:10px;right:10px;font-size:11px;color:#808080;text-align:center">3 columns fit · col 3 spills to <span style="color:#FF8000">S-002</span> · paste stays within border</div>
+      </div>
+    </div>
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:8px 12px">
+      <span style="font-size:11px;color:#808080;flex:1">Preview updates live as you drag columns.</span>
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#9db3a8;font-family:Arial;font-size:12px;cursor:pointer">Cancel</button>
+      <button style="width:150px;height:30px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Place</button>
+    </div>
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;font-size:12px">
+      <a href="#" style="justify-self:start;margin-left:10px;font-weight:500;text-decoration:underline">Prototype</a>
+      <span style="justify-self:center;color:#808080">Version: 2.0</span>
+      <a href="#" style="justify-self:end;margin-right:10px;font-weight:500;text-decoration:underline">Outreach</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SI-5: UPDATE / SYNC LINKS MANAGER ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:12px;color:#E5E4E2;background:#33714F;padding:2px 8px;border-radius:8px">SI-5</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Update Startup Links — sync manager</span>
+    <span style="font-size:12px;color:#3a3a3a">live source link · detect drift · rebuild</span>
+  </div>
+  <div style="width:720px;height:480px;background:#1A252B;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)">
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+      <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+      <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">Update Startup Links</span>
+      <button style="grid-column:3;grid-row:1;justify-self:center;width:60px;height:18px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:10px;cursor:pointer" style-hover="background:#407058">Close</button>
+    </div>
+    <div style="padding:8px 12px 4px;font-size:11px;color:#808080">Import groups carry a link to their source checklist &amp; seed. This recomputes hashes and flags drift — you choose what to rebuild.</div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid #286048;border-radius:10px;margin:4px 12px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:26px 1fr 110px 130px;gap:6px;padding:6px 8px;background:#22303a;font-size:11px;color:#33714F;font-weight:600">
+        <span></span><span>Import group / source</span><span>Items</span><span>Status</span>
+      </div>
+      <div style="flex:1;overflow-y:auto">
+        <div style="display:grid;grid-template-columns:26px 1fr 110px 130px;gap:6px;padding:8px;align-items:center;border-bottom:1px solid #22303a">
+          <span style="width:15px;height:15px;border-radius:2px;background:linear-gradient(to top right,rgba(48,112,80,.9),rgba(40,96,72,.85));display:flex;align-items:center;justify-content:center;font-size:9px;color:#E5E4E2">✓</span>
+          <div><div style="font-size:12px;color:#FFF">2601 Startup — 2026-06-04</div><div style="font-size:10px;color:#808080">2601-Startup-Checklist.xlsx · SHA 4a9f…c2</div></div>
+          <span style="font-size:11px;color:#808080">8 views</span>
+          <span style="font-size:11px;color:#DAA520;border:1px solid #DAA520;border-radius:8px;padding:1px 8px;justify-self:start">Source changed</span>
+        </div>
+        <div style="display:grid;grid-template-columns:26px 1fr 110px 130px;gap:6px;padding:8px;align-items:center;border-bottom:1px solid #22303a">
+          <span style="width:15px;height:15px;border-radius:2px;border:1px solid #3d5049"></span>
+          <div><div style="font-size:12px;color:#FFF">2601 Gen Notes — 2026-06-04</div><div style="font-size:10px;color:#808080">2601-Startup-Checklist.xlsx · SHA 4a9f…c2</div></div>
+          <span style="font-size:11px;color:#808080">3 notes</span>
+          <span style="font-size:11px;color:#3CB371;border:1px solid #3CB371;border-radius:8px;padding:1px 8px;justify-self:start">Up to date</span>
+        </div>
+        <div style="display:grid;grid-template-columns:26px 1fr 110px 130px;gap:6px;padding:8px;align-items:center;border-bottom:1px solid #22303a">
+          <span style="width:15px;height:15px;border-radius:2px;border:1px solid #3d5049"></span>
+          <div><div style="font-size:12px;color:#FFF">2601 Schedules — 2026-06-04</div><div style="font-size:10px;color:#FF8000">source file not found at stored path</div></div>
+          <span style="font-size:11px;color:#808080">2 sched</span>
+          <span style="font-size:11px;color:#FF8000;border:1px solid #FF8000;border-radius:8px;padding:1px 8px;justify-self:start">Link broken</span>
+        </div>
+      </div>
+    </div>
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:8px 12px">
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Browse… relink</button>
+      <span style="font-size:11px;color:#808080;margin-left:4px">1 changed · 1 broken</span>
+      <div style="flex:1"></div>
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:#9db3a8;font-family:Arial;font-size:12px;cursor:pointer">Close</button>
+      <button style="width:180px;height:30px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Rebuild Selected</button>
+    </div>
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;font-size:12px">
+      <a href="#" style="justify-self:start;margin-left:10px;font-weight:500;text-decoration:underline">Prototype</a>
+      <span style="justify-self:center;color:#808080">Version: 2.0</span>
+      <a href="#" style="justify-self:end;margin-right:10px;font-weight:500;text-decoration:underline">Outreach</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SI-6: IMPORT SUMMARY + ERROR ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:12px;color:#E5E4E2;background:#33714F;padding:2px 8px;border-radius:8px">SI-6</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Import Summary &amp; Error</span>
+  </div>
+  <div style="display:flex;gap:24px;align-items:flex-start">
+    <!-- summary (info alert) -->
+    <div style="width:440px;height:300px;background:#1A252B;border:1px solid #286048;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)">
+      <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+        <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+        <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">KL&amp;A Startup Importer</span>
+      </div>
+      <div style="flex:1;padding:14px 20px;display:flex;gap:14px;align-items:flex-start">
+        <div style="width:34px;height:34px;flex-shrink:0;border-radius:50%;border:2px solid #3CB371;display:flex;align-items:center;justify-content:center;color:#3CB371;font-size:22px;font-family:Georgia,serif;font-style:italic">i</div>
+        <div>
+          <div style="font-size:16px;color:#33714F;font-weight:bold;margin-bottom:6px">Import complete</div>
+          <div style="font-size:12px;color:#E5E4E2;line-height:1.7">Created items: <span style="color:#3CB371">6</span><br>Skipped existing: <span style="color:#9db3a8">2</span><br>Catalog version: <span style="color:#9db3a8">2026.08</span><br><br>All content is native and editable. A source link was stored on each new view.</div>
+        </div>
+      </div>
+      <div style="height:55px;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:10px;border-top:1px solid #286048">
+        <button style="width:150px;height:30px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Open First View</button>
+        <button style="width:100px;height:30px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">OK</button>
+      </div>
+    </div>
+    <!-- error (warning alert) -->
+    <div style="width:440px;height:300px;background:#1A252B;border:1px solid #286048;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)">
+      <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+        <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+        <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">KL&amp;A Startup Importer</span>
+      </div>
+      <div style="flex:1;padding:14px 20px;display:flex;gap:14px;align-items:flex-start">
+        <div style="width:34px;height:34px;flex-shrink:0;border-radius:50%;border:2px solid #DAA520;display:flex;align-items:center;justify-content:center;color:#DAA520;font-size:22px;font-weight:bold">!</div>
+        <div>
+          <div style="font-size:16px;color:#33714F;font-weight:bold;margin-bottom:6px">Checklist could not be read</div>
+          <div style="font-size:12px;color:#E5E4E2;line-height:1.6">Row 12 has an invalid Selected value <span style="font-family:Consolas,monospace;color:#DAA520">"maybe"</span>. Use x, true, yes, 1 — or blank / false / no / 0.<br><br>Nothing was imported. Fix the row and try again.</div>
+        </div>
+      </div>
+      <div style="height:55px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-top:1px solid #286048">
+        <button style="width:200px;height:30px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const mk = React.createElement("svg", { width: 9, height: 9, viewBox: "0 0 9 9" }, React.createElement("path", { d: "M 0 4 L 3 8 8 0", fill: "none", stroke: "#E5E4E2", strokeWidth: 2 }));
+    const box = checked => "width:15px;height:15px;border-radius:2px;display:flex;align-items:center;justify-content:center;background:" + (checked ? "linear-gradient(to top right,rgba(48,112,80,.9),rgba(40,96,72,.85))" : "transparent") + ";border:1px solid " + (checked ? "#33714F" : "#3d5049");
+    const chip = (label, color) => "font-size:10px;color:" + color + ";border:1px solid " + color + ";border-radius:8px;padding:1px 7px;justify-self:start;white-space:nowrap";
+    const green = "#3CB371", gray = "#808080", gold = "#DAA520", orange = "#FF8000";
+    const defs = [
+      ["D-001", "Typ. Anchor Bolt Detail", "detail", "Matched", green, true, true],
+      ["D-014", "Base Plate Detail", "detail", "Matched", green, true, false],
+      ["D-204", "Moment Frame Elev.", "detail", "Matched", green, true, false],
+      ["N-001", "General Structural Notes", "general note", "Matched", green, true, false],
+      ["N-008", "Special Inspection Notes", "general note", "Matched", green, true, false],
+      ["S-330", "Shear Wall Schedule", "schedule", "Matched", green, true, false],
+      ["D-118", "Weld Symbol Legend", "detail", "Existing", gray, false, false],
+      ["N-002", "Deferred Submittals", "general note", "Existing", gray, false, false],
+      ["D-402", "Anchor Embed Detail", "detail", "Unchecked", gray, false, false],
+      ["S-101", "Column Schedule", "schedule", "Unchecked", gray, false, false],
+      ["N-020", "Abbreviations", "general note", "Unchecked", gray, false, false],
+    ];
+    const rows = defs.map(([id, title, cat, status, color, checked, sel]) => ({
+      id, title, cat, status,
+      mark: checked ? mk : null,
+      boxStyle: box(checked),
+      statusStyle: chip(status, color),
+      rowStyle: "display:grid;grid-template-columns:26px 78px 1fr 96px 104px;gap:6px;padding:6px 8px;align-items:center;border-bottom:1px solid #22303a;background:" + (sel ? "rgba(51,113,79,.22)" : "transparent"),
+    }));
+    return { rows };
+  }
+}
+</script>
+</body>
+</html>

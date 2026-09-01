@@ -28,6 +28,8 @@
     <Error Condition="!Exists('$(BundleBin)\KLA.ModelStartupImporter.Revit_2024.dll')" Text="Packaging did not produce KLA.ModelStartupImporter.Revit_2024.dll." />
     <Error Condition="!Exists('$(BundleBin)\KLA.ModelStartupImporter.Revit.dll')" Text="Packaging did not produce KLA.ModelStartupImporter.Revit.dll." />
     <Error Condition="!Exists('$(BundleBin)\KLA.ModelStartupImporter.Core.dll')" Text="Packaging did not copy KLA.ModelStartupImporter.Core.dll." />
+    <Error Condition="!Exists('$(BundleBin)\KLCode.Wpf_2024.dll')" Text="Packaging did not preserve the Revit 2024 WPF adapter." />
+    <Error Condition="!Exists('$(BundleBin)\KLCode.Wpf.dll')" Text="Packaging did not produce the Revit 2025+ WPF adapter." />
     <Error Condition="!Exists('$(BundleBin)\DocumentFormat.OpenXml.dll')" Text="Packaging did not copy DocumentFormat.OpenXml.dll." />
     <Error Condition="!Exists('$(BundleBin)\DocumentFormat.OpenXml.Framework.dll')" Text="Packaging did not copy DocumentFormat.OpenXml.Framework.dll." />
   </Target>
