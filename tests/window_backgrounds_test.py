@@ -79,6 +79,18 @@ class WindowBackgroundTests(unittest.TestCase):
             self.assertIn('forms.WPFWindow', script, relative_path)
             self.assertNotIn('from WPF_Base import my_WPF', script, relative_path)
 
+    def test_view_range_comboboxes_use_dark_template(self):
+        relative_path = 'KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml'
+        xaml_path = os.path.join(PROJECT_ROOT, relative_path)
+        with open(xaml_path, 'r') as xaml_file:
+            xaml = xaml_file.read()
+
+        self.assertIn('x:Key="ComboBoxToggleButton"', xaml)
+        self.assertIn('x:Key="{x:Type ComboBox}"', xaml)
+        self.assertIn('x:Key="{x:Type ComboBoxItem}"', xaml)
+        self.assertIn('DropDownBorder', xaml)
+        self.assertIn('SelectionBoxItem', xaml)
+
 
 if __name__ == '__main__':
     unittest.main()
