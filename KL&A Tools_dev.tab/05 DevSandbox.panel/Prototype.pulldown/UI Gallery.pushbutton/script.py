@@ -5,8 +5,8 @@ from __future__ import print_function
 import os
 import sys
 
-import wpf
 from pyrevit import forms
+from System.Windows.Input import MouseButtonState
 
 
 def _extension_root(path):
@@ -34,8 +34,6 @@ XAML_PATH = os.path.join(os.path.dirname(__file__), 'Gallery.xaml')
 GUI_LIB_DIR = os.path.join(LIB_DIR, 'GUI')
 if GUI_LIB_DIR not in sys.path:
     sys.path.insert(0, GUI_LIB_DIR)
-
-from WPF_Base import my_WPF
 
 
 class GalleryRow(object):
@@ -91,14 +89,20 @@ class ViewRangePreviewData(object):
         self.cutplane_level_name = 'Level 01 - Lobby'
 
 
-class Gallery(my_WPF):
+class Gallery(forms.WPFWindow):
     def __init__(self):
-        self.add_wpf_resource()
-        wpf.LoadComponent(self, XAML_PATH)
+        forms.WPFWindow.__init__(self, XAML_PATH)
         self._rows = [GalleryRow(launcher) for launcher in gallery_launchers()]
         self._visible_rows = list(self._rows)
         self.EntriesGrid.ItemsSource = self._visible_rows
         self._update_actions()
+
+    def button_close(self, sender, args):
+        self.Close()
+
+    def header_drag(self, sender, args):
+        if args.LeftButton == MouseButtonState.Pressed:
+            self.DragMove()
 
     def filter_changed(self, sender, args):
         query = (self.FilterBox.Text or '').lower()
@@ -458,10 +462,9 @@ class Gallery(my_WPF):
             EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
             'ViewRange.pushbutton', 'MainWindow.xaml')
 
-        class ViewRangePreview(my_WPF):
+        class ViewRangePreview(forms.WPFWindow):
             def __init__(self):
-                self.add_wpf_resource()
-                wpf.LoadComponent(self, xaml_path)
+                forms.WPFWindow.__init__(self, xaml_path)
                 self.DataContext = ViewRangePreviewData()
                 self.ShowDialog()
 
@@ -470,6 +473,13 @@ class Gallery(my_WPF):
 
             def reset_values_click(self, sender, args):
                 self.warning.Text = 'Preview values are already seeded.'
+
+            def button_close(self, sender, args):
+                self.Close()
+
+            def header_drag(self, sender, args):
+                if args.LeftButton == MouseButtonState.Pressed:
+                    self.DragMove()
 
         ViewRangePreview()
 

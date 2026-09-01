@@ -65,6 +65,20 @@ class WindowBackgroundTests(unittest.TestCase):
             self.assertNotIn('#E8E8E8', xaml, relative_path)
             self.assertNotIn('Foreground="Red"', xaml, relative_path)
 
+    def test_command_windows_keep_pyrevit_wpf_loader(self):
+        script_paths = (
+            'KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/script.py',
+            'KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py',
+        )
+
+        for relative_path in script_paths:
+            script_path = os.path.join(PROJECT_ROOT, relative_path)
+            with open(script_path, 'r') as script_file:
+                script = script_file.read()
+
+            self.assertIn('forms.WPFWindow', script, relative_path)
+            self.assertNotIn('from WPF_Base import my_WPF', script, relative_path)
+
 
 if __name__ == '__main__':
     unittest.main()

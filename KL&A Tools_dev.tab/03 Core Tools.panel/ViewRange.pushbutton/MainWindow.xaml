@@ -5,6 +5,51 @@
         WindowStartupLocation="CenterScreen"
         WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResize"
         Background="#1A252B">
+    <Window.Resources>
+        <SolidColorBrush x:Key="header_background" Color="#1A252B"/>
+        <SolidColorBrush x:Key="text_white" Color="#E5E4E2"/>
+        <SolidColorBrush x:Key="text_gray" Color="Gray"/>
+        <SolidColorBrush x:Key="text_green" Color="#33714F"/>
+        <SolidColorBrush x:Key="button_fg_normal" Color="White"/>
+        <SolidColorBrush x:Key="button_bg_normal" Color="#286048"/>
+        <SolidColorBrush x:Key="button_bg_hover" Color="#407058"/>
+        <SolidColorBrush x:Key="border_green_dark" Color="#286048"/>
+        <SolidColorBrush x:Key="border_green" Color="#33714F"/>
+
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource button_fg_normal}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="8" Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource button_bg_hover}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource text_white}"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource header_background}"/>
+            <Setter Property="Foreground" Value="{StaticResource text_white}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource border_green}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{StaticResource header_background}"/>
+            <Setter Property="Foreground" Value="{StaticResource text_white}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource border_green}"/>
+        </Style>
+    </Window.Resources>
     <Grid Background="#1A252B">
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
