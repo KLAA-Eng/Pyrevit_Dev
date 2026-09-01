@@ -89,6 +89,16 @@ _LAUNCHERS = (
         'can_launch': True,
     },
     {
+        'id': 'kla-main-template',
+        'category': 'KL&A custom',
+        'title': 'KLCode main template',
+        'relative_path': 'lib/GUI/_templates/KLCodeMainTemplate.xaml',
+        'called_by': 'UI Gallery.pushbutton template preview',
+        'description': 'Editable SelectFromDict baseline with fictional selectable items.',
+        'uses_seed_data': True,
+        'can_launch': True,
+    },
+    {
         'id': 'kla-match-properties-recall',
         'category': 'KL&A custom',
         'title': 'Match properties recall',

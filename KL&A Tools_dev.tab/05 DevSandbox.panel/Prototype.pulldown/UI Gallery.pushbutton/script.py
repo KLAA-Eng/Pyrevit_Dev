@@ -192,6 +192,8 @@ class Gallery(forms.WPFWindow):
             self._launch_duplicate_sheets_preview()
         elif launcher_id == 'kla-match-properties-recall':
             self._launch_match_properties_recall_preview()
+        elif launcher_id == 'kla-main-template':
+            self._launch_main_template_preview()
         elif launcher_id == 'kla-select-from-dict':
             from SelectFromDict import select_from_dict
             select_from_dict(dict((name, name) for name in sample_names),
@@ -390,6 +392,83 @@ class Gallery(forms.WPFWindow):
                                         'UI_sheet_name_prefix': 'Sample - ',
                                         'UI_sheet_name_suffix': ' - Review',
                                     })
+
+    def _launch_main_template_preview(self):
+        import wpf
+        from GUI.forms import my_WPF
+
+        xaml_path = os.path.join(
+            EXTENSION_ROOT, 'lib', 'GUI', '_templates', 'KLCodeMainTemplate.xaml')
+
+        class MainTemplatePreview(my_WPF):
+            def __init__(self):
+                self._items = [
+                    PreviewListItem('A101 - Floor Plan', 'a101', True),
+                    PreviewListItem('A201 - Building Section', 'a201', False),
+                    PreviewListItem('S101 - Foundation Plan', 's101', False),
+                    PreviewListItem('M101 - HVAC Plan', 'm101', False),
+                    PreviewListItem('A301 - Reflected Ceiling Plan', 'a301', False),
+                    PreviewListItem('A401 - Exterior Elevations', 'a401', False),
+                    PreviewListItem('A501 - Wall Sections', 'a501', False),
+                    PreviewListItem('A601 - Interior Elevations', 'a601', False),
+                    PreviewListItem('A701 - Finish Plans', 'a701', False),
+                    PreviewListItem('A801 - Door and Frame Schedule', 'a801', False),
+                    PreviewListItem('S201 - Framing Plan', 's201', False),
+                    PreviewListItem('S301 - Typical Details', 's301', False),
+                    PreviewListItem('S401 - Steel Details', 's401', False),
+                    PreviewListItem('S501 - Foundation Details', 's501', False),
+                    PreviewListItem('M201 - Ductwork Plan', 'm201', False),
+                    PreviewListItem('M301 - Piping Plan', 'm301', False),
+                    PreviewListItem('M401 - Equipment Schedule', 'm401', False),
+                    PreviewListItem('E101 - Lighting Plan', 'e101', False),
+                    PreviewListItem('E201 - Power Plan', 'e201', False),
+                    PreviewListItem('E301 - Electrical Details', 'e301', False),
+                    PreviewListItem('P101 - Plumbing Plan', 'p101', False),
+                    PreviewListItem('P201 - Sanitary Plan', 'p201', False),
+                    PreviewListItem('P301 - Plumbing Details', 'p301', False),
+                    PreviewListItem('FP101 - Fire Protection Plan', 'fp101', False),
+                    PreviewListItem('FP201 - Fire Protection Details', 'fp201', False),
+                    PreviewListItem('C001 - General Notes', 'c001', False),
+                    PreviewListItem('C101 - Civil Site Plan', 'c101', False),
+                    PreviewListItem('L101 - Landscape Plan', 'l101', False),
+                    PreviewListItem('I001 - Interior Design Legend', 'i001', False),
+                ]
+                self.add_wpf_resource()
+                wpf.LoadComponent(self, xaml_path)
+                self.main_title.Text = 'Main template — gallery preview'
+                self.text_label.Content = 'Select fictional drawing types:'
+                self.button_main.Content = 'Close preview'
+                self.footer_version.Text = 'UI Gallery — fictional data only'
+                self.main_ListBox.ItemsSource = self._items
+                self.ShowDialog()
+
+            def text_filter_updated(self, sender, args):
+                query = (self.textbox_filter.Text or '').lower()
+                if not query:
+                    self.main_ListBox.ItemsSource = self._items
+                    return
+                self.main_ListBox.ItemsSource = [
+                    item for item in self._items if query in item.Name.lower()
+                ]
+
+            def UIe_ItemChecked(self, sender, args):
+                return None
+
+            def button_select_all(self, sender, args):
+                self._set_checked(True)
+
+            def button_select_none(self, sender, args):
+                self._set_checked(False)
+
+            def _set_checked(self, checked):
+                for item in self._items:
+                    item.IsChecked = checked
+                self.main_ListBox.ItemsSource = list(self._items)
+
+            def button_select(self, sender, args):
+                self.Close()
+
+        MainTemplatePreview()
 
     def _launch_static_preview(self, xaml_path, title, sample_values=None):
         import wpf
