@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using KLCode.FamilyStudio.Core.Search;
@@ -30,6 +31,31 @@ internal sealed class RevitFamilyLoadService : IFamilyLoadService
             ?? throw new InvalidOperationException("The selected family has no placeable types.");
         Activate(symbol);
         _uiDocument.PromptForFamilyInstancePlacement(symbol);
+    }
+
+    public void LoadBatch(IReadOnlyList<FamilySearchResult> families)
+    {
+        if (families is null || families.Count == 0)
+        {
+            throw new ArgumentException("At least one family is required for batch loading.", nameof(families));
+        }
+
+        using TransactionGroup group = new TransactionGroup(_uiDocument.Document, "Load Family Studio Families");
+        group.Start();
+        try
+        {
+            foreach (FamilySearchResult family in families)
+            {
+                Load(family);
+            }
+
+            group.Assimilate();
+        }
+        catch
+        {
+            group.RollBack();
+            throw;
+        }
     }
 
     private Family GetOrLoadFamily(FamilySearchResult family)

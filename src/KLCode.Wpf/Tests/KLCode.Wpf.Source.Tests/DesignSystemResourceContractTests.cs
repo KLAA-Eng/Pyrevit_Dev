@@ -35,6 +35,33 @@ public sealed class DesignSystemResourceContractTests
         "OutreachLabel",
     };
 
+    private static readonly string[] RequiredCompiledStyleKeys =
+    {
+        "KlaWindowStyle",
+        "KlaHeaderBrandStyle",
+        "KlaHeaderTitleStyle",
+        "KlaButtonStyle",
+        "KlaSmallButtonStyle",
+        "KlaCloseButtonStyle",
+        "KlaGhostButtonStyle",
+        "KlaLinkButtonStyle",
+        "KlaSegmentButtonStyle",
+        "KlaTextBoxStyle",
+        "KlaComboBoxStyle",
+        "KlaCheckBoxStyle",
+        "KlaListBoxStyle",
+        "KlaListBoxItemStyle",
+        "KlaGroupBorderStyle",
+        "KlaPreviewBorderStyle",
+        "KlaGroupCaptionStyle",
+        "KlaChipBorderStyle",
+        "KlaInfoChipStyle",
+        "KlaWarningChipStyle",
+        "KlaBlockingChipStyle",
+        "KlaNeutralChipStyle",
+        "KlaFooterTextStyle",
+    };
+
     private static readonly XNamespace Presentation =
         "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
 
@@ -101,6 +128,57 @@ public sealed class DesignSystemResourceContractTests
                 StringAssert.StartsWith(attribute.Value, "{StaticResource ");
             }
         }
+    }
+
+    [TestMethod]
+    public void CompiledAdapter_DefinesTheCompleteIsolatedControlSurfaceAndEmbedsAudiowide()
+    {
+        XDocument controls = LoadXaml("src/KLCode.Wpf/Resources/KLCodeControls.xaml");
+        HashSet<string> styleKeys = controls
+            .Descendants(Presentation + "Style")
+            .Select(element => (string?)element.Attribute(Xaml + "Key"))
+            .Where(key => key is not null)
+            .Select(key => key!)
+            .ToHashSet(StringComparer.Ordinal);
+        CollectionAssert.IsSubsetOf(RequiredCompiledStyleKeys, styleKeys.ToArray());
+
+        string[] mergedSources = controls
+            .Descendants(Presentation + "ResourceDictionary")
+            .Attributes("Source")
+            .Select(attribute => attribute.Value)
+            .ToArray();
+        CollectionAssert.Contains(mergedSources, "KLCodePalette.xaml");
+        CollectionAssert.Contains(mergedSources, "KLCodeCompiledTokens.xaml");
+
+        XDocument project = XDocument.Load(Path.Combine(FindRepositoryRoot(), "src/KLCode.Wpf/KLCode.Wpf.csproj"));
+        XElement? font = project.Descendants("Resource")
+            .FirstOrDefault(element => ((string?)element.Attribute("Include"))?.EndsWith(
+                "Audiowide-Regular.ttf", StringComparison.OrdinalIgnoreCase) == true);
+        Assert.IsNotNull(font, "The handoff Audiowide font must be embedded in the compiled adapter.");
+        Assert.AreEqual("Assets/Fonts/Audiowide-Regular.ttf", ((string?)font.Attribute("Link"))?.Replace('\\', '/'));
+    }
+
+    [TestMethod]
+    public void ApprovedHandoffWindows_UseExactDimensionsAndRequiredChrome()
+    {
+        AssertWindowContract(
+            "src/KLCode.FamilyStudio/Revit/KLCode.FamilyStudio.Revit/Views/FamilyStudioWindow.xaml",
+            "1180", "740",
+            "SearchBox", "Results", "GridResults", "Thumbnail", "BatchLoadButton", "EmptyState");
+        AssertWindowContract(
+            "src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/Views/StartupSourcePickerWindow.xaml",
+            "560", "470",
+            "ChecklistStatus", "SettingsStatus");
+        AssertWindowContract(
+            "src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/Views/StartupImportReviewWindow.xaml",
+            "860", "640");
+        AssertWindowContract(
+            "src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/Views/BlockingIssuesWindow.xaml",
+            "560", "520");
+        AssertWindowContract(
+            "src/KLCode.Wpf/Views/KlaAlertWindow.xaml",
+            "440", "300",
+            "AlertIconBorder", "AlertHeading", "AlertMessage");
     }
 
     [TestMethod]
@@ -220,5 +298,34 @@ public sealed class DesignSystemResourceContractTests
                 "/KLCode.Wpf/KLCode.Wpf.csproj",
                 StringComparison.Ordinal)),
             relativePath + " must reference the shared compiled-WPF adapter.");
+    }
+
+    private static void AssertWindowContract(
+        string relativePath,
+        string expectedWidth,
+        string expectedHeight,
+        params string[] requiredNames)
+    {
+        XDocument window = LoadXaml(relativePath);
+        Assert.AreEqual(expectedWidth, (string?)window.Root?.Attribute("Width"), relativePath + " width");
+        Assert.AreEqual(expectedHeight, (string?)window.Root?.Attribute("Height"), relativePath + " height");
+        Assert.AreEqual("{StaticResource KlaWindowStyle}", (string?)window.Root?.Attribute("Style"));
+
+        HashSet<string> names = window.Descendants()
+            .Select(element => (string?)element.Attribute(Xaml + "Name"))
+            .Where(name => name is not null)
+            .Select(name => name!)
+            .ToHashSet(StringComparer.Ordinal);
+        CollectionAssert.IsSubsetOf(requiredNames, names.ToArray(), relativePath);
+
+        string source = window.ToString(SaveOptions.DisableFormatting);
+        StringAssert.Contains(source, "KlaHeaderBrandStyle", relativePath);
+        StringAssert.Contains(source, "BrandSlash", relativePath);
+        StringAssert.Contains(source, "BrandName", relativePath);
+        if (!relativePath.EndsWith("KlaAlertWindow.xaml", StringComparison.Ordinal))
+        {
+            StringAssert.Contains(source, "KlaFooterTextStyle", relativePath);
+            StringAssert.Contains(source, "VersionLabel", relativePath);
+        }
     }
 }

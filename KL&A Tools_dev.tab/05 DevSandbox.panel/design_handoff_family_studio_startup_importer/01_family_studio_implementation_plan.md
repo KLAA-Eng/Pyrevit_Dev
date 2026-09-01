@@ -2,8 +2,11 @@
 
 - Repository / evidence commit: `KLCode.pyRevit`, `e856ca3`; design source: `Family Studio.dc.html` and this handoff's `README.md`.
 - Owner / priority / scope: KL&A engineering, next after the shared design-system foundation. Command remains `KL&A Tools_dev.tab/05 DevSandbox.panel/Family Studio.invokebutton`.
-- Status: `NOT READY` for implementation until `00_design_system_implementation_plan.md` checkpoint 1 passes and the material decisions below are made.
-- Outcome: replace the imperative, native-looking catalog browser with the FS-1 green WPF browser and support the already-approved Family Studio catalog, load/place, batch, refresh, tags, duplicate-preference, and local-root workflows.
+- Status: `SUPPORTED FS-1 SLICE IMPLEMENTED — LIVE REVIT ACCEPTANCE PENDING`.
+  Source tests and Revit 2024/2025 builds/package pass. Views, project scope,
+  project-local type mutation, root/tag/duplicate-preference editing, and FS-6
+  remain parked behind the ownership/contracts documented below.
+- Outcome: replace the imperative, native-looking catalog browser with the FS-1 green WPF browser and support the approved Family Studio catalog browse/search, load/place, batch, refresh, favorite/recent, preview/detail, and path workflows without inventing unsafe catalog mutation behavior.
 - Non-goals: FS-6 vendor catalog integration; destructive duplicate resolution; shared catalog/root/tag governance; desktop Revit API indexing; production ribbon promotion; unapproved drafting-view support.
 
 ## Current Architecture And Constraints
@@ -37,7 +40,10 @@
 - Owner must define the type-editing scope: loaded project type only versus source-library family document, naming/collision rules, and the allowed duplicate behavior. The plan assumes project-local type edits because source-library mutation would violate catalog safety.
 - Owner must choose the canonical root JSON location and save concurrency behavior. The handoff requests `%APPDATA%\\KLCode\\FamilyStudio\\library.json`, while current refresh accepts a user-selected full configuration that also owns database and thumbnail paths.
 - Dependency: the shared theme/localization plan; Windows Revit assemblies; a disposable Revit project and local family fixture set for live actions.
-- Release gate: all source tests `PASS`; current macOS Family Studio test command is `UNAVAILABLE` until restore runs because `Tests/*/obj/project.assets.json` is absent; Windows Revit 2024/2025+ compilation, packaging, and live validation are `UNAVAILABLE` here. The command remains DevSandbox until all are accepted.
+- Release gate: all 24 source tests `PASS`; Windows Revit 2024/2025+
+  compilation and packaging `PASS`; FS-1 exact-size/resource contracts `PASS`;
+  live Revit 2024/2025+ visual and disposable-project workflow validation
+  `PENDING`. The command remains DevSandbox until live acceptance is recorded.
 
 ## Implementation Checkpoints
 

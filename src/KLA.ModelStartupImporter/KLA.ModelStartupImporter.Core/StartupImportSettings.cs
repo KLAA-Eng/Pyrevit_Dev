@@ -62,6 +62,86 @@ public sealed class StartupImportReview
     public IReadOnlyList<ImportMatch> ExistingMatches { get; }
     public IReadOnlyList<ImportMatch> ActionableMatches { get; }
     public bool CanImport => !Plan.HasBlockingIssues && ActionableMatches.Count > 0;
+
+    public StartupImportSelection CreateSelection(IEnumerable<string> selectedItemIds)
+    {
+        return StartupImportSelection.Create(this, selectedItemIds);
+    }
+}
+
+/// <summary>
+/// UI-owned selection intent. It contains only stable catalog item identifiers;
+/// the Revit host rebuilds the review immediately before mutating a project.
+/// </summary>
+public sealed class StartupImportSelection
+{
+    private StartupImportSelection(IReadOnlyList<string> itemIds)
+    {
+        ItemIds = itemIds;
+    }
+
+    public IReadOnlyList<string> ItemIds { get; }
+
+    public static StartupImportSelection Create(
+        StartupImportReview review,
+        IEnumerable<string> selectedItemIds)
+    {
+        if (review is null)
+        {
+            throw new ArgumentNullException(nameof(review));
+        }
+
+        if (selectedItemIds is null)
+        {
+            throw new ArgumentNullException(nameof(selectedItemIds));
+        }
+
+        HashSet<string> actionable = new HashSet<string>(
+            review.ActionableMatches.Select(match => match.Item.ItemId),
+            StringComparer.OrdinalIgnoreCase);
+        List<string> selected = selectedItemIds
+            .Where(itemId => !string.IsNullOrWhiteSpace(itemId))
+            .Select(itemId => itemId.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        if (selected.Count == 0)
+        {
+            throw new InvalidOperationException("Select at least one actionable startup item.");
+        }
+
+        if (selected.Any(itemId => !actionable.Contains(itemId)))
+        {
+            throw new InvalidOperationException(
+                "The import selection contains an item that is not actionable in the current review.");
+        }
+
+        return new StartupImportSelection(new ReadOnlyCollection<string>(selected));
+    }
+
+    public IReadOnlyList<ImportMatch> Resolve(StartupImportReview review)
+    {
+        if (review is null)
+        {
+            throw new ArgumentNullException(nameof(review));
+        }
+
+        if (review.Plan.HasBlockingIssues)
+        {
+            throw new InvalidOperationException("Resolve unknown and duplicate selected checklist items before importing.");
+        }
+
+        HashSet<string> selected = new HashSet<string>(ItemIds, StringComparer.OrdinalIgnoreCase);
+        ImportMatch[] matches = review.ActionableMatches
+            .Where(match => selected.Contains(match.Item.ItemId))
+            .ToArray();
+        if (matches.Length != ItemIds.Count)
+        {
+            throw new InvalidOperationException(
+                "The project changed after review; selected startup items must be reviewed again.");
+        }
+
+        return new ReadOnlyCollection<ImportMatch>(matches);
+    }
 }
 
 public sealed class StartupImportReviewBuilder

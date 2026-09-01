@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Windows;
 
 namespace KLCode.Wpf;
@@ -22,6 +23,48 @@ public static class ThemeBootstrapper
         resources.MergedDictionaries.Add(Load("Resources/KLCodeControls.xaml"));
         resources.MergedDictionaries.Add(
             Load("Resources/Strings/ResourceDictionary." + locale + ".xaml"));
+    }
+
+    /// <summary>
+    /// Adds a tool-owned string dictionary after the common chrome resources.
+    /// A missing requested locale deliberately falls back to the tool's English
+    /// dictionary; it never selects a partially translated dictionary.
+    /// </summary>
+    public static void ApplyToolStrings(
+        ResourceDictionary resources,
+        string? requestedLocale,
+        Assembly toolAssembly,
+        IEnumerable<string> availableLocales,
+        string resourceDirectory)
+    {
+        if (resources is null)
+        {
+            throw new ArgumentNullException(nameof(resources));
+        }
+
+        if (toolAssembly is null)
+        {
+            throw new ArgumentNullException(nameof(toolAssembly));
+        }
+
+        if (string.IsNullOrWhiteSpace(resourceDirectory))
+        {
+            throw new ArgumentException("A resource directory is required.", nameof(resourceDirectory));
+        }
+
+        string locale = SupportedLocaleCatalog.SelectAvailableLocale(
+            requestedLocale,
+            availableLocales);
+        string assemblyName = toolAssembly.GetName().Name
+            ?? throw new InvalidOperationException("The tool resource assembly name is unavailable.");
+        string directory = resourceDirectory.Trim('/');
+        resources.MergedDictionaries.Add(new ResourceDictionary
+        {
+            Source = new Uri(
+                "/" + assemblyName + ";component/" + directory +
+                "/ResourceDictionary." + locale + ".xaml",
+                UriKind.RelativeOrAbsolute),
+        });
     }
 
     private static ResourceDictionary Load(string componentPath)

@@ -2,12 +2,14 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="KLCodePalette.xaml" />
+        <ResourceDictionary Source="KLCodeCompiledTokens.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style x:Key="KlaWindowStyle" TargetType="{x:Type Window}">
         <Setter Property="Background" Value="{StaticResource header_background}" />
         <Setter Property="Foreground" Value="{StaticResource text_white}" />
         <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="12" />
         <Setter Property="WindowStyle" Value="None" />
         <Setter Property="AllowsTransparency" Value="True" />
         <Setter Property="ResizeMode" Value="NoResize" />
@@ -15,25 +17,93 @@
         <Setter Property="UseLayoutRounding" Value="True" />
     </Style>
 
+    <Style x:Key="KlaHeaderBrandStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="FontFamily" Value="{StaticResource KlaLogoFont}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Foreground" Value="{StaticResource text_white}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Margin" Value="5,0,0,0" />
+    </Style>
+    <Style x:Key="KlaHeaderTitleStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{StaticResource text_white}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+
     <Style x:Key="KlaButtonStyle" TargetType="{x:Type Button}">
         <Setter Property="Background" Value="{StaticResource button_bg_normal}" />
         <Setter Property="Foreground" Value="{StaticResource button_fg_normal}" />
         <Setter Property="FontFamily" Value="Arial" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="Padding" Value="12,0" />
         <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border x:Name="ButtonBorder"
-                            Background="{TemplateBinding Background}"
-                            CornerRadius="8">
-                        <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center" />
+                    <Border x:Name="ButtonBorder" Background="{TemplateBinding Background}" CornerRadius="8">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ButtonBorder"
-                                    Property="Background"
-                                    Value="{StaticResource button_bg_hover}" />
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource button_bg_hover}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="KlaSmallButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource KlaButtonStyle}">
+        <Setter Property="Height" Value="22" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="10,0" />
+    </Style>
+    <Style x:Key="KlaCloseButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource KlaButtonStyle}">
+        <Setter Property="Width" Value="60" />
+        <Setter Property="Height" Value="18" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontSize" Value="10" />
+    </Style>
+    <Style x:Key="KlaGhostButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource KlaButtonStyle}">
+        <Setter Property="Background" Value="{StaticResource KlaTransparentBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource KlaSubtleTextBrush}" />
+    </Style>
+    <Style x:Key="KlaLinkButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource KlaGhostButtonStyle}">
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Padding" Value="2,0" />
+        <Setter Property="Foreground" Value="{StaticResource footer_donate}" />
+        <Setter Property="TextBlock.TextDecorations" Value="Underline" />
+    </Style>
+
+    <Style x:Key="KlaSegmentButtonStyle" TargetType="{x:Type RadioButton}">
+        <Setter Property="Foreground" Value="{StaticResource KlaSubtleTextBrush}" />
+        <Setter Property="FontFamily" Value="Arial" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Height" Value="22" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RadioButton}">
+                    <Border x:Name="SegmentBorder" Background="Transparent" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource button_bg_normal}" />
+                            <Setter Property="Foreground" Value="{StaticResource button_fg_normal}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource button_bg_hover}" />
+                            <Setter Property="Foreground" Value="{StaticResource button_fg_normal}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.45" />
@@ -45,17 +115,245 @@
         </Setter>
     </Style>
 
-    <Style x:Key="KlaCloseButtonStyle"
-           TargetType="{x:Type Button}"
-           BasedOn="{StaticResource KlaButtonStyle}">
-        <Setter Property="Width" Value="60" />
-        <Setter Property="Height" Value="18" />
-        <Setter Property="FontSize" Value="10" />
+    <Style x:Key="KlaTextBoxStyle" TargetType="{x:Type TextBox}">
+        <Setter Property="Background" Value="{StaticResource header_background}" />
+        <Setter Property="Foreground" Value="{StaticResource text_white}" />
+        <Setter Property="CaretBrush" Value="{StaticResource text_white}" />
+        <Setter Property="BorderBrush" Value="{StaticResource border_green}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Height" Value="22" />
+        <Setter Property="Padding" Value="6,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5">
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
+    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource KlaTextBoxStyle}" />
+
+    <ControlTemplate x:Key="KlaComboBoxToggleTemplate" TargetType="{x:Type ToggleButton}">
+        <Grid>
+            <Border Background="{StaticResource header_background}" BorderBrush="{StaticResource border_green}"
+                    BorderThickness="1" CornerRadius="2" />
+            <Path HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,7,0"
+                  Fill="{StaticResource text_green}" Data="M 0 0 L 8 0 L 4 5 Z" />
+        </Grid>
+    </ControlTemplate>
+    <Style x:Key="KlaComboBoxStyle" TargetType="{x:Type ComboBox}">
+        <Setter Property="Background" Value="{StaticResource header_background}" />
+        <Setter Property="Foreground" Value="{StaticResource text_white}" />
+        <Setter Property="BorderBrush" Value="{StaticResource border_green}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Height" Value="22" />
+        <Setter Property="MinWidth" Value="80" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ComboBox}">
+                    <Grid>
+                        <ToggleButton x:Name="ToggleButton" Template="{StaticResource KlaComboBoxToggleTemplate}"
+                                      Focusable="False" ClickMode="Press"
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
+                        <ContentPresenter Margin="7,0,24,0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                          Content="{TemplateBinding SelectionBoxItem}"
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
+                        <Popup x:Name="PART_Popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}"
+                               AllowsTransparency="True" PopupAnimation="Slide">
+                            <Border Margin="0,2,0,0" MinWidth="{TemplateBinding ActualWidth}" MaxHeight="260"
+                                    Background="{StaticResource header_background}" BorderBrush="{StaticResource border_green}"
+                                    BorderThickness="1" CornerRadius="2">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource KlaComboBoxStyle}" />
+    <Style TargetType="{x:Type ComboBoxItem}">
+        <Setter Property="Foreground" Value="{StaticResource text_white}" />
+        <Setter Property="Background" Value="{StaticResource header_background}" />
+        <Setter Property="Padding" Value="7,4" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                    <Border x:Name="ItemBorder" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource KlaRowHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource KlaRowSelectedBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="KlaCheckBoxStyle" TargetType="{x:Type CheckBox}">
+        <Setter Property="Foreground" Value="{StaticResource text_white}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type CheckBox}">
+                    <BulletDecorator Background="Transparent">
+                        <BulletDecorator.Bullet>
+                            <Border x:Name="CheckBorder" Width="15" Height="15" CornerRadius="2"
+                                    Background="Transparent" BorderBrush="{StaticResource KlaNeutralBorderBrush}" BorderThickness="1">
+                                <Path x:Name="CheckMark" Width="9" Height="9" Visibility="Collapsed"
+                                      Stroke="{StaticResource text_white}" StrokeThickness="2" Data="M 0 4 L 3 8 8 0" />
+                            </Border>
+                        </BulletDecorator.Bullet>
+                        <ContentPresenter Margin="5,0,0,0" VerticalAlignment="Center" />
+                    </BulletDecorator>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource KlaCheckboxFillBrush}" />
+                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource border_green}" />
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource KlaNearBlackBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource KlaCheckBoxStyle}" />
+
+    <Style x:Key="KlaListBoxStyle" TargetType="{x:Type ListBox}">
+        <Setter Property="Background" Value="{StaticResource header_background}" />
+        <Setter Property="Foreground" Value="{StaticResource text_white}" />
+        <Setter Property="BorderBrush" Value="{StaticResource border_green_dark}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="5" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Visible" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBox}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10" Padding="{TemplateBinding Padding}">
+                        <ScrollViewer Focusable="False"><ItemsPresenter /></ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="KlaListBoxItemStyle" TargetType="{x:Type ListBoxItem}">
+        <Setter Property="Foreground" Value="{StaticResource text_white}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="6" />
+        <Setter Property="Margin" Value="0,0,0,2" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                    <Border x:Name="RowBorder" Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}" CornerRadius="8">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="RowBorder" Property="Background" Value="{StaticResource KlaRowHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="RowBorder" Property="Background" Value="{StaticResource KlaRowSelectedBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="KlaScrollThumbStyle" TargetType="{x:Type Thumb}">
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="{x:Type Thumb}">
+            <Border Background="{StaticResource KlaBlackBrush}" CornerRadius="8" />
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style TargetType="{x:Type ScrollBar}">
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Background" Value="{StaticResource border_green_dark}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollBar}">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="10" Margin="3">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False" /></Track.DecreaseRepeatButton>
+                            <Track.Thumb><Thumb Style="{StaticResource KlaScrollThumbStyle}" MinHeight="24" /></Track.Thumb>
+                            <Track.IncreaseRepeatButton><RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="False" /></Track.IncreaseRepeatButton>
+                        </Track>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="KlaGroupBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="BorderBrush" Value="{StaticResource border_green_dark}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="10" />
+    </Style>
+    <Style x:Key="KlaPreviewBorderStyle" TargetType="{x:Type Border}" BasedOn="{StaticResource KlaGroupBorderStyle}">
+        <Setter Property="Background" Value="{StaticResource KlaSurfaceBrush}" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style x:Key="KlaGroupCaptionStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{StaticResource text_green}" />
+        <Setter Property="Background" Value="{StaticResource header_background}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="5,0" />
+    </Style>
+    <Style x:Key="KlaChipBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{StaticResource border_green}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="7,1" />
+    </Style>
+    <Style x:Key="KlaInfoChipStyle" TargetType="{x:Type Border}" BasedOn="{StaticResource KlaChipBorderStyle}"><Setter Property="BorderBrush" Value="{StaticResource KlaInfoBrush}" /></Style>
+    <Style x:Key="KlaWarningChipStyle" TargetType="{x:Type Border}" BasedOn="{StaticResource KlaChipBorderStyle}"><Setter Property="BorderBrush" Value="{StaticResource KlaWarningBrush}" /></Style>
+    <Style x:Key="KlaBlockingChipStyle" TargetType="{x:Type Border}" BasedOn="{StaticResource KlaChipBorderStyle}"><Setter Property="BorderBrush" Value="{StaticResource KlaBlockingBrush}" /></Style>
+    <Style x:Key="KlaNeutralChipStyle" TargetType="{x:Type Border}" BasedOn="{StaticResource KlaChipBorderStyle}"><Setter Property="BorderBrush" Value="{StaticResource KlaNeutralBorderBrush}" /></Style>
 
     <Style x:Key="KlaFooterTextStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="Foreground" Value="{StaticResource footer_donate}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="TextDecorations" Value="Underline" />
+    </Style>
+    <Style x:Key="KlaMutedTextStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{StaticResource KlaMutedTextBrush}" />
+        <Setter Property="FontSize" Value="11" />
     </Style>
 </ResourceDictionary>

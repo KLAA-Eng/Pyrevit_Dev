@@ -1,7 +1,7 @@
 title: Startup Importer
 tooltip: >-
-  Preflight a structured KL&A Word or Excel startup checklist. The DevSandbox
-  MVP does not modify the active Revit model.
+  Review and create-only import controlled KL&A Word or Excel startup content.
+  Existing targets are skipped; DevSandbox never overwrites them.
 author: KL&A
 context: doc-project
 assembly: KLA.ModelStartupImporter.Revit.dll

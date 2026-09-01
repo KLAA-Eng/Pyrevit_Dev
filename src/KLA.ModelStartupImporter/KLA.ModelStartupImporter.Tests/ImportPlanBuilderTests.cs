@@ -42,4 +42,24 @@ public sealed class ImportPlanBuilderTests
 
         Assert.Contains("D-001", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public void ReviewSelection_AllowsOnlyCurrentActionableItems()
+    {
+        var document = TestModels.Document(
+            TestModels.Item("D-001", selected: true),
+            TestModels.Item("D-002", selected: true));
+        var catalog = new ContentCatalog(new[]
+        {
+            TestModels.CatalogItem("D-001"),
+            TestModels.CatalogItem("D-002"),
+        });
+        var review = new StartupImportReviewBuilder().Build(document, catalog, new[] { "D-002" });
+
+        StartupImportSelection selection = review.CreateSelection(new[] { "d-001" });
+
+        Assert.Equal(new[] { "d-001" }, selection.ItemIds);
+        Assert.Equal(new[] { "D-001" }, selection.Resolve(review).Select(match => match.Item.ItemId));
+        Assert.Throws<InvalidOperationException>(() => review.CreateSelection(new[] { "D-002" }));
+    }
 }

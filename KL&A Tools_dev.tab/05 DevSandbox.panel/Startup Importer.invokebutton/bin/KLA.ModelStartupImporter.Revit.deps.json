@@ -8,7 +8,9 @@
     ".NETCoreApp,Version=v8.0": {
       "KLA.ModelStartupImporter.Revit/1.0.0": {
         "dependencies": {
-          "KLA.ModelStartupImporter.Core": "1.0.0"
+          "KLA.ModelStartupImporter.Core": "1.0.0",
+          "KLA.ModelStartupImporter.UI": "1.0.0",
+          "KLCode.Wpf": "1.0.0"
         },
         "runtime": {
           "KLA.ModelStartupImporter.Revit.dll": {}
@@ -54,6 +56,26 @@
             "fileVersion": "1.0.0.0"
           }
         }
+      },
+      "KLA.ModelStartupImporter.UI/1.0.0": {
+        "dependencies": {
+          "KLA.ModelStartupImporter.Core": "1.0.0",
+          "KLCode.Wpf": "1.0.0"
+        },
+        "runtime": {
+          "KLA.ModelStartupImporter.UI.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "KLCode.Wpf/1.0.0": {
+        "runtime": {
+          "KLCode.Wpf.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -85,6 +107,16 @@
       "hashPath": "system.io.packaging.8.0.1.nupkg.sha512"
     },
     "KLA.ModelStartupImporter.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "KLA.ModelStartupImporter.UI/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "KLCode.Wpf/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

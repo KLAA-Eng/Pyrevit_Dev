@@ -2,7 +2,10 @@
 
 - Repository / evidence commit: `KLCode.pyRevit`, `e856ca3`; design handoff is an untracked input bundle in this directory.
 - Owner / priority / scope: KL&A engineering, active prerequisite for the Family Studio and Startup Importer DevSandbox windows.
-- Status: `NOT READY` for feature delivery until checkpoint 1 proves the theme/resource boundary and the locale inventory is approved.
+- Status: `IMPLEMENTED — LIVE REVIT ACCEPTANCE PENDING`. The compiled adapter,
+  English resource boundary, approved Audiowide asset, Revit 2024/2025 builds,
+  packaging, and source contracts pass; live visual/focus/high-DPI evidence is
+  the remaining gate.
 - Outcome: deliver one compiled-WPF consumption path for the existing green theme so both tools render fixed-size, borderless KLCode dialogs without hard-coded user-facing copy or forked palette values.
 - Non-goals: changing the native-theme tools, changing the visual-system source of truth, shipping the handoff HTML, adding a web UI framework, or promoting either command out of `05 DevSandbox.panel`.
 
@@ -32,11 +35,21 @@
 
 ## Dependencies, Decisions, And Gates
 
-- Owner decision required: whether the existing `WPF_styles.xaml` can receive narrowly scoped compiled-WPF compatibility changes, or must remain unmodified with a consuming adapter. Its `Header` template includes an event-handler reference, so this cannot be assumed.
-- Owner decision required: the authoritative list of the eight supported locales and translations for all new keys. The current source shows an English resource dictionary and a locale-loader pattern, but not the compiled-WPF contract.
-- Owner decision required: confirm whether the handoff font is an approved distributable asset for the Revit assemblies. Existing shared logo assets were not identified in the handoff bundle.
-- Required gates: source-level resource tests `PASS`; Windows Revit 2024 and 2025+ compile/package `UNAVAILABLE` in this macOS workspace; live visual QA `UNAVAILABLE`; accessibility/focus inspection `UNAVAILABLE` until a Windows Revit host is available.
+- Resolved: `WPF_styles.xaml` remains unmodified; `src/KLCode.Wpf` is the
+  compiled-only consuming adapter because the legacy `Header` owns an
+  IronPython event-handler contract.
+- Resolved for this delivery: tool-owned `en_us` dictionaries are authoritative
+  and every unsupported/missing locale deterministically falls back to English.
+  Owner-supplied translations remain future content work.
+- Resolved by repository-owner direction: embed the handoff's
+  `Audiowide-Regular.ttf` in `KLCode.Wpf` for compiled `/KLCode` branding only.
+- Required gates: source-level resource tests `PASS`; Windows Revit 2024 and
+  2025+ compile/package `PASS`; exact-dimension source contracts `PASS`; live
+  Revit visual, keyboard/focus, and high-DPI inspection `PENDING`.
 
 ## Execution Order And Handoff
 
-Run this plan before either tool plan. Checkpoint 1 has exclusive write scope over the selected theme-integration spike; checkpoint 2 can create the approved shared/per-tool resource structure; feature plans then own their separate UI projects. Route an approved plan to `$build` only after the three owner decisions and the smoke-window result are recorded.
+The implementation followed this order. `src/KLCode.Wpf` is the approved
+compiled-only boundary; neither `lib/GUI/Resources/WPF_styles.xaml` nor existing
+Python/pyRevit windows changed. See `DESIGN_SYSTEM_VALIDATION.md` and
+`IMPLEMENTATION_STATUS.md` for the current evidence and live acceptance matrix.

@@ -2,7 +2,10 @@
 
 - Repository / evidence commit: `KLCode.pyRevit`, `e856ca3`; design source: `Startup Importer.dc.html` and this handoff's `README.md`.
 - Owner / priority / scope: KL&A engineering, next after the shared design-system foundation. Command remains `KL&A Tools_dev.tab/05 DevSandbox.panel/Startup Importer.invokebutton`.
-- Status: `NOT READY` for feature delivery until the design-system prerequisite passes and an owner supplies the controlled seed/catalog/live-Revit fixtures required for mutation validation.
+- Status: `SI-1/SI-2/SI-3/SI-6 IMPLEMENTED — LIVE REVIT ACCEPTANCE PENDING`.
+  Core/UI tests, exact-size/resource contracts, and Revit 2024/2025 packaging
+  pass. A controlled checklist/settings/seed/project set is still required for
+  the final live mutation evidence.
 - Outcome: replace the two native file pickers and TaskDialog review/alerts with SI-1, SI-2, SI-3, and SI-6 green WPF screens around the existing deterministic reader, review, and create-only importer.
 - Non-goals: SI-4 placement/split implementation, SI-5 Update Startup Links implementation, Extensible Storage/created-element tracking, PDF intake, overwriting/rebuilding existing targets, or production promotion.
 
@@ -37,7 +40,10 @@
 - Owner must decide whether review-time per-item selection modifies an immutable derived plan or creates a separately validated selection request. The smallest safe route is a UI DTO of actionable item IDs, revalidated by the Revit service immediately before import.
 - The handoff's live preview is a seed-view preview placeholder until the owner defines an approved, safe preview-generation path. It cannot silently open/render arbitrary seed documents outside the current preflight.
 - SI-4/SI-5 are blocked by the existing SPEC: no Extensible Storage identity/version, element tracking, link persistence, rebuild semantics, multi-column conversion/splitting, or physical sheet placement contract exists.
-- Dependencies: design-system/localization foundation; Windows Revit API assemblies; package restore; known fixtures. Current local Core test command is repository-supported but not run here after the Family Studio no-restore gate showed missing assets files; Windows gates remain unavailable in this environment.
+- Dependencies: design-system/localization foundation `PASS`; installed Windows
+  Revit 2024/2025 API assemblies `PASS`; package restore and dual-target package
+  `PASS`; 15 Core and 3 UI tests `PASS`; known live fixtures and Revit-hosted
+  visual/workflow acceptance `PENDING`.
 
 ## Implementation Checkpoints
 

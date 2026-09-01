@@ -1,13 +1,15 @@
 # KLCode compiled-WPF design-system validation
 
-## Checkpoint 1 decision record
+## Completed foundation decision record
 
 - Plan/version: `00_design_system_implementation_plan.md` at evidence commit
   `e856ca3`.
 - Decision owner: KL&A engineering, initiated by the repository owner on
   2026-08-31 for this source checkpoint.
-- Execution boundary: source-level proof in this macOS worktree; Windows/Revit
-  launch evidence remains required.
+- Execution boundary: source-level proof and Windows compile/package evidence
+  in this worktree. The local .NET 8.0.424 SDK/MSBuild installation compiled
+  both Revit targets against the installed Revit API assemblies; live-host
+  visual and workflow evidence remains required.
 - Compatibility decision: keep the legacy IronPython-only
   `WPF_styles.xaml` control templates intact and expose a compiled-safe adapter.
   The canonical brush tokens move to `KLCode_palette.xaml`, which the legacy
@@ -17,11 +19,12 @@
   event target, and compiled feature windows must source copy from locale
   dictionaries.
 - Locale inventory: `en_us`, `ko`, `fr_fr`, `ru`, `chinese_s`, `es_es`,
-  `de_de`, and `pt_br`. Only the approved English smoke copy exists in this
-  checkpoint; every other locale explicitly uses the English fallback until
+  `de_de`, and `pt_br`. Feature copy currently ships in the approved English
+  dictionaries; every other locale explicitly uses the English fallback until
   owner-supplied translations are approved.
-- Font decision: Audiowide is omitted. Distribution/license approval is still
-  required before the handoff font can enter a compiled assembly.
+- Font decision: the repository owner explicitly requested the handoff's
+  Audiowide brand treatment. `Audiowide-Regular.ttf` is embedded only in
+  `KLCode.Wpf` and is used only by compiled feature branding.
 
 Options considered:
 
@@ -42,7 +45,8 @@ host-specific dependency probing layout that removes the shared-bin collision.
 ## Compiled adapter boundary
 
 The compiled adapter owns only behavior and control composition. It references
-the canonical palette keys and does not duplicate color values. The legacy
+the canonical palette keys; compiled-only supplementary/semantic tokens live
+in `KLCodeCompiledTokens.xaml`. The legacy
 `Header` style is intentionally not exposed to compiled consumers. The smoke
 window is the live proof surface for header drag and Close behavior; its
 compiled handlers and English resource bindings pass the source/build gates,
@@ -63,10 +67,12 @@ Required canonical keys:
 
 | Surface | Exact size | Source gate | Revit 2024 | Revit 2025+ | Visual/focus/high-DPI |
 | --- | ---: | --- | --- | --- | --- |
-| Design-system smoke | 440 x 240 | Required resource/static-copy tests | Unavailable on macOS | Unavailable on macOS | Unavailable on macOS |
-| Family Studio FS-1 | 1180 x 740 | Pending feature checkpoint | Pending | Pending | Pending |
-| Startup Importer SI-1 | 760 x 540 | Pending feature checkpoint | Pending | Pending | Pending |
-| Startup Importer SI-2/SI-3 | Per handoff | Pending feature checkpoint | Pending | Pending | Pending |
+| Design-system smoke | 440 x 240 | 13 compiled-WPF source-contract tests passed | Packaged | Packaged | Pending live Revit QA |
+| Family Studio FS-1 | 1180 x 740 | 24 Family Studio source tests passed | Packaged | Packaged | Pending live Revit QA |
+| Startup Importer SI-1 | 560 x 470 | 15 Core + 3 UI tests passed | Packaged | Packaged | Pending live Revit QA |
+| Startup Importer SI-2 | 860 x 640 | 15 Core + 3 UI tests passed | Packaged | Packaged | Pending live Revit QA |
+| Startup Importer SI-3 | 560 x 520 | 15 Core + 3 UI tests passed | Packaged | Packaged | Pending live Revit QA |
+| Startup Importer SI-6 | 440 x 300 | 13 compiled-WPF contracts passed | Packaged | Packaged | Pending live Revit QA |
 
 Windows acceptance must confirm parser/load success, every required key,
 header drag, Close, clipping, keyboard focus order, disabled states, 100% and

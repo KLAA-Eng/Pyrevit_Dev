@@ -1,10 +1,11 @@
 using System;
-using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using KLA.ModelStartupImporter.Core;
-using Microsoft.Win32;
+using KLA.ModelStartupImporter.UI;
+using KLA.ModelStartupImporter.UI.Views;
+using KLCode.Wpf.Views;
 
 namespace KLA.ModelStartupImporter.Revit;
 
@@ -16,82 +17,88 @@ public sealed class StartupImportCommand : IExternalCommand
     {
         if (commandData?.Application?.ActiveUIDocument?.Document == null)
         {
-            message = "Open a Revit project before running Startup Importer.";
+            message = StartupImporterText.Get("OpenProjectFirstLabel");
+            KlaAlertWindow.ShowWarning(
+                null,
+                StartupImporterText.Get("StartupImporterTitle"),
+                StartupImporterText.Get("ChecklistReadFailedHeading"),
+                message);
             return Result.Cancelled;
         }
 
-        var dialog = new OpenFileDialog
-        {
-            Title = "Select a KL&A startup checklist",
-            Filter = "Startup checklists (*.docx;*.xlsx)|*.docx;*.xlsx",
-            CheckFileExists = true,
-            Multiselect = false,
-        };
-        if (dialog.ShowDialog() != true)
-        {
-            return Result.Cancelled;
-        }
-
-        var settingsDialog = new OpenFileDialog
-        {
-            Title = "Select Startup Importer settings",
-            Filter = "Startup Importer settings (*.json)|*.json",
-            CheckFileExists = true,
-            Multiselect = false,
-        };
-        if (settingsDialog.ShowDialog() != true)
+        Document destinationDocument = commandData.Application.ActiveUIDocument.Document;
+        StartupSourcePickerWindow picker = new StartupSourcePickerWindow(destinationDocument.Title);
+        if (picker.ShowDialog() != true)
         {
             return Result.Cancelled;
         }
 
         return ReviewAndImport(
-            dialog.FileName,
-            settingsDialog.FileName,
+            picker.ValidatedDocument ?? new StartupDocumentReader().Read(picker.ChecklistPath),
+            picker.ValidatedSettings ?? new JsonStartupSettingsProvider().Load(picker.SettingsPath),
             commandData.Application.Application,
-            commandData.Application.ActiveUIDocument.Document,
+            destinationDocument,
             ref message);
     }
 
     private static Result ReviewAndImport(
-        string sourcePath,
-        string settingsPath,
+        StartupDocumentModel startupDocument,
+        StartupImportSettings settings,
         Autodesk.Revit.ApplicationServices.Application application,
         Document destinationDocument,
         ref string message)
     {
         try
         {
-            var startupDocument = new StartupDocumentReader().Read(sourcePath);
-            var settings = new JsonStartupSettingsProvider().Load(settingsPath);
             var importer = new RevitStartupImportService(application);
             var review = importer.Review(startupDocument, settings, destinationDocument);
-            var dialog = new TaskDialog("KL&A Startup Importer Review")
+            if (review.Plan.HasBlockingIssues)
             {
-                MainInstruction = review.Plan.HasBlockingIssues
-                    ? "Resolve the checklist issues before importing."
-                    : review.ActionableMatches.Count == 0
-                        ? "No new selected items are available to import."
-                        : "Review the startup content before importing.",
-                MainContent = BuildReviewSummary(startupDocument, settings, review),
-                CommonButtons = review.CanImport ? TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No : TaskDialogCommonButtons.Close,
-                DefaultButton = review.CanImport ? TaskDialogResult.No : TaskDialogResult.Close,
-            };
-            if (dialog.Show() == TaskDialogResult.Yes)
-            {
-                importer.Import(settings, review, destinationDocument);
-                TaskDialog.Show(
-                    "KL&A Startup Importer",
-                    "Import complete. Created items: " + review.ActionableMatches.Count +
-                    "\nSkipped existing items: " + review.ExistingMatches.Count +
-                    "\nCatalog version: " + settings.CatalogVersion);
+                new BlockingIssuesWindow(settings, review).ShowDialog();
+                return Result.Cancelled;
             }
+
+            StartupImportReviewWindow reviewWindow = new StartupImportReviewWindow(
+                startupDocument,
+                settings,
+                review);
+            if (reviewWindow.ShowDialog() != true)
+            {
+                return Result.Cancelled;
+            }
+
+            StartupImportSelection selection = review.CreateSelection(reviewWindow.SelectedItemIds);
+            importer.Import(startupDocument, settings, selection, destinationDocument);
+            KlaAlertWindow.ShowInformation(
+                null,
+                StartupImporterText.Get("StartupImporterTitle"),
+                StartupImporterText.Get("ImportCompleteHeading"),
+                string.Format(
+                    StartupImporterText.Get("ImportCompleteFormat"),
+                    selection.ItemIds.Count,
+                    review.ExistingMatches.Count,
+                    settings.CatalogVersion));
 
             return Result.Succeeded;
         }
         catch (Exception exception) when (IsExpectedInputFailure(exception))
         {
-            message = "The startup checklist could not be read: " + exception.Message;
-            TaskDialog.Show("KL&A Startup Importer", message);
+            message = StartupImporterText.Get("ChecklistReadFailedPrefix") + exception.Message;
+            KlaAlertWindow.ShowWarning(
+                null,
+                StartupImporterText.Get("StartupImporterTitle"),
+                StartupImporterText.Get("ChecklistReadFailedHeading"),
+                message + "\n\n" + StartupImporterText.Get("NothingImportedLabel"));
+            return Result.Failed;
+        }
+        catch (Exception exception)
+        {
+            message = exception.ToString();
+            KlaAlertWindow.ShowWarning(
+                null,
+                StartupImporterText.Get("StartupImporterTitle"),
+                StartupImporterText.Get("ChecklistReadFailedHeading"),
+                StartupImporterText.Get("NothingImportedLabel"));
             return Result.Failed;
         }
     }
@@ -104,19 +111,4 @@ public sealed class StartupImportCommand : IExternalCommand
                exception is StartupSettingsException;
     }
 
-    private static string BuildReviewSummary(
-        StartupDocumentModel startupDocument,
-        StartupImportSettings settings,
-        StartupImportReview review)
-    {
-        return "Selected: " + startupDocument.Items.Count(item => item.IsSelected) + "\n" +
-               "Unchecked: " + review.Plan.SkippedItems.Count + "\n" +
-               "Matched for import: " + review.ActionableMatches.Count + "\n" +
-               "Already present (skipped): " + review.ExistingMatches.Count + "\n" +
-               "Unknown (blocking): " + review.Plan.UnknownItems.Count + "\n" +
-               "Duplicate (blocking): " + review.Plan.DuplicateItems.Count + "\n" +
-               "Catalog version: " + settings.CatalogVersion + "\n" +
-               "Seed model: " + settings.SeedModelPath + "\n" +
-               "Checklist SHA-256: " + startupDocument.FileHash;
-    }
 }

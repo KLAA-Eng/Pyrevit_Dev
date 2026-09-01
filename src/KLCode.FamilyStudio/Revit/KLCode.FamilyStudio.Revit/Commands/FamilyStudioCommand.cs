@@ -7,6 +7,7 @@ using Autodesk.Revit.UI;
 using KLCode.FamilyStudio.Database.Repositories;
 using KLCode.FamilyStudio.Revit.Services;
 using KLCode.FamilyStudio.Revit.Views;
+using KLCode.Wpf.Views;
 using Microsoft.Win32;
 
 namespace KLCode.FamilyStudio.Revit.Commands;
@@ -21,8 +22,12 @@ public sealed class FamilyStudioCommand : IExternalCommand
         UIDocument? uiDocument = revitApplication?.ActiveUIDocument;
         if (revitApplication is null || uiDocument is null || uiDocument.Document.IsFamilyDocument)
         {
-            message = "Family Studio requires an active project document.";
-            TaskDialog.Show("Family Studio", message);
+            message = FamilyStudioText.Get("ActiveProjectRequiredMessage");
+            KlaAlertWindow.ShowWarning(
+                null,
+                FamilyStudioText.Get("FamilyStudioTitle"),
+                FamilyStudioText.Get("FamilyStudioAttentionLabel"),
+                message);
             return Result.Cancelled;
         }
 
@@ -55,8 +60,12 @@ public sealed class FamilyStudioCommand : IExternalCommand
         }
         catch (Exception exception)
         {
-            message = "Family Studio could not open:\n\n" + exception;
-            TaskDialog.Show("Family Studio", message);
+            message = string.Format(FamilyStudioText.Get("CouldNotOpenFormat"), exception);
+            KlaAlertWindow.ShowWarning(
+                null,
+                FamilyStudioText.Get("FamilyStudioTitle"),
+                FamilyStudioText.Get("FamilyStudioAttentionLabel"),
+                message);
             return Result.Cancelled;
         }
     }
@@ -79,8 +88,8 @@ public sealed class FamilyStudioCommand : IExternalCommand
     {
         OpenFileDialog dialog = new OpenFileDialog
         {
-            Title = "Select Family Studio library configuration",
-            Filter = "Family Studio configuration (*.json)|*.json",
+            Title = FamilyStudioText.Get("SelectLibraryConfigurationTitle"),
+            Filter = FamilyStudioText.Get("LibraryConfigurationFilter"),
             CheckFileExists = true,
             Multiselect = false,
         };

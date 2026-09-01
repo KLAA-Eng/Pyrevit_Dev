@@ -5,6 +5,7 @@
     <system:String x:Key="BrandSlash">/</system:String>
     <system:String x:Key="BrandName">KLCode</system:String>
     <system:String x:Key="CloseLabel">Close</system:String>
+    <system:String x:Key="OkLabel">OK</system:String>
     <system:String x:Key="DesignSystemSmokeBody">Compiled WPF theme resources loaded.</system:String>
     <system:String x:Key="PrototypeLabel">Prototype</system:String>
     <system:String x:Key="VersionLabel">Version: 2.0</system:String>

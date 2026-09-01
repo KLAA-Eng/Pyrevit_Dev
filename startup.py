@@ -26,6 +26,14 @@ if HOST_APP.version in ("2024", "2025", "2026"):
     # Invoke Button loads the command assembly from bytes. Revit provides its
     # own API assemblies, but managed companions in each package must be loaded
     # into the AppDomain before the command resolves them.
+    # The 2024 host uses .NET Framework assemblies with a `_2024` identity;
+    # newer hosts use the .NET 8 assemblies without that suffix.
+    _compiled_wpf_assembly = "KLCode.Wpf_2024.dll"
+    _startup_importer_ui_assembly = "KLA.ModelStartupImporter.UI_2024.dll"
+    if HOST_APP.version != "2024":
+        _compiled_wpf_assembly = "KLCode.Wpf.dll"
+        _startup_importer_ui_assembly = "KLA.ModelStartupImporter.UI.dll"
+
     _family_studio_bin = os.path.join(
         os.path.dirname(__file__), "KL&A Tools_dev.tab", "05 DevSandbox.panel",
         "Family Studio.invokebutton", "bin")
@@ -46,6 +54,14 @@ if HOST_APP.version in ("2024", "2025", "2026"):
             "PATH", _family_studio_bin + os.pathsep + current_path)
 
     for _dependency in (
+            os.path.join(
+                "KL&A Tools_dev.tab", "05 DevSandbox.panel",
+                "Startup Importer.invokebutton", "bin",
+                _compiled_wpf_assembly),
+            os.path.join(
+                "KL&A Tools_dev.tab", "05 DevSandbox.panel",
+                "Startup Importer.invokebutton", "bin",
+                _startup_importer_ui_assembly),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
                 "Startup Importer.invokebutton", "bin",

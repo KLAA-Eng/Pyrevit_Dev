@@ -49,6 +49,19 @@ class CompiledCommandBundlesTest(unittest.TestCase):
             )
             self.assertIn("  - " + command_name, panel_metadata)
 
+    def test_startup_preloads_host_specific_compiled_dependencies(self):
+        startup_path = os.path.join(REPO_ROOT, "startup.py")
+        startup_text = _read_text(startup_path)
+
+        self.assertIn('_compiled_wpf_assembly = "KLCode.Wpf_2024.dll"', startup_text)
+        self.assertIn('_startup_importer_ui_assembly = "KLA.ModelStartupImporter.UI_2024.dll"', startup_text)
+        self.assertIn('_compiled_wpf_assembly = "KLCode.Wpf.dll"', startup_text)
+        self.assertIn('_startup_importer_ui_assembly = "KLA.ModelStartupImporter.UI.dll"', startup_text)
+        self.assertLess(
+            startup_text.index("_compiled_wpf_assembly),"),
+            startup_text.index("_startup_importer_ui_assembly),"),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

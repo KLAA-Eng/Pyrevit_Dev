@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\KLCode.Wpf\KLCode.Wpf.csproj" />
+    <ProjectReference Include="..\KLA.ModelStartupImporter.UI\KLA.ModelStartupImporter.UI.csproj" />
     <ProjectReference Include="..\KLA.ModelStartupImporter.Core\KLA.ModelStartupImporter.Core.csproj" />
     <Reference Include="RevitAPI">
       <HintPath>$(RevitApiPath)/RevitAPI.dll</HintPath>

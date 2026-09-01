@@ -18,6 +18,12 @@ public interface ISeedContentImporter
         StartupImportSettings settings,
         StartupImportReview review,
         Document destinationDocument);
+
+    void Import(
+        StartupDocumentModel startupDocument,
+        StartupImportSettings settings,
+        StartupImportSelection selection,
+        Document destinationDocument);
 }
 
 public sealed class RevitStartupImportService : ISeedContentImporter
@@ -80,13 +86,53 @@ public sealed class RevitStartupImportService : ISeedContentImporter
             throw new InvalidOperationException("No selected catalog items are available to import.");
         }
 
+        StartupImportSelection selection = review.CreateSelection(
+            review.ActionableMatches.Select(match => match.Item.ItemId));
+        ImportMatches(settings, selection.Resolve(review), destinationDocument);
+    }
+
+    public void Import(
+        StartupDocumentModel startupDocument,
+        StartupImportSettings settings,
+        StartupImportSelection selection,
+        Document destinationDocument)
+    {
+        if (startupDocument is null)
+        {
+            throw new ArgumentNullException(nameof(startupDocument));
+        }
+
+        if (settings is null)
+        {
+            throw new ArgumentNullException(nameof(settings));
+        }
+
+        if (selection is null)
+        {
+            throw new ArgumentNullException(nameof(selection));
+        }
+
+        StartupImportReview refreshedReview = Review(startupDocument, settings, destinationDocument);
+        ImportMatches(settings, selection.Resolve(refreshedReview), destinationDocument);
+    }
+
+    private void ImportMatches(
+        StartupImportSettings settings,
+        IReadOnlyList<ImportMatch> matches,
+        Document destinationDocument)
+    {
+        if (matches.Count == 0)
+        {
+            throw new InvalidOperationException("No selected catalog items are available to import.");
+        }
+
         using Document seedDocument = _application.OpenDocumentFile(settings.SeedModelPath);
-        ValidateSourceViews(seedDocument, review.ActionableMatches);
+        ValidateSourceViews(seedDocument, matches);
         using TransactionGroup group = new TransactionGroup(destinationDocument, "KL&A Startup Import");
         group.Start();
         try
         {
-            foreach (ImportMatch match in review.ActionableMatches)
+            foreach (ImportMatch match in matches)
             {
                 using Transaction transaction = new Transaction(destinationDocument, "Import " + match.CatalogItem.TargetName);
                 transaction.Start();
