@@ -45,6 +45,26 @@ class WindowBackgroundTests(unittest.TestCase):
             self.assertIn('<Grid Background="#1A252B">', xaml, relative_path)
             self.assertNotIn('<LinearGradientBrush', xaml, relative_path)
 
+    def test_editor_and_gallery_use_branded_chrome(self):
+        target_paths = (
+            'KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
+            'KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml',
+        )
+
+        for relative_path in target_paths:
+            xaml_path = os.path.join(PROJECT_ROOT, relative_path)
+            root = ElementTree.parse(xaml_path).getroot()
+            with open(xaml_path, 'r') as xaml_file:
+                xaml = xaml_file.read()
+
+            self.assertEqual('None', root.attrib.get('WindowStyle'), relative_path)
+            self.assertEqual('True', root.attrib.get('AllowsTransparency'), relative_path)
+            self.assertIn('MouseDown="header_drag"', xaml, relative_path)
+            self.assertIn('x:Name="main_title"', xaml, relative_path)
+            self.assertNotIn('#F5F5F5', xaml, relative_path)
+            self.assertNotIn('#E8E8E8', xaml, relative_path)
+            self.assertNotIn('Foreground="Red"', xaml, relative_path)
+
 
 if __name__ == '__main__':
     unittest.main()

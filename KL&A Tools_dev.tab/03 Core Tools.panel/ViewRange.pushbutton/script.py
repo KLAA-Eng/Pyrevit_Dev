@@ -1,5 +1,9 @@
 # -*- coding: UTF-8 -*-
 
+import os
+import sys
+
+import wpf
 from pyrevit import script, forms, revit, HOST_APP, DB, UI
 from pyrevit.revit import events
 from pyrevit.framework import Convert, List, Color, SolidColorBrush
@@ -9,10 +13,32 @@ from Autodesk.Revit.Exceptions import InvalidOperationException
 from collections import OrderedDict
 
 
+def _extension_root(path):
+    current = os.path.dirname(os.path.abspath(path))
+    while True:
+        if current.lower().endswith(".extension"):
+            return current
+        if os.path.isdir(os.path.join(current, "lib")):
+            return current
+        parent = os.path.dirname(current)
+        if parent == current:
+            return os.path.abspath(path)
+        current = parent
+
+
+EXTENSION_ROOT = _extension_root(__file__)
+GUI_LIB_DIR = os.path.join(EXTENSION_ROOT, "lib", "GUI")
+if GUI_LIB_DIR not in sys.path:
+    sys.path.insert(0, GUI_LIB_DIR)
+
+from WPF_Base import my_WPF
+
+
 doc = HOST_APP.doc
 uidoc = HOST_APP.uidoc
 logger = script.get_logger()
 output = script.get_output()
+XAML_PATH = os.path.join(os.path.dirname(__file__), "MainWindow.xaml")
 
 PLANES = OrderedDict([
     (DB.PlanViewPlane.TopClipPlane, ([0, 255, 0], "Top Clip Plane", "topplane")),
@@ -734,9 +760,10 @@ class MainViewModel(forms.Reactive):
         self._viewdepth_new_value = value
 
 
-class MainWindow(forms.WPFWindow):
+class MainWindow(my_WPF):
     def __init__(self):
-        forms.WPFWindow.__init__(self, "MainWindow.xaml")
+        self.add_wpf_resource()
+        wpf.LoadComponent(self, XAML_PATH)
         self.Closed += self.window_closed
         # Events are now handled via @events.handle decorators
         server.add_server()

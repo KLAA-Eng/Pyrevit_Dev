@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import sys
 
+import wpf
 from pyrevit import forms
 
 
@@ -33,6 +34,8 @@ XAML_PATH = os.path.join(os.path.dirname(__file__), 'Gallery.xaml')
 GUI_LIB_DIR = os.path.join(LIB_DIR, 'GUI')
 if GUI_LIB_DIR not in sys.path:
     sys.path.insert(0, GUI_LIB_DIR)
+
+from WPF_Base import my_WPF
 
 
 class GalleryRow(object):
@@ -88,9 +91,10 @@ class ViewRangePreviewData(object):
         self.cutplane_level_name = 'Level 01 - Lobby'
 
 
-class Gallery(forms.WPFWindow):
+class Gallery(my_WPF):
     def __init__(self):
-        forms.WPFWindow.__init__(self, XAML_PATH)
+        self.add_wpf_resource()
+        wpf.LoadComponent(self, XAML_PATH)
         self._rows = [GalleryRow(launcher) for launcher in gallery_launchers()]
         self._visible_rows = list(self._rows)
         self.EntriesGrid.ItemsSource = self._visible_rows
@@ -454,9 +458,10 @@ class Gallery(forms.WPFWindow):
             EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
             'ViewRange.pushbutton', 'MainWindow.xaml')
 
-        class ViewRangePreview(forms.WPFWindow):
+        class ViewRangePreview(my_WPF):
             def __init__(self):
-                forms.WPFWindow.__init__(self, xaml_path)
+                self.add_wpf_resource()
+                wpf.LoadComponent(self, xaml_path)
                 self.DataContext = ViewRangePreviewData()
                 self.ShowDialog()
 
