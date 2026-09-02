@@ -1,5 +1,0 @@
-title: Design System Smoke
-tooltip: Validate the shared compiled KLCode WPF resources in Revit. DevSandbox only.
-author: KL&A
-assembly: KLCode.FamilyStudio.Revit.dll
-command_class: DesignSystemSmokeCommand

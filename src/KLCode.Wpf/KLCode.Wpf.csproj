@@ -29,7 +29,7 @@
   <ItemGroup Condition="'$(TargetFramework)' != 'net8.0'">
     <Page Include="../../lib/GUI/Resources/KLCode_palette.xaml"
           Link="Resources/KLCodePalette.xaml" />
-    <Resource Include="../../KL&amp;A Tools_dev.tab/05 DevSandbox.panel/design_handoff_family_studio_startup_importer/_ds/klcode-design-system-aefd264c-7a9c-4d51-9c1d-b8ce2d9895f4/assets/fonts/Audiowide-Regular.ttf"
+    <Resource Include="../../lib/_logos/_font/Audiowide-Regular.ttf"
               Link="Assets/Fonts/Audiowide-Regular.ttf" />
   </ItemGroup>
 

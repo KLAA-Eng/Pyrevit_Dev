@@ -29,6 +29,7 @@ Desktop.ini
 !.env.template
 .envrc
 .venv/
+.venv*/
 env/
 venv/
 ENV/
@@ -59,6 +60,7 @@ coverage.xml
 
 .zed
 pyrightconfig.json
+.vscode/
 
 .dotnet
 .family-studio

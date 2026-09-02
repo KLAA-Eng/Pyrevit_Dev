@@ -11,7 +11,6 @@
     <RootNamespace>KLCode.FamilyStudio.Revit</RootNamespace>
     <OutputPath>bin/Revit$(RevitVersion)/</OutputPath>
     <PyRevitBundleBin>$(MSBuildProjectDirectory)/../../../../KL&amp;A Tools_dev.tab/05 DevSandbox.panel/Family Studio.invokebutton/bin</PyRevitBundleBin>
-    <PyRevitSmokeBundleBin>$(MSBuildProjectDirectory)/../../../../KL&amp;A Tools_dev.tab/05 DevSandbox.panel/Design System Smoke.invokebutton/bin</PyRevitSmokeBundleBin>
     <PyRevitAssemblyFileName Condition="'$(RevitVersion)' == '2024'">$(AssemblyName)_2024.dll</PyRevitAssemblyFileName>
     <PyRevitAssemblyFileName Condition="'$(RevitVersion)' != '2024'">$(AssemblyName).dll</PyRevitAssemblyFileName>
     <PyRevitWpfAssemblyFileName Condition="'$(RevitVersion)' == '2024'">KLCode.Wpf_2024.dll</PyRevitWpfAssemblyFileName>
@@ -44,24 +43,16 @@
     <ItemGroup>
       <PyRevitRuntimeFile Include="$(TargetDir)**/*" Exclude="$(TargetPath)" />
     </ItemGroup>
-    <MakeDir Directories="$(PyRevitBundleBin);$(PyRevitSmokeBundleBin)" />
+    <MakeDir Directories="$(PyRevitBundleBin)" />
     <Copy SourceFiles="@(PyRevitRuntimeFile)"
           DestinationFiles="@(PyRevitRuntimeFile->'$(PyRevitBundleBin)/%(RecursiveDir)%(Filename)%(Extension)')"
-          SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(PyRevitRuntimeFile)"
-          DestinationFiles="@(PyRevitRuntimeFile->'$(PyRevitSmokeBundleBin)/%(RecursiveDir)%(Filename)%(Extension)')"
           SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(TargetPath)"
           DestinationFiles="$(PyRevitBundleBin)/$(PyRevitAssemblyFileName)"
           SkipUnchangedFiles="true" />
-    <Copy SourceFiles="$(TargetPath)"
-          DestinationFiles="$(PyRevitSmokeBundleBin)/$(PyRevitAssemblyFileName)"
-          SkipUnchangedFiles="true" />
     <Error Condition="!Exists('$(PyRevitBundleBin)/$(PyRevitAssemblyFileName)')"
            Text="pyRevit package verification failed: $(PyRevitAssemblyFileName) was not copied to the bundle bin directory." />
-    <Error Condition="!Exists('$(PyRevitSmokeBundleBin)/$(PyRevitAssemblyFileName)')"
-           Text="pyRevit smoke package verification failed: $(PyRevitAssemblyFileName) was not copied to the smoke bundle bin directory." />
-    <Error Condition="!Exists('$(PyRevitBundleBin)/$(PyRevitWpfAssemblyFileName)') or !Exists('$(PyRevitSmokeBundleBin)/$(PyRevitWpfAssemblyFileName)')"
-           Text="pyRevit package verification failed: $(PyRevitWpfAssemblyFileName) was not copied to both compiled command bundles." />
+    <Error Condition="!Exists('$(PyRevitBundleBin)/$(PyRevitWpfAssemblyFileName)')"
+           Text="pyRevit package verification failed: $(PyRevitWpfAssemblyFileName) was not copied to the compiled command bundle." />
   </Target>
 </Project>

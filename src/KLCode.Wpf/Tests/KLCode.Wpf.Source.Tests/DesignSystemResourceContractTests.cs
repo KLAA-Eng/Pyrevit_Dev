@@ -23,18 +23,6 @@ public sealed class DesignSystemResourceContractTests
         "footer_donate",
     };
 
-    private static readonly string[] RequiredSmokeCopyKeys =
-    {
-        "DesignSystemSmokeTitle",
-        "BrandSlash",
-        "BrandName",
-        "CloseLabel",
-        "DesignSystemSmokeBody",
-        "PrototypeLabel",
-        "VersionLabel",
-        "OutreachLabel",
-    };
-
     private static readonly string[] RequiredCompiledStyleKeys =
     {
         "KlaWindowStyle",
@@ -103,31 +91,11 @@ public sealed class DesignSystemResourceContractTests
     }
 
     [TestMethod]
-    public void CompiledAdapter_UsesCanonicalResourcesAndLocalizedCopy()
+    public void CompiledAdapter_UsesCanonicalResources()
     {
         XDocument controls = LoadXaml("src/KLCode.Wpf/Resources/KLCodeControls.xaml");
-        XDocument smokeWindow = LoadXaml("src/KLCode.Wpf/Views/DesignSystemSmokeWindow.xaml");
-        XDocument english = LoadXaml(
-            "src/KLCode.Wpf/Resources/Strings/ResourceDictionary.en_us.xaml");
 
         AssertNoColorLiterals(controls, "compiled control resources");
-        AssertNoColorLiterals(smokeWindow, "compiled smoke window");
-
-        HashSet<string> copyKeys = english
-            .Descendants()
-            .Select(element => (string?)element.Attribute(Xaml + "Key"))
-            .Where(key => key is not null)
-            .Select(key => key!)
-            .ToHashSet(StringComparer.Ordinal);
-        CollectionAssert.IsSubsetOf(RequiredSmokeCopyKeys, copyKeys.ToArray());
-
-        foreach (XAttribute attribute in smokeWindow.Descendants().Attributes())
-        {
-            if (attribute.Name.LocalName is "Content" or "Text" or "Title" or "ToolTip")
-            {
-                StringAssert.StartsWith(attribute.Value, "{StaticResource ");
-            }
-        }
     }
 
     [TestMethod]
@@ -182,7 +150,7 @@ public sealed class DesignSystemResourceContractTests
     }
 
     [TestMethod]
-    public void RevitConsumers_ReferenceTheAdapterAndExposeTheSmokeCommand()
+    public void RevitConsumers_ReferenceTheAdapter()
     {
         AssertProjectReferencesAdapter(
             "src/KLCode.FamilyStudio/Revit/KLCode.FamilyStudio.Revit/" +
@@ -190,15 +158,6 @@ public sealed class DesignSystemResourceContractTests
         AssertProjectReferencesAdapter(
             "src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.Revit/" +
             "KLA.ModelStartupImporter.Revit.csproj");
-
-        string commandPath = Path.Combine(
-            FindRepositoryRoot(),
-            "src/KLCode.FamilyStudio/Revit/KLCode.FamilyStudio.Revit/" +
-            "Commands/DesignSystemSmokeCommand.cs");
-        Assert.IsTrue(File.Exists(commandPath), "The Revit-hosted smoke command is missing.");
-        string command = File.ReadAllText(commandPath);
-        StringAssert.Contains(command, "DesignSystemSmokeWindow");
-        StringAssert.Contains(command, "CurrentUICulture.Name");
     }
 
     [TestMethod]
@@ -236,7 +195,6 @@ public sealed class DesignSystemResourceContractTests
             "KLCode.FamilyStudio.Revit.csproj"));
         StringAssert.Contains(familyProject, "KLCode.Wpf_2024.dll");
         StringAssert.Contains(familyProject, "KLCode.Wpf.dll");
-        StringAssert.Contains(familyProject, "Design System Smoke.invokebutton/bin");
 
         string startupPackaging = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(),

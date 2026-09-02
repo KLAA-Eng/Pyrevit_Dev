@@ -28,7 +28,6 @@ class CompiledCommandBundlesTest(unittest.TestCase):
         command_classes = {
             "Startup Importer": "StartupImportCommand",
             "Family Studio": "FamilyStudioCommand",
-            "Design System Smoke": "DesignSystemSmokeCommand",
         }
 
         for command_name, command_class in command_classes.items():

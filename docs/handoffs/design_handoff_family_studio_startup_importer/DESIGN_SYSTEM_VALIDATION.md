@@ -47,14 +47,10 @@ host-specific dependency probing layout that removes the shared-bin collision.
 The compiled adapter owns only behavior and control composition. It references
 the canonical palette keys; compiled-only supplementary/semantic tokens live
 in `KLCodeCompiledTokens.xaml`. The legacy
-`Header` style is intentionally not exposed to compiled consumers. The smoke
-window is the live proof surface for header drag and Close behavior; its
-compiled handlers and English resource bindings pass the source/build gates,
+`Header` style is intentionally not exposed to compiled consumers. Family
+Studio and Startup Importer are the compiled Revit launch surfaces for the
+shared adapter; their English resource bindings pass the source/build gates,
 while live interaction remains a Windows/Revit gate.
-
-The DevSandbox `Design System Smoke.invokebutton` is the explicit Revit launch
-surface. Family Studio packaging copies the matching command assembly and
-adapter dependency into that bundle as well as the Family Studio bundle.
 
 Required canonical keys:
 
@@ -67,7 +63,6 @@ Required canonical keys:
 
 | Surface | Exact size | Source gate | Revit 2024 | Revit 2025+ | Visual/focus/high-DPI |
 | --- | ---: | --- | --- | --- | --- |
-| Design-system smoke | 440 x 240 | 13 compiled-WPF source-contract tests passed | Packaged | Packaged | Pending live Revit QA |
 | Family Studio FS-1 | 1180 x 740 | 24 Family Studio source tests passed | Packaged | Packaged | Pending live Revit QA |
 | Startup Importer SI-1 | 560 x 470 | 15 Core + 3 UI tests passed | Packaged | Packaged | Pending live Revit QA |
 | Startup Importer SI-2 | 860 x 640 | 15 Core + 3 UI tests passed | Packaged | Packaged | Pending live Revit QA |
