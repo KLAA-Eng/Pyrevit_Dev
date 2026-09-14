@@ -103,6 +103,8 @@ Shared WPF GUI styling is defined in `lib/GUI/Resources/WPF_styles.xaml`.
 
 These values describe the default styles in `lib/GUI/Resources/WPF_styles.xaml`. They apply to windows that load the shared dictionary through `my_WPF.add_wpf_resource()` unless the window defines local resources with the same keys.
 
+Command-specific windows that must stay on pyRevit's `forms.WPFWindow` loader may define a local `Window.Resources` block with the same KLCode token names. Keep those local values synchronized with this table, and only promote control templates into `lib/GUI/Resources/WPF_styles.xaml` after a second reusable window needs the same behavior.
+
 ### Color Properties
 
 | Control | UI part | XAML property | Implementation value | KLName |
@@ -121,10 +123,25 @@ These values describe the default styles in `lib/GUI/Resources/WPF_styles.xaml`.
 | `CheckBox` | checkmark | `Stroke` | `#E5E4E2` | KLWhite |
 | `CheckBox` | hover checkbox fill | `Background` | `#FF131313` | KLCharcoal-black |
 | `ComboBox` | default | `Foreground` | `White` | white |
+| `ComboBox` | selector body | `Background` | `header_background` | KLCharcoal |
+| `ComboBox` | selector border | `BorderBrush` | `border_green` | KLGreen |
+| `ComboBox` | arrow | `Fill` | `text_white` | KLWhite |
+| `ComboBox` | disabled selector body | `Background` | `#FF131313` | KLCharcoal-black |
+| `ComboBox` | disabled arrow | `Fill` | `text_gray` | gray |
+| `ComboBox` | dropdown body | `Background` | `header_background` | KLCharcoal |
+| `ComboBox` | dropdown border | `BorderBrush` | `border_green` | KLGreen |
 | `ComboBox` | editable text field | `Background` | `#FF3F3F3F` | KLGray-dark |
 | `ComboBox` | editable text field | `Foreground` | `#E5E4E2` | KLWhite |
 | `ComboBoxItem` | default | `Foreground` | `White` | white |
 | `ComboBoxItem` | highlighted state | `Background` | `#FF4F4F4F` | KLCharcoal-gray |
+| `DataGrid` | default | `Background` | `header_background` | KLCharcoal |
+| `DataGrid` | default | `Foreground` | `text_white` | KLWhite |
+| `DataGrid` | border/grid lines | `BorderBrush`/`HorizontalGridLinesBrush` | `border_green_dark` | KLGreen-dark |
+| `DataGrid` | alternate row | `AlternatingRowBackground` | `#FF131313` | KLCharcoal-black |
+| `DataGridColumnHeader` | default | `Background` | `border_green_dark` | KLGreen-dark |
+| `DataGridColumnHeader` | default | `Foreground` | `text_white` | KLWhite |
+| `DataGridCell` | selected state | `Background` | `button_bg_hover` | KLGreen-secondary |
+| `DataGridCell` | selected state | `Foreground` | `button_fg_normal` | white |
 | `ListBox` | default | `Background` | `header_background` | KLCharcoal |
 | `ListBox` | default | `BorderBrush` | `border_green_dark` | KLGreen-dark |
 | `ScrollBar` | default | `Background` | `border_green_dark` | KLGreen-dark |
@@ -148,6 +165,14 @@ These values describe the default styles in `lib/GUI/Resources/WPF_styles.xaml`.
 | `DockPanel` | default | `Margin` | `2` |
 | `ComboBox` | default | `MinWidth` | `120` |
 | `ComboBox` | default | `MinHeight` | `20` |
+| `ComboBox` | local dark template key | `x:Key` | `ComboBoxToggleButton` |
+| `ComboBox` | editable text host key | `x:Key` | `ComboBoxTextBox` |
+| `ComboBoxItem` | item template padding | `Padding` | `4,3` |
+| `DataGrid` | headers shown | `HeadersVisibility` | `Column` |
+| `DataGrid` | selection mode | `SelectionMode` | `Single` |
+| `DataGrid` | row resize | `CanUserResizeRows` | `False` |
+| `DataGridColumnHeader` | header padding | `Padding` | `6,4` |
+| `DataGridCell` | cell padding | `Padding` | `6,3` |
 | `ListBox` | default | `ScrollViewer.VerticalScrollBarVisibility` | `Visible` |
 | `ListBox` | default | `ScrollViewer.HorizontalScrollBarVisibility` | `Hidden` |
 | `ListBox` | border style | `CornerRadius` | `10` |
@@ -157,6 +182,10 @@ These values describe the default styles in `lib/GUI/Resources/WPF_styles.xaml`.
 | `ScrollBarThumbVertical` | thumb border | `CornerRadius` | `8` |
 
 Selection-style branded windows use `text_white` for the filter label or icon, filter input text, and selection prompt label. Borders and separators remain on KLGreen/KLGreen-dark accents so labels such as `Select stories to review:` stay readable against the KLCharcoal background.
+
+The View Range editor uses a command-local dark `ComboBox` template for the Associated Level selectors because shallow brush setters leave the native WPF selector surface light in Revit. The selector body, arrow well, popup border, and `ComboBoxItem` highlight all use KLCode token values.
+
+The DevSandbox UI Gallery uses command-local `DataGrid` styles because table styling is not yet part of the shared WPF dictionary. Its catalog grid keeps the dark KLCharcoal body, KLGreen-dark header/grid lines, KLCharcoal-black alternating rows, and KLGreen-secondary selected cells.
 
 ### Window Defaults
 
@@ -171,6 +200,8 @@ The shared GUI windows follow these conventions where present:
 | Header row height | `25` | N/A |
 | Header background | `header_background` | KLCharcoal |
 | Close button size | `60 x 20` | N/A |
+
+Command-local windows that use `forms.WPFWindow`, including the View Range editor and UI Gallery, keep the same chrome event names as shared windows: `button_close` for the header close button and `header_drag` for dragging the borderless header.
 
 ## Windows
 
@@ -196,7 +227,7 @@ future selection-style windows.
 | Window | XAML path | Loader path | Tools | Reason to remain outside `lib/GUI` |
 | --- | --- | --- | --- | --- |
 | Match properties recall | `lib/match/clipboard_window.xaml` | `lib/match/clipboard.py` | `UI Gallery.pushbutton` | A modeless content host coupled to the Match Properties workflow and its localized clipboard content. It uses the shared palette but is not a reusable dialog family. |
-| View range editor | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/script.py` | `ViewRange.pushbutton`; `UI Gallery.pushbutton` | A command-specific, data-bound editor that needs its own future theming pass before any extraction. |
+| View range editor | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/script.py` | `ViewRange.pushbutton`; `UI Gallery.pushbutton` | A command-specific, data-bound editor that uses KLCode design tokens locally while keeping pyRevit's command-window loader, bindings, and events. |
 
 ### Prototype Windows
 
@@ -248,8 +279,31 @@ Audit scope: all 14 window XAML files listed in the Shared GUI Windows, One-Off 
 | Match properties recall | KL&A custom | `lib/match/clipboard_window.xaml` | Reference/aligned | Modeless clipboard content is hosted inside SelectFromDict-style dark chrome and loads the shared palette directly. | Keep the content host pattern so command content does not replace the KLCode shell. |
 | KL&A list selection | KL&A custom | `lib/GUI/SelectFromDict.xaml` | Reference/aligned | This is the reference theme for list-selection windows. | Keep as the base for future selection-style custom windows. |
 | Steel PSF story selection | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | Reference/aligned | Closely follows SelectFromDict list-selection chrome with a solid KLCharcoal background; footer is prototype-specific. | Keep aligned with SelectFromDict when Steel PSF controls change. |
-| View range editor | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | Needs future theming | Uses a KLCharcoal window background but retains default resizable WPF chrome, default text styling against that dark surface, light row/header styling, non-KL `#E8E8E8`, and WPF `Red` warning text. | Restyle controls, text, and chrome while preserving the editable grid and data bindings. |
-| UI Gallery | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | Needs future theming | Uses a KLCharcoal window background but retains default resizable WPF chrome, default text styling against that dark surface, and unthemed DataGrid controls. | Apply KLCode header/chrome, readable text, and a dark gallery table in a future UI pass. |
+| View range editor | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | Reference/aligned | Uses SelectFromDict-style dark chrome and local KLCode token resources while preserving pyRevit's `forms.WPFWindow` loading path for this command-specific editor. The Associated Level selectors use a full local dark `ComboBox`/`ComboBoxItem` template so the selector body and popup do not fall back to native light WPF styling. | Keep command-specific behavior in the bundle; promote only reusable styles into `WPF_styles.xaml` when another command needs them. |
+| UI Gallery | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | Reference/aligned | Uses SelectFromDict-style dark chrome, local KLCode token resources, and a KLCharcoal/KLGreen dark DataGrid treatment for catalog rows. | Keep gallery-only DataGrid styling local unless another KLCode table view adopts the same pattern. |
 | UI Gallery preview fixture | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | Needs future theming | Uses a KLCharcoal window background but remains an intentionally minimal fixture with default WPF chrome and text styling. | Leave plain unless the fixture is promoted to a visual-review artifact; document it as a test exception if unchanged. |
+
+## Another Cleanup Pass
+
+This is a documentation-only audit for a future standardization pass. Use `lib/GUI/SelectFromDict.xaml` as the template style unless a command-specific workflow needs a documented exception.
+
+Template baseline: `400 x 550`, `MinWidth=400`, `MinHeight=550`, `MaxHeight=550`, `WindowStartupLocation=CenterScreen`, `HorizontalAlignment=Center`, `WindowStyle=None`, `AllowsTransparency=True`, KLCharcoal root and body background, a 25 px header, KLCode branding at 14 px heavy text, a centered `main_title`, a `60 x 20` 10 px Close button, KLWhite primary text, KLGreen/KLGreen-dark borders and accents, KLGreen-secondary link/action accents, and no explicit `FontFamily` in window XAML.
+
+| Window | XAML path | Proportion and chrome differences from `SelectFromDict.xaml` | Font and color differences from template style | Cleanup target |
+| --- | --- | --- | --- | --- |
+| KL&A list selection | `lib/GUI/SelectFromDict.xaml` | Baseline template: `400 x 550`, constrained height, centered, borderless dark chrome. | Baseline text/color usage: KLWhite body/header text, KLGreen-dark borders, KLGreen-secondary footer link, no explicit `FontFamily`. | Keep as the reference window. |
+| KL&A alert | `lib/GUI/CustomAlert.xaml` | Alert-specific fixed size `440 x 255`; has `MinWidth/MaxWidth` and `MinHeight/MaxHeight`; uses the same borderless chrome but a shorter footer/action band. | Adds alert-specific heading sizes `16` and icon size `22`; heading uses `text_green` instead of KLWhite for emphasis. | Keep compact alert proportions, but decide whether alert headings should use a standard semantic color token such as warning/info/success. |
+| Find and replace | `lib/GUI/FindReplace.xaml` | Compact fixed dialog `350 x 210`; lacks `MinWidth`, `MinHeight`, `MaxHeight`, and `AllowsTransparency`; body `Grid` does not explicitly set `Background="#1A252B"`. | Uses `text_green` labels inside the form; otherwise follows KLWhite text and shared resources. | Add the missing window constraints/transparency if compatible; standardize body background and label color rules with rename windows. |
+| Find and replace views | `lib/GUI/RenameViews.xaml` | Compact fixed dialog `350 x 235`; lacks `MinWidth`, `MinHeight`, `MaxHeight`, and `AllowsTransparency`; header brand column is `100` and includes an empty `Image`, unlike the `75` column/no-image template. | Uses `text_green` section label plus `footer_donate`; text boxes explicitly set KLWhite foreground over the shared TextBox default. | Align header grid and chrome attributes; decide whether rename labels use KLWhite or KLGreen consistently. |
+| Find and replace sheets | `lib/GUI/RenameSheets.xaml` | Wider fixed dialog `620 x 250`; lacks `MinWidth`, `MinHeight`, `MaxHeight`, and `AllowsTransparency`; header brand column is `100` and includes an empty `Image`. | Uses `text_green` section labels, `text_gray` footer, and `button_bg_hover` link accent. | Align header grid/chrome attributes with the template; keep wider content layout as a workflow exception. |
+| Duplicate sheets | `lib/GUI/DuplicateSheets.xaml` | Large fixed workflow window `800 x 470`; lacks `MinWidth`, `MinHeight`, `MaxHeight`, and `AllowsTransparency`; otherwise uses the standard header pattern. | Mixes `StaticResource` and `DynamicResource` for KL text tokens; includes local font sizes `12` and `14` in addition to header/button sizes. | Keep large workflow proportions, but normalize resource lookup style and typography scale. |
+| Create from rooms | `lib/GUI/Tools/CreateFromRooms.xaml` | Template-like width `400`, shorter `460` height, `MinHeight=460`, `MaxHeight=550`; same borderless transparent chrome. | Closely follows template colors; uses `Search` label instead of search icon and local 14 px filter text. | Keep as a second list-selection variant; document when list selectors can be shorter than 550 px. |
+| Match properties recall | `lib/match/clipboard_window.xaml` | Modeless/content-host window uses `Width=420`, `SizeToContent=Height`, no fixed `Height`, no `MaxHeight`, and a host border; title text is static rather than named `main_title`. | Uses KLWhite and `text_gray`; footer text is `KLCode` rather than version/outreach content. | Keep content-host behavior as an exception, but consider naming the title element and aligning footer conventions. |
+| View range editor | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | Command editor is `760 x 430`, resizable, has `MinWidth/MinHeight`, and no `HorizontalAlignment=Center`; uses local `Window.Resources` because it stays on `forms.WPFWindow`. | Uses local token copies plus full dark ComboBox templates; includes warning/status text at 11 px and grid/table labels at 14 px. | Keep resizable editor proportions; if another command needs dark ComboBoxes, promote that template to `WPF_styles.xaml`. |
+| Find and replace views prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Prototype copy is `350 x 245`; lacks `AllowsTransparency`, `MinWidth`, `MinHeight`, and `MaxHeight`; embeds a full local resource dictionary instead of loading shared resources. | Contains direct color literals such as `#E5E4E2`, `#FF3F3F3F`, and `Black` in the copied dictionary. | Keep isolated while prototyping; do not standardize unless promoted back into `lib/GUI/RenameViews.xaml`. |
+| Find and replace sheets prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Prototype copy is `620 x 260`; lacks `AllowsTransparency`, `MinWidth`, `MinHeight`, and `MaxHeight`; embeds a full local resource dictionary instead of loading shared resources. | Contains direct color literals and one WPF color name `Green` alongside KL token resources. | Keep isolated while prototyping; replace direct colors if this window is promoted. |
+| Steel PSF story selection | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | List-selection variant is `430 x 610`, `MinHeight/MaxHeight=610`; otherwise closely follows the template chrome. | Closely follows template colors; uses `Search` text label instead of the template search icon and keeps local list/control sizes. | Keep taller story-list proportions as a documented list-selection variant; align search-label treatment with SelectFromDict/CreateFromRooms. |
+| UI Gallery | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | DevSandbox catalog is `900 x 520`, resizable, has `MinWidth/MinHeight`, and no `HorizontalAlignment=Center`; uses local `Window.Resources` because it stays on `forms.WPFWindow`. | Uses local token copies and local dark `DataGrid` styles, including KLCharcoal-black alternate rows and KLGreen-secondary selected cells. | Keep wide/resizable catalog proportions; promote DataGrid styles only after another table window needs them. |
+| UI Gallery preview fixture | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | Minimal fixture `360 x 160`, `CenterOwner`, native chrome, no KLCode header/footer, no transparency. | Has no explicit font/color styling beyond the KLCharcoal window background. | Keep as a test fixture exception unless it becomes a user-facing visual-review artifact. |
 
 Future KL&A custom windows should use the SelectFromDict chrome and palette by default. Exceptions must be explicit: standard pyRevit dialogs, test fixtures, and tool-specific windows may keep different chrome only when the reason is documented near the launcher or in this design system.

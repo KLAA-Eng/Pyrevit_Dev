@@ -24,6 +24,7 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         self.assertIn('pyrevit-select-list', launcher_ids)
         self.assertIn('pyrevit-command-switch', launcher_ids)
         self.assertIn('kla-select-from-dict', launcher_ids)
+        self.assertIn('kla-main-template', launcher_ids)
         self.assertIn('kla-custom-alert', launcher_ids)
         self.assertIn('kla-find-replace', launcher_ids)
         self.assertIn('kla-steel-psf', launcher_ids)

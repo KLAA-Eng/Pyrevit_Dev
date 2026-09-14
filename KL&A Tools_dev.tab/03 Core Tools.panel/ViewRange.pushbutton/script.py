@@ -7,6 +7,7 @@ from pyrevit.compat import get_elementid_value_func
 import traceback
 from Autodesk.Revit.Exceptions import InvalidOperationException
 from collections import OrderedDict
+from System.Windows.Input import MouseButtonState
 
 
 doc = HOST_APP.doc
@@ -740,6 +741,13 @@ class MainWindow(forms.WPFWindow):
         self.Closed += self.window_closed
         # Events are now handled via @events.handle decorators
         server.add_server()
+
+    def button_close(self, sender, e):
+        self.Close()
+
+    def header_drag(self, sender, e):
+        if e.LeftButton == MouseButtonState.Pressed:
+            self.DragMove()
 
     def window_closed(self, sender, args):
         server.remove_server()
