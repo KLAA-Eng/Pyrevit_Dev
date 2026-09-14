@@ -64,3 +64,4 @@ pyrightconfig.json
 .family-studio
 
 .venv*
+.vscode
