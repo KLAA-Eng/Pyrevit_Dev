@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="128"
+   height="128"
+   viewBox="0 0 24 24"
+   fill="none"
+   stroke="#E5E4E2"
+   stroke-width="1.5"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   class="lucide lucide-square-chevron-up"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="buttonpulldown_128px_green.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   inkscape:export-filename="buttonpulldown_96px_green.png"
+   inkscape:export-xdpi="72"
+   inkscape:export-ydpi="72"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="6.9140625"
+     inkscape:cx="64"
+     inkscape:cy="64"
+     inkscape:window-width="1920"
+     inkscape:window-height="1129"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <rect
+     width="18"
+     height="18"
+     x="3"
+     y="3"
+     rx="2"
+     id="rect1"
+     style="fill:#33714f;fill-opacity:1;stroke:none" />
+  <path
+     d="M 17.052634,9.478615 11.999998,14.531247 6.947365,9.478615"
+     id="path1"
+     style="fill:none;fill-opacity:1;stroke:#e5e4e2;stroke-width:1.89473;stroke-opacity:1" />
+</svg>
