@@ -24,7 +24,7 @@
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="24"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
 
@@ -38,17 +38,21 @@
                 Grid.ColumnSpan="2"
               >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="86"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="86"/>
 
 
             </Grid.ColumnDefinitions>
 
+            <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
+                            VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"
+                            ContentTemplate="{StaticResource KLCodeWordmark}"/>
             <DockPanel Grid.Column="0"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       Margin="10,0,0,0">
+                       Margin="10,0,0,0"
+                       Visibility="Collapsed">
                 
 
 
@@ -65,51 +69,20 @@
 
             <TextBlock x:Name="main_title"
                 Text="__title__"
-                Grid.Column="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Foreground="{StaticResource text_white}"
+                MaxWidth="180"
+                TextTrimming="CharacterEllipsis"
                 />
 
 
-            <Button
-                HorizontalAlignment="Right"
-                    Grid.Column="2"
+            <Button Grid.Column="2"
                     Content="Close"
-                    Foreground="{DynamicResource text_white}"
-                    FontSize="10"
-                    FontWeight="Medium"
                     Click="button_close"
-                    Margin="0,0,10,0"
-                    >
-
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="TextElement.FontFamily" Value="Arial"/>
-                        <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
-                        <Setter Property="Cursor" Value="Hand"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource button_bg_hover}"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                                Width="60" Height="20"
-                                CornerRadius="8"
-                                Background="{TemplateBinding Background}"
-                                >
-                            <ContentPresenter  VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"/>
-                        </Border>
-
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+                    Style="{StaticResource KLCodeCloseButton}"/>
 
         </Grid>
 
@@ -859,36 +832,8 @@
                     FontWeight="Medium"
                     Click="button_run"
                     Margin="0,10,0,0"
-                Height="40"
-                    >
-
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="TextElement.FontFamily" Value="Arial"/>
-                        <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
-                        <Setter Property="Cursor" Value="Hand"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource button_bg_hover}"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                                Width="200" Height="30"
-                                CornerRadius="8"
-                                Background="{TemplateBinding Background}"
-                                >
-                            <ContentPresenter  VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"/>
-                        </Border>
-
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+                    Height="40"
+                    Style="{StaticResource KLCodeActionButton}"/>
 
         </StackPanel>
 

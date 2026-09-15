@@ -18,6 +18,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Common.WPF_styles">
 
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../../../lib/GUI/Resources/WPF_styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[COLOURS]-->
             <SolidColorBrush x:Key="header_background"  Color="#1A252B" />
 
@@ -463,9 +467,9 @@
     </Window.Resources>
 
     <!--MAIN-->
-    <Grid>
+    <Grid Background="#1A252B">
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="24"></RowDefinition>
             <RowDefinition></RowDefinition>
             <RowDefinition Height="25"></RowDefinition>
         </Grid.RowDefinitions>
@@ -479,16 +483,20 @@
                 Grid.ColumnSpan="2">
             <!--HEADER GRID-->
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="86"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="86"/>
             </Grid.ColumnDefinitions>
 
             <!--LOGO-->
+            <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
+                            VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"
+                            ContentTemplate="{StaticResource KLCodeWordmark}"/>
             <DockPanel  Grid.Column="0"
                         Grid.ColumnSpan="2"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Left">
+                        HorizontalAlignment="Left"
+                        Visibility="Collapsed">
                 <Image Width="20" Height="20"
                       />
                 <!--Source="https://www.erikfrits.com/media/images/LOGO.png"-->
@@ -504,19 +512,19 @@
             <!--__TITLE__-->
             <TextBlock x:Name="main_title"
                 Text="__title__"
-                Grid.Column="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
-                Foreground="{StaticResource text_white}"/>
+                Foreground="{StaticResource text_white}"
+                MaxWidth="180"
+                TextTrimming="CharacterEllipsis"/>
 
             <!--CLOSE-->
             <Button Content="Close"
                     Grid.Column="2"
-                    Width="60" Height="20"
-                    FontSize="10"
                     Click="button_close"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"/>
+                    Style="{StaticResource KLCodeCloseButton}"/>
         </Grid>
         <!--HEADER END-->
 

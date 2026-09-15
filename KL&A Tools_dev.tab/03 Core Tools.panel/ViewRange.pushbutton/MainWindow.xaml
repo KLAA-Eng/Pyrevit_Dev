@@ -6,6 +6,9 @@
         WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResize"
         Background="#1A252B">
     <Window.Resources>
+        <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="../../../lib/GUI/Resources/WPF_styles.xaml"/>
+        </ResourceDictionary.MergedDictionaries>
         <SolidColorBrush x:Key="header_background" Color="#1A252B"/>
         <SolidColorBrush x:Key="text_white" Color="#E5E4E2"/>
         <SolidColorBrush x:Key="text_gray" Color="Gray"/>
@@ -184,7 +187,7 @@
     </Window.Resources>
     <Grid Background="#1A252B">
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="24"/>
             <RowDefinition/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
@@ -192,30 +195,26 @@
         <Grid MouseDown="header_drag"
               Background="{StaticResource header_background}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="85"/>
+                <ColumnDefinition Width="86"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="86"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0"
-                       Text="KLCode"
-                       Margin="5,0,0,0"
-                       FontSize="14px"
-                       FontWeight="Heavy"
-                       VerticalAlignment="Center"
-                       Foreground="{StaticResource text_white}"/>
+            <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
+                            VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"
+                            ContentTemplate="{StaticResource KLCodeWordmark}"/>
             <TextBlock x:Name="main_title"
-                       Grid.Column="1"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="3"
                        Text="View Range Editor"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"
-                       Foreground="{StaticResource text_white}"/>
+                       Foreground="{StaticResource text_white}"
+                       MaxWidth="180"
+                       TextTrimming="CharacterEllipsis"/>
             <Button Grid.Column="2"
                     Content="Close"
-                    Width="60" Height="20"
-                    FontSize="10"
                     Click="button_close"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right"/>
+                    Style="{StaticResource KLCodeCloseButton}"/>
         </Grid>
 
         <StackPanel Grid.Row="1" Margin="12">

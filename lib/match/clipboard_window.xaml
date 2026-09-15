@@ -13,18 +13,21 @@
     <Border Background="#1A252B" BorderBrush="{StaticResource border_green_dark}" BorderThickness="1">
         <Grid Background="#1A252B">
             <Grid.RowDefinitions>
-                <RowDefinition Height="25" />
+                <RowDefinition Height="24" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="25" />
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0" Background="{StaticResource header_background}" MouseDown="header_drag">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="75" />
+                    <ColumnDefinition Width="86" />
                     <ColumnDefinition />
-                    <ColumnDefinition Width="60" />
+                    <ColumnDefinition Width="86" />
                 </Grid.ColumnDefinitions>
-                <DockPanel Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Left">
+                <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
+                                VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"
+                                ContentTemplate="{StaticResource KLCodeWordmark}"/>
+                <DockPanel Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Left" Visibility="Collapsed">
                     <TextBlock Margin="5,0,0,0"
                                FontSize="14px"
                                FontWeight="Heavy"
@@ -33,17 +36,17 @@
                     </TextBlock>
                 </DockPanel>
                 <TextBlock Text="Match Properties Recall"
-                           Grid.Column="1"
+                           Grid.Column="0"
+                           Grid.ColumnSpan="3"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"
-                           Foreground="{StaticResource text_white}" />
+                           Foreground="{StaticResource text_white}"
+                           MaxWidth="180"
+                           TextTrimming="CharacterEllipsis" />
                 <Button Content="Close"
                         Grid.Column="2"
-                        Width="60" Height="20"
-                        FontSize="10"
                         Click="button_close"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Right" />
+                        Style="{StaticResource KLCodeCloseButton}" />
             </Grid>
 
             <ContentControl x:Name="content_host"

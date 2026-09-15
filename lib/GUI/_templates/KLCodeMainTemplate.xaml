@@ -32,16 +32,16 @@
               Background="#1A252B"
               Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="86"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="66"/>
+                <ColumnDefinition Width="86"/>
             </Grid.ColumnDefinitions>
 
             <!-- Outlined logo geometry avoids pyRevit font and bitmap-loading differences. -->
             <Viewbox Grid.Column="0"
-                     Width="94"
-                     Height="16"
-                     Margin="5,0,1,0"
+                     Width="70"
+                     Height="12"
+                     Margin="8,0,0,0"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Left"
                      Stretch="Uniform"
@@ -70,41 +70,13 @@
                        HorizontalAlignment="Center"
                        Foreground="{StaticResource text_white}"
                        FontSize="14"
-                       MaxWidth="200"
+                       MaxWidth="180"
                        TextTrimming="CharacterEllipsis"/>
 
             <Button Content="Close"
                     Grid.Column="2"
-                    Width="60" Height="18"
-                    FontSize="10"
                     Click="button_close"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="TextElement.FontFamily" Value="Arial"/>
-                        <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
-                        <Setter Property="Foreground" Value="{StaticResource button_fg_normal}"/>
-                        <Setter Property="Cursor" Value="Hand"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Border CornerRadius="6"
-                                            Background="{TemplateBinding Background}">
-                                        <ContentPresenter VerticalAlignment="Center"
-                                                          HorizontalAlignment="Center"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource button_bg_hover}"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
+                    Style="{StaticResource KLCodeCloseButton}"/>
         </Grid>
 
         <!-- Filter -->
@@ -132,13 +104,8 @@
                     SnapsToDevicePixels="True">
                 <TextBox x:Name="textbox_filter"
                          Text=""
-                         VerticalContentAlignment="Center"
-                         Foreground="{StaticResource text_white}"
-                         Background="Transparent"
-                         FontSize="14"
-                         BorderThickness="0"
-                         Padding="8,0"
-                         TextChanged="text_filter_updated"/>
+                         TextChanged="text_filter_updated"
+                         Style="{StaticResource KLCodeFilterTextBox}"/>
             </Border>
         </Grid>
 
@@ -146,34 +113,6 @@
         <StackPanel Grid.Row="2"
                     VerticalAlignment="Top"
                     Margin="12,6,12,6">
-            <StackPanel.Resources>
-                <!-- Keep action geometry local while the template is still under visual review. -->
-                <Style x:Key="TemplateActionButton" TargetType="Button">
-                    <Setter Property="TextElement.FontFamily" Value="Arial"/>
-                    <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
-                    <Setter Property="Foreground" Value="{StaticResource button_fg_normal}"/>
-                    <Setter Property="BorderThickness" Value="0"/>
-                    <Setter Property="Cursor" Value="Hand"/>
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="Button">
-                                <Border Background="{TemplateBinding Background}"
-                                        CornerRadius="8"
-                                        SnapsToDevicePixels="True">
-                                    <ContentPresenter VerticalAlignment="Center"
-                                                      HorizontalAlignment="Center"/>
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                    <Style.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource button_bg_hover}"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </StackPanel.Resources>
-
             <Separator Background="{StaticResource border_green_dark}"/>
 
             <Label x:Name="text_label"
@@ -188,128 +127,6 @@
                      ScrollViewer.VerticalScrollBarVisibility="Visible"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      BorderBrush="{StaticResource border_green_dark}">
-                <ListBox.Resources>
-                    <!-- Template-specific scrolling treatment. -->
-                    <Style x:Key="TemplateScrollBarThumbVertical" TargetType="Thumb">
-                        <Setter Property="OverridesDefaultStyle" Value="true"/>
-                        <Setter Property="IsTabStop" Value="false"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type Thumb}">
-                                    <Border x:Name="rectangle"
-                                            Background="{StaticResource text_green}"
-                                            Height="{TemplateBinding Height}"
-                                            SnapsToDevicePixels="True"
-                                            Width="{TemplateBinding Width}"
-                                            CornerRadius="8"/>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                    <Style TargetType="ScrollBar">
-                        <Setter Property="Background" Value="#1A252B"/>
-                        <Setter Property="Foreground" Value="#1A252B"/>
-                        <Setter Property="BorderBrush" Value="#1A252B"/>
-                        <Setter Property="Opacity" Value="0.9"/>
-                        <Setter Property="Margin" Value="3"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ScrollBar}">
-                                    <Grid x:Name="Bg" SnapsToDevicePixels="true">
-                                        <Border BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                Background="{TemplateBinding Background}"
-                                                Grid.Row="1"
-                                                CornerRadius="10"/>
-                                        <Track x:Name="PART_Track"
-                                               IsDirectionReversed="true"
-                                               IsEnabled="{TemplateBinding IsMouseOver}"
-                                               Grid.Row="1">
-                                            <Track.Thumb>
-                                                <Thumb Style="{StaticResource TemplateScrollBarThumbVertical}"
-                                                       Margin="2"/>
-                                            </Track.Thumb>
-                                        </Track>
-                                    </Grid>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                    <Style TargetType="ListBox">
-                        <Style.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="10"/>
-                            </Style>
-                        </Style.Resources>
-                    </Style>
-                    <Style TargetType="CheckBox">
-                        <Setter Property="SnapsToDevicePixels" Value="true"/>
-                        <Setter Property="OverridesDefaultStyle" Value="true"/>
-                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                        <Setter Property="Foreground" Value="White"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="CheckBox">
-                                    <BulletDecorator Background="Transparent">
-                                        <BulletDecorator.Bullet>
-                                            <Border x:Name="Border"
-                                                    Width="16"
-                                                    Height="16"
-                                                    CornerRadius="2"
-                                                    BorderThickness="1"
-                                                    BorderBrush="{StaticResource text_green}"
-                                                    Background="#1A252B">
-                                                <Path Width="9"
-                                                      Height="9"
-                                                      x:Name="CheckMark"
-                                                      SnapsToDevicePixels="False"
-                                                      Stroke="#E5E4E2"
-                                                      StrokeThickness="2"
-                                                      Data="M 0 4 L 3 8 8 0"/>
-                                            </Border>
-                                        </BulletDecorator.Bullet>
-                                        <ContentPresenter Margin="4,0,0,0"
-                                                          VerticalAlignment="Center"
-                                                          HorizontalAlignment="Left"
-                                                          RecognizesAccessKey="True"/>
-                                    </BulletDecorator>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsChecked" Value="false">
-                                            <Setter TargetName="CheckMark"
-                                                    Property="Visibility"
-                                                    Value="Collapsed"/>
-                                            <Setter TargetName="Border"
-                                                    Property="Background"
-                                                    Value="#1A252B"/>
-                                        </Trigger>
-                                        <Trigger Property="IsChecked" Value="true">
-                                            <Setter TargetName="Border"
-                                                    Property="Background"
-                                                    Value="{StaticResource checkbox_checked_colour}"/>
-                                        </Trigger>
-                                        <Trigger Property="IsChecked" Value="{x:Null}">
-                                            <Setter TargetName="CheckMark"
-                                                    Property="Data"
-                                                    Value="M 0 8 L 8 0"/>
-                                        </Trigger>
-                                        <Trigger Property="IsMouseOver" Value="true">
-                                            <Setter TargetName="Border"
-                                                    Property="Background"
-                                                    Value="{StaticResource button_bg_hover}"/>
-                                        </Trigger>
-                                        <Trigger Property="IsEnabled" Value="false">
-                                            <Setter TargetName="CheckMark"
-                                                    Property="Stroke"
-                                                    Value="#FF6C6C6C"/>
-                                            <Setter Property="Foreground" Value="Gray"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.Resources>
-
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <CheckBox Background="#286048"
@@ -329,14 +146,14 @@
                         x:Name="UI_Buttons_all_none">
                 <Button Content="Select All"
                         Click="button_select_all"
-                        Style="{StaticResource TemplateActionButton}"
+                        Style="{StaticResource KLCodeActionButton}"
                         Height="26"
                         Width="104"
                         FontSize="12"
                         Margin="0,0,8,0"/>
                 <Button Content="Select None"
                         Click="button_select_none"
-                        Style="{StaticResource TemplateActionButton}"
+                        Style="{StaticResource KLCodeActionButton}"
                         Height="26"
                         Width="104"
                         FontSize="12"
@@ -346,7 +163,7 @@
             <Button x:Name="button_main"
                     Content="Select"
                     Click="button_select"
-                    Style="{StaticResource TemplateActionButton}"
+                    Style="{StaticResource KLCodeActionButton}"
                     Height="32"
                     Width="216"
                     FontSize="14"

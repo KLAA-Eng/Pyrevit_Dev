@@ -21,8 +21,8 @@
 
         <Grid.RowDefinitions>
 
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="45"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="32"/>
             <RowDefinition/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
@@ -36,16 +36,20 @@
                 Grid.ColumnSpan="2">
             <!--HEADER GRID-->
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="75"/>
+                <ColumnDefinition Width="86"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="86"/>
             </Grid.ColumnDefinitions>
 
             <!--LOGO-->
+            <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
+                            VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"
+                            ContentTemplate="{StaticResource KLCodeWordmark}"/>
             <DockPanel  Grid.Column="0"
                         Grid.ColumnSpan="2"
                         VerticalAlignment="Center"
-                        HorizontalAlignment="Left">
+                        HorizontalAlignment="Left"
+                        Visibility="Collapsed">
 
 
                 <TextBlock
@@ -60,21 +64,25 @@
             <!--__TITLE__-->
             <TextBlock x:Name="main_title"
                 Text="__title__"
-                Grid.Column="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Foreground="{StaticResource text_white}"
+                MaxWidth="180"
+                TextTrimming="CharacterEllipsis"
                 />
 
             <!--CLOSE-->
             <Button
                 Content="Close"
                 Grid.Column="2"
-                Width="60" Height="20"
+                Width="60" Height="18"
                 FontSize="10"
                 Click="button_close"
                 VerticalAlignment="Center"
-                HorizontalAlignment="Right"
+                HorizontalAlignment="Center"
+                Style="{StaticResource KLCodeCloseButton}"
                     />
         </Grid>
         <!--HEADER END-->
@@ -82,31 +90,20 @@
 
 
         <!--FILTER START-->
-        <DockPanel Grid.Row="1">
-            <Label  Content="🔍"
-                    VerticalAlignment="Top" Height="26"
-                    Foreground="{StaticResource text_white}"
-                    Margin="5,5,5,5"/>
-
-            <TextBox x:Name="textbox_filter"
-                    Text=""
-                     Height="22" VerticalAlignment="Top"
-                     Foreground="{StaticResource text_white}" Background="{StaticResource header_background}"
-                     Margin="0,8,10,5" FontSize="14"
-                     BorderBrush="{StaticResource border_green_dark}"
-                     TextChanged="text_filter_updated">
-
-                <TextBox.Style>
-                    <Style TargetType="TextBox">
-                        <Style.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="5"/>
-                            </Style>
-                        </Style.Resources>
-                    </Style>
-                </TextBox.Style>
-            </TextBox>
-        </DockPanel>
+        <Grid Grid.Row="1" Margin="8,4,12,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition Width="6"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Column="0" Source="../_icons/search_16px_light.png" Width="16" Height="16"
+                   VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="None" SnapsToDevicePixels="True"/>
+            <Border Grid.Column="2" Background="{StaticResource window_background}" BorderBrush="{StaticResource text_green}"
+                    BorderThickness="1" CornerRadius="6" SnapsToDevicePixels="True">
+                <TextBox x:Name="textbox_filter" Text="" TextChanged="text_filter_updated"
+                         Style="{StaticResource KLCodeFilterTextBox}"/>
+            </Border>
+        </Grid>
         <!--FILTER END-->
 
         <!--LISTBOX START-->

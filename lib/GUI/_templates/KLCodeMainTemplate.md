@@ -1,9 +1,9 @@
 # KLCode Main Template
 
-`KLCodeMainTemplate.xaml` is the working template for a KLCode multi-select
-window. It is currently displayed through the DevSandbox UI Gallery with
-fictional drawing types. Production commands continue to use
-`lib/GUI/SelectFromDict.xaml`.
+`KLCodeMainTemplate.xaml` is the visual authority for KL&A custom-window
+styling. It is currently displayed through the DevSandbox UI Gallery with
+fictional drawing types; production commands retain their own workflow layouts
+while consuming the same shared chrome and control styles.
 
 The template has no code-behind. The UI Gallery supplies the sample data,
 sets preview text, loads the search icon, and provides the event handlers.
@@ -31,8 +31,8 @@ The header is `24` px high with a `100`, `*`, `66` column layout.
 
 | Part | Current design |
 | --- | --- |
-| Wordmark | Embedded `/KLCode` outlined geometry in a `94 x 16` Viewbox, left aligned with `Margin="5,0,1,0"`. It has no font or external image dependency. |
-| Title | `main_title`, 14 px KLWhite, centered across the full header, 200 px maximum width, character ellipsis. |
+| Wordmark | Embedded `/KLCode` outlined geometry in a `70 x 12` Viewbox, left aligned with `Margin="8,0,0,0"`. It has no font or external image dependency. |
+| Title | `main_title`, 14 px KLWhite, centered across the full header, 180 px maximum width, character ellipsis. The 86 px edge columns reserve clear space for the logo and Close button. |
 | Close button | `60 x 18`, Arial 10 px, 6 px radius, centered in the right column. |
 | Dragging | The header calls `header_drag`. |
 
@@ -54,7 +54,7 @@ Typing in the search field filters the gallery's fictional items by name.
 
 ## Actions
 
-The local `TemplateActionButton` style uses Arial, no border, a KLGreen-dark
+The shared `KLCodeActionButton` style uses Arial, no border, a KLGreen-dark
 fill, KLWhite text, and a KLGreen-secondary hover fill.
 
 | Button | Size and placement | Gallery behavior |
@@ -106,8 +106,8 @@ replaces them with these values and fictional data:
 
 ## Editing Scope
 
-Use this XAML for window-specific layout, controls, local templates, and
-preview-facing labels. Shared color tokens and baseline WPF styles live in
-`lib/GUI/Resources/WPF_styles.xaml`. Keep the outlined header wordmark inline;
-it is intentionally self-contained so pyRevit WPF does not need to resolve a
-font or load a separate logo bitmap.
+Use this XAML for window-specific layout, controls, and preview-facing labels.
+Shared color tokens, the outlined wordmark, and baseline WPF styles live in
+`lib/GUI/Resources/WPF_styles.xaml`. The template consumes the shared close,
+filter, action-button, checkbox, list, and scrollbar styles so future changes
+are applied consistently to KL&A custom windows.
