@@ -63,7 +63,7 @@
                 <ColumnDefinition Width="6"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Image x:Name="filter_icon" Grid.Column="0" Width="16" Height="16"
+            <Image x:Name="filter_icon" Grid.Column="0" Width="16" Height="16" Source="../../../../lib/_icons/search_16px_light.png"
                    VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="None" SnapsToDevicePixels="True"/>
             <Border Grid.Column="2" Background="{StaticResource window_background}" BorderBrush="{StaticResource text_green}"
                     BorderThickness="1" CornerRadius="6" SnapsToDevicePixels="True">
