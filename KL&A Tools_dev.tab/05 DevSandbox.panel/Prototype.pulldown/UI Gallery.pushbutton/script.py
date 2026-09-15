@@ -395,10 +395,26 @@ class Gallery(forms.WPFWindow):
 
     def _launch_main_template_preview(self):
         import wpf
+        from System import Uri, UriKind
+        from System.Windows.Media.Imaging import (
+            BitmapImage, BitmapCacheOption, BitmapCreateOptions)
         from GUI.forms import my_WPF
 
         xaml_path = os.path.join(
             EXTENSION_ROOT, 'lib', 'GUI', '_templates', 'KLCodeMainTemplate.xaml')
+        search_icon_path = os.path.join(
+            EXTENSION_ROOT, 'lib', '_icons', 'search_16px_light.png')
+
+        def load_template_bitmap(image_path):
+            """Load a local preview asset before the gallery window is shown."""
+            bitmap = BitmapImage()
+            bitmap.BeginInit()
+            bitmap.CacheOption = BitmapCacheOption.OnLoad
+            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache
+            bitmap.UriSource = Uri(image_path, UriKind.Absolute)
+            bitmap.EndInit()
+            bitmap.Freeze()
+            return bitmap
 
         class MainTemplatePreview(my_WPF):
             def __init__(self):
@@ -435,6 +451,7 @@ class Gallery(forms.WPFWindow):
                 ]
                 self.add_wpf_resource()
                 wpf.LoadComponent(self, xaml_path)
+                self.filter_icon.Source = load_template_bitmap(search_icon_path)
                 self.main_title.Text = 'Main template — gallery preview'
                 self.text_label.Content = 'Select fictional drawing types:'
                 self.button_main.Content = 'Close preview'
