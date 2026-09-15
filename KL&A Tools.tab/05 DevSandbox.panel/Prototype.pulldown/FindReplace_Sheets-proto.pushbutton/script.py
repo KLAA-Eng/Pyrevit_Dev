@@ -33,9 +33,12 @@ from Autodesk.Revit.Exceptions import ArgumentException
 
 #pyRevit
 from pyrevit import forms
+import os
+import wpf
 
 # CUSTOM
 from Snippets._selection        import get_selected_sheets
+from GUI.forms                  import my_WPF
 
 # .NET IMPORTS
 from clr import AddReference
@@ -72,10 +75,11 @@ def update_project_browser():
 # ╚═╝╩═╝╩ ╩╚═╝╚═╝╚═╝╚═╝ CLASSES
 # ==================================================================
 
-class MyWindow(forms.WPFWindow):
+class MyWindow(my_WPF):
     """GUI for ViewSheet renaming tool."""
     def __init__(self, xaml_file_name):
-        self.form = forms.WPFWindow.__init__(self, xaml_file_name)
+        self.add_wpf_resource()
+        wpf.LoadComponent(self, os.path.join(os.path.dirname(__file__), xaml_file_name))
         self.main_title.Text = __title__
 
 

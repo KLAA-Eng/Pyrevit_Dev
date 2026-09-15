@@ -3,18 +3,19 @@
                     xmlns:local="clr-namespace:Common.WPF_styles">
 
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[COLOURS]-->
+            <SolidColorBrush x:Key="window_background"  Color="#1A252B" />
             <SolidColorBrush x:Key="header_background"  Color="#1A252B" />
 
             <SolidColorBrush x:Key="text_white"         Color="#E5E4E2" />
             <SolidColorBrush x:Key="text_gray"          Color="Gray" />
-            <SolidColorBrush x:Key="text_magenta"       Color="#33714F" />
+            <SolidColorBrush x:Key="text_green"       Color="#33714F" />
 
             <SolidColorBrush x:Key="button_fg_normal"   Color="White" />
             <SolidColorBrush x:Key="button_bg_normal"   Color="#286048" />
             <SolidColorBrush x:Key="button_bg_hover"    Color="#407058" />
 
-            <SolidColorBrush x:Key="border_magenta"     Color="#286048" />
-            <SolidColorBrush x:Key="border_blue"     Color="#33714F" />
+            <SolidColorBrush x:Key="border_green_dark"     Color="#286048" />
+            <SolidColorBrush x:Key="border_green"     Color="#33714F" />
 
             <SolidColorBrush x:Key="uncheckbox_checked_colour"     Color="Gray" />
             <SolidColorBrush x:Key="checkbox_checked_colour"     Color="#286048" />
@@ -53,13 +54,13 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Thumb}">
-                            <Border x:Name="rectangle" Background="Black" Height="{TemplateBinding Height}" SnapsToDevicePixels="True" Width="{TemplateBinding Width}" CornerRadius="8"/>
+                            <Border x:Name="rectangle" Background="{StaticResource text_green}" Height="{TemplateBinding Height}" SnapsToDevicePixels="True" Width="{TemplateBinding Width}" CornerRadius="8"/>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="true">
-                                    <Setter Property="Background" TargetName="rectangle" Value="Black"/>
+                                    <Setter Property="Background" TargetName="rectangle" Value="{StaticResource text_green}"/>
                                 </Trigger>
                                 <Trigger Property="IsDragging" Value="true">
-                                    <Setter Property="Background" TargetName="rectangle" Value="Black"/>
+                                    <Setter Property="Background" TargetName="rectangle" Value="{StaticResource text_green}"/>
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -81,8 +82,8 @@
                         <ControlTemplate TargetType="Button">
                             <Border CornerRadius="8"
                             Background="{TemplateBinding Background}">
-
-                                <ContentPresenter  VerticalAlignment="Center"
+                                <ContentPresenter Margin="{TemplateBinding Padding}"
+                                           VerticalAlignment="Center"
                                            HorizontalAlignment="Center"/>
                             </Border>
                         </ControlTemplate>
@@ -107,8 +108,10 @@
 
             <Style TargetType="TextBox">
                 <Setter Property="Background" Value="{StaticResource header_background}"/>
-                <Setter Property="Foreground" Value="{StaticResource text_magenta}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource border_blue}"/>
+                <Setter Property="Foreground" Value="{StaticResource text_white}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource border_green}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="8,0"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
 
                 <Style.Resources>
@@ -118,8 +121,68 @@
                 </Style.Resources>
             </Style>
 
+            <!-- The template's header close control keeps a tighter radius than action buttons. -->
+            <Style x:Key="KLCodeCloseButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Width" Value="60"/>
+                <Setter Property="Height" Value="18"/>
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border CornerRadius="6" Background="{TemplateBinding Background}">
+                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="KLCodeActionButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="Padding" Value="12,0"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <!-- Use inside the template's bordered filter shell. -->
+            <Style x:Key="KLCodeFilterTextBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="FontSize" Value="14"/>
+            </Style>
+
+            <!-- Shared chrome rules used by every branded custom-window footer. -->
+            <Style x:Key="KLCodeHeaderTitle" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="Foreground" Value="{StaticResource text_white}"/>
+                <Setter Property="MaxWidth" Value="180"/>
+                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="KLCodeFooterGrid" TargetType="Grid">
+                <Setter Property="Background" Value="{StaticResource header_background}"/>
+            </Style>
+
+            <Style x:Key="KLCodeFooterVersion" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                <Setter Property="Foreground" Value="{StaticResource text_gray}"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                <Setter Property="Margin" Value="4,0"/>
+            </Style>
+
+            <Style x:Key="KLCodeFooterLink" TargetType="Hyperlink">
+                <Setter Property="FontWeight" Value="Medium"/>
+                <Setter Property="Foreground" Value="{StaticResource button_bg_hover}"/>
+            </Style>
+
             <!--
-                            <Border  BorderBrush="{DynamicResource border_magenta}"
+                            <Border  BorderBrush="{DynamicResource border_green_dark}"
                          BorderThickness="1"
                          CornerRadius="10" >
             -->
@@ -134,7 +197,7 @@
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[STYLE] - LABEL -->
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[STYLE] - LABEL -->
             <Style TargetType="Label">
-                <Setter Property="Foreground" Value="{StaticResource text_magenta}"/>
+                <Setter Property="Foreground" Value="{StaticResource text_green}"/>
             </Style>
 
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[STYLE] - CheckBox -->
@@ -149,13 +212,8 @@
                         <ControlTemplate TargetType="CheckBox">
                             <BulletDecorator Background="Transparent">
                                 <BulletDecorator.Bullet>
-                                    <Border x:Name="Border" Width="15" Height="15" CornerRadius="2" BorderThickness="0">
-                                        <Border.Background>
-                                            <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
-                                                <GradientStop Color= "#88286048" Offset="1" />
-                                                <GradientStop Color= "#99307050" Offset="0" />
-                                            </LinearGradientBrush>
-                                        </Border.Background>
+                                    <Border x:Name="Border" Width="16" Height="16" CornerRadius="2" BorderThickness="1"
+                                            BorderBrush="{StaticResource text_green}" Background="{StaticResource window_background}">
                                         <Path Width="9" Height="9" x:Name="CheckMark" SnapsToDevicePixels="False"
                                               Stroke="#E5E4E2" StrokeThickness="2" Data="M 0 4 L 3 8 8 0" />
                                     </Border>
@@ -166,12 +224,16 @@
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsChecked" Value="false">
                                     <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed"/>
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource window_background}"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="true">
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource checkbox_checked_colour}"/>
                                 </Trigger>
                                 <Trigger Property="IsChecked" Value="{x:Null}">
                                     <Setter TargetName="CheckMark" Property="Data" Value="M 0 8 L 8 0" />
                                 </Trigger>
                                 <Trigger Property="IsMouseOver" Value="true">
-                                    <Setter TargetName="Border" Property="Background" Value="#FF131313" />
+                                    <Setter TargetName="Border" Property="Background" Value="{StaticResource button_bg_hover}" />
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="false">
                                     <Setter TargetName="CheckMark" Property="Stroke" Value="#FF6C6C6C"/>
@@ -188,6 +250,20 @@
                 <Setter Property="Margin" Value="2"/>
             </Style>
 
+            <!-- Self-contained outlined wordmark copied from KLCodeMainTemplate.xaml. -->
+            <DataTemplate x:Key="KLCodeWordmark">
+                <Viewbox Width="70" Height="12" Stretch="Uniform" SnapsToDevicePixels="True">
+                    <Canvas Width="961" Height="138" ClipToBounds="True">
+                        <Path Fill="#33714F" Data="M 144.85174,64.616159 58.592597,201.29639 H 32.000001 L 118.35445,64.616159 Z">
+                            <Path.RenderTransform><TranslateTransform X="-32" Y="-64"/></Path.RenderTransform>
+                        </Path>
+                        <Path Fill="#E5E4E2" Data="M 310.22147,201.29639 H 275.05062 L 219.29195,145.4424 h -17.44246 v -24.97226 h 17.44246 l 55.75867,-55.853981 h 35.17085 l -70.24639,68.340111 z m -118.28463,0 H 167.15521 V 64.616159 h 24.78163 z m 259.34929,0 H 338.24377 c -1.77919,0 -3.4313,-0.31771 -4.95633,-0.95314 -1.52502,-0.63543 -2.85941,-1.49325 -4.00318,-2.57348 -1.08023,-1.14377 -1.93805,-2.47816 -2.57348,-4.00319 -0.63543,-1.52502 -0.95314,-3.17713 -0.95314,-4.95632 V 64.616159 h 24.78163 V 176.51476 h 100.74686 z m 140.5881,0 h -89.4045 c -2.28753,0 -4.7657,-0.25417 -7.43449,-0.76252 -2.60525,-0.57188 -5.21049,-1.4297 -7.81574,-2.57347 -2.54171,-1.14377 -4.9881,-2.60525 -7.33918,-4.38444 -2.35107,-1.84274 -4.44798,-4.03496 -6.29072,-6.57667 -1.77919,-2.60525 -3.2089,-5.59175 -4.28913,-8.95951 -1.08022,-3.43131 -1.62033,-7.27564 -1.62033,-11.53299 V 99.405757 c 0,-2.287535 0.25417,-4.733927 0.76251,-7.339176 0.57188,-2.668791 1.4297,-5.274039 2.57347,-7.815745 1.14377,-2.605248 2.63703,-5.083411 4.47976,-7.434489 1.84274,-2.351078 4.03496,-4.416214 6.57666,-6.195408 2.60525,-1.842737 5.59176,-3.304217 8.95952,-4.384442 3.36776,-1.080225 7.18032,-1.620338 11.43767,-1.620338 h 89.4045 V 89.39779 h -89.4045 c -3.24067,0 -5.71884,0.857826 -7.43449,2.573477 -1.71565,1.715651 -2.57347,4.257357 -2.57347,7.625118 v 66.910405 c 0,3.17713 0.85782,5.6553 2.57347,7.43449 1.77919,1.71565 4.25736,2.57348 7.43449,2.57348 h 89.4045 z m 131.5333,-34.7896 c 0,4.25735 -0.54011,8.10168 -1.62034,11.53299 -1.08023,3.36776 -2.50994,6.35426 -4.28913,8.95951 -1.77919,2.54171 -3.84433,4.73393 -6.1954,6.57667 -2.35108,1.77919 -4.82924,3.24067 -7.43449,4.38444 -2.54171,1.14377 -5.14696,2.00159 -7.81575,2.57347 -2.60525,0.50835 -5.08341,0.76252 -7.43449,0.76252 h -44.70225 c -3.4313,0 -7.18032,-0.60366 -11.24705,-1.81097 -4.06673,-1.20731 -7.84751,-3.17713 -11.34236,-5.90946 -3.4313,-2.79588 -6.32249,-6.38604 -8.67357,-10.77048 -2.28753,-4.44799 -3.4313,-9.88088 -3.4313,-16.29869 v -33.55052 c 0,-6.35426 1.14377,-11.72361 3.4313,-16.10806 2.35108,-4.44799 5.24227,-8.03815 8.67357,-10.77048 3.49485,-2.79587 7.27563,-4.79747 11.34236,-6.00478 4.06673,-1.207307 7.81575,-1.810961 11.24705,-1.810961 h 44.70225 c 6.35427,0 11.75539,1.143767 16.20338,3.431301 4.44798,2.28753 8.03814,5.17872 10.77047,8.67357 2.73233,3.43131 4.70216,7.18032 5.90947,11.24705 1.27085,4.06673 1.90628,7.84751 1.90628,11.34236 z M 698.6259,133.1469 c 0,-3.4313 -0.85783,-5.97301 -2.57348,-7.62512 -1.71565,-1.65211 -4.19382,-2.47816 -7.43449,-2.47816 h -44.51162 c -3.30422,0 -5.81415,0.85783 -7.5298,2.57348 -1.71565,1.65211 -2.57348,4.0985 -2.57348,7.33917 v 33.55052 c 0,3.24067 0.85783,5.71884 2.57348,7.43449 1.71565,1.71565 4.22558,2.57348 7.5298,2.57348 h 44.51162 c 3.36776,0 5.87769,-0.85783 7.5298,-2.57348 1.65211,-1.71565 2.47817,-4.19382 2.47817,-7.43449 z m 158.88839,33.35989 c 0,4.25735 -0.54011,8.10168 -1.62033,11.53299 -1.08023,3.36776 -2.50994,6.35426 -4.28913,8.95951 -1.77919,2.54171 -3.84433,4.73393 -6.19541,6.57667 -2.35108,1.77919 -4.82924,3.24067 -7.43449,4.38444 -2.54171,1.14377 -5.14695,2.00159 -7.81574,2.57347 -2.60525,0.50835 -5.08342,0.76252 -7.43449,0.76252 h -44.70225 c -4.25736,0 -8.06992,-0.54011 -11.43768,-1.62034 -3.36776,-1.08023 -6.35426,-2.50994 -8.95951,-4.28913 -2.54171,-1.84273 -4.73393,-3.93964 -6.57667,-6.29072 -1.77919,-2.35108 -3.24067,-4.79747 -4.38444,-7.33918 -1.14377,-2.60525 -2.00159,-5.21049 -2.57348,-7.81574 -0.50834,-2.66879 -0.76251,-5.14696 -0.76251,-7.43449 v -33.55052 c 0,-6.35426 1.14377,-11.72361 3.43131,-16.10806 2.35107,-4.44799 5.24226,-8.03815 8.67357,-10.77048 3.49484,-2.79587 7.27563,-4.79747 11.34236,-6.00478 4.06673,-1.207307 7.81574,-1.810961 11.24705,-1.810961 h 44.70225 v 24.781631 h -44.51163 c -3.30421,0 -5.81415,0.85783 -7.5298,2.57348 -1.71565,1.65211 -2.57348,4.0985 -2.57348,7.33917 v 33.35989 c 0,3.36776 0.82606,5.90947 2.47817,7.62512 1.71565,1.71565 4.19381,2.57348 7.43449,2.57348 h 44.70225 c 3.36776,0 5.87769,-0.85783 7.5298,-2.57348 1.65211,-1.71565 2.47816,-4.19382 2.47816,-7.43449 V 64.616159 h 24.78163 z m 134.48796,-34.1224 c 0,3.4313 -0.60366,7.14854 -1.81097,11.15173 -1.20731,3.93965 -3.17713,7.62512 -5.90946,11.05642 -2.66879,3.36776 -6.19541,6.19541 -10.57985,8.48295 -4.3209,2.28753 -9.59494,3.4313 -15.82212,3.4313 H 913.1776 v -23.54255 h 44.70225 c 3.36776,0 5.97301,-1.01668 7.81574,-3.05005 1.84274,-2.09691 2.76411,-4.67038 2.76411,-7.72043 0,-3.24067 -1.04845,-5.78238 -3.14536,-7.62512 -2.03337,-1.84273 -4.51153,-2.7641 -7.43449,-2.7641 H 913.1776 c -3.36776,0 -5.97301,1.04845 -7.81575,3.14536 -1.84273,2.03337 -2.7641,4.57507 -2.7641,7.62512 v 34.59897 c 0,3.30421 1.01668,5.87769 3.05005,7.72043 2.09691,1.84273 4.67038,2.7641 7.72043,2.7641 h 44.51162 v 23.63787 H 913.1776 c -3.43131,0 -7.14855,-0.60366 -11.15174,-1.81097 -3.93964,-1.20731 -7.62511,-3.14536 -11.05642,-5.81415 -3.36776,-2.73233 -6.19541,-6.25895 -8.48294,-10.57985 -2.28753,-4.38444 -3.4313,-9.69025 -3.4313,-15.91743 v -34.7896 c 0,-3.43131 0.60365,-7.11678 1.81096,-11.05642 1.20731,-4.00319 3.14537,-6.29073 5.81416,-11.05642 2.73233,-3.43131 6.25895,-6.29073 10.57985,-8.57826 4.38444,-2.287534 9.69025,-3.431301 15.91743,-3.431301 h 44.70225 c 3.4313,0 7.11677,0.603654 11.05642,1.810961 4.00319,1.20731 7.68866,3.17714 11.05642,5.90947 3.4313,2.66879 6.29072,6.19541 8.57826,10.57985 2.28753,4.3209 3.4313,9.59494 3.4313,15.82212 z">
+                            <Path.RenderTransform><TranslateTransform X="-32" Y="-64"/></Path.RenderTransform>
+                        </Path>
+                    </Canvas>
+                </Viewbox>
+            </DataTemplate>
+
 
 
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>HEADER -->
@@ -201,44 +277,33 @@
                 Grid.ColumnSpan="2">
                                 <!--HEADER GRID-->
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="86"/>
                                     <ColumnDefinition/>
-                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="86"/>
                                 </Grid.ColumnDefinitions>
 
                                 <!--LOGO-->
-                                <DockPanel  Grid.Column="0"
-                        Grid.ColumnSpan="2"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left">
-                                    <Image Width="20" Height="20"
-                      />
-                                    <!--Source="https://www.erikfrits.com/media/images/LOGO.png"-->
-
-                                    <TextBlock
-                                FontSize="14px"
-                                FontWeight="Heavy"
-                                Foreground="{StaticResource text_white}">
-                                KLCode
-                                    </TextBlock>
-                                </DockPanel>
+                                <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
+                                                VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                IsHitTestVisible="False"
+                                                ContentTemplate="{StaticResource KLCodeWordmark}"/>
 
                                 <!--__TITLE__-->
                                 <TextBlock x:Name="main_title"
                                             Text="__title__"
-                                            Grid.Column="1"
+                                            Grid.Column="0"
+                                            Grid.ColumnSpan="3"
                                             VerticalAlignment="Center"
                                             HorizontalAlignment="Center"
-                                            Foreground="{StaticResource text_white}"/>
+                                            Foreground="{StaticResource text_white}"
+                                            MaxWidth="180"
+                                            TextTrimming="CharacterEllipsis"/>
 
                                 <!--CLOSE-->
                                 <Button Content="Close"
                                         Grid.Column="2"
-                                        Width="60" Height="20"
-                                        FontSize="10"
                                         Click="button_close"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Right"/>
+                                        Style="{StaticResource KLCodeCloseButton}"/>
                             </Grid>
                             <!--HEADER END-->
                         </DataTemplate>
@@ -259,7 +324,7 @@
                             Grid.ColumnSpan="2"
                             CornerRadius="2"
                             Background="{StaticResource header_background}"
-                            BorderBrush="{StaticResource border_blue}"
+                            BorderBrush="{StaticResource border_green}"
                             BorderThickness="1" />
 
                     <!-- MAIN BOX-->
@@ -268,7 +333,7 @@
                             CornerRadius="0"
                             Margin="1"
                             Background="{StaticResource header_background}"
-                            BorderBrush="{StaticResource border_blue}"
+                            BorderBrush="{StaticResource border_green}"
                             BorderThickness="0,0,1,0" />
 
                     <!-- MAIN BOX-->
@@ -340,7 +405,7 @@
                                         <Border x:Name="DropDownBorder"
                                                 Background="{StaticResource header_background}"
                                                 BorderThickness="1"
-                                                BorderBrush="{StaticResource border_blue}"/>
+                                                BorderBrush="{StaticResource border_green}"/>
 
                                         <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
                                             <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
@@ -411,7 +476,7 @@
 
                                 <Style TargetType="ListBox">
                         <Setter Property="Background" Value="{StaticResource header_background}"/>
-                        <Setter Property="BorderBrush" Value="{StaticResource border_magenta}"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource border_green_dark}"/>
                         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Visible"/>
                         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>
 
@@ -426,8 +491,8 @@
             <!-->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[SCROLLBAR] -->
 
                     <Style TargetType="ScrollBar">
-                        <Setter Property="Background" Value="{StaticResource border_magenta}"/>
-                        <Setter Property="Foreground" Value="{StaticResource border_magenta}"/>
+                        <Setter Property="Background" Value="{StaticResource window_background}"/>
+                        <Setter Property="Foreground" Value="{StaticResource window_background}"/>
                         <Setter Property="BorderBrush" Value="{StaticResource header_background}"/>
                         <Setter Property="Opacity" Value="0.9"/>
                         <Setter Property="Margin" Value="3"/>

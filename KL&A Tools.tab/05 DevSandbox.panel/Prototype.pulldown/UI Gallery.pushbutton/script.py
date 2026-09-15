@@ -6,6 +6,9 @@ import os
 import sys
 
 from pyrevit import forms
+from System import Uri
+from System.Windows import ResourceDictionary
+from System.Windows.Input import MouseButtonState
 
 
 def _extension_root(path):
@@ -43,7 +46,7 @@ class GalleryRow(object):
         self.RelativePath = launcher.get('relative_path') or 'pyRevit built-in'
         self.CalledBy = launcher.get('called_by') or ''
         self.Description = launcher['description']
-        self.SampleData = 'Seeded sample data' if launcher.get('uses_seed_data') else 'Catalog only'
+        self.SampleData = launcher.get('sample_data_label') or 'Catalog only'
         self.CanLaunch = launcher.get('can_launch', True)
 
 
@@ -96,6 +99,13 @@ class Gallery(forms.WPFWindow):
         self.EntriesGrid.ItemsSource = self._visible_rows
         self._update_actions()
 
+    def button_close(self, sender, args):
+        self.Close()
+
+    def header_drag(self, sender, args):
+        if args.LeftButton == MouseButtonState.Pressed:
+            self.DragMove()
+
     def filter_changed(self, sender, args):
         query = (self.FilterBox.Text or '').lower()
         self._visible_rows = [row for row in self._rows if self._matches(row, query)]
@@ -137,6 +147,8 @@ class Gallery(forms.WPFWindow):
         if launcher_id == 'pyrevit-alert':
             forms.alert('This is a safe gallery preview. No model data is changed.',
                         title='Sample pyRevit alert')
+        elif launcher_id == 'pyrevit-ask-for-color':
+            forms.ask_for_color()
         elif launcher_id == 'pyrevit-ask-for-string':
             forms.ask_for_string(default='Sample project note',
                                  prompt='Enter a preview value:',
@@ -145,6 +157,12 @@ class Gallery(forms.WPFWindow):
             forms.CommandSwitchWindow.show(
                 ['Open sample report', 'Review sample warnings', 'Cancel preview'],
                 message='Choose a safe gallery action')
+        elif launcher_id == 'pyrevit-pick-file':
+            forms.pick_file(file_ext='rvt', title='Sample pyRevit file picker')
+        elif launcher_id == 'pyrevit-pick-folder':
+            forms.pick_folder(title='Sample pyRevit folder picker')
+        elif launcher_id == 'pyrevit-progress-bar':
+            self._launch_pyrevit_progress_bar_preview()
         elif launcher_id == 'pyrevit-select-list':
             forms.SelectFromList.show(sample_names, multiselect=True,
                                       title='Sample pyRevit list selection',
@@ -153,6 +171,9 @@ class Gallery(forms.WPFWindow):
             forms.SelectFromList.show(sample_names, multiselect=False,
                                       title='Sample pyRevit list selection',
                                       button_name='Select sample')
+        elif launcher_id == 'pyrevit-show-balloon':
+            forms.show_balloon('UI Gallery preview',
+                               'Sample pyRevit balloon notification.')
         elif launcher_id == 'kla-custom-alert':
             from CustomAlert import show_alert
             show_alert('Preview data is fictional and cannot modify this model.',
@@ -173,6 +194,8 @@ class Gallery(forms.WPFWindow):
             self._launch_duplicate_sheets_preview()
         elif launcher_id == 'kla-match-properties-recall':
             self._launch_match_properties_recall_preview()
+        elif launcher_id == 'kla-main-template':
+            self._launch_main_template_preview()
         elif launcher_id == 'kla-select-from-dict':
             from SelectFromDict import select_from_dict
             select_from_dict(dict((name, name) for name in sample_names),
@@ -193,17 +216,40 @@ class Gallery(forms.WPFWindow):
         else:
             raise ValueError('Unsupported gallery launcher: {}'.format(launcher_id))
 
+    def _launch_pyrevit_progress_bar_preview(self):
+        with forms.ProgressBar(title='Sample pyRevit progress',
+                               cancellable=False) as progress_bar:
+            for value in range(0, 11):
+                progress_bar.update_progress(value, 10)
+
     def _launch_create_from_rooms_preview(self):
         import wpf
+        from System import Uri, UriKind
+        from System.Windows.Media.Imaging import (
+            BitmapImage, BitmapCacheOption, BitmapCreateOptions)
         from GUI.forms import my_WPF
 
         xaml_path = os.path.join(
             EXTENSION_ROOT, 'lib', 'GUI', 'Tools', 'CreateFromRooms.xaml')
+        search_icon_path = os.path.join(
+            EXTENSION_ROOT, 'lib', '_icons', 'search_16px_light.png')
+
+        def load_search_icon():
+            """Load the shared 16 px search icon for the gallery preview."""
+            bitmap = BitmapImage()
+            bitmap.BeginInit()
+            bitmap.CacheOption = BitmapCacheOption.OnLoad
+            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache
+            bitmap.UriSource = Uri(search_icon_path, UriKind.Absolute)
+            bitmap.EndInit()
+            bitmap.Freeze()
+            return bitmap
 
         class CreateFromRoomsPreview(my_WPF):
             def __init__(self):
                 self.add_wpf_resource()
                 wpf.LoadComponent(self, xaml_path)
+                self.filter_icon.Source = load_search_icon()
                 self.main_title.Text = 'Create From Rooms — gallery preview'
                 self.text_label.Content = 'Select fictional room type:'
                 self.button_main.Content = 'Close preview'
@@ -264,7 +310,7 @@ class Gallery(forms.WPFWindow):
 
     def _launch_find_replace_views_preview(self):
         self._launch_rename_preview(
-            os.path.join(EXTENSION_ROOT, 'lib', 'Renaming', 'GUI_BaseRename.xaml'),
+            os.path.join(EXTENSION_ROOT, 'lib', 'GUI', 'RenameViews.xaml'),
             'Find and Replace Views — gallery preview',
             {
                 'input_find': 'Office',
@@ -288,8 +334,7 @@ class Gallery(forms.WPFWindow):
 
     def _launch_find_replace_sheets_preview(self):
         self._launch_rename_preview(
-            os.path.join(EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
-                         'Rename.pulldown', 'FindReplace_Sheets.pushbutton', 'Script.xaml'),
+            os.path.join(EXTENSION_ROOT, 'lib', 'GUI', 'RenameSheets.xaml'),
             'Find and Replace Sheets — gallery preview',
             {
                 'input_sheet_number_find': 'A',
@@ -349,19 +394,132 @@ class Gallery(forms.WPFWindow):
         RenamePreview()
 
     def _launch_duplicate_sheets_preview(self):
-        xaml_path = os.path.join(
-            EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
-            'duplicate_sheets.pushbutton', 'Script.xaml')
+        xaml_path = os.path.join(EXTENSION_ROOT, 'lib', 'GUI', 'DuplicateSheets.xaml')
         self._launch_static_preview(xaml_path,
-                                    'Duplicate Sheets — gallery preview')
+                                    'Duplicate Sheets — gallery preview',
+                                    {
+                                        'UI_view_find': 'Office',
+                                        'UI_view_replace': 'Studio',
+                                        'UI_view_prefix': 'Sample - ',
+                                        'UI_view_suffix': ' - Review',
+                                        'UI_sheet_number_find': 'A',
+                                        'UI_sheet_number_replace': 'S',
+                                        'UI_sheet_number_prefix': 'Sample-',
+                                        'UI_sheet_number_suffix': '-R1',
+                                        'UI_sheet_name_find': 'Office',
+                                        'UI_sheet_name_replace': 'Studio',
+                                        'UI_sheet_name_prefix': 'Sample - ',
+                                        'UI_sheet_name_suffix': ' - Review',
+                                    })
 
-    def _launch_static_preview(self, xaml_path, title):
-        class StaticPreview(forms.WPFWindow):
+    def _launch_main_template_preview(self):
+        import wpf
+        from System import Uri, UriKind
+        from System.Windows.Media.Imaging import (
+            BitmapImage, BitmapCacheOption, BitmapCreateOptions)
+        from GUI.forms import my_WPF
+
+        xaml_path = os.path.join(
+            EXTENSION_ROOT, 'lib', 'GUI', '_templates', 'KLCodeMainTemplate.xaml')
+        search_icon_path = os.path.join(
+            EXTENSION_ROOT, 'lib', '_icons', 'search_16px_light.png')
+
+        def load_template_bitmap(image_path):
+            """Load a local preview asset before the gallery window is shown."""
+            bitmap = BitmapImage()
+            bitmap.BeginInit()
+            bitmap.CacheOption = BitmapCacheOption.OnLoad
+            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache
+            bitmap.UriSource = Uri(image_path, UriKind.Absolute)
+            bitmap.EndInit()
+            bitmap.Freeze()
+            return bitmap
+
+        class MainTemplatePreview(my_WPF):
             def __init__(self):
-                forms.WPFWindow.__init__(self, xaml_path)
+                self._items = [
+                    PreviewListItem('A101 - Floor Plan', 'a101', True),
+                    PreviewListItem('A201 - Building Section', 'a201', False),
+                    PreviewListItem('S101 - Foundation Plan', 's101', False),
+                    PreviewListItem('M101 - HVAC Plan', 'm101', False),
+                    PreviewListItem('A301 - Reflected Ceiling Plan', 'a301', False),
+                    PreviewListItem('A401 - Exterior Elevations', 'a401', False),
+                    PreviewListItem('A501 - Wall Sections', 'a501', False),
+                    PreviewListItem('A601 - Interior Elevations', 'a601', False),
+                    PreviewListItem('A701 - Finish Plans', 'a701', False),
+                    PreviewListItem('A801 - Door and Frame Schedule', 'a801', False),
+                    PreviewListItem('S201 - Framing Plan', 's201', False),
+                    PreviewListItem('S301 - Typical Details', 's301', False),
+                    PreviewListItem('S401 - Steel Details', 's401', False),
+                    PreviewListItem('S501 - Foundation Details', 's501', False),
+                    PreviewListItem('M201 - Ductwork Plan', 'm201', False),
+                    PreviewListItem('M301 - Piping Plan', 'm301', False),
+                    PreviewListItem('M401 - Equipment Schedule', 'm401', False),
+                    PreviewListItem('E101 - Lighting Plan', 'e101', False),
+                    PreviewListItem('E201 - Power Plan', 'e201', False),
+                    PreviewListItem('E301 - Electrical Details', 'e301', False),
+                    PreviewListItem('P101 - Plumbing Plan', 'p101', False),
+                    PreviewListItem('P201 - Sanitary Plan', 'p201', False),
+                    PreviewListItem('P301 - Plumbing Details', 'p301', False),
+                    PreviewListItem('FP101 - Fire Protection Plan', 'fp101', False),
+                    PreviewListItem('FP201 - Fire Protection Details', 'fp201', False),
+                    PreviewListItem('C001 - General Notes', 'c001', False),
+                    PreviewListItem('C101 - Civil Site Plan', 'c101', False),
+                    PreviewListItem('L101 - Landscape Plan', 'l101', False),
+                    PreviewListItem('I001 - Interior Design Legend', 'i001', False),
+                ]
+                self.add_wpf_resource()
+                wpf.LoadComponent(self, xaml_path)
+                self.filter_icon.Source = load_template_bitmap(search_icon_path)
+                self.main_title.Text = 'Main template — gallery preview'
+                self.text_label.Content = 'Select fictional drawing types:'
+                self.button_main.Content = 'Close preview'
+                self.footer_version.Text = 'UI Gallery — fictional data only'
+                self.main_ListBox.ItemsSource = self._items
+                self.ShowDialog()
+
+            def text_filter_updated(self, sender, args):
+                query = (self.textbox_filter.Text or '').lower()
+                if not query:
+                    self.main_ListBox.ItemsSource = self._items
+                    return
+                self.main_ListBox.ItemsSource = [
+                    item for item in self._items if query in item.Name.lower()
+                ]
+
+            def UIe_ItemChecked(self, sender, args):
+                return None
+
+            def button_select_all(self, sender, args):
+                self._set_checked(True)
+
+            def button_select_none(self, sender, args):
+                self._set_checked(False)
+
+            def _set_checked(self, checked):
+                for item in self._items:
+                    item.IsChecked = checked
+                self.main_ListBox.ItemsSource = list(self._items)
+
+            def button_select(self, sender, args):
+                self.Close()
+
+        MainTemplatePreview()
+
+    def _launch_static_preview(self, xaml_path, title, sample_values=None):
+        import wpf
+        from GUI.forms import my_WPF
+
+        class StaticPreview(my_WPF):
+            def __init__(self):
+                self.add_wpf_resource()
+                wpf.LoadComponent(self, xaml_path)
                 self.Title = title
                 if hasattr(self, 'main_title'):
                     self.main_title.Text = title
+                for control_name, value in (sample_values or {}).items():
+                    if hasattr(self, control_name):
+                        getattr(self, control_name).Text = value
                 self.ShowDialog()
 
             def button_close(self, sender, args):
@@ -371,7 +529,8 @@ class Gallery(forms.WPFWindow):
                 self.Close()
 
             def header_drag(self, sender, args):
-                return None
+                if args.LeftButton == MouseButtonState.Pressed:
+                    self.DragMove()
 
             def radiobutton_duplicate_option(self, sender, args):
                 return None
@@ -379,14 +538,17 @@ class Gallery(forms.WPFWindow):
         StaticPreview()
 
     def _launch_match_properties_recall_preview(self):
+        import wpf
+        from GUI.forms import my_WPF
         from System.Windows import Thickness
         from System.Windows.Controls import StackPanel, TextBlock, ListBox
 
         xaml_path = os.path.join(EXTENSION_ROOT, 'lib', 'match', 'clipboard_window.xaml')
 
-        class MatchRecallPreview(forms.WPFWindow):
+        class MatchRecallPreview(my_WPF):
             def __init__(self):
-                forms.WPFWindow.__init__(self, xaml_path)
+                self.add_wpf_resource()
+                wpf.LoadComponent(self, xaml_path)
                 self.Title = 'Match Properties Recall — gallery preview'
                 panel = StackPanel()
                 panel.Margin = Thickness(12)
@@ -415,10 +577,18 @@ class Gallery(forms.WPFWindow):
         xaml_path = os.path.join(
             EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
             'ViewRange.pushbutton', 'MainWindow.xaml')
+        styles_path = os.path.join(
+            EXTENSION_ROOT, 'lib', 'GUI', 'Resources', 'WPF_styles.xaml')
+
+        def shared_wordmark_template():
+            styles = ResourceDictionary()
+            styles.Source = Uri(styles_path)
+            return styles['KLCodeWordmark']
 
         class ViewRangePreview(forms.WPFWindow):
             def __init__(self):
                 forms.WPFWindow.__init__(self, xaml_path)
+                self.wordmark_host.ContentTemplate = shared_wordmark_template()
                 self.DataContext = ViewRangePreviewData()
                 self.ShowDialog()
 
@@ -427,6 +597,16 @@ class Gallery(forms.WPFWindow):
 
             def reset_values_click(self, sender, args):
                 self.warning.Text = 'Preview values are already seeded.'
+
+            def button_close(self, sender, args):
+                self.Close()
+
+            def header_drag(self, sender, args):
+                if args.LeftButton == MouseButtonState.Pressed:
+                    self.DragMove()
+
+            def Hyperlink_RequestNavigate(self, sender, args):
+                args.Handled = True
 
         ViewRangePreview()
 

@@ -9,6 +9,7 @@ from pyrevit.framework import ComponentModel, wpf, Controls, Uri, UriKind, Resou
 from pyrevit.compat import get_elementid_value_func
 from System.Windows.Input import MouseButtonState
 from System.Windows.Window import DragMove
+from GUI.forms import my_WPF
 
 from match.match_utils import (
     PropKeyValue,
@@ -453,9 +454,10 @@ class MatchHistoryClipboard(forms.WPFPanel):
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-class RecallWindow(forms.WPFWindow):
+class RecallWindow(my_WPF):
     def __init__(self, target_type, initial_props, memfile):
-        forms.WPFWindow.__init__(self, _WINDOW_XAML)
+        self.add_wpf_resource()
+        wpf.LoadComponent(self, _WINDOW_XAML)
         self._content = ClipboardContent(
             is_recall=True,
             target_type=target_type,

@@ -1,0 +1,243 @@
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Views: Find and Replace"
+    Height="253" Width="350"
+    WindowStartupLocation="CenterScreen"
+    HorizontalAlignment="Center"
+    ShowInTaskbar="True"
+    WindowStyle="None"
+    ResizeMode="NoResize"
+    Background="#1A252B">
+
+
+    <!--MAIN-->
+    <Grid Background="#1A252B">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="24"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="24"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <!--HEADER START-->
+        <Grid   MouseDown="header_drag"
+                Background="{StaticResource header_background}"
+                Grid.ColumnSpan="2">
+            <!--HEADER GRID-->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="86"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="86"/>
+            </Grid.ColumnDefinitions>
+
+            <!--LOGO-->
+            <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
+                            VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"
+                            ContentTemplate="{StaticResource KLCodeWordmark}"/>
+            <DockPanel  Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Visibility="Collapsed">
+                <Image Width="20" Height="20"
+                      />
+                <!--Source="https://www.erikfrits.com/media/images/LOGO.png"-->
+
+                <TextBlock
+                    FontSize="14px"
+                    FontWeight="Heavy"
+                    Foreground="{StaticResource text_white}">
+                    KLCode
+                </TextBlock>
+            </DockPanel>
+
+            <!--__TITLE__-->
+            <TextBlock x:Name="main_title"
+                Text="__title__"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Foreground="{StaticResource text_white}"
+                MaxWidth="180"
+                TextTrimming="CharacterEllipsis"/>
+
+            <!--CLOSE-->
+            <Button Content="Close"
+                    Grid.Column="2"
+                    Width="60" Height="18"
+                    FontSize="10"
+                    Click="button_close"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource KLCodeCloseButton}"/>
+        </Grid>
+        <!--HEADER END-->
+
+        <StackPanel Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Margin="5,16,5,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="15*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+
+                <StackPanel Grid.Column="0"
+                                    Margin="5,0,5,0" >
+                    <Label Content="Renaming Parameters"
+                           Margin="0"
+                           Foreground="{StaticResource text_white}"/>
+                    <Border  Height="110"
+                          BorderBrush="{DynamicResource border_green_dark}"
+                         BorderThickness="1,1,1,1" CornerRadius="10" HorizontalAlignment="Stretch" Width="Auto">
+
+
+
+                        <StackPanel Grid.Row="2"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        Margin="10">
+
+                            <!--FIND-->
+                            <DockPanel  HorizontalAlignment="Left"
+                                        Margin="2">
+                                <TextBlock Text="Find:"
+                                            Foreground="{StaticResource text_white}"
+                                            Width="60"/>
+
+                                <TextBox x:Name="input_find"
+                                         Width="200"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         Background="{StaticResource header_background}"
+                                         Foreground="{StaticResource text_white}"/>
+                            </DockPanel>
+
+                            <!--REPLACE-->
+                            <DockPanel HorizontalAlignment="Left"
+                                       Margin="2">
+
+                                <TextBlock  Text="Replace:"
+                                            Foreground="{StaticResource text_white}"
+                                            Width="60"/>
+
+                                <TextBox x:Name="input_replace"
+                                            Width="200"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Background="{StaticResource header_background}"
+                                            Foreground="{StaticResource text_white}"/>
+                            </DockPanel>
+
+                            <!--PREFIX-->
+                            <DockPanel HorizontalAlignment="Left"
+                                        Margin="2">
+                                <TextBlock Text="Prefix:"
+                                           Foreground="{StaticResource text_white}"
+                                           Width="60"/>
+
+                                <TextBox x:Name="input_prefix"
+                                         Width="200"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         Background="{StaticResource header_background}"
+                                         Foreground="{StaticResource text_white}"/>
+                            </DockPanel>
+
+                            <!--SUFFIX-->
+                            <DockPanel HorizontalAlignment="Left"
+                                        Margin="2">
+                                <TextBlock Text="Suffix:"
+                                           Foreground="{StaticResource text_white}"
+                                           Width="60"/>
+
+                                <TextBox x:Name="input_suffix"
+                                         Width="200"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         Background="{StaticResource header_background}"
+                                         Foreground="{StaticResource text_white}"/>
+                            </DockPanel>
+
+
+                        </StackPanel>
+                    </Border>
+
+                    <Button x:Name="UI_main_button"
+                            Click="button_run"
+                            Content="Rename"
+                            Margin="0,8,0,16"
+                            Width="210"
+                            Height="32"
+                            Style="{StaticResource KLCodeActionButton}"/>
+
+
+
+
+
+                </StackPanel>
+
+
+
+
+            </Grid>
+
+
+
+        </StackPanel>
+
+
+        <!--FOOTER START-->
+        <Grid Grid.Row="2" Style="{StaticResource KLCodeFooterGrid}">
+            <!--FOOTER GRID-->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0">
+                <Hyperlink NavigateUri="https://forms.cloud.microsoft/r/HjuggSZqyU"
+                           RequestNavigate="Hyperlink_RequestNavigate"
+                           Style="{StaticResource KLCodeFooterLink}">Prototype</Hyperlink>
+            </TextBlock>
+
+            <!--VERSION-->
+            <TextBlock x:Name="footer_version" Style="{StaticResource KLCodeFooterVersion}"
+                        Text="Version: 1.0"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Foreground="{StaticResource text_gray}"
+                />
+
+            <!--PATREON-->
+            <TextBlock  Grid.Column="2"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Margin="0,0,10,0">
+                    <Hyperlink
+                        RequestNavigate="Hyperlink_RequestNavigate"
+                        NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
+                        Style="{StaticResource KLCodeFooterLink}">
+                        Outreach
+                    </Hyperlink>
+            </TextBlock>
+
+
+        </Grid>
+        <!--FOOTER END-->
+
+    </Grid>
+</Window>

@@ -57,24 +57,25 @@ _____________________________________________________________________
 #====================================================================================================
 
 
+import os
+
 from Autodesk.Revit.DB import *
 from Autodesk.Revit.UI.Selection import *
 
 import pyrevit
-from pyrevit import revit
-from pyrevit import forms
 
 # Custom
+from GUI.DuplicateSheets import DuplicateSheets
 from Snippets._selection import get_selected_sheets
 
 # .NET IMPORTS
 import clr
-from pyrevit.forms import WPFWindow
 clr.AddReference("System")
 from System.Diagnostics.Process import Start
 from System.Collections.Generic import List
 from System.Windows.Window import DragMove
 from System.Windows.Input import MouseButtonState
+import wpf
 
 # ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
 # ╚╗╔╝╠═╣╠╦╝║╠═╣╠╩╗║  ║╣ ╚═╗
@@ -89,7 +90,7 @@ app = __revit__.Application
 # ╚═╝╩═╝╩ ╩╚═╝╚═╝ CLASS
 #====================================================================================================
 
-class MyWindow(forms.WPFWindow):
+class MyWindow(DuplicateSheets):
     """GUI for View renaming tool."""
 
     # VARIABLES
@@ -100,14 +101,14 @@ class MyWindow(forms.WPFWindow):
     # ╩╝╚╝╩ ╩  INIT
     # ====================================================================================================
 
-    def __init__(self, xaml_file_name):
+    def __init__(self):
         self.selected_sheets = get_selected_sheets(uidoc,
                                                    title=__title__,
                                                    label = 'Select Sheet to Duplicate',
                                                    exit_if_none= False)
         if self.selected_sheets:
-            self.form = forms.WPFWindow.__init__(self, xaml_file_name)
-            self.main_title.Text = __title__
+            DuplicateSheets.__init__(self, __title__, self.duplicate_selected_sheets,
+                                     self.set_duplicate_option)
             self.ShowDialog()
     # ╔═╗╦ ╦╔╗╔╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     # ╠╣ ║ ║║║║║   ║ ║║ ║║║║╚═╗
@@ -644,27 +645,8 @@ class MyWindow(forms.WPFWindow):
     def use_existing_schedules(self):
         return self.UI_checkbox_use_existing_schedules.IsChecked
 
-    # ╔═╗╦  ╦╔═╗╔╗╔╔╦╗  ╦ ╦╔═╗╔╗╔╔╦╗╦  ╔═╗╦═╗╔═╗
-    # ║╣ ╚╗╔╝║╣ ║║║ ║   ╠═╣╠═╣║║║ ║║║  ║╣ ╠╦╝╚═╗
-    # ╚═╝ ╚╝ ╚═╝╝╚╝ ╩   ╩ ╩╩ ╩╝╚╝═╩╝╩═╝╚═╝╩╚═╚═╝ GUI EVENT HANDLERS:
-    # ====================================================================================================
-
-    def button_close(self,sender,e):
-        """Stop application by clicking on a <Close> button in the top right corner."""
-        self.Close()
-
-    def Hyperlink_RequestNavigate(self, sender, e):
-        """Forwarding for a Hyperlink"""
-        Start(e.Uri.AbsoluteUri)
-
-    def header_drag(self,sender,e):
-        """Drag window by holding LeftButton on the header."""
-        if e.LeftButton == MouseButtonState.Pressed:
-            DragMove(self)
-
-    def radiobutton_duplicate_option(self, sender, e):
-        """[Event Handler] Grab the value of a radio button on its change."""
-        checked_radiobutton = sender
+    def set_duplicate_option(self, checked_radiobutton):
+        """Map the selected UI label to the Revit duplicate option."""
         if checked_radiobutton.IsChecked:
             if checked_radiobutton.Content == "Duplicate":
                 self.view_dupicate_option = ViewDuplicateOption.Duplicate
@@ -673,23 +655,13 @@ class MyWindow(forms.WPFWindow):
             elif checked_radiobutton.Content == "Duplicate Dependent":
                 self.view_dupicate_option = ViewDuplicateOption.AsDependent
 
-    def button_run(self,sender,e):
-        """Main run button.
-        Closes the dialog box anda start duplicating selected sheets."""
-
-        self.Close()
-        self.duplicate_selected_sheets()
-    # ====================================================================================================
-
-
-
 # ╔╦╗╔═╗╦╔╗╔
 # ║║║╠═╣║║║║
 # ╩ ╩╩ ╩╩╝╚╝ MAIN
 #====================================================================================================
 t = Transaction(doc,__title__)
 t.Start()
-MyWindow("Script.xaml")
+MyWindow()
 t.Commit()
 
 
@@ -737,5 +709,3 @@ t.Commit()
 #             #                     Reset size of view to original, title remain in place
 #             #                     It would be good if the API had a method.  Mine is a very "messy" workaround.
 #             #                 """+
-
-

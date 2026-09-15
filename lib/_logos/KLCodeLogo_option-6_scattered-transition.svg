@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512" role="img" aria-label="KLCode logo scattered transition concept">
+  <defs><style>@font-face{font-family:'Audiowide';src:url('_font_candidates/Audiowide-Regular.ttf') format('truetype');font-weight:400;font-style:normal;}</style></defs>
+  <!-- An asymmetric boundary: deeper only where the pixel clusters need support. -->
+  <path fill="#1A252B" d="M60 32H824V60H852V116H796V172H824V228H852V284H796V340H824V396H852V452H796V480H60A28 28 0 0 1 32 452V60A28 28 0 0 1 60 32Z"/>
+  <circle cx="84" cy="90" r="14" fill="#33714F"/><circle cx="134" cy="90" r="14" fill="#33714F"/><circle cx="183" cy="90" r="14" fill="#E5E4E2"/>
+  <text x="108" y="343" font-family="Audiowide, sans-serif" font-size="180" font-weight="400" letter-spacing="1"><tspan fill="#33714F">/</tspan><tspan fill="#E5E4E2">KLC</tspan></text>
+  <g id="pixel-stream">
+    <rect x="852" y="32" width="28" height="28" fill="#33714F"/><rect x="880" y="32" width="28" height="28" fill="#407058" fill-opacity=".55"/>
+    <rect x="824" y="60" width="28" height="28" fill="#286048"/><rect x="852" y="60" width="28" height="28" fill="#33714F"/><rect x="936" y="60" width="28" height="28" fill="#307050" fill-opacity=".20"/>
+    <rect x="768" y="88" width="28" height="28" fill="#407058" fill-opacity=".45"/><rect x="796" y="88" width="28" height="28" fill="#33714F"/><rect x="824" y="88" width="28" height="28" fill="#407058"/>
+    <rect x="852" y="116" width="28" height="28" fill="#286048"/><rect x="880" y="116" width="28" height="28" fill="#33714F"/>
+    <rect x="824" y="144" width="28" height="28" fill="#33714F"/><rect x="908" y="144" width="28" height="28" fill="#286048" fill-opacity=".20"/>
+    <rect x="796" y="172" width="28" height="28" fill="#286048"/><rect x="824" y="172" width="28" height="28" fill="#407058"/>
+    <rect x="768" y="200" width="28" height="28" fill="#286048" fill-opacity=".35"/><rect x="796" y="200" width="28" height="28" fill="#33714F"/><rect x="852" y="200" width="28" height="28" fill="#286048"/><rect x="880" y="200" width="28" height="28" fill="#407058"/>
+    <rect x="824" y="228" width="28" height="28" fill="#33714F"/><rect x="852" y="228" width="28" height="28" fill="#407058"/><rect x="936" y="228" width="28" height="28" fill="#307050" fill-opacity=".20"/>
+    <rect x="796" y="256" width="28" height="28" fill="#286048"/><rect x="824" y="256" width="28" height="28" fill="#33714F"/><rect x="908" y="256" width="28" height="28" fill="#407058" fill-opacity=".25"/>
+    <rect x="768" y="284" width="28" height="28" fill="#407058" fill-opacity=".40"/><rect x="796" y="284" width="28" height="28" fill="#407058"/><rect x="824" y="284" width="28" height="28" fill="#286048"/><rect x="880" y="284" width="28" height="28" fill="#33714F"/><rect x="964" y="284" width="28" height="28" fill="#307050" fill-opacity=".20"/>
+    <rect x="852" y="312" width="28" height="28" fill="#33714F"/><rect x="880" y="312" width="28" height="28" fill="#286048"/>
+    <rect x="796" y="340" width="28" height="28" fill="#33714F"/><rect x="824" y="340" width="28" height="28" fill="#407058"/><rect x="908" y="340" width="28" height="28" fill="#286048" fill-opacity=".20"/>
+    <rect x="768" y="368" width="28" height="28" fill="#286048" fill-opacity=".35"/><rect x="796" y="368" width="28" height="28" fill="#286048"/><rect x="824" y="368" width="28" height="28" fill="#33714F"/><rect x="852" y="368" width="28" height="28" fill="#407058"/>
+    <rect x="824" y="396" width="28" height="28" fill="#286048"/><rect x="880" y="396" width="28" height="28" fill="#33714F"/>
+    <rect x="796" y="424" width="28" height="28" fill="#407058"/><rect x="824" y="424" width="28" height="28" fill="#33714F"/><rect x="936" y="424" width="28" height="28" fill="#307050" fill-opacity=".20"/>
+    <rect x="852" y="452" width="28" height="28" fill="#286048" fill-opacity=".20"/>
+  </g>
+</svg>
