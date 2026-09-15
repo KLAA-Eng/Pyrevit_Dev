@@ -43,12 +43,14 @@ These are the named colors used across KLCode ribbon icons and WPF GUIs. This ta
 
 KLCode ribbon icons are transparent-background PNGs. Use a single foreground color unless the command clearly needs additional visual detail.
 
-### Live Icon Conventions
+### Current Command Icon State
 
-| Context | File | Foreground |
-| --- | --- | --- |
-| Light UI | `icon.png` | `#1A252B` KLCharcoal |
-| Dark UI | `icon.dark.png` | `#E5E4E2` KLWhite |
+Command-bundle icon files are not yet a single normalized palette. Current
+`icon.png` files include KLOrange (`#FF8000`), the older blue-gray
+(`#34495E`), and multicolor or anti-aliased artwork. Most `icon.dark.png`
+files use `#EBEBEB`, with existing exceptions. Treat these as the deployed
+asset inventory, not as a universal export rule; preserve an existing command
+icon's established treatment unless its refresh is in scope.
 
 ### Source Assets
 
@@ -62,6 +64,10 @@ Name reusable source icons with a descriptive lowercase icon name, size, and col
 | KLGreen | `#33714F` |  `<icon-name>_<size>px_green.png` |
 | KLWhite | `#E5E4E2` |  `<icon-name>_<size>px_light.png` |
 | KLCharcoal | `#1A252B` |  `<icon-name>_<size>px_dark.png` |
+
+At the time of this audit, all 390 root PNG source assets follow this naming
+pattern: 97 light, 97 dark, 98 green, and 98 orange variants. The four
+`drill_32px_*` files are single-color references for the values above.
 
 ### Standard Sizes
 
@@ -102,9 +108,9 @@ Shared WPF GUI styling is defined in `lib/GUI/Resources/WPF_styles.xaml`.
 
 ## GUI Properties
 
-`lib/GUI/_templates/KLCodeMainTemplate.xaml` is the visual authority for these values. The shared dictionary exposes its outlined wordmark, compact close control, action buttons, filter field, checkbox, list, and scrollbar treatments. These values apply to windows that load the shared dictionary through `my_WPF.add_wpf_resource()` unless the window defines local resources with the same keys.
+`lib/GUI/_templates/KLCodeMainTemplate.xaml` is the visual authority for these values. The shared dictionary exposes its outlined wordmark, compact close control, action buttons, filter field, checkbox, list, and scrollbar treatments. These values apply to windows that load the shared dictionary through `my_WPF.add_wpf_resource()` unless a nested or window-level resource overrides them.
 
-Most reusable dialogs load the shared dictionary through `my_WPF.add_wpf_resource()`. The View Range editor and the two Find and Replace prototypes use `forms.WPFWindow` and merge the dictionary from their local `Window.Resources`; each currently retains a local resource dictionary for command-specific or prototype behavior. The UI Gallery is a separate DevSandbox surface with its own local resources.
+Most reusable dialogs, including the two Find and Replace prototypes, load the shared dictionary through `my_WPF.add_wpf_resource()`. The View Range editor instead uses `forms.WPFWindow` with its own `Window.Resources`; after loading it assigns the shared `KLCodeWordmark` template to `wordmark_host` in Python. The UI Gallery is a separate DevSandbox surface with its own local resources.
 
 ### Color Properties
 
@@ -138,14 +144,14 @@ Most reusable dialogs load the shared dictionary through `my_WPF.add_wpf_resourc
 | `ComboBox` | editable text field | `Foreground` | `#E5E4E2` | KLWhite |
 | `ComboBoxItem` | default | `Foreground` | `White` | white |
 | `ComboBoxItem` | highlighted state | `Background` | `#FF4F4F4F` | KLCharcoal-gray |
-| `DataGrid` | default | `Background` | `header_background` | KLCharcoal |
-| `DataGrid` | default | `Foreground` | `text_white` | KLWhite |
-| `DataGrid` | border/grid lines | `BorderBrush`/`HorizontalGridLinesBrush` | `border_green_dark` | KLGreen-dark |
-| `DataGrid` | alternate row | `AlternatingRowBackground` | `#FF131313` | KLCharcoal-black |
-| `DataGridColumnHeader` | default | `Background` | `border_green_dark` | KLGreen-dark |
-| `DataGridColumnHeader` | default | `Foreground` | `text_white` | KLWhite |
-| `DataGridCell` | selected state | `Background` | `button_bg_hover` | KLGreen-secondary |
-| `DataGridCell` | selected state | `Foreground` | `button_fg_normal` | white |
+| `DataGrid` (UI Gallery local override) | default | `Background` | `header_background` | KLCharcoal |
+| `DataGrid` (UI Gallery local override) | default | `Foreground` | `text_white` | KLWhite |
+| `DataGrid` (UI Gallery local override) | border/grid lines | `BorderBrush`/`HorizontalGridLinesBrush` | `border_green_dark` | KLGreen-dark |
+| `DataGrid` (UI Gallery local override) | alternate row | `AlternatingRowBackground` | `#FF131313` | KLCharcoal-black |
+| `DataGridColumnHeader` (UI Gallery local override) | default | `Background` | `border_green_dark` | KLGreen-dark |
+| `DataGridColumnHeader` (UI Gallery local override) | default | `Foreground` | `text_white` | KLWhite |
+| `DataGridCell` (UI Gallery local override) | selected state | `Background` | `button_bg_hover` | KLGreen-secondary |
+| `DataGridCell` (UI Gallery local override) | selected state | `Foreground` | `button_fg_normal` | white |
 | `ListBox` | default | `Background` | `header_background` | KLCharcoal |
 | `ListBox` | default | `BorderBrush` | `border_green_dark` | KLGreen-dark |
 | `ScrollBar` | default | `Background` | `window_background` | KLCharcoal |
@@ -257,7 +263,7 @@ standardization scope.
 
 ## UI Gallery Theme Audit
 
-The DevSandbox UI Gallery catalogs representative KL&A custom, DevSandbox, and standard pyRevit windows in `lib/ui_gallery/launchers.py`. For the 12 styled KL&A custom entries, use `lib/GUI/_templates/KLCodeMainTemplate.xaml` as the visual reference: borderless dark chrome, the outlined KLCode wordmark in the 24 px header, KLCharcoal window background, KLGreen-dark/KLGreen/KLGreen-secondary accents, and readable KLWhite text.
+The DevSandbox UI Gallery catalogs representative KL&A custom, DevSandbox, and standard pyRevit windows in `lib/ui_gallery/launchers.py`. For the 12 user-facing KL&A custom windows, use `lib/GUI/_templates/KLCodeMainTemplate.xaml` as the visual reference: borderless dark chrome, the outlined KLCode wordmark in the 24 px header, KLCharcoal window background, KLGreen-dark/KLGreen/KLGreen-secondary accents, and readable KLWhite text. The template is also a separate gallery preview entry, not a thirteenth user-facing window.
 
 Standard pyRevit gallery entries, the UI Gallery shell, and its preview fixture are intentional tooling/external references and are not scored for KLCode theme consistency.
 
@@ -265,28 +271,28 @@ Audit scope: all 14 window XAML files listed in the Shared GUI Windows, One-Off 
 
 | Gallery title | Category | XAML path | Theme status | Notable drift | Recommended future action |
 | --- | --- | --- | --- | --- | --- |
-| Create from rooms | KL&A custom | `lib/GUI/Tools/CreateFromRooms.xaml` | Reference/aligned | Loads shared styles through `my_WPF` and uses a solid KLCharcoal window background. | Keep layout and behavior; update shared control values in `WPF_styles.xaml`. |
+| Create from rooms | KL&A custom | `lib/GUI/Tools/CreateFromRooms.xaml` | Reference/aligned with local list override | Loads shared styles through `my_WPF`, uses a solid KLCharcoal window background, and locally overrides its `ListBox`/scrollbar resources. | Keep layout and behavior; update shared control values in `WPF_styles.xaml`, then retain only its list-specific override. |
 | KL&A alert | KL&A custom | `lib/GUI/CustomAlert.xaml` | Reference/aligned | Alert-specific icon, heading, and OK button are preserved inside SelectFromDict-style dark chrome. | Keep aligned with the shared palette when alert states are expanded. |
-| Duplicate sheets | KL&A custom | `lib/GUI/DuplicateSheets.xaml` | Reference/aligned | Large command-specific form uses shared styles whose resource keys map to the named design tokens. | Keep command handlers in the bundle and presentation in `lib/GUI`. |
+| Duplicate sheets | KL&A custom | `lib/GUI/DuplicateSheets.xaml` | Reference/aligned with local checkbox override | Large command-specific form uses shared styles whose resource keys map to the named design tokens, plus a nested checkbox style for its option grid. | Keep command handlers in the bundle and presentation in `lib/GUI`. |
 | Find and replace | KL&A custom | `lib/GUI/FindReplace.xaml` | Reference/aligned | Compact rename form uses the solid KLCharcoal header/body and shared KLCode resources. | Keep as a compact aligned variant. |
 | Find and replace sheets | KL&A custom | `lib/GUI/RenameSheets.xaml` | Reference/aligned | Production sheet rename presentation loads the shared dictionary; command behavior remains in its bundle. | Keep handlers and Revit transactions in the command bundle. |
-| Find and replace sheets prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Explicit prototype exception | Prototype-local copy remains isolated while its experimental behavior is evaluated. | Promote deliberate changes into `lib/GUI/RenameSheets.xaml`; do not sync opportunistically. |
+| Find and replace sheets prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Explicit prototype exception | Prototype behavior remains isolated, but its XAML now consumes the shared dictionary directly. | Promote deliberate behavior changes into `lib/GUI/RenameSheets.xaml`; do not sync opportunistically. |
 | Find and replace views | KL&A custom | `lib/GUI/RenameViews.xaml` | Reference/aligned | Shared rename base now loads `WPF_styles.xaml` through `my_WPF`. | Keep production view rename presentation in `lib/GUI`. |
-| Find and replace views prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Explicit prototype exception | Prototype-local XAML remains isolated from the production rename base. | Promote deliberate changes into `lib/GUI/RenameViews.xaml`; do not sync opportunistically. |
+| Find and replace views prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Explicit prototype exception | Prototype behavior remains isolated, but its XAML now consumes the shared dictionary directly. | Promote deliberate behavior changes into `lib/GUI/RenameViews.xaml`; do not sync opportunistically. |
 | Match properties recall | KL&A custom | `lib/match/clipboard_window.xaml` | Reference/aligned | Modeless clipboard content is hosted inside SelectFromDict-style dark chrome and loads the shared palette directly. | Keep the content host pattern so command content does not replace the KLCode shell. |
 | KL&A list selection | KL&A custom | `lib/GUI/SelectFromDict.xaml` | Reference/aligned | This is the reference theme for list-selection windows. | Keep as the base for future selection-style custom windows. |
 | Steel PSF story selection | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | Reference/aligned | Closely follows SelectFromDict list-selection chrome with a solid KLCharcoal background; footer is prototype-specific. | Keep aligned with SelectFromDict when Steel PSF controls change. |
-| View range editor | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | Reference/aligned | Uses SelectFromDict-style dark chrome and local KLCode token resources while preserving pyRevit's `forms.WPFWindow` loading path for this command-specific editor. The Associated Level selectors use a full local dark `ComboBox`/`ComboBoxItem` template so the selector body and popup do not fall back to native light WPF styling. | Keep command-specific behavior in the bundle; promote only reusable styles into `WPF_styles.xaml` when another command needs them. |
+| View range editor | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | Reference/aligned with local dictionary | Uses SelectFromDict-style dark chrome and local KLCode token resources while preserving pyRevit's `forms.WPFWindow` loading path for this command-specific editor. Python applies the shared `KLCodeWordmark` template after XAML loading. The Associated Level selectors use a full local dark `ComboBox`/`ComboBoxItem` template so the selector body and popup do not fall back to native light WPF styling. | Keep command-specific behavior in the bundle; promote only reusable styles into `WPF_styles.xaml` when another command needs them. |
 | UI Gallery | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | Reference/aligned | Uses SelectFromDict-style dark chrome, local KLCode token resources, and a KLCharcoal/KLGreen dark DataGrid treatment for catalog rows. | Keep gallery-only DataGrid styling local unless another KLCode table view adopts the same pattern. |
 | UI Gallery preview fixture | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | Needs future theming | Uses a KLCharcoal window background but remains an intentionally minimal fixture with default WPF chrome and text styling. | Leave plain unless the fixture is promoted to a visual-review artifact; document it as a test exception if unchanged. |
 
 ## Style Loading And Local GUI Overrides
 
-The visual baseline is `lib/GUI/_templates/KLCodeMainTemplate.xaml`: a `400 x 550` list-selection window with a 24 px borderless header, 86 px edge columns, a `70 x 12` outlined wordmark, a centered title spanning all three columns, and `KLCodeCloseButton`. It also defines the search-icon/filter-shell pattern used by the list-selection variants. `SelectFromDict.xaml` is the production implementation of that pattern.
+The visual baseline is `lib/GUI/_templates/KLCodeMainTemplate.xaml`: a `432 x 576` list-selection window with a 24 px borderless header, 86 px edge columns, a `70 x 12` outlined wordmark, a centered title spanning all three columns, and `KLCodeCloseButton`. It also defines the search-icon/filter-shell pattern used by the list-selection variants. `SelectFromDict.xaml` is the production implementation of that pattern.
 
 ### Windows that load shared properties without local resource copies
 
-These loaders call `my_WPF.add_wpf_resource()` before `wpf.LoadComponent()`. Their XAML consumes `WPF_styles.xaml` directly; local layout and workflow content remain deliberate window-level differences.
+These loaders call `my_WPF.add_wpf_resource()` before `wpf.LoadComponent()`. Their XAML consumes `WPF_styles.xaml` directly and has no local resource dictionary; local layout and workflow content remain deliberate window-level differences.
 
 | Window | XAML path | Loader path |
 | --- | --- | --- |
@@ -295,21 +301,21 @@ These loaders call `my_WPF.add_wpf_resource()` before `wpf.LoadComponent()`. The
 | Find and replace | `lib/GUI/FindReplace.xaml` | `lib/GUI/FindReplace.py` |
 | Find and replace views | `lib/GUI/RenameViews.xaml` | `lib/Renaming/BaseClass_FindReplace.py` |
 | Find and replace sheets | `lib/GUI/RenameSheets.xaml` | `lib/GUI/RenameSheets.py` |
-| Duplicate sheets | `lib/GUI/DuplicateSheets.xaml` | `lib/GUI/DuplicateSheets.py` |
-| Create from rooms | `lib/GUI/Tools/CreateFromRooms.xaml` | `lib/GUI/Tools/CreateFromRooms.py` |
 | Match properties recall | `lib/match/clipboard_window.xaml` | `lib/match/clipboard.py` |
 | Steel PSF story selection | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/script.py` |
+| Find and replace views prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/script.py` |
+| Find and replace sheets prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/script.py` |
 
 ### Local GUI Overrides
 
-These windows have local `Window.Resources`. They are visually aligned at the header level but are not pure shared-style consumers.
+These entries are not pure shared-style consumers. Some define local resources at window or nested-control scope; the preview fixture has no shared-style dependency.
 
 | Window | XAML path | Local implementation | Reason |
 | --- | --- | --- | --- |
-| View range editor | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | Merges `WPF_styles.xaml`, then defines local brushes and a full dark `ComboBox`/`ComboBoxItem` template. | It stays on `forms.WPFWindow`; the selector template prevents Revit from falling back to native light WPF surfaces. |
-| Find and replace views prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Merges `WPF_styles.xaml` and retains a prototype-local dictionary. | The prototype is intentionally isolated from `lib/GUI/RenameViews.xaml`. |
-| Find and replace sheets prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Merges `WPF_styles.xaml` and retains a prototype-local dictionary. | The prototype is intentionally isolated from `lib/GUI/RenameSheets.xaml`. |
+| View range editor | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | Defines a full local palette and dark `ComboBox`/`ComboBoxItem` templates. Its Python loader retrieves only `KLCodeWordmark` from `WPF_styles.xaml` after `forms.WPFWindow` loads the XAML. | It stays on `forms.WPFWindow`; the selector template prevents Revit from falling back to native light WPF surfaces. |
+| Duplicate sheets | `lib/GUI/DuplicateSheets.xaml` | Nested `Grid.Resources` adds a checkbox style based on the shared checkbox style. | Its option grid needs local spacing, font, and alignment without replacing the shared checkbox template. |
+| Create from rooms | `lib/GUI/Tools/CreateFromRooms.xaml` | Nested `ListBox.Resources` overrides the scrollbar track colors and list border radius. | Its selection list retains command-specific styling on top of the shared dictionary. |
 | UI Gallery | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | Independent local palette and `DataGrid` styles; it does not merge `WPF_styles.xaml`. | DevSandbox catalog tooling has table-specific styling not yet shared by another window. |
 | UI Gallery preview fixture | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | No shared dictionary or KLCode header treatment. | A deliberately minimal preview/test fixture. |
 
-Future user-facing KL&A custom dialogs should start from `KLCodeMainTemplate.xaml` and use `WPF_styles.xaml`. Keep a local resource dictionary only for a documented command-specific control template or an isolated prototype; promote it into the shared dictionary when a second reusable window needs the same behavior.
+Future user-facing KL&A custom dialogs should start from `KLCodeMainTemplate.xaml` and use `WPF_styles.xaml`. Keep a local resource scope only for a documented command-specific control template or an isolated prototype; promote it into the shared dictionary when a second reusable window needs the same behavior.
