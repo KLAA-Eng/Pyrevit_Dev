@@ -6,9 +6,7 @@
         WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResize"
         Background="#1A252B">
     <Window.Resources>
-        <ResourceDictionary.MergedDictionaries>
-            <ResourceDictionary Source="../../../lib/GUI/Resources/WPF_styles.xaml"/>
-        </ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary>
         <SolidColorBrush x:Key="header_background" Color="#1A252B"/>
         <SolidColorBrush x:Key="text_white" Color="#E5E4E2"/>
         <SolidColorBrush x:Key="text_gray" Color="Gray"/>
@@ -47,7 +45,7 @@
             <Setter Property="BorderBrush" Value="{StaticResource border_green}"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
-        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -82,11 +80,11 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
 
-        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
+        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="TextBox">
             <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}"/>
         </ControlTemplate>
 
-        <Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
+        <Style x:Key="ViewRangeComboBox" TargetType="ComboBox">
             <Setter Property="SnapsToDevicePixels" Value="true"/>
             <Setter Property="OverridesDefaultStyle" Value="true"/>
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
@@ -95,7 +93,7 @@
             <Setter Property="Foreground" Value="{StaticResource text_white}"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                    <ControlTemplate TargetType="ComboBox">
                         <Grid>
                             <ToggleButton Name="ToggleButton"
                                           Template="{StaticResource ComboBoxToggleButton}"
@@ -162,13 +160,13 @@
             </Setter>
         </Style>
 
-        <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}">
+        <Style x:Key="ViewRangeComboBoxItem" TargetType="ComboBoxItem">
             <Setter Property="SnapsToDevicePixels" Value="true"/>
             <Setter Property="Foreground" Value="{StaticResource text_white}"/>
             <Setter Property="OverridesDefaultStyle" Value="true"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                    <ControlTemplate TargetType="ComboBoxItem">
                         <Border Name="Border" Padding="4,3" SnapsToDevicePixels="true">
                             <ContentPresenter/>
                         </Border>
@@ -184,12 +182,74 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="KLCodeActionButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource button_fg_normal}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="8" Background="{TemplateBinding Background}">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"
+                                              HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource button_bg_hover}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="KLCodeFooterGrid" TargetType="Grid">
+            <Setter Property="Background" Value="{StaticResource header_background}"/>
+        </Style>
+        <Style x:Key="KLCodeFooterVersion" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource text_gray}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+        <Style x:Key="KLCodeFooterLink" TargetType="Hyperlink">
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="{StaticResource button_bg_hover}"/>
+        </Style>
+        <Style x:Key="KLCodeHeaderTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource text_white}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+        <Style x:Key="KLCodeCloseButton" TargetType="Button">
+            <Setter Property="Width" Value="60"/>
+            <Setter Property="Height" Value="18"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource text_white}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="6" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        </ResourceDictionary>
     </Window.Resources>
     <Grid Background="#1A252B">
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>
             <RowDefinition/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
 
         <Grid MouseDown="header_drag"
@@ -199,16 +259,14 @@
                 <ColumnDefinition/>
                 <ColumnDefinition Width="86"/>
             </Grid.ColumnDefinitions>
-            <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
+            <ContentControl x:Name="wordmark_host" Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
                             VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"
-                            ContentTemplate="{StaticResource KLCodeWordmark}"/>
+                            />
             <TextBlock x:Name="main_title"
                        Grid.Column="0"
                        Grid.ColumnSpan="3"
                        Text="View Range Editor"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center"
-                       Foreground="{StaticResource text_white}"
+                       Style="{StaticResource KLCodeHeaderTitle}"
                        MaxWidth="180"
                        TextTrimming="CharacterEllipsis"/>
             <Button Grid.Column="2"
@@ -217,7 +275,7 @@
                     Style="{StaticResource KLCodeCloseButton}"/>
         </Grid>
 
-        <StackPanel Grid.Row="1" Margin="12">
+        <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="12,12,12,16">
         <TextBlock Text="{Binding message}" Margin="0,0,0,10" FontSize="14" Height="40" TextWrapping="Wrap"/>
         <Separator Background="{StaticResource border_green_dark}"/>
         
@@ -259,6 +317,8 @@
                       DisplayMemberPath="Name" 
                       SelectedValuePath="IdValue"
                       Height="25" Margin="5,0" VerticalContentAlignment="Center"
+                      Style="{StaticResource ViewRangeComboBox}"
+                      ItemContainerStyle="{StaticResource ViewRangeComboBoxItem}"
                       IsEnabled="{Binding can_modify_view}"/>
             
             <!-- Cut Plane Row -->
@@ -291,6 +351,8 @@
                       DisplayMemberPath="Name" 
                       SelectedValuePath="IdValue"
                       Height="25" Margin="5,0" VerticalContentAlignment="Center"
+                      Style="{StaticResource ViewRangeComboBox}"
+                      ItemContainerStyle="{StaticResource ViewRangeComboBoxItem}"
                       IsEnabled="{Binding can_modify_view}"/>
             
             <!-- View Depth Row -->
@@ -308,28 +370,32 @@
                       DisplayMemberPath="Name" 
                       SelectedValuePath="IdValue"
                       Height="25" Margin="5,0" VerticalContentAlignment="Center"
+                      Style="{StaticResource ViewRangeComboBox}"
+                      ItemContainerStyle="{StaticResource ViewRangeComboBoxItem}"
                       IsEnabled="{Binding can_modify_view}"/>
         </Grid>
         
-        <Separator Margin="0,10" Background="{StaticResource border_green_dark}"/>
+        <TextBlock x:Name="warning" Text="{Binding warning_message}" Foreground="{StaticResource text_green}"
+                   TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0,8,0,0" FontSize="11"/>
+
+        <Separator Margin="0,10,0,16" Background="{StaticResource border_green_dark}"/>
         
         <!-- Buttons -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10">
-            <Button Content="Apply Changes" Width="120" Height="30" Margin="5" Click="apply_changes_click" 
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0">
+            <Button Content="Apply Changes" Width="120" Height="32" Margin="0,0,8,0" Click="apply_changes_click"
+                    Style="{StaticResource KLCodeActionButton}"
                     IsEnabled="{Binding can_modify_view}"/>
-            <Button Content="Reset to Original" Width="130" Height="30" Margin="5" Click="reset_values_click"/>
+            <Button Content="Reset to Original" Width="130" Height="32" Margin="0" Click="reset_values_click"
+                    Style="{StaticResource KLCodeActionButton}"/>
         </StackPanel>
         
-        <!-- Warning/Status Messages -->
-        <TextBlock x:Name="warning" Text="{Binding warning_message}" Foreground="{StaticResource text_green}" 
-                   TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0,5" FontSize="11"/>
     </StackPanel>
 
-        <Grid Grid.Row="2" Background="{StaticResource header_background}">
-            <TextBlock Text="View Range"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center"
-                       Foreground="{StaticResource text_gray}"/>
+        <Grid Grid.Row="2" Style="{StaticResource KLCodeFooterGrid}">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition/><ColumnDefinition Width="100"/></Grid.ColumnDefinitions>
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0"><Hyperlink NavigateUri="https://forms.cloud.microsoft/r/HjuggSZqyU" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource KLCodeFooterLink}">Prototype</Hyperlink></TextBlock>
+            <TextBlock Grid.Column="1" Text="View Range" Style="{StaticResource KLCodeFooterVersion}"/>
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0"><Hyperlink NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource KLCodeFooterLink}">Outreach</Hyperlink></TextBlock>
         </Grid>
     </Grid>
 </Window>

@@ -5,9 +5,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="Create From Rooms"
-    Height="460" Width="400"
+    Height="406" Width="400"
     MinWidth="400"
-    MinHeight="460" MaxHeight="550"
+    MinHeight="406" MaxHeight="406"
     WindowStartupLocation="CenterScreen"
     HorizontalAlignment="Center"
     ShowInTaskbar="True"
@@ -99,7 +99,7 @@
                 <ColumnDefinition Width="6"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Image Grid.Column="0" Source="../../_icons/search_16px_light.png" Width="16" Height="16"
+            <Image x:Name="filter_icon" Grid.Column="0" Width="16" Height="16"
                    VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="None" SnapsToDevicePixels="True"/>
             <Border Grid.Column="2" Background="{StaticResource window_background}" BorderBrush="{StaticResource text_green}"
                     BorderThickness="1" CornerRadius="6" SnapsToDevicePixels="True">
@@ -191,7 +191,7 @@
 
             <!--REGION SETTINGS-->
             <StackPanel Margin="5,20,5,5" x:Name="UI_stack_region_settings" >
-                <Label Content="Additional Settings:" Margin="0, -25,0,0 "/>
+                <Label Content="Additional Settings:" Margin="0, -25,0,0 " Foreground="{StaticResource text_white}"/>
                 <Border  BorderBrush="{DynamicResource border_green_dark}" Padding="0,5,0,10">
                     <StackPanel Margin="5,10,5,5" >
 
@@ -210,9 +210,10 @@
             <Button x:Name="button_main"
                 Content="Create"
                         Click="button_run"
-                        Height="30"
+                        Height="32"
                         Width="210"
-                        Margin="5"
+                        Margin="0,8,0,16"
+                        Style="{StaticResource KLCodeActionButton}"
                         />
 
 
@@ -220,7 +221,7 @@
         <!--LISTBOX END-->
 
         <!--FOOTER START-->
-        <Grid Grid.Row="3" Background="{StaticResource header_background}">
+        <Grid Grid.Row="3" Style="{StaticResource KLCodeFooterGrid}">
             <!--FOOTER GRID-->
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -228,18 +229,17 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <!--IMAGE-->
-            <TextBlock>
-                <Hyperlink  NavigateUri="https://www.learnrevitapi.com" RequestNavigate="Hyperlink_RequestNavigate">
-                               <Image  Height="20"   Margin="1"  HorizontalAlignment="Left"   VerticalAlignment="Top"
-                                   Source="https://www.learnrevitapi.com/static/img_new/logo/logo_learnrevitapi.png" />
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0">
+                <Hyperlink NavigateUri="https://forms.cloud.microsoft/r/HjuggSZqyU" RequestNavigate="Hyperlink_RequestNavigate"
+                           Style="{StaticResource KLCodeFooterLink}">
+                    Prototype
                 </Hyperlink>
             </TextBlock>
 
 
 
             <!--VERSION-->
-            <TextBlock x:Name="footer_version"
+            <TextBlock x:Name="footer_version" Style="{StaticResource KLCodeFooterVersion}"
               Text="Version: 1.0"
               Grid.Column="1"
               VerticalAlignment="Center"
@@ -255,8 +255,7 @@
               <Hyperlink
                   RequestNavigate="Hyperlink_RequestNavigate"
                   NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
-                  FontWeight="Medium"
-                  Foreground="{StaticResource button_bg_hover}">
+                  Style="{StaticResource KLCodeFooterLink}">
                   Outreach
               </Hyperlink>
             </TextBlock>

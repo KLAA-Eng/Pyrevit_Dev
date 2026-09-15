@@ -255,25 +255,6 @@ standardization scope.
 | UI Gallery | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py` | `UI Gallery.pushbutton` |
 | UI Gallery preview fixture | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py` | `UI Gallery.pushbutton` |
 
-### Window Backgrounds
-
-| Window | Implementation value | KLName |
-| --- | --- | --- |
-| `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | `#1A252B` | KLCharcoal |
-| `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | `#1A252B` | KLCharcoal |
-| `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | `#1A252B` | KLCharcoal |
-| `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | `#1A252B` | KLCharcoal |
-| `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | `#1A252B` | KLCharcoal |
-| `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | `#1A252B` | KLCharcoal |
-| `lib/GUI/CustomAlert.xaml` | `#1A252B` | KLCharcoal |
-| `lib/GUI/DuplicateSheets.xaml` | `#1A252B` | KLCharcoal |
-| `lib/GUI/FindReplace.xaml` | `#1A252B` | KLCharcoal |
-| `lib/GUI/RenameSheets.xaml` | `#1A252B` | KLCharcoal |
-| `lib/GUI/RenameViews.xaml` | `#1A252B` | KLCharcoal |
-| `lib/GUI/SelectFromDict.xaml` | `#1A252B` | KLCharcoal |
-| `lib/GUI/Tools/CreateFromRooms.xaml` | `#1A252B` | KLCharcoal |
-| `lib/match/clipboard_window.xaml` | `#1A252B` | KLCharcoal |
-
 ## UI Gallery Theme Audit
 
 The DevSandbox UI Gallery catalogs representative KL&A custom, DevSandbox, and standard pyRevit windows in `lib/ui_gallery/launchers.py`. For the 12 styled KL&A custom entries, use `lib/GUI/_templates/KLCodeMainTemplate.xaml` as the visual reference: borderless dark chrome, the outlined KLCode wordmark in the 24 px header, KLCharcoal window background, KLGreen-dark/KLGreen/KLGreen-secondary accents, and readable KLWhite text.

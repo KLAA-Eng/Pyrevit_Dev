@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="Views: Find and Replace"
-    Height="235" Width="350"
+    Height="253" Width="350"
     WindowStartupLocation="CenterScreen"
     HorizontalAlignment="Center"
     ShowInTaskbar="True"
@@ -19,7 +19,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="24"></RowDefinition>
             <RowDefinition></RowDefinition>
-            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="24"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
@@ -82,8 +82,8 @@
 
         <StackPanel Grid.Row="1"
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Bottom"
-                    Margin="5">
+                    VerticalAlignment="Top"
+                    Margin="5,16,5,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="15*"/>
@@ -94,10 +94,10 @@
 
 
                 <StackPanel Grid.Column="0"
-                                    Margin="5" >
+                                    Margin="5,0,5,0" >
                     <Label Content="Renaming Parameters"
-                           Margin="0, -25,0,0 "
-                           Foreground="{StaticResource text_green}"/>
+                           Margin="0"
+                           Foreground="{StaticResource text_white}"/>
                     <Border  Height="110"
                           BorderBrush="{DynamicResource border_green_dark}"
                          BorderThickness="1,1,1,1" CornerRadius="10" HorizontalAlignment="Stretch" Width="Auto">
@@ -174,11 +174,13 @@
                         </StackPanel>
                     </Border>
 
-                    <Button Click="button_run"
+                    <Button x:Name="UI_main_button"
+                            Click="button_run"
                             Content="Rename"
-                            Margin="0,10,0,0"
-                            Width="75"
-                            Height="25"/>
+                            Margin="0,8,0,16"
+                            Width="210"
+                            Height="32"
+                            Style="{StaticResource KLCodeActionButton}"/>
 
 
 
@@ -197,17 +199,22 @@
 
 
         <!--FOOTER START-->
-        <Grid   Grid.Row="2"
-                Background="{StaticResource header_background}">
+        <Grid Grid.Row="2" Style="{StaticResource KLCodeFooterGrid}">
             <!--FOOTER GRID-->
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
 
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0">
+                <Hyperlink NavigateUri="https://forms.cloud.microsoft/r/HjuggSZqyU"
+                           RequestNavigate="Hyperlink_RequestNavigate"
+                           Style="{StaticResource KLCodeFooterLink}">Prototype</Hyperlink>
+            </TextBlock>
+
             <!--VERSION-->
-            <TextBlock x:Name="footer_version"
+            <TextBlock x:Name="footer_version" Style="{StaticResource KLCodeFooterVersion}"
                         Text="Version: 1.0"
                         Grid.Column="1"
                         VerticalAlignment="Center"
@@ -223,8 +230,7 @@
                     <Hyperlink
                         RequestNavigate="Hyperlink_RequestNavigate"
                         NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
-                        FontWeight="Medium"
-                        Foreground="{StaticResource footer_donate}">
+                        Style="{StaticResource KLCodeFooterLink}">
                         Outreach
                     </Hyperlink>
             </TextBlock>

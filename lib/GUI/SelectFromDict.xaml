@@ -5,9 +5,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="Select From Dict"
-    Height="550" Width="400"
-    MinWidth="400"
-    MinHeight="550" MaxHeight="550"
+    Height="576" Width="432"
+    MinWidth="432"
+    MinHeight="576" MaxHeight="576"
     WindowStartupLocation="CenterScreen"
     HorizontalAlignment="Center"
     ShowInTaskbar="True"
@@ -24,7 +24,7 @@
             <RowDefinition Height="24"/>
             <RowDefinition Height="32"/>
             <RowDefinition/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
@@ -32,7 +32,7 @@
 
         <!--HEADER START-->
         <Grid   MouseDown="header_drag"
-                Background="{StaticResource header_background}"
+                Background="#1A252B"
                 Grid.ColumnSpan="2">
             <!--HEADER GRID-->
             <Grid.ColumnDefinitions>
@@ -63,12 +63,14 @@
 
             <!--__TITLE__-->
             <TextBlock x:Name="main_title"
+                Style="{StaticResource KLCodeHeaderTitle}"
                 Text="__title__"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Foreground="{StaticResource text_white}"
+                FontSize="14"
                 MaxWidth="180"
                 TextTrimming="CharacterEllipsis"
                 />
@@ -96,9 +98,9 @@
                 <ColumnDefinition Width="6"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Image Grid.Column="0" Source="../_icons/search_16px_light.png" Width="16" Height="16"
+            <Image x:Name="filter_icon" Grid.Column="0" Width="16" Height="16"
                    VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="None" SnapsToDevicePixels="True"/>
-            <Border Grid.Column="2" Background="{StaticResource window_background}" BorderBrush="{StaticResource text_green}"
+            <Border Grid.Column="2" Background="#1A252B" BorderBrush="{StaticResource text_green}"
                     BorderThickness="1" CornerRadius="6" SnapsToDevicePixels="True">
                 <TextBox x:Name="textbox_filter" Text="" TextChanged="text_filter_updated"
                          Style="{StaticResource KLCodeFilterTextBox}"/>
@@ -108,71 +110,27 @@
 
         <!--LISTBOX START-->
         <StackPanel Grid.Row="2"
-                    VerticalAlignment="Top"
-                    Margin="10,5,10,5">
+                    VerticalAlignment="Bottom"
+                    Margin="12,6,12,0">
 
             <Separator Background="{StaticResource border_green_dark}"/>
 
             <Label x:Name="text_label"  Content="Select Elements:"
-                           Foreground="{StaticResource text_white}"/>
+                           Foreground="{StaticResource text_white}"
+                           FontSize="14"/>
 
             <ListBox x:Name="main_ListBox"
-                         Height="350" Grid.Row="0"
-                         Background="{StaticResource header_background}"
+                         Height="360" Grid.Row="0"
+                         Background="#1A252B"
                          SelectionMode="Single"
                          ScrollViewer.VerticalScrollBarVisibility="Visible"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          BorderBrush="{StaticResource border_green_dark}"
                          >
 
-                <ListBox.Resources>
-                    <Style TargetType="ScrollBar">
-                        <Setter Property="Background" Value="{StaticResource border_green_dark}"/>
-                        <Setter Property="Foreground" Value="{StaticResource border_green_dark}"/>
-                        <Setter Property="BorderBrush" Value="{StaticResource header_background}"/>
-                        <Setter Property="Opacity" Value="0.9"/>
-                        <Setter Property="Margin" Value="3"/>
-
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ScrollBar}">
-                                    <Grid x:Name="Bg"
-                                              SnapsToDevicePixels="true">
-                                        <Border BorderBrush     = "{TemplateBinding BorderBrush}"
-                                                    BorderThickness = "{TemplateBinding BorderThickness}"
-                                                    Background      = "{TemplateBinding Background}"
-
-                                                    Grid.Row        = "1"
-                                                    CornerRadius="10"/>
-
-                                        <Track x:Name="PART_Track"
-                                                   IsDirectionReversed="true"
-                                                   IsEnabled="{TemplateBinding IsMouseOver}"
-                                                   Grid.Row="1">
-                                            <Track.Thumb>
-                                                <Thumb Style="{StaticResource ScrollBarThumbVertical}"
-                                                           Margin="2"/>
-                                            </Track.Thumb>
-                                        </Track>
-
-                                    </Grid>
-
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                    <Style TargetType="ListBox">
-                        <Style.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="10"/>
-                            </Style>
-                        </Style.Resources>
-                    </Style>
-                </ListBox.Resources>
-
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <CheckBox  Background="#286048" Foreground="{StaticResource text_white}" IsChecked="{Binding IsChecked}"  Checked="UIe_ItemChecked" >
+                        <CheckBox  Background="#286048" Foreground="{StaticResource text_white}" IsChecked="{Binding IsChecked}"  Checked="UIe_ItemChecked" FontSize="12">
                             <TextBlock Text="{Binding Name}"/>
                         </CheckBox>
                     </DataTemplate>
@@ -182,21 +140,23 @@
             </ListBox>
 
             <!--BUTTONS START-->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="UI_Buttons_all_none">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0" x:Name="UI_Buttons_all_none">
                 <!--BUTTON_1-->
                 <Button Content="Select All"
                         Click="button_select_all"
-                        Height="20"
-                        Width="100"
-                        Margin="5"
-                        />
+                        Style="{StaticResource KLCodeActionButton}"
+                        Height="26"
+                        Width="104"
+                        FontSize="12"
+                        Margin="0,0,8,0"/>
                 <!--BUTTON_2-->
                 <Button Content="Select None"
                         Click="button_select_none"
-                        Height="20"
-                        Width="100"
-                        Margin="5"
-                        />
+                        Style="{StaticResource KLCodeActionButton}"
+                        Height="26"
+                        Width="104"
+                        FontSize="12"
+                        Margin="0"/>
             </StackPanel>
             <!--BUTTONS END-->
 
@@ -204,35 +164,37 @@
             <Button x:Name="button_main"
                 Content="Select"
                         Click="button_select"
-                        Height="30"
-                        Width="210"
-                        Margin="5"
+                        Height="32"
+                        Width="216"
+                FontSize="14"
+                HorizontalAlignment="Center"
+                Margin="0,8,0,16"
+                Style="{StaticResource KLCodeActionButton}"
                         />
 
         </StackPanel>
         <!--LISTBOX END-->
 
         <!--FOOTER START-->
-        <Grid Grid.Row="3" Background="{StaticResource header_background}">
+        <Grid Grid.Row="3" Style="{StaticResource KLCodeFooterGrid}">
             <!--FOOTER GRID-->
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
 
-            <!--IMAGE-->
-            <TextBlock>
-                <Hyperlink  NavigateUri="https://www.learnrevitapi.com" RequestNavigate="Hyperlink_RequestNavigate">
-                               <Image  Height="20"   Margin="1"  HorizontalAlignment="Left"   VerticalAlignment="Top"
-                                   Source="https://www.learnrevitapi.com/static/img_new/logo/logo_learnrevitapi.png" />
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0">
+                <Hyperlink NavigateUri="https://forms.cloud.microsoft/r/HjuggSZqyU" RequestNavigate="Hyperlink_RequestNavigate"
+                           Style="{StaticResource KLCodeFooterLink}">
+                    Prototype
                 </Hyperlink>
             </TextBlock>
 
 
 
             <!--VERSION-->
-            <TextBlock x:Name="footer_version"
+            <TextBlock x:Name="footer_version" Style="{StaticResource KLCodeFooterVersion}"
               Text="Version: 1.0"
               Grid.Column="1"
               VerticalAlignment="Center"
@@ -248,8 +210,7 @@
               <Hyperlink
                   RequestNavigate="Hyperlink_RequestNavigate"
                   NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
-                  FontWeight="Medium"
-                  Foreground="{StaticResource button_bg_hover}">
+                  Style="{StaticResource KLCodeFooterLink}">
                   Outreach
               </Hyperlink>
             </TextBlock>

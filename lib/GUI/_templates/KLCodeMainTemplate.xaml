@@ -63,6 +63,7 @@
             </Viewbox>
 
             <TextBlock x:Name="main_title"
+                       Style="{StaticResource KLCodeHeaderTitle}"
                        Text="Select From Dict"
                        Grid.Column="0"
                        Grid.ColumnSpan="3"
@@ -172,7 +173,7 @@
         </StackPanel>
 
         <!-- Footer -->
-        <Grid Grid.Row="3" Background="#1A252B">
+        <Grid Grid.Row="3" Style="{StaticResource KLCodeFooterGrid}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>
@@ -184,13 +185,13 @@
                        Margin="10,0,0,0">
                 <Hyperlink NavigateUri="https://forms.cloud.microsoft/r/HjuggSZqyU"
                            RequestNavigate="Hyperlink_RequestNavigate"
-                           FontWeight="Medium"
-                           Foreground="{StaticResource button_bg_hover}">
+                           Style="{StaticResource KLCodeFooterLink}">
                     Prototype
                 </Hyperlink>
             </TextBlock>
 
             <TextBlock x:Name="footer_version"
+                       Style="{StaticResource KLCodeFooterVersion}"
                        Text="Template preview"
                        Grid.Column="1"
                        VerticalAlignment="Center"
@@ -206,8 +207,7 @@
                        Margin="0,0,10,0">
                 <Hyperlink RequestNavigate="Hyperlink_RequestNavigate"
                            NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
-                           FontWeight="Medium"
-                           Foreground="{StaticResource button_bg_hover}">
+                           Style="{StaticResource KLCodeFooterLink}">
                     Outreach
                 </Hyperlink>
             </TextBlock>

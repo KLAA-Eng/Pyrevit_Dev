@@ -53,11 +53,24 @@
                             Grid.Row="1"
                             Margin="10" />
 
-            <Grid Grid.Row="2" Background="{StaticResource header_background}">
-                <TextBlock Text="KLCode"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"
-                           Foreground="{StaticResource text_gray}" />
+            <Grid Grid.Row="2" Style="{StaticResource KLCodeFooterGrid}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="100" />
+                </Grid.ColumnDefinitions>
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0">
+                    <Hyperlink NavigateUri="https://forms.cloud.microsoft/r/HjuggSZqyU"
+                               RequestNavigate="Hyperlink_RequestNavigate"
+                               Style="{StaticResource KLCodeFooterLink}">Prototype</Hyperlink>
+                </TextBlock>
+                <TextBlock Grid.Column="1" Text="Match Properties"
+                           Style="{StaticResource KLCodeFooterVersion}" />
+                <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0">
+                    <Hyperlink NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
+                               RequestNavigate="Hyperlink_RequestNavigate"
+                               Style="{StaticResource KLCodeFooterLink}">Outreach</Hyperlink>
+                </TextBlock>
             </Grid>
         </Grid>
     </Border>

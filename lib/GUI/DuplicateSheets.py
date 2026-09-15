@@ -6,7 +6,6 @@ from GUI.forms import my_WPF
 from clr import AddReference
 AddReference("System")
 from System.Diagnostics.Process import Start
-from System.Windows.Window import DragMove
 from System.Windows.Input import MouseButtonState
 import wpf
 
@@ -29,7 +28,7 @@ class DuplicateSheets(my_WPF):
 
     def header_drag(self, sender, e):
         if e.LeftButton == MouseButtonState.Pressed:
-            DragMove(self)
+            self.DragMove()
 
     def radiobutton_duplicate_option(self, sender, e):
         self._duplicate_option_handler(sender)

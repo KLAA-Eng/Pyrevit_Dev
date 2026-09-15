@@ -6,6 +6,8 @@ import os
 import sys
 
 from pyrevit import forms
+from System import Uri
+from System.Windows import ResourceDictionary
 from System.Windows.Input import MouseButtonState
 
 
@@ -222,15 +224,32 @@ class Gallery(forms.WPFWindow):
 
     def _launch_create_from_rooms_preview(self):
         import wpf
+        from System import Uri, UriKind
+        from System.Windows.Media.Imaging import (
+            BitmapImage, BitmapCacheOption, BitmapCreateOptions)
         from GUI.forms import my_WPF
 
         xaml_path = os.path.join(
             EXTENSION_ROOT, 'lib', 'GUI', 'Tools', 'CreateFromRooms.xaml')
+        search_icon_path = os.path.join(
+            EXTENSION_ROOT, 'lib', '_icons', 'search_16px_light.png')
+
+        def load_search_icon():
+            """Load the shared 16 px search icon for the gallery preview."""
+            bitmap = BitmapImage()
+            bitmap.BeginInit()
+            bitmap.CacheOption = BitmapCacheOption.OnLoad
+            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache
+            bitmap.UriSource = Uri(search_icon_path, UriKind.Absolute)
+            bitmap.EndInit()
+            bitmap.Freeze()
+            return bitmap
 
         class CreateFromRoomsPreview(my_WPF):
             def __init__(self):
                 self.add_wpf_resource()
                 wpf.LoadComponent(self, xaml_path)
+                self.filter_icon.Source = load_search_icon()
                 self.main_title.Text = 'Create From Rooms — gallery preview'
                 self.text_label.Content = 'Select fictional room type:'
                 self.button_main.Content = 'Close preview'
@@ -510,7 +529,8 @@ class Gallery(forms.WPFWindow):
                 self.Close()
 
             def header_drag(self, sender, args):
-                return None
+                if args.LeftButton == MouseButtonState.Pressed:
+                    self.DragMove()
 
             def radiobutton_duplicate_option(self, sender, args):
                 return None
@@ -557,10 +577,18 @@ class Gallery(forms.WPFWindow):
         xaml_path = os.path.join(
             EXTENSION_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
             'ViewRange.pushbutton', 'MainWindow.xaml')
+        styles_path = os.path.join(
+            EXTENSION_ROOT, 'lib', 'GUI', 'Resources', 'WPF_styles.xaml')
+
+        def shared_wordmark_template():
+            styles = ResourceDictionary()
+            styles.Source = Uri(styles_path)
+            return styles['KLCodeWordmark']
 
         class ViewRangePreview(forms.WPFWindow):
             def __init__(self):
                 forms.WPFWindow.__init__(self, xaml_path)
+                self.wordmark_host.ContentTemplate = shared_wordmark_template()
                 self.DataContext = ViewRangePreviewData()
                 self.ShowDialog()
 
@@ -576,6 +604,9 @@ class Gallery(forms.WPFWindow):
             def header_drag(self, sender, args):
                 if args.LeftButton == MouseButtonState.Pressed:
                     self.DragMove()
+
+            def Hyperlink_RequestNavigate(self, sender, args):
+                args.Handled = True
 
         ViewRangePreview()
 
