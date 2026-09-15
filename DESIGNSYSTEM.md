@@ -43,15 +43,6 @@ These are the named colors used across KLCode ribbon icons and WPF GUIs. This ta
 
 KLCode ribbon icons are transparent-background PNGs. Use a single foreground color unless the command clearly needs additional visual detail.
 
-### Current Command Icon State
-
-Command-bundle icon files are not yet a single normalized palette. Current
-`icon.png` files include KLOrange (`#FF8000`), the older blue-gray
-(`#34495E`), and multicolor or anti-aliased artwork. Most `icon.dark.png`
-files use `#EBEBEB`, with existing exceptions. Treat these as the deployed
-asset inventory, not as a universal export rule; preserve an existing command
-icon's established treatment unless its refresh is in scope.
-
 ### Source Assets
 
 Reusable source icons live in `lib/_icons/`. Keep source assets at `96 x 96 px` or smaller. Export command icons at the size needed by the bundle, usually `32 x 32 px` for large ribbon buttons.
@@ -64,10 +55,6 @@ Name reusable source icons with a descriptive lowercase icon name, size, and col
 | KLGreen | `#33714F` |  `<icon-name>_<size>px_green.png` |
 | KLWhite | `#E5E4E2` |  `<icon-name>_<size>px_light.png` |
 | KLCharcoal | `#1A252B` |  `<icon-name>_<size>px_dark.png` |
-
-At the time of this audit, all 390 root PNG source assets follow this naming
-pattern: 97 light, 97 dark, 98 green, and 98 orange variants. The four
-`drill_32px_*` files are single-color references for the values above.
 
 ### Standard Sizes
 
