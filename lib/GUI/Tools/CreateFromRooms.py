@@ -15,6 +15,8 @@ from Snippets._convert import convert_internal_units
 #>>>>>>>>>> .NET IMPORTS
 clr.AddReference("System")
 from System.Collections.Generic import List
+from System import Uri, UriKind
+from System.Windows.Media.Imaging import BitmapImage, BitmapCacheOption, BitmapCreateOptions
 import wpf
 
 # ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
@@ -22,6 +24,20 @@ import wpf
 #  ╚╝ ╩ ╩╩╚═╩╩ ╩╚═╝╩═╝╚═╝╚═╝ VARIABLES
 #====================================================================================================
 PATH_SCRIPT = os.path.dirname(__file__)
+SEARCH_ICON_PATH = os.path.abspath(os.path.join(
+    PATH_SCRIPT, '..', '..', '_icons', 'search_16px_light.png'))
+
+
+def _load_search_icon():
+    """Load the template search icon from its absolute extension path."""
+    bitmap = BitmapImage()
+    bitmap.BeginInit()
+    bitmap.CacheOption = BitmapCacheOption.OnLoad
+    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache
+    bitmap.UriSource = Uri(SEARCH_ICON_PATH, UriKind.Absolute)
+    bitmap.EndInit()
+    bitmap.Freeze()
+    return bitmap
 
 uidoc   = __revit__.ActiveUIDocument
 app     = __revit__.Application
@@ -66,6 +82,7 @@ class CreateFromRooms(my_WPF):
         super(CreateFromRooms, self).add_wpf_resource()
         path_xaml_file = os.path.join(PATH_SCRIPT, 'CreateFromRooms.xaml')
         wpf.LoadComponent(self, path_xaml_file )
+        self.filter_icon.Source = _load_search_icon()
 
         self.update_UI()
         self.ShowDialog()

@@ -6,7 +6,7 @@
     mc:Ignorable="d"
 
     Title="Views: Find and Replace"
-    Height="470" Width="800"
+    Height="491" Width="800"
     WindowStartupLocation="CenterScreen"
     HorizontalAlignment="Center"
     ShowInTaskbar="False"
@@ -24,8 +24,9 @@
     <Grid>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="24"></RowDefinition>
             <RowDefinition></RowDefinition>
+            <RowDefinition Height="24"></RowDefinition>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -33,22 +34,27 @@
         </Grid.ColumnDefinitions>
 
 
-        <Grid MouseDown="header_drag"
+        <Grid Grid.Row="0"
+                MouseDown="header_drag"
                 Background="{StaticResource header_background}"
                 Grid.ColumnSpan="2"
               >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="86"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="86"/>
 
 
             </Grid.ColumnDefinitions>
 
+            <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
+                            VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"
+                            ContentTemplate="{StaticResource KLCodeWordmark}"/>
             <DockPanel Grid.Column="0"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       Margin="10,0,0,0">
+                       Margin="10,0,0,0"
+                       Visibility="Collapsed">
                 
 
 
@@ -65,51 +71,20 @@
 
             <TextBlock x:Name="main_title"
                 Text="__title__"
-                Grid.Column="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Foreground="{StaticResource text_white}"
+                MaxWidth="180"
+                TextTrimming="CharacterEllipsis"
                 />
 
 
-            <Button
-                HorizontalAlignment="Right"
-                    Grid.Column="2"
+            <Button Grid.Column="2"
                     Content="Close"
-                    Foreground="{DynamicResource text_white}"
-                    FontSize="10"
-                    FontWeight="Medium"
                     Click="button_close"
-                    Margin="0,0,10,0"
-                    >
-
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="TextElement.FontFamily" Value="Arial"/>
-                        <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
-                        <Setter Property="Cursor" Value="Hand"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource button_bg_hover}"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                                Width="60" Height="20"
-                                CornerRadius="8"
-                                Background="{TemplateBinding Background}"
-                                >
-                            <ContentPresenter  VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"/>
-                        </Border>
-
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+                    Style="{StaticResource KLCodeCloseButton}"/>
 
         </Grid>
 
@@ -121,7 +96,7 @@
 
         <StackPanel Grid.Row="1"
                     VerticalAlignment="Top"
-                    Margin="40">
+                    Margin="16,16,16,0">
 
 
 
@@ -134,13 +109,18 @@
                     <ColumnDefinition Width="5*"/>
                     <ColumnDefinition Width="139*"/>
                 </Grid.ColumnDefinitions>
-                <Label Content="Naming"
-                           Margin="0, -25,0,0 "
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0"
+                           Content="Naming"
+                           Margin="0"
                            Background="{StaticResource header_background}"
-                           Foreground="{StaticResource text_green}"
+                           Foreground="{StaticResource text_white}"
                            Grid.ColumnSpan="2"/>
 
-                <Border
+                <Border Grid.Row="1"
                             
                         BorderBrush="{DynamicResource border_green}"
                             BorderThickness="1,1,1,1"
@@ -164,7 +144,7 @@
 
                         <StackPanel Grid.Column="0" Grid.Row="0">
                             <Label Content="ViewName"
-                               Foreground="{StaticResource text_green}"
+                               Foreground="{StaticResource text_white}"
                                FontSize="12"
                                HorizontalAlignment="left"
                                FontWeight="Medium"
@@ -223,7 +203,7 @@
                         </StackPanel>
                         <StackPanel Grid.Column="1" Grid.Row="0">
                             <Label Content="SheetNumber"
-                               Foreground="{DynamicResource text_green}"
+                               Foreground="{DynamicResource text_white}"
                                FontSize="12"
                                HorizontalAlignment="Left"
                                    Margin="50,0,0,0"
@@ -289,7 +269,7 @@
                         <StackPanel Grid.Column="2" Grid.Row="0"
                                 Margin="10,0,0,0">
                             <Label Content="SheetName"
-                               Foreground="{DynamicResource text_green}"
+                               Foreground="{DynamicResource text_white}"
                                FontSize="12"
                                FontWeight="Medium"
                                    Margin="50,0,0,0"
@@ -374,7 +354,7 @@
                 <Label Content="Project Browser"
                            Margin="0, -25,0,0 "
        
-                           Foreground="{StaticResource text_green}"/>
+                           Foreground="{StaticResource text_white}"/>
                 <Border BorderBrush="{DynamicResource border_green}"
                         BorderThickness="1,1,1,1" CornerRadius="10">
 
@@ -388,7 +368,6 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="25*"/>
                             <RowDefinition Height="25*"/>
-
                         </Grid.RowDefinitions>
 
 
@@ -532,7 +511,7 @@
                 <Label Content="Include Elements"
                            Margin="0, -25,0,0 "
        
-                           Foreground="{StaticResource text_green}"/>
+                           Foreground="{StaticResource text_white}"/>
                 <Border BorderBrush="{DynamicResource border_green}"
                         BorderThickness="1,1,1,1" CornerRadius="10">
 
@@ -549,10 +528,21 @@
                         </Grid.ColumnDefinitions>
 
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="25*"/>
-                            <RowDefinition Height="25*"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="8"/>
+                            <RowDefinition Height="25"/>
 
                         </Grid.RowDefinitions>
+
+                        <Grid.Resources>
+                            <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                                <Setter Property="Foreground" Value="{StaticResource text_white}"/>
+                                <Setter Property="FontSize" Value="12"/>
+                                <Setter Property="FontWeight" Value="Medium"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Margin" Value="0,0,10,0"/>
+                            </Style>
+                        </Grid.Resources>
 
 
                         <CheckBox  x:Name = "UI_checkbox_views"
@@ -580,27 +570,7 @@
                     FontSize="12"
                     FontWeight="Medium"
                     Margin="0,0,0,0"
-                    >
-                            <CheckBox.Style>
-                                <Style TargetType="CheckBox">
-                                    <Setter Property="Background" Value="{DynamicResource checkbox_checked_colour}"/>
-                                    <Setter Property="Cursor" Value="Hand"/>
-
-                                    <Style.Triggers>
-
-                                        <Trigger Property="IsChecked" Value="False">
-                                            <Setter Property="Background" Value="{DynamicResource uncheckbox_checked_colour}"/>
-                                        </Trigger>
-
-                                        <Trigger Property="IsChecked" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource checkbox_checked_colour}"/>
-                                        </Trigger>
-
-                                    </Style.Triggers>
-                                </Style>
-                            </CheckBox.Style>
-
-                        </CheckBox>
+                    />
                         <CheckBox  x:Name = "UI_checkbox_schedules"
                                     Grid.Column="3"
                                     Grid.Row="0"
@@ -747,7 +717,7 @@
                             >
                     <Label Content="Use Existing [True] / Duplicate [False] "
                            Margin="0, -25,0,0 "
-                           Foreground="{StaticResource text_green}"/>
+                           Foreground="{StaticResource text_white}"/>
                     <Border  Height="75"
                           BorderBrush="{DynamicResource border_green_dark}"
                          BorderThickness="1,1,1,1" CornerRadius="10" HorizontalAlignment="Stretch" Width="Auto">
@@ -799,11 +769,11 @@
                 </StackPanel>
 
 
-                <StackPanel Grid.Column="2"
+                <StackPanel Grid.Column="1"
                                     Margin="5">
                     <Label Content="View Duplicate Opions"
                            Margin="0, -25,0,0 "
-                           Foreground="{StaticResource text_green}"/>
+                           Foreground="{StaticResource text_white}"/>
                     <Border  
                         Height="75"
                           BorderBrush="{DynamicResource border_green_dark}"
@@ -852,46 +822,23 @@
 
 
             <Button 
-                    Grid.Column="10"
                     Content="Duplicate selected sheets"
                     Foreground="{DynamicResource text_white}"
                     FontSize="14"
                     FontWeight="Medium"
                     Click="button_run"
-                    Margin="0,10,0,0"
-                Height="40"
-                    >
-
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="TextElement.FontFamily" Value="Arial"/>
-                        <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
-                        <Setter Property="Cursor" Value="Hand"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource button_bg_hover}"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border
-                                Width="200" Height="30"
-                                CornerRadius="8"
-                                Background="{TemplateBinding Background}"
-                                >
-                            <ContentPresenter  VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center"/>
-                        </Border>
-
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+                    Margin="0,8,0,16"
+                    Height="32"
+                    Style="{StaticResource KLCodeActionButton}"/>
 
         </StackPanel>
 
+        <Grid Grid.Row="2" Style="{StaticResource KLCodeFooterGrid}">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition/><ColumnDefinition Width="100"/></Grid.ColumnDefinitions>
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0"><Hyperlink NavigateUri="https://forms.cloud.microsoft/r/HjuggSZqyU" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource KLCodeFooterLink}">Prototype</Hyperlink></TextBlock>
+            <TextBlock Grid.Column="1" Text="Duplicate sheets" Style="{StaticResource KLCodeFooterVersion}"/>
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0"><Hyperlink NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u" RequestNavigate="Hyperlink_RequestNavigate" Style="{StaticResource KLCodeFooterLink}">Outreach</Hyperlink></TextBlock>
+        </Grid>
     </Grid>
 
 

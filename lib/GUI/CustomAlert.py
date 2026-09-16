@@ -30,10 +30,6 @@ class CustomAlert(my_WPF):
         self.alert_icon.Text = 'i'
         self.alert_icon.Foreground = Brushes.MediumSeaGreen
 
-    def button_ok(self, sender, event):
-        self.Close()
-
-
 def show_alert(message, title='KL&A Tools', is_warning=False):
     """Show a modal custom alert and return after the user dismisses it."""
     CustomAlert(message, title=title, is_warning=is_warning)

@@ -2,9 +2,9 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Steel PSF"
-    Height="610" Width="430"
-    MinWidth="430"
-    MinHeight="610" MaxHeight="610"
+    Height="576" Width="432"
+    MinWidth="432"
+    MinHeight="576" MaxHeight="576"
     WindowStartupLocation="CenterScreen"
     HorizontalAlignment="Center"
     ShowInTaskbar="True"
@@ -15,20 +15,23 @@
     <Grid Background="#1A252B">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition Height="45"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="32"/>
             <RowDefinition/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
 
-        <Grid MouseDown="header_drag" Background="{StaticResource header_background}">
+        <Grid MouseDown="header_drag" Background="#1A252B">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="75"/>
+                <ColumnDefinition Width="86"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="86"/>
             </Grid.ColumnDefinitions>
 
-            <DockPanel Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
+                            VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"
+                            ContentTemplate="{StaticResource KLCodeWordmark}"/>
+            <DockPanel Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Left" Visibility="Collapsed">
                 <TextBlock Margin="5,0,0,0"
                            FontSize="14px"
                            FontWeight="Heavy"
@@ -39,154 +42,137 @@
 
             <TextBlock x:Name="main_title"
                        Text="Steel PSF"
-                       Grid.Column="1"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="3"
+                       Style="{StaticResource KLCodeHeaderTitle}"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"
-                       Foreground="{StaticResource text_white}" />
+                       Foreground="{StaticResource text_white}"
+                       MaxWidth="180"
+                       TextTrimming="CharacterEllipsis" />
 
             <Button Content="Close"
                     Grid.Column="2"
-                    Width="60" Height="20"
-                    FontSize="10"
                     Click="button_close"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Right" />
+                    Style="{StaticResource KLCodeCloseButton}" />
         </Grid>
 
-        <DockPanel Grid.Row="1">
-            <Label Content="Search"
-                   VerticalAlignment="Top"
-                   Height="26"
-                   Foreground="{StaticResource text_white}"
-                   Margin="5,5,5,5"/>
-
-            <TextBox x:Name="textbox_filter"
-                     Text=""
-                     Height="22"
-                     VerticalAlignment="Top"
-                     Foreground="{StaticResource text_white}"
-                     Background="{StaticResource header_background}"
-                     Margin="0,8,10,5"
-                     FontSize="14"
-                     BorderBrush="{StaticResource border_green_dark}"
-                     TextChanged="text_filter_updated" />
-        </DockPanel>
+        <Grid Grid.Row="1" Margin="8,4,12,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition Width="6"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Image x:Name="filter_icon" Grid.Column="0" Width="16" Height="16" Source="../../../../lib/_icons/search_16px_light.png"
+                   VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="None" SnapsToDevicePixels="True"/>
+            <Border Grid.Column="2" Background="{StaticResource window_background}" BorderBrush="{StaticResource text_green}"
+                    BorderThickness="1" CornerRadius="6" SnapsToDevicePixels="True">
+                <TextBox x:Name="textbox_filter" Text="" TextChanged="text_filter_updated"
+                         Style="{StaticResource KLCodeFilterTextBox}"/>
+            </Border>
+        </Grid>
 
         <StackPanel Grid.Row="2"
-                    VerticalAlignment="Top"
-                    Margin="10,5,10,5">
+                    VerticalAlignment="Bottom"
+                    Margin="12,6,12,0">
 
             <Separator Background="{StaticResource border_green_dark}"/>
 
             <Label x:Name="text_label"
                    Content="Select stories to review:"
-                   Foreground="{StaticResource text_white}"/>
+                   Foreground="{StaticResource text_white}"
+                   FontSize="14"/>
 
             <ListBox x:Name="main_ListBox"
                      Height="330"
-                     Background="{StaticResource header_background}"
+                     Background="#1A252B"
                      SelectionMode="Single"
                      ScrollViewer.VerticalScrollBarVisibility="Visible"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      BorderBrush="{StaticResource border_green_dark}">
-
-                <ListBox.Resources>
-                    <Style TargetType="ScrollBar">
-                        <Setter Property="Background" Value="{StaticResource border_green_dark}"/>
-                        <Setter Property="Foreground" Value="{StaticResource border_green_dark}"/>
-                        <Setter Property="BorderBrush" Value="{StaticResource header_background}"/>
-                        <Setter Property="Opacity" Value="0.9"/>
-                        <Setter Property="Margin" Value="3"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ScrollBar}">
-                                    <Grid x:Name="Bg" SnapsToDevicePixels="true">
-                                        <Border BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                Background="{TemplateBinding Background}"
-                                                Grid.Row="1"
-                                                CornerRadius="10"/>
-                                        <Track x:Name="PART_Track"
-                                               IsDirectionReversed="true"
-                                               IsEnabled="{TemplateBinding IsMouseOver}"
-                                               Grid.Row="1">
-                                            <Track.Thumb>
-                                                <Thumb Style="{StaticResource ScrollBarThumbVertical}" Margin="2"/>
-                                            </Track.Thumb>
-                                        </Track>
-                                    </Grid>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                    <Style TargetType="ListBox">
-                        <Style.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="10"/>
-                            </Style>
-                        </Style.Resources>
-                    </Style>
-                </ListBox.Resources>
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <CheckBox Background="#286048"
                                   Foreground="{StaticResource text_white}"
                                   IsChecked="{Binding IsChecked}"
-                                  Checked="UIe_ItemChecked">
+                                  Checked="UIe_ItemChecked"
+                                  FontSize="12">
                             <TextBlock Text="{Binding Name}"/>
                         </CheckBox>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0">
                 <Button Content="Select All"
                         Click="button_select_all"
-                        Height="20"
-                        Width="100"
-                        Margin="5" />
+                        Height="26"
+                        Width="104"
+                        FontSize="12"
+                        Margin="0,0,8,0"
+                        Style="{StaticResource KLCodeActionButton}" />
                 <Button Content="Select None"
                         Click="button_select_none"
-                        Height="20"
-                        Width="100"
-                        Margin="5" />
+                        Height="26"
+                        Width="104"
+                        FontSize="12"
+                        Margin="0"
+                        Style="{StaticResource KLCodeActionButton}" />
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,4,0,0">
                 <Button Content="Initialize CSV"
                         Click="button_initialize_csv"
-                        Height="20"
-                        Width="100"
-                        Margin="5" />
+                        Height="26"
+                        Width="104"
+                        FontSize="12"
+                        Margin="0,0,8,0"
+                        Style="{StaticResource KLCodeActionButton}" />
                 <Button Content="Append CSV"
                         Click="button_append_csv"
-                        Height="20"
-                        Width="100"
-                        Margin="5" />
+                        Height="26"
+                        Width="104"
+                        FontSize="12"
+                        Margin="0"
+                        Style="{StaticResource KLCodeActionButton}" />
             </StackPanel>
 
             <Button x:Name="button_main"
                     Content="Review Selected Stories"
                     Click="button_select"
-                    Height="30"
-                    Width="230"
-                    Margin="5" />
+                    Height="32"
+                    Width="216"
+                    FontSize="14"
+                    HorizontalAlignment="Center"
+                    Margin="0,8,0,16"
+                    Style="{StaticResource KLCodeActionButton}" />
         </StackPanel>
 
-        <Grid Grid.Row="3" Background="{StaticResource header_background}">
+        <Grid Grid.Row="3" Style="{StaticResource KLCodeFooterGrid}">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock x:Name="footer_version"
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0">
+                <Hyperlink NavigateUri="https://forms.cloud.microsoft/r/HjuggSZqyU"
+                           RequestNavigate="Hyperlink_RequestNavigate"
+                           Style="{StaticResource KLCodeFooterLink}">Prototype</Hyperlink>
+            </TextBlock>
+
+            <TextBlock x:Name="footer_version" Style="{StaticResource KLCodeFooterVersion}"
                        Text="DevSandbox Prototype"
                        Grid.Column="1"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"
-                       Foreground="{StaticResource text_gray}" />
+                       />
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0">
+                <Hyperlink NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
+                           RequestNavigate="Hyperlink_RequestNavigate"
+                           Style="{StaticResource KLCodeFooterLink}">Outreach</Hyperlink>
+            </TextBlock>
         </Grid>
     </Grid>
 </Window>
