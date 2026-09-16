@@ -8,7 +8,7 @@
     <UseWPF>true</UseWPF>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <OutputPath>../../../KL&amp;A Tools_dev.tab/05 DevSandbox.panel/Startup Importer.invokebutton/bin/</OutputPath>
+    <OutputPath>../../../KL&amp;A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Startup Importer.invokebutton/bin/</OutputPath>
     <RevitApiPath Condition="'$(RevitApiPath)' == ''">$(REVIT_API_PATH)</RevitApiPath>
   </PropertyGroup>
 

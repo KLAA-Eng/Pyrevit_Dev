@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
     <ImporterProject>$(MSBuildThisFileDirectory)KLA.ModelStartupImporter.Revit/KLA.ModelStartupImporter.Revit.csproj</ImporterProject>
-    <BundleBin>$(MSBuildThisFileDirectory)..\..\KL&amp;A Tools_dev.tab\05 DevSandbox.panel\Startup Importer.invokebutton\bin</BundleBin>
+    <BundleBin>$(MSBuildThisFileDirectory)..\..\KL&amp;A Tools_dev.tab\05 DevSandbox.panel\Prototype.pulldown\Startup Importer.invokebutton\bin</BundleBin>
     <PackageIntermediateDirectory>$(MSBuildThisFileDirectory)obj\$(Configuration)\package</PackageIntermediateDirectory>
     <Revit2024CommandStagingPath>$(PackageIntermediateDirectory)\KLA.ModelStartupImporter.Revit_2024.dll</Revit2024CommandStagingPath>
   </PropertyGroup>

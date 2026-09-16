@@ -9,6 +9,7 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PANEL_ROOT = os.path.join(
     REPO_ROOT, "KL&A Tools_dev.tab", "05 DevSandbox.panel"
 )
+PROTOTYPE_ROOT = os.path.join(PANEL_ROOT, "Prototype.pulldown")
 
 
 def _read_text(path):
@@ -24,6 +25,10 @@ def _metadata_value(bundle_text, key):
 class CompiledCommandBundlesTest(unittest.TestCase):
     def test_compiled_commands_are_exposed_in_dev_sandbox(self):
         panel_metadata = _read_text(os.path.join(PANEL_ROOT, "bundle.yaml"))
+        prototype_metadata = _read_text(
+            os.path.join(PROTOTYPE_ROOT, "bundle.yaml")
+        )
+        self.assertIn("  - Prototype", panel_metadata)
 
         command_classes = {
             "Startup Importer": "StartupImportCommand",
@@ -32,7 +37,7 @@ class CompiledCommandBundlesTest(unittest.TestCase):
 
         for command_name, command_class in command_classes.items():
             bundle_root = os.path.join(
-                PANEL_ROOT, command_name + ".invokebutton"
+                PROTOTYPE_ROOT, command_name + ".invokebutton"
             )
             bundle_metadata_path = os.path.join(bundle_root, "bundle.yaml")
 
@@ -46,7 +51,45 @@ class CompiledCommandBundlesTest(unittest.TestCase):
                 command_class,
                 _metadata_value(bundle_metadata, "command_class"),
             )
-            self.assertIn("  - " + command_name, panel_metadata)
+            self.assertIn("  - " + command_name, prototype_metadata)
+
+    def test_startup_preloads_dependencies_from_prototype_pulldown(self):
+        startup_path = os.path.join(REPO_ROOT, "startup.py")
+        startup_text = _read_text(startup_path)
+
+        self.assertNotIn(
+            '"05 DevSandbox.panel",\n                "Startup Importer.invokebutton"',
+            startup_text,
+        )
+        self.assertNotIn(
+            '"05 DevSandbox.panel",\n                "Family Studio.invokebutton"',
+            startup_text,
+        )
+        self.assertGreaterEqual(
+            startup_text.count('"Prototype.pulldown"'),
+            18,
+        )
+
+    def test_compiled_package_outputs_target_prototype_pulldown(self):
+        source_paths = (
+            os.path.join(
+                REPO_ROOT, "src", "KLA.ModelStartupImporter",
+                "KLA.ModelStartupImporter.Packaging.proj",
+            ),
+            os.path.join(
+                REPO_ROOT, "src", "KLA.ModelStartupImporter",
+                "KLA.ModelStartupImporter.Revit",
+                "KLA.ModelStartupImporter.Revit.csproj",
+            ),
+            os.path.join(
+                REPO_ROOT, "src", "KLCode.FamilyStudio", "Revit",
+                "KLCode.FamilyStudio.Revit",
+                "KLCode.FamilyStudio.Revit.csproj",
+            ),
+        )
+
+        for source_path in source_paths:
+            self.assertIn("Prototype.pulldown", _read_text(source_path))
 
     def test_startup_preloads_host_specific_compiled_dependencies(self):
         startup_path = os.path.join(REPO_ROOT, "startup.py")

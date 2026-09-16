@@ -10,7 +10,7 @@
     <AssemblyName>KLCode.FamilyStudio.Revit</AssemblyName>
     <RootNamespace>KLCode.FamilyStudio.Revit</RootNamespace>
     <OutputPath>bin/Revit$(RevitVersion)/</OutputPath>
-    <PyRevitBundleBin>$(MSBuildProjectDirectory)/../../../../KL&amp;A Tools_dev.tab/05 DevSandbox.panel/Family Studio.invokebutton/bin</PyRevitBundleBin>
+    <PyRevitBundleBin>$(MSBuildProjectDirectory)/../../../../KL&amp;A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Family Studio.invokebutton/bin</PyRevitBundleBin>
     <PyRevitAssemblyFileName Condition="'$(RevitVersion)' == '2024'">$(AssemblyName)_2024.dll</PyRevitAssemblyFileName>
     <PyRevitAssemblyFileName Condition="'$(RevitVersion)' != '2024'">$(AssemblyName).dll</PyRevitAssemblyFileName>
     <PyRevitWpfAssemblyFileName Condition="'$(RevitVersion)' == '2024'">KLCode.Wpf_2024.dll</PyRevitWpfAssemblyFileName>

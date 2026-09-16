@@ -36,7 +36,7 @@ if HOST_APP.version in ("2024", "2025", "2026"):
 
     _family_studio_bin = os.path.join(
         os.path.dirname(__file__), "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-        "Family Studio.invokebutton", "bin")
+        "Prototype.pulldown", "Family Studio.invokebutton", "bin")
     _family_studio_data_root = os.path.join(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "KLCode", "FamilyStudio")
@@ -56,71 +56,71 @@ if HOST_APP.version in ("2024", "2025", "2026"):
     for _dependency in (
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Startup Importer.invokebutton", "bin",
+                "Prototype.pulldown", "Startup Importer.invokebutton", "bin",
                 _compiled_wpf_assembly),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Startup Importer.invokebutton", "bin",
+                "Prototype.pulldown", "Startup Importer.invokebutton", "bin",
                 _startup_importer_ui_assembly),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Startup Importer.invokebutton", "bin",
+                "Prototype.pulldown", "Startup Importer.invokebutton", "bin",
                 "KLA.ModelStartupImporter.Core.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Startup Importer.invokebutton", "bin",
+                "Prototype.pulldown", "Startup Importer.invokebutton", "bin",
                 "DocumentFormat.OpenXml.Framework.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Startup Importer.invokebutton", "bin",
+                "Prototype.pulldown", "Startup Importer.invokebutton", "bin",
                 "DocumentFormat.OpenXml.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "KLCode.FamilyStudio.Core.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "Microsoft.Bcl.AsyncInterfaces.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "System.Buffers.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "System.Memory.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "System.Numerics.Vectors.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "System.Runtime.CompilerServices.Unsafe.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "System.Threading.Tasks.Extensions.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "System.ValueTuple.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "SQLitePCLRaw.core.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "SQLitePCLRaw.provider.e_sqlite3.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "Microsoft.Data.Sqlite.dll"),
             os.path.join(
                 "KL&A Tools_dev.tab", "05 DevSandbox.panel",
-                "Family Studio.invokebutton", "bin",
+                "Prototype.pulldown", "Family Studio.invokebutton", "bin",
                 "KLCode.FamilyStudio.Database.dll"),
     ):
         _load_dependency(_dependency)
