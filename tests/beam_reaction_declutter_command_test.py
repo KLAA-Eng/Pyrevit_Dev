@@ -10,7 +10,7 @@ import unittest
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COMMAND_PATH = os.path.join(
     PROJECT_ROOT,
-    'KL&A Tools_dev.tab',
+    'KL&A Tools.tab',
     '05 DevSandbox.panel',
     'Prototype.pulldown',
     'Beam Reaction Declutter.pushbutton',

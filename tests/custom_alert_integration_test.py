@@ -8,7 +8,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GUI_DIR = os.path.join(PROJECT_ROOT, 'lib', 'GUI')
 STEEL_PSF_SCRIPT = os.path.join(
     PROJECT_ROOT,
-    'KL&A Tools_dev.tab',
+    'KL&A Tools.tab',
     '05 DevSandbox.panel',
     'Prototype.pulldown',
     'Steel PSF.pushbutton',

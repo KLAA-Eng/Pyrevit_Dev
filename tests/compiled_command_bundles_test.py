@@ -7,7 +7,7 @@ import unittest
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PANEL_ROOT = os.path.join(
-    REPO_ROOT, "KL&A Tools_dev.tab", "05 DevSandbox.panel"
+    REPO_ROOT, "KL&A Tools.tab", "05 DevSandbox.panel"
 )
 PROTOTYPE_ROOT = os.path.join(PANEL_ROOT, "Prototype.pulldown")
 

@@ -20,11 +20,11 @@ The Revit project exposes an opt-in `PackagePyRevit` build target that copies th
 compiled command and runtime dependencies into this bundle's `bin` directory
 and verifies the host-specific command assembly exists after the copy.
 It uses `KLCode.FamilyStudio.Revit_2024.dll` for Revit 2024 and the unsuffixed
-assembly for Revit 2025+. No binaries are committed by this source slice, and
-the packaging target has not been run on this macOS workspace. The shared panel
+assembly for Revit 2025+. Verified Windows build artifacts and runtime
+dependencies are packaged in this bundle's `bin` directory. The shared panel
 layout exposes Family Studio as a development command by explicit owner
-direction. The visible button cannot launch until verified Windows artifacts
-are copied into this bundle's `bin` directory.
+direction. Live Revit acceptance remains required before promotion beyond
+DevSandbox.
 
 ## Indexing behavior
 

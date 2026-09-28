@@ -9,7 +9,7 @@ import unittest
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REVISION_ROOT = os.path.join(
-    PROJECT_ROOT, 'KL&A Tools_dev.tab', '03 Core Tools.panel',
+    PROJECT_ROOT, 'KL&A Tools.tab', '03 Core Tools.panel',
     'Revision.pulldown')
 COMMAND_PATH = os.path.join(
     REVISION_ROOT, 'Hide Revision Clouds.pushbutton', 'script.py')
@@ -225,7 +225,7 @@ class RevisionCloudCommandTests(unittest.TestCase):
         with open(os.path.join(REVISION_ROOT, 'bundle.yaml'), 'r') as stream:
             revision_layout = stream.read()
         prototype_layout_path = os.path.join(
-            PROJECT_ROOT, 'KL&A Tools_dev.tab', '05 DevSandbox.panel',
+            PROJECT_ROOT, 'KL&A Tools.tab', '05 DevSandbox.panel',
             'Prototype.pulldown', 'bundle.yaml')
         with open(prototype_layout_path, 'r') as stream:
             prototype_layout = stream.read()
@@ -239,9 +239,9 @@ class RevisionCloudCommandTests(unittest.TestCase):
             'Find All Revision Clouds On Views.pushbutton':
                 'Find All Revision Clouds',
             'Set Revision On Sheets.pushbutton':
-                'Manually Turn on Revisions',
+                'Toggle on Revision Schedule',
             'Remove Revision From Sheets.pushbutton':
-                'Manually Turn off Revisions',
+                'Toggle off Revision Schedule',
         }
         for bundle_name, title in expected_titles.items():
             bundle_path = os.path.join(
