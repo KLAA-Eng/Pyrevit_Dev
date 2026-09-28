@@ -8,6 +8,29 @@ tools, user-facing changes, known limits, and rollback tag.
 
 No pending published release.
 
+## 0.0.8 - 2026-09-28
+
+- **Channel:** Beta
+- **Tag:** `v0.0.8-beta`
+- **Tested Revit range:** No new live Revit claim. This release adds a
+  host-independent packaging-path regression check; DevSandbox tools remain
+  beta development content.
+
+### Fixed
+
+- Family Studio and Startup Importer now preload their managed dependencies
+  from the ribbon-tab folder actually present in the extension. This supports
+  both the development `KL&A Tools_dev.tab` layout and the distributed
+  `KL&A Tools.tab` layout, preventing missing-dependency messages in the
+  installed release.
+
+### Known limits
+
+- Family Studio and Startup Importer remain DevSandbox beta tools and require
+  their documented live-Revit acceptance before promotion beyond DevSandbox.
+
+**Rollback tag:** `v0.0.7-beta`
+
 ## 0.0.7 - 2026-09-28
 
 - **Channel:** Beta
