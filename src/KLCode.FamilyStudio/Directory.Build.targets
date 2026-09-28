@@ -1,0 +1,7 @@
+<Project>
+  <!-- The Revit-host build uses a nested intermediate path. Keep all generated
+       output out of the SDK default source glob, including prior local builds. -->
+  <ItemGroup>
+    <Compile Remove="obj/**/*.cs;bin/**/*.cs;.build_validation/**/*.cs" />
+  </ItemGroup>
+</Project>

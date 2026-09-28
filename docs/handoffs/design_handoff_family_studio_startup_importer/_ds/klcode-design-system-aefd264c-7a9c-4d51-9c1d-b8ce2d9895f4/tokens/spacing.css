@@ -1,0 +1,15 @@
+/* KLCode — spacing. WPF Margin values from the shared green dialogs, verbatim.
+   The scale is 2 / 3 / 4 / 5 / 8 / 10, plus 20/24 insets in the KL&A alert. */
+:root{
+  --space-1:1px;
+  --space-2:2px;   /* DockPanel default margin, row gutters */
+  --space-3:3px;   /* ScrollBar margin */
+  --space-4:4px;   /* checkbox label gap (ContentPresenter Margin 4,0,0,0) */
+  --space-5:5px;   /* the dark theme's default padding unit */
+  --space-6:6px;   /* legacy — native clipboard row gap (surfaces not recreated) */
+  --space-8:8px;   /* filter box top margin */
+  --space-10:10px; /* dialog content inset */
+  --space-16:16px;
+  --space-20:20px;
+  --space-25:25px; /* header / footer band height */
+}

@@ -3,6 +3,7 @@ tooltip: Development prototypes for evaluation in DevSandbox.
 author: KL&A
 layout:
   - Carbon GWP Pull
+  - Beam Reaction Declutter
   - Steel PSF
   - Highlight Changed Elements
   - Create Detail Folders
@@ -11,8 +12,9 @@ layout:
   - FindReplace - Views-proto
   - FindReplace_Sheets-proto
   - Open Keynote File
-  - Hide Revision Clouds
   - Concrete Mix Header
   - Trial
+  - Family Studio
+  - Startup Importer
   - Inspect Schedule Header
   - UI Gallery

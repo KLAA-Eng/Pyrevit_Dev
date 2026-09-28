@@ -1,0 +1,29 @@
+/* KLCode — control metrics and borders. WPF has no shadow system here;
+   depth is expressed with a 1px border and a flat colour change. */
+:root{
+  --border-hairline:1px;          /* the only border weight in the system */
+  --border-dark:1px solid var(--kl-green);
+  --border-dark-strong:1px solid var(--kl-green-dark);
+  --border-native:1px solid var(--kl-rule);
+
+  --control-h-xs:18px;  /* legacy — native pane undo button (surfaces not recreated) */
+  --control-h-sm:20px;  /* Close, Select All/None */
+  --control-h-md:22px;  /* filter box */
+  --control-h-lg:25px;  /* header/footer band, ViewRange inputs */
+  --control-h-xl:28px;  /* KL&A alert OK button */
+  --control-h-2xl:30px; /* primary dialog button */
+
+  --width-close:60px;
+  --width-half:100px;   /* Select All / Select None */
+  --width-main:210px;   /* primary dialog button */
+  --width-field:200px;  /* FindReplace inputs */
+  --width-label:60px;   /* FindReplace label column */
+
+  --checkbox-size:15px; /* BulletDecorator bullet */
+  --icon-ribbon:32px;   /* ribbon pushbutton icon render size */
+  --icon-inline:15px;   /* Viewbox icon inside clipboard buttons */
+
+  --shadow-none:none;
+  /* WPF triggers snap; there are no CSS-style eases */
+  --transition-none:none; /* @kind other */
+}

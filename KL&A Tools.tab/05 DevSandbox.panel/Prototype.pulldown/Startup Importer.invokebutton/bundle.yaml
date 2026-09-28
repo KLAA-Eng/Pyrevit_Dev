@@ -1,0 +1,8 @@
+title: Startup Importer
+tooltip: >-
+  Review and create-only import controlled KL&A Word or Excel startup content.
+  Existing targets are skipped; DevSandbox never overwrites them.
+author: KL&A
+context: doc-project
+assembly: KLA.ModelStartupImporter.Revit.dll
+command_class: StartupImportCommand

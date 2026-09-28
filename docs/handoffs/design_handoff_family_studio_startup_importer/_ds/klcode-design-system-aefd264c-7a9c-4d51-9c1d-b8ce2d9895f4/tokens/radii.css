@@ -1,0 +1,9 @@
+/* KLCode — corner radii, straight from the XAML CornerRadius setters. */
+:root{
+  --radius-xs:2px;  /* checkbox bullet, combobox arrow box */
+  --radius-sm:3px;  /* ViewRange plane swatch (RadiusX/Y=3) */
+  --radius-md:5px;  /* TextBox */
+  --radius-lg:8px;  /* Button, scrollbar thumb */
+  --radius-xl:10px; /* default Border style: panels, ListBox, scroll track */
+  --radius-none:0;  /* every native Revit surface: no rounding at all */
+}

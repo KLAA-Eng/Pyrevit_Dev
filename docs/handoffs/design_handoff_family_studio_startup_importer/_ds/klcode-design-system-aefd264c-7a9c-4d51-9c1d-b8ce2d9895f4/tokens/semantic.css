@@ -1,0 +1,59 @@
+/* KLCode — semantic aliases. Two themes live side by side:
+   .theme-dark  = the custom green-on-charcoal WPF dialogs (KLCode branded)
+   .theme-native = pyRevit/Revit-native panes and windows (unstyled OS look) */
+:root{
+  /* dark green theme (default) */
+  --surface-window:var(--kl-charcoal);
+  --surface-window-opaque:var(--kl-charcoal);
+  --surface-chrome:var(--kl-charcoal);
+  --surface-field:var(--kl-charcoal);
+  --surface-list:var(--kl-charcoal);
+
+  --text-body:var(--kl-white);
+  --text-label:var(--kl-green);
+  --text-muted:var(--kl-gray-medium);
+  --text-link:var(--kl-green-secondary);
+  --text-on-accent:var(--kl-pure-white);
+
+  --action-bg:var(--kl-green-dark);
+  --action-bg-hover:var(--kl-green-secondary);
+  --action-fg:var(--kl-pure-white);
+
+  --border-subtle:var(--kl-green);
+  --border-strong:var(--kl-green-dark);
+  --control-checked:var(--kl-green-dark);
+
+  --brand-primary:var(--kl-green);
+  --brand-accent:var(--kl-orange);
+
+  --radius-control:var(--radius-lg);
+  --radius-panel:var(--radius-xl);
+  --radius-field:var(--radius-md);
+}
+.theme-native{
+  --surface-window:var(--kl-surface);
+  --surface-window-opaque:var(--kl-surface);
+  --surface-chrome:var(--kl-surface-header);
+  --surface-field:var(--kl-surface);
+  --surface-list:var(--kl-surface);
+
+  --text-body:var(--kl-ink-900);
+  --text-label:var(--kl-ink-900);
+  --text-muted:var(--kl-ink-600);
+  --text-link:#0563C1;
+  --text-on-accent:var(--kl-ink-900);
+
+  --action-bg:#EFEFEF;
+  --action-bg-hover:#DCECFC;
+  --action-fg:var(--kl-ink-900);
+
+  --border-subtle:var(--kl-rule);
+  --border-strong:#ACACAC;
+  --control-checked:#0078D7;
+
+  --radius-control:var(--radius-none);
+  --radius-panel:var(--radius-none);
+  --radius-field:var(--radius-none);
+}
+a{color:var(--text-link);text-decoration:none}
+a:hover{color:var(--kl-green);text-decoration:underline}

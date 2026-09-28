@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<script src="./ds-base.js"></script>
+<style>
+  *{scrollbar-width:thin;scrollbar-color:#000 #286048}
+  ::-webkit-scrollbar{width:12px;height:12px}
+  ::-webkit-scrollbar-track{background:#286048;border-radius:10px;margin:3px}
+  ::-webkit-scrollbar-thumb{background:#000;border-radius:8px}
+  .fs-desk a{color:#407058}
+  .fs-desk a:hover{color:#33714F}
+</style>
+</helmet>
+<div class="fs-desk" style="min-height:100vh;background:#6E6E6E;padding:56px;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif;display:flex;flex-wrap:wrap;gap:64px;align-items:flex-start">
+
+<!-- ============ WINDOW 1: MAIN BROWSER (interactive) ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-family:Consolas,monospace;font-size:12px;color:#1A252B;background:#33714F;color:#E5E4E2;padding:2px 8px;border-radius:8px">FS-1</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Family Studio — Main Browser</span>
+    <span style="font-size:12px;color:#3a3a3a">re-skinned + Views mode, grid/list, scope, batch · interactive</span>
+  </div>
+  <div style="width:1180px;height:740px;background:#1A252B;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)" data-screen-label="Family Studio Browser">
+    <!-- header -->
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+      <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2;white-space:nowrap"><span style="color:#33714F">/</span>KLCode</span>
+      <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">Family Studio</span>
+      <button style="grid-column:3;grid-row:1;justify-self:center;width:60px;height:18px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:10px;cursor:pointer" style-hover="background:#407058">Close</button>
+    </div>
+    <!-- toolbar -->
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px 6px">
+      <!-- families / views segmented -->
+      <div style="display:flex;border:1px solid #286048;border-radius:8px;overflow:hidden;flex-shrink:0">
+        <button onClick="{{ setFamilies }}" style="{{ famBtn }}">Families</button>
+        <button onClick="{{ setViews }}" style="{{ viewBtn }}">Views</button>
+      </div>
+      <!-- search -->
+      <div style="display:flex;align-items:center;gap:5px;flex:1;min-width:0;height:22px;background:#1A252B;border:1px solid #33714F;border-radius:5px;padding:0 6px">
+        <span style="font-size:13px">🔍</span>
+        <input value="{{ searchText }}" placeholder="Search name, category, type, parameter, tag…" style="flex:1;min-width:0;height:20px;background:transparent;border:0;outline:none;color:#E5E4E2;font-family:'Segoe UI';font-size:13px"></input>
+      </div>
+      <!-- scope toggle -->
+      <div style="display:flex;border:1px solid #286048;border-radius:8px;overflow:hidden;flex-shrink:0">
+        <button onClick="{{ setProject }}" style="{{ projBtn }}">This Project</button>
+        <button onClick="{{ setLibrary }}" style="{{ libBtn }}">Library</button>
+      </div>
+      <!-- view mode -->
+      <div style="display:flex;border:1px solid #286048;border-radius:8px;overflow:hidden;flex-shrink:0">
+        <button onClick="{{ setList }}" title="List" style="{{ listBtn }}">≣ List</button>
+        <button onClick="{{ setGrid }}" title="Grid" style="{{ gridBtn }}">▦ Grid</button>
+      </div>
+      <button style="height:22px;padding:0 10px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer;flex-shrink:0" style-hover="background:#407058">Refresh Library</button>
+    </div>
+    <!-- filters -->
+    <div style="display:flex;align-items:center;gap:6px;padding:0 10px 8px;flex-wrap:wrap">
+      <span style="font-size:12px;color:#E5E4E2">Category:</span>
+      <div style="width:150px;height:20px;background:#1A252B;border:1px solid #33714F;border-radius:2px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;font-size:12px;color:#E5E4E2;cursor:pointer">{{ catLabel }}<span style="color:#33714F">▾</span></div>
+      <span style="font-size:12px;color:#E5E4E2;margin-left:4px">Type:</span>
+      <div style="width:130px;height:20px;background:#1A252B;border:1px solid #33714F;border-radius:2px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;font-size:12px;color:#E5E4E2;cursor:pointer">All types<span style="color:#33714F">▾</span></div>
+      <span style="font-size:12px;color:#E5E4E2;margin-left:4px">Parameter:</span>
+      <div style="width:130px;height:20px;background:#1A252B;border:1px solid #33714F;border-radius:2px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;font-size:12px;color:#E5E4E2;cursor:pointer">All parameters<span style="color:#33714F">▾</span></div>
+      <span style="font-size:12px;color:#E5E4E2;margin-left:4px">Root:</span>
+      <div style="width:190px;height:20px;background:#1A252B;border:1px solid #33714F;border-radius:2px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;font-size:12px;color:#E5E4E2;cursor:pointer">All configured roots<span style="color:#33714F">▾</span></div>
+      <label style="display:flex;align-items:center;gap:5px;margin-left:6px;color:#E5E4E2;font-size:12px;cursor:pointer">
+        <span style="width:14px;height:14px;border-radius:2px;background:linear-gradient(to top right,rgba(48,112,80,.6),rgba(40,96,72,.53))"></span>Duplicates / variants
+      </label>
+      <a href="#" style="font-size:12px;margin-left:2px">Clear Filters</a>
+    </div>
+    <!-- body split -->
+    <div style="flex:1;min-height:0;display:grid;grid-template-columns:1fr 460px;gap:0;padding:0 10px">
+      <!-- results -->
+      <div style="min-height:0;display:flex;flex-direction:column;padding-right:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 2px 4px">
+          <span style="font-size:12px;color:#33714F">{{ resultCaption }}</span>
+          <span style="font-size:12px;color:#808080">{{ countLabel }}</span>
+        </div>
+        <div style="flex:1;min-height:0;overflow-y:auto;background:#1A252B;border:1px solid #286048;border-radius:10px;padding:5px;box-sizing:border-box">
+          <!-- LIST -->
+          <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <sc-for list="{{ results }}" as="r" hint-placeholder-count="9">
+                <div onClick="{{ r.pick }}" style="{{ r.rowStyle }}">
+                  <span onClick="{{ r.check }}" style="{{ r.boxStyle }}">{{ r.mark }}</span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:12px;color:#FFF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+                    <div style="font-size:11px;color:#808080;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.sub }}</div>
+                  </div>
+                  <span style="{{ r.flagStyle }}">{{ r.flag }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <!-- GRID -->
+          <sc-if value="{{ isGrid }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:2px">
+              <sc-for list="{{ results }}" as="r" hint-placeholder-count="9">
+                <div onClick="{{ r.pick }}" style="{{ r.cardStyle }}">
+                  <div style="position:relative;aspect-ratio:4/3;background:#10171b;border:1px solid #286048;border-radius:3px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+                    <span style="font-size:11px;color:#3f5a4c;font-family:Consolas,monospace">{{ r.glyph }}</span>
+                    <span onClick="{{ r.check }}" style="{{ r.cardBoxStyle }}">{{ r.mark }}</span>
+                    <span style="{{ r.cardFlagStyle }}">{{ r.flag }}</span>
+                  </div>
+                  <div style="font-size:11px;color:#FFF;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+                  <div style="font-size:10px;color:#808080;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.cat }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      <!-- detail pane -->
+      <div style="min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:0 2px">
+        <div style="aspect-ratio:4/3;background:#10171b;border:1px solid #286048;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;flex-shrink:0">
+          <span style="font-family:Consolas,monospace;font-size:12px;color:#3f5a4c">{{ sel.glyph }}</span>
+          <span style="font-size:11px;color:#5c6d64">Revit type preview · 4:3</span>
+        </div>
+        <div style="font-size:14px;color:#E5E4E2;font-weight:600">{{ sel.name }}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span style="{{ sel.statusChip }}">{{ sel.status }}</span>
+          <span style="font-size:11px;color:#808080;border:1px solid #33714F;border-radius:8px;padding:1px 7px">{{ sel.cat }}</span>
+          <span style="font-size:11px;color:#808080;border:1px solid #33714F;border-radius:8px;padding:1px 7px">{{ sel.discipline }}</span>
+        </div>
+        <!-- type row with inline edit actions -->
+        <div style="border:1px solid #286048;border-radius:10px;padding:8px;position:relative">
+          <div style="font-size:12px;color:#33714F;position:absolute;top:-9px;left:10px;background:#1A252B;padding:0 5px">Type</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+            <div style="flex:1;height:22px;background:#1A252B;border:1px solid #33714F;border-radius:2px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;font-size:12px;color:#E5E4E2;cursor:pointer">{{ sel.typeName }}<span style="color:#33714F">▾</span></div>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button style="flex:1;height:20px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:11px;cursor:pointer" style-hover="background:#407058">Duplicate</button>
+            <button style="flex:1;height:20px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:11px;cursor:pointer" style-hover="background:#407058">Rename</button>
+            <button style="flex:1;height:20px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:11px;cursor:pointer" style-hover="background:#407058">Edit Type…</button>
+          </div>
+          <!-- type params -->
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:3px">
+            <sc-for list="{{ sel.params }}" as="p" hint-placeholder-count="4">
+              <div style="display:flex;justify-content:space-between;font-size:11px;gap:8px">
+                <span style="color:#808080">{{ p.k }}</span>
+                <span style="color:#E5E4E2;text-align:right">{{ p.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <!-- tags editor -->
+        <div style="border:1px solid #286048;border-radius:10px;padding:8px;position:relative">
+          <div style="font-size:12px;color:#33714F;position:absolute;top:-9px;left:10px;background:#1A252B;padding:0 5px">Tags</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:2px">
+            <sc-for list="{{ sel.tags }}" as="t" hint-placeholder-count="3">
+              <span style="font-size:11px;color:#E5E4E2;background:#22303a;border:1px solid #286048;border-radius:8px;padding:2px 8px;display:flex;align-items:center;gap:5px">{{ t }}<span style="color:#808080;cursor:pointer">✕</span></span>
+            </sc-for>
+            <span style="font-size:11px;color:#407058;border:1px dashed #33714F;border-radius:8px;padding:2px 8px;cursor:pointer">+ Add tag</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#808080;word-break:break-all;line-height:1.5">
+          <div>Path: <span style="color:#9db3a8">{{ sel.path }}</span></div>
+          <div>Modified: <span style="color:#9db3a8">{{ sel.modified }}</span> · Revit <span style="color:#9db3a8">{{ sel.revit }}</span></div>
+          <div>Catalog check: <span style="{{ sel.dupInline }}">{{ sel.dupLabel }}</span></div>
+        </div>
+      </div>
+    </div>
+    <!-- action bar -->
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:8px 10px">
+      <button style="height:28px;padding:0 14px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Load</button>
+      <button style="height:28px;padding:0 14px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Load &amp; Place</button>
+      <button style="{{ batchBtn }}">{{ batchLabel }}</button>
+      <div style="flex:1"></div>
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">★ Favorite</button>
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Copy Path</button>
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Open Folder</button>
+    </div>
+    <!-- footer -->
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;font-size:12px">
+      <a href="#" style="justify-self:start;margin-left:10px;font-weight:500;text-decoration:underline">Prototype</a>
+      <span style="justify-self:center;color:#808080">Version: 2.0</span>
+      <a href="#" style="justify-self:end;margin-right:10px;font-weight:500;text-decoration:underline">Outreach</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ WINDOW 2: DUPLICATE / VARIANT RESOLVER ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:12px;color:#E5E4E2;background:#33714F;padding:2px 8px;border-radius:8px">FS-2</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Duplicate &amp; Variant Resolver</span>
+    <span style="font-size:12px;color:#3a3a3a">non-destructive review workflow</span>
+  </div>
+  <div style="width:640px;height:520px;background:#1A252B;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)">
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+      <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+      <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">Resolve: HSS6x6x3/8 Column</span>
+      <button style="grid-column:3;grid-row:1;justify-self:center;width:60px;height:18px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:10px;cursor:pointer" style-hover="background:#407058">Close</button>
+    </div>
+    <div style="padding:8px 12px 4px;font-size:12px;color:#E5E4E2;line-height:1.5">3 files share this family name. <span style="color:#DAA520">2 are byte-identical</span>; 1 is a same-name variant with different content. Nothing is deleted, renamed, or auto-selected — you choose the authoritative copy.</div>
+    <div style="flex:1;min-height:0;overflow-y:auto;padding:4px 12px;display:flex;flex-direction:column;gap:8px">
+      <div style="border:1px solid #33714F;border-radius:10px;padding:10px;display:flex;gap:10px;align-items:flex-start">
+        <span style="width:16px;height:16px;flex-shrink:0;border-radius:2px;border:2px solid #33714F;background:linear-gradient(to top right,rgba(48,112,80,.6),rgba(40,96,72,.53));display:flex;align-items:center;justify-content:center;margin-top:1px"><span style="font-size:10px;color:#E5E4E2">●</span></span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;color:#FFF">…\Standards\Steel\HSS6x6x3-8.rfa <span style="font-size:10px;color:#286048;border:1px solid #286048;border-radius:6px;padding:0 5px;margin-left:4px">AUTHORITATIVE</span></div>
+          <div style="font-size:11px;color:#808080;margin-top:2px">Modified 2026-07-14 · Revit 2024 · SHA e3b0…a1 · 2 identical siblings</div>
+        </div>
+      </div>
+      <div style="border:1px solid #286048;border-radius:10px;padding:10px;display:flex;gap:10px;align-items:flex-start">
+        <span style="width:16px;height:16px;flex-shrink:0;border-radius:2px;border:2px solid #286048;margin-top:1px"></span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;color:#FFF">…\ProjectA\Imported\HSS6x6x3-8.rfa <span style="font-size:10px;color:#DAA520;border:1px solid #DAA520;border-radius:6px;padding:0 5px;margin-left:4px">EXACT DUPLICATE</span></div>
+          <div style="font-size:11px;color:#808080;margin-top:2px">Modified 2026-07-14 · Revit 2024 · SHA e3b0…a1 · identical bytes</div>
+        </div>
+      </div>
+      <div style="border:1px solid #286048;border-radius:10px;padding:10px;display:flex;gap:10px;align-items:flex-start">
+        <span style="width:16px;height:16px;flex-shrink:0;border-radius:2px;border:2px solid #286048;margin-top:1px"></span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;color:#FFF">…\Legacy\2019\HSS6x6x3-8.rfa <span style="font-size:10px;color:#FF8000;border:1px solid #FF8000;border-radius:6px;padding:0 5px;margin-left:4px">VARIANT — DIFFERENT BYTES</span></div>
+          <div style="font-size:11px;color:#808080;margin-top:2px">Modified 2019-03-02 · Revit 2019 · SHA 9f1c…7d · differs in 4 type params</div>
+        </div>
+      </div>
+    </div>
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:8px 12px">
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Compare Params</button>
+      <div style="flex:1"></div>
+      <button style="width:200px;height:30px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Mark Authoritative</button>
+    </div>
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;font-size:12px">
+      <a href="#" style="justify-self:start;margin-left:10px;font-weight:500;text-decoration:underline">Prototype</a>
+      <span style="justify-self:center;color:#808080">Version: 2.0</span>
+      <a href="#" style="justify-self:end;margin-right:10px;font-weight:500;text-decoration:underline">Outreach</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ WINDOW 3: LIBRARY ROOTS CONFIG EDITOR ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:12px;color:#E5E4E2;background:#33714F;padding:2px 8px;border-radius:8px">FS-3</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Library Roots — Config Editor</span>
+    <span style="font-size:12px;color:#3a3a3a">in-app editor over the operator-owned JSON</span>
+  </div>
+  <div style="width:640px;height:470px;background:#1A252B;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)">
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+      <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+      <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">Library Roots</span>
+      <button style="grid-column:3;grid-row:1;justify-self:center;width:60px;height:18px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:10px;cursor:pointer" style-hover="background:#407058">Close</button>
+    </div>
+    <div style="padding:8px 12px 6px;font-size:11px;color:#808080">Source of truth: <span style="color:#9db3a8">%APPDATA%\KLCode\FamilyStudio\library.json</span></div>
+    <div style="flex:1;min-height:0;overflow-y:auto;padding:0 12px;display:flex;flex-direction:column;gap:8px">
+      <div style="border:1px solid #286048;border-radius:10px;padding:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:14px;height:14px;border-radius:2px;background:linear-gradient(to top right,rgba(48,112,80,.6),rgba(40,96,72,.53));display:flex;align-items:center;justify-content:center;font-size:9px;color:#E5E4E2">✓</span>
+          <span style="flex:1;font-size:12px;color:#FFF">\\kla-fs01\Revit\Standards\Families</span>
+          <span style="font-size:10px;color:#3CB371;border:1px solid #3CB371;border-radius:6px;padding:0 6px">VALID · 1,284 rfa</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;font-size:11px;color:#808080">
+          <span>Discipline: <span style="color:#E5E4E2">Structural</span></span>
+          <span>Default status: <span style="color:#E5E4E2">Approved</span></span>
+          <span>Last scan: <span style="color:#E5E4E2">2026-08-30 16:04</span></span>
+        </div>
+      </div>
+      <div style="border:1px solid #286048;border-radius:10px;padding:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:14px;height:14px;border-radius:2px;background:linear-gradient(to top right,rgba(48,112,80,.6),rgba(40,96,72,.53));display:flex;align-items:center;justify-content:center;font-size:9px;color:#E5E4E2">✓</span>
+          <span style="flex:1;font-size:12px;color:#FFF">D:\KLA Content\Connections</span>
+          <span style="font-size:10px;color:#3CB371;border:1px solid #3CB371;border-radius:6px;padding:0 6px">VALID · 312 rfa</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;font-size:11px;color:#808080">
+          <span>Discipline: <span style="color:#E5E4E2">Structural</span></span>
+          <span>Default status: <span style="color:#E5E4E2">Draft</span></span>
+          <span>Last scan: <span style="color:#E5E4E2">2026-08-30 16:05</span></span>
+        </div>
+      </div>
+      <div style="border:1px solid #286048;border-radius:10px;padding:10px;opacity:.65">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:14px;height:14px;border-radius:2px;border:1px solid #33714F"></span>
+          <span style="flex:1;font-size:12px;color:#FFF">E:\Archive\2019 Library</span>
+          <span style="font-size:10px;color:#DAA520;border:1px solid #DAA520;border-radius:6px;padding:0 6px">DISABLED</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;font-size:11px;color:#808080">
+          <span>Discipline: <span style="color:#E5E4E2">—</span></span>
+          <span>Path not validated since disable</span>
+        </div>
+      </div>
+      <div style="border:1px solid #DAA520;border-radius:10px;padding:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:14px;height:14px;border-radius:2px;border:1px solid #DAA520;color:#DAA520;font-size:10px;display:flex;align-items:center;justify-content:center">!</span>
+          <span style="flex:1;font-size:12px;color:#FFF">\\old-nas\shared\rfa</span>
+          <span style="font-size:10px;color:#DAA520;border:1px solid #DAA520;border-radius:6px;padding:0 6px">UNREACHABLE</span>
+        </div>
+        <div style="margin-top:6px;font-size:11px;color:#DAA520">Root did not respond during pre-refresh validation. Fix the path or disable before the next refresh.</div>
+      </div>
+    </div>
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:8px 12px">
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">+ Add Root…</button>
+      <button style="height:28px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Validate All</button>
+      <div style="flex:1"></div>
+      <button style="height:28px;padding:0 14px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Save to JSON</button>
+    </div>
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;font-size:12px">
+      <a href="#" style="justify-self:start;margin-left:10px;font-weight:500;text-decoration:underline">Prototype</a>
+      <span style="justify-self:center;color:#808080">Version: 2.0</span>
+      <a href="#" style="justify-self:end;margin-right:10px;font-weight:500;text-decoration:underline">Outreach</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ WINDOW 4: REFRESH LIBRARY PROGRESS + SUMMARY ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:12px;color:#E5E4E2;background:#33714F;padding:2px 8px;border-radius:8px">FS-4</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Refresh Library — Progress &amp; Summary</span>
+  </div>
+  <div style="display:flex;gap:24px;align-items:flex-start">
+    <!-- progress -->
+    <div style="width:440px;height:300px;background:#1A252B;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)">
+      <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+        <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+        <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">Refreshing…</span>
+      </div>
+      <div style="flex:1;padding:16px 16px 8px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-size:12px;color:#E5E4E2">Opening families and rendering previews. This runs in the background; Revit stays responsive.</div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#808080;margin-bottom:4px"><span>\\kla-fs01\…\Families</span><span>842 / 1,284</span></div>
+          <div style="height:10px;background:#10171b;border:1px solid #286048;border-radius:8px;overflow:hidden"><div style="width:66%;height:100%;background:#33714F"></div></div>
+        </div>
+        <div style="font-size:11px;color:#808080;line-height:1.6">Seen 842 · <span style="color:#3CB371">updated 61</span> · skipped 779 · <span style="color:#DAA520">preview issues 2</span></div>
+        <div style="font-size:11px;color:#9db3a8;font-family:Consolas,monospace;background:#10171b;border:1px solid #286048;border-radius:8px;padding:8px;flex:1;overflow:hidden">▸ W12x26_Wide-Flange.rfa<br>▸ HSS6x6x3-8.rfa<br>▸ BasePlate_KLA-Std.rfa<br>▸ ShearTab_3bolt.rfa</div>
+      </div>
+      <div style="flex-shrink:0;display:flex;justify-content:center;padding:8px">
+        <button style="width:200px;height:30px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Cancel</button>
+      </div>
+    </div>
+    <!-- summary alert -->
+    <div style="width:440px;height:300px;background:#1A252B;border:1px solid #286048;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)">
+      <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+        <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+        <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">KL&amp;A Family Studio</span>
+      </div>
+      <div style="flex:1;padding:14px 20px;display:flex;gap:14px;align-items:flex-start">
+        <div style="width:34px;height:34px;flex-shrink:0;border-radius:50%;border:2px solid #DAA520;display:flex;align-items:center;justify-content:center;color:#DAA520;font-size:22px;font-weight:bold">!</div>
+        <div>
+          <div style="font-size:16px;color:#33714F;font-weight:bold;margin-bottom:6px">Refresh complete — 2 issues</div>
+          <div style="font-size:12px;color:#E5E4E2;line-height:1.6">Seen 1,284 · updated 61 · skipped 1,221 · preview/index issues 2.<br><br>Issues:<br><span style="color:#DAA520">Anchor_Cast-In.rfa</span> — preview render failed; prior preview retained.<br><span style="color:#DAA520">Legacy_Truss.rfa</span> — no prior preview; indexed without one.</div>
+        </div>
+      </div>
+      <div style="height:55px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-top:1px solid #286048">
+        <button style="width:200px;height:30px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ WINDOW 5: EMPTY STATE ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:12px;color:#E5E4E2;background:#33714F;padding:2px 8px;border-radius:8px">FS-5</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Empty Result State</span>
+  </div>
+  <div style="width:700px;height:360px;background:#1A252B;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)">
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+      <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+      <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">Family Studio</span>
+      <button style="grid-column:3;grid-row:1;justify-self:center;width:60px;height:18px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:10px;cursor:pointer" style-hover="background:#407058">Close</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;flex:0 0 auto;margin:8px 12px;height:22px;background:#1A252B;border:1px solid #33714F;border-radius:5px;padding:0 6px">
+      <span style="font-size:13px">🔍</span>
+      <span style="flex:1;font-size:13px;color:#E5E4E2">HSS12x12 moment base</span>
+    </div>
+    <div style="flex:1;margin:0 12px 12px;border:1px solid #286048;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:0 40px">
+      <div style="font-size:13px;color:#E5E4E2">No families match this search.</div>
+      <div style="font-size:12px;color:#808080;line-height:1.6">Nothing in the configured roots matched <span style="color:#9db3a8">"HSS12x12 moment base"</span>. Clear a filter, widen the scope to Library, or run Refresh Library if the file is new.</div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button style="height:26px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Clear Filters</button>
+        <button style="height:26px;padding:0 12px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Refresh Library</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ WINDOW 6: WEB CATALOG CONNECTOR (generic concept) ============ -->
+<div style="display:flex;flex-direction:column;gap:10px">
+  <div style="display:flex;align-items:baseline;gap:10px">
+    <span style="font-size:12px;color:#E5E4E2;background:#33714F;padding:2px 8px;border-radius:8px">FS-6</span>
+    <span style="font-size:14px;color:#1A252B;font-weight:600">Web Catalog Connector — concept</span>
+    <span style="font-size:12px;color:#3a3a3a">generic, vendor-neutral · no content ingested to the local catalog</span>
+  </div>
+  <div style="width:700px;height:520px;background:#1A252B;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 6px 26px rgba(0,0,0,.45)">
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:120px 1fr 66px;align-items:center">
+      <span style="grid-column:1;grid-row:1;justify-self:start;margin-left:5px;font-family:'Audiowide','Segoe UI',sans-serif;font-size:16px;color:#E5E4E2"><span style="color:#33714F">/</span>KLCode</span>
+      <span style="grid-column:1 / 4;grid-row:1;justify-self:center;font-size:14px;color:#E5E4E2">Web Catalog Connector</span>
+      <button style="grid-column:3;grid-row:1;justify-self:center;width:60px;height:18px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:10px;cursor:pointer" style-hover="background:#407058">Close</button>
+    </div>
+    <div style="padding:8px 12px 4px">
+      <div style="border:1px solid #DAA520;border-radius:8px;padding:8px 10px;font-size:11px;color:#DAA520;line-height:1.5">Vendor-neutral bridge. Results come from a configured manufacturer endpoint and are placed directly — they are <b>never copied into the Family Studio local catalog</b> and no content is redistributed. Governed by each vendor's license.</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;padding:4px 12px 8px">
+      <div style="width:170px;height:22px;background:#1A252B;border:1px solid #33714F;border-radius:2px;display:flex;align-items:center;justify-content:space-between;padding:0 6px;font-size:12px;color:#E5E4E2;cursor:pointer">Simpson Strong-Tie<span style="color:#33714F">▾</span></div>
+      <div style="display:flex;align-items:center;gap:5px;flex:1;height:22px;background:#1A252B;border:1px solid #33714F;border-radius:5px;padding:0 6px">
+        <span style="font-size:13px">🔍</span>
+        <span style="flex:1;font-size:13px;color:#E5E4E2">HDU hold-down</span>
+      </div>
+      <span style="font-size:11px;color:#3CB371;display:flex;align-items:center;gap:4px"><span style="width:7px;height:7px;border-radius:50%;background:#3CB371;display:inline-block"></span>Connected</span>
+    </div>
+    <div style="flex:1;min-height:0;overflow-y:auto;padding:0 12px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-content:start">
+      <div style="border:1px solid #286048;border-radius:10px;padding:8px">
+        <div style="aspect-ratio:4/3;background:#10171b;border:1px solid #286048;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:Consolas,monospace;font-size:10px;color:#3f5a4c">HDU2</div>
+        <div style="font-size:11px;color:#FFF;margin-top:4px">HDU2-SDS2.5</div>
+        <div style="font-size:10px;color:#808080">Hold-down · latest</div>
+      </div>
+      <div style="border:1px solid #286048;border-radius:10px;padding:8px">
+        <div style="aspect-ratio:4/3;background:#10171b;border:1px solid #286048;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:Consolas,monospace;font-size:10px;color:#3f5a4c">HDU4</div>
+        <div style="font-size:11px;color:#FFF;margin-top:4px">HDU4-SDS2.5</div>
+        <div style="font-size:10px;color:#808080">Hold-down · latest</div>
+      </div>
+      <div style="border:1px solid #286048;border-radius:10px;padding:8px">
+        <div style="aspect-ratio:4/3;background:#10171b;border:1px solid #286048;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:Consolas,monospace;font-size:10px;color:#3f5a4c">HDU8</div>
+        <div style="font-size:11px;color:#FFF;margin-top:4px">HDU8-SDS2.5</div>
+        <div style="font-size:10px;color:#808080">Hold-down · latest</div>
+      </div>
+      <div style="border:1px solid #286048;border-radius:10px;padding:8px">
+        <div style="aspect-ratio:4/3;background:#10171b;border:1px solid #286048;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:Consolas,monospace;font-size:10px;color:#3f5a4c">HDU11</div>
+        <div style="font-size:11px;color:#FFF;margin-top:4px">HDU11-SDS2.5</div>
+        <div style="font-size:10px;color:#808080">Hold-down · latest</div>
+      </div>
+      <div style="border:1px solid #286048;border-radius:10px;padding:8px">
+        <div style="aspect-ratio:4/3;background:#10171b;border:1px solid #286048;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:Consolas,monospace;font-size:10px;color:#3f5a4c">HDU14</div>
+        <div style="font-size:11px;color:#FFF;margin-top:4px">HDU14-SDS2.5</div>
+        <div style="font-size:10px;color:#808080">Hold-down · latest</div>
+      </div>
+      <div style="border:1px solid #286048;border-radius:10px;padding:8px;opacity:.55">
+        <div style="aspect-ratio:4/3;background:#10171b;border:1px solid #286048;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:Consolas,monospace;font-size:10px;color:#3f5a4c">…</div>
+        <div style="font-size:11px;color:#FFF;margin-top:4px">Loading more…</div>
+        <div style="font-size:10px;color:#808080">from vendor</div>
+      </div>
+    </div>
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:8px 12px">
+      <span style="font-size:11px;color:#808080;flex:1">1 selected · pulled live from vendor endpoint</span>
+      <button style="height:28px;padding:0 14px;border:0;border-radius:8px;background:#286048;color:#FFF;font-family:Arial;font-size:12px;cursor:pointer" style-hover="background:#407058">Place in Model</button>
+    </div>
+    <div style="height:24px;flex-shrink:0;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;font-size:12px">
+      <a href="#" style="justify-self:start;margin-left:10px;font-weight:500;text-decoration:underline">Prototype</a>
+      <span style="justify-self:center;color:#808080">Version: 2.0</span>
+      <a href="#" style="justify-self:end;margin-right:10px;font-weight:500;text-decoration:underline">Outreach</a>
+    </div>
+  </div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mode: "families", viewMode: "list", scope: "library", selId: null, checked: {} };
+
+  fams() {
+    return [
+      { id: "wf1", name: "W12x26 — Wide Flange Beam", cat: "Structural Framing", discipline: "Structural", status: "Approved", typeName: "W12x26", glyph: "I-beam", flag: "", revit: "2024", modified: "2026-07-14 09:12", path: "\\\\kla-fs01\\Revit\\Standards\\Steel\\W12x26.rfa", dupLabel: "Unique", tags: ["Steel", "Beam", "AISC"], params: [{ k: "W (in)", v: "12.2" }, { k: "Weight (plf)", v: "26" }, { k: "Area (in²)", v: "7.65" }, { k: "Ix (in⁴)", v: "204" }] },
+      { id: "hss1", name: "HSS6x6x3/8 — Column", cat: "Structural Columns", discipline: "Structural", status: "Approved", typeName: "HSS6x6x3/8", glyph: "HSS", flag: "3", revit: "2024", modified: "2026-07-14 09:14", path: "\\\\kla-fs01\\Revit\\Standards\\Steel\\HSS6x6x3-8.rfa", dupLabel: "3 files — 2 identical, 1 variant", tags: ["Steel", "HSS", "Column"], params: [{ k: "H (in)", v: "6" }, { k: "t (in)", v: "0.375" }, { k: "Weight (plf)", v: "27.4" }, { k: "A (in²)", v: "7.58" }] },
+      { id: "bp1", name: "Base Plate — KLA Standard", cat: "Structural Connections", discipline: "Structural", status: "Approved", typeName: "BP-12x12x1", glyph: "plate", flag: "", revit: "2024", modified: "2026-06-30 15:02", path: "D:\\KLA Content\\Connections\\BasePlate_KLA-Std.rfa", dupLabel: "Unique", tags: ["Connection", "Anchor"], params: [{ k: "Plate (in)", v: "12×12" }, { k: "t (in)", v: "1" }, { k: "Bolts", v: "4 — 3/4\"" }, { k: "Grout (in)", v: "1" }] },
+      { id: "st1", name: "Shear Tab — 3 Bolt", cat: "Structural Connections", discipline: "Structural", status: "Draft", typeName: "ST-3B", glyph: "tab", flag: "", revit: "2024", modified: "2026-08-02 11:41", path: "D:\\KLA Content\\Connections\\ShearTab_3bolt.rfa", dupLabel: "Unique", tags: ["Connection", "Bolted"], params: [{ k: "Bolts", v: "3 — 3/4\"" }, { k: "Plate t (in)", v: "3/8" }, { k: "Weld", v: "1/4\" fillet" }, { k: "Capacity (k)", v: "46.5" }] },
+      { id: "mc1", name: "Moment Connection — Bolted Flange", cat: "Structural Connections", discipline: "Structural", status: "Approved", typeName: "MC-BFP", glyph: "moment", flag: "", revit: "2024", modified: "2026-05-19 08:20", path: "\\\\kla-fs01\\Revit\\Standards\\Connections\\Moment_BFP.rfa", dupLabel: "Unique", tags: ["Connection", "Moment", "Seismic"], params: [{ k: "Flange plate", v: "3/4×8" }, { k: "Bolts / flange", v: "6 — 1\"" }, { k: "Doubler", v: "None" }, { k: "Demand (k-ft)", v: "312" }] },
+      { id: "ab1", name: "Anchor Bolt — Cast-In", cat: "Structural Connections", discipline: "Structural", status: "Approved", typeName: "F1554-Gr36", glyph: "anchor", flag: "!", revit: "2024", modified: "2026-04-11 13:55", path: "\\\\kla-fs01\\Revit\\Standards\\Anchors\\Anchor_Cast-In.rfa", dupLabel: "Preview missing", tags: ["Anchor", "Cast-in"], params: [{ k: "Dia (in)", v: "3/4" }, { k: "Embed (in)", v: "12" }, { k: "Grade", v: "F1554-36" }, { k: "Hook", v: "None" }] },
+      { id: "wf2", name: "W16x31 — Wide Flange Beam", cat: "Structural Framing", discipline: "Structural", status: "Approved", typeName: "W16x31", glyph: "I-beam", flag: "", revit: "2024", modified: "2026-07-14 09:12", path: "\\\\kla-fs01\\Revit\\Standards\\Steel\\W16x31.rfa", dupLabel: "Unique", tags: ["Steel", "Beam", "AISC"], params: [{ k: "W (in)", v: "16" }, { k: "Weight (plf)", v: "31" }, { k: "Area (in²)", v: "9.13" }, { k: "Ix (in⁴)", v: "375" }] },
+      { id: "c1", name: "C10x15.3 — Channel", cat: "Structural Framing", discipline: "Structural", status: "Draft", typeName: "C10x15.3", glyph: "channel", flag: "", revit: "2024", modified: "2026-03-08 10:00", path: "E:\\Archive\\2019 Library\\C10x15-3.rfa", dupLabel: "Unique", tags: ["Steel", "Channel"], params: [{ k: "Depth (in)", v: "10" }, { k: "Weight (plf)", v: "15.3" }, { k: "Area (in²)", v: "4.48" }, { k: "Ix (in⁴)", v: "67.3" }] },
+      { id: "l1", name: "L4x4x1/4 — Angle", cat: "Structural Framing", discipline: "Structural", status: "Approved", typeName: "L4x4x1/4", glyph: "angle", flag: "", revit: "2024", modified: "2026-07-01 14:30", path: "\\\\kla-fs01\\Revit\\Standards\\Steel\\L4x4x1-4.rfa", dupLabel: "Unique", tags: ["Steel", "Angle"], params: [{ k: "Leg (in)", v: "4×4" }, { k: "t (in)", v: "1/4" }, { k: "Weight (plf)", v: "6.6" }, { k: "A (in²)", v: "1.93" }] },
+    ];
+  }
+
+  views() {
+    return [
+      { id: "v1", name: "D-101 — Typ. Base Plate Detail", cat: "Drafting View", discipline: "Structural", status: "Approved", typeName: "Detail · 1 1/2\"=1'", glyph: "detail", flag: "", revit: "2024", modified: "2026-07-20 08:00", path: "\\\\kla-fs01\\Revit\\Details\\Base Plates.rvt", dupLabel: "Unique", tags: ["Detail", "Base Plate"], params: [{ k: "Scale", v: "1 1/2\"=1'-0\"" }, { k: "Discipline", v: "Structural" }, { k: "Detail level", v: "Fine" }, { k: "Elements", v: "34" }] },
+      { id: "v2", name: "D-204 — Moment Frame Elevation", cat: "Drafting View", discipline: "Structural", status: "Approved", typeName: "Detail · 1/4\"=1'", glyph: "detail", flag: "", revit: "2024", modified: "2026-07-18 16:20", path: "\\\\kla-fs01\\Revit\\Details\\Moment Frames.rvt", dupLabel: "Unique", tags: ["Detail", "Moment", "Seismic"], params: [{ k: "Scale", v: "1/4\"=1'-0\"" }, { k: "Discipline", v: "Structural" }, { k: "Detail level", v: "Medium" }, { k: "Elements", v: "58" }] },
+      { id: "v3", name: "S-001 — General Structural Notes", cat: "Drafting View", discipline: "Structural", status: "Approved", typeName: "Legend", glyph: "notes", flag: "", revit: "2024", modified: "2026-06-11 09:45", path: "\\\\kla-fs01\\Revit\\Standards\\GenNotes.rvt", dupLabel: "Unique", tags: ["Notes", "General"], params: [{ k: "Scale", v: "12\"=1'-0\"" }, { k: "Discipline", v: "Structural" }, { k: "Text notes", v: "112" }, { k: "Sheets used", v: "1" }] },
+      { id: "v4", name: "D-330 — Shear Wall Schedule", cat: "Schedule", discipline: "Structural", status: "Draft", typeName: "Schedule", glyph: "sched", flag: "", revit: "2024", modified: "2026-08-05 12:10", path: "\\\\kla-fs01\\Revit\\Details\\ShearWalls.rvt", dupLabel: "Unique", tags: ["Schedule", "Shear Wall"], params: [{ k: "Fields", v: "9" }, { k: "Sort / group", v: "Mark, Level" }, { k: "Filters", v: "2" }, { k: "Rows", v: "24" }] },
+      { id: "v5", name: "D-118 — Weld Symbol Legend", cat: "Legend", discipline: "Structural", status: "Approved", typeName: "Legend", glyph: "legend", flag: "", revit: "2024", modified: "2026-05-30 10:05", path: "\\\\kla-fs01\\Revit\\Standards\\Legends.rvt", dupLabel: "Unique", tags: ["Legend", "Welds"], params: [{ k: "Scale", v: "1\"=1'-0\"" }, { k: "Discipline", v: "Structural" }, { k: "Components", v: "18" }, { k: "Sheets used", v: "3" }] },
+      { id: "v6", name: "D-402 — Anchor Embed Detail", cat: "Drafting View", discipline: "Structural", status: "Approved", typeName: "Detail · 3\"=1'", glyph: "detail", flag: "", revit: "2024", modified: "2026-07-02 15:30", path: "\\\\kla-fs01\\Revit\\Details\\Anchors.rvt", dupLabel: "Unique", tags: ["Detail", "Anchor"], params: [{ k: "Scale", v: "3\"=1'-0\"" }, { k: "Discipline", v: "Structural" }, { k: "Detail level", v: "Fine" }, { k: "Elements", v: "41" }] },
+    ];
+  }
+
+  checkMark() {
+    return React.createElement("svg", { width: 9, height: 9, viewBox: "0 0 9 9" }, React.createElement("path", { d: "M 0 4 L 3 8 8 0", fill: "none", stroke: "#E5E4E2", strokeWidth: 2 }));
+  }
+
+  renderVals() {
+    const mode = this.state.mode;
+    const isFamilies = mode === "families";
+    const all = isFamilies ? this.fams() : this.views();
+    const selId = this.state.selId && all.some(x => x.id === this.state.selId) ? this.state.selId : all[0].id;
+    const sel = all.find(x => x.id === selId);
+    const isList = this.state.viewMode === "list";
+    const mk = this.checkMark();
+
+    const statusColor = s => s === "Approved" ? "#3CB371" : s === "Draft" ? "#DAA520" : "#808080";
+    const flagColor = f => f === "!" ? "#DAA520" : "#FF8000";
+
+    const results = all.map(x => {
+      const isSel = x.id === selId;
+      const isChecked = !!this.state.checked[x.id];
+      return {
+        ...x,
+        sub: isFamilies ? (x.cat + " · " + x.typeName) : (x.cat + " · " + x.path.split("\\").pop()),
+        mark: isChecked ? mk : null,
+        flagStyle: x.flag ? ("flex-shrink:0;min-width:16px;height:16px;padding:0 4px;border-radius:8px;font-size:10px;display:flex;align-items:center;justify-content:center;color:" + flagColor(x.flag) + ";border:1px solid " + flagColor(x.flag)) : "display:none",
+        cardFlagStyle: x.flag ? ("position:absolute;top:4px;left:4px;min-width:15px;height:15px;padding:0 3px;border-radius:7px;font-size:9px;display:flex;align-items:center;justify-content:center;background:#10171b;color:" + flagColor(x.flag) + ";border:1px solid " + flagColor(x.flag)) : "display:none",
+        rowStyle: "display:flex;align-items:center;gap:8px;padding:6px 6px;border-radius:8px;cursor:pointer;margin-bottom:2px;background:" + (isSel ? "rgba(51,113,79,.28)" : "transparent"),
+        boxStyle: "width:15px;height:15px;flex:0 0 auto;border-radius:2px;display:flex;align-items:center;justify-content:center;background:" + (isChecked ? "linear-gradient(to top right,rgba(48,112,80,.9),rgba(40,96,72,.85))" : "transparent") + ";border:1px solid " + (isChecked ? "#33714F" : "#3d5049"),
+        cardStyle: "border:1px solid " + (isSel ? "#33714F" : "#286048") + ";border-radius:10px;padding:6px;cursor:pointer;background:" + (isSel ? "rgba(51,113,79,.18)" : "transparent"),
+        cardBoxStyle: "position:absolute;top:4px;right:4px;width:15px;height:15px;border-radius:2px;display:flex;align-items:center;justify-content:center;background:" + (isChecked ? "linear-gradient(to top right,rgba(48,112,80,.9),rgba(40,96,72,.85))" : "rgba(16,23,27,.7)") + ";border:1px solid " + (isChecked ? "#33714F" : "#3d5049"),
+        pick: () => this.setState({ selId: x.id }),
+        check: () => this.setState(s => ({ checked: { ...s.checked, [x.id]: !s.checked[x.id] } })),
+      };
+    });
+
+    const checkedCount = Object.values(this.state.checked).filter(Boolean).length;
+    const tabOn = "padding:0 12px;height:22px;border:0;font-family:Arial;font-size:12px;cursor:pointer;background:#286048;color:#FFF";
+    const tabOff = "padding:0 12px;height:22px;border:0;font-family:Arial;font-size:12px;cursor:pointer;background:transparent;color:#9db3a8";
+    const vtabOn = "padding:0 10px;height:22px;border:0;font-family:Arial;font-size:12px;cursor:pointer;background:#286048;color:#FFF";
+    const vtabOff = "padding:0 10px;height:22px;border:0;font-family:Arial;font-size:12px;cursor:pointer;background:transparent;color:#9db3a8";
+
+    return {
+      results, sel, isList, isGrid: !isList, isFamilies,
+      searchText: isFamilies ? "" : "",
+      catLabel: "All categories",
+      resultCaption: isFamilies ? "Families" : "Views",
+      countLabel: results.length + (isFamilies ? (results.length === 1 ? " family" : " families") : (results.length === 1 ? " view" : " views")),
+      sel: {
+        ...sel,
+        statusChip: "font-size:11px;color:" + statusColor(sel.status) + ";border:1px solid " + statusColor(sel.status) + ";border-radius:8px;padding:1px 7px",
+        dupInline: sel.dupLabel === "Unique" ? "color:#3CB371" : "color:#DAA520",
+      },
+      famBtn: isFamilies ? tabOn : tabOff,
+      viewBtn: isFamilies ? tabOff : tabOn,
+      projBtn: this.state.scope === "project" ? tabOn : tabOff,
+      libBtn: this.state.scope === "library" ? tabOn : tabOff,
+      listBtn: isList ? vtabOn : vtabOff,
+      gridBtn: isList ? vtabOff : vtabOn,
+      batchLabel: checkedCount > 0 ? ("Batch Load (" + checkedCount + ")") : "Batch Load",
+      batchBtn: "height:28px;padding:0 14px;border:0;border-radius:8px;font-family:Arial;font-size:12px;background:#286048;color:#FFF;cursor:" + (checkedCount > 0 ? "pointer" : "default") + ";opacity:" + (checkedCount > 0 ? 1 : 0.45),
+      setFamilies: () => this.setState({ mode: "families", selId: null, checked: {} }),
+      setViews: () => this.setState({ mode: "views", selId: null, checked: {} }),
+      setProject: () => this.setState({ scope: "project" }),
+      setLibrary: () => this.setState({ scope: "library" }),
+      setList: () => this.setState({ viewMode: "list" }),
+      setGrid: () => this.setState({ viewMode: "grid" }),
+    };
+  }
+}
+</script>
+</body>
+</html>

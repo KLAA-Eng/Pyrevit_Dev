@@ -1,0 +1,25 @@
+/* KLCode — type. UI surfaces use the Windows/WPF system stack: buttons in the
+   green theme explicitly set TextElement.FontFamily="Arial"; everything else
+   inherits Segoe UI. Audiowide exists ONLY for the logo wordmark
+   (lib/_logos/_font) — never for UI text. */
+@font-face{font-family:"Audiowide";src:url("../assets/fonts/Audiowide-Regular.ttf") format("truetype");font-weight:400;font-style:normal}
+:root{
+  --font-ui:"Segoe UI", Tahoma, Verdana, sans-serif;
+  --font-button:Arial, Helvetica, sans-serif;
+  --font-mono:Consolas, "Courier New", monospace; /* pyRevit output window */
+  --font-logo:"Audiowide", "Segoe UI", sans-serif; /* wordmark lockups only */
+
+  --text-10:10px;  /* Close button */
+  --text-11:11px;  /* native pane + clipboard body, warnings */
+  --text-12:12px;  /* WPF default — TextBlock, Label, CheckBox, ComboBox, buttons without explicit FontSize */
+  --text-13:13px;  /* rare — only where XAML sets 13 explicitly */
+  --text-14:14px;  /* header wordmark, filter box, ViewRange message */
+
+  --weight-regular:400;
+  --weight-semibold:600; /* SemiBold section headers */
+  --weight-bold:700;     /* grid headers, alert heading */
+  --weight-heavy:900;    /* WPF FontWeight="Heavy" — the KLCode header wordmark */
+
+  --leading-tight:1.15;
+  --leading-normal:1.35;
+}

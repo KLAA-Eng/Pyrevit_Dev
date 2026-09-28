@@ -9,19 +9,19 @@ def filterfunc(rev):
         return True
     return rev.Issued == False
 
-revisions = forms.select_revisions(button_name='Select Revision',
+revisions = forms.select_revisions(button_name='Select Revisions',
                                    multiple=True,
                                    filterfunc=filterfunc)
 
 if revisions:
-    sheets = forms.select_sheets(button_name='Set Revision',
+    sheets = forms.select_sheets(button_name='Turn on Revisions',
                                  include_placeholder=True)
     if sheets:
-        with revit.Transaction('Set Revision on Sheets'):
+        with revit.Transaction('Manually Turn on Revisions'):
             updated_sheets = revit.update.update_sheet_revisions(revisions,
                                                                  sheets)
         if updated_sheets:
-            print('SELECTED REVISION ADDED TO THESE SHEETS:')
+            print('SELECTED REVISIONS TURNED ON FOR THESE SHEETS:')
             print('-' * 100)
             for s in updated_sheets:
                 snum = s.Parameter[DB.BuiltInParameter.SHEET_NUMBER]\

@@ -1,0 +1,57 @@
+<Window x:Class="KLCode.Wpf.Views.KlaAlertWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="440" Height="300"
+        Style="{StaticResource KlaWindowStyle}"
+        WindowStartupLocation="CenterOwner">
+    <Border BorderBrush="{StaticResource border_green_dark}" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="24" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="55" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Background="{StaticResource header_background}"
+                  MouseLeftButtonDown="OnHeaderMouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="66" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Style="{StaticResource KlaHeaderBrandStyle}">
+                    <Run Text="{StaticResource BrandSlash}" Foreground="{StaticResource text_green}" />
+                    <Run Text="{StaticResource BrandName}" />
+                </TextBlock>
+                <TextBlock x:Name="AlertTitle" Grid.ColumnSpan="3"
+                           Style="{StaticResource KlaHeaderTitleStyle}" MaxWidth="228" />
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="20,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="AlertIconBorder" Width="34" Height="34" HorizontalAlignment="Left"
+                        VerticalAlignment="Top" Background="Transparent" BorderThickness="2" CornerRadius="17">
+                    <TextBlock x:Name="AlertIcon" FontSize="22" FontWeight="Bold"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel Grid.Column="1">
+                    <TextBlock x:Name="AlertHeading" FontSize="16" FontWeight="Bold"
+                               Foreground="{StaticResource text_green}" Margin="0,0,0,6" />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <TextBlock x:Name="AlertMessage" Foreground="{StaticResource text_white}"
+                                   FontSize="12" LineHeight="20" TextWrapping="Wrap" />
+                    </ScrollViewer>
+                </StackPanel>
+            </Grid>
+
+            <Border Grid.Row="2" BorderBrush="{StaticResource border_green_dark}" BorderThickness="0,1,0,0">
+                <Button Width="200" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Content="{StaticResource OkLabel}" Style="{StaticResource KlaButtonStyle}"
+                        IsDefault="True" Click="OnCloseClick" />
+            </Border>
+        </Grid>
+    </Border>
+</Window>

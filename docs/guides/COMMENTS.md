@@ -102,8 +102,8 @@ encoding declaration and any required `from __future__` imports, before normal
 imports.
 
 ```python
-__version__ = "0.1.0"
-__doc__ = """Version: 0.1.0
+__version__ = "0.1.0-beta"
+__doc__ = """Version: 0.1.0-beta
 _____________________________________________________________________
 Description:
 
@@ -126,8 +126,9 @@ Author: KL&A"""
 
 Rules for this block:
 
-- `__version__` is a repository convention for the command's release or
-  prototype status.
+- `__version__` records the last extension release that affected this command.
+  It is not an independent command version stream. Use the published extension
+  version and channel, such as `0.1.0-beta` or `0.1.0`.
 - `__doc__` is the user-facing command card. Use the ordered sections shown
   above: `Version`, `Description`, `How-to`, applicable limits/requirements,
   and `Author`.
@@ -135,7 +136,8 @@ Rules for this block:
   sections. Keep the content accurate to observed behavior.
 - State destructive or externally visible side effects, required workstation
   software, fixed input counts, and conditions that stop the command.
-- Update `__version__` and the `Version:` line together.
+- Update `__version__` and the `Version:` line together when the command is
+  changed for a release.
 
 The normal Google module-docstring rule still applies to reusable `lib/` modules
 when they need module documentation. Do not add a second long user guide to a

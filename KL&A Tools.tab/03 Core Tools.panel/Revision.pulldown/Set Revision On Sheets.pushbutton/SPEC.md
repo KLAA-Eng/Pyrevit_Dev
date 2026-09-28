@@ -1,4 +1,4 @@
-# Set Revision On Sheets
+# Manually Turn on Revisions
 
 ## Purpose
 

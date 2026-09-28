@@ -1,0 +1,5 @@
+title: "Hide/Unhide\nRevision Clouds"
+tooltip:
+  en_us: Hides or unhides selected revision clouds on selected sheets and their placed views. Hide turns selected revisions off in each selected sheet's titleblock revision schedule; Unhide leaves it unchanged.
+engine:
+  clean: true

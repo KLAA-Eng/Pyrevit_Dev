@@ -1,8 +1,13 @@
-# Find All Revision Clouds On Views
+# Find All Revision Clouds
 
 ## Purpose
 
-Documents the current command implementation and intended user-facing behavior.
+Lists every revision cloud visible on each project sheet, grouping the output
+by sheet. The command obtains the individual cloud ids from each sheet rather
+than expanding a cloud's related-sheet list, so it does not merge clouds into a
+single result or infer sibling dependent-view sheets. A cloud owned by a
+primary view is labelled with the dependent view placed on the sheet; a cloud
+owned by the sheet is labelled **ON SHEET**.
 
 ## Behavior
 

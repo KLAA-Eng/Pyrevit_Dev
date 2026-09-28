@@ -62,7 +62,7 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         self.assertEqual('Host/model data required',
                          by_id['pyrevit-select-views']['sample_data_label'])
 
-    def test_all_repo_window_xaml_files_are_accounted_for(self):
+    def test_all_pyrevit_window_xaml_files_are_accounted_for(self):
         launchers = gallery_launchers()
         launcher_paths = set(
             launcher['relative_path']
@@ -72,7 +72,8 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         window_paths = set(
             entry['relative_path']
             for entry in catalog_xaml_sources(PROJECT_ROOT)
-            if entry['root_kind'] == 'Window'
+            if (entry['root_kind'] == 'Window' and
+                not entry['relative_path'].startswith('src/'))
         )
 
         self.assertEqual(sorted(window_paths), sorted(launcher_paths))

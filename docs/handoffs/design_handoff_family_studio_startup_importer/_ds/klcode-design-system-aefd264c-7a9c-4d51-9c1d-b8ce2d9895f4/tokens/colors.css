@@ -1,0 +1,55 @@
+/* KLCode — master design colors (the "KLName" palette). Values verbatim from
+   KLCode.pyRevit/DESIGNSYSTEM.md and GUI/Resources/WPF_styles.xaml. Do not
+   round or "improve" these. */
+:root{
+  /* --- Core brand --- */
+  --kl-charcoal:#1A252B;            /* KLCharcoal: window, header, field, list bg */
+  --kl-green:#33714F;               /* KLGreen: labels, input borders, icon green */
+  --kl-green-dark:#286048;          /* KLGreen-dark: button fill, panel borders, checked */
+  --kl-green-secondary:#407058;     /* KLGreen-secondary: button hover, footer link */
+  --kl-orange:#FF8000;              /* KLOrange: toggle-off icons, prototype icons */
+
+  /* --- Text --- */
+  --kl-white:#E5E4E2;               /* KLWhite: body text — never pure white */
+  --kl-pure-white:#FFFFFF;          /* white: button fg, checkbox/combobox glyphs */
+  --kl-gray-medium:#808080;         /* "gray" in DESIGNSYSTEM.md: footer version, muted text */
+
+  /* --- Grays --- */
+  --kl-gray-dark:#3F3F3F;           /* KLGray-dark: editable combobox background */
+  --kl-charcoal-gray:#4F4F4F;       /* KLCharcoal-gray: highlighted ComboBoxItem */
+  --kl-gray-scroll:#505050;         /* KLGray-scroll: scrollbar repeat button */
+  --kl-gray-disabled:#888888;       /* KLGray-disabled: disabled combobox / listitem */
+  --kl-gray-disabled-check:#6C6C6C; /* KLGray-disabled-check: disabled checkmark stroke */
+  --kl-charcoal-black:#131313;      /* KLCharcoal-black: checkbox hover fill */
+  --kl-black:#000000;               /* black: scrollbar thumb */
+
+  /* --- Semantic accents --- */
+  --kl-warning-gold:#DAA520;        /* warning-gold */
+  --kl-info-green:#3CB371;          /* info-green */
+
+  /* --- Legacy icon inks — NOT KLName colors; from the pre-colorway ribbon PNGs slated for migration (CLEANUP.md) --- */
+  --kl-slate:#34495E;               /* filled icon body */
+  --kl-ink-black:#000000;           /* line icon stroke */
+  --kl-gray-c8:#C8C8C8;             /* icon shadow plane */
+
+  /* --- Native Revit surfaces — NOT KLCode brand colors. Sampled from the
+     unthemed Revit/WPF windows (Custom Props pane, clipboard, View Range);
+     kept only so the panes/revit kits can recreate those surfaces. The repo
+     flags #E8E8E8 and Red as drift awaiting a KLCode theming pass. --- */
+  --kl-surface:#FFFFFF;
+  --kl-surface-header:#F5F5F5;      /* grid header row */
+  --kl-surface-readonly:#E8E8E8;    /* read-only value chip */
+  --kl-rule:#DDDDDD;                /* 1px separator */
+  --kl-ink-900:#333333;             /* section header */
+  --kl-ink-700:#555555;             /* read-only label */
+  --kl-ink-600:#666666;             /* italic status line */
+  --kl-dirty:#FFFACD;               /* LemonChiffon pending-apply — View Range drift, slated for re-theme */
+  --kl-danger:#FF0000;              /* WPF Red warning text — View Range drift, slated for re-theme */
+
+  /* --- Named transparent greens (DESIGNSYSTEM.md; ARGB from XAML) --- */
+  --kl-green-transparent-a:rgba(40,96,72,.2);  /* KLGreen-transparent-a #33286048 — reserved; window backgrounds are solid KLCharcoal (wash retired) */
+  --kl-green-transparent-b:rgba(48,112,80,.2); /* KLGreen-transparent-b #33307050 — reserved */
+  --kl-green-checkbox-a:rgba(40,96,72,.53);    /* KLGreen-checkbox-a #88286048: checkbox gradient end */
+  --kl-green-checkbox-b:rgba(48,112,80,.6);    /* KLGreen-checkbox-b #99307050: checkbox gradient start */
+  --kl-check-fill:linear-gradient(to top right, rgba(48,112,80,.6) 0%, rgba(40,96,72,.53) 100%); /* KLGreen-checkbox-b → -a: the only gradient in the system */
+}

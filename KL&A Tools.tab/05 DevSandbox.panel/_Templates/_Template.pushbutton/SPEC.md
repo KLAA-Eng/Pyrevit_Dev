@@ -1,43 +1,56 @@
-# PushbuttonExample
+# Command Name
 
-## Purpose
+## Identity
 
-Documents the current command implementation and intended user-facing behavior.
+| Field | Value |
+| --- | --- |
+| Bundle path | `KL&A Tools_dev.tab/.../Command.pushbutton` |
+| Maturity | Prototype, Beta, or Core |
+| Last extension release affecting this command | `0.0.0-beta` |
+| Maintainer | Name or team |
+| Revit versions live-tested | List exact tested versions |
 
-## Behavior
+## Purpose and workflow
 
-This command is implemented by `script.py` in this pyRevit bundle. It runs in the Revit/pyRevit host and uses the active-document context required by its implementation. It must preserve unrelated model content and report unsupported or cancelled interactions without applying partial changes.
+State the user problem, intended users, and the result this command provides.
+Describe the normal user workflow in plain language, including any choices,
+confirmation points, and where users should review the result.
 
-## Validation boundary
+## Inputs and prerequisites
 
-Validate this command against a representative Revit fixture, its empty or cancelled-input path, and its documented output or transaction effect before promotion beyond development use.
+- Active Revit context, selected elements, sheets, views, files, or schedules.
+- Required model conditions and user permissions.
+- Required workstation software, packages, configuration, and external files.
 
-## Implementation inventory
+## Outputs and effects
 
-- Entry point: `script.py`
-- Direct imports: from Autodesk.Revit.DB import *;import clr;from System.Collections.Generic import List;from Snippets._customprint import kit_button_clicked    # Import Reusable Function from 'lib/Snippets/_customprint.py';
-- Local helper functions: Top-level script flow.
-- Bundled external assets: None.
+Describe pyRevit output, dialogs, model changes, graphics overrides, files,
+workbooks, launched applications, and external services. State what the command
+does not change and how cancellation avoids partial work.
 
-## GUI and interaction
+## Limits and compatibility
 
-Static UI/API references: No explicit forms, WPF, or pyRevit-output API detected.
+List exclusions, unsupported cases, known limits, Revit compatibility, and
+error or skip reporting. Revit 2024 and later is the design target; only exact
+versions with live evidence may be claimed as supported.
 
-Use the command from its pyRevit button. Where it exposes a dialog or selection
-workflow, make the required selection and review the result before confirming.
+## Validation evidence
 
-## Current execution logic
+| Date | Extension release | Revit version | Scenario | Result | Evidence link or location |
+| --- | --- | --- | --- | --- | --- |
+| YYYY-MM-DD | `0.0.0-beta` | 2024 | Representative workflow | Pass or fail | Link or path |
 
-pyRevit loads the bundle and executes its entry point. The implementation uses
-the imports and helper functions listed above; inspect `script.py` for the exact
-branching order and host API calls.
+Record focused automated/static checks separately from live Revit acceptance.
+Automated checks do not prove Revit transactions, native dialogs, Excel COM,
+file outputs, or user workflow.
 
-## Model and external effects
+## Release history
 
-Detected mutation/external-effect patterns: No Revit transaction or direct mutation pattern detected.
+| Extension release | Date | Change summary |
+| --- | --- | --- |
+| `0.0.0-beta` | YYYY-MM-DD | Initial record. |
 
-## Current status
+## Backlog
 
-This is a development-tab command. The inventory above is statically derived
-from the current bundle and must be confirmed inside the target Revit/pyRevit
-environment before promotion or behavior changes.
+- Planned feature or improvement.
+- Known issue or validation still needed.

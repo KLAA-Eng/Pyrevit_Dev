@@ -4,7 +4,7 @@ KL&A Tools is a development pyRevit extension for KL&A Revit workflows. It
 adds a **KL&A Tools** ribbon tab within Revit.
 
 > **Development / beta extension.** The current release is
-> [`0.0.5.beta`](version.json), dated August 19, 2026.
+> [`0.0.6beta`](version.json), dated September 15, 2026.
 
 ## Ribbon tour
 
@@ -87,7 +87,7 @@ checkout rather than another installed copy.
 
 | Area | Current requirement or boundary |
 | --- | --- |
-| Host | Autodesk Revit with pyRevit. This repository does not declare one global minimum Revit version. |
+| Host | Autodesk Revit 2024 or later with pyRevit. A release may claim only the versions live-tested for its changed behavior. |
 | Command Python | IronPython/Python 2.7-compatible by default, unless a command explicitly opts into CPython. |
 | Create View Detail Folders | Native PDF export requires Revit 2022 or later. |
 | Highlight Changed Elements | Prototype currently targets Revit 2024 or later. |
@@ -129,12 +129,14 @@ for a useful report.
 
 | Current version | Channel | Release date | Notes |
 | --- | --- | --- | --- |
-| `0.0.5.beta` | Beta | 2026-08-19 | Current source version; validate changes in Revit before deployment. |
+| `0.0.6beta` | Beta | 2026-09-15 | Current source version; validate changed behavior in Revit before deployment. |
 
-`version.json` is the single human-edited version source. After changing it,
-regenerate `lib/build_info.py` with the provided script; do not edit the
-generated file directly. The full steps, including release tagging and in-Revit
-verification, are in [RELEASING.md](RELEASING.md).
+`version.json` is the single human-edited extension version source. After
+changing it, regenerate `lib/build_info.py` with the provided script; do not
+edit the generated file directly. Release versions, beta-to-stable promotion,
+tags, validation evidence, and in-Revit verification are defined in
+[RELEASING.md](RELEASING.md). Published release notes live in
+[CHANGELOG.md](CHANGELOG.md).
 
 ## Prototype promotion roadmap
 
@@ -171,15 +173,20 @@ it can be tested without Revit.
 
 Before changing a command:
 
-1. Read its `SPEC.md` and the adjacent `bundle.yaml` when present.
-2. Preserve the established pyRevit bundle hierarchy and command metadata.
-3. Keep command-path Python compatible with the pyRevit engine unless the
+1. Create a short-lived topic branch from `dev`; do not push directly to
+   protected `dev` or `main`.
+2. Read its `SPEC.md` and adjacent `bundle.yaml` when present.
+3. Preserve the established pyRevit bundle hierarchy and command metadata.
+4. Keep command-path Python compatible with the pyRevit engine unless the
    command explicitly opts into CPython.
-4. Put reusable, host-independent behavior in `lib/` and cover it with a
+5. Put reusable, host-independent behavior in `lib/` and cover it with a
    focused test when practical.
-5. Check the final diff and run the narrowest relevant validation.
+6. Check the final diff, record the applicable live-Revit validation, and open
+   a pull request into `dev`.
 
-For repository-specific contributor requirements, see [AGENTS.md](AGENTS.md).
+For the complete team workflow, see
+[Contributing](docs/guides/CONTRIBUTING.md), [RELEASING.md](RELEASING.md), and
+[AGENTS.md](AGENTS.md).
 
 ## Test locally
 
@@ -199,6 +206,12 @@ the intended Revit environment.
   pyRevit script structure.
 - [Comment and Docstring Guide](docs/guides/COMMENTS.md) - comments,
   docstrings, command metadata, and section dividers.
+- [Contributor Guide](docs/guides/CONTRIBUTING.md) - GitHub workflow,
+  validation evidence, and SPEC requirements.
+- [Release History](CHANGELOG.md) - published extension releases and known
+  limits.
+- [KLCode Standards](https://www.notion.so/KLCode-Standards-3e95b7f93e0c80c1bda4f1eaf7f89b62?source=copy_link) -
+  team-facing standards handbook and navigation hub.
 - [pyRevit Labs](https://pyrevitlabs.notion.site/) - pyRevit documentation and
   resources.
 - [Revit API Docs](https://www.revitapidocs.com/) - Revit API reference.

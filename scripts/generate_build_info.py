@@ -6,6 +6,7 @@ import datetime
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -35,11 +36,21 @@ def run_git(args):
     return output.strip()
 
 
+def expected_git_tag(version, channel):
+    """Return the conventional tag for a version and release channel."""
+    normalized_channel = (channel or "stable").lower()
+    legacy_channel_suffix = re.search(r"(alpha|beta|rc)$", version, re.I)
+    if normalized_channel == "stable" or legacy_channel_suffix:
+        return "v{0}".format(version)
+    return "v{0}-{1}".format(version, normalized_channel)
+
+
 def main():
     payload = read_version_payload()
     version = payload["version"]
+    channel = payload.get("channel", "")
     release_date = payload.get("release_date") or datetime.date.today().isoformat()
-    git_tag = run_git(["describe", "--tags", "--exact-match", "HEAD"]) or "v{0}".format(version)
+    git_tag = run_git(["describe", "--tags", "--exact-match", "HEAD"]) or expected_git_tag(version, channel)
     git_sha = run_git(["rev-parse", "--short", "HEAD"]) or "unknown"
 
     build_info_contents = """# This file is generated from version.json.
@@ -53,7 +64,7 @@ GIT_SHA = "{git_sha}"
 BUILD_DATE = "{build_date}"
 """.format(
         version=version,
-        channel=payload.get("channel", ""),
+        channel=channel,
         release_date=release_date,
         git_tag=git_tag,
         git_sha=git_sha,

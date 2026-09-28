@@ -71,7 +71,11 @@ class SelectFromDict(my_WPF):
                  initial_checked_names = None):
         self.SelectMultiple = SelectMultiple
         self.given_dict_items = {k:v for k,v in items.items() if k}
-        self.initial_checked_names = set(initial_checked_names or [])
+        # None preserves the legacy first-item default. An explicit empty
+        # collection means the caller wants every item initially unchecked.
+        self.initial_checked_names = (
+            None if initial_checked_names is None
+            else set(initial_checked_names))
 
         self.items          = self.generate_list_items()
         self.selected_items = []
@@ -103,8 +107,9 @@ class SelectFromDict(my_WPF):
         list_of_items = List[type(ListItem())]()
         first = True
         for type_name, floor_type in sorted(self.given_dict_items.items()):
-            checked = True if type_name in self.initial_checked_names else False
-            if first and not self.initial_checked_names:
+            checked = bool(self.initial_checked_names and
+                           type_name in self.initial_checked_names)
+            if first and self.initial_checked_names is None:
                 checked = True
             first = False
             list_of_items.Add(ListItem(type_name, floor_type, checked))
