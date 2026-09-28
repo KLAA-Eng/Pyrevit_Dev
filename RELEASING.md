@@ -1,65 +1,83 @@
-# Releasing
+# Releasing KL&A Tools
 
-This repo uses one human-edited version source:
+This procedure controls every release from protected `dev` into protected
+`main`. Only the designated technical owner or backup reviewer may merge the
+release pull request or create and push a release tag.
 
-- `version.json`
+## Release authority
 
-`lib/build_info.py` is generated from `version.json`. Do not edit `lib/build_info.py` by hand.
+`version.json` is the one human-edited extension version source.
+`lib/build_info.py` is generated from it and must never be edited by hand.
+`CHANGELOG.md` is the canonical release record.
 
-## Bump The Version
+Use numeric semantic versions for every new release:
 
-1. Edit `version.json`.
-2. Update:
-   - `version`
-   - `channel`
-   - `release_date`
+- `MAJOR` — a breaking user workflow, compatibility, or platform change.
+- `MINOR` — a new compatible tool or meaningful compatible feature.
+- `PATCH` — a compatible fix or small maintenance improvement.
 
-Example:
+The release channel is separate. Releases are `beta` by default and become
+`stable` only through explicit promotion by the technical owner or backup.
+Use `vMAJOR.MINOR.PATCH-beta` tags for beta releases and
+`vMAJOR.MINOR.PATCH` tags for stable releases. Existing legacy tags remain
+unchanged.
+
+Example beta release:
 
 ```json
 {
-  "version": "0.4.1",
-  "channel": "stable",
-  "release_date": "2026-07-16"
+  "version": "0.1.0",
+  "channel": "beta",
+  "release_date": "2026-09-28"
 }
 ```
 
-## Regenerate Build Metadata
+## Prepare the release on dev
 
-Run:
+1. Confirm the release contains only reviewed work already merged into `dev`.
+2. Review the affected command `SPEC.md` files. New or materially changed
+   commands must document their workflow, effects, compatibility, validation,
+   release history, and backlog.
+3. Record the release in `CHANGELOG.md`: version, date, channel, affected
+   tools, user-facing changes, fixes, known limits, tested Revit range, and
+   rollback tag.
+4. Update `version.json` with the numeric version, channel, and release date.
+5. Regenerate build metadata:
 
-```powershell
-C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File .\scripts\generate_build_info.ps1
-```
+   ```powershell
+   C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File .\scripts\generate_build_info.ps1
+   ```
 
-This rewrites `lib/build_info.py` from `version.json`.
+6. Commit `version.json`, `lib/build_info.py`, and `CHANGELOG.md` with the
+   release preparation.
 
-## Commit
+## Validate the release
 
-Commit both files:
+Every release pull request must state the affected tools and include the
+applicable evidence:
 
-- `version.json`
-- `lib/build_info.py`
+- Focused host-independent checks for deterministic logic, where practical.
+- Static or audit checks appropriate to the changed bundles and metadata.
+- Live Revit evidence for each Revit version the changed command claims to
+  support. The design target is Revit 2024 and later; a release may claim only
+  versions explicitly tested for its changed behavior.
+- A `SPEC.md` update when the command's workflow, output, effects, limits,
+  dependencies, or validation boundary changed.
 
-## Tag The Release
+Automated checks do not prove Revit transactions, native dialogs, Excel COM,
+file outputs, or user workflow. Independent non-developer testing is welcomed
+but is not a required release gate.
 
-If this is a real release, create the matching tag:
+## Merge, tag, and verify
 
-```powershell
-git tag -a v0.4.1 -m "Release v0.4.1"
-git push origin v0.4.1
-```
-
-Replace `0.4.1` with the version from `version.json`.
-
-## Verify In Revit
-
-1. Reload pyRevit.
-2. Open `KL&A Tools > Outreach > About KL&A Tools`.
-3. Confirm:
-   - version
-   - Git tag
-   - Git SHA
-   - loaded extension path
-
-The loaded extension path is the key support check. It confirms which `.extension` folder pyRevit actually loaded.
+1. Open the controlled `dev` to `main` pull request. The technical owner or
+   backup reviewer reviews and merges it only after all release evidence is
+   complete.
+2. Fetch `origin/main` and verify the exact merged commit.
+3. Create and push the matching annotated tag on that `main` commit. Use the
+   channel-specific tag format above.
+4. Deploy through the established distribution process.
+5. Reload pyRevit and open **KL&A Tools > Outreach > About KL&A Tools**.
+   Confirm the extension version, channel, Git tag, Git SHA, and loaded
+   extension path. The loaded path is the decisive support check: it confirms
+   which `.extension` folder Revit is using.

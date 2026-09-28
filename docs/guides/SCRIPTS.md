@@ -116,15 +116,20 @@ Design return values so tests can assert:
 
 Each user-facing command should use `SPEC.md` for the operational contract:
 
-- what the command does
-- expected inputs
-- user prompts
-- excluded elements or unsupported cases
-- model or file outputs
-- acceptance notes for manual Revit validation
+- command identity, current maturity, and the last extension release affecting
+  the command
+- purpose, intended users, and workflow
+- expected inputs, prompts, prerequisites, and dependencies
+- outputs and all model, file, workbook, or external side effects
+- exclusions, known limitations, and Revit compatibility
+- validation evidence and the manual Revit acceptance boundary
+- release history and an actionable future-work backlog
 
 Keep implementation details in code comments and docstrings. Keep user behavior
-and testing expectations in `SPEC.md`.
+and testing expectations in `SPEC.md`. New or materially changed user-facing
+commands must use the repository template. Existing specifications are updated
+when their command is materially changed; they do not require a separate
+migration-only rewrite.
 
 ## Script Layout
 
@@ -155,8 +160,8 @@ from __future__ import print_function
 
 __title__ = "Room Readiness Audit"
 __author__ = "KL&A"
-__version__ = "0.1.0"
-__doc__ = """Version: 0.1.0
+__version__ = "0.1.0-beta"
+__doc__ = """Version: 0.1.0-beta
 _____________________________________________________________________
 Description:
 

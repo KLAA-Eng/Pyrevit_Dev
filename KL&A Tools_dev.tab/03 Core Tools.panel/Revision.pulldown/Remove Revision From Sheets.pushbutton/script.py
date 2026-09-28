@@ -8,21 +8,21 @@ from pyrevit import script
 logger = script.get_logger()
 
 
-revisions = forms.select_revisions(button_name='Select Revision',
+revisions = forms.select_revisions(button_name='Select Revisions',
                                    multiple=True)
 
 logger.debug(revisions)
 
 if revisions:
-    sheets = forms.select_sheets(button_name='Remove Revisions',
+    sheets = forms.select_sheets(button_name='Turn off Revisions',
                                  include_placeholder=True)
     if sheets:
-        with revit.Transaction('Remove Revision from Sheets'):
+        with revit.Transaction('Manually Turn off Revisions'):
             updated_sheets = revit.update.update_sheet_revisions(revisions,
                                                                  sheets,
                                                                  state=False)
         if updated_sheets:
-            print('SELECTED REVISION REMOVED FROM THESE SHEETS:')
+            print('SELECTED REVISIONS TURNED OFF FOR THESE SHEETS:')
             print('-' * 100)
             cloudedsheets = []
             for s in sheets:
@@ -35,7 +35,7 @@ if revisions:
 
         if len(cloudedsheets) > 0:
             print('\n\nSELECTED REVISION IS CLOUDED ON THESE SHEETS '
-                  'AND CAN NOT BE REMOVED.')
+                  'AND CAN NOT BE TURNED OFF.')
             print('-' * 100)
 
             for s in cloudedsheets:

@@ -14,21 +14,18 @@ namespace KLCode.FamilyStudio.Revit.Services;
 internal sealed class RevitFamilyMetadataExtractor : IMetadataExtractor
 {
     private readonly Application _application;
+    private readonly RevitFamilyDocumentSession _documents;
 
-    public RevitFamilyMetadataExtractor(Application application)
+    public RevitFamilyMetadataExtractor(Application application, RevitFamilyDocumentSession documents)
     {
         _application = application ?? throw new ArgumentNullException(nameof(application));
+        _documents = documents ?? throw new ArgumentNullException(nameof(documents));
     }
 
     public Task<FamilyMetadata> ExtractAsync(string filePath, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException("The family file is not available.", filePath);
-        }
-
-        Document document = _application.OpenDocumentFile(filePath);
+        Document document = _documents.Open(filePath);
         try
         {
             if (!document.IsFamilyDocument)
@@ -38,9 +35,10 @@ internal sealed class RevitFamilyMetadataExtractor : IMetadataExtractor
 
             return Task.FromResult(ReadMetadata(document, filePath));
         }
-        finally
+        catch
         {
-            document.Close(false);
+            _documents.Close(filePath);
+            throw;
         }
     }
 

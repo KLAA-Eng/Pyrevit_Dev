@@ -12,9 +12,16 @@ if (-not (Test-Path $versionPath)) {
 $versionPayload = Get-Content $versionPath -Raw | ConvertFrom-Json
 $today = Get-Date -Format "yyyy-MM-dd"
 $releaseDate = if ($versionPayload.release_date) { $versionPayload.release_date } else { $today }
+$channel = if ($versionPayload.channel) { $versionPayload.channel.ToLowerInvariant() } else { "stable" }
+$gitTag = "v$($versionPayload.version)"
+
+# Legacy version strings already include their channel (for example 0.0.6beta).
+# New releases use a numeric version plus a separate beta or stable channel.
+if ($channel -ne "stable" -and $versionPayload.version -notmatch "(alpha|beta|rc)$") {
+    $gitTag = "$gitTag-$channel"
+}
 
 $gitSha = "unknown"
-$gitTag = "v$($versionPayload.version)"
 
 try {
     $gitShaOutput = git -c safe.directory="$RepoRoot" rev-parse --short HEAD 2>$null

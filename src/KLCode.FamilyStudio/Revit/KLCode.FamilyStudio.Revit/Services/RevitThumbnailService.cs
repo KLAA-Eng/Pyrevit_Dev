@@ -19,11 +19,11 @@ internal sealed class RevitThumbnailService : IThumbnailService
     private const int PreviewWidthPixels = 400;
     private const int PreviewHeightPixels = 300;
     private const double PreviewAspectRatio = (double)PreviewWidthPixels / PreviewHeightPixels;
-    private readonly Autodesk.Revit.ApplicationServices.Application _application;
+    private readonly RevitFamilyDocumentSession _documents;
 
-    internal RevitThumbnailService(Autodesk.Revit.ApplicationServices.Application application)
+    internal RevitThumbnailService(RevitFamilyDocumentSession documents)
     {
-        _application = application ?? throw new ArgumentNullException(nameof(application));
+        _documents = documents ?? throw new ArgumentNullException(nameof(documents));
     }
 
     public Task<ThumbnailResult> EnsureThumbnailAsync(
@@ -31,17 +31,17 @@ internal sealed class RevitThumbnailService : IThumbnailService
         string thumbnailDirectory,
         CancellationToken cancellationToken)
     {
-        cancellationToken.ThrowIfCancellationRequested();
         if (metadata is null)
         {
             throw new ArgumentNullException(nameof(metadata));
         }
 
-        string directory = Path.GetFullPath(thumbnailDirectory ?? throw new ArgumentNullException(nameof(thumbnailDirectory)));
-        Directory.CreateDirectory(directory);
-        Document document = _application.OpenDocumentFile(metadata.SourcePath);
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            string directory = Path.GetFullPath(thumbnailDirectory ?? throw new ArgumentNullException(nameof(thumbnailDirectory)));
+            Directory.CreateDirectory(directory);
+            Document document = _documents.Open(metadata.SourcePath);
             cancellationToken.ThrowIfCancellationRequested();
             List<FamilyPreview> typedPreviews = CreateTypePreviews(document, metadata, directory, cancellationToken);
             if (typedPreviews.Count > 0)
@@ -56,7 +56,7 @@ internal sealed class RevitThumbnailService : IThumbnailService
         }
         finally
         {
-            document.Close(false);
+            _documents.Close(metadata.SourcePath);
         }
     }
 

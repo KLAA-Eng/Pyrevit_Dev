@@ -91,7 +91,8 @@ public sealed class LibraryIndexer
 
     public async Task<IndexRunSummary> RunAsync(
         LibraryConfiguration configuration,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        IProgress<IndexRunProgress>? progress = null)
     {
         if (configuration is null)
         {
@@ -99,23 +100,28 @@ public sealed class LibraryIndexer
         }
 
         LibraryScanResult scan = _scanner.Scan(configuration);
+        ReportProgress(progress, scan.Files.Count, 0, 0, 0, 0, null, false);
         _repository.SyncLibraryRoots(configuration.LibraryRoots);
         List<IndexRunError> errors = new List<IndexRunError>();
         int updated = 0;
         int skipped = 0;
+        int processed = 0;
         foreach (LibraryFileCandidate file in scan.Files)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            ReportProgress(progress, scan.Files.Count, processed, updated, skipped, errors.Count, file.FilePath, false);
             IndexedFileState? existing = _repository.GetIndexedFile(file.FilePath);
             IndexDecision decision = _changeDetector.Decide(file, existing);
             if (decision == IndexDecision.Unchanged)
             {
                 skipped++;
+                processed++;
                 continue;
             }
 
             bool wasUpdated = await TryUpdateAsync(file, existing, configuration, errors, cancellationToken).ConfigureAwait(false);
             updated += wasUpdated ? 1 : 0;
+            processed++;
         }
 
         if (scan.Issues.Count == 0)
@@ -128,7 +134,9 @@ public sealed class LibraryIndexer
                     .ToArray());
         }
 
-        return new IndexRunSummary(scan.Files.Count, updated, skipped, errors.AsReadOnly(), scan.Issues);
+        IndexRunSummary summary = new IndexRunSummary(scan.Files.Count, updated, skipped, errors.AsReadOnly(), scan.Issues);
+        ReportProgress(progress, scan.Files.Count, processed, updated, skipped, errors.Count, null, true);
+        return summary;
     }
 
     private async Task<bool> TryUpdateAsync(
@@ -198,5 +206,25 @@ public sealed class LibraryIndexer
         using FileStream stream = File.OpenRead(filePath);
         using SHA256 hash = SHA256.Create();
         return BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", string.Empty);
+    }
+
+    private static void ReportProgress(
+        IProgress<IndexRunProgress>? progress,
+        int totalFiles,
+        int filesProcessed,
+        int filesUpdated,
+        int filesSkipped,
+        int filesFailed,
+        string? currentFilePath,
+        bool isComplete)
+    {
+        progress?.Report(new IndexRunProgress(
+            totalFiles,
+            filesProcessed,
+            filesUpdated,
+            filesSkipped,
+            filesFailed,
+            currentFilePath,
+            isComplete));
     }
 }

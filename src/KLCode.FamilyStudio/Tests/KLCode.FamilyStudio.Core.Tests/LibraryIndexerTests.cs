@@ -46,6 +46,64 @@ public sealed class LibraryIndexerTests
     }
 
     [TestMethod]
+    public async Task RunAsync_ReportsCurrentFamilyAndFinalCounts()
+    {
+        DateTimeOffset timestamp = new DateTimeOffset(2026, 9, 25, 12, 0, 0, TimeSpan.Zero);
+        LibraryFileCandidate first = new LibraryFileCandidate("/library/first.rfa", 10, timestamp);
+        LibraryFileCandidate failing = new LibraryFileCandidate("/library/failing.rfa", 20, timestamp);
+        FakeRepository repository = new FakeRepository();
+        List<IndexRunProgress> reports = new List<IndexRunProgress>();
+        LibraryIndexer indexer = new LibraryIndexer(
+            new FakeScanner(new[] { first, failing }, Array.Empty<LibraryScanIssue>()),
+            new FileChangeDetector(),
+            new FakeMetadataExtractor(failing.FilePath),
+            new NoThumbnailService(),
+            repository,
+            () => timestamp);
+
+        await indexer.RunAsync(
+            TestConfiguration(),
+            CancellationToken.None,
+            new ImmediateProgress(report => reports.Add(report)));
+
+        Assert.AreEqual(4, reports.Count);
+        Assert.AreEqual(2, reports[0].TotalFiles);
+        Assert.IsNull(reports[0].CurrentFilePath);
+        Assert.AreEqual(first.FilePath, reports[1].CurrentFilePath);
+        Assert.AreEqual(0, reports[1].FilesProcessed);
+        Assert.AreEqual(failing.FilePath, reports[2].CurrentFilePath);
+        Assert.AreEqual(1, reports[2].FilesProcessed);
+        Assert.IsTrue(reports[3].IsComplete);
+        Assert.AreEqual(2, reports[3].FilesProcessed);
+        Assert.AreEqual(1, reports[3].FilesUpdated);
+        Assert.AreEqual(1, reports[3].FilesFailed);
+    }
+
+    [TestMethod]
+    public void IndexRunStatusFileReporter_WritesCurrentAndFailureStates()
+    {
+        using TempDirectory temp = new TempDirectory();
+        string statusPath = Path.Combine(temp.Path, "refresh-status.txt");
+        var reporter = new IndexRunStatusFileReporter(
+            statusPath,
+            () => new DateTimeOffset(2026, 9, 25, 12, 0, 0, TimeSpan.Zero));
+
+        reporter.Report(new IndexRunProgress(3, 1, 1, 0, 0, "/library/current.rfa", false));
+
+        string running = File.ReadAllText(statusPath);
+        StringAssert.Contains(running, "state=running");
+        StringAssert.Contains(running, "totalFiles=3");
+        StringAssert.Contains(running, "filesProcessed=1");
+        StringAssert.Contains(running, "currentFilePath=/library/current.rfa");
+
+        reporter.MarkFailed("Unable to open current family.");
+
+        string failed = File.ReadAllText(statusPath);
+        StringAssert.Contains(failed, "state=failed");
+        StringAssert.Contains(failed, "message=Unable to open current family.");
+    }
+
+    [TestMethod]
     public async Task RunAsync_DoesNotMarkMissingWhenAnyRootScanFails()
     {
         DateTimeOffset timestamp = new DateTimeOffset(2026, 8, 26, 12, 0, 0, TimeSpan.Zero);
@@ -186,6 +244,21 @@ public sealed class LibraryIndexerTests
             CancellationToken cancellationToken)
         {
             throw new InvalidOperationException("preview fixture failure");
+        }
+    }
+
+    private sealed class ImmediateProgress : IProgress<IndexRunProgress>
+    {
+        private readonly Action<IndexRunProgress> _report;
+
+        public ImmediateProgress(Action<IndexRunProgress> report)
+        {
+            _report = report;
+        }
+
+        public void Report(IndexRunProgress value)
+        {
+            _report(value);
         }
     }
 

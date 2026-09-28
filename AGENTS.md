@@ -29,3 +29,19 @@ This repository is a pyRevit extension. User-facing commands live under
   assets: avoid replacing them unless the task explicitly requires it.
 - Check `git diff` before handing off changes. Run the narrowest relevant
   validation available for the edited code.
+
+## Contribution and release controls
+
+- Create a short-lived topic branch from `dev`. Submit it through a pull
+  request into protected `dev`; do not push directly to `dev` or `main`.
+- Only the designated technical owner or backup reviewer may merge pull
+  requests, prepare a release, or create and push a release tag.
+- A `dev` to `main` pull request is the only release path. It must include the
+  approved version, generated build metadata, changelog entry, review record,
+  and the validation evidence required by `RELEASING.md`.
+- The extension version in `version.json` is the release authority. A command
+  `__version__` records the last extension release that affected that command;
+  it is not an independent tool release stream.
+- New or materially changed user-facing commands require an adjacent
+  `SPEC.md`. Use the command template and `docs/guides/CONTRIBUTING.md` before
+  opening the pull request.

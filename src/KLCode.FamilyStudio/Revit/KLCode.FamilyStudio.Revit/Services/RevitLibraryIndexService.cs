@@ -23,29 +23,45 @@ internal sealed class RevitLibraryIndexService
 
     internal IndexRunSummary Refresh(string configurationPath, string expectedDatabasePath, CancellationToken cancellationToken)
     {
-        LibraryConfiguration configuration = new RevitLibraryConfigurationProvider().Load(configurationPath);
-        string configuredDatabasePath = Path.GetFullPath(configuration.DatabasePath);
         string activeDatabasePath = Path.GetFullPath(expectedDatabasePath);
-        if (!string.Equals(
-                configuredDatabasePath,
-                activeDatabasePath,
-                StringComparison.OrdinalIgnoreCase))
-        {
-            throw new ConfigurationException(
-                "The selected configuration must use the Family Studio database currently open in Revit.\n\n" +
-                "Active database:\n" + activeDatabasePath + "\n\n" +
-                "Configuration database:\n" + configuredDatabasePath);
-        }
+        string statusPath = Path.Combine(
+            Path.GetDirectoryName(activeDatabasePath) ?? AppDomain.CurrentDomain.BaseDirectory,
+            "family_studio-refresh-status.txt");
+        var progress = new IndexRunStatusFileReporter(statusPath);
+        progress.MarkStarting();
 
-        using SqliteFamilyRepository repository = new SqliteFamilyRepository(configuration.DatabasePath);
-        LibraryIndexer indexer = new LibraryIndexer(
-            new FileSystemLibraryScanner(),
-            new RevitFullRefreshChangeDetector(),
-            new RevitFamilyMetadataExtractor(_application),
-            new RevitThumbnailService(_application),
-            repository,
-            () => DateTimeOffset.UtcNow);
-        return indexer.RunAsync(configuration, cancellationToken).GetAwaiter().GetResult();
+        try
+        {
+            LibraryConfiguration configuration = new RevitLibraryConfigurationProvider().Load(configurationPath);
+            string configuredDatabasePath = Path.GetFullPath(configuration.DatabasePath);
+            if (!string.Equals(
+                    configuredDatabasePath,
+                    activeDatabasePath,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ConfigurationException(
+                    "The selected configuration must use the Family Studio database currently open in Revit.\n\n" +
+                    "Active database:\n" + activeDatabasePath + "\n\n" +
+                    "Configuration database:\n" + configuredDatabasePath + "\n\n" +
+                    "Refresh status:\n" + statusPath);
+            }
+
+            using SqliteFamilyRepository repository = new SqliteFamilyRepository(configuration.DatabasePath);
+            var documents = new RevitFamilyDocumentSession(_application);
+            LibraryIndexer indexer = new LibraryIndexer(
+                new FileSystemLibraryScanner(),
+                new RevitFullRefreshChangeDetector(),
+                new RevitFamilyMetadataExtractor(_application, documents),
+                new RevitThumbnailService(documents),
+                repository,
+                () => DateTimeOffset.UtcNow);
+            return indexer.RunAsync(configuration, cancellationToken, progress).GetAwaiter().GetResult();
+        }
+        catch (Exception exception)
+        {
+            progress.MarkFailed(exception.Message);
+            throw;
+        }
     }
 }
 

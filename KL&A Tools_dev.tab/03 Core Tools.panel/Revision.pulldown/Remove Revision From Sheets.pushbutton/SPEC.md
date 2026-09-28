@@ -1,4 +1,4 @@
-# Remove Revision From Sheets
+# Manually Turn off Revisions
 
 ## Purpose
 
