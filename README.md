@@ -38,7 +38,7 @@ appropriate model before project use.
 | Who Did That | Core Tools | Inspect available model-history information. | Core | No |
 | About KL&A Tools | Outreach/Feedback | Show version, Git, pyRevit, Revit, and loaded-path details. | Beta | No |
 | Suggestions | Outreach/Feedback | Open the KL&A feedback form with optional context prefilled. | Beta | No |
-| Carbon GWP Pull | Dev-Sandbox > Prototypes | Import calculated GWP values from Excel into eligible family-type parameters. | Prototype | Yes |
+| Carbon GWP Pull | Dev-Sandbox > Prototypes | Render calculated Excel GWP values as a managed chart on the SYNC TO CENTRAL sheet. | Prototype | Yes |
 | Concrete Mix Header | Dev-Sandbox > Prototypes | Import `tblMixHistory` Excel data into a selected schedule header. | Prototype | Yes |
 | Create View Detail Folders | Dev-Sandbox > Prototypes | Export matching detail/drafting views as PDF, JPEG, and HTML packages. | Prototype | No; writes files |
 | Hide Revision Clouds | Dev-Sandbox > Prototypes | Hide matching revision clouds on selected sheets and placed views. | Prototype | Graphics |
