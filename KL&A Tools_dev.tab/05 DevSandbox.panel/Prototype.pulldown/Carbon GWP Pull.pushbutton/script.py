@@ -9,8 +9,8 @@ _____________________________________________________________________
 Description:
 
 Export selected Carbon GWP schedules to Excel, read the post-processed
-Export worksheet, and write those values to Carbon Pie.JMP family type
-parameters in the active Revit model.
+Export worksheet, render its GWP and material-volume values as doughnut
+charts, and place or update them on the SYNC TO CENTRAL sheet.
 _____________________________________________________________________
 How-to:
 
@@ -23,8 +23,8 @@ _____________________________________________________________________
 Prototype limits:
 - Requires Microsoft Excel COM interop on the Revit workstation
 - Does not run workbook macros directly
-- Stops before Revit writes if required schedules, workbooks, or family
-  data are missing
+- Stops before Revit changes if required schedules, workbooks, chart data, or
+  the SYNC TO CENTRAL sheet are missing
 _____________________________________________________________________
 Author: KL&A"""
 
@@ -37,6 +37,7 @@ Author: KL&A"""
 
 import os
 import sys
+import time
 import traceback
 
 from pyrevit import DB, forms, revit, script
@@ -49,6 +50,25 @@ from pyrevit import DB, forms, revit, script
 # ------------------------------------------------------------------
 
 COMMAND_TITLE = __title__
+TARGET_SHEET_NAME = 'SYNC TO CENTRAL'
+POST_PROCESSING_REFRESH_TIMEOUT_SECONDS = 60.0
+POST_PROCESSING_REFRESH_POLL_SECONDS = 0.25
+CLOUD_MODEL_WORKBOOK_FOLDER = r'J:\Standards\910 Revit Support\KLAA Library'
+MATERIAL_ACCURACY_WORKSHEET_NAME = 'Post-Processing'
+MATERIAL_ACCURACY_FIRST_ROW = 41
+MATERIAL_ACCURACY_LAST_ROW = 70
+MATERIAL_ACCURACY_COLUMN = 'F'
+EXPORT_WORKBOOK_PICKER_TITLE = 'Select Export Container'
+POST_PROCESSING_WORKBOOK_PICKER_TITLE = 'Select Post-processing'
+CHART_IMAGE_FILENAMES = {
+    'gwp': 'Carbon GWP Summary.png',
+    'volume': 'Carbon Material Volume Summary.png',
+}
+
+
+def _is_target_sheet_name(value):
+    """Return whether a sheet name matches the required target, ignoring case."""
+    return _safe_text(value).lower() == TARGET_SHEET_NAME.lower()
 
 
 def _extension_root(path):
@@ -81,18 +101,28 @@ if LIB_DIR not in sys.path:
 
 from GUI.forms import select_from_dict
 from carbon_gwp.workflow import (
-    CARBON_PIE_FAMILY_NAME,
     DEFAULT_EXPORT_CONTAINER_PATH,
-    DEFAULT_POST_PROCESSING_PATH,
     DEFAULT_SCHEDULE_NAMES,
     EXPORT_WORKSHEET_NAME,
     has_exportable_cells,
     normalize_grid,
-    parameter_value_pairs_from_export_rows,
     safe_text as _safe_text,
     uniquify_worksheet_names,
-    validate_parameter_value_pairs,
     worksheet_name_for_schedule,
+)
+from carbon_gwp.chart import (
+    GWP_CHART_UNIT,
+    VOLUME_CHART_UNIT,
+    chart_slices_from_export_rows,
+    chart_total,
+    format_chart_amount,
+    format_chart_table_amount,
+)
+from carbon_gwp.revit_chart import (
+    create_or_reload_chart,
+    image_bottom_left,
+    render_chart_png,
+    titleblock_top_right,
 )
 
 
@@ -214,17 +244,63 @@ def _select_schedules(document):
 
 # Excel workbook helpers
 # ------------------------------------------------------------------
-def _pick_workbook(title, default_path):
-    """Prompt for an Excel workbook using a configured starting folder.
+def _cloud_model_workbook_folder():
+    """Return the cloud-model workbook folder with an offline local fallback."""
+    if os.path.isdir(CLOUD_MODEL_WORKBOOK_FOLDER):
+        return CLOUD_MODEL_WORKBOOK_FOLDER
+    user_profile = os.environ.get('USERPROFILE')
+    if user_profile and os.path.isdir(user_profile):
+        return user_profile
+    system_drive = os.environ.get('SystemDrive', 'C:')
+    return system_drive + os.sep
+
+
+def _model_workbook_folder(document, fallback_path):
+    """Return a usable workbook folder for the active Revit model.
+
+    Local and workshared-central models use their disk folder. Cloud models use
+    the KL&A Library folder when it is accessible, otherwise the user's local
+    Windows profile folder. Revit Server, detached, and unsaved models retain
+    the established Carbon-folder fallback because they do not expose a usable
+    Windows project directory.
+    """
+    fallback_folder = os.path.dirname(fallback_path)
+    try:
+        if getattr(document, 'IsModelInCloud', False):
+            return _cloud_model_workbook_folder()
+    except Exception:
+        return fallback_folder
+
+    if getattr(document, 'IsWorkshared', False):
+        try:
+            central_path = document.GetWorksharingCentralModelPath()
+            visible_path = DB.ModelPathUtils.ConvertModelPathToUserVisiblePath(central_path)
+            central_folder = os.path.dirname(visible_path)
+            if central_folder and os.path.isdir(central_folder):
+                return central_folder
+        except Exception:
+            pass
+
+    try:
+        model_folder = os.path.dirname(document.PathName)
+        if model_folder and os.path.isdir(model_folder):
+            return model_folder
+    except Exception:
+        pass
+    return fallback_folder
+
+
+def _pick_workbook(title, initial_directory):
+    """Prompt for an Excel workbook using the provided starting folder.
 
     Args:
         title: Text to display in the file picker.
-        default_path: Workbook path whose existing directory starts the picker.
+        initial_directory: Existing folder that should open in the picker.
 
     Returns:
         Chosen workbook path, or a falsey value after cancellation.
     """
-    init_dir = os.path.dirname(default_path) if default_path and os.path.isdir(os.path.dirname(default_path)) else None
+    init_dir = initial_directory if initial_directory and os.path.isdir(initial_directory) else None
     # Select a workbook. Start in the configured folder and allow macro-enabled
     # files without this command running workbook macros.
     picked = forms.pick_file(file_ext='xlsx', init_dir=init_dir, title=title)
@@ -269,6 +345,15 @@ def _worksheet_by_name(workbook, worksheet_name):
     for index in range(1, workbook.Worksheets.Count + 1):
         worksheet = workbook.Worksheets[index]
         if worksheet.Name == worksheet_name:
+            return worksheet
+    return None
+
+
+def _worksheet_by_name_ignoring_case(workbook, worksheet_name):
+    """Find a workbook worksheet by name without depending on letter case."""
+    for index in range(1, workbook.Worksheets.Count + 1):
+        worksheet = workbook.Worksheets[index]
+        if _safe_text(worksheet.Name).lower() == _safe_text(worksheet_name).lower():
             return worksheet
     return None
 
@@ -529,16 +614,126 @@ def _com_range_values_to_rows(values, row_count, column_count):
     return normalize_grid(rows)
 
 
-def _read_export_rows(workbook_path):
+def _com_collection_items(collection):
+    """Return COM collection items whether the host exposes iteration or Item."""
+    if collection is None:
+        return []
+    try:
+        return list(collection)
+    except Exception:
+        pass
+    try:
+        return [collection.Item(index) for index in range(1, int(collection.Count) + 1)]
+    except Exception:
+        return []
+
+
+def _make_query_refresh_foreground(workbook):
+    """Disable background refresh for workbook query tables in this session.
+
+    The setting is applied only to the read-only COM instance; it is never
+    saved back into the analyst's workbook.
+    """
+    for connection in _com_collection_items(getattr(workbook, 'Connections', None)):
+        for property_name in ('OLEDBConnection', 'ODBCConnection'):
+            try:
+                getattr(connection, property_name).BackgroundQuery = False
+            except Exception:
+                pass
+    for worksheet in _com_collection_items(getattr(workbook, 'Worksheets', None)):
+        for collection_name in ('QueryTables', 'ListObjects'):
+            for source in _com_collection_items(getattr(worksheet, collection_name, None)):
+                try:
+                    query_table = getattr(source, 'QueryTable', source)
+                    query_table.BackgroundQuery = False
+                except Exception:
+                    pass
+
+
+def _query_refresh_is_running(workbook):
+    """Return whether a workbook query still reports an active refresh."""
+    for connection in _com_collection_items(getattr(workbook, 'Connections', None)):
+        for property_name in ('OLEDBConnection', 'ODBCConnection'):
+            try:
+                if getattr(connection, property_name).Refreshing:
+                    return True
+            except Exception:
+                pass
+    for worksheet in _com_collection_items(getattr(workbook, 'Worksheets', None)):
+        for collection_name in ('QueryTables', 'ListObjects'):
+            for source in _com_collection_items(getattr(worksheet, collection_name, None)):
+                try:
+                    query_table = getattr(source, 'QueryTable', source)
+                    if query_table.Refreshing:
+                        return True
+                except Exception:
+                    pass
+    return False
+
+
+def _wait_for_query_refresh(workbook):
+    """Wait briefly for foreground workbook queries and fail before stale reads."""
+    elapsed = 0.0
+    while _query_refresh_is_running(workbook):
+        if elapsed >= POST_PROCESSING_REFRESH_TIMEOUT_SECONDS:
+            raise ValueError(
+                'Post-processing workbook refresh did not finish within {} seconds. '
+                'The Export sheet was not read to avoid a stale chart.'.format(
+                    int(POST_PROCESSING_REFRESH_TIMEOUT_SECONDS)))
+        time.sleep(POST_PROCESSING_REFRESH_POLL_SECONDS)
+        elapsed += POST_PROCESSING_REFRESH_POLL_SECONDS
+
+
+def _material_accuracy_check(workbook):
+    """Inspect the approved material-classification cells for Excel #N/A errors.
+
+    Excel's ``ISNA`` function distinguishes a true formula error from text that
+    happens to look like ``#N/A``. The check is informational: callers always
+    receive a result record and may continue the chart workflow.
+    """
+    result = {
+        'status': 'completed',
+        'sheet': MATERIAL_ACCURACY_WORKSHEET_NAME,
+        'range': '{}{}:{}{}'.format(
+            MATERIAL_ACCURACY_COLUMN, MATERIAL_ACCURACY_FIRST_ROW,
+            MATERIAL_ACCURACY_COLUMN, MATERIAL_ACCURACY_LAST_ROW),
+        'cells': [],
+        'reason': '',
+    }
+    try:
+        worksheet = _worksheet_by_name_ignoring_case(
+            workbook, MATERIAL_ACCURACY_WORKSHEET_NAME)
+        if worksheet is None:
+            raise ValueError('Worksheet not found: {}'.format(
+                MATERIAL_ACCURACY_WORKSHEET_NAME))
+        for row_number in range(MATERIAL_ACCURACY_FIRST_ROW,
+                                MATERIAL_ACCURACY_LAST_ROW + 1):
+            address = '{}{}'.format(MATERIAL_ACCURACY_COLUMN, row_number)
+            # ``ISNA`` is true only for Excel's #N/A error value, not for a
+            # manually entered text value that resembles the error.
+            if bool(worksheet.Evaluate('ISNA({})'.format(address))):
+                result['cells'].append(address)
+    except Exception as error:
+        result['status'] = 'unavailable'
+        result['reason'] = _safe_text(error) or 'The worksheet or range could not be read.'
+    return result
+
+
+def _read_export_rows(workbook_path, include_material_accuracy_check=False):
     """Refresh links and read rows from the post-processing Export sheet.
 
-    Opens Excel read-only and closes it without saving after recalculation.
+    Opens Excel read-only, updates external formula links in memory, and closes
+    without saving after recalculation.
 
     Args:
         workbook_path: Path to the post-processing Excel workbook.
+        include_material_accuracy_check: When true, also return the
+            informational #N/A material-classification check result.
 
     Returns:
-        Rectangular grid of Export worksheet values.
+        Rectangular grid of Export worksheet values. When
+        ``include_material_accuracy_check`` is true, returns a tuple of the
+        grid and the check result.
 
     Raises:
         ValueError: Required Export worksheet is not present.
@@ -548,26 +743,27 @@ def _read_export_rows(workbook_path):
     excel.DisplayAlerts = False
     workbook = None
     try:
-        workbook = excel.Workbooks.Open(workbook_path, ReadOnly=True)
+        # ``UpdateLinks=3`` makes Excel update external formula links when the
+        # post-processing workbook opens. Without it, a linked Export sheet can
+        # retain its last saved (often zero) values even though this command has
+        # just written fresh schedule data to the selected container workbook.
+        workbook = excel.Workbooks.Open(
+            workbook_path, UpdateLinks=3, ReadOnly=True)
         # Open the analyst workbook read-only. This command needs calculated
         # values but must not overwrite its formulas or source data.
-        # WORKAROUND: Excel versions and workbook connections support different
-        # refresh APIs, so try each available calculation path.
-        try:
-            workbook.RefreshAll()
-        except Exception:
-            pass
-        try:
-            excel.CalculateUntilAsyncQueriesDone()
-        except Exception:
-            pass
-        try:
-            excel.CalculateFullRebuild()
-        except Exception:
-            try:
-                excel.Calculate()
-            except Exception:
-                pass
+        # The new post-processing workbook uses Power Query to read the three
+        # DYN Out sheets from the container workbook. RefreshAll normally runs
+        # those queries in the background; make the read-only session
+        # foreground-only before refreshing so Export cannot be read while its
+        # query inputs are temporarily blank.
+        _make_query_refresh_foreground(workbook)
+        workbook.RefreshAll()
+        _wait_for_query_refresh(workbook)
+        link_sources = workbook.LinkSources()
+        if link_sources is not None:
+            workbook.UpdateLink(link_sources)
+        excel.CalculateUntilAsyncQueriesDone()
+        excel.CalculateFullRebuild()
         # Read the workbook contract. The Export tab's first two columns map
         # Revit parameter names to the values this command will write.
         worksheet = _worksheet_by_name(workbook, EXPORT_WORKSHEET_NAME)
@@ -578,6 +774,8 @@ def _read_export_rows(workbook_path):
         row_count = int(used_range.Rows.Count)
         column_count = int(used_range.Columns.Count)
         rows = _com_range_values_to_rows(used_range.Value2, row_count, column_count)
+        if include_material_accuracy_check:
+            return rows, _material_accuracy_check(workbook)
         return rows
     finally:
         # INVARIANT: This reader never saves analyst-owned workbook changes.
@@ -586,96 +784,58 @@ def _read_export_rows(workbook_path):
         excel.Quit()
 
 
-# Carbon Pie family parameter writing
+# Managed Revit chart placement
 # ------------------------------------------------------------------
-def _family_symbols_by_family_name(document, family_name):
-    """Collect type symbols belonging to a named Revit family.
+def _sync_to_central_sheet(document):
+    """Return the uniquely named SYNC TO CENTRAL sheet, when it exists.
 
-    Args:
-        document: Active Revit project document.
-        family_name: Target Revit family name.
-
-    Returns:
-        Matching Revit ``FamilySymbol`` instances.
+    The tool never creates a sheet or guesses between duplicate sheet names.
     """
-    symbols = []
-    # Collect Carbon Pie types. Revit stores family types as symbols, so filter
-    # all symbols by their parent family name.
-    collector = DB.FilteredElementCollector(document).OfClass(DB.FamilySymbol)
-    for symbol in collector:
-        family = getattr(symbol, 'Family', None)
-        if family is not None and _element_name(family) == family_name:
-            symbols.append(symbol)
-    return symbols
-
-
-def _set_parameter_value(parameter, value):
-    """Write one Export worksheet value to a Revit parameter.
-
-    Args:
-        parameter: Revit parameter to write, or ``None``.
-        value: Excel value to convert for the storage type.
-
-    Returns:
-        Tuple ``(success, reason)``; ``reason`` is empty after success.
-    """
-    if parameter is None:
-        return False, 'missing parameter'
-    if getattr(parameter, 'IsReadOnly', False):
-        return False, 'read-only parameter'
-    # Prepare the Revit value. Convert Excel's generic cell value to the exact
-    # storage type required by ``Set``; failures become report rows.
-    storage_type = parameter.StorageType
-    text = _safe_text(value)
-
-    # Revit parameters reject values whose Python type does not match storage.
-    try:
-        if storage_type == DB.StorageType.String:
-            parameter.Set(text)
-        elif storage_type == DB.StorageType.Integer:
-            parameter.Set(int(float(text)) if text else 0)
-        elif storage_type == DB.StorageType.Double:
-            parameter.Set(float(text) if text else 0.0)
-        elif storage_type == DB.StorageType.ElementId:
-            parameter.Set(DB.ElementId(int(float(text))))
+    matches = []
+    for sheet in DB.FilteredElementCollector(document).OfClass(DB.ViewSheet):
+        if _is_target_sheet_name(_element_name(sheet)):
+            matches.append(sheet)
+    if len(matches) != 1:
+        if not matches:
+            forms.alert(
+                'Sheet not found: {}. Create it outside this command, then run again.'.format(
+                    TARGET_SHEET_NAME),
+                title=COMMAND_TITLE,
+                warn_icon=True)
         else:
-            return False, 'unsupported storage type'
-    except Exception as error:
-        return False, _safe_text(error)
-    return True, ''
+            forms.alert(
+                'Multiple sheets are named {}. Rename the duplicates before running again.'.format(
+                    TARGET_SHEET_NAME),
+                title=COMMAND_TITLE,
+                warn_icon=True)
+        return None
+    return matches[0]
 
 
-def _write_family_type_parameters(symbols, pairs):
-    """Apply validated Export worksheet values to every target family type.
+def _is_active_sheet(document, sheet):
+    """Return whether the command is currently running on the target sheet."""
+    try:
+        return _element_id_value(document.ActiveView.Id) == _element_id_value(sheet.Id)
+    except Exception:
+        return False
 
-    Args:
-        symbols: Target Revit ``FamilySymbol`` instances.
-        pairs: Validated parameter/value dictionaries from the Export sheet.
 
-    Returns:
-        Tuple ``(successes, skips)`` of pyRevit report-table rows.
+def _chart_png_path(post_processing_workbook, chart_kind):
+    """Return the persistent PNG location for a managed chart.
+
+    Chart images are saved beside the selected post-processing workbook so
+    the project team can access the exact rendered graphics outside Revit.
     """
-    successes = []
-    skips = []
-    # Track each write result. The report must distinguish completed writes from
-    # missing, read-only, or incompatible parameters.
-    for symbol in symbols:
-        symbol_name = _element_name(symbol)
-        # Apply every validated Export row to this Carbon Pie family type.
-        for pair in pairs:
-            parameter_name = pair['parameter_name']
-            parameter = symbol.LookupParameter(parameter_name)
-            ok, reason = _set_parameter_value(parameter, pair['value'])
-            if ok:
-                successes.append([symbol_name, parameter_name, pair['value']])
-            else:
-                skips.append([symbol_name, parameter_name, reason])
-    return successes, skips
+    try:
+        filename = CHART_IMAGE_FILENAMES[chart_kind]
+    except KeyError:
+        raise ValueError('Unsupported chart kind: {}'.format(chart_kind))
+    return os.path.join(os.path.dirname(post_processing_workbook), filename)
 
 
 # pyRevit output reporting
 # ------------------------------------------------------------------
-def _print_report(output, metadata, exports, valid_pairs, skipped_rows, successes, write_skips):
+def _print_report(output, metadata, exports, chart_results, material_accuracy_check=None):
     """Render a Carbon GWP result summary in the pyRevit output window.
 
     Writes report headings and tables to ``output`` without modifying the
@@ -683,20 +843,16 @@ def _print_report(output, metadata, exports, valid_pairs, skipped_rows, successe
 
     Args:
         output: pyRevit output window for this command run.
-        metadata: Selected workbooks and target-family metadata.
+        metadata: Selected workbooks, target sheet, and chart update metadata.
         exports: Schedule export metadata dictionaries.
-        valid_pairs: Parameter/value dictionaries approved for writing.
-        skipped_rows: Rows rejected while parsing or validating Export data.
-        successes: Successful parameter-write table rows.
-        write_skips: Skipped parameter-write table rows.
+        chart_results: Per-measure chart dictionaries containing slices and
+            skipped Export rows.
+        material_accuracy_check: Optional informational #N/A check result.
     """
     output.print_md('# {}'.format(COMMAND_TITLE))
     output.print_md('Export container workbook: `{}`'.format(metadata['export_workbook']))
     output.print_md('Post-processing workbook: `{}`'.format(metadata['post_processing_workbook']))
-    output.print_md('Target family: `{}`'.format(CARBON_PIE_FAMILY_NAME))
-    output.print_md('Family types found: {}'.format(metadata['family_type_count']))
-    output.print_md('Parameter/value pairs attempted per type: {}'.format(len(valid_pairs)))
-    output.print_md('Successful writes: {}'.format(len(successes)))
+    output.print_md('Target sheet: `{}`'.format(metadata['target_sheet']))
     # Report only populated sections. Empty headings add noise, while populated
     # tables show the selected schedules, skipped rows, and write outcomes.
     if exports:
@@ -704,22 +860,70 @@ def _print_report(output, metadata, exports, valid_pairs, skipped_rows, successe
         output.print_table(
             [[item['schedule_name'], item['worksheet_name'], item['rows'], item['columns']] for item in exports],
             columns=['Schedule', 'Worksheet', 'Rows', 'Columns'])
-    if valid_pairs:
-        output.print_md('## Export Sheet Parameter Values')
-        output.print_table(
-            [[pair['row'], pair['parameter_name'], pair['value']] for pair in valid_pairs],
-            columns=['Row', 'Parameter', 'Value'])
-    if skipped_rows:
-        output.print_md('## Skipped Export Rows')
-        output.print_table(
-            [[item.get('row'), item.get('reason'), item.get('value', '')] for item in skipped_rows],
-            columns=['Row', 'Reason', 'Value'])
-    if write_skips:
-        output.print_md('## Skipped Parameter Writes')
-        output.print_table(write_skips, columns=['Family Type', 'Parameter', 'Reason'])
-    if successes:
-        output.print_md('## Successful Writes')
-        output.print_table(successes, columns=['Family Type', 'Parameter', 'Value'])
+    for chart in chart_results:
+        output.print_md('## {} Chart'.format(chart['name']))
+        output.print_md('Chart slices: {}'.format(len(chart['slices'])))
+        output.print_md(
+            'Chart total: {}'.format(format_chart_amount(chart['total'], chart['unit'])))
+        if chart.get('action'):
+            output.print_md('Managed chart: {}'.format(chart['action']))
+        if chart['slices']:
+            output.print_table(
+                [[item['row'], item['source_name'], item['display_label'],
+                  format_chart_table_amount(item['value'])]
+                 for item in chart['slices']],
+                columns=['Row', 'Source', 'Material', chart['unit']])
+        if chart['skipped']:
+            output.print_md('### Skipped Export Rows')
+            output.print_table(
+                [[item.get('row'), item.get('source_name', ''),
+                  item.get('display_label', ''), item.get('reason')]
+                 for item in chart['skipped']],
+                columns=['Row', 'Source', 'Material', 'Reason'])
+    if material_accuracy_check:
+        output.print_md('## Material Accuracy Check')
+        if material_accuracy_check['status'] == 'unavailable':
+            output.print_md('Check not completed: {}'.format(
+                material_accuracy_check['reason']))
+        elif material_accuracy_check['cells']:
+            output.print_md(
+                'Excel `#N/A` errors found in `{}`:'.format(
+                    material_accuracy_check['range']))
+            output.print_table(
+                [[material_accuracy_check['sheet'], cell]
+                 for cell in material_accuracy_check['cells']],
+                columns=['Worksheet', 'Cell'])
+        else:
+            output.print_md(
+                'Completed: no Excel `#N/A` errors found in `{}`.'.format(
+                    material_accuracy_check['range']))
+
+
+def _show_material_accuracy_warning(material_accuracy_check,
+                                    chart_update_completed=True):
+    """Show a non-blocking material-accuracy warning after reporting results."""
+    if material_accuracy_check['status'] == 'unavailable':
+        forms.alert(
+            'The Material Accuracy check was not completed, please review the '
+            'Material Breakdown table in Excel',
+            title=COMMAND_TITLE,
+            warn_icon=True)
+    elif material_accuracy_check['cells']:
+        if chart_update_completed:
+            message = (
+                'The chart update completed, but {} #N/A result(s) were found in '
+                '{}!{}. Review the pyRevit report for affected cells.')
+        else:
+            message = (
+                '{} #N/A result(s) were found in {}!{}. Review the pyRevit '
+                'report for affected cells.')
+        forms.alert(
+            message.format(
+                len(material_accuracy_check['cells']),
+                material_accuracy_check['sheet'],
+                material_accuracy_check['range']),
+            title=COMMAND_TITLE,
+            warn_icon=True)
 
 
 # ╔╦╗╔═╗╦╔╗╔
@@ -729,13 +933,20 @@ def _print_report(output, metadata, exports, valid_pairs, skipped_rows, successe
 # Main
 # ------------------------------------------------------------------
 def main():
-    """Run the interactive Carbon GWP export and parameter-write workflow.
-
-    Prompts for schedules and workbooks, then writes validated Export values
-    to Carbon Pie types in one Revit transaction.
-    """
+    """Run the interactive Carbon GWP export and managed-chart workflow."""
     output = script.get_output()
     document = revit.doc
+    target_sheet = _sync_to_central_sheet(document)
+    if target_sheet is None:
+        return
+    if not _is_active_sheet(document, target_sheet):
+        forms.alert(
+            'Open the {} sheet, then run {} again.'.format(TARGET_SHEET_NAME, COMMAND_TITLE),
+            title=COMMAND_TITLE,
+            warn_icon=True)
+        return
+    # The titleblock anchors both chart images on every run. GWP aligns its
+    # top-left to the titleblock top-right; volume starts at the GWP bottom-left.
     # Collect required user input. Later steps need all three schedules and both
     # workbooks, so cancellation ends the run before external work begins.
     schedules = _select_schedules(document)
@@ -743,12 +954,14 @@ def main():
         return
     # Select the two workbook roles. The container receives schedule tabs; the
     # post-processing workbook calculates values written back to Revit.
-    export_workbook = _pick_workbook('Select Team Carbon GWP export container workbook',
-                                     DEFAULT_EXPORT_CONTAINER_PATH)
+    export_workbook = _pick_workbook(
+        EXPORT_WORKBOOK_PICKER_TITLE,
+        _model_workbook_folder(document, DEFAULT_EXPORT_CONTAINER_PATH))
     if not export_workbook:
         return
-    post_processing_workbook = _pick_workbook('Select Team Carbon GWP post-processing workbook',
-                                             DEFAULT_POST_PROCESSING_PATH)
+    post_processing_workbook = _pick_workbook(
+        POST_PROCESSING_WORKBOOK_PICKER_TITLE,
+        os.path.dirname(export_workbook))
     if not post_processing_workbook:
         return
     if not os.path.isfile(post_processing_workbook):
@@ -758,36 +971,83 @@ def main():
     # Refresh external data first. Excel failures occur before a Revit
     # transaction, keeping file problems separate from model changes.
     exports = _export_schedules_to_workbook(export_workbook, schedules)
-    export_rows = _read_export_rows(post_processing_workbook)
-
-    # INVARIANT: Validate workbook rows before a Revit transaction can change
-    # any family type.
-    pairs, skipped_rows = parameter_value_pairs_from_export_rows(export_rows)
-    valid_pairs, validation_skips = validate_parameter_value_pairs(pairs)
-    skipped_rows.extend(validation_skips)
-    if not valid_pairs:
-        forms.alert('No parameter/value pairs were found on the Export worksheet.',
-                    title=COMMAND_TITLE, warn_icon=True)
-        return
-    # Find target types before a transaction starts. A missing Carbon Pie family
-    # must not create an empty or misleading model change.
-    symbols = _family_symbols_by_family_name(document, CARBON_PIE_FAMILY_NAME)
-    if not symbols:
-        forms.alert('Family not found in active model: {}'.format(CARBON_PIE_FAMILY_NAME),
-                    title=COMMAND_TITLE, warn_icon=True)
-        return
-    # Write values in one transaction. Revit can undo the complete update if a
-    # later parameter write fails.
-    # INVARIANT: This transaction is the only place the active model changes.
-    with revit.Transaction('Carbon GWP Pull - Write Family Type Parameters'):
-        successes, write_skips = _write_family_type_parameters(symbols, valid_pairs)
+    export_rows, material_accuracy_check = _read_export_rows(
+        post_processing_workbook, include_material_accuracy_check=True)
+    gwp_slices, gwp_skipped = chart_slices_from_export_rows(export_rows, 1, 'GWP')
+    volume_slices, volume_skipped = chart_slices_from_export_rows(
+        export_rows, 2, 'material volume')
 
     metadata = {
         'export_workbook': export_workbook,
         'post_processing_workbook': post_processing_workbook,
-        'family_type_count': len(symbols),
+        'target_sheet': TARGET_SHEET_NAME,
     }
-    _print_report(output, metadata, exports, valid_pairs, skipped_rows, successes, write_skips)
+    chart_results = [
+        {
+            'kind': 'gwp',
+            'name': 'Embodied Carbon',
+            'caption': 'Total GWP',
+            'unit': GWP_CHART_UNIT,
+            'slices': gwp_slices,
+            'skipped': gwp_skipped,
+        },
+        {
+            'kind': 'volume',
+            'name': 'Material Volume',
+            'caption': 'Total Volume',
+            'unit': VOLUME_CHART_UNIT,
+            'slices': volume_slices,
+            'skipped': volume_skipped,
+        },
+    ]
+    for chart in chart_results:
+        chart['total'] = chart_total(chart['slices'])
+    missing_charts = [chart['name'] for chart in chart_results if not chart['slices']]
+    if missing_charts:
+        _print_report(
+            output, metadata, exports, chart_results, material_accuracy_check)
+        _show_material_accuracy_warning(
+            material_accuracy_check, chart_update_completed=False)
+        forms.alert(
+            'No positive numeric values were found for {} on the Export worksheet. '
+            'Review the pyRevit output for skipped rows.'.format(', '.join(missing_charts)),
+            title=COMMAND_TITLE,
+            warn_icon=True)
+        return
+
+    image_paths = {}
+    # Render before the Revit transaction. A drawing failure leaves both
+    # existing managed charts unchanged. The managed PNGs are intentionally
+    # retained beside the post-processing workbook after the chart is updated.
+    for chart in chart_results:
+        image_path = _chart_png_path(post_processing_workbook, chart['kind'])
+        image_paths[chart['kind']] = image_path
+        # Bitmap.Save cannot replace an existing file. These are fixed,
+        # tool-owned output names, so each successful render replaces its prior
+        # generated image in the post-processing workbook folder.
+        if os.path.isfile(image_path):
+            os.remove(image_path)
+        render_chart_png(chart['slices'], image_path, chart['caption'], chart['unit'])
+    # INVARIANT: Import/reload is the only Revit model mutation. Revit rolls
+    # this transaction back if either image placement or reload cannot complete.
+    with revit.Transaction('Carbon GWP Pull - Update Managed Charts'):
+        gwp_chart = chart_results[0]
+        volume_chart = chart_results[1]
+        titleblock_point = titleblock_top_right(document, target_sheet, DB)
+        chart_action, image_instance = create_or_reload_chart(
+            document, target_sheet, titleblock_point,
+            image_paths[gwp_chart['kind']], DB, gwp_chart['kind'])
+        gwp_chart['action'] = chart_action
+        gwp_chart['instance_id'] = _element_id_value(image_instance.Id)
+        gwp_image_instance = image_instance
+        chart_action, image_instance = create_or_reload_chart(
+            document, target_sheet, image_bottom_left(
+                gwp_image_instance, target_sheet, DB),
+            image_paths[volume_chart['kind']], DB, volume_chart['kind'])
+        volume_chart['action'] = chart_action
+        volume_chart['instance_id'] = _element_id_value(image_instance.Id)
+    _print_report(output, metadata, exports, chart_results, material_accuracy_check)
+    _show_material_accuracy_warning(material_accuracy_check)
 
 
 if __name__ == '__main__':

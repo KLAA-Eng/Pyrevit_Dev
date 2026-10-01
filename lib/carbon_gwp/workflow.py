@@ -12,7 +12,7 @@ import re
 
 
 DEFAULT_SCHEDULE_NAMES = [
-    'Material Classfication, Area, and Volume',
+    'z_Project Material Takeoff',
     '2x Wood Wall Volume',
     'Composite Deck Volume',
 ]
