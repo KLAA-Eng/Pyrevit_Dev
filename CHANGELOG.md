@@ -8,6 +8,37 @@ tools, user-facing changes, known limits, and rollback tag.
 
 No pending published release.
 
+## 0.0.9 - 2026-10-01
+
+- **Channel:** Beta
+- **Tag:** `v0.0.9-beta`
+- **Tested Revit range:** No new live Revit claim. Carbon GWP Pull remains a
+  DevSandbox beta workflow; its deterministic logic is covered by the static
+  test suite.
+
+### Added
+
+- Carbon GWP Pull now renders and places managed GWP and material-volume
+  doughnut charts from the selected post-processing workbook's `Export` sheet.
+- The command reports every chart slice and independently identifies invalid
+  GWP or volume rows without discarding valid values for the other chart.
+- An informational Material Accuracy check reports actual Excel `#N/A` cells
+  in the post-processing workbook without blocking chart creation.
+
+### Fixed
+
+- Carbon GWP Pull command tests now load the distributed `KL&A Tools.tab`
+  bundle path.
+
+### Known limits
+
+- Carbon GWP Pull requires Microsoft Excel COM interop and trusted,
+  formula-linked `.xlsx` or `.xlsm` workbooks.
+- Live Revit acceptance remains required for image import, sheet placement,
+  rerun reload, worksharing permissions, model reopening, and undo behavior.
+
+**Rollback tag:** `v0.0.8-beta`
+
 ## 0.0.8 - 2026-09-28
 
 - **Channel:** Beta
