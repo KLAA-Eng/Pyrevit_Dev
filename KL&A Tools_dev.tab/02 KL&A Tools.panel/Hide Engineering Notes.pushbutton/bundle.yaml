@@ -4,4 +4,4 @@ title:
   en_us: "Hide/Unhide\nEng Notes"
 
 tooltip:
-  en_us: Changes Engineering Note Visibility on Sheet
+  en_us: Hide or unhide matching engineering-note text in eligible views and sheets.

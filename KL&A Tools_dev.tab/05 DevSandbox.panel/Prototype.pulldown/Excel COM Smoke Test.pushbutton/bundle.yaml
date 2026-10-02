@@ -1,0 +1,8 @@
+title:
+  en_us: "Excel COM\nSmoke Test"
+tooltip:
+  en_us: >-
+    Prototype: creates, reopens, verifies, and removes one uniquely named
+    temporary Excel workbook to test the shared Revit 25/26 Excel COM facade.
+engine:
+  clean: true

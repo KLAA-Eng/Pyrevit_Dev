@@ -4,7 +4,7 @@ KL&A Tools is a development pyRevit extension for KL&A Revit workflows. It
 adds a **KL&A Tools** ribbon tab within Revit.
 
 > **Development / beta extension.** The current release is
-> [`0.0.6beta`](version.json), dated September 15, 2026.
+> [`0.0.9-beta`](version.json), dated October 1, 2026.
 
 ## Ribbon tour
 
@@ -38,7 +38,7 @@ appropriate model before project use.
 | Who Did That | Core Tools | Inspect available model-history information. | Core | No |
 | About KL&A Tools | Outreach/Feedback | Show version, Git, pyRevit, Revit, and loaded-path details. | Beta | No |
 | Suggestions | Outreach/Feedback | Open the KL&A feedback form with optional context prefilled. | Beta | No |
-| Carbon GWP Pull | Dev-Sandbox > Prototypes | Render calculated Excel GWP values as a managed chart on the SYNC TO CENTRAL sheet. | Prototype | Yes |
+| Carbon GWP Pull | KL&A Tools | Export selected material schedules and create or update GWP and material-volume charts on the active SYNC TO CENTRAL sheet. | Beta | Yes |
 | Concrete Mix Header | Dev-Sandbox > Prototypes | Import `tblMixHistory` Excel data into a selected schedule header. | Prototype | Yes |
 | Create View Detail Folders | Dev-Sandbox > Prototypes | Export matching detail/drafting views as PDF, JPEG, and HTML packages. | Prototype | No; writes files |
 | Hide Revision Clouds | Dev-Sandbox > Prototypes | Hide matching revision clouds on selected sheets and placed views. | Prototype | Graphics |
@@ -49,7 +49,7 @@ appropriate model before project use.
 Each user-facing command should have a neighboring `SPEC.md` that documents its
 inputs, outputs, exclusions, and validation boundary. For example:
 
-- [Carbon GWP Pull specification](<KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Carbon GWP Pull.pushbutton/SPEC.md>)
+- [Carbon GWP Pull specification](<KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/SPEC.md>)
 - [Create View Detail Folders specification](<KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/SPEC.md>)
 - [UI Gallery specification](<KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
 
@@ -92,7 +92,7 @@ checkout rather than another installed copy.
 | Create View Detail Folders | Native PDF export requires Revit 2022 or later. |
 | Highlight Changed Elements | Prototype currently targets Revit 2024 or later. |
 | Steel PSF | Its fixture validation currently targets Revit 2024 or later. |
-| Excel-based tools | Carbon GWP Pull and Concrete Mix Header require Microsoft Excel COM interop. Steel PSF can create its companion workbook only when Excel COM is available. |
+| Excel-based tools | Carbon GWP Pull and Concrete Mix Header require Microsoft Excel COM interop. Steel PSF can create its companion workbook only when Excel COM is available. Run the Dev-Sandbox > Prototypes > Excel COM Smoke Test first when validating Revit 25/26 compatibility. |
 | Live acceptance | Unit tests and static checks do not prove Revit transactions, native dialogs, Excel automation, or exported deliverables. |
 
 ## Troubleshooting and support

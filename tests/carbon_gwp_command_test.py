@@ -1,5 +1,6 @@
 import importlib.util
 import os
+import shutil
 import sys
 import tempfile
 import types
@@ -8,9 +9,8 @@ import unittest
 
 COMMAND_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
-    'KL&A Tools.tab',
-    '05 DevSandbox.panel',
-    'Prototype.pulldown',
+    'KL&A Tools_dev.tab',
+    '02 KL&A Tools.panel',
     'Carbon GWP Pull.pushbutton',
     'script.py',
 )
@@ -183,23 +183,41 @@ class FakeOutput(object):
 class CarbonGwpCommandTests(unittest.TestCase):
     def test_chart_png_paths_are_saved_beside_post_processing_workbook(self):
         command = load_command_module()
-        workbook_path = os.path.join(r'C:\Projects\Carbon', 'Post-Processing.xlsx')
+        output_folder = os.path.join(
+            r'C:\Projects\Carbon', command.CHART_OUTPUT_FOLDER_NAME,
+            '20261001-120000')
 
         self.assertEqual(
-            os.path.join(r'C:\Projects\Carbon', 'Carbon GWP Summary.png'),
-            command._chart_png_path(workbook_path, 'gwp'))
+            os.path.join(output_folder, 'Carbon GWP Summary.png'),
+            command._chart_png_path(output_folder, 'gwp'))
         self.assertEqual(
             os.path.join(
-                r'C:\Projects\Carbon',
+                output_folder,
                 'Carbon Material Volume Summary.png'),
-            command._chart_png_path(workbook_path, 'volume'))
+            command._chart_png_path(output_folder, 'volume'))
         with self.assertRaises(ValueError):
-            command._chart_png_path(workbook_path, 'unsupported')
+            command._chart_png_path(output_folder, 'unsupported')
+
+    def test_chart_output_folder_is_unique_and_preserves_prior_output(self):
+        command = load_command_module()
+        temporary_directory = tempfile.mkdtemp()
+        original_strftime = command.time.strftime
+        try:
+            command.time.strftime = lambda _format: '20261001-120000'
+            workbook_path = os.path.join(temporary_directory, 'Post-Processing.xlsx')
+            first_folder = command._create_chart_output_folder(workbook_path)
+            second_folder = command._create_chart_output_folder(workbook_path)
+        finally:
+            command.time.strftime = original_strftime
+            shutil.rmtree(temporary_directory)
+
+        self.assertTrue(first_folder.endswith('20261001-120000'))
+        self.assertTrue(second_folder.endswith('20261001-120000-2'))
 
     def test_workbook_picker_titles_match_the_two_workbook_roles(self):
         command = load_command_module()
 
-        self.assertEqual('Select Export Container',
+        self.assertEqual('Select Export Workbook (DYN Out sheets will be replaced)',
                          command.EXPORT_WORKBOOK_PICKER_TITLE)
         self.assertEqual('Select Post-processing',
                          command.POST_PROCESSING_WORKBOOK_PICKER_TITLE)
@@ -285,6 +303,26 @@ class CarbonGwpCommandTests(unittest.TestCase):
         self.assertTrue(command._is_target_sheet_name('Sync To Central'))
         self.assertFalse(command._is_target_sheet_name('SYNC TO CENTRAL - COPY'))
 
+    def test_workbook_roles_must_use_different_normalized_paths(self):
+        command = load_command_module()
+
+        self.assertTrue(command._same_workbook_path(
+            r'C:\Projects\Carbon\Export.xlsx',
+            r'C:\Projects\Carbon\EXPORT.xlsx'))
+        self.assertFalse(command._same_workbook_path(
+            r'C:\Projects\Carbon\Export.xlsx',
+            r'C:\Projects\Carbon\Post-Processing.xlsx'))
+
+    def test_chart_slice_limit_identifies_only_oversized_charts(self):
+        command = load_command_module()
+        chart_results = [
+            {'name': 'Embodied Carbon', 'slices': [{}] * command.MAX_CHART_SLICE_COUNT},
+            {'name': 'Material Volume', 'slices': [{}] * (command.MAX_CHART_SLICE_COUNT + 1)},
+        ]
+
+        self.assertEqual(['Material Volume'],
+                         command._chart_slice_limit_exceeded(chart_results))
+
     def test_failed_export_closes_without_saving_partial_workbook(self):
         command = load_command_module()
         workbook = FakeWorkbook()
@@ -319,6 +357,39 @@ class CarbonGwpCommandTests(unittest.TestCase):
         self.assertEqual([False], workbook.close_arguments)
         self.assertTrue(excel.quit_called)
 
+    def test_export_quits_excel_when_workbook_close_fails(self):
+        command = load_command_module()
+        workbook = FakeWorkbook()
+        excel = FakeExcel(workbook)
+        command._load_excel_application = lambda: excel
+        workbook.Close = lambda _save_changes: (_ for _ in ()).throw(RuntimeError('close failed'))
+        command._schedule_table_grid = lambda _schedule: [['value']]
+        command._ensure_worksheet = lambda _workbook, _name: object()
+        command._write_grid_to_worksheet = lambda _worksheet, _grid: None
+
+        with tempfile.NamedTemporaryFile() as temporary_file:
+            with self.assertRaises(RuntimeError):
+                command._export_schedules_to_workbook(temporary_file.name, [object()])
+
+        self.assertTrue(excel.quit_called)
+
+    def test_export_opens_existing_workbook_through_shared_helper(self):
+        command = load_command_module()
+        workbook = FakeWorkbook()
+        excel = FakeExcel(workbook)
+        calls = []
+        command._load_excel_application = lambda: excel
+        command.open_workbook = (
+            lambda actual_excel, path: calls.append((actual_excel, path)) or workbook)
+        command._schedule_table_grid = lambda _schedule: (_ for _ in ()).throw(
+            RuntimeError('stop after open'))
+
+        with tempfile.NamedTemporaryFile(suffix='.xlsm') as temporary_file:
+            with self.assertRaises(RuntimeError):
+                command._export_schedules_to_workbook(temporary_file.name, [object()])
+
+        self.assertEqual([(excel, temporary_file.name)], calls)
+
     def test_export_read_updates_formula_links_before_charting_rows(self):
         command = load_command_module()
         workbook = FakeExportWorkbook()
@@ -337,6 +408,24 @@ class CarbonGwpCommandTests(unittest.TestCase):
             {'UpdateLinks': 3, 'ReadOnly': True},
             excel.Workbooks.open_arguments[0][1],
         )
+
+    def test_post_processing_open_uses_shared_helper_options(self):
+        command = load_command_module()
+        workbook = FakeExportWorkbook()
+        excel = FakeExcel(workbook)
+        calls = []
+        command._load_excel_application = lambda: excel
+        command.open_workbook = (
+            lambda actual_excel, path, **options: calls.append(
+                (actual_excel, path, options)) or workbook)
+        command._worksheet_by_name = lambda _book, _name: FakeExportWorksheet()
+
+        command._read_export_rows('post-processing.xlsm')
+
+        self.assertEqual(
+            [(excel, 'post-processing.xlsm', {
+                'update_links': 3, 'read_only': True})],
+            calls)
 
     def test_export_read_stops_when_refresh_fails(self):
         command = load_command_module()
@@ -387,6 +476,19 @@ class CarbonGwpCommandTests(unittest.TestCase):
             command._read_export_rows('post-processing.xlsx')
 
         self.assertEqual([False], workbook.close_arguments)
+        self.assertTrue(excel.quit_called)
+
+    def test_export_read_quits_excel_when_workbook_close_fails(self):
+        command = load_command_module()
+        workbook = FakeExportWorkbook()
+        excel = FakeExcel(workbook)
+        command._load_excel_application = lambda: excel
+        command._worksheet_by_name = lambda _book, _name: FakeExportWorksheet()
+        workbook.Close = lambda _save_changes: (_ for _ in ()).throw(RuntimeError('close failed'))
+
+        with self.assertRaises(RuntimeError):
+            command._read_export_rows('post-processing.xlsx')
+
         self.assertTrue(excel.quit_called)
 
     def test_query_refresh_is_made_foreground_without_saving_workbook(self):

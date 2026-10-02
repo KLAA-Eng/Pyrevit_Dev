@@ -1,5 +1,28 @@
 # -*- coding: utf-8 -*-
-# __title__ = "Hide/Unhide Engineer Notes"
+
+__title__ = "Hide/Unhide\nEng Notes"
+__author__ = "KL&A"
+__version__ = "0.0.9-beta"
+__doc__ = """Version: 0.0.9-beta
+_____________________________________________________________________
+Description:
+
+Hide or unhide matching KL&A engineering-note text in eligible views and
+sheets. The command changes element visibility only; it does not delete notes.
+_____________________________________________________________________
+How-to:
+
+-> Click the button and choose Hide or Unhide.
+-> Review the completion report in the pyRevit output window. Hold Shift while
+   clicking for diagnostics.
+_____________________________________________________________________
+Requirements and limits:
+
+- Notes must use a type name beginning with "KLAA - ENGINEER'S NOTE".
+- Only supported view types on sheets that appear in the Sheet List qualify.
+- The command continues past invalid targets and reports skips and failures.
+_____________________________________________________________________
+Author: KL&A"""
 
 from pyrevit import revit, DB, forms, script
 import clr
@@ -16,11 +39,9 @@ from Autodesk.Revit.UI import (
 doc = revit.doc
 output = script.get_output()
 
-SCRIPT_VERSION = "2.1-dependents"
-
 # ---------------------------------------------------------------------------
 # DEBUG: True  -> full diagnostic funnel printed to the pyRevit output window
-#         False -> quiet (only the summary alert)
+#         False -> completion report only
 # You can also hold SHIFT while clicking the button to force debug mode.
 # ---------------------------------------------------------------------------
 DEBUG = False
@@ -39,19 +60,25 @@ TARGET_VIEW_TYPES = {
     DB.ViewType.Detail,
     DB.ViewType.Schedule,
     DB.ViewType.DrawingSheet,
-    # NOTE: Only *Structural Plans* are ViewType.EngineeringPlan.
-    # Mech/Plumb/Arch plan views are ViewType.FloorPlan, RCPs are CeilingPlan.
-    # Uncomment as needed:
-    # DB.ViewType.FloorPlan,
-    # DB.ViewType.CeilingPlan,
-    # DB.ViewType.Section,
-    # DB.ViewType.Elevation,
+    # Structural plans use EngineeringPlan. Other disciplines use FloorPlan or
+    # CeilingPlan, so all three plan types are eligible.
+    DB.ViewType.FloorPlan,
+    DB.ViewType.CeilingPlan,
+    DB.ViewType.Section,
+    DB.ViewType.Elevation,
 }
 
 
 def normalize_name(s):
-    """Normalize a type name for comparison: unify apostrophe variants,
-    strip whitespace, uppercase. Catches curly-quote / spacing mismatches."""
+    """Return a comparable engineering-note type name.
+
+    Args:
+        s: Text note type name, or ``None`` when the type cannot be read.
+
+    Returns:
+        A trimmed, uppercase unicode string with apostrophe and nonbreaking
+        space variants normalized.
+    """
     if s is None:
         return u""
     s = s.replace(u"\u2019", u"'").replace(u"\u2018", u"'")  # curly -> straight
@@ -62,21 +89,16 @@ def normalize_name(s):
 NORMALIZED_PREFIX = normalize_name(TEXTNOTE_TYPE_PREFIX)
 
 
-def set_button_green_hidden():
-    try:
-        script.toggle_icon(True)
-    except:
-        pass
-
-
-def set_button_orange_not_hidden():
-    try:
-        script.toggle_icon(False)
-    except:
-        pass
-
-
 def get_elementid_value(eid):
+    """Return the comparable integer value for a Revit ElementId.
+
+    Args:
+        eid: Revit ElementId, or ``None``.
+
+    Returns:
+        The ElementId value, or ``None`` when it cannot be read. Supports the
+        ElementId members used by the extension's supported Revit versions.
+    """
     if eid is None:
         return None
     try:
@@ -89,6 +111,14 @@ def get_elementid_value(eid):
 
 
 def get_textnote_type_name(note):
+    """Return a text note's type name from the active Revit document.
+
+    Args:
+        note: Revit TextNote instance in ``doc``.
+
+    Returns:
+        The type name, or ``None`` when its type cannot be found.
+    """
     note_type = doc.GetElement(note.GetTypeId())
     if note_type is None:
         return None
@@ -99,7 +129,15 @@ def get_textnote_type_name(note):
 
 
 def is_dependent_view(view):
-    """True if the view is a dependent (has a primary view)."""
+    """Return whether a Revit view has a primary view.
+
+    Args:
+        view: Revit View instance to inspect.
+
+    Returns:
+        ``True`` for a dependent view; otherwise ``False``. Unreadable view
+        relationships are treated as not dependent.
+    """
     try:
         return view.GetPrimaryViewId() != DB.ElementId.InvalidElementId
     except:
@@ -107,7 +145,15 @@ def is_dependent_view(view):
 
 
 def get_dependent_view_ids(view):
-    """Returns the ElementIds of this view's dependent views (empty if none)."""
+    """Return the ElementIds for a primary view's dependent views.
+
+    Args:
+        view: Revit View instance to inspect.
+
+    Returns:
+        A list of Revit ElementIds, or an empty list if the relationship cannot
+        be read or the view has no dependents.
+    """
     try:
         return list(view.GetDependentViewIds())
     except:
@@ -115,6 +161,15 @@ def get_dependent_view_ids(view):
 
 
 def collect_target_views(document):
+    """Collect supported, non-template views from a Revit project.
+
+    Args:
+        document: Active Revit project document.
+
+    Returns:
+        Views whose ViewType is in ``TARGET_VIEW_TYPES``. This function reads
+        the document and does not change view visibility.
+    """
     views = DB.FilteredElementCollector(document).OfClass(DB.View).ToElements()
     result = []
     for v in views:
@@ -126,9 +181,16 @@ def collect_target_views(document):
 
 
 def collect_matching_textnotes(document):
-    """Returns (matches, type_name_census).
-    type_name_census maps every distinct textnote type name found in the
-    model -> [instance_count, matched_bool]."""
+    """Collect text notes whose type names match the engineering-note prefix.
+
+    Args:
+        document: Active Revit project document.
+
+    Returns:
+        A tuple of matching TextNote instances and a census mapping each type
+        name to ``[instance_count, matched_bool]``. The function only reads the
+        document.
+    """
     notes = (
         DB.FilteredElementCollector(document)
         .OfClass(DB.TextNote)
@@ -158,7 +220,17 @@ def collect_matching_textnotes(document):
 
 
 def sheet_appears_in_sheet_list(sheet, diag):
-    """Uses the built-in parameter (locale-proof), falls back to name lookup."""
+    """Return whether a sheet is included in the Revit Sheet List.
+
+    Args:
+        sheet: Revit ViewSheet to inspect.
+        diag: Diagnostics dictionary updated for missing or unreadable
+            parameters.
+
+    Returns:
+        ``True`` only when the sheet's scheduled parameter is set. The
+        built-in parameter is preferred; the localized name is a fallback.
+    """
     p = None
     try:
         p = sheet.get_Parameter(DB.BuiltInParameter.SHEET_SCHEDULED)
@@ -180,6 +252,16 @@ def sheet_appears_in_sheet_list(sheet, diag):
 
 
 def collect_allowed_sheet_ids_and_placed_view_ids(document, diag):
+    """Collect eligible sheets and views placed on them.
+
+    Args:
+        document: Active Revit project document.
+        diag: Diagnostics dictionary updated with sheet eligibility results.
+
+    Returns:
+        A tuple of integer sheet IDs and placed-view IDs. Only sheets that
+        appear in the Sheet List contribute IDs.
+    """
     allowed_sheet_ids = set()
     placed_view_ids = set()
 
@@ -215,8 +297,17 @@ def collect_allowed_sheet_ids_and_placed_view_ids(document, diag):
 
 
 def get_placed_dependents(document, view, placed_view_ids, target_view_dict):
-    """For a (primary) view, returns [(key, dependent_view), ...] for every
-    dependent view that is placed on an eligible sheet."""
+    """Return a primary view's dependents placed on eligible sheets.
+
+    Args:
+        document: Active Revit project document.
+        view: Primary Revit View whose dependents are inspected.
+        placed_view_ids: Integer IDs for views placed on eligible sheets.
+        target_view_dict: Mapping of supported integer view IDs to View objects.
+
+    Returns:
+        ``[(view_id, dependent_view), ...]`` for placed dependent views.
+    """
     placed = []
     for did in get_dependent_view_ids(view):
         dkey = get_elementid_value(did)
@@ -232,6 +323,20 @@ def get_placed_dependents(document, view, placed_view_ids, target_view_dict):
 
 def build_view_note_map(document, target_views, matching_notes,
                         allowed_sheet_ids, placed_view_ids, diag):
+    """Map eligible engineering notes to the views where visibility will change.
+
+    Args:
+        document: Active Revit project document.
+        target_views: Supported, non-template Revit views.
+        matching_notes: TextNote instances whose type matches the prefix.
+        allowed_sheet_ids: Integer IDs for sheets in the Sheet List.
+        placed_view_ids: Integer IDs for views placed on eligible sheets.
+        diag: Diagnostics dictionary updated with exclusions and eligibility.
+
+    Returns:
+        A mapping of integer view IDs to their View object and note ElementIds.
+        This function reads visibility eligibility but does not change it.
+    """
     target_view_dict = {}
     for v in target_views:
         key = get_elementid_value(v.Id)
@@ -242,6 +347,7 @@ def build_view_note_map(document, target_views, matching_notes,
     dependent_view_keys = set()
 
     def add_note_to_view(key, view, note_id, via_dependent=False):
+        """Add one note ID to a target view without duplicates."""
         if key not in view_note_map:
             view_note_map[key] = {"view": view, "ids": []}
             if via_dependent:
@@ -263,7 +369,8 @@ def build_view_note_map(document, target_views, matching_notes,
 
         view = target_view_dict.get(key)
         if view is None:
-            # Diagnose WHY the owner view isn't a target
+            # Record the excluded owner type so Shift-click diagnostics explain
+            # why matching notes were not eligible for this run.
             owner = document.GetElement(owner_view_id)
             if owner is None:
                 label = u"<owner view not found>"
@@ -285,9 +392,8 @@ def build_view_note_map(document, target_views, matching_notes,
         else:
             owner_placed = key in placed_view_ids
 
-            # NEW: a view also qualifies if any of its DEPENDENT views is
-            # placed on an eligible sheet (typical dependent-view workflow:
-            # notes live in the primary, only dependents go on sheets).
+            # A primary view qualifies when a dependent is placed on an
+            # eligible sheet; this supports notes owned by primary views.
             placed_dependents = get_placed_dependents(
                 document, view, placed_view_ids, target_view_dict)
 
@@ -300,22 +406,21 @@ def build_view_note_map(document, target_views, matching_notes,
 
         try:
             if not note.CanBeHidden(view):
-                diag["notes_cannot_be_hidden"] += 1
+                diag["notes_skipped_not_hideable"] += 1
                 continue
         except Exception as ex:
-            diag["notes_canbehidden_errors"].append(
-                u"View '{}': {}".format(view.Name, ex))
+            diag["state_check_failures"].append(
+                u"View '{}': CanBeHidden failed: {}".format(view.Name, ex))
             continue
 
         diag["notes_eligible"] += 1
 
-        # Hide in the owner view (primary). Element hiding generally
-        # propagates from a primary to its dependents...
+        # Apply the owner-view change first. Revit may propagate it to
+        # dependents, but each placed dependent is evaluated independently.
         add_note_to_view(key, view, note.Id)
 
-        # ...but also hide explicitly in each placed dependent view to be
-        # bulletproof. If propagation already hid it there, the IsHidden
-        # check in the execution loop just skips it.
+        # Target placed dependents explicitly so their visibility is evaluated
+        # even when primary-view propagation does not apply.
         for dkey, dv in placed_dependents:
             add_note_to_view(dkey, dv, note.Id, via_dependent=True)
 
@@ -324,6 +429,12 @@ def build_view_note_map(document, target_views, matching_notes,
 
 
 def ask_hide_or_unhide():
+    """Prompt for a visibility action before starting a Revit transaction.
+
+    Returns:
+        A tuple of ``(hide_elements, action_label, action_word)``. All values
+        are ``None`` when the user cancels.
+    """
     dlg = TaskDialog("Hide Engineering Notes")
     dlg.TitleAutoPrefix = False
     dlg.MainInstruction = "Choose action"
@@ -343,9 +454,21 @@ def ask_hide_or_unhide():
 
 def print_diagnostics(diag, census, target_views, matching_notes,
                       allowed_sheet_ids, placed_view_ids, view_note_map):
+    """Print the Shift-click diagnostic report to pyRevit output.
+
+    Args:
+        diag: Collected classification and execution results.
+        census: Text note type-name census from ``collect_matching_textnotes``.
+        target_views: Supported views inspected by the command.
+        matching_notes: Notes whose type names match the configured prefix.
+        allowed_sheet_ids: Eligible Sheet List IDs.
+        placed_view_ids: Views placed on eligible sheets.
+        view_note_map: Eligible notes grouped by target view.
+    """
     lines = []
     lines.append(u"=" * 70)
-    lines.append(u"ENGINEER NOTES DIAGNOSTIC REPORT  (script v{})".format(SCRIPT_VERSION))
+    lines.append(u"ENGINEER NOTES DIAGNOSTIC REPORT  (release v{})".format(
+        __version__))
     lines.append(u"Document: {}".format(doc.Title))
     try:
         lines.append(u"Workshared: {}".format(doc.IsWorkshared))
@@ -412,10 +535,8 @@ def print_diagnostics(diag, census, target_views, matching_notes,
         diag["notes_view_not_placed"]))
     lines.append(u"  Qualified ONLY via placed dependent views: {}".format(
         diag["notes_qualified_via_dependents"]))
-    lines.append(u"  CanBeHidden() returned False: {}".format(
-        diag["notes_cannot_be_hidden"]))
-    for e in diag["notes_canbehidden_errors"][:10]:
-        lines.append(u"  !! CanBeHidden threw: {}".format(e))
+    lines.append(u"  Skipped (not hideable): {}".format(
+        diag["notes_skipped_not_hideable"]))
     lines.append(u"  ELIGIBLE notes surviving all filters: {}".format(
         diag["notes_eligible"]))
 
@@ -426,12 +547,14 @@ def print_diagnostics(diag, census, target_views, matching_notes,
         diag["dependent_views_targeted"]))
     lines.append(u"  Skipped (already in requested state): {}".format(
         diag["notes_already_in_state"]))
-    lines.append(u"  State-check exceptions (silently skipped notes): {}".format(
-        diag["notes_state_check_errors"]))
+    lines.append(u"  Failed state checks: {}".format(
+        len(diag["state_check_failures"])))
     lines.append(u"  Changed in views: {}".format(diag["view_notes_changed"]))
     lines.append(u"    ...of which in dependent views: {}".format(
         diag["dependent_notes_changed"]))
     lines.append(u"  Changed on sheets: {}".format(diag["sheet_notes_changed"]))
+    for failure in diag["state_check_failures"][:10]:
+        lines.append(u"  !! STATE CHECK FAILED: {}".format(failure))
     for f in diag["hide_failures"]:
         lines.append(u"  !! FAILED: {}".format(f))
     lines.append(u"=" * 70)
@@ -459,11 +582,10 @@ diag = {
     "notes_sheet_not_in_list": 0,
     "notes_view_not_placed": 0,
     "notes_qualified_via_dependents": 0,
-    "notes_cannot_be_hidden": 0,
-    "notes_canbehidden_errors": [],
+    "notes_skipped_not_hideable": 0,
+    "state_check_failures": [],
     "notes_eligible": 0,
     "notes_already_in_state": 0,
-    "notes_state_check_errors": 0,
     "view_notes_changed": 0,
     "dependent_notes_changed": 0,
     "sheet_notes_changed": 0,
@@ -475,15 +597,10 @@ target_views = collect_target_views(doc)
 matching_notes, type_census = collect_matching_textnotes(doc)
 allowed_sheet_ids, placed_view_ids = \
     collect_allowed_sheet_ids_and_placed_view_ids(doc, diag)
-
 view_note_map = build_view_note_map(
     doc, target_views, matching_notes,
     allowed_sheet_ids, placed_view_ids, diag
 )
-
-# --- Execute (only if there is something to do) ---
-processed_views = 0
-failed = diag["hide_failures"]
 
 if view_note_map:
     with revit.Transaction("Hide/Unhide Engineer Notes"):
@@ -491,33 +608,37 @@ if view_note_map:
             view = item["view"]
             ids_for_view = item["ids"]
             view_is_dependent = is_dependent_view(view)
+            valid_ids = []
+
+            for eid in ids_for_view:
+                el = doc.GetElement(eid)
+                if el is None:
+                    diag["state_check_failures"].append(
+                        u"View '{}': note {} no longer exists.".format(
+                            view.Name, get_elementid_value(eid)))
+                    continue
+                try:
+                    if hide_elements:
+                        if el.IsHidden(view):
+                            diag["notes_already_in_state"] += 1
+                        elif el.CanBeHidden(view):
+                            valid_ids.append(eid)
+                        else:
+                            diag["notes_skipped_not_hideable"] += 1
+                    elif el.IsHidden(view):
+                        valid_ids.append(eid)
+                    else:
+                        diag["notes_already_in_state"] += 1
+                except Exception as ex:
+                    diag["state_check_failures"].append(
+                        u"View '{}', note {}: {}".format(
+                            view.Name, get_elementid_value(eid), ex))
+
+            if not valid_ids:
+                continue
 
             try:
-                valid_ids = []
-                for eid in ids_for_view:
-                    el = doc.GetElement(eid)
-                    if el is None:
-                        continue
-                    try:
-                        if hide_elements:
-                            if not el.IsHidden(view) and el.CanBeHidden(view):
-                                valid_ids.append(eid)
-                            else:
-                                diag["notes_already_in_state"] += 1
-                        else:
-                            if el.IsHidden(view):
-                                valid_ids.append(eid)
-                            else:
-                                diag["notes_already_in_state"] += 1
-                    except:
-                        diag["notes_state_check_errors"] += 1
-
-                if not valid_ids:
-                    processed_views += 1
-                    continue
-
                 net_ids = List[DB.ElementId](valid_ids)
-
                 if hide_elements:
                     view.HideElements(net_ids)
                 else:
@@ -529,66 +650,56 @@ if view_note_map:
                     diag["view_notes_changed"] += len(valid_ids)
                     if view_is_dependent:
                         diag["dependent_notes_changed"] += len(valid_ids)
-
             except Exception as ex:
-                failed.append(u"{}: {}".format(view.Name, ex))
-
-            processed_views += 1
+                diag["hide_failures"].append(
+                    u"View '{}': {}".format(view.Name, ex))
 
         doc.Regenerate()
 
-# --- Button icon state ---
-if view_note_map and (diag["view_notes_changed"] or diag["sheet_notes_changed"]):
-    if hide_elements:
-        set_button_green_hidden()
-    else:
-        set_button_orange_not_hidden()
-
-# --- Diagnostics to pyRevit output window ---
 if DEBUG:
     print_diagnostics(diag, type_census, target_views, matching_notes,
                       allowed_sheet_ids, placed_view_ids, view_note_map)
 
-# --- Summary alert ---
 total_changed = diag["view_notes_changed"] + diag["sheet_notes_changed"]
+failed_count = len(diag["state_check_failures"]) + len(diag["hide_failures"])
 
-msg = (
-    u"Action: {0}\n"
-#    u"Action: {0}  (script v{1})\n\n"
-    u"Notes {2} in views: {3}\n"
-#    u"  ...of which in dependent views: {4}\n"
-    u"Notes {2} on sheets: {5}"
-).format(action_label, SCRIPT_VERSION, action_word,
-         diag["view_notes_changed"], diag["dependent_notes_changed"],
-         diag["sheet_notes_changed"])
+output.print_md("# Hide Engineering Notes")
+output.print_md("**Action:** {}".format(action_label))
+output.print_md("**Changed in views:** {}".format(
+    diag["view_notes_changed"]))
+output.print_md("**Changed on sheets:** {}".format(
+    diag["sheet_notes_changed"]))
+output.print_md("**Already {}:** {}".format(
+    action_word, diag["notes_already_in_state"]))
+output.print_md("**Skipped (not hideable):** {}".format(
+    diag["notes_skipped_not_hideable"]))
+output.print_md("**Failed (state/write error):** {}".format(failed_count))
 
 if total_changed == 0:
     if not matching_notes:
-        reason = (u"No text notes matched the type prefix.\n"
-                  u"Check the diagnostic report for the exact type names "
-                  u"found in this model.")
+        reason = (u"No text notes matched the type prefix. Hold Shift while "
+                  u"clicking to review the type-name census.")
     elif diag["notes_owner_not_target"]:
-        worst = max(diag["notes_owner_not_target"].items(), key=lambda kv: kv[1])
-        reason = (u"{} matching note(s) exist, but their views are not in "
-                  u"the targeted view types (most common: {}).").format(
-                      len(matching_notes), worst[0])
+        worst = max(diag["notes_owner_not_target"].items(),
+                    key=lambda kv: kv[1])
+        reason = (u"Matching notes exist, but their owner views are not "
+                  u"supported (most common: {}).").format(worst[0])
     elif len(allowed_sheet_ids) == 0 and diag["sheets_total"] > 0:
         reason = (u"No sheets qualified via 'Appears In Sheet List' "
-                  u"({} sheets scanned, param missing on {}).").format(
-                      diag["sheets_total"], diag["sheets_param_missing"])
-    elif diag["notes_sheet_not_in_list"] or diag["notes_view_not_placed"]:
-        reason = (u"Matching notes were found, but they are on excluded "
-                  u"sheets or in views (and dependents) not placed on "
-                  u"eligible sheets.")
+                  u"({} sheets scanned).").format(diag["sheets_total"])
     elif diag["notes_already_in_state"]:
-        reason = u"All matching notes were already {}.".format(action_word)
+        reason = u"All eligible notes were already {}.".format(action_word)
     else:
-        reason = u"See the diagnostic report in the pyRevit output window."
-    msg += u"\n\nNOTHING WAS CHANGED.\n" + reason
-    if DEBUG:
-        msg += u"\n\nFull diagnostic report is in the pyRevit output window."
+        reason = u"Review the reported skips and failures before retrying."
+    output.print_md("## Nothing changed")
+    output.print_md(reason)
 
-if failed:
-    msg += u"\n\nItems with issues:\n- " + u"\n- ".join(failed[:20])
+if diag["state_check_failures"] or diag["hide_failures"]:
+    failures = diag["state_check_failures"] + diag["hide_failures"]
+    output.print_md("## Items with issues")
+    for failure in failures[:20]:
+        output.print_md("- {}".format(failure))
 
-forms.alert(msg)
+if DEBUG:
+    output.print_md("## Diagnostics")
+    output.print_md("Full diagnostic report printed above.")

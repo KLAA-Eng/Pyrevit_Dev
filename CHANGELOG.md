@@ -12,9 +12,9 @@ No pending published release.
 
 - **Channel:** Beta
 - **Tag:** `v0.0.9-beta`
-- **Tested Revit range:** No new live Revit claim. Carbon GWP Pull remains a
-  DevSandbox beta workflow; its deterministic logic is covered by the static
-  test suite.
+- **Tested Revit range:** No new live Revit claim. Carbon GWP Pull is a beta
+  workflow in the KL&A Tools panel; its deterministic logic is covered by the
+  static test suite.
 
 ### Added
 
@@ -27,8 +27,7 @@ No pending published release.
 
 ### Fixed
 
-- Carbon GWP Pull command tests now load the distributed `KL&A Tools.tab`
-  bundle path.
+- Carbon GWP Pull command tests now load the current KL&A Tools source bundle.
 
 ### Known limits
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Transform Carbon GWP schedule and worksheet data outside Revit.
 
-The helpers preserve the worksheet naming and parameter-pair conventions used
-by the Carbon GWP Pull command without importing pyRevit, Revit, or Excel COM
+The helpers preserve the worksheet naming and chart-data conventions used by
+the Carbon GWP Pull command without importing pyRevit, Revit, or Excel COM
 APIs. They accept ordinary Python values so their behavior can be tested outside
 the host applications.
 """
@@ -20,12 +20,7 @@ DEFAULT_EXPORT_CONTAINER_PATH = (
     r'G:\_Carbon\10 Internal GWP Studies\Revit Material Quantification'
     r'\Team Carbon GWP Pull_Data Container.xlsx'
 )
-DEFAULT_POST_PROCESSING_PATH = (
-    r'G:\_Carbon\10 Internal GWP Studies\Revit Material Quantification'
-    r'\Revit Material and GWP Quantification Post-Processing_v2.xlsx'
-)
 EXPORT_WORKSHEET_NAME = 'Export'
-CARBON_PIE_FAMILY_NAME = 'Carbon Pie.JMP'
 
 
 # COMPAT: IronPython provides ``unicode`` while CPython 3 provides ``str``.
@@ -161,68 +156,3 @@ def has_exportable_cells(grid):
         if row:
             return True
     return False
-
-
-def parameter_value_pairs_from_export_rows(rows):
-    """Return parameter/value pairs from Excel Export worksheet rows.
-
-    The existing Dynamo graph transposes the sheet before reading indexes zero
-    and one; this function preserves that behavior by reading the first two
-    worksheet columns row by row.
-
-    Args:
-        rows: An iterable of Export worksheet rows.
-
-    Returns:
-        A tuple ``(pairs, skipped)``, where ``pairs`` contains row, parameter
-        name, and value dictionaries, and ``skipped`` records blank names.
-    """
-    pairs = []
-    skipped = []
-    for row_index, row in enumerate(rows or [], start=1):
-        parameter_name = safe_text(row[0] if len(row) > 0 else '').strip()
-        value = safe_text(row[1] if len(row) > 1 else '')
-        if not parameter_name:
-            skipped.append({
-                'row': row_index,
-                'reason': 'blank parameter name',
-                'value': value,
-            })
-            continue
-        pairs.append({
-            'row': row_index,
-            'parameter_name': parameter_name,
-            'value': value,
-        })
-    return pairs, skipped
-
-
-def validate_parameter_value_pairs(pairs):
-    """Classify parameter/value pairs before Revit writes.
-
-    Args:
-        pairs: An iterable of dictionaries with ``parameter_name`` and
-            ``value`` entries.
-
-    Returns:
-        A tuple ``(valid, skipped)``. Duplicate parameter names are compared
-        case-insensitively and recorded in ``skipped``.
-    """
-    valid = []
-    skipped = []
-    seen = set()
-    for pair in pairs or []:
-        name = safe_text(pair.get('parameter_name')).strip()
-        if not name:
-            skipped.append(dict(pair, reason='blank parameter name'))
-            continue
-        if name.lower() in seen:
-            skipped.append(dict(pair, reason='duplicate parameter name'))
-            continue
-        seen.add(name.lower())
-        valid.append({
-            'row': pair.get('row'),
-            'parameter_name': name,
-            'value': safe_text(pair.get('value')),
-        })
-    return valid, skipped

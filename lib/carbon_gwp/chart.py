@@ -81,6 +81,11 @@ def chart_slices_from_export_rows(rows, value_column=1, measure_name='GWP'):
     derived from column A and the fixed material palette; no extra workbook
     columns are consumed.
 
+    Args:
+        rows: Iterable Export worksheet rows.
+        value_column: Zero-based column containing the requested measure.
+        measure_name: User-facing name used in skipped-row reasons.
+
     Returns:
         Tuple ``(slices, skipped)``. Each slice contains row, source_name,
         display_label, value, color, and color_source fields.

@@ -148,13 +148,13 @@ class SelectFromDict(my_WPF):
 
 
     def UIe_ItemChecked(self, sender, e):
-        # SINGLE SELECTIOn
+        """Keep a single-select dialog consistent across filtered views."""
         if not self.SelectMultiple:
-            filtered_list_of_items = List[type(ListItem())]()
-            for item in self.main_ListBox.Items:
+            # Update the canonical collection, not just the visible filter
+            # subset. Otherwise checking one item after a search can leave a
+            # previously checked hidden item selected at confirmation time.
+            for item in self.items:
                 item.IsChecked = True if item.Name == sender.Content.Text else False
-                filtered_list_of_items.Add(item)
-            self.main_ListBox.ItemsSource = filtered_list_of_items
 
     # ╔╗ ╦ ╦╔╦╗╔╦╗╔═╗╔╗╔╔═╗
     # ╠╩╗║ ║ ║  ║ ║ ║║║║╚═╗
@@ -182,7 +182,7 @@ class SelectFromDict(my_WPF):
         self.select_mode(mode='none')
 
     def button_select(self, sender, e):
-        """Button to finilize selection"""
+        """Finalize selections from the canonical collection, then close."""
         # Reset Filter
         self.textbox_filter.Text = ''
         self.Close()
@@ -190,7 +190,9 @@ class SelectFromDict(my_WPF):
 
 
         selected_items = []
-        for item in self.main_ListBox.ItemsSource:
+        # A filtered ItemsSource shows only a subset. Read self.items so a
+        # schedule selected before filtering is not silently discarded.
+        for item in self.items:
             if item.IsChecked:
                 selected_items.append(item.element)
         self.selected_items = selected_items

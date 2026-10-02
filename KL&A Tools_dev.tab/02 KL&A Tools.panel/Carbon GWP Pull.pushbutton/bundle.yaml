@@ -1,0 +1,8 @@
+engine:
+  clean: true
+title:
+  en_us: "Carbon\nGWP Pull"
+
+tooltip:
+  en_us: Exports material schedules to Excel and creates or updates GWP and material-volume charts on the active SYNC TO CENTRAL sheet.
+

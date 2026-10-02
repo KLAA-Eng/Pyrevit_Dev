@@ -24,6 +24,11 @@ elements remain untouched.
 The command imports `tblMixHistory` data rows only. Excel table header cells are
 used to map columns, but the Excel headers themselves are not imported.
 
+Workbook access uses the shared `lib/excel_com.py` explicit façade. If Revit
+2025+ exposes Excel as a raw COM object, every workbook, worksheet, table,
+column, and range member is invoked through public `IDispatch` rather than
+normal Python member guessing; the workbook remains read-only.
+
 ## Configuration
 
 Edit the constants at the top of `script.py` while the prototype is being tuned:
@@ -136,9 +141,10 @@ Formatting is intentionally limited in this prototype:
 ## Validation limits
 
 The reference workbook path is on a mapped `J:` drive and may only be reachable
-from the user's Revit session. Static tests cover the host-independent range and
-mapping/reconciliation helpers, but live acceptance requires running the button
-in Revit against the actual workbook and target schedule.
+from the user's Revit session. Static tests cover the host-independent range,
+mapping/reconciliation helpers, and shared Excel PIA/raw-COM dispatch, but live
+acceptance requires running the button in Revit against the actual workbook and
+target schedule.
 
 Live validation should verify that removing an element from Excel can delete the
 paired Revit header rows, and that adding the element back to Excel reinserts the

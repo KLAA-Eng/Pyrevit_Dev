@@ -85,6 +85,11 @@ environment before promotion or behavior changes.
   workbooks connect to raw tabs plus individual CSV-backed tabs for each
   output-window summary table.
 - Excel workbook creation depends on installed Microsoft Excel COM automation.
+  It uses the shared `lib/excel_com.py` explicit façade for workbook, worksheet,
+  query, range, pivot, and chart members. Each CSV tab remains a `QueryTable`:
+  Excel does not permit a `ListObject` to overlap query results. When Revit 2025+ exposes a raw
+  COM object, the same public Excel member is invoked through `IDispatch` rather
+  than being guessed from normal Python attribute access.
   CSV export remains successful if workbook creation fails.
 
 ## Future development

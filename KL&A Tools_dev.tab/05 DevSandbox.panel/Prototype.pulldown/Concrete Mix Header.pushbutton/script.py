@@ -55,6 +55,10 @@ if LIB_DIR not in sys.path:
     sys.path.insert(0, LIB_DIR)
 
 from GUI.forms import select_from_dict
+from excel_com import (
+    close_excel_application, collection_count, create_excel_application,
+    get_item, get_property, open_workbook, set_property, worksheet_collection,
+)
 from concrete_mix_schedule_header import (
     build_write_plan,
     build_mix_history_schedule_grid,
@@ -107,25 +111,19 @@ def _excel_path():
 
 
 def _load_excel_application():
-    import clr
-    try:
-        clr.AddReference('Microsoft.Office.Interop.Excel')
-    except Exception:
-        clr.AddReferenceByName(
-            'Microsoft.Office.Interop.Excel, Version=11.0.0.0, '
-            'Culture=neutral, PublicKeyToken=71e9bce111e9429c')
-    from Microsoft.Office.Interop import Excel
-    return Excel.ApplicationClass()
+    """Return the shared Excel COM application used by this command."""
+    return create_excel_application()
 
 
 def _worksheet_by_name(workbook, worksheet_name):
     if worksheet_name:
-        for index in range(1, workbook.Worksheets.Count + 1):
-            worksheet = workbook.Worksheets[index]
-            if worksheet.Name == worksheet_name:
+        worksheets = worksheet_collection(workbook)
+        for index in range(1, collection_count(worksheets) + 1):
+            worksheet = get_item(worksheets, index)
+            if get_property(worksheet, 'Name') == worksheet_name:
                 return worksheet
         raise ValueError('Worksheet not found: {}'.format(worksheet_name))
-    return workbook.Worksheets[1]
+    return get_item(worksheet_collection(workbook), 1)
 
 
 def _table_by_name(workbook, worksheet_name, table_name):
@@ -135,13 +133,15 @@ def _table_by_name(workbook, worksheet_name, table_name):
     if worksheet_name:
         worksheets.append(_worksheet_by_name(workbook, worksheet_name))
     else:
-        for index in range(1, workbook.Worksheets.Count + 1):
-            worksheets.append(workbook.Worksheets[index])
+        collection = worksheet_collection(workbook)
+        for index in range(1, collection_count(collection) + 1):
+            worksheets.append(get_item(collection, index))
 
     for worksheet in worksheets:
-        for index in range(1, worksheet.ListObjects.Count + 1):
-            table = worksheet.ListObjects[index]
-            if table.Name == table_name:
+        tables = get_property(worksheet, 'ListObjects')
+        for index in range(1, collection_count(tables) + 1):
+            table = get_item(tables, index)
+            if get_property(table, 'Name') == table_name:
                 return worksheet, table
     raise ValueError('Excel table not found: {}'.format(table_name))
 
@@ -181,15 +181,16 @@ def _com_range_values_to_rows(values, row_count, column_count):
 def _table_headers(table, column_count):
     headers = []
     try:
-        for index in range(1, table.ListColumns.Count + 1):
-            headers.append(table.ListColumns[index].Name)
+        columns = get_property(table, 'ListColumns')
+        for index in range(1, collection_count(columns) + 1):
+            headers.append(get_property(get_item(columns, index), 'Name'))
     except Exception:
         headers = []
     if len(headers) == column_count and any(headers):
         return normalize_grid([headers], 1, column_count)[0]
 
     try:
-        header_values = table.HeaderRowRange.Value2
+        header_values = get_property(get_property(table, 'HeaderRowRange'), 'Value2')
         headers = _com_range_values_to_rows(header_values, 1, column_count)[0]
     except Exception:
         headers = []
@@ -198,31 +199,33 @@ def _table_headers(table, column_count):
 
 def _read_excel_table_data(workbook_path, worksheet_name, table_name):
     excel = _load_excel_application()
-    excel.Visible = False
-    excel.DisplayAlerts = False
+    set_property(excel, 'Visible', False)
+    set_property(excel, 'DisplayAlerts', False)
     workbook = None
+    operation_failed = False
     try:
-        workbook = excel.Workbooks.Open(workbook_path, ReadOnly=True)
+        workbook = open_workbook(excel, workbook_path, read_only=True)
         worksheet, table = _table_by_name(workbook, worksheet_name, table_name)
-        data_range = table.DataBodyRange
+        data_range = get_property(table, 'DataBodyRange')
         if data_range is None:
             raise ValueError('Excel table has no data rows: {}'.format(table_name))
-        row_count = data_range.Rows.Count
-        column_count = data_range.Columns.Count
+        row_count = get_property(get_property(data_range, 'Rows'), 'Count')
+        column_count = get_property(get_property(data_range, 'Columns'), 'Count')
         headers = _table_headers(table, column_count)
-        values = data_range.Value2
+        values = get_property(data_range, 'Value2')
         grid = _com_range_values_to_rows(values, row_count, column_count)
         return {
             'workbook_path': workbook_path,
-            'worksheet_name': worksheet.Name,
-            'table_name': table.Name,
+            'worksheet_name': get_property(worksheet, 'Name'),
+            'table_name': get_property(table, 'Name'),
             'headers': headers,
             'grid': grid,
         }
+    except Exception:
+        operation_failed = True
+        raise
     finally:
-        if workbook is not None:
-            workbook.Close(False)
-        excel.Quit()
+        close_excel_application(excel, workbook, suppress_errors=operation_failed)
 
 
 def _schedule_options(document):

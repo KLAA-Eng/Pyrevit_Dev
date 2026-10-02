@@ -94,13 +94,14 @@ def render_chart_png(slices, image_path, center_caption='Total GWP', unit=GWP_CH
     Args:
         slices: Valid chart-slice dictionaries from ``chart_slices_from_export_rows``.
         image_path: Destination PNG path.
-
-    Args:
         center_caption: Title displayed above the total inside the doughnut.
         unit: Unit displayed below the total and in legend amounts.
 
     Raises:
         ValueError: The caller did not provide any valid positive slices.
+
+    The function creates a PNG at ``image_path`` and disposes every drawing
+    resource before returning or raising.
     """
     if not slices:
         raise ValueError('At least one positive value is required to render a chart.')
@@ -320,6 +321,18 @@ def managed_chart_exists(document, target_sheet, db, chart_kind='gwp'):
 
     Ambiguous image ownership remains an error rather than being silently
     treated as a first-run placement.
+
+    Args:
+        document: Active Revit project document.
+        target_sheet: Required ``SYNC TO CENTRAL`` sheet.
+        db: Autodesk Revit DB API namespace.
+        chart_kind: Managed chart identifier.
+
+    Returns:
+        ``True`` when exactly one owned image exists on the target sheet.
+
+    Raises:
+        ValueError: Managed image ownership is ambiguous.
     """
     return bool(_managed_instances(document, target_sheet, db, chart_kind))
 
@@ -347,7 +360,19 @@ def _box_bottom_left(box, db):
 
 
 def titleblock_top_right(document, target_sheet, db):
-    """Return the unique titleblock's top-right point on the target sheet."""
+    """Return the unique titleblock's top-right point on the target sheet.
+
+    Args:
+        document: Active Revit project document.
+        target_sheet: Required ``SYNC TO CENTRAL`` sheet.
+        db: Autodesk Revit DB API namespace.
+
+    Returns:
+        Revit ``XYZ`` point at the titleblock's top-right corner.
+
+    Raises:
+        ValueError: The sheet does not have exactly one usable titleblock.
+    """
     titleblocks = list(
         db.FilteredElementCollector(document, target_sheet.Id)
         .OfCategory(db.BuiltInCategory.OST_TitleBlocks)
@@ -363,7 +388,21 @@ def titleblock_top_right(document, target_sheet, db):
 
 
 def image_bottom_left(image_instance, target_sheet, db):
-    """Return a placed image's bottom-left point on the target sheet."""
+    """Return a placed image's bottom-left point on the target sheet.
+
+    Args:
+        image_instance: Placed Revit ``ImageInstance`` to inspect.
+        target_sheet: Sheet that owns the image.
+        db: Autodesk Revit DB API namespace.
+
+    Returns:
+        Revit ``XYZ`` point at the image bounding box's bottom-left corner.
+
+    Raises:
+        ValueError: Revit cannot provide an image bounding box.
+
+    Regenerates the image document before reading its bounding box.
+    """
     image_instance.Document.Regenerate()
     box = image_instance.get_BoundingBox(target_sheet)
     if box is None:
@@ -391,8 +430,19 @@ def create_or_reload_chart(document, target_sheet, point, image_path, db, chart_
     The caller must open a Revit transaction. Imported images embed their PNG
     data in the project. The image is then aligned to the supplied sheet point.
 
+    Args:
+        document: Active Revit project document with an open transaction.
+        target_sheet: Required ``SYNC TO CENTRAL`` sheet.
+        point: Revit ``XYZ`` location for the chart's top-left corner.
+        image_path: Generated PNG to import or reload.
+        db: Autodesk Revit DB API namespace.
+        chart_kind: Managed chart identifier.
+
     Returns:
-        ``('created' or 'updated', ImageInstance)``.
+        Tuple ``('created' or 'updated', ImageInstance)``.
+
+    Raises:
+        ValueError: Existing chart ownership or placement is ambiguous.
     """
     definition = _chart_definition(chart_kind)
     options = _image_type_options(image_path, db)

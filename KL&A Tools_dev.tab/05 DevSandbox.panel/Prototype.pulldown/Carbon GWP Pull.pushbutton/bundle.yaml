@@ -1,8 +1,0 @@
-engine:
-  clean: true
-title:
-  en_us: "Carbon\nGWP Pull"
-
-tooltip:
-  en_us: Exports material schedules to Excel and creates or updates an embodied-carbon chart on SYNC TO CENTRAL.
-
