@@ -1,7 +1,19 @@
-engine: 
-  clean: true
 title:
   en_us: "Element\nTakeoff"
-
 tooltip:
-  en_us: Computes cumulative length and volume of seleted elements
+  en_us: |-
+    Version: v0.0
+    Date: 07.16.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: reports cumulative length and volume for interactively selected Revit elements.
+    _____________________________________________________________________
+    How-to:
+    - Click the button and select the elements to measure.
+    - Finish the selection and review the accumulated length and volume.
+    _____________________________________________________________________
+    Last update:
+    - [07.16.2026] - v0.0 (0.0.0.beta): First main delivery of interactive element selection and accumulated length/volume measurement.
+author: KL&A
+engine:
+  clean: true

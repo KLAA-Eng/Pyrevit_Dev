@@ -1,28 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __title__ = "Hide/Unhide\nEng Notes"
-__author__ = "KL&A"
-__version__ = "0.0.9-beta"
-__doc__ = """Version: 0.0.9-beta
-_____________________________________________________________________
-Description:
-
-Hide or unhide matching KL&A engineering-note text in eligible views and
-sheets. The command changes element visibility only; it does not delete notes.
-_____________________________________________________________________
-How-to:
-
--> Click the button and choose Hide or Unhide.
--> Review the completion report in the pyRevit output window. Hold Shift while
-   clicking for diagnostics.
-_____________________________________________________________________
-Requirements and limits:
-
-- Notes must use a type name beginning with "KLAA - ENGINEER'S NOTE".
-- Only supported view types on sheets that appear in the Sheet List qualify.
-- The command continues past invalid targets and reports skips and failures.
-_____________________________________________________________________
-Author: KL&A"""
+__version__ = "v1.1"
 
 from pyrevit import revit, DB, forms, script
 import clr

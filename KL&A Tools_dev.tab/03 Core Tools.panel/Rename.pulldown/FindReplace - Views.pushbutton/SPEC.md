@@ -41,3 +41,19 @@ Detected mutation/external-effect patterns: No Revit transaction or direct mutat
 This is a development-tab command. The inventory above is statically derived
 from the current bundle and must be confirmed inside the target Revit/pyRevit
 environment before promotion or behavior changes.
+
+## Tool versioning
+
+| Field | Value |
+| --- | --- |
+| Tool ID | `core.rename.findreplace-views` |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton` |
+| Version inputs | `bundle.yaml`; `script.py` (no KL&A-owned shared helper inputs) |
+| Tool version | `v1.2.EFTools` |
+| Status/origin | Special — imported unchanged from EF Tools. |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v1.2.EFTools` | `0.0.0.beta` | 07.16.2026 | Unchanged EF Tools 1.2 source present in the first mainline delivery ledger. | Upstream header; `484924b`; import `6a46157` |

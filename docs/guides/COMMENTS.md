@@ -90,54 +90,41 @@ Do not document exceptions caused only by a caller violating the documented
 contract. Do document meaningful interface failures that callers may need to
 handle.
 
-For a module-level Python docstring, make the literal the first statement in
-the module. A command's `__doc__` assignment is KLMetadata, not a Python module
-docstring; use the convention below instead.
+For a module-level Python docstring in reusable modules, make the literal the
+first statement in the module. Command help belongs in `bundle.yaml`; do not
+assign `__doc__` in a command script.
 
 ## KLMetadata
 
-Every user-facing `script.py` command MUST define `__version__` and the
-user-facing `__doc__` command card. KLMetadata belongs directly after the
+Every user-facing `script.py` command MUST define `__title__` and a pure
+`__version__` string. KLMetadata belongs directly after the
 encoding declaration and any required `from __future__` imports, before normal
 imports.
 
 ```python
-__version__ = "0.1.0-beta"
-__doc__ = """Version: 0.1.0-beta
-_____________________________________________________________________
-Description:
-
-Inspect rooms in the active model and report rooms that are missing a Department
-value.
-_____________________________________________________________________
-How-to:
-
--> Click the button
--> Review the pyRevit output report
--> Correct the reported room data in Revit
-_____________________________________________________________________
-Prototype limits:
-- Inspects only the active project document
-- Does not modify the Revit model
-- Stops when no project document or rooms are available
-_____________________________________________________________________
-Author: KL&A"""
+__title__ = "Room Readiness Audit"
+__version__ = "v1.0"
 ```
 
 Rules for this block:
 
-- `__version__` records the last extension release that affected this command.
-  It is not an independent command version stream. Use the published extension
-  version and channel, such as `0.1.0-beta` or `0.1.0`.
-- `__doc__` is the user-facing command card. Use the ordered sections shown
-  above: `Version`, `Description`, `How-to`, applicable limits/requirements,
-  and `Author`.
-- Use the 69-underscore divider exactly as shown to separate command-card
-  sections. Keep the content accurate to observed behavior.
+- `__version__` is the independent tool version, not the extension release.
+  Follow [TOOL_VERSIONING.md](TOOL_VERSIONING.md) for maintained tools,
+  DevSandbox prototypes, and unchanged source imports.
+- Keep only the title and pure version string in script metadata. Do not add
+  `__author__` or `__doc__`; `bundle.yaml` owns author and tooltip.
+- The bundle title must match `__title__` exactly, including line breaks. For
+  localized titles, compare the English `en_us` value.
+- Use the FindReplace Sheets tooltip layout documented in
+  [TOOL_VERSIONING.md](TOOL_VERSIONING.md): Version, Date, Description, How-to,
+  and Last update bullets, separated by 69 underscores. No author line belongs
+  in the tooltip; attribution belongs in the bundle author and SPEC origin.
 - State destructive or externally visible side effects, required workstation
   software, fixed input counts, and conditions that stop the command.
-- Update `__version__` and the `Version:` line together when the command is
-  changed for a release.
+- Update `__version__`, tooltip version/date/update bullets, and the SPEC tool
+  version history together when preparing the meaningful delivery to `main`.
+  Before that delivery, show the next planned version and `Status: Unreleased`
+  as defined in [TOOL_VERSIONING.md](TOOL_VERSIONING.md).
 
 The normal Google module-docstring rule still applies to reusable `lib/` modules
 when they need module documentation. Do not add a second long user guide to a
@@ -441,7 +428,7 @@ name.
 - Do Tier 1 comments remain minimal and effective; do Tier 2 comments explain
   meaningful blocks for new readers; and do Tier 3 comments form a concise,
   complete walkthrough without narrating obvious syntax?
-- Does each KLMetadata block use `__version__`, the ordered command card, and
-  matching version strings?
+- Does script metadata contain only matching `__title__` and pure `__version__`
+  values, with author and the ordered tooltip in `bundle.yaml`?
 - Does every ASCII-art divider have an adjacent plain-text section label?
 - Did the change avoid adding redundant narration or unnecessary comment churn?

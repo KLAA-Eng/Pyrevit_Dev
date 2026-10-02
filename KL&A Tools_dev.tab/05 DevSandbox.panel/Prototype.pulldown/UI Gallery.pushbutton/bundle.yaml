@@ -1,3 +1,20 @@
-title: UI Gallery
-tooltip: Open safe, seeded previews of pyRevit and KL&A dialogs.
+title:
+  en_us: "UI Gallery"
+tooltip:
+  en_us: |-
+    Version: v0.3
+    Date: 09.15.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: opens safe, seeded previews of pyRevit and KL&A dialogs. Previews use fictional data; host/model-dependent commands remain catalog entries until safe preview support exists.
+    _____________________________________________________________________
+    How-to:
+    - Select a gallery row and choose Open Selected Window.
+    - Use the seeded preview controls; disabled rows identify dialogs requiring host/model or interactive input.
+    _____________________________________________________________________
+    Last update:
+    - [09.15.2026] - v0.3 (0.0.6beta): Deliver expanded host picker and themed previews with repaired launcher/resource paths.
+    - [08.20.2026] - v0.2 (0.0.5.beta): Deliver additional prototype/room/recall previews and safe catalog launch permissions.
+    - [08.17.2026] - v0.1 (0.0.4.beta): Deliver seeded dialog previews, including rename, duplicate-sheet, and ViewRange examples.
+    - [08.13.2026] - v0.0 (0.0.1.beta): First main delivery of safe XAML cataloging and static previews.
 author: KL&A

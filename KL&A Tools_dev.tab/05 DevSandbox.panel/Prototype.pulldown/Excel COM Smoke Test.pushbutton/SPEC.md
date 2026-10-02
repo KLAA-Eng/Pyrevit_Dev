@@ -1,5 +1,25 @@
 # Excel COM Smoke Test
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.excel-com-smoke-test` |
+| Tool version | `v0.0` |
+| Status | Unreleased |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | Unreleased |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton/script.py` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | Unreleased | 10.02.2026 | Planned first delivery of a disposable Excel facade lifecycle and operation smoke test. | 0dcb4d3 (not delivered to main) |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 ## Identity
 
 - Bundle: `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton`

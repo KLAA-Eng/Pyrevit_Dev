@@ -1,8 +1,19 @@
-engine:
-  clean: true
 title:
   en_us: "Launch\nDyn Player"
 tooltip:
-  en_us: >-
-    Prototype: opens Dynamo Player. SupportsRevit 2021's Playlist
-    command and Revit 2022 or later's Dynamo Player command.
+  en_us: |-
+    Version: v0.0
+    Date: 08.17.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: opens Dynamo Player installed with the running Revit version. Supports the older Playlist command and the current Dynamo Player command.
+    _____________________________________________________________________
+    How-to:
+    - Click the button with Dynamo installed.
+    - Finish any active Revit command if the tool asks, then try again.
+    _____________________________________________________________________
+    Last update:
+    - [08.17.2026] - v0.0 (0.0.4.beta): First main delivery of the Dynamo Player launcher with availability checks.
+author: KL&A
+engine:
+  clean: true

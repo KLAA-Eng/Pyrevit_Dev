@@ -1,5 +1,25 @@
 # KL&A Model Startup Importer — DevSandbox MVP Contract
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.startup-importer` |
+| Tool version | `v0.0` |
+| Status | Released |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | 0.0.7 |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Startup Importer.invokebutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Startup Importer.invokebutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Startup Importer.invokebutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Startup Importer.invokebutton/bundle.yaml`; `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.Core/`; `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.Revit/`; `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | 0.0.7 | 09.28.2026 | First main delivery of checklist parsing, controlled create-only import, and themed review/blocking dialogs. | 2c4a3b2 |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 Status: provisional Wave 2 implementation, approved for DevSandbox validation only.
 
 ## Outcome

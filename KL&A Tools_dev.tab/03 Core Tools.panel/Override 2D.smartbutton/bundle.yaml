@@ -5,11 +5,25 @@ title:
   de_de: 2D hervorheben
 tooltip:
   fr_fr: Suriligner les éléments 2D elements en Rouge
-  en_us: Higlight 2D elements in red
+  en_us: |-
+    Version: v1.0
+    Date    = 08.13.2026
+    _____________________________________________________________________
+    Description:
+
+    Highlight 2D elements in red in the active view.
+    _____________________________________________________________________
+    How-to:
+
+    -> Run the tool to apply the temporary graphic override.
+    -> Run it again to clear the override.
+    _____________________________________________________________________
+    Last update:
+    - [08.13.2026] - KL&A adapted the graphic-override workflow.
   ru: Подсвечивает 2D элементы красным цветом
   de_de: >-
     2D Elemente werden in der aktuellen Ansicht mit rot hervorgehoben. 
     Es handelt sich dabei um eine grafische Überschreibung der Elemente. 
     Wenn man nochmals auf das Werkzeug klickt, wird die grafische 
     Überschreibung wieder rückgängig gemacht.
-author: Jean-Marc Couffin
+author: KL&A

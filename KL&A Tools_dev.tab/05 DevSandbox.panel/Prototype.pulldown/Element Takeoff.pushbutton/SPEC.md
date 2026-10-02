@@ -1,5 +1,25 @@
 # Element Takeoff
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.element-takeoff` |
+| Tool version | `v0.0` |
+| Status | Released |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | 0.0.0.beta |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Element Takeoff.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Element Takeoff.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Element Takeoff.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Element Takeoff.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/Element Takeoff.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Element Takeoff.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Element Takeoff.pushbutton/script.py` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | 0.0.0.beta | 07.16.2026 | First main delivery of interactive element selection and accumulated length/volume measurement. | 484924b |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 ## Purpose
 
 Documents the current command implementation and intended user-facing behavior.

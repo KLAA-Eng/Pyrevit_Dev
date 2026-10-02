@@ -1,5 +1,25 @@
 # Inspect Schedule Header
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.inspect-schedule-header` |
+| Tool version | `v0.0` |
+| Status | Released |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | 0.0.6beta |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Inspect Schedule Header.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Inspect Schedule Header.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Inspect Schedule Header.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Inspect Schedule Header.pushbutton/script.py` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | 0.0.6beta | 09.15.2026 | First main delivery of read-only schedule header inspection and JSON/CSV export. | 300f8d4 |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 ## Purpose
 
 `Inspect Schedule Header` is a read-only DevSandbox pyRevit prototype for

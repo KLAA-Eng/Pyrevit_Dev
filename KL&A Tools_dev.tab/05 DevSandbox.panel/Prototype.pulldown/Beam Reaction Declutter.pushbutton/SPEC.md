@@ -1,5 +1,25 @@
 # Beam Reaction Declutter
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.beam-reaction-declutter` |
+| Tool version | `v0.0` |
+| Status | Released |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | 0.0.7 |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Beam Reaction Declutter.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Beam Reaction Declutter.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Beam Reaction Declutter.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Beam Reaction Declutter.pushbutton/script.py`; `lib/beam_reaction_declutter/` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | 0.0.7 | 09.28.2026 | First main delivery of Move/Reset reaction-tag decluttering. | 2c4a3b2 |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 ## Purpose
 
 `Beam Reaction Declutter` is a Revit 2024+ DevSandbox pyRevit prototype based

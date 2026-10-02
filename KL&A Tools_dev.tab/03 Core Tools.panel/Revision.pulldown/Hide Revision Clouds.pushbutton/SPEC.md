@@ -40,3 +40,19 @@ on Unhide.
 
 This is a Core Tools development-tab command. Static and unit checks do not
 replace live Revit acceptance.
+
+## Tool versioning
+
+| Field | Value |
+| --- | --- |
+| Tool ID | `core.revision.hide-revision-clouds` |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Revision.pulldown/Hide Revision Clouds.pushbutton` (0.0.7–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/Revision.pulldown/Hide Revision Clouds.pushbutton` |
+| Version inputs | `bundle.yaml`; `script.py`; `lib/GUI/forms.py` |
+| Tool version | `v1.0` |
+| Status/origin | Maintained — KL&A custom command. |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v1.0` | `0.0.7` | 09.28.2026 | Added the KL&A hide/unhide revision-cloud workflow. | `2c4a3b2` |

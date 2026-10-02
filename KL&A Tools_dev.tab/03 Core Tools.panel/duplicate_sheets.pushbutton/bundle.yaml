@@ -1,0 +1,19 @@
+title:
+  en_us: Duplicate Sheets
+author: KL&A
+tooltip:
+  en_us: |-
+    Version: v1.0
+    Date    = 09.15.2026
+    _____________________________________________________________________
+    Description:
+
+    Duplicate selected sheets with controls for copying sheet contents and naming views and sheets.
+    _____________________________________________________________________
+    How-to:
+
+    -> Select sheets in the Project Browser.
+    -> Run the tool, choose duplicate options, and confirm.
+    _____________________________________________________________________
+    Last update:
+    - [09.15.2026] - KL&A adapted the duplicate-sheets UI base.

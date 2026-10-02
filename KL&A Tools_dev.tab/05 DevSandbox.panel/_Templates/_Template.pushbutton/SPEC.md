@@ -5,8 +5,12 @@
 | Field | Value |
 | --- | --- |
 | Bundle path | `KL&A Tools_dev.tab/.../Command.pushbutton` |
+| Tool ID | replace-with-stable-command-id |
+| Path aliases | Record current path and any previous bundle paths. |
+| Version inputs | `bundle.yaml`; `script.py`; list owned/shared helpers. |
 | Maturity | Prototype, Beta, or Core |
-| Last extension release affecting this command | `0.0.0-beta` |
+| Tool version | `v0.0` |
+| Status/origin | KL&A DevSandbox prototype; identify original source if imported. |
 | Maintainer | Name or team |
 | Revit versions live-tested | List exact tested versions |
 
@@ -44,11 +48,15 @@ Record focused automated/static checks separately from live Revit acceptance.
 Automated checks do not prove Revit transactions, native dialogs, Excel COM,
 file outputs, or user workflow.
 
-## Release history
+## Tool version history
 
-| Extension release | Date | Change summary |
-| --- | --- | --- |
-| `0.0.0-beta` | YYYY-MM-DD | Initial record. |
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v0.0` | Unreleased | 10.02.2026 | Planned prototype template baseline; replace with actual command evidence. | Template example; replace with development commit evidence. |
+
+Follow `docs/guides/TOOL_VERSIONING.md`. Use meaningful user-facing Git
+milestones; promote a maintained DevSandbox command to production at `v1.0`.
+Keep extension release evidence above separate from the independent tool version.
 
 ## Backlog
 

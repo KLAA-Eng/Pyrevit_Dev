@@ -2,6 +2,25 @@ title:
   en_us: "About\nKL&A Tools"
 
 tooltip:
-  en_us: Shows the loaded KL&A Tools extension version, build metadata, and extension path.
+  en_us: |
+    Version: v1.1
+    Date: 08.13.2026
+    _____________________________________________________________________
+    Description:
+
+    Show the loaded KL&A Tools extension version, build metadata, extension
+    path, pyRevit version, and Revit build for support and verification.
+    _____________________________________________________________________
+    How-to:
+
+    -> Click the button.
+    -> Review the About dialog and copy the details for troubleshooting.
+    _____________________________________________________________________
+    Last update:
+
+    - [08.13.2026] v1.1 - 0.0.1.beta: Delivered loaded-extension library resolution so build metadata imports work from the actual checkout.
+    - [07.16.2026] v1.0 - 0.0.0.beta: Delivered the extension/build metadata, loaded path, pyRevit version, and Revit build dialog.
+
+author: KL&A
 
 context: zero-doc

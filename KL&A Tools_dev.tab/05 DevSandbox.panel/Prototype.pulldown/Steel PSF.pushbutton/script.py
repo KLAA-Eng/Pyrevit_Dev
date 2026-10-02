@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Report host-model steel PSF summaries without changing the Revit model."""
 from __future__ import print_function
+
+__title__ = "Steel PSF"
+__version__ = "v0.5"
 
 import datetime
 import os

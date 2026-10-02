@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Import the Concrete Mix workbook block into a Revit schedule header."""
 from __future__ import print_function
+
+__title__ = "Concrete Mix Header"
+__version__ = "v0.1"
 
 import os
 import sys

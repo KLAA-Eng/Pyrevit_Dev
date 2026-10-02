@@ -5,7 +5,21 @@ title:
   ru: Секущий диапазон
 tooltip:
   fr_fr: Outil pour illustrer la profondeur de vue des vues en plan dans une vue 3D à l'aide de plans colorés. Ouvrir une vue 3D et sélectionner les vues en plan à illustrer dans le navigateur de projet.
-  en_us: Tool to illustrate the view range of plan views in a 3D view using colored planes. Open a 3D view and select the plan views to illustrate in the project browser.
+  en_us: |-
+    Version: v1.0
+    Date    = 09.15.2026
+    _____________________________________________________________________
+    Description:
+
+    Illustrate the view range of selected plan views in a 3D view using colored planes.
+    _____________________________________________________________________
+    How-to:
+
+    -> Open a 3D view and select plan views in the Project Browser.
+    -> Run the tool to review the illustrated range.
+    _____________________________________________________________________
+    Last update:
+    - [09.15.2026] - KL&A adapted the shared window and branding behavior.
   de_de: >-
     Zunächst öffnet man eine 3D Ansicht, in der der Ansichtsbereich 
     eines Grundrisses farblich temporär mit Flächen dargestellt 
@@ -23,7 +37,7 @@ tooltip:
     В 3D-виде будут графически отображены: верхняя граница (Top Plane), секущая плоскость (Cut Plane), нижняя граница (Bottom Plane) и плоскость глубины вида (View Depth).
 
     Кроме того, в диалоге будут показаны их отметки (высоты).
-author: Tamás Déri
+author: KL&A
 min_revit_version: 2023
 engine:
   clean: true

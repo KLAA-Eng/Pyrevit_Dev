@@ -1,55 +1,6 @@
 # -*- coding: utf-8 -*-
 __title__ = "Duplicate Sheets"
-__author__ = "Erik Frits"
-__doc__ = """Version = 1.1
-Date    = 08.12.2020
-_____________________________________________________________________
-Description:
-
-Duplicate selected sheets with controls over copying elements
-and naming of Views and Sheets.
-_____________________________________________________________________
-How-to:
-
--> Select sheets in Project Browser 
--> Run the script.
--> Select duplicate options 
--> Click duplicate button.
-_____________________________________________________________________
-Prerequisite:
-
-You have to select sheets in ProjectBrowser.
-_____________________________________________________________________
-
-Last update:
-- [22.10.2021] Refactoring 
-- Creates Sheet Copy
-- Copies Views
-- Failsave ViewName and SheetNumber
-- Copies Legends
-- Additional Sheet Revisions
-- Schedules
-- Allign title block to original in case it was moved!
-- Text on Sheet
-- Lines on Sheets
-- Revision
-- Images
-- Dimensions
-- Duplicate Legend = bool
-- Duplicate Schedule = bool
-
-_____________________________________________________________________
-To-do:
-
-- MOVE VIEWPORT TITLE (RevitAPI workaround only)
-- Set similar Viewport Title 
-- Titleblock position
-- COPY parameters from sheets too! (ALL/GUI to select parameter to copy?)
-- ViewTemplate (Keep the same/ Remove/ Duplicate)
-- BUG Warning when duplicating dimensioning!!! Some elements are reported 
-to be deleted even ugh nothing is gone...? 
-_____________________________________________________________________
-"""
+__version__ = 'v1.0'
 
 # ╦╔╦╗╔═╗╔═╗╦═╗╔╦╗╔═╗
 # ║║║║╠═╝║ ║╠╦╝ ║ ╚═╗

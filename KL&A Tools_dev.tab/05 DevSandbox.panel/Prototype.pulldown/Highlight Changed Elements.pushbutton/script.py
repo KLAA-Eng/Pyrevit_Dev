@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Highlight changed host-model elements visible on selected sheets.
-
-This DevSandbox prototype compares selected-sheet content with a local baseline
-RVT. It excludes links, title blocks, and revision clouds.
-"""
 from __future__ import print_function
+
+__title__ = "Highlight\nChanged Elements"
+__version__ = "v0.1"
 
 import os
 import traceback

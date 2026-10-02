@@ -1,6 +1,19 @@
 title:
   en_us: "Open Keynote\nFile"
 tooltip:
-  en_us: Opens the keynote file connected to the active Revit project.
+  en_us: |-
+    Version: v0.0
+    Date: 08.20.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: opens the keynote text file connected to the active Revit project.
+    _____________________________________________________________________
+    How-to:
+    - Open the Revit project with its keynote file configured.
+    - Click the button to open that file in the associated application.
+    _____________________________________________________________________
+    Last update:
+    - [08.20.2026] - v0.0 (0.0.5.beta): First main delivery of the configured keynote file opener and missing-file reporting.
+author: KL&A
 engine:
   clean: true

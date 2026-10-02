@@ -41,3 +41,19 @@ Detected mutation/external-effect patterns: revit.Transaction,
 This is a development-tab command. The inventory above is statically derived
 from the current bundle and must be confirmed inside the target Revit/pyRevit
 environment before promotion or behavior changes.
+
+## Tool versioning
+
+| Field | Value |
+| --- | --- |
+| Tool ID | `core.viewrange` |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton` |
+| Version inputs | `bundle.yaml`; `script.py`; `MainWindow.xaml`; `lib/GUI/Resources/WPF_styles.xaml` |
+| Tool version | `v1.0` |
+| Status/origin | Maintained — KL&A adaptation of pyRevit. |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v1.0` | `0.0.6beta` | 09.15.2026 | KL&A adapted the shared window and branding behavior. | `300f8d4` |

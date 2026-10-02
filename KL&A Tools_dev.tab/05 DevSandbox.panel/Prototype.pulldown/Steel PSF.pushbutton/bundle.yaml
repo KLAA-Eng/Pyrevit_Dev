@@ -1,10 +1,25 @@
 title:
   en_us: "Steel PSF"
 tooltip:
-  en_us: >-
-    Prototype: reports summary-only host-model steel PSF. Structural framing and
-    columns use usable length times nominal section weight; PSF uses summed
-    computed Floor area by level. Includes optional raw and summary CSV export
-    files and an Excel workbook when Microsoft Excel is available.
+  en_us: |-
+    Version: v0.5
+    Date: 10.02.2026
+    Status: Unreleased
+    _____________________________________________________________________
+    Description:
+    Prototype: reports host-model steel weight per computed floor area by selected stories. Includes raw and summary CSV export, with a companion Excel workbook when Excel is available.
+    _____________________________________________________________________
+    How-to:
+    - Select stories and choose Review Selected Stories, Initialize CSV, or Append CSV.
+    - Review the report; for export modes, choose the output folder after the report.
+    _____________________________________________________________________
+    Last update:
+    - [10.02.2026] - v0.5 (Unreleased): Planned: make companion-workbook creation use the shared Excel COM facade across Revit hosts.
+    - [09.15.2026] - v0.4 (0.0.6beta): Deliver the updated story-selection window and shared KL&A design resources.
+    - [08.17.2026] - v0.3 (0.0.4.beta): Deliver branded export controls and complete raw/summary CSV and Excel history export.
+    - [08.13.2026] - v0.2 (0.0.3.beta): Deliver robust parameter/unit/ElementId handling and corrected aggregation/reporting.
+    - [08.13.2026] - v0.1 (0.0.2.beta): Deliver story selection and filtering of steel/floor data to selected levels.
+    - [08.13.2026] - v0.0 (0.0.1.beta): First main delivery of the host steel-weight and PSF summary report.
+author: KL&A
 engine:
   clean: true

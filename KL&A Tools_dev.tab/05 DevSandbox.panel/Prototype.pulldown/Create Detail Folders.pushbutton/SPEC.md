@@ -1,5 +1,25 @@
 # Create View Detail Folders
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.create-detail-folders` |
+| Tool version | `v0.0` |
+| Status | Released |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | 0.0.4.beta |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create View Detail Folders.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/Create Detail Folders.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/script.py`; `lib/detail_view_deliverables.py`; `lib/detail_view_folders.py`; `lib/detail_view_html.py` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | 0.0.4.beta | 08.17.2026 | First main delivery of per-view PDF/JPEG/HTML packages, including export/API corrections developed before delivery. | 1f3dd23 |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 ## Purpose
 
 `Create View Detail Folders` is a DevSandbox pyRevit prototype that creates a

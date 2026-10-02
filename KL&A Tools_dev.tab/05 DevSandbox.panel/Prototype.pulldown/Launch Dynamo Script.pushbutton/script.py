@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+__title__ = "Launch Dynamo\n Script"
+__version__ = "v0.0"
 import os
 import clr
 

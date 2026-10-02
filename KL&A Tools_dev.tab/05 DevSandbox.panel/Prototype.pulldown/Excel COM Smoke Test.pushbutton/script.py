@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Development-only Excel COM facade compatibility smoke test."""
 from __future__ import print_function
 
-__title__ = 'Excel COM Smoke Test'
-__author__ = 'KL&A'
-__doc__ = """Creates and removes one owned temporary workbook to test the
-shared Excel COM facade in the current Revit and pyRevit host."""
+__title__ = "Excel COM Smoke Test"
+__version__ = "v0.0"
+
 
 import os
 import sys

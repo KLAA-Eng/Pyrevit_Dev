@@ -1,4 +1,5 @@
-"""Lists all sheets revised under any revision."""
+__title__ = 'Find All Revised Sheets'
+__version__ = 'v1.0.pyRevit'
 
 from pyrevit import revit, DB
 from pyrevit import script

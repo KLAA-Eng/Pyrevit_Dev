@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Open the keynote file connected to the active Revit project."""
 from __future__ import print_function
+
+__title__ = "Open Keynote\nFile"
+__version__ = "v0.0"
 
 import os
 

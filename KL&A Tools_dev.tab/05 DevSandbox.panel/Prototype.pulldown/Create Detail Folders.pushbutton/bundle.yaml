@@ -1,11 +1,19 @@
 title:
   en_us: "Create View\nDetail Folders"
 tooltip:
-  en_us: >-
-    Prototype: select Detail and Drafting view types, then create a destination
-    subfolder for every matching individual project view. Each successful
-    package contains an 8.5x11 PDF, 2400-pixel JPEG preview, and static HTML
-    page. Existing output is never overwritten and the Revit model is not
-    modified. Revit 2022 or later is required.
+  en_us: |-
+    Version: v0.0
+    Date: 08.17.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: creates a folder for each matching Detail or Drafting view, with an 8.5x11 PDF, 2400-pixel JPEG preview, and static HTML page. Existing output is preserved. Revit 2022+.
+    _____________________________________________________________________
+    How-to:
+    - Select Detail and Drafting view types.
+    - Choose an existing destination folder and review the export results.
+    _____________________________________________________________________
+    Last update:
+    - [08.17.2026] - v0.0 (0.0.4.beta): First main delivery of per-view PDF/JPEG/HTML packages, including export/API corrections developed before delivery.
+author: KL&A
 engine:
   clean: true

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Declutter Reaction structural-framing tags in selected Revit plan views."""
 from __future__ import print_function
+
+__title__ = "Beam Reaction\nDeclutter"
+__version__ = "v0.0"
 
 import traceback
 

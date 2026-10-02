@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+__title__ = "Element\nTakeoff"
+__version__ = "v0.0"
 from pyrevit import revit, DB, forms, script
 from collections import defaultdict
 

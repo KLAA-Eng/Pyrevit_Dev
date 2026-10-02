@@ -39,9 +39,19 @@ This repository is a pyRevit extension. User-facing commands live under
 - A `dev` to `main` pull request is the only release path. It must include the
   approved version, generated build metadata, changelog entry, review record,
   and the validation evidence required by `RELEASING.md`.
-- The extension version in `version.json` is the release authority. A command
-  `__version__` records the last extension release that affected that command;
-  it is not an independent tool release stream.
+- The extension version in `version.json` is the extension release authority.
+  Tool versions are independent: use `vMAJOR.MINOR` for KL&A-maintained tools,
+  `v0.x` in DevSandbox, and `vMAJOR.MINOR.Source` for unchanged imports.
+  Tool versions advance once per meaningful mainline release delivery, not per
+  development commit. Follow `docs/guides/TOOL_VERSIONING.md` and
+  `docs/tool-version-delivery-ledger.md` for baselines, planned versions, and
+  release evidence.
+- Every visible command, including DevSandbox, needs matching script/bundle
+  titles, a versioned bundle tooltip, bundle author, and an adjacent `SPEC.md`
+  with tool ID, path aliases, version inputs, status/origin, and a Git-backed
+  main-delivery version history. Python command
+  metadata contains only `__title__` and pure `__version__`; keep author and
+  tooltip in `bundle.yaml`, without `__author__` or `__doc__` assignments.
 - New or materially changed user-facing commands require an adjacent
   `SPEC.md`. Use the command template and `docs/guides/CONTRIBUTING.md` before
   opening the pull request.

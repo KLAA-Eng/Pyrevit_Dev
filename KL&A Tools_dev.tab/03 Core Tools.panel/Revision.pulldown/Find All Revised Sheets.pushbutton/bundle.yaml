@@ -8,7 +8,20 @@ title:
   de_de: FInde alle geänderten Pläne
   pt_br: Encontrar Todas as Folhas Revisadas
 tooltip:
-  en_us: Lists all sheets revised under any revision
+  en_us: |-
+    Version: v1.0.pyRevit
+    Date    = 07.16.2026
+    _____________________________________________________________________
+    Description:
+
+    List all sheets revised under any revision.
+    _____________________________________________________________________
+    How-to:
+
+    -> Run the tool and review the pyRevit output.
+    _____________________________________________________________________
+    Last update:
+    - [07.16.2026] - Imported unchanged pyRevit snapshot.
   ko: 모든 수정 사항으로 수정된 시트를 나열합니다
   fr_fr: Liste toutes les feuilles révisées comportant n'importe qu'elle révision
   ru: Показывает все листы с изменениями.
@@ -16,3 +29,4 @@ tooltip:
   es_es: Lista todas las hojas revisadas bajo cualquier revisión
   de_de: Es werden alle Pläne aufgelistet die mit einer beliebigen Änderung markiert wurden
   pt_br: Lista todas as folhas revisadas sob qualquer revisão
+author: pyRevit

@@ -2,6 +2,24 @@ title:
   en_us: "Suggestions/Bugs\nFeedback"
 
 tooltip:
-  en_us: Opens the KL&A feedback form for bug reporting, tool suggestions, or general feedback.
+  en_us: |
+    Version: v1.0
+    Date: 07.16.2026
+    _____________________________________________________________________
+    Description:
+
+    Open the KL&A feedback form for bugs, tool suggestions, or general
+    feedback, prefilled with your report type, subject, and Revit context.
+    _____________________________________________________________________
+    How-to:
+
+    -> Click the button and choose a feedback type.
+    -> Enter a short subject, then complete and submit the browser form.
+    _____________________________________________________________________
+    Last update:
+
+    - [07.16.2026] v1.0 - 0.0.0.beta: Delivered configured feedback type/subject prompts and Microsoft Form prefill with Revit context.
+
+author: KL&A
 
 context: zero-doc

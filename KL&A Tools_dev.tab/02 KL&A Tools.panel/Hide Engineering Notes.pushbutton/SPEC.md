@@ -4,10 +4,16 @@
 
 | Field | Value |
 | --- | --- |
+| Tool ID | `hide-engineering-notes` |
+| Path aliases | `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton`, `KL&A Tools.tab/KL&A Tools.panel/Hide Engineering Notes.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/script.py` |
 | Bundle path | `KL&A Tools_dev.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton` |
 | Maturity | Beta |
+| Tool version | `v1.1` |
+| Status/origin | Unreleased planned production update; KL&A custom command. Last delivered version: `v1.0`. |
+| Status | Unreleased |
 | Last extension release affecting this command | `0.0.9-beta` |
-| Maintainer | KL&A Tools |
+| Maintainer | KL&A |
 | Revit versions live-tested | No exact version recorded for this command. |
 
 ## Purpose and workflow
@@ -64,11 +70,25 @@ notes, already-hidden notes, unhideable notes, state/write failures, each
 supported view type, direct sheets, placed primary/dependent views, undo, and
 ribbon presentation.
 
-## Release history
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v1.0` | `0.0.0.beta` | 07.16.2026 | Delivered hide/unhide engineering-note text with eligible-sheet/view filtering, type-name normalization, action dialog, and diagnostics. | `484924b` |
+| `v1.1` | Unreleased | 10.02.2026 | Planned broader supported views and dependent-view handling; plain pushbutton with changed/already/skipped/failed output reporting. | `0dcb4d3` |
+
+Versions follow meaningful changes between adjacent mainline release snapshots,
+including the listed version inputs. Earlier development iterations are grouped
+into the first delivery; tab/panel moves, formatting, and metadata/documentation
+changes do not create additional milestones. Dates use `MM.DD.YYYY`; released
+rows use the main delivery date, and Unreleased rows use the latest meaningful
+development change date.
+
+## Extension release history
 
 | Extension release | Date | Change summary |
 | --- | --- | --- |
-| `0.0.9-beta` | 2026-10-01 | Released the prior pushbutton implementation with dependent-view handling. |
+| `0.0.9-beta` | 2026-10-01 | Packaged the prior delivered command unchanged. The broader views, dependent-view handling, and completion report remain Unreleased on dev. |
 
 ## Backlog
 

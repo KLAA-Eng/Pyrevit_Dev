@@ -1,7 +1,19 @@
-title: Startup Importer
-tooltip: >-
-  Review and create-only import controlled KL&A Word or Excel startup content.
-  Existing targets are skipped; DevSandbox never overwrites them.
+title:
+  en_us: "Startup Importer"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 09.28.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: reviews and creates controlled KL&A startup content from a Word or Excel checklist, seed RVT, and catalog. Existing target views are skipped.
+    _____________________________________________________________________
+    How-to:
+    - Choose a startup checklist and controlled settings file.
+    - Review matches and resolve blocking items, then confirm the create-only import.
+    _____________________________________________________________________
+    Last update:
+    - [09.28.2026] - v0.0 (0.0.7): First main delivery of checklist parsing, controlled create-only import, and themed review/blocking dialogs.
 author: KL&A
 context: doc-project
 assembly: KLA.ModelStartupImporter.Revit.dll

@@ -1,7 +1,19 @@
-engine: 
-  clean: true
 title:
   en_us: "Launch Dynamo\n Script"
-
 tooltip:
-  en_us: Launches a Dynamo Script
+  en_us: |-
+    Version: v0.0
+    Date: 07.16.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: opens and runs the bundled script.dyn through Dynamo in the active Revit document.
+    _____________________________________________________________________
+    How-to:
+    - Open the intended Revit model or family.
+    - Click the button and review the Dynamo result message.
+    _____________________________________________________________________
+    Last update:
+    - [07.16.2026] - v0.0 (0.0.0.beta): First main delivery of the bundled Dynamo graph launcher.
+author: KL&A
+engine:
+  clean: true

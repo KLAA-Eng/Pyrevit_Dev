@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Create destination folders for Detail and Drafting Views of selected types."""
 from __future__ import print_function
+
+__title__ = "Create View\nDetail Folders"
+__version__ = "v0.0"
 
 import os
 import sys

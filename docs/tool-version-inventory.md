@@ -1,58 +1,69 @@
 # Tool Version Inventory
 
-Audited October 2, 2026. This inventory covers every runnable command under
-`KL&A Tools_dev.tab` except the `05 DevSandbox.panel` hierarchy. It records
-only source-declared command versions; it does not infer a command version
-from `version.json`, a release tag, or a command's modification history.
+This inventory covers every visible runnable command in `KL&A Tools_dev.tab`,
+including `05 DevSandbox.panel`. Versions were reconstructed from the mainline
+release snapshots in the [Tool-Version Delivery Ledger](tool-version-delivery-ledger.md),
+not from development commit counts. `Planned` means meaningful work exists on
+`dev` but has not reached `main`.
 
-## Requested convention
+The adjacent `SPEC.md` is the authoritative command-level record: it contains
+all version rows, path aliases, version inputs, and delivery evidence.
 
-Command versions use `vMAJOR.MINOR` formatting (for example, `v1.0`) and are
-independent of the extension's release version. An extension-release value may
-still be documented separately as release history.
+## Production and shared tools
 
-## Findings
-
-| Ribbon command | Runtime command version | Formatting assessment | Notes |
+| Command | Current tool version | Delivery / status | Status/origin |
 | --- | --- | --- | --- |
-| Launch Gen Notes Typ Details | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| Launch Revit Standards | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| Carbon GWP Pull | `v1.0` | Conforms | Updated in this change; the SPEC separately retains its last extension release. |
-| Hide Engineering Notes | `0.0.9-beta` | Does not conform | Matches the extension release rather than the requested independent command format. |
-| Copy Legends to Other Documents | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| Duplicate Sheets | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| Override 2D | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| ViewRange | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| Who Did That | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| FindReplace - Views | `Version: 1.2` | Does not conform | Uses a prose prefix and omits the requested `v` prefix. |
-| FindReplace Sheets | `Version: 1.1` | Does not conform | Uses a prose prefix and omits the requested `v` prefix. |
-| Find All Revised Sheets | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| Find All Revision Clouds On Views | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| Hide Revision Clouds | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| Remove Revision From Sheets | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| Set Revision On Sheets | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| About KL&A Tools | Not declared | Not applicable | Deliberately displays generated extension build information from `lib/build_info.py`; it has no tool-version declaration. |
-| Prototype | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
-| Suggestions | Not declared | Missing | No `__version__` or `Version:` metadata in `script.py`. |
+| General Notes / Typical Details | `v1.0` | `0.0.0.beta` | Maintained KL&A custom |
+| Launch Revit Standards | `v1.0` | `0.0.0.beta` | Maintained KL&A custom |
+| Carbon GWP Pull | `v1.0` | Planned | KL&A; pending production promotion; delivered DevSandbox history `v0.0`–`v0.1` |
+| Hide/Unhide Engineering Notes | `v1.1` | Planned | Maintained KL&A custom |
+| Copy Legends to Other Documents | `v1.0.pyRevit` | `0.0.0.beta` | Special unchanged pyRevit import |
+| Duplicate Sheets | `v1.0` | `0.0.6beta` | Maintained KL&A EF Tools adaptation |
+| Highlight 2D | `v1.0` | `0.0.1.beta` | Maintained KL&A pyRevit adaptation |
+| Find and Replace in Views | `v1.2.EFTools` | `0.0.0.beta` | Special unchanged EF Tools import |
+| Find and Replace in Sheets | `v1.0` | `0.0.6beta` | Maintained KL&A EF Tools adaptation |
+| Find All Revised Sheets | `v1.0.pyRevit` | `0.0.0.beta` | Special unchanged pyRevit import |
+| Find All Revision Clouds | `v1.0` | `0.0.7` | Maintained KL&A pyRevit adaptation |
+| Hide/Unhide Revision Clouds | `v1.0` | `0.0.7` | Maintained KL&A custom |
+| Toggle off Revision Schedule | `v1.0` | `0.0.7` | Maintained KL&A pyRevit adaptation |
+| Toggle on Revision Schedule | `v1.0` | `0.0.7` | Maintained KL&A pyRevit adaptation |
+| Show View Range | `v1.0` | `0.0.6beta` | Maintained KL&A pyRevit adaptation |
+| Who Did That? | `v1.0.pyRevit` | `0.0.0.beta` | Special unchanged pyRevit import |
+| About KL&A Tools | `v1.1` | `0.0.1.beta` | Maintained KL&A custom |
+| Prototype Request | `v1.0` | `0.0.4.beta` | Maintained KL&A internal derivative |
+| Suggestions | `v1.0` | `0.0.0.beta` | Maintained KL&A custom |
 
-## Totals
+## DevSandbox prototypes
 
-- 19 commands audited.
-- 1 command conforms to the requested `vMAJOR.MINOR` convention: Carbon GWP
-  Pull.
-- 3 commands declare a version in a different format: Hide Engineering Notes,
-  FindReplace - Views, and FindReplace Sheets.
-- 14 commands have no runtime command-version declaration.
-- 1 command is intentionally extension-information-only: About KL&A Tools.
+| Command | Current tool version | Delivery / status | Status/origin |
+| --- | --- | --- | --- |
+| Launch Dynamo Player | `v0.0` | `0.0.4.beta` | KL&A prototype |
+| Beam Reaction Declutter | `v0.0` | `0.0.7` | KL&A prototype |
+| Concrete Mix Header | `v0.1` | Planned | KL&A prototype; delivered baseline `v0.0` in `0.0.6beta` |
+| Create Detail Folders | `v0.0` | `0.0.4.beta` | KL&A prototype |
+| Element Takeoff | `v0.0` | `0.0.0.beta` | KL&A prototype |
+| Excel COM Smoke Test | `v0.0` | Planned | KL&A prototype; not yet delivered to main |
+| Find and Replace in Views Prototype | `v0.0` | `0.0.6beta` | KL&A EF Tools adaptation |
+| Find and Replace in Sheets Prototype | `v0.0` | `0.0.6beta` | KL&A EF Tools adaptation |
+| Highlight Changed Elements | `v0.1` | `0.0.3.beta` | KL&A prototype |
+| Inspect Schedule Header | `v0.0` | `0.0.6beta` | KL&A prototype |
+| Launch Dynamo Script | `v0.0` | `0.0.0.beta` | KL&A prototype |
+| Open Keynote File | `v0.0` | `0.0.5.beta` | KL&A prototype |
+| Steel PSF | `v0.5` | Planned | KL&A prototype; delivered `v0.0`–`v0.4` |
+| UI Gallery | `v0.3` | `0.0.6beta` | KL&A prototype |
+| Family Studio | `v0.0` | `0.0.7` | KL&A prototype |
+| Startup Importer | `v0.0` | `0.0.7` | KL&A prototype |
+| Trial | `v0.0` | `0.0.6beta` | KL&A prototype |
 
-## Scope and follow-up
+## Totals and scope
 
-No command other than Carbon GWP Pull was changed by this audit. In particular,
-`version.json` remains the extension release authority and `lib/build_info.py`
-was not regenerated.
+- 36 visible command bundles audited.
+- 15 maintained production/shared commands.
+- 4 special unchanged imports with source-qualified versions.
+- 17 DevSandbox prototypes; three currently have planned unreleased work.
+- Two production commands also have planned unreleased versions.
 
-The current command-authoring guidance in `docs/guides/COMMENTS.md` still
-states that `__version__` records the last extension release affecting a
-command. That policy conflicts with the independent command-version convention
-documented here and should be revised in a separately scoped standards change
-before versioning the remaining commands.
+`version.json`, generated `lib/build_info.py`, release tags, and the root
+`CHANGELOG.md` remain extension-release artifacts. Tool versions are released
+per command at a mainline delivery and are documented in the central ledger and
+adjacent specifications.

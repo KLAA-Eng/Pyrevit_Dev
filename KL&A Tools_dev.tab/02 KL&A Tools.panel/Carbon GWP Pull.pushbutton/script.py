@@ -1,34 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-__title__ = 'Carbon GWP Pull'
-__author__ = 'KL&A'
+__title__ = 'Carbon\nGWP Pull'
 __version__ = 'v1.0'
-__doc__ = """Version: v1.0
-_____________________________________________________________________
-Description:
-
-Export selected Carbon GWP schedules to Excel, read the post-processed
-Export worksheet, render its GWP and material-volume values as doughnut
-charts, and place or update them on the SYNC TO CENTRAL sheet.
-_____________________________________________________________________
-How-to:
-
--> Click the button
--> Select exactly three schedules
--> Select the export container workbook
--> Select the post-processing workbook
--> Review the pyRevit output report
-_____________________________________________________________________
-Requirements and limits:
-- Requires Microsoft Excel COM interop on the Revit workstation
-- Does not run workbook macros directly
-- Stops before Revit changes if required schedules, workbooks, chart data, or
-  the SYNC TO CENTRAL sheet are missing
-- Saves generated chart PNGs in a new, timestamped Carbon GWP Pull Charts
-  subfolder beside the selected post-processing workbook
-_____________________________________________________________________
-Author: KL&A"""
 
 # ╦╔╦╗╔═╗╔═╗╦═╗╔╦╗╔═╗
 # ║║║║╠═╝║ ║╠╦╝ ║ ╚═╗
@@ -51,7 +25,7 @@ from pyrevit import DB, forms, revit, script
 # Command setup and shared helpers
 # ------------------------------------------------------------------
 
-COMMAND_TITLE = __title__
+COMMAND_TITLE = __title__.replace('\n', ' ')
 TARGET_SHEET_NAME = 'SYNC TO CENTRAL'
 POST_PROCESSING_REFRESH_TIMEOUT_SECONDS = 60.0
 POST_PROCESSING_REFRESH_POLL_SECONDS = 0.25

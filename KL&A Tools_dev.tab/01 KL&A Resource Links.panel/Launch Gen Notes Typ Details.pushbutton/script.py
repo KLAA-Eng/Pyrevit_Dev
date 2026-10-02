@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-# __title__ = "(2)Launch Gen Notes Typ Details"
+__title__ = "Gen Notes\nTYP DTLS"
+__version__ = "v1.0"
 
 import subprocess
 

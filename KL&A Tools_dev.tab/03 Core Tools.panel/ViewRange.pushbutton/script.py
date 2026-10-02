@@ -1,4 +1,6 @@
 # -*- coding: UTF-8 -*-
+__title__ = 'Show View Range'
+__version__ = 'v1.0'
 
 from pyrevit import script, forms, revit, HOST_APP, DB, UI
 from pyrevit.revit import events

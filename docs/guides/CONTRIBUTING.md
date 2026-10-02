@@ -20,6 +20,9 @@ allowed.
 2. Make one focused change. Read the affected command's `SPEC.md` and
    `bundle.yaml` before changing a command.
 3. Update `SPEC.md` for every new or materially changed user-facing command.
+   Record meaningful development work as the next planned tool version. During
+   release preparation, convert it to the matching main-delivery version,
+   tooltip date, and SPEC history row together.
 4. Run the narrowest relevant automated or static checks, then record the
    result in the pull request.
 5. Perform and record live Revit validation when the change affects behavior,
@@ -45,8 +48,15 @@ non-developer feedback is encouraged but is not a mandatory release gate.
 Use the adjacent `SPEC.md` as the team-facing command contract. It explains
 the workflow, inputs, effects, limitations, requirements, compatibility,
 validation evidence, release history, and backlog. Use the DevSandbox command
-template for a new command. Do not make migration-only edits to older specs;
-bring them up to the current template when their command changes materially.
+template for a new command. All visible commands, including DevSandbox, must
+record Tool ID, Path aliases, Version inputs, Tool version, Status/origin, and
+a history with Version, Main delivery, Date, Meaningful change, and Git
+evidence. Follow
+[TOOL_VERSIONING.md](TOOL_VERSIONING.md) for the exact metadata and version rules.
+
+Run `python scripts/check_tool_metadata.py` to check visible command metadata.
+Its host-independent tests run with
+`python -m unittest discover -s tests -p tool_metadata_test.py`.
 
 ## Release flow
 
@@ -55,6 +65,10 @@ preparation includes the semantic version, channel, generated build metadata,
 changelog entry, validation evidence, and exact release tag. Beta is the
 default channel; promotion to stable is explicit. Follow [RELEASING.md](../../RELEASING.md)
 for the complete procedure.
+
+The extension version in `version.json` remains the release authority. Tool
+versions identify individual command milestones and do not change extension
+release numbering, tagging, approval, or promotion controls.
 
 ## Where to find help
 

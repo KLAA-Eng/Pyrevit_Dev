@@ -1,0 +1,17 @@
+title:
+  en_us: "Find and Replace in Views"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 09.15.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: renames selected views with Find, Replace, Prefix, and Suffix fields. Uses the locally adapted KL&A window resources.
+    _____________________________________________________________________
+    How-to:
+    - Select views in the Project Browser, or choose them when prompted.
+    - Set Find, Replace, Prefix, or Suffix fields and apply the rename.
+    _____________________________________________________________________
+    Last update:
+    - [09.15.2026] - v0.0 (0.0.6beta): First main delivery of the local KL&A prototype adaptation with WPF/resource changes.
+author: KL&A

@@ -1,8 +1,19 @@
 title:
   en_us: "Inspect Schedule Header"
 tooltip:
-  en_us: >-
-    Prototype: exports selected Revit schedule header text, dimensions, and
-    accessible cell style metadata to JSON and CSV for formatter development.
+  en_us: |-
+    Version: v0.0
+    Date: 09.15.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: exports a selected Revit schedule header layout to JSON and CSV, including cells, widths, heights, merged cells, and available style metadata.
+    _____________________________________________________________________
+    How-to:
+    - Select the schedule to inspect.
+    - Choose an export folder and review the generated JSON and CSV files.
+    _____________________________________________________________________
+    Last update:
+    - [09.15.2026] - v0.0 (0.0.6beta): First main delivery of read-only schedule header inspection and JSON/CSV export.
+author: KL&A
 engine:
   clean: true

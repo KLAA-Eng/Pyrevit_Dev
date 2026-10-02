@@ -46,3 +46,19 @@ Detected mutation/external-effect patterns: No Revit transaction or direct mutat
 This is a development-tab command. The inventory above is statically derived
 from the current bundle and must be confirmed inside the target Revit/pyRevit
 environment before promotion or behavior changes.
+
+## Tool versioning
+
+| Field | Value |
+| --- | --- |
+| Tool ID | `core.revision.find-all-revision-clouds-on-views` |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Revision.pulldown/Find All Revision Clouds On Views.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/Revision.pulldown/Find All Revision Clouds On Views.pushbutton` |
+| Version inputs | `bundle.yaml`; `script.py` |
+| Tool version | `v1.0` |
+| Status/origin | Maintained — KL&A adaptation of pyRevit. |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v1.0` | `0.0.7` | 09.28.2026 | Rewrote the report for sheet-visible and dependent-view revision clouds. | `2c4a3b2` |

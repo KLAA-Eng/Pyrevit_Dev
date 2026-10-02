@@ -1,11 +1,21 @@
 title:
   en_us: "Highlight\nChanged Elements"
 tooltip:
-  en_us: >-
-    Prototype: compare the current host model with a local baseline RVT and
-    highlight changed or new elements visible in selected sheets' placed views.
-    Run again on highlighted sheets to clear matching red overrides. Detects type
-    and location changes. Revit 2024+; host model only.
+  en_us: |-
+    Version: v0.1
+    Date: 08.13.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: compares the host model with a local baseline RVT and highlights changed or new elements visible in selected sheets. Re-run to clear matching red overrides. Revit 2024+.
+    _____________________________________________________________________
+    How-to:
+    - Choose a detached/archive baseline RVT and select sheets to compare.
+    - Review the changed-element report and highlighted views, or clear existing matching highlights.
+    _____________________________________________________________________
+    Last update:
+    - [08.13.2026] - v0.1 (0.0.3.beta): Deliver compatible ElementId/override access for supported Revit hosts.
+    - [08.13.2026] - v0.0 (0.0.1.beta): First main delivery of baseline comparison, red highlighting, conflict guidance, and detailed reporting.
+author: KL&A
 min_revit_version: 2024
 engine:
   clean: true

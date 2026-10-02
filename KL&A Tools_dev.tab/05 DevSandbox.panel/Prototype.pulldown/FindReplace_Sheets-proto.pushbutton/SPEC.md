@@ -1,5 +1,26 @@
 # FindReplace_Sheets
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.findreplace-sheets-proto` |
+| Tool version | `v0.0` |
+| Status | Released |
+| Status/origin | Prototype; locally maintained KL&A adaptation of EFTools (Erik Frits). |
+| Main delivery | 0.0.6beta |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v1.1.EFTools | 0.0.5.beta | 08.20.2026 | First prototype delivery of the unchanged EFTools version 1.1 functionality. | 8cd45f8 |
+| v0.0 | 0.0.6beta | 09.15.2026 | First main delivery of the local KL&A prototype adaptation using shared WPF resources. | 300f8d4 |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 ## Purpose
 
 Documents the current command implementation and intended user-facing behavior.
