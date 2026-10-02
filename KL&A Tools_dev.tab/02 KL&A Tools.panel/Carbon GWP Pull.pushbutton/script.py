@@ -3,8 +3,8 @@ from __future__ import print_function
 
 __title__ = 'Carbon GWP Pull'
 __author__ = 'KL&A'
-__version__ = '0.0.9-beta'
-__doc__ = """Version: 0.0.9-beta
+__version__ = 'v1.0'
+__doc__ = """Version: v1.0
 _____________________________________________________________________
 Description:
 

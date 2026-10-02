@@ -6,6 +6,7 @@
 - **Ribbon label:** Carbon GWP Pull
 - **Maturity:** Beta
 - **Maintainer:** KL&A
+- **Tool version:** `v1.0` (maintained independently of the extension release)
 - **Last extension release affecting this command:** `0.0.9-beta`
 - **Compatibility:** Revit 2024 and later is the repository target. No
   command-specific live Revit version acceptance is recorded yet.
