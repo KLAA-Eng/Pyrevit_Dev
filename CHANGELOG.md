@@ -4,6 +4,11 @@ This is the canonical release record for KL&A Tools. Each controlled `dev` to
 `main` release records the version, channel, tested Revit range, affected
 tools, user-facing changes, known limits, and rollback tag.
 
+This changelog is the concise extension-release summary. Detailed independent
+command histories are kept in each command's `SPEC.md`, using the
+[`docs/tool-version-delivery-ledger.md`](docs/tool-version-delivery-ledger.md)
+release boundaries.
+
 ## Unreleased
 
 No pending published release.
