@@ -32,6 +32,16 @@ Example beta release:
 }
 ```
 
+## Development identity
+
+`dev` is an untagged, unpublished development identity, not a release channel.
+After a published beta or stable release is synchronized back into `dev`, advance
+`version.json` to the next numeric version with `"channel": "dev"` and
+regenerate `lib/build_info.py`. About will display the fallback identity as
+`vMAJOR.MINOR.PATCH-dev`, but that identifier must not receive a Git tag or a
+GitHub release. Keep the latest published beta or stable release as the most
+recent changelog release.
+
 ## Prepare the release on dev
 
 1. Confirm the release contains only reviewed work already merged into `dev`.

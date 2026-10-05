@@ -11,7 +11,9 @@ release boundaries.
 
 ## Unreleased
 
-No pending published release.
+Development is underway for `0.0.11`. This is an untagged, unpublished `dev`
+identity, not a changelog release. The latest published release remains
+`0.0.10-beta`.
 
 ## 0.0.10 - 2026-10-05
 
