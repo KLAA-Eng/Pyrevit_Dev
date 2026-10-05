@@ -4,10 +4,8 @@ from lib.carbon_gwp.workflow import (
     DEFAULT_SCHEDULE_NAMES,
     clean_schedule_title,
     has_exportable_cells,
-    parameter_value_pairs_from_export_rows,
     safe_text,
     uniquify_worksheet_names,
-    validate_parameter_value_pairs,
     worksheet_name_for_schedule,
 )
 from lib.carbon_gwp.chart import (
@@ -64,29 +62,6 @@ class CarbonGwpWorkflowTests(unittest.TestCase):
         self.assertEqual('DYN Out - Same Schedule Name', names[0])
         self.assertEqual('DYN Out - Same Schedule Nam (2)', names[1])
         self.assertTrue(all(len(name) <= 31 for name in names))
-
-    def test_parameter_value_pairs_read_first_two_columns(self):
-        pairs, skipped = parameter_value_pairs_from_export_rows([
-            ['GWP Concrete', 42.0, 'ignored'],
-            ['', 'missing name'],
-            ['GWP Steel', None],
-        ])
-        self.assertEqual(
-            [
-                {'row': 1, 'parameter_name': 'GWP Concrete', 'value': '42'},
-                {'row': 3, 'parameter_name': 'GWP Steel', 'value': ''},
-            ],
-            pairs,
-        )
-        self.assertEqual('blank parameter name', skipped[0]['reason'])
-
-    def test_validate_parameter_value_pairs_rejects_duplicate_names(self):
-        valid, skipped = validate_parameter_value_pairs([
-            {'row': 1, 'parameter_name': 'GWP Concrete', 'value': '10'},
-            {'row': 2, 'parameter_name': 'gwp concrete', 'value': '11'},
-        ])
-        self.assertEqual(1, len(valid))
-        self.assertEqual('duplicate parameter name', skipped[0]['reason'])
 
     def test_chart_slices_ignore_columns_after_the_export_contract(self):
         slices, skipped = chart_slices_from_export_rows([

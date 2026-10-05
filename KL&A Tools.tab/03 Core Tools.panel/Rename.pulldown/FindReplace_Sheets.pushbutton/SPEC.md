@@ -41,3 +41,19 @@ Detected mutation/external-effect patterns: No Revit transaction or direct mutat
 This is a development-tab command. The inventory above is statically derived
 from the current bundle and must be confirmed inside the target Revit/pyRevit
 environment before promotion or behavior changes.
+
+## Tool versioning
+
+| Field | Value |
+| --- | --- |
+| Tool ID | `core.rename.findreplace-sheets` |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton` |
+| Version inputs | `bundle.yaml`; `script.py`; `lib/GUI/RenameSheets.py`; `lib/Snippets/_selection.py` |
+| Tool version | `v1.0` |
+| Status/origin | Maintained — KL&A adaptation of EF Tools. |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v1.0` | `0.0.6beta` | 09.15.2026 | KL&A adapted sheet-renaming UI and resources. | `300f8d4` |

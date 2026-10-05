@@ -41,3 +41,19 @@ Detected mutation/external-effect patterns: No Revit transaction or direct mutat
 This is a development-tab command. The inventory above is statically derived
 from the current bundle and must be confirmed inside the target Revit/pyRevit
 environment before promotion or behavior changes.
+
+## Tool versioning
+
+| Field | Value |
+| --- | --- |
+| Tool ID | `core.who-did-that` |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Who Did That.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/Who Did That.pushbutton` |
+| Version inputs | `bundle.yaml`; `script.py` (no KL&A-owned shared helper inputs) |
+| Tool version | `v1.0.pyRevit` |
+| Status/origin | Special — imported unchanged from pyRevit. |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v1.0.pyRevit` | `0.0.0.beta` | 07.16.2026 | Unchanged pyRevit snapshot present in the first mainline delivery ledger. | `484924b`; import `5a385ee` |

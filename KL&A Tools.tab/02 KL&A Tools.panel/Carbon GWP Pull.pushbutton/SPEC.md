@@ -1,8 +1,23 @@
 # Carbon GWP Pull
 
+## Identity
+
+- **Tool ID:** `carbon-gwp-pull`
+- **Path aliases:** `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`; formerly `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Carbon GWP Pull.pushbutton`.
+- **Version inputs:** `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/bundle.yaml`, `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/script.py`, `lib/carbon_gwp/workflow.py`, `lib/carbon_gwp/chart.py`, `lib/carbon_gwp/revit_chart.py`, `lib/excel_com.py`.
+- **Ribbon location:** `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`
+- **Ribbon label:** Carbon GWP Pull
+- **Maturity:** Beta
+- **Status/origin:** Released KL&A Tools-panel beta command; KL&A custom replacement for an internal Dynamo workflow. Last delivered version: `v1.0`.
+- **Maintainer:** KL&A
+- **Tool version:** `v1.0`
+- **Last extension release affecting this command:** `0.0.10-beta`
+- **Compatibility:** Revit 2024 and later is the repository target. No
+  command-specific live Revit version acceptance is recorded yet.
+
 ## Purpose
 
-Prototype pyRevit replacement for the Dynamo `x_Team Carbon GWP Pull_RVT 24.dyn` workflow.
+Beta pyRevit replacement for the Dynamo `x_Team Carbon GWP Pull_RVT 24.dyn` workflow.
 
 The command exports selected Revit schedule table data to an Excel container workbook, reads calculated GWP and material-volume values from a post-processing workbook, and creates or updates two rendered doughnut charts on the `SYNC TO CENTRAL` sheet.
 
@@ -14,17 +29,19 @@ The command exports selected Revit schedule table data to an Excel container wor
   - `z_Project Material Takeoff`
   - `2x Wood Wall Volume`
   - `Composite Deck Volume`
-- Export container workbook selected by file picker. Both workbook pickers
-  accept `.xlsx` and `.xlsm` files. For a disk-hosted model,
+- Export workbook selected by file picker. The picker states that its existing
+  `DYN Out - ...` worksheets will be replaced. Both workbook pickers accept
+  `.xlsx` and `.xlsm` files. For a disk-hosted model,
   the first picker opens in the model's local or central-model folder. Cloud
   models use `J:\Standards\910 Revit Support\KLAA Library`, falling back to
   the current user's local Windows profile folder when that location is
   unavailable. Server, detached, and unsaved models use the configured
   Carbon-folder fallback.
 - Post-processing workbook selected by file picker. The second picker opens in
-  the folder selected for the export container workbook.
+  the folder selected for the export workbook. It must be a different file from
+  the export workbook.
 
-The tool prompts every run. It does not save paths.
+The tool prompts every run. It does not save paths or run an unattended job.
 
 ## Excel Contract
 
@@ -84,7 +101,10 @@ the image grows 0.65 inch vertically while keeping the fixed doughnut and
 legend vertically centered. The PNGs are saved beside the selected
 post-processing workbook as `Carbon GWP Summary.png` and `Carbon Material
 Volume Summary.png`; each successful render replaces those generated files.
-They are also imported into the RVT, not linked.
+They are also imported into the RVT, not linked. Each run writes the PNGs to a
+new timestamped subfolder under `Carbon GWP Pull Charts` beside the selected
+post-processing workbook, so it does not overwrite a user-created file or a
+previous run's evidence.
 Existing `Carbon Pie.JMP` parameter values are not read, changed, or cleared.
 
 The schedule export and Excel reads do not change the Revit model. Rendering
@@ -104,27 +124,75 @@ The pyRevit output window reports:
 - Skipped Excel rows as row, source, material, and reason.
 - Runtime errors.
 
-## Prototype Limits
+## Limits and safeguards
 
 - Requires Microsoft Excel COM interop on the Revit workstation.
 - Uses the built-in Windows/.NET drawing APIs and Revit image APIs; it does not
   require additional Python packages.
 - Requires the post-processing workbook formulas or macros to already produce the `Export` worksheet values after schedule export.
-- The command does not explicitly invoke workbook macros. It currently does
-  not override Excel's automation macro-security setting, so users must select
-  only trusted `.xlsx` and `.xlsm` workbooks.
+- All Excel access uses the shared `lib/excel_com.py` explicit façade. It uses
+  the Excel PIA when available and public `IDispatch` invocation when Revit
+  2025+ exposes a raw COM wrapper. This covers workbook lifecycle, worksheet
+  collections, ranges, query tables, refreshes, links, and calculation without
+  guessing whether a raw COM member is a property or method. Automation macros
+  are force-disabled only while a workbook opens, then the prior setting is
+  restored. Excel 4.0 macro prompts remain an Excel limitation; select trusted
+  workbooks and do not enable any unexpected prompt.
 - Refreshes Power Query inputs from the selected export container in the
   read-only post-processing Excel session before reading `Export`. It waits up
   to 60 seconds and stops rather than rendering a chart from still-refreshing
   (stale or temporary zero) values. Refresh, external-link update, or
   calculation errors also stop the command before it reads `Export` or changes
   Revit.
-- A pre-existing generated PNG is deleted before its replacement is rendered.
-  If rendering fails, the existing Revit chart remains unchanged, but the local
-  generated PNG is not retained.
+- Each chart supports at most 30 material rows. Reduce or group `Export` rows
+  before rerunning when either chart exceeds that readable rendering limit.
 - Does not validate that the exported schedule workbook and post-processing workbook are formula-linked correctly.
 - Stops before Revit changes if the target sheet or `Export` worksheet is missing,
   if the target sheet is not active, or if either chart has no positive values.
 - Requires live Revit validation for image import, sheet placement, rerun reload,
   worksharing permissions, model reopening, and undo behavior.
+
+## Validation evidence
+
+- Static unit coverage verifies schedule/worksheet normalization, chart data
+  parsing and geometry, workbook-control flow, macro-security handoff, PIA and
+  raw-COM explicit-member dispatch, output-folder uniqueness, and command-path
+  loading. The DevSandbox `Excel COM Smoke Test` is the required one-run live
+  façade diagnostic before troubleshooting a Carbon workbook-specific failure.
+- Static coverage does not validate Revit image import/reload, Excel COM refresh
+  behavior, Power Query refresh, permissions, worksharing, sheet placement,
+  undo, or the native dialogs.
+- Before release acceptance, validate with a trusted `.xlsx` and `.xlsm`
+  fixture: first run, rerun, no-data, same-workbook rejection, cancelled picker,
+  workbook refresh failure, sheet placement, worksharing, undo, reopen, and
+  keyboard use of the schedule selector.
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v0.0` | `0.0.6beta` | 09.15.2026 | First delivered DevSandbox workflow: export selected schedules to Excel and update Carbon Pie.JMP family parameters from Export values. | `300f8d4` |
+| `v0.1` | `0.0.9` | 10.01.2026 | Delivered the revised DevSandbox workflow with managed GWP/material-volume charts, refresh guards, Material Accuracy reporting, and chart placement/retention safeguards. | `d7185d2` |
+| `v1.0` | `0.0.10` | 10.05.2026 | Delivered production-panel promotion with explicit raw Excel COM support, refined refresh/workbook safeguards, chart placement, and retained generated PNGs. | `0dcb4d3`, `c7ca2f9` |
+
+Versions follow meaningful changes between adjacent mainline release snapshots,
+including the listed version inputs. Earlier development iterations are grouped
+into the first delivery; tab/panel moves, formatting, and metadata/documentation
+changes do not create additional milestones. Dates use `MM.DD.YYYY`; released
+rows use the main delivery date, and Unreleased rows use the latest meaningful
+development change date.
+
+## Extension release history
+
+- `0.0.10-beta` — Delivered the production-panel promotion and raw Excel COM
+  compatibility changes. Live Revit/Excel acceptance remains separately
+  required.
+- `0.0.9-beta` — Delivered the revised DevSandbox chart workflow.
+
+## Backlog
+
+- Record representative live Revit and Excel acceptance evidence before any
+  promotion beyond beta.
+- Improve the shared schedule-selector behavior and keyboard focus treatment in
+  a separately tested shared-UI change.
 

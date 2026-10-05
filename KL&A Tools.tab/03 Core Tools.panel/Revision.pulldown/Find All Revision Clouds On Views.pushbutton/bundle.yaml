@@ -1,4 +1,18 @@
 title:
   en_us: Find All Revision Clouds
 tooltip:
-  en_us: Lists every revision cloud visible on each sheet, grouped by sheet.
+  en_us: |-
+    Version: v1.0
+    Date    = 09.28.2026
+    _____________________________________________________________________
+    Description:
+
+    List every revision cloud visible on each sheet, grouped by sheet.
+    _____________________________________________________________________
+    How-to:
+
+    -> Run the tool and review the pyRevit output.
+    _____________________________________________________________________
+    Last update:
+    - [09.28.2026] - KL&A rewrote the sheet-visible and dependent-view report.
+author: KL&A

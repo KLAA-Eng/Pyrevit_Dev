@@ -4,17 +4,53 @@ This is the canonical release record for KL&A Tools. Each controlled `dev` to
 `main` release records the version, channel, tested Revit range, affected
 tools, user-facing changes, known limits, and rollback tag.
 
+This changelog is the concise extension-release summary. Detailed independent
+command histories are kept in each command's `SPEC.md`, using the
+[`docs/tool-version-delivery-ledger.md`](docs/tool-version-delivery-ledger.md)
+release boundaries.
+
 ## Unreleased
 
 No pending published release.
+
+## 0.0.10 - 2026-10-05
+
+- **Channel:** Beta
+- **Tag:** `v0.0.10-beta`
+- **Tested Revit range:** No new live Revit claim. Carbon GWP Pull and Hide
+  Engineering Notes retain their documented live Revit and Excel acceptance
+  boundaries; their deterministic behavior is covered by the static suite.
+
+### Changed
+
+- Carbon GWP Pull is now a KL&A Tools-panel beta command with explicit Excel
+  PIA/IDispatch compatibility for raw COM wrappers, guarded workbook refresh
+  and calculation, and retained chart-render evidence.
+- Hide Engineering Notes now supports additional placed view types and
+  dependent views, and reports changed, already-correct, skipped, and failed
+  results from its plain pushbutton workflow.
+
+### Fixed
+
+- Release checks now resolve the shipped `KL&A Tools.tab` command bundles.
+
+### Known limits
+
+- Carbon GWP Pull requires Microsoft Excel COM interop and trusted,
+  formula-linked `.xlsx` or `.xlsm` workbooks.
+- Static checks do not validate Revit transactions, native dialogs, Excel
+  refresh behavior, image import, sheet placement, worksharing, undo, or
+  model reopening.
+
+**Rollback tag:** `v0.0.9-beta`
 
 ## 0.0.9 - 2026-10-01
 
 - **Channel:** Beta
 - **Tag:** `v0.0.9-beta`
-- **Tested Revit range:** No new live Revit claim. Carbon GWP Pull remains a
-  DevSandbox beta workflow; its deterministic logic is covered by the static
-  test suite.
+- **Tested Revit range:** No new live Revit claim. Carbon GWP Pull is a beta
+  workflow in the KL&A Tools panel; its deterministic logic is covered by the
+  static test suite.
 
 ### Added
 
@@ -27,8 +63,7 @@ No pending published release.
 
 ### Fixed
 
-- Carbon GWP Pull command tests now load the distributed `KL&A Tools.tab`
-  bundle path.
+- Carbon GWP Pull command tests now load the current KL&A Tools source bundle.
 
 ### Known limits
 

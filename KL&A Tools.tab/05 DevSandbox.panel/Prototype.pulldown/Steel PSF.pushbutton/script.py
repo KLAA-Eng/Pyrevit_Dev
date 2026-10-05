@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Report host-model steel PSF summaries without changing the Revit model."""
 from __future__ import print_function
+
+__title__ = "Steel PSF"
+__version__ = "v0.5"
 
 import datetime
 import os
@@ -127,6 +129,11 @@ if LIB_DIR not in sys.path:
     sys.path.insert(0, LIB_DIR)
 
 from GUI.forms import my_WPF
+from excel_com import (
+    add_chart_object, add_workbook, add_worksheet, call_method,
+    close_excel_application, create_excel_application, create_pivot_cache,
+    get_item, get_property, range_at, save_workbook, set_property, worksheet_at,
+)
 from steel_weight.aggregation import aggregate_steel_weight
 from steel_weight.history import (
     RUN_APPEND,
@@ -458,75 +465,76 @@ def _ensure_history_workbook(folder_path):
 
 
 def _create_history_workbook(folder_path, workbook_path):
-    import clr
-    try:
-        clr.AddReference('Microsoft.Office.Interop.Excel')
-    except Exception:
-        clr.AddReferenceByName(
-            'Microsoft.Office.Interop.Excel, Version=11.0.0.0, '
-            'Culture=neutral, PublicKeyToken=71e9bce111e9429c')
-    from Microsoft.Office.Interop import Excel
-
     max_chart_rows = 2000
     paths = export_set_paths(folder_path)
-    excel = Excel.ApplicationClass()
-    excel.Visible = False
-    excel.DisplayAlerts = False
+    excel = create_excel_application()
     workbook = None
+    operation_failed = False
     try:
-        workbook = excel.Workbooks.Add()
-        steel_sheet = workbook.Worksheets[1]
+        workbook = add_workbook(excel)
+        steel_sheet = worksheet_at(workbook, 1)
         _connect_csv_sheet(steel_sheet, 'Steel Raw', paths[STEEL_KEY], 'SteelPSFRawSteel')
-        floor_sheet = workbook.Worksheets.Add(After=steel_sheet)
+        floor_sheet = add_worksheet(workbook, after=steel_sheet)
         _connect_csv_sheet(floor_sheet, 'Floor Raw', paths[FLOORS_KEY], 'SteelPSFRawFloors')
-        exclusion_sheet = workbook.Worksheets.Add(After=floor_sheet)
+        exclusion_sheet = add_worksheet(workbook, after=floor_sheet)
         _connect_csv_sheet(exclusion_sheet, 'Exclusion Raw', paths[EXCLUSIONS_KEY], 'SteelPSFRawExclusions')
-        level_summary_sheet = workbook.Worksheets.Add(After=exclusion_sheet)
+        level_summary_sheet = add_worksheet(workbook, after=exclusion_sheet)
         _connect_csv_sheet(level_summary_sheet, 'Level Summaries', paths[LEVEL_SUMMARIES_KEY], 'SteelPSFLevelSummaries')
-        category_summary_sheet = workbook.Worksheets.Add(After=level_summary_sheet)
+        category_summary_sheet = add_worksheet(workbook, after=level_summary_sheet)
         _connect_csv_sheet(category_summary_sheet, 'Category Summaries', paths[CATEGORY_SUMMARIES_KEY], 'SteelPSFCategorySummaries')
-        family_type_summary_sheet = workbook.Worksheets.Add(After=category_summary_sheet)
+        family_type_summary_sheet = add_worksheet(workbook, after=category_summary_sheet)
         _connect_csv_sheet(family_type_summary_sheet, 'Family Type Summaries', paths[FAMILY_TYPE_SUMMARIES_KEY], 'SteelPSFFamilyTypeSummaries')
-        floor_type_summary_sheet = workbook.Worksheets.Add(After=family_type_summary_sheet)
+        floor_type_summary_sheet = add_worksheet(workbook, after=family_type_summary_sheet)
         _connect_csv_sheet(floor_type_summary_sheet, 'Floor Type Summaries', paths[FLOOR_TYPE_SUMMARIES_KEY], 'SteelPSFFloorTypeSummaries')
-        exclusion_summary_sheet = workbook.Worksheets.Add(After=floor_type_summary_sheet)
+        exclusion_summary_sheet = add_worksheet(workbook, after=floor_type_summary_sheet)
         _connect_csv_sheet(exclusion_summary_sheet, 'Excluded Unavailable', paths[EXCLUSION_SUMMARIES_KEY], 'SteelPSFExcludedUnavailable')
 
-        pivot_sheet = workbook.Worksheets.Add(After=exclusion_summary_sheet)
-        pivot_sheet.Name = 'Pivot Tables'
+        pivot_sheet = add_worksheet(workbook, after=exclusion_summary_sheet)
+        set_property(pivot_sheet, 'Name', 'Pivot Tables')
         _populate_pivot_tables(workbook, pivot_sheet, steel_sheet, floor_sheet, exclusion_sheet,
                                level_summary_sheet, category_summary_sheet, family_type_summary_sheet,
                                floor_type_summary_sheet, exclusion_summary_sheet)
 
-        summary_sheet = workbook.Worksheets.Add(After=pivot_sheet)
-        summary_sheet.Name = 'Pivot Summaries'
+        summary_sheet = add_worksheet(workbook, after=pivot_sheet)
+        set_property(summary_sheet, 'Name', 'Pivot Summaries')
         _populate_pivot_summary_sheet(summary_sheet, max_chart_rows)
 
-        charts = workbook.Worksheets.Add(After=summary_sheet)
-        charts.Name = 'Steel PSF Charts'
+        charts = add_worksheet(workbook, after=summary_sheet)
+        set_property(charts, 'Name', 'Steel PSF Charts')
         _add_line_chart(charts, summary_sheet, 'Steel PSF - PSF History', 'A1:C{}'.format(max_chart_rows + 1), 20, 20)
         _add_line_chart(charts, summary_sheet, 'Steel PSF - Steel Weight History', 'E1:G{}'.format(max_chart_rows + 1), 20, 260)
         _add_line_chart(charts, summary_sheet, 'Steel PSF - Floor Area History', 'I1:K{}'.format(max_chart_rows + 1), 20, 500)
-        workbook.SaveAs(workbook_path)
+        save_workbook(workbook, workbook_path)
+    except Exception:
+        operation_failed = True
+        raise
     finally:
-        if workbook is not None:
-            workbook.Close(False)
-        excel.Quit()
+        close_excel_application(excel, workbook, suppress_errors=operation_failed)
 
 
 def _connect_csv_sheet(sheet, sheet_name, csv_path, table_name):
-    sheet.Name = sheet_name
-    query_table = sheet.QueryTables.Add('TEXT;{}'.format(csv_path), sheet.Range('A1'))
-    query_table.Name = table_name + 'Csv'
-    query_table.TextFileParseType = 1
-    query_table.TextFileCommaDelimiter = True
-    query_table.RefreshOnFileOpen = True
-    query_table.Refresh(False)
-    try:
-        sheet.ListObjects.Add(1, sheet.UsedRange, None, 1).Name = table_name
-    except Exception:
-        pass
-    sheet.Columns.AutoFit()
+    set_property(sheet, 'Name', sheet_name)
+    query_tables = get_property(sheet, 'QueryTables')
+    query_table = call_method(query_tables, 'Add', 'TEXT;{}'.format(csv_path), range_at(sheet, 'A1'))
+    set_property(query_table, 'Name', table_name + 'Csv')
+    set_property(query_table, 'TextFileParseType', 1)
+    set_property(query_table, 'TextFileCommaDelimiter', True)
+    set_property(query_table, 'RefreshOnFileOpen', True)
+    call_method(query_table, 'Refresh', False)
+    # A QueryTable owns its destination range. Excel rejects adding a ListObject
+    # over those query results, so retain the query table as the tab's data
+    # object instead of silently attempting an invalid overlapping table.
+    call_method(get_property(sheet, 'Columns'), 'AutoFit')
+
+
+def _set_range_value(sheet, address, value):
+    """Set an Excel range value through the shared explicit COM boundary."""
+    set_property(range_at(sheet, address), 'Value2', value)
+
+
+def _set_range_formula(sheet, address, formula):
+    """Set an Excel range formula through the shared explicit COM boundary."""
+    set_property(range_at(sheet, address), 'Formula', formula)
 
 
 def _populate_pivot_summary_sheet(sheet, max_chart_rows):
@@ -537,98 +545,101 @@ def _populate_pivot_summary_sheet(sheet, max_chart_rows):
         ('M1', 'Run Timestamp'), ('N1', 'Reason'), ('O1', 'Family Type'), ('P1', 'Count'),
     ]
     for cell, value in headers:
-        sheet.Range(cell).Value2 = value
+        _set_range_value(sheet, cell, value)
     for row in range(2, max_chart_rows + 2):
-        sheet.Range('E{}'.format(row)).Formula = '=IF(\'Steel Raw\'!$N{}="Eligible",\'Steel Raw\'!$B{},NA())'.format(row, row)
-        sheet.Range('F{}'.format(row)).Formula = '=IF(\'Steel Raw\'!$N{}="Eligible",\'Steel Raw\'!$H{},NA())'.format(row, row)
-        sheet.Range('G{}'.format(row)).Formula = '=IF(\'Steel Raw\'!$N{}="Eligible",\'Steel Raw\'!$M{},NA())'.format(row, row)
-        sheet.Range('I{}'.format(row)).Formula = '=IF(\'Floor Raw\'!$K{}="Eligible",\'Floor Raw\'!$B{},NA())'.format(row, row)
-        sheet.Range('J{}'.format(row)).Formula = '=IF(\'Floor Raw\'!$K{}="Eligible",\'Floor Raw\'!$H{},NA())'.format(row, row)
-        sheet.Range('K{}'.format(row)).Formula = '=IF(\'Floor Raw\'!$K{}="Eligible",\'Floor Raw\'!$J{},NA())'.format(row, row)
-        sheet.Range('A{}'.format(row)).Formula = '=E{}'.format(row)
-        sheet.Range('B{}'.format(row)).Formula = '=F{}'.format(row)
-        sheet.Range('C{}'.format(row)).Formula = '=IFERROR(G{}/SUMIFS($K:$K,$I:$I,E{},$J:$J,F{}),NA())'.format(row, row, row)
-        sheet.Range('M{}'.format(row)).Formula = '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$B{},NA())'.format(row, row)
-        sheet.Range('N{}'.format(row)).Formula = '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$M{},NA())'.format(row, row)
-        sheet.Range('O{}'.format(row)).Formula = '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$K{},NA())'.format(row, row)
-        sheet.Range('P{}'.format(row)).Formula = '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$O{},NA())'.format(row, row)
-    sheet.Columns.AutoFit()
+        _set_range_formula(sheet, 'E{}'.format(row), '=IF(\'Steel Raw\'!$N{}="Eligible",\'Steel Raw\'!$B{},NA())'.format(row, row))
+        _set_range_formula(sheet, 'F{}'.format(row), '=IF(\'Steel Raw\'!$N{}="Eligible",\'Steel Raw\'!$H{},NA())'.format(row, row))
+        _set_range_formula(sheet, 'G{}'.format(row), '=IF(\'Steel Raw\'!$N{}="Eligible",\'Steel Raw\'!$M{},NA())'.format(row, row))
+        _set_range_formula(sheet, 'I{}'.format(row), '=IF(\'Floor Raw\'!$K{}="Eligible",\'Floor Raw\'!$B{},NA())'.format(row, row))
+        _set_range_formula(sheet, 'J{}'.format(row), '=IF(\'Floor Raw\'!$K{}="Eligible",\'Floor Raw\'!$H{},NA())'.format(row, row))
+        _set_range_formula(sheet, 'K{}'.format(row), '=IF(\'Floor Raw\'!$K{}="Eligible",\'Floor Raw\'!$J{},NA())'.format(row, row))
+        _set_range_formula(sheet, 'A{}'.format(row), '=E{}'.format(row))
+        _set_range_formula(sheet, 'B{}'.format(row), '=F{}'.format(row))
+        _set_range_formula(sheet, 'C{}'.format(row), '=IFERROR(G{}/SUMIFS($K:$K,$I:$I,E{},$J:$J,F{}),NA())'.format(row, row, row))
+        _set_range_formula(sheet, 'M{}'.format(row), '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$B{},NA())'.format(row, row))
+        _set_range_formula(sheet, 'N{}'.format(row), '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$M{},NA())'.format(row, row))
+        _set_range_formula(sheet, 'O{}'.format(row), '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$K{},NA())'.format(row, row))
+        _set_range_formula(sheet, 'P{}'.format(row), '=IF(\'Exclusion Raw\'!$F{}<>"",\'Exclusion Raw\'!$O{},NA())'.format(row, row))
+    call_method(get_property(sheet, 'Columns'), 'AutoFit')
 
 
 def _populate_pivot_tables(workbook, pivot_sheet, steel_sheet, floor_sheet, exclusion_sheet,
                            level_summary_sheet, category_summary_sheet, family_type_summary_sheet,
                            floor_type_summary_sheet, exclusion_summary_sheet):
-    pivot_sheet.Range('A1').Value2 = 'Steel Weight By Run And Level'
-    pivot_sheet.Range('A18').Value2 = 'Floor Area By Run And Level'
-    pivot_sheet.Range('A35').Value2 = 'Exclusions By Run, Reason, And Family Type'
-    pivot_sheet.Range('A52').Value2 = 'Output Level Summaries'
-    pivot_sheet.Range('A69').Value2 = 'Output Category Summaries'
-    pivot_sheet.Range('A86').Value2 = 'Output Family/Type Summaries'
-    pivot_sheet.Range('A103').Value2 = 'Output Floor-Type Summaries'
-    pivot_sheet.Range('A120').Value2 = 'Output Excluded Or Unavailable Summaries'
+    _set_range_value(pivot_sheet, 'A1', 'Steel Weight By Run And Level')
+    _set_range_value(pivot_sheet, 'A18', 'Floor Area By Run And Level')
+    _set_range_value(pivot_sheet, 'A35', 'Exclusions By Run, Reason, And Family Type')
+    _set_range_value(pivot_sheet, 'A52', 'Output Level Summaries')
+    _set_range_value(pivot_sheet, 'A69', 'Output Category Summaries')
+    _set_range_value(pivot_sheet, 'A86', 'Output Family/Type Summaries')
+    _set_range_value(pivot_sheet, 'A103', 'Output Floor-Type Summaries')
+    _set_range_value(pivot_sheet, 'A120', 'Output Excluded Or Unavailable Summaries')
     try:
         _add_pivot_table(
-            workbook, steel_sheet, pivot_sheet.Range('A2'), 'SteelWeightPivot',
+            workbook, steel_sheet, range_at(pivot_sheet, 'A2'), 'SteelWeightPivot',
             ['RunTimestamp', 'LevelName'], 'ComputedPounds', 'Sum of ComputedPounds',
             'EligibilityStatus', 'Eligible')
         _add_pivot_table(
-            workbook, floor_sheet, pivot_sheet.Range('A19'), 'FloorAreaPivot',
+            workbook, floor_sheet, range_at(pivot_sheet, 'A19'), 'FloorAreaPivot',
             ['RunTimestamp', 'LevelName'], 'AreaSquareFeet', 'Sum of AreaSquareFeet',
             'EligibilityStatus', 'Eligible')
         _add_pivot_table(
-            workbook, exclusion_sheet, pivot_sheet.Range('A36'), 'ExclusionsPivot',
+            workbook, exclusion_sheet, range_at(pivot_sheet, 'A36'), 'ExclusionsPivot',
             ['RunTimestamp', 'Reason', 'FamilyType'], 'Count', 'Count of Exclusions',
             None, None)
         _add_pivot_table(
-            workbook, level_summary_sheet, pivot_sheet.Range('A53'), 'OutputLevelSummariesPivot',
+            workbook, level_summary_sheet, range_at(pivot_sheet, 'A53'), 'OutputLevelSummariesPivot',
             ['RunTimestamp', 'LevelName'], 'SteelWeightLb', 'Sum of SteelWeightLb',
             None, None)
         _add_pivot_table(
-            workbook, category_summary_sheet, pivot_sheet.Range('A70'), 'OutputCategorySummariesPivot',
+            workbook, category_summary_sheet, range_at(pivot_sheet, 'A70'), 'OutputCategorySummariesPivot',
             ['RunTimestamp', 'LevelName', 'Category'], 'SteelWeightLb', 'Sum of SteelWeightLb',
             None, None)
         _add_pivot_table(
-            workbook, family_type_summary_sheet, pivot_sheet.Range('A87'), 'OutputFamilyTypeSummariesPivot',
+            workbook, family_type_summary_sheet, range_at(pivot_sheet, 'A87'), 'OutputFamilyTypeSummariesPivot',
             ['RunTimestamp', 'LevelName', 'FamilyType'], 'SteelWeightLb', 'Sum of SteelWeightLb',
             None, None)
         _add_pivot_table(
-            workbook, floor_type_summary_sheet, pivot_sheet.Range('A104'), 'OutputFloorTypeSummariesPivot',
+            workbook, floor_type_summary_sheet, range_at(pivot_sheet, 'A104'), 'OutputFloorTypeSummariesPivot',
             ['RunTimestamp', 'LevelName', 'FloorType'], 'FloorAreaSf', 'Sum of FloorAreaSf',
             None, None)
         _add_pivot_table(
-            workbook, exclusion_summary_sheet, pivot_sheet.Range('A121'), 'OutputExcludedUnavailablePivot',
+            workbook, exclusion_summary_sheet, range_at(pivot_sheet, 'A121'), 'OutputExcludedUnavailablePivot',
             ['RunTimestamp', 'Reason', 'LevelName', 'FamilyType'], 'Count', 'Sum of Count',
             None, None)
     except Exception:
-        pivot_sheet.Range('A138').Value2 = 'PivotTable creation failed. Refresh raw data tabs and build pivots from the CSV-backed tables.'
-    pivot_sheet.Columns.AutoFit()
+        _set_range_value(pivot_sheet, 'A138', 'PivotTable creation failed. Refresh raw data tabs and build pivots from the CSV-backed tables.')
+    call_method(get_property(pivot_sheet, 'Columns'), 'AutoFit')
 
 
 def _add_pivot_table(workbook, source_sheet, target_range, pivot_name,
                      row_fields, data_field, data_caption, page_field, page_value):
-    pivot_cache = workbook.PivotCaches().Create(1, source_sheet.UsedRange)
-    pivot_table = pivot_cache.CreatePivotTable(target_range, pivot_name)
+    pivot_cache = create_pivot_cache(
+        workbook, get_property(source_sheet, 'UsedRange'))
+    pivot_table = call_method(pivot_cache, 'CreatePivotTable', target_range, pivot_name)
     for field_name in row_fields:
-        field = pivot_table.PivotFields(field_name)
-        field.Orientation = 1
+        field = call_method(pivot_table, 'PivotFields', field_name)
+        set_property(field, 'Orientation', 1)
     if page_field:
-        field = pivot_table.PivotFields(page_field)
-        field.Orientation = 3
+        field = call_method(pivot_table, 'PivotFields', page_field)
+        set_property(field, 'Orientation', 3)
         try:
-            field.CurrentPage = page_value
+            set_property(field, 'CurrentPage', page_value)
         except Exception:
             pass
-    pivot_table.AddDataField(pivot_table.PivotFields(data_field), data_caption, -4157)
+    call_method(
+        pivot_table, 'AddDataField',
+        call_method(pivot_table, 'PivotFields', data_field), data_caption, -4157)
     return pivot_table
 
 
 def _add_line_chart(sheet, source_sheet, title, source_range, left, top):
-    chart_object = sheet.ChartObjects().Add(left, top, 560, 210)
-    chart = chart_object.Chart
-    chart.ChartType = 65
-    chart.SetSourceData(source_sheet.Range(source_range))
-    chart.HasTitle = True
-    chart.ChartTitle.Text = title
+    chart_object = add_chart_object(sheet, left, top, 560, 210)
+    chart = get_property(chart_object, 'Chart')
+    set_property(chart, 'ChartType', 65)
+    call_method(chart, 'SetSourceData', range_at(source_sheet, source_range))
+    set_property(chart, 'HasTitle', True)
+    set_property(get_property(chart, 'ChartTitle'), 'Text', title)
 
 
 def main():

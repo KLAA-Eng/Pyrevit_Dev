@@ -1,5 +1,26 @@
 # Highlight Changed Elements
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.highlight-changed-elements` |
+| Tool version | `v0.1` |
+| Status | Released |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | 0.0.3.beta |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Highlight Changed Elements.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Highlight Changed Elements.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Highlight Changed Elements.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/Highlight Changed Elements.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Highlight Changed Elements.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Highlight Changed Elements.pushbutton/script.py`; `lib/changed_elements/` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | 0.0.1.beta | 08.13.2026 | First main delivery of baseline comparison, red highlighting, conflict guidance, and detailed reporting. | 78b2aee |
+| v0.1 | 0.0.3.beta | 08.13.2026 | Deliver compatible ElementId/override access for supported Revit hosts. | d1e0c69 |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 ## Purpose
 
 `Highlight Changed Elements` is a DevSandbox pyRevit prototype for comparing

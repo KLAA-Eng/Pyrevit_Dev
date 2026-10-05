@@ -1,5 +1,17 @@
 # Launch Gen Notes Typ Details
 
+## Identity
+
+- **Tool ID:** `launch-gen-notes-typ-details`
+- **Path aliases:** `KL&A Tools.tab/01 KL&A Resource Links.panel/Launch Gen Notes Typ Details.pushbutton`, `KL&A Tools.tab/KL&A Tools.panel/Launch Graphic Standards.pushbutton`.
+- **Version inputs:** `KL&A Tools_dev.tab/01 KL&A Resource Links.panel/Launch Gen Notes Typ Details.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/01 KL&A Resource Links.panel/Launch Gen Notes Typ Details.pushbutton/script.py`.
+- **Tool version:** `v1.0`
+- **Status/origin:** Maintained production; KL&A custom command.
+- **Status:** Released.
+- **Maintainer:** KL&A.
+- **Ribbon location:** `KL&A Tools_dev.tab/01 KL&A Resource Links.panel/Launch Gen Notes Typ Details.pushbutton`.
+- **Live acceptance:** Exact-version Revit/pyRevit acceptance is not recorded.
+
 ## Purpose
 
 Documents the current command implementation and intended user-facing behavior.
@@ -38,6 +50,19 @@ Detected mutation/external-effect patterns: No Revit transaction or direct mutat
 
 ## Current status
 
-This is a development-tab command. The inventory above is statically derived
-from the current bundle and must be confirmed inside the target Revit/pyRevit
-environment before promotion or behavior changes.
+This utility is visible on the production ribbon panels of the development
+extension. The implementation inventory is static; its external application or
+form behavior still requires representative live acceptance.
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v1.0` | `0.0.0.beta` | 07.16.2026 | Delivered the working KL&A General Notes/Typical Details Bluebeam Studio launcher. | `484924b` |
+
+Versions follow meaningful changes between adjacent mainline release snapshots,
+including the listed version inputs. Earlier development iterations are grouped
+into the first delivery; tab/panel moves, formatting, and metadata/documentation
+changes do not create additional milestones. Dates use `MM.DD.YYYY`; released
+rows use the main delivery date, and Unreleased rows use the latest meaningful
+development change date.

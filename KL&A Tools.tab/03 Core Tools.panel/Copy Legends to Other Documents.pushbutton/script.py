@@ -1,5 +1,8 @@
 # pylint: disable=E0401,W0613,C0103,C0111
 # -*- coding: utf-8 -*-
+__title__ = 'Copy legends\nto others documents'
+__version__ = 'v1.0.pyRevit'
+
 import sys
 from Autodesk.Revit.DB import Transaction, TransactionGroup
 from pyrevit import revit, DB, script, forms

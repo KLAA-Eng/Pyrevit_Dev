@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Launch safe, seeded previews of pyRevit and KL&A dialog families."""
 from __future__ import print_function
+
+__title__ = "UI Gallery"
+__version__ = "v0.3"
 
 import os
 import sys

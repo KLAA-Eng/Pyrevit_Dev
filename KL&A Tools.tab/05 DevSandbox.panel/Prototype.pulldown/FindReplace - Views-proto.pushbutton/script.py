@@ -1,30 +1,7 @@
 # -*- coding: utf-8 -*-
+
 __title__ = "Find and Replace in Views"
-__author__ = "Erik Frits"
-__version__ = 'Version: 1.2'
-__doc__ = """Version: 1.2
-Date    = 10.11.2020
-_____________________________________________________________________
-Description:
-
-Rename multiple views at once with Find/Replace/Suffix/Prefix logic.
-You can select views in Project Browser or if nothing selected
-you will get a menu to select your views.
-
-_____________________________________________________________________
-How-to:
-
-- Select views in ProjectBrowser (optional)
-- Run the script
-- Type Find/Replace/Prefix/Suffix as needed.
-_____________________________________________________________________
-Last update:
-- [15.12.2022] - 1.2 RELEASE
-- [10.05.2021] - 1.0 RELESE
-- [10.05.2021] - ViewSchedule, ViewDrafting added.
-- [10.05.2021] - GUI Updated
-_____________________________________________________________________
-Author: Erik Frits"""
+__version__ = "v0.0"
 
 # ╦╔╦╗╔═╗╔═╗╦═╗╔╦╗╔═╗
 # ║║║║╠═╝║ ║╠╦╝ ║ ╚═╗

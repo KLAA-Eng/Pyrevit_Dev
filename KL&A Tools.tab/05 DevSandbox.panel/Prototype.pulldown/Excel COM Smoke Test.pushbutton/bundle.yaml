@@ -1,0 +1,20 @@
+title:
+  en_us: "Excel COM Smoke Test"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 10.02.2026
+    Status: Unreleased
+    _____________________________________________________________________
+    Description:
+    Prototype: tests the shared Excel COM facade in the current Revit/pyRevit host using owned temporary workbook and CSV files. Reports PASS/FAIL per operation.
+    _____________________________________________________________________
+    How-to:
+    - Run with Microsoft Excel installed.
+    - Review the operation table; inspect retained temporary files if a test or safe cleanup fails.
+    _____________________________________________________________________
+    Last update:
+    - [10.02.2026] - v0.0 (Unreleased): Planned first delivery of a disposable Excel facade lifecycle and operation smoke test.
+author: KL&A
+engine:
+  clean: true

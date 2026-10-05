@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+__title__ = "Prototype\nRequest"
+__version__ = "v1.0"
+
 import os
 
 

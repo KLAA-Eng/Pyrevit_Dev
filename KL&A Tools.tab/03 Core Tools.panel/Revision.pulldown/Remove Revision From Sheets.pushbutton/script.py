@@ -1,4 +1,5 @@
-"""Remove selected revisions from selected sheets."""
+__title__ = 'Toggle off Revision Schedule'
+__version__ = 'v1.0'
 
 from pyrevit import revit, DB
 from pyrevit import forms

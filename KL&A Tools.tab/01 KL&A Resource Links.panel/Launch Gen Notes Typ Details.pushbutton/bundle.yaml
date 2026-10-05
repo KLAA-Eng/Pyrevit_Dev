@@ -1,6 +1,24 @@
 title:
   en_us: "Gen Notes\nTYP DTLS"
 tooltip:
-  en_us: Launches KL&A's General Notes, Typical Details and Graphic Style Guide Bluebeam Studio Session.
+  en_us: |
+    Version: v1.0
+    Date: 07.16.2026
+    _____________________________________________________________________
+    Description:
+
+    Open KL&A's General Notes, Typical Details and Graphic Style Guide
+    Bluebeam Studio Session. Requires a registered Bluebeam Studio handler.
+    _____________________________________________________________________
+    How-to:
+
+    -> Click the button to open the session in Bluebeam.
+    -> Sign in if prompted. Opening it can switch an existing Studio session.
+    _____________________________________________________________________
+    Last update:
+
+    - [07.16.2026] v1.0 - 0.0.0.beta: Delivered the working KL&A General Notes/Typical Details Bluebeam Studio launcher.
+
+author: KL&A
 
 context: zero-doc

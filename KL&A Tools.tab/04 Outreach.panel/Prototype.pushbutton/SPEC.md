@@ -1,43 +1,65 @@
-# Suggestions
+# Prototype Request
+
+## Identity
+
+- **Tool ID:** `prototype-request`
+- **Path aliases:** `KL&A Tools.tab/04 Outreach.panel/Prototype.pushbutton`.
+- **Version inputs:** `KL&A Tools_dev.tab/04 Outreach.panel/Prototype.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/04 Outreach.panel/Prototype.pushbutton/script.py`.
+- **Tool version:** `v1.0`
+- **Status/origin:** Maintained production utility; KL&A internal derivative of the KL&A Suggestions command.
+- **Status:** Released.
+- **Maintainer:** KL&A.
+- **Ribbon location:** `KL&A Tools_dev.tab/04 Outreach.panel/Prototype.pushbutton`.
+- **Live acceptance:** Exact-version Revit/pyRevit acceptance is not recorded.
 
 ## Purpose
 
-Documents the current command implementation and intended user-facing behavior.
+Open the KL&A prototype request Microsoft Form in the user's default browser.
 
 ## Behavior
 
-This command is implemented by `script.py` in this pyRevit bundle. It runs in the Revit/pyRevit host and uses the active-document context required by its implementation. It must preserve unrelated model content and report unsupported or cancelled interactions without applying partial changes.
+The command opens `FORM_URL` through Windows' registered URL handler. It needs
+no active Revit document, gathers no Revit context, and does not submit the form.
 
 ## Validation boundary
 
-Validate this command against a representative Revit fixture, its empty or cancelled-input path, and its documented output or transaction effect before promotion beyond development use.
+Confirm in Revit that the button opens the intended browser form with no active
+document. Form access, questions, branching, and submission require live browser
+acceptance and are controlled by the form, not by this command.
 
 ## Implementation inventory
 
 - Entry point: `script.py`
-- Direct imports: import os;import urllib;from pyrevit import forms, revit, script;from Autodesk.Revit.DB import ModelPathUtils;
-- Local helper functions: has_form_configuration,get_document_path,collect_context,prompt_for_user_input,build_form_url,main,
+- Direct imports: `os`.
+- Local helper functions: `main`.
 - Bundled external assets: None.
 
 ## GUI and interaction
 
-Static UI/API references: forms.CommandSwitchWindow,forms.alert,forms.ask_for_string,forms.microsoft,
-
-Use the command from its pyRevit button. Where it exposes a dialog or selection
-workflow, make the required selection and review the result before confirming.
+Click the button, then complete and submit the request in the browser.
 
 ## Current execution logic
 
-pyRevit loads the bundle and executes its entry point. The implementation uses
-the imports and helper functions listed above; inspect `script.py` for the exact
-branching order and host API calls.
+pyRevit executes `main()`, which calls `os.startfile(FORM_URL)`.
 
 ## Model and external effects
 
-Detected mutation/external-effect patterns: No Revit transaction or direct mutation pattern detected.
+Opens an external browser URL. No Revit transaction or model edit occurs.
 
 ## Current status
 
-This is a development-tab command. The inventory above is statically derived
-from the current bundle and must be confirmed inside the target Revit/pyRevit
-environment before promotion or behavior changes.
+This utility is visible on the production ribbon panels of the development
+extension. Browser/form acceptance is not recorded here.
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v1.0` | `0.0.4.beta` | 08.17.2026 | First delivered Prototype Request bundle opens the dedicated Microsoft Form directly in the browser. | `1f3dd23` |
+
+Versions follow meaningful changes between adjacent mainline release snapshots,
+including the listed version inputs. Earlier development iterations are grouped
+into the first delivery; tab/panel moves, formatting, and metadata/documentation
+changes do not create additional milestones. Dates use `MM.DD.YYYY`; released
+rows use the main delivery date, and Unreleased rows use the latest meaningful
+development change date.

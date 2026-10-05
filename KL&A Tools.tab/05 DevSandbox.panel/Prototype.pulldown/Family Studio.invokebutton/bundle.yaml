@@ -1,5 +1,19 @@
-title: Family Studio
-tooltip: Browse the local Family Studio index and load or place Revit families.
+title:
+  en_us: "Family Studio"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 09.28.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: browses the local Family Studio index and loads or places selected Revit families. Includes library indexing and preview thumbnails.
+    _____________________________________________________________________
+    How-to:
+    - Open a project and choose the library configuration when prompted.
+    - Index or search the library, inspect a family, then choose Load or Load and Place.
+    _____________________________________________________________________
+    Last update:
+    - [09.28.2026] - v0.0 (0.0.7): First main delivery of the local family catalog, browser, Load/Load and Place, indexing progress, and previews.
 author: KL&A
 context: doc-project
 assembly: KLCode.FamilyStudio.Revit.dll

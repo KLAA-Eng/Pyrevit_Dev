@@ -1,7 +1,27 @@
-engine: 
+engine:
   clean: true
 title:
   en_us: "Hide/Unhide\nEng Notes"
 
 tooltip:
-  en_us: Changes Engineering Note Visibility on Sheet
+  en_us: |
+    Version: v1.1
+    Date: 10.05.2026
+    _____________________________________________________________________
+    Description:
+
+    Hide or unhide matching KL&A engineering-note text in supported views
+    and sheets that appear in the Sheet List. Changes visibility only.
+    _____________________________________________________________________
+    How-to:
+
+    -> Click the button and choose Hide or Unhide.
+    -> Review changed, already, skipped, and failed results in the output.
+    -> Hold Shift while clicking for detailed diagnostics.
+    _____________________________________________________________________
+    Last update:
+
+    - [10.05.2026] v1.1 - 0.0.10: Delivered broader supported views and dependent-view handling; plain pushbutton with changed/already/skipped/failed output reporting.
+    - [07.16.2026] v1.0 - 0.0.0.beta: Delivered hide/unhide engineering-note text with eligible-sheet/view filtering, type-name normalization, action dialog, and diagnostics.
+
+author: KL&A

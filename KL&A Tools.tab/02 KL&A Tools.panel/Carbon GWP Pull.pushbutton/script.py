@@ -1,32 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-__title__ = 'Carbon GWP Pull'
-__author__ = 'KL&A'
-__version__ = 'v0.0.0.proto'
-__doc__ = """Version: v0.0.0.proto
-_____________________________________________________________________
-Description:
-
-Export selected Carbon GWP schedules to Excel, read the post-processed
-Export worksheet, render its GWP and material-volume values as doughnut
-charts, and place or update them on the SYNC TO CENTRAL sheet.
-_____________________________________________________________________
-How-to:
-
--> Click the button
--> Select exactly three schedules
--> Select the export container workbook
--> Select the post-processing workbook
--> Review the pyRevit output report
-_____________________________________________________________________
-Prototype limits:
-- Requires Microsoft Excel COM interop on the Revit workstation
-- Does not run workbook macros directly
-- Stops before Revit changes if required schedules, workbooks, chart data, or
-  the SYNC TO CENTRAL sheet are missing
-_____________________________________________________________________
-Author: KL&A"""
+__title__ = 'Carbon\nGWP Pull'
+__version__ = 'v1.0'
 
 # ╦╔╦╗╔═╗╔═╗╦═╗╔╦╗╔═╗
 # ║║║║╠═╝║ ║╠╦╝ ║ ╚═╗
@@ -49,7 +25,7 @@ from pyrevit import DB, forms, revit, script
 # Command setup and shared helpers
 # ------------------------------------------------------------------
 
-COMMAND_TITLE = __title__
+COMMAND_TITLE = __title__.replace('\n', ' ')
 TARGET_SHEET_NAME = 'SYNC TO CENTRAL'
 POST_PROCESSING_REFRESH_TIMEOUT_SECONDS = 60.0
 POST_PROCESSING_REFRESH_POLL_SECONDS = 0.25
@@ -58,8 +34,13 @@ MATERIAL_ACCURACY_WORKSHEET_NAME = 'Post-Processing'
 MATERIAL_ACCURACY_FIRST_ROW = 41
 MATERIAL_ACCURACY_LAST_ROW = 70
 MATERIAL_ACCURACY_COLUMN = 'F'
-EXPORT_WORKBOOK_PICKER_TITLE = 'Select Export Container'
+EXPORT_WORKBOOK_PICKER_TITLE = 'Select Export Workbook (DYN Out sheets will be replaced)'
 POST_PROCESSING_WORKBOOK_PICKER_TITLE = 'Select Post-processing'
+EXCEL_WORKBOOK_FILTER = (
+    'Excel Workbook (*.xlsx)|*.xlsx|'
+    'Excel Macro-Enabled Workbook (*.xlsm)|*.xlsm')
+CHART_OUTPUT_FOLDER_NAME = 'Carbon GWP Pull Charts'
+MAX_CHART_SLICE_COUNT = 30
 CHART_IMAGE_FILENAMES = {
     'gwp': 'Carbon GWP Summary.png',
     'volume': 'Carbon Material Volume Summary.png',
@@ -100,6 +81,21 @@ if LIB_DIR not in sys.path:
     sys.path.insert(0, LIB_DIR)
 
 from GUI.forms import select_from_dict
+from excel_com import (
+    add_workbook,
+    add_worksheet,
+    call_method,
+    cell_at,
+    close_excel_application,
+    collection_count,
+    create_excel_application,
+    get_item,
+    get_property,
+    open_workbook,
+    set_property,
+    save_workbook,
+    worksheet_collection,
+)
 from carbon_gwp.workflow import (
     DEFAULT_EXPORT_CONTAINER_PATH,
     DEFAULT_SCHEDULE_NAMES,
@@ -222,7 +218,7 @@ def _select_schedules(document):
         title=COMMAND_TITLE,
         label='Select exactly three schedules to export:',
         button_name='Use Schedules',
-        version='DevSandbox Prototype',
+        version=__version__,
         SelectMultiple=True,
         initial_checked_names=DEFAULT_SCHEDULE_NAMES,
     )
@@ -301,35 +297,16 @@ def _pick_workbook(title, initial_directory):
         Chosen workbook path, or a falsey value after cancellation.
     """
     init_dir = initial_directory if initial_directory and os.path.isdir(initial_directory) else None
-    # Select a workbook. Start in the configured folder and allow macro-enabled
-    # files without this command running workbook macros.
-    picked = forms.pick_file(file_ext='xlsx', init_dir=init_dir, title=title)
-    if picked:
-        return picked
-    picked = forms.pick_file(file_ext='xlsm', init_dir=init_dir, title=title)
-    return picked
+    # Show both supported formats in one dialog. A cancelled selection must end
+    # the command rather than opening a second, unexpected file picker.
+    return forms.pick_file(
+        files_filter=EXCEL_WORKBOOK_FILTER,
+        init_dir=init_dir,
+        title=title)
 
 def _load_excel_application():
-    """Start a caller-owned Microsoft Excel COM application.
-
-    The caller must close every workbook it opens and quit the returned Excel
-    application in a ``finally`` block.
-
-    Returns:
-        Excel application owned by the caller.
-    """
-    # COMPAT: Office installations resolve different Excel interop names.
-    import clr
-    try:
-        clr.AddReference('Microsoft.Office.Interop.Excel')
-    except Exception:
-        clr.AddReferenceByName(
-            'Microsoft.Office.Interop.Excel, Version=11.0.0.0, '
-            'Culture=neutral, PublicKeyToken=71e9bce111e9429c')
-    # Create only the Excel application. Each caller owns the matching
-    # workbook-close and Excel-quit lifecycle for the files it opens.
-    from Microsoft.Office.Interop import Excel
-    return Excel.ApplicationClass()
+    """Return the shared Excel COM application used by this command."""
+    return create_excel_application()
 
 def _worksheet_by_name(workbook, worksheet_name):
     """Find an open workbook worksheet by its visible name.
@@ -342,18 +319,20 @@ def _worksheet_by_name(workbook, worksheet_name):
         Matching worksheet, or ``None`` when absent.
     """
     # COMPAT: Excel COM worksheet collections start at index 1, not 0.
-    for index in range(1, workbook.Worksheets.Count + 1):
-        worksheet = workbook.Worksheets[index]
-        if worksheet.Name == worksheet_name:
+    worksheets = worksheet_collection(workbook)
+    for index in range(1, collection_count(worksheets) + 1):
+        worksheet = get_item(worksheets, index)
+        if get_property(worksheet, 'Name') == worksheet_name:
             return worksheet
     return None
 
 
 def _worksheet_by_name_ignoring_case(workbook, worksheet_name):
     """Find a workbook worksheet by name without depending on letter case."""
-    for index in range(1, workbook.Worksheets.Count + 1):
-        worksheet = workbook.Worksheets[index]
-        if _safe_text(worksheet.Name).lower() == _safe_text(worksheet_name).lower():
+    worksheets = worksheet_collection(workbook)
+    for index in range(1, collection_count(worksheets) + 1):
+        worksheet = get_item(worksheets, index)
+        if _safe_text(get_property(worksheet, 'Name')).lower() == _safe_text(worksheet_name).lower():
             return worksheet
     return None
 
@@ -373,8 +352,9 @@ def _ensure_worksheet(workbook, worksheet_name):
         return worksheet
     # Append the export sheet after existing tabs so unrelated workbook tabs
     # remain in their original order.
-    worksheet = workbook.Worksheets.Add(After=workbook.Worksheets[workbook.Worksheets.Count])
-    worksheet.Name = worksheet_name
+    worksheets = worksheet_collection(workbook)
+    worksheet = add_worksheet(workbook, get_item(worksheets, collection_count(worksheets)))
+    set_property(worksheet, 'Name', worksheet_name)
     return worksheet
 
 def _clear_worksheet(worksheet):
@@ -384,10 +364,10 @@ def _clear_worksheet(worksheet):
         worksheet: Excel worksheet to clear before export.
     """
     try:
-        worksheet.Cells.Clear()
+        call_method(get_property(worksheet, 'Cells'), 'Clear')
     except Exception:
         # WORKAROUND: Some Excel COM wrappers expose only ``UsedRange.Clear``.
-        worksheet.UsedRange.Clear()
+        call_method(get_property(worksheet, 'UsedRange'), 'Clear')
 
 def _write_grid_to_worksheet(worksheet, grid):
     """Replace an export worksheet with schedule cell values.
@@ -412,11 +392,11 @@ def _write_grid_to_worksheet(worksheet, grid):
         # Excel cell indexes begin at 1, unlike normal Python list indexes.
         for column_index in range(1, column_count + 1):
             value = row[column_index - 1] if column_index - 1 < len(row) else ''
-            worksheet.Cells[row_index, column_index].Value2 = value
+            set_property(cell_at(worksheet, row_index, column_index), 'Value2', value)
     # Format for readability. AutoFit changes presentation only, so a failure
     # here must not discard the completed schedule export.
     try:
-        worksheet.Columns.AutoFit()
+        call_method(get_property(worksheet, 'Columns'), 'AutoFit')
     except Exception:
         pass
 
@@ -516,19 +496,20 @@ def _export_schedules_to_workbook(workbook_path, schedules):
     excel = _load_excel_application()
     # Prepare background Excel. Hide the application and its prompts so they do
     # not interrupt the pyRevit command.
-    excel.Visible = False
-    excel.DisplayAlerts = False
+    set_property(excel, 'Visible', False)
+    set_property(excel, 'DisplayAlerts', False)
     workbook = None
     exports = []
+    operation_failed = False
     # Open or create the container. Keep a new workbook in memory until every
     # schedule has exported successfully, so a failed export cannot leave an
     # incomplete workbook at the user-selected path.
     try:
         is_new_workbook = not os.path.isfile(workbook_path)
         if is_new_workbook:
-            workbook = excel.Workbooks.Add()
+            workbook = add_workbook(excel)
         else:
-            workbook = excel.Workbooks.Open(workbook_path)
+            workbook = open_workbook(excel, workbook_path)
         # Plan worksheet names. Convert Revit titles to unique Excel names so
         # duplicate titles cannot overwrite each other's export.
         raw_sheet_names = [worksheet_name_for_schedule(_element_name(schedule)) for schedule in schedules]
@@ -551,19 +532,21 @@ def _export_schedules_to_workbook(workbook_path, schedules):
         # Save the completed export only after every selected schedule tab is
         # refreshed, avoiding a partial workbook on an earlier failure.
         if is_new_workbook:
-            workbook.SaveAs(workbook_path)
+            save_workbook(workbook, workbook_path)
         else:
-            workbook.Save()
+            save_workbook(workbook)
         return exports
+    except Exception:
+        operation_failed = True
+        raise
     finally:
         # INVARIANT: This function owns the export workbook and must release
         # Excel so the file is not left locked for the post-processing workbook.
-        if workbook is not None:
-            # The explicit Save/SaveAs above is the only persistence point.
-            # Closing without saving prevents a failed mid-export from writing
-            # a partially cleared container workbook.
-            workbook.Close(False)
-        excel.Quit()
+        # The explicit Save/SaveAs above is the only persistence point.
+        # Closing without saving prevents a failed mid-export from writing a
+        # partially cleared container workbook. The shared helper still quits
+        # Excel when the workbook-close COM call fails.
+        close_excel_application(excel, workbook, suppress_errors=operation_failed)
 
 
 # Post-processing workbook reader
@@ -619,13 +602,15 @@ def _com_collection_items(collection):
     if collection is None:
         return []
     try:
-        return list(collection)
+        return [get_item(collection, index)
+                for index in range(1, collection_count(collection) + 1)]
     except Exception:
-        pass
-    try:
-        return [collection.Item(index) for index in range(1, int(collection.Count) + 1)]
-    except Exception:
-        return []
+        # Host-independent tests use ordinary Python lists; production COM
+        # collections normally expose Count and Item through the facade above.
+        try:
+            return list(collection)
+        except Exception:
+            return []
 
 
 def _make_query_refresh_foreground(workbook):
@@ -634,37 +619,59 @@ def _make_query_refresh_foreground(workbook):
     The setting is applied only to the read-only COM instance; it is never
     saved back into the analyst's workbook.
     """
-    for connection in _com_collection_items(getattr(workbook, 'Connections', None)):
+    try:
+        connections = get_property(workbook, 'Connections')
+    except Exception:
+        connections = None
+    for connection in _com_collection_items(connections):
         for property_name in ('OLEDBConnection', 'ODBCConnection'):
             try:
-                getattr(connection, property_name).BackgroundQuery = False
+                set_property(get_property(connection, property_name), 'BackgroundQuery', False)
             except Exception:
                 pass
-    for worksheet in _com_collection_items(getattr(workbook, 'Worksheets', None)):
+    for worksheet in _com_collection_items(worksheet_collection(workbook)):
         for collection_name in ('QueryTables', 'ListObjects'):
-            for source in _com_collection_items(getattr(worksheet, collection_name, None)):
+            try:
+                collection = get_property(worksheet, collection_name)
+            except Exception:
+                collection = None
+            for source in _com_collection_items(collection):
                 try:
-                    query_table = getattr(source, 'QueryTable', source)
-                    query_table.BackgroundQuery = False
+                    try:
+                        query_table = get_property(source, 'QueryTable')
+                    except Exception:
+                        query_table = source
+                    set_property(query_table, 'BackgroundQuery', False)
                 except Exception:
                     pass
 
 
 def _query_refresh_is_running(workbook):
     """Return whether a workbook query still reports an active refresh."""
-    for connection in _com_collection_items(getattr(workbook, 'Connections', None)):
+    try:
+        connections = get_property(workbook, 'Connections')
+    except Exception:
+        connections = None
+    for connection in _com_collection_items(connections):
         for property_name in ('OLEDBConnection', 'ODBCConnection'):
             try:
-                if getattr(connection, property_name).Refreshing:
+                if get_property(get_property(connection, property_name), 'Refreshing'):
                     return True
             except Exception:
                 pass
-    for worksheet in _com_collection_items(getattr(workbook, 'Worksheets', None)):
+    for worksheet in _com_collection_items(worksheet_collection(workbook)):
         for collection_name in ('QueryTables', 'ListObjects'):
-            for source in _com_collection_items(getattr(worksheet, collection_name, None)):
+            try:
+                collection = get_property(worksheet, collection_name)
+            except Exception:
+                collection = None
+            for source in _com_collection_items(collection):
                 try:
-                    query_table = getattr(source, 'QueryTable', source)
-                    if query_table.Refreshing:
+                    try:
+                        query_table = get_property(source, 'QueryTable')
+                    except Exception:
+                        query_table = source
+                    if get_property(query_table, 'Refreshing'):
                         return True
                 except Exception:
                     pass
@@ -711,7 +718,7 @@ def _material_accuracy_check(workbook):
             address = '{}{}'.format(MATERIAL_ACCURACY_COLUMN, row_number)
             # ``ISNA`` is true only for Excel's #N/A error value, not for a
             # manually entered text value that resembles the error.
-            if bool(worksheet.Evaluate('ISNA({})'.format(address))):
+            if bool(call_method(worksheet, 'Evaluate', 'ISNA({})'.format(address))):
                 result['cells'].append(address)
     except Exception as error:
         result['status'] = 'unavailable'
@@ -739,16 +746,17 @@ def _read_export_rows(workbook_path, include_material_accuracy_check=False):
         ValueError: Required Export worksheet is not present.
     """
     excel = _load_excel_application()
-    excel.Visible = False
-    excel.DisplayAlerts = False
+    set_property(excel, 'Visible', False)
+    set_property(excel, 'DisplayAlerts', False)
     workbook = None
+    operation_failed = False
     try:
         # ``UpdateLinks=3`` makes Excel update external formula links when the
         # post-processing workbook opens. Without it, a linked Export sheet can
         # retain its last saved (often zero) values even though this command has
         # just written fresh schedule data to the selected container workbook.
-        workbook = excel.Workbooks.Open(
-            workbook_path, UpdateLinks=3, ReadOnly=True)
+        workbook = open_workbook(
+            excel, workbook_path, update_links=3, read_only=True)
         # Open the analyst workbook read-only. This command needs calculated
         # values but must not overwrite its formulas or source data.
         # The new post-processing workbook uses Power Query to read the three
@@ -757,31 +765,34 @@ def _read_export_rows(workbook_path, include_material_accuracy_check=False):
         # foreground-only before refreshing so Export cannot be read while its
         # query inputs are temporarily blank.
         _make_query_refresh_foreground(workbook)
-        workbook.RefreshAll()
+        call_method(workbook, 'RefreshAll')
         _wait_for_query_refresh(workbook)
-        link_sources = workbook.LinkSources()
+        link_sources = call_method(workbook, 'LinkSources')
         if link_sources is not None:
-            workbook.UpdateLink(link_sources)
-        excel.CalculateUntilAsyncQueriesDone()
-        excel.CalculateFullRebuild()
-        # Read the workbook contract. The Export tab's first two columns map
-        # Revit parameter names to the values this command will write.
+            call_method(workbook, 'UpdateLink', link_sources)
+        call_method(excel, 'CalculateUntilAsyncQueriesDone')
+        call_method(excel, 'CalculateFullRebuild')
+        # Read the workbook contract. The Export tab's first three columns map
+        # source names to the GWP and material-volume chart values to render.
         worksheet = _worksheet_by_name(workbook, EXPORT_WORKSHEET_NAME)
         if worksheet is None:
             raise ValueError('Worksheet not found: {}'.format(EXPORT_WORKSHEET_NAME))
 
-        used_range = worksheet.UsedRange
-        row_count = int(used_range.Rows.Count)
-        column_count = int(used_range.Columns.Count)
-        rows = _com_range_values_to_rows(used_range.Value2, row_count, column_count)
+        used_range = get_property(worksheet, 'UsedRange')
+        row_count = int(get_property(get_property(used_range, 'Rows'), 'Count'))
+        column_count = int(get_property(get_property(used_range, 'Columns'), 'Count'))
+        rows = _com_range_values_to_rows(get_property(used_range, 'Value2'), row_count, column_count)
         if include_material_accuracy_check:
             return rows, _material_accuracy_check(workbook)
         return rows
+    except Exception:
+        operation_failed = True
+        raise
     finally:
         # INVARIANT: This reader never saves analyst-owned workbook changes.
-        if workbook is not None:
-            workbook.Close(False)
-        excel.Quit()
+        # The shared helper quits Excel even if Close(False) fails, avoiding a
+        # lingering hidden process and a locked analyst workbook.
+        close_excel_application(excel, workbook, suppress_errors=operation_failed)
 
 
 # Managed Revit chart placement
@@ -820,17 +831,83 @@ def _is_active_sheet(document, sheet):
         return False
 
 
-def _chart_png_path(post_processing_workbook, chart_kind):
-    """Return the persistent PNG location for a managed chart.
+def _chart_png_path(chart_output_folder, chart_kind):
+    """Return the generated PNG location for a managed chart.
 
-    Chart images are saved beside the selected post-processing workbook so
-    the project team can access the exact rendered graphics outside Revit.
+    Args:
+        chart_output_folder: New command-owned folder for the current run.
+        chart_kind: ``gwp`` or ``volume`` chart identifier.
+
+    Returns:
+        Absolute PNG path in ``chart_output_folder``.
+
+    Raises:
+        ValueError: ``chart_kind`` is not a supported chart identifier.
+
+    Chart images are saved in a timestamped folder beside the selected
+    post-processing workbook so the project team can access the exact
+    rendered graphics without replacing pre-existing files.
     """
     try:
         filename = CHART_IMAGE_FILENAMES[chart_kind]
     except KeyError:
         raise ValueError('Unsupported chart kind: {}'.format(chart_kind))
-    return os.path.join(os.path.dirname(post_processing_workbook), filename)
+    return os.path.join(chart_output_folder, filename)
+
+
+def _create_chart_output_folder(post_processing_workbook):
+    """Create and return a unique generated-chart folder for this run.
+
+    Args:
+        post_processing_workbook: Path to the selected analyst workbook.
+
+    Returns:
+        New timestamped folder below the workbook's ``Carbon GWP Pull Charts``
+        directory.
+
+    Raises:
+        OSError: The command cannot create the output folder.
+
+    The folder is deliberately unique per run. Re-rendering never deletes or
+    overwrites a file chosen or created by a project user.
+    """
+    parent_folder = os.path.dirname(post_processing_workbook)
+    base_folder = os.path.join(parent_folder, CHART_OUTPUT_FOLDER_NAME)
+    run_name = time.strftime('%Y%m%d-%H%M%S')
+    run_folder = os.path.join(base_folder, run_name)
+    suffix = 2
+    while os.path.exists(run_folder):
+        run_folder = os.path.join(base_folder, '{}-{}'.format(run_name, suffix))
+        suffix += 1
+    os.makedirs(run_folder)
+    return run_folder
+
+
+def _same_workbook_path(first_path, second_path):
+    """Return whether two workbook selections identify the same file.
+
+    Args:
+        first_path: First selected workbook path.
+        second_path: Second selected workbook path.
+
+    Returns:
+        ``True`` when normalized absolute paths are equal.
+    """
+    return os.path.normcase(os.path.abspath(first_path)) == os.path.normcase(
+        os.path.abspath(second_path))
+
+
+def _chart_slice_limit_exceeded(chart_results):
+    """Return chart names whose legends exceed the supported render limit.
+
+    Args:
+        chart_results: Chart dictionaries containing ``name`` and ``slices``.
+
+    Returns:
+        Names of charts with more than ``MAX_CHART_SLICE_COUNT`` slices.
+    """
+    return [chart['name'] for chart in chart_results
+            if len(chart['slices']) > MAX_CHART_SLICE_COUNT]
 
 
 # pyRevit output reporting
@@ -853,6 +930,9 @@ def _print_report(output, metadata, exports, chart_results, material_accuracy_ch
     output.print_md('Export container workbook: `{}`'.format(metadata['export_workbook']))
     output.print_md('Post-processing workbook: `{}`'.format(metadata['post_processing_workbook']))
     output.print_md('Target sheet: `{}`'.format(metadata['target_sheet']))
+    if metadata.get('chart_output_folder'):
+        output.print_md('Generated chart folder: `{}`'.format(
+            metadata['chart_output_folder']))
     # Report only populated sections. Empty headings add noise, while populated
     # tables show the selected schedules, skipped rows, and write outcomes.
     if exports:
@@ -952,8 +1032,8 @@ def main():
     schedules = _select_schedules(document)
     if not schedules:
         return
-    # Select the two workbook roles. The container receives schedule tabs; the
-    # post-processing workbook calculates values written back to Revit.
+    # Select the two workbook roles. The export workbook receives schedule
+    # tabs; the post-processing workbook calculates values for chart rendering.
     export_workbook = _pick_workbook(
         EXPORT_WORKBOOK_PICKER_TITLE,
         _model_workbook_folder(document, DEFAULT_EXPORT_CONTAINER_PATH))
@@ -964,13 +1044,23 @@ def main():
         os.path.dirname(export_workbook))
     if not post_processing_workbook:
         return
+    if _same_workbook_path(export_workbook, post_processing_workbook):
+        forms.alert(
+            'Select different workbooks for schedule export and post-processing. '
+            'The export workbook will have its DYN Out worksheets replaced.',
+            title=COMMAND_TITLE,
+            warn_icon=True)
+        return
     if not os.path.isfile(post_processing_workbook):
         forms.alert('Post-processing workbook not found:\n{}'.format(post_processing_workbook),
                     title=COMMAND_TITLE, warn_icon=True)
         return
-    # Refresh external data first. Excel failures occur before a Revit
-    # transaction, keeping file problems separate from model changes.
+    # Export and refresh external data before a Revit transaction, keeping
+    # workbook failures separate from model changes.
+    output.print_md('Preparing Carbon GWP Pull...')
+    output.print_md('Exporting selected schedules to the export workbook...')
     exports = _export_schedules_to_workbook(export_workbook, schedules)
+    output.print_md('Refreshing and calculating the post-processing workbook...')
     export_rows, material_accuracy_check = _read_export_rows(
         post_processing_workbook, include_material_accuracy_check=True)
     gwp_slices, gwp_skipped = chart_slices_from_export_rows(export_rows, 1, 'GWP')
@@ -1015,21 +1105,31 @@ def main():
             warn_icon=True)
         return
 
+    oversized_charts = _chart_slice_limit_exceeded(chart_results)
+    if oversized_charts:
+        forms.alert(
+            '{} has more than {} material rows. Reduce or group the Export '
+            'worksheet rows before rendering a readable chart.'.format(
+                ', '.join(oversized_charts), MAX_CHART_SLICE_COUNT),
+            title=COMMAND_TITLE,
+            warn_icon=True)
+        return
+
+    # Create a new tool-owned output folder before rendering. A failed render
+    # can leave only partial generated output; it cannot delete an earlier file.
+    output.print_md('Rendering chart PNGs...')
+    chart_output_folder = _create_chart_output_folder(post_processing_workbook)
+    metadata['chart_output_folder'] = chart_output_folder
     image_paths = {}
     # Render before the Revit transaction. A drawing failure leaves both
-    # existing managed charts unchanged. The managed PNGs are intentionally
-    # retained beside the post-processing workbook after the chart is updated.
+    # existing managed charts unchanged and preserves prior generated PNGs.
     for chart in chart_results:
-        image_path = _chart_png_path(post_processing_workbook, chart['kind'])
+        image_path = _chart_png_path(chart_output_folder, chart['kind'])
         image_paths[chart['kind']] = image_path
-        # Bitmap.Save cannot replace an existing file. These are fixed,
-        # tool-owned output names, so each successful render replaces its prior
-        # generated image in the post-processing workbook folder.
-        if os.path.isfile(image_path):
-            os.remove(image_path)
         render_chart_png(chart['slices'], image_path, chart['caption'], chart['unit'])
     # INVARIANT: Import/reload is the only Revit model mutation. Revit rolls
     # this transaction back if either image placement or reload cannot complete.
+    output.print_md('Updating managed charts on {}...'.format(TARGET_SHEET_NAME))
     with revit.Transaction('Carbon GWP Pull - Update Managed Charts'):
         gwp_chart = chart_results[0]
         volume_chart = chart_results[1]

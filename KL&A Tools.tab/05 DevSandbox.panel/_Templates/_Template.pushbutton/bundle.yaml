@@ -1,0 +1,19 @@
+title: Pushbutton
+author: Erik Frits; KL&A
+tooltip: |
+  Version: v0.0
+  Date: 10.02.2026
+  Status: Unreleased
+  _____________________________________________________________________
+  Description:
+
+  Start a new DevSandbox command from this hidden placeholder template.
+  Replace its example metadata and implementation before exposing it.
+  _____________________________________________________________________
+  How-to:
+
+  -> Copy this bundle into the established command hierarchy.
+  -> Implement the workflow and update the title, version, tooltip, and SPEC.
+  _____________________________________________________________________
+  Last update:
+  - [10.02.2026] v0.0 - Planned DevSandbox command baseline template.

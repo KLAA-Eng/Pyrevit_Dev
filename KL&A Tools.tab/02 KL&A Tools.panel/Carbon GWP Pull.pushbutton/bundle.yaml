@@ -1,0 +1,30 @@
+engine:
+  clean: true
+title:
+  en_us: "Carbon\nGWP Pull"
+
+tooltip:
+  en_us: |
+    Version: v1.0
+    Date: 10.05.2026
+    _____________________________________________________________________
+    Description:
+
+    Export three material schedules to Excel, read calculated GWP and
+    material-volume values, and create or update charts on the active
+    SYNC TO CENTRAL sheet. Requires Microsoft Excel on this workstation.
+    _____________________________________________________________________
+    How-to:
+
+    -> Open the SYNC TO CENTRAL sheet and click the button.
+    -> Select three schedules, an export workbook, and a different
+       post-processing workbook.
+    -> Review the pyRevit output report and any Material Accuracy warning.
+    _____________________________________________________________________
+    Last update:
+
+    - [10.05.2026] v1.0 - 0.0.10: Delivered production-panel promotion with explicit raw Excel COM support, refined refresh/workbook safeguards, chart placement, and retained generated PNGs.
+    - [10.01.2026] v0.1 - 0.0.9: Delivered the revised DevSandbox workflow with managed GWP/material-volume charts, refresh guards, Material Accuracy reporting, and chart placement/retention safeguards.
+    - [09.15.2026] v0.0 - 0.0.6beta: First delivered DevSandbox workflow: export selected schedules to Excel and update Carbon Pie.JMP family parameters from Export values.
+
+author: KL&A

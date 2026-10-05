@@ -1,5 +1,18 @@
 title:
   en_us: Toggle off Revision Schedule
 tooltip:
-  en_us: >-
-    Select revisions and sheets to remove those revisions from each sheet's titleblock revision schedule when no visible revision cloud requires them.
+  en_us: |-
+    Version: v1.0
+    Date    = 09.28.2026
+    _____________________________________________________________________
+    Description:
+
+    Remove selected revisions from selected sheets when no visible revision cloud requires them.
+    _____________________________________________________________________
+    How-to:
+
+    -> Select revisions and sheets to turn off.
+    _____________________________________________________________________
+    Last update:
+    - [09.28.2026] - KL&A adapted the revision terminology and workflow labels.
+author: KL&A

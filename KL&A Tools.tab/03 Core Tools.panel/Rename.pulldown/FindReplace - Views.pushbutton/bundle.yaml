@@ -1,0 +1,19 @@
+title:
+  en_us: Find and Replace in Views
+author: Erik Frits
+tooltip:
+  en_us: |-
+    Version: v1.2.EFTools
+    Date    = 07.16.2026
+    _____________________________________________________________________
+    Description:
+
+    Rename multiple views using find, replace, prefix, and suffix logic.
+    _____________________________________________________________________
+    How-to:
+
+    -> Select views in the Project Browser, or select them in the tool.
+    -> Run the tool and enter find, replace, prefix, or suffix values.
+    _____________________________________________________________________
+    Last update:
+    - [07.16.2026] - EF Tools 1.2 release; imported unchanged locally.

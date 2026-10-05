@@ -1,5 +1,25 @@
 # Launch Dynamo Script
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.launch-dynamo-script` |
+| Tool version | `v0.0` |
+| Status | Released |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | 0.0.0.beta |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Launch Dynamo Script.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Launch Dynamo Script.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/Launch Dynamo Script.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton/script.dyn` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | 0.0.0.beta | 07.16.2026 | First main delivery of the bundled Dynamo graph launcher. | 484924b |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 ## Purpose
 
 Documents the current command implementation and intended user-facing behavior.

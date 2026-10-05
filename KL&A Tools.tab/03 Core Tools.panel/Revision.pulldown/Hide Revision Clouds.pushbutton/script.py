@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Hide or unhide selected revision clouds on selected sheets and views."""
 from __future__ import print_function
+
+__title__ = 'Hide/Unhide\nRevision Clouds'
+__version__ = 'v1.0'
 
 import clr
 
@@ -17,7 +19,7 @@ from Autodesk.Revit.UI import (
 )
 
 
-COMMAND_TITLE = 'Hide/Unhide Revision Clouds'
+COMMAND_TITLE = __title__.replace('\n', ' ')
 
 
 def _stop(message):

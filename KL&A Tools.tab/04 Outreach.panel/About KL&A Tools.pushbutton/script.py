@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Show extension build and load-path details for support and release verification."""
+__title__ = "About\nKL&A Tools"
+__version__ = "v1.1"
 
 import os
 import sys

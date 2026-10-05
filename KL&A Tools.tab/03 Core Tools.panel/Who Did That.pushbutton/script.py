@@ -1,4 +1,5 @@
-"""Figure out who made specific changes in the model."""
+__title__ = 'Who did that??'
+__version__ = 'v1.0.pyRevit'
 
 from pyrevit import revit, DB, UI
 from pyrevit import forms

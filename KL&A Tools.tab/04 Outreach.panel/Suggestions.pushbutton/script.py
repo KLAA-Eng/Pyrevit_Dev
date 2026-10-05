@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+__title__ = "Suggestions/Bugs\nFeedback"
+__version__ = "v1.0"
+
 import os
 import urllib
 

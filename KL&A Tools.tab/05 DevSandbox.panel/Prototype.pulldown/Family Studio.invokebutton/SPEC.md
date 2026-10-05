@@ -1,5 +1,25 @@
 # KLCode Family Studio V1
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.family-studio` |
+| Tool version | `v0.0` |
+| Status | Released |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | 0.0.7 |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Family Studio.invokebutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Family Studio.invokebutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Family Studio.invokebutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Family Studio.invokebutton/bundle.yaml`; `src/KLCode.FamilyStudio/App/`; `src/KLCode.FamilyStudio/Library/`; `src/KLCode.FamilyStudio/Revit/` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | 0.0.7 | 09.28.2026 | First main delivery of the local family catalog, browser, Load/Load and Place, indexing progress, and previews. | 2c4a3b2 |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 ## Purpose
 
 Family Studio provides a local, searchable SQLite catalog of `.rfa` family

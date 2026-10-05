@@ -1,8 +1,21 @@
 title:
   en_us: "Concrete Mix Header"
 tooltip:
-  en_us: >-
-    Prototype: imports a configured Excel range from the Concrete Mix Design
-    Requirements workbook into the header section of a selected Revit schedule.
+  en_us: |-
+    Version: v0.1
+    Date: 10.02.2026
+    Status: Unreleased
+    _____________________________________________________________________
+    Description:
+    Prototype: imports tblMixHistory data from the Concrete Mix Design Requirements Excel workbook into a selected Revit schedule header. Preserves the schedule body and notes.
+    _____________________________________________________________________
+    How-to:
+    - Choose the Excel workbook and target Revit schedule.
+    - Review the reconciliation preview, choose how to handle missing rows, and confirm the import.
+    _____________________________________________________________________
+    Last update:
+    - [10.02.2026] - v0.1 (Unreleased): Planned: use the shared Excel COM facade for read-only workbook access across Revit hosts.
+    - [09.15.2026] - v0.0 (0.0.6beta): First main delivery of paired-row Excel import, template reconciliation, and schedule header workflow.
+author: KL&A
 engine:
   clean: true

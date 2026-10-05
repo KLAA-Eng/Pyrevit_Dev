@@ -1,4 +1,5 @@
-"""Set selected revisions on selected sheets."""
+__title__ = 'Toggle on Revision Schedule'
+__version__ = 'v1.0'
 
 from pyrevit import revit, DB, EXEC_PARAMS
 from pyrevit import forms

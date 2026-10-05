@@ -1,4 +1,5 @@
-"""Lists revision clouds on sheets and directly placed views, by sheet."""
+__title__ = 'Find All Revision Clouds'
+__version__ = 'v1.0'
 
 from pyrevit import revit, DB
 from pyrevit import script

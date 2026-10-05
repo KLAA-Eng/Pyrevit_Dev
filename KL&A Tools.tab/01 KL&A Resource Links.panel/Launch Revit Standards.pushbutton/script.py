@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-# __title__ = "(1)Launch Revit Standards"
+__title__ = "RVT Stds\nOnenote"
+__version__ = "v1.0"
 
 import subprocess
 

@@ -6,10 +6,19 @@ title:
 tooltip:
   ru: Выясните, кто внес конкретные изменения в модель.
   fr_fr: Trouver qui a fait un changement spécifique dans le modèle.
-  en_us: Figure out who made specific changes in the model.
+  en_us: |-
+    Version: v1.0.pyRevit
+    Date    = 07.16.2026
+    _____________________________________________________________________
+    Description:
+
+    Figure out who made specific changes in the model.
+    _____________________________________________________________________
+    How-to:
+
+    -> Run the tool and choose the worksharing history to inspect.
+    _____________________________________________________________________
+    Last update:
+    - [07.16.2026] - Imported unchanged pyRevit snapshot.
   de_de: Hiermit kann man herausfinden wer bestimmte Änderungen am Modell vorgenommen hat.
-author: >-
-    Frederic Beaupere
-    
-    {{author}}
-    
+author: pyRevit

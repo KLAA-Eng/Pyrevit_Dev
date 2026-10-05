@@ -1,5 +1,19 @@
 title:
   en_us: Toggle on Revision Schedule
 tooltip:
-  en_us: >-
-    Select revisions and sheets to add those revisions to each sheet's titleblock revision schedule. Shift+Click includes issued revisions.
+  en_us: |-
+    Version: v1.0
+    Date    = 09.28.2026
+    _____________________________________________________________________
+    Description:
+
+    Add selected revisions to each selected sheet's titleblock revision schedule.
+    _____________________________________________________________________
+    How-to:
+
+    -> Select revisions and sheets to turn on.
+    -> Shift+Click to include issued revisions.
+    _____________________________________________________________________
+    Last update:
+    - [09.28.2026] - KL&A adapted the revision terminology and workflow labels.
+author: KL&A

@@ -1,3 +1,6 @@
+__title__ = 'Highlight 2D'
+__version__ = 'v1.0'
+
 from time import sleep
 from pyrevit import DB, script, revit
 from pyrevit import forms

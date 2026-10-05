@@ -116,20 +116,22 @@ Design return values so tests can assert:
 
 Each user-facing command should use `SPEC.md` for the operational contract:
 
-- command identity, current maturity, and the last extension release affecting
-  the command
+- command identity, path aliases, version inputs, independent tool version, and status/origin
 - purpose, intended users, and workflow
 - expected inputs, prompts, prerequisites, and dependencies
 - outputs and all model, file, workbook, or external side effects
 - exclusions, known limitations, and Revit compatibility
 - validation evidence and the manual Revit acceptance boundary
-- release history and an actionable future-work backlog
+- tool version history with Version, Main delivery, Date, Meaningful change, and Git evidence columns,
+  plus an actionable future-work backlog
 
 Keep implementation details in code comments and docstrings. Keep user behavior
 and testing expectations in `SPEC.md`. New or materially changed user-facing
-commands must use the repository template. Existing specifications are updated
-when their command is materially changed; they do not require a separate
-migration-only rewrite.
+commands must use the repository template. All visible commands, including
+DevSandbox, follow [TOOL_VERSIONING.md](TOOL_VERSIONING.md). Extension release
+ evidence may remain as separate historical context. Tool versions advance per
+ meaningful delivery to `main`; use the central delivery ledger rather than raw
+ development commit ancestry.
 
 ## Script Layout
 
@@ -137,8 +139,7 @@ Use the existing KLCode command shape for new or materially changed scripts:
 
 1. Encoding declaration.
 2. Required `from __future__` imports.
-3. KLMetadata block: `__title__`, `__author__` when known, `__version__`, and
-   `__doc__`.
+3. KLMetadata block: `__title__` and a pure `__version__` string only.
 4. Major `COMMENTS.md` section divider for imports.
 5. Imports grouped by standard library, pyRevit/Revit/.NET, then local `lib`.
 6. Command setup and constants.
@@ -147,10 +148,12 @@ Use the existing KLCode command shape for new or materially changed scripts:
 9. `main()`.
 10. Guarded command entry point.
 
-Use the `COMMENTS.md` rules for the exact KLMetadata card, Google-style
+Use the `COMMENTS.md` rules for script metadata, Google-style
 docstrings, tagged comments, and ASCII-art dividers. Do not add a second
 module-level docstring to a command script solely to satisfy generic Python
-style guidance; the command card is the user-facing command documentation.
+style guidance; the bundle tooltip is the user-facing command documentation.
+Keep matching title, author, and tooltip in `bundle.yaml`, following
+[TOOL_VERSIONING.md](TOOL_VERSIONING.md).
 
 Example skeleton:
 
@@ -159,20 +162,7 @@ Example skeleton:
 from __future__ import print_function
 
 __title__ = "Room Readiness Audit"
-__author__ = "KL&A"
-__version__ = "0.1.0-beta"
-__doc__ = """Version: 0.1.0-beta
-_____________________________________________________________________
-Description:
-
-Inspect rooms in the active model and report rooms that need review.
-_____________________________________________________________________
-How-to:
-
--> Click the button
--> Review the pyRevit output report
-_____________________________________________________________________
-Author: KL&A"""
+__version__ = "v1.0"
 
 # Major Imports divider from COMMENTS.md goes here.
 

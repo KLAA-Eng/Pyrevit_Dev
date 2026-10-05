@@ -1,45 +1,99 @@
 # Hide Engineering Notes
 
-## Purpose
+## Identity
 
-Documents the current command implementation and intended user-facing behavior.
+| Field | Value |
+| --- | --- |
+| Tool ID | `hide-engineering-notes` |
+| Path aliases | `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton`, `KL&A Tools.tab/KL&A Tools.panel/Hide Engineering Notes.pushbutton` |
+| Version inputs | `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/bundle.yaml`, `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/script.py` |
+| Bundle path | `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton` |
+| Maturity | Beta |
+| Tool version | `v1.1` |
+| Status/origin | Released KL&A beta command. Last delivered version: `v1.1`. |
+| Last extension release affecting this command | `0.0.10-beta` |
+| Maintainer | KL&A |
+| Revit versions live-tested | No exact version recorded for this command. |
 
-## Behavior
+## Purpose and workflow
 
-This command is implemented by `script.py` in this pyRevit bundle. It runs in the Revit/pyRevit host and uses the active-document context required by its implementation. It must preserve unrelated model content and report unsupported or cancelled interactions without applying partial changes.
+This command helps documentation teams hide or unhide KL&A engineering-note
+text without deleting it. Click the ribbon button, choose **Hide engineer
+notes** or **Unhide engineer notes** in the native Revit dialog, then review the
+completion report in the pyRevit output window. Hold Shift while clicking for a
+detailed diagnostic report.
+Cancelling the dialog exits before a Revit transaction starts.
 
-## Validation boundary
+## Inputs and prerequisites
 
-Validate this command against a representative Revit fixture, its empty or cancelled-input path, and its documented output or transaction effect before promotion beyond development use.
+- An active Revit project document with TextNote instances.
+- Text note types whose normalized names begin with `KLAA - ENGINEER'S NOTE`.
+  Normalization ignores leading/trailing whitespace, nonbreaking spaces, and
+  straight versus curly apostrophes.
+- A qualifying direct sheet or a supported view placed on a sheet whose
+  **Appears In Sheet List** parameter is enabled.
+- Supported view types: Engineering Plan, Floor Plan, Ceiling Plan, Section,
+  Elevation, Legend, Drafting View, Detail, Schedule, and Drawing Sheet.
 
-## Implementation inventory
+## Outputs and effects
 
-- Entry point: `script.py`
-- Direct imports: from pyrevit import revit, DB, forms, script;import clr;from System.Collections.Generic import List;from Autodesk.Revit.UI import (;
-- Local helper functions: normalize_name,set_button_green_hidden,set_button_orange_not_hidden,get_elementid_value,get_textnote_type_name,is_dependent_view,get_dependent_view_ids,collect_target_views,collect_matching_textnotes,sheet_appears_in_sheet_list,collect_allowed_sheet_ids_and_placed_view_ids,get_placed_dependents,build_view_note_map,add_note_to_view,ask_hide_or_unhide,print_diagnostics,
-- Bundled external assets: None.
+The command changes individual TextNote visibility with `HideElements` or
+`UnhideElements` inside one Revit transaction. It changes graphics only; it
+does not edit or delete note text, note types, sheets, or views.
 
-## GUI and interaction
+The command is best-effort: it changes every valid target it can process and
+reports four result classes in its pyRevit output report: changed, already in the requested
+state, skipped because not hideable, and failed because a state or write check
+raised an error. A failure can therefore leave other valid targets changed.
+Shift-click diagnostics identify exclusions and the first reported failures.
 
-Static UI/API references: TaskDialog,forms.alert,script.get_output,
+## Limits and compatibility
 
-Use the command from its pyRevit button. Where it exposes a dialog or selection
-workflow, make the required selection and review the result before confirming.
+- Text notes in unsupported view types, templates, views not placed on eligible
+  sheets, and sheets excluded from the Sheet List are not changed.
+- A primary view qualifies when it is placed on an eligible sheet or when a
+  dependent view is placed there. Placed dependents are explicitly evaluated.
+- The command uses permanent element visibility; users can reverse successful
+  changes by choosing the opposite action or by using Revit Undo.
+- Revit 2024 and later is the repository design target. This command has no
+  recorded exact-version live acceptance claim.
 
-## Current execution logic
+## Validation evidence
 
-pyRevit loads the bundle and executes its entry point. The implementation uses
-the imports and helper functions listed above; inspect `script.py` for the exact
-branching order and host API calls.
+| Date | Extension release | Revit version | Scenario | Result | Evidence link or location |
+| --- | --- | --- | --- | --- | --- |
+| 2026-10-05 | 0.0.10-beta | Not run | Static source and bundle review | Pass; no live Revit claim | Current release preparation |
 
-## Model and external effects
+Live Revit acceptance remains required for hide/unhide, Cancel, no matching
+notes, already-hidden notes, unhideable notes, state/write failures, each
+supported view type, direct sheets, placed primary/dependent views, undo, and
+ribbon presentation.
 
-Detected mutation/external-effect patterns: revit.Transaction,
+## Tool version history
 
-## Current status
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| `v1.0` | `0.0.0.beta` | 07.16.2026 | Delivered hide/unhide engineering-note text with eligible-sheet/view filtering, type-name normalization, action dialog, and diagnostics. | `484924b` |
+| `v1.1` | `0.0.10` | 10.05.2026 | Delivered broader supported views and dependent-view handling; plain pushbutton with changed/already/skipped/failed output reporting. | `0dcb4d3` |
 
-This is a development-tab command. The inventory above is statically derived
-from the current bundle and must be confirmed inside the target Revit/pyRevit
-environment before promotion or behavior changes.
+Versions follow meaningful changes between adjacent mainline release snapshots,
+including the listed version inputs. Earlier development iterations are grouped
+into the first delivery; tab/panel moves, formatting, and metadata/documentation
+changes do not create additional milestones. Dates use `MM.DD.YYYY`; released
+rows use the main delivery date, and Unreleased rows use the latest meaningful
+development change date.
 
-Need to configure the smart button
+## Extension release history
+
+| Extension release | Date | Change summary |
+| --- | --- | --- |
+| `0.0.10-beta` | 2026-10-05 | Delivered broader views, dependent-view handling, and changed/already/skipped/failed completion reporting. |
+| `0.0.9-beta` | 2026-10-01 | Packaged the prior delivered command unchanged. |
+
+## Backlog
+
+- Extract deterministic selection and result-classification logic into `lib/`
+  with host-independent tests.
+- Refactor the command entry point into `main()` only as part of that focused
+  structural change.
+- Record live Revit acceptance for the broadened view-type support.

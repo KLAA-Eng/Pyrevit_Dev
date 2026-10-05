@@ -1,0 +1,19 @@
+title:
+  en_us: Find and Replace in Sheets
+author: KL&A
+tooltip:
+  en_us: |-
+    Version: v1.0
+    Date    = 09.15.2026
+    _____________________________________________________________________
+    Description:
+
+    Rename multiple sheets using find, replace, prefix, and suffix logic.
+    _____________________________________________________________________
+    How-to:
+
+    -> Select sheets in the Project Browser, or select them in the tool.
+    -> Run the tool and enter find, replace, prefix, or suffix values.
+    _____________________________________________________________________
+    Last update:
+    - [09.15.2026] - KL&A adapted the sheet-renaming UI and resources.

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Export selected Revit schedule header layout metadata."""
 from __future__ import print_function
+
+__title__ = "Inspect Schedule Header"
+__version__ = "v0.0"
 
 import codecs
 import csv

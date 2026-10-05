@@ -2,6 +2,23 @@ title:
   en_us: "Prototype\nRequest"
 
 tooltip:
-  en_us: Opens the KL&A prototype form.
+  en_us: |
+    Version: v1.0
+    Date: 08.17.2026
+    _____________________________________________________________________
+    Description:
+
+    Open the KL&A prototype request form in your default browser.
+    _____________________________________________________________________
+    How-to:
+
+    -> Click the button to open the form.
+    -> Complete and submit your request in the browser.
+    _____________________________________________________________________
+    Last update:
+
+    - [08.17.2026] v1.0 - 0.0.4.beta: First delivered Prototype Request bundle opens the dedicated Microsoft Form directly in the browser.
+
+author: KL&A
 
 context: zero-doc

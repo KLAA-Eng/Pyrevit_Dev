@@ -1,5 +1,26 @@
 # Concrete Mix Header
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.concrete-mix-header` |
+| Tool version | `v0.1` |
+| Status | Unreleased |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | Unreleased |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Concrete Mix Header.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Concrete Mix Header.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Concrete Mix Header.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Concrete Mix Header.pushbutton/script.py`; `lib/concrete_mix_schedule_header.py` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | 0.0.6beta | 09.15.2026 | First main delivery of paired-row Excel import, template reconciliation, and schedule header workflow. | 300f8d4 |
+| v0.1 | Unreleased | 10.02.2026 | Planned: use the shared Excel COM facade for read-only workbook access across Revit hosts. | 0dcb4d3 (not delivered to main) |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 ## Purpose
 
 `Concrete Mix Header` is a DevSandbox pyRevit prototype for importing a
@@ -23,6 +44,11 @@ elements remain untouched.
 
 The command imports `tblMixHistory` data rows only. Excel table header cells are
 used to map columns, but the Excel headers themselves are not imported.
+
+Workbook access uses the shared `lib/excel_com.py` explicit façade. If Revit
+2025+ exposes Excel as a raw COM object, every workbook, worksheet, table,
+column, and range member is invoked through public `IDispatch` rather than
+normal Python member guessing; the workbook remains read-only.
 
 ## Configuration
 
@@ -136,9 +162,10 @@ Formatting is intentionally limited in this prototype:
 ## Validation limits
 
 The reference workbook path is on a mapped `J:` drive and may only be reachable
-from the user's Revit session. Static tests cover the host-independent range and
-mapping/reconciliation helpers, but live acceptance requires running the button
-in Revit against the actual workbook and target schedule.
+from the user's Revit session. Static tests cover the host-independent range,
+mapping/reconciliation helpers, and shared Excel PIA/raw-COM dispatch, but live
+acceptance requires running the button in Revit against the actual workbook and
+target schedule.
 
 Live validation should verify that removing an element from Excel can delete the
 paired Revit header rows, and that adding the element back to Excel reinserts the

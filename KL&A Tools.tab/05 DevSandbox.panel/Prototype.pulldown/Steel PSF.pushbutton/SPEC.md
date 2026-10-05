@@ -1,5 +1,30 @@
 # Steel PSF
 
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.steel-psf` |
+| Tool version | `v0.5` |
+| Status | Unreleased |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | Unreleased |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/Steel PSF.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml`; `lib/steel_weight/` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | 0.0.1.beta | 08.13.2026 | First main delivery of the host steel-weight and PSF summary report. | 78b2aee |
+| v0.1 | 0.0.2.beta | 08.13.2026 | Deliver story selection and filtering of steel/floor data to selected levels. | ca09b3f |
+| v0.2 | 0.0.3.beta | 08.13.2026 | Deliver robust parameter/unit/ElementId handling and corrected aggregation/reporting. | d1e0c69 |
+| v0.3 | 0.0.4.beta | 08.17.2026 | Deliver branded export controls and complete raw/summary CSV and Excel history export. | 1f3dd23 |
+| v0.4 | 0.0.6beta | 09.15.2026 | Deliver the updated story-selection window and shared KL&A design resources. | 300f8d4 |
+| v0.5 | Unreleased | 10.02.2026 | Planned: make companion-workbook creation use the shared Excel COM facade across Revit hosts. | 0dcb4d3 (not delivered to main) |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
 ## Purpose
 
 `Steel PSF` is a read-only DevSandbox pyRevit prototype that reports host-model
@@ -85,6 +110,11 @@ environment before promotion or behavior changes.
   workbooks connect to raw tabs plus individual CSV-backed tabs for each
   output-window summary table.
 - Excel workbook creation depends on installed Microsoft Excel COM automation.
+  It uses the shared `lib/excel_com.py` explicit façade for workbook, worksheet,
+  query, range, pivot, and chart members. Each CSV tab remains a `QueryTable`:
+  Excel does not permit a `ListObject` to overlap query results. When Revit 2025+ exposes a raw
+  COM object, the same public Excel member is invoked through `IDispatch` rather
+  than being guessed from normal Python attribute access.
   CSV export remains successful if workbook creation fails.
 
 ## Future development

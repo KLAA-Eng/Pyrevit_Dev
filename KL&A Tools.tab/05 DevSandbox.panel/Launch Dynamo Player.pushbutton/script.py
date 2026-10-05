@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Open the Dynamo Player that is installed with the running Revit version."""
+
+__title__ = "Launch\nDyn Player"
+__version__ = "v0.0"
 from pyrevit import HOST_APP, forms
 from Autodesk.Revit.UI import PostableCommand, RevitCommandId
 
