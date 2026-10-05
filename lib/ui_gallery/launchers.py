@@ -9,6 +9,18 @@ from __future__ import unicode_literals
 
 _LAUNCHERS = (
     {
+        'id': 'kla-compiled-alert',
+        'category': 'Compiled add-in',
+        'title': 'KL&A compiled alert',
+        'relative_path': 'src/KLCode.Wpf/Views/KlaAlertWindow.xaml',
+        'called_by': ('KLCode.FamilyStudio.Revit.Commands.FamilyStudioCommand; '
+                      'KLA.ModelStartupImporter.Revit.StartupImportCommand'),
+        'description': 'Shared compiled-WPF alert used by the Family Studio and Startup Importer add-ins.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Compiled Revit host required',
+        'can_launch': False,
+    },
+    {
         'id': 'kla-create-from-rooms',
         'category': 'KL&A custom',
         'title': 'Create from rooms',
@@ -37,6 +49,18 @@ _LAUNCHERS = (
         'description': 'Sheet duplication form with fictional selections.',
         'uses_seed_data': True,
         'can_launch': True,
+    },
+    {
+        'id': 'kla-family-studio',
+        'category': 'Compiled add-in',
+        'title': 'Family Studio',
+        'relative_path': ('src/KLCode.FamilyStudio/Revit/KLCode.FamilyStudio.Revit/'
+                          'Views/FamilyStudioWindow.xaml'),
+        'called_by': 'KLCode.FamilyStudio.Revit.Commands.FamilyStudioCommand',
+        'description': 'Compiled Revit family-browser workspace with search, results, and batch loading.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Compiled Revit host required',
+        'can_launch': False,
     },
     {
         'id': 'kla-find-replace',
@@ -117,6 +141,42 @@ _LAUNCHERS = (
         'description': 'Branded selectable list with sample family types.',
         'uses_seed_data': True,
         'can_launch': True,
+    },
+    {
+        'id': 'kla-startup-importer-blocking-issues',
+        'category': 'Compiled add-in',
+        'title': 'Startup Importer blocking issues',
+        'relative_path': ('src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/'
+                          'Views/BlockingIssuesWindow.xaml'),
+        'called_by': 'KLA.ModelStartupImporter.Revit.StartupImportCommand',
+        'description': 'Compiled review dialog for import-blocking issues.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Compiled Revit host required',
+        'can_launch': False,
+    },
+    {
+        'id': 'kla-startup-importer-review',
+        'category': 'Compiled add-in',
+        'title': 'Startup Importer review',
+        'relative_path': ('src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/'
+                          'Views/StartupImportReviewWindow.xaml'),
+        'called_by': 'KLA.ModelStartupImporter.Revit.StartupImportCommand',
+        'description': 'Compiled import-review dialog shown before model changes are committed.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Compiled Revit host required',
+        'can_launch': False,
+    },
+    {
+        'id': 'kla-startup-importer-source-picker',
+        'category': 'Compiled add-in',
+        'title': 'Startup Importer source picker',
+        'relative_path': ('src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/'
+                          'Views/StartupSourcePickerWindow.xaml'),
+        'called_by': 'KLA.ModelStartupImporter.Revit.StartupImportCommand',
+        'description': 'Compiled source-selection dialog for the Startup Importer workflow.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Compiled Revit host required',
+        'can_launch': False,
     },
     {
         'id': 'kla-steel-psf',

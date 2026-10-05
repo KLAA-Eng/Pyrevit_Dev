@@ -31,13 +31,18 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         self.assertIn('pyrevit-command-switch', launcher_ids)
         self.assertIn('kla-select-from-dict', launcher_ids)
         self.assertIn('kla-main-template', launcher_ids)
+        self.assertIn('kla-compiled-alert', launcher_ids)
         self.assertIn('kla-custom-alert', launcher_ids)
+        self.assertIn('kla-family-studio', launcher_ids)
         self.assertIn('kla-find-replace', launcher_ids)
         self.assertIn('kla-steel-psf', launcher_ids)
         self.assertIn('kla-find-replace-views', launcher_ids)
         self.assertIn('kla-find-replace-sheets', launcher_ids)
         self.assertIn('kla-duplicate-sheets', launcher_ids)
         self.assertIn('kla-view-range', launcher_ids)
+        self.assertIn('kla-startup-importer-source-picker', launcher_ids)
+        self.assertIn('kla-startup-importer-review', launcher_ids)
+        self.assertIn('kla-startup-importer-blocking-issues', launcher_ids)
         self.assertIn('pyrevit-ask-for-color', launcher_ids)
         self.assertIn('pyrevit-pick-file', launcher_ids)
         self.assertIn('pyrevit-pick-folder', launcher_ids)
@@ -67,8 +72,11 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         self.assertFalse(by_id['pyrevit-select-views']['can_launch'])
         self.assertEqual('Host/model data required',
                          by_id['pyrevit-select-views']['sample_data_label'])
+        self.assertFalse(by_id['kla-family-studio']['can_launch'])
+        self.assertEqual('Compiled Revit host required',
+                         by_id['kla-family-studio']['sample_data_label'])
 
-    def test_all_pyrevit_window_xaml_files_are_accounted_for(self):
+    def test_all_repository_window_xaml_files_are_accounted_for(self):
         launchers = gallery_launchers()
         launcher_paths = set(
             canonical_path(launcher['relative_path'])
@@ -79,7 +87,8 @@ class UiGalleryLaunchersTests(unittest.TestCase):
             canonical_path(entry['relative_path'])
             for entry in catalog_xaml_sources(PROJECT_ROOT)
             if (entry['root_kind'] == 'Window' and
-                not entry['relative_path'].startswith('src/'))
+                entry['relative_path'].startswith(
+                    ('KL&A Tools_dev.tab/', 'lib/', 'src/')))
         )
 
         self.assertEqual(sorted(window_paths), sorted(launcher_paths))

@@ -1,6 +1,8 @@
-# KLCode pyRevit Design System
+# KLCode Design System
 
-This file records the default visual properties used by the KLCode pyRevit extension.
+This file records the current visual system used by the KLCode repository. It
+covers the legacy IronPython/pyRevit dialogs, their DevSandbox gallery, and
+the compiled WPF add-ins. It does not replace host-specific runtime validation.
 
 ## Master Design Colors
 
@@ -30,7 +32,12 @@ These are the named colors used across KLCode ribbon icons and WPF GUIs. This ta
 | warning-gold | `#DAA520` | Warm golden yellow |
 | info-green | `#3CB371` | Medium sea green |
 
-`lib/_logos/KLCodeLogo.png` is the source branding asset used to sample the primary charcoal and green colors.
+`lib/GUI/Resources/KLCode_palette.xaml` supplies the named palette consumed by
+the compiled-WPF adapter. The legacy `WPF_styles.xaml` dictionary currently
+repeats the same legacy brush values rather than merging that file; keep the
+two palettes synchronized until that consolidation is completed. The current
+repository wordmark asset is `lib/_logos/KLCode_text_1024x256px.svg` (with a
+PNG export).
 
 | Property | Value |
 | --- | --- |
@@ -75,7 +82,12 @@ New prototype scripts should start with `lib/_icons/drill_32px_orange.png` as th
 
 ## GUI Colors
 
-Shared WPF GUI styling is defined in `lib/GUI/Resources/WPF_styles.xaml`.
+`lib/GUI/Resources/WPF_styles.xaml` defines the legacy pyRevit brush keys and
+control templates. `lib/GUI/Resources/KLCode_palette.xaml` carries matching
+palette keys for compiled WPF, and
+`src/KLCode.Wpf/Resources/KLCodeControls.xaml` merges that compiled palette.
+The duplicated legacy/compiled brush definitions are a known consolidation
+boundary, not a license to create further copies.
 
 | Token | Value | KLName |
 | --- | --- | --- |
@@ -205,6 +217,36 @@ The shared GUI windows follow these conventions where present:
 
 Command-local windows that use `forms.WPFWindow`, including the View Range editor and UI Gallery, keep the same chrome event names as shared windows: `button_close` for the header close button and `header_drag` for dragging the borderless header.
 
+## Compiled WPF Add-in System
+
+The compiled add-ins use a separate control adapter rather than loading the
+IronPython `my_WPF` base class. This is deliberate: the adapter merges its
+compiled palette file while keeping compiled-only tokens and WPF control
+templates in a CLR-loadable assembly. Its base palette values match the legacy
+dictionary, but the two files have not yet been consolidated.
+
+| Layer | Source | Responsibility |
+| --- | --- | --- |
+| Compiled palette | `lib/GUI/Resources/KLCode_palette.xaml` | Named brush keys matching the legacy palette, such as `header_background`, `text_white`, and `button_bg_normal`. |
+| Compiled semantic tokens | `src/KLCode.Wpf/Resources/KLCodeCompiledTokens.xaml` | Compiled-only surface, neutral, informational, warning, blocking, and checkbox tokens. |
+| Compiled controls | `src/KLCode.Wpf/Resources/KLCodeControls.xaml` | `KlaWindowStyle`, header, button, input, selection, list, status-chip, and footer styles. |
+| Shared compiled alert | `src/KLCode.Wpf/Views/KlaAlertWindow.xaml` | Reusable information and warning dialog used by compiled Revit commands. |
+
+The compiled control adapter embeds the repository-local Audiowide font for
+the header wordmark. Compiled windows use `KlaWindowStyle`, giving them the
+same borderless dark chrome and shared palette while preserving their own
+host-specific bindings and event handlers.
+
+### Compiled WPF Windows
+
+| Window | XAML path | Invoked by | Size | Gallery status |
+| --- | --- | --- | --- | --- |
+| KL&A compiled alert | `src/KLCode.Wpf/Views/KlaAlertWindow.xaml` | Family Studio and Startup Importer commands | `440 x 300` | Catalog only; requires the compiled Revit host. |
+| Family Studio | `src/KLCode.FamilyStudio/Revit/KLCode.FamilyStudio.Revit/Views/FamilyStudioWindow.xaml` | `KLCode.FamilyStudio.Revit.Commands.FamilyStudioCommand` | `1180 x 740` | Catalog only; requires the compiled Revit host. |
+| Startup Importer source picker | `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/Views/StartupSourcePickerWindow.xaml` | `KLA.ModelStartupImporter.Revit.StartupImportCommand` | `560 x 470` | Catalog only; requires the compiled Revit host. |
+| Startup Importer review | `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/Views/StartupImportReviewWindow.xaml` | `KLA.ModelStartupImporter.Revit.StartupImportCommand` | `860 x 640` | Catalog only; requires the compiled Revit host. |
+| Startup Importer blocking issues | `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/Views/BlockingIssuesWindow.xaml` | `KLA.ModelStartupImporter.Revit.StartupImportCommand` | `560 x 520` | Catalog only; requires the compiled Revit host. |
+
 ## Windows
 
 **Canonical example:** `lib/GUI/_templates/KLCodeMainTemplate.xaml` is the
@@ -250,11 +292,24 @@ standardization scope.
 
 ## UI Gallery Theme Audit
 
-The DevSandbox UI Gallery catalogs representative KL&A custom, DevSandbox, and standard pyRevit windows in `lib/ui_gallery/launchers.py`. For the 12 user-facing KL&A custom windows, use `lib/GUI/_templates/KLCodeMainTemplate.xaml` as the visual reference: borderless dark chrome, the outlined KLCode wordmark in the 24 px header, KLCharcoal window background, KLGreen-dark/KLGreen/KLGreen-secondary accents, and readable KLWhite text. The template is also a separate gallery preview entry, not a thirteenth user-facing window.
+The DevSandbox UI Gallery catalogs representative KL&A custom, DevSandbox,
+compiled add-in, and standard pyRevit windows in `lib/ui_gallery/launchers.py`.
+For the 12 user-facing KL&A custom windows, use
+`lib/GUI/_templates/KLCodeMainTemplate.xaml` as the visual reference:
+borderless dark chrome, the outlined KLCode wordmark in the 24 px header,
+KLCharcoal window background, KLGreen-dark/KLGreen/KLGreen-secondary accents,
+and readable KLWhite text. The template is also a separate gallery preview
+entry, not a thirteenth user-facing window. The five compiled WPF windows are
+cataloged with their source paths but remain disabled in the gallery because
+their constructors require compiled Revit host state.
 
 Standard pyRevit gallery entries, the UI Gallery shell, and its preview fixture are intentional tooling/external references and are not scored for KLCode theme consistency.
 
-Audit scope: all 14 window XAML files listed in the Shared GUI Windows, One-Off Windows, and Prototype Windows tables above. Each is represented once below.
+The gallery registry currently contains 20 repository Window XAML surfaces:
+the 14 pyRevit/DevSandbox windows audited below, the separate main-template
+preview, and the five compiled WPF windows listed above. Each surface has one
+gallery entry; only host-independent previews are launchable from the
+IronPython gallery.
 
 | Gallery title | Category | XAML path | Theme status | Notable drift | Recommended future action |
 | --- | --- | --- | --- | --- | --- |

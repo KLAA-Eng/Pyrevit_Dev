@@ -29,6 +29,10 @@ Provides a safe launcher gallery for the pyRevit and KL&A dialog families used
 by this extension. Seeded previews use fictional data and never start a Revit
 transaction or call a document-changing command. pyRevit forms that require
 active model state or an interactive Revit pick are cataloged but disabled.
+The gallery also catalogs the compiled Family Studio, Startup Importer, and
+shared compiled-alert windows. Those rows remain disabled because their
+constructors require compiled Revit host state and must not be approximated by
+the IronPython preview harness.
 
 ## Behavior
 
@@ -62,6 +66,18 @@ Rows marked `Host picker` open the native host picker. Rows marked
 `Host/model data required` or `Interactive pick required` are visible in the
 catalog but cannot be launched from the safe gallery. The gallery only opens
 dialog previews; it does not invoke the corresponding tool command.
+
+Rows marked `Compiled Revit host required` identify compiled add-in dialogs
+that are cataloged for discovery but cannot open from this IronPython command.
+
+## Unreleased catalog update
+
+The current development checkout adds five catalog-only compiled-WPF surfaces:
+the shared KL&A alert, Family Studio, and the Startup Importer source picker,
+review, and blocking-issues dialogs. `tests/ui_gallery_launchers_test.py`
+enforces one UI Gallery entry for every repository Window XAML source under
+the pyRevit, shared-library, and compiled-add-in source roots. The next main
+delivery must assign the tool version and add the Git-backed history entry.
 
 ## Current execution logic
 
