@@ -20,8 +20,10 @@ WINDOW = '<Window Title="Safe preview" xmlns="http://schemas.microsoft.com/winfx
 
 class UiGalleryCatalogTests(unittest.TestCase):
     def setUp(self):
-        self.temp_dir = tempfile.mkdtemp()
-        self.external_dir = tempfile.mkdtemp()
+        # Keep parent-path checks independent of other Windows temp contents.
+        self.fixture_root = tempfile.mkdtemp()
+        self.temp_dir = tempfile.mkdtemp(dir=self.fixture_root)
+        self.external_dir = tempfile.mkdtemp(dir=self.fixture_root)
 
     def tearDown(self):
         for root, directories, filenames in os.walk(self.temp_dir, topdown=False):
@@ -36,6 +38,7 @@ class UiGalleryCatalogTests(unittest.TestCase):
             for directory in directories:
                 os.rmdir(os.path.join(root, directory))
         os.rmdir(self.external_dir)
+        os.rmdir(self.fixture_root)
 
     def _write(self, relative_path, contents):
         path = os.path.join(self.temp_dir, relative_path)

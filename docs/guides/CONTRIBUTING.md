@@ -11,8 +11,10 @@ request, review documentation, report an issue, and provide validation
 evidence. The technical owner and backup reviewer alone may merge pull
 requests, prepare releases, and create or push release tags.
 
-`dev` and `main` are protected branches. Direct pushes to either branch are not
-allowed.
+Ordinary contributors use PRs into `dev`. The release owner may prepare releases
+and the next development cycle directly on `dev`. Releases reach `main` only
+through a `dev` to `main` PR personally merged by the release owner; never push
+directly to `main`. See the [release workflow](../releasing/RELEASING.md).
 
 ## Day-to-day change flow
 
@@ -25,8 +27,9 @@ allowed.
    tooltip date, and SPEC history row together.
 4. Run the narrowest relevant automated or static checks, then record the
    result in the pull request.
-5. Perform and record live Revit validation when the change affects behavior,
-   compatibility, UI, transactions, graphics, Excel, files, or external tools.
+5. Record relevant live Revit evidence and remaining acceptance limits for
+   changed behavior. Beta releases may retain documented limits; stable promotion
+   requires relevant live acceptance as defined in the release workflow.
 6. Open a pull request into `dev`. State the affected tools, user impact,
    evidence, known limits, and rollback considerations.
 7. The technical owner or backup reviewer reviews and merges the approved pull
@@ -35,7 +38,8 @@ allowed.
 ## Revit support and validation
 
 The extension targets Revit 2024 and later. A release may claim support only
-for exact Revit versions where the changed behavior has live evidence. Prior
+for exact Revit versions where the changed behavior has live evidence. A beta may
+proceed with documented testing limits and passing release checks. Prior
 evidence can carry forward only when the relevant command did not change.
 
 Automated tests and static checks are valuable but do not prove host behavior.
@@ -52,7 +56,7 @@ template for a new command. All visible commands, including DevSandbox, must
 record Tool ID, Path aliases, Version inputs, Tool version, Status/origin, and
 a history with Version, Main delivery, Date, Meaningful change, and Git
 evidence. Follow
-[TOOL_VERSIONING.md](TOOL_VERSIONING.md) for the exact metadata and version rules.
+[Tool version rules](../releasing/TOOL_VERSIONING.md) for the exact metadata and version rules.
 
 Run `python scripts/check_tool_metadata.py` to check visible command metadata.
 Its host-independent tests run with
@@ -60,15 +64,10 @@ Its host-independent tests run with
 
 ## Release flow
 
-Only a controlled `dev` to `main` pull request produces a release. The release
-preparation includes the semantic version, channel, generated build metadata,
-changelog entry, validation evidence, and exact release tag. Beta is the
-default channel; promotion to stable is explicit. Follow [RELEASING.md](../../RELEASING.md)
-for the complete procedure.
-
-The extension version in `version.json` remains the release authority. Tool
-versions identify individual command milestones and do not change extension
-release numbering, tagging, approval, or promotion controls.
+Follow the authoritative [release workflow](../releasing/RELEASING.md) for
+preparation, checks, the owner's merge, tagging, GitHub publication, live
+verification, and the next development cycle. It defines roles, beta/stable gates,
+and extension identity; this guide does not maintain a second release checklist.
 
 ## Where to find help
 

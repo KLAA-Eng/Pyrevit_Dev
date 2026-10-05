@@ -4,18 +4,18 @@
 | --- | --- |
 | Tool ID | `devsandbox.concrete-mix-header` |
 | Tool version | `v0.1` |
-| Status | Unreleased |
+| Status | Released prototype; live acceptance remains pending |
 | Status/origin | Prototype; KL&A custom tool. |
-| Main delivery | Unreleased |
+| Main delivery | 0.0.10 |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Concrete Mix Header.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Concrete Mix Header.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Concrete Mix Header.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Concrete Mix Header.pushbutton/script.py`; `lib/concrete_mix_schedule_header.py` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Concrete Mix Header.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Concrete Mix Header.pushbutton/script.py`; `lib/concrete_mix_schedule_header.py`; `lib/excel_com.py` |
 
 ## Tool version history
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
 | v0.0 | 0.0.6beta | 09.15.2026 | First main delivery of paired-row Excel import, template reconciliation, and schedule header workflow. | 300f8d4 |
-| v0.1 | Unreleased | 10.02.2026 | Planned: use the shared Excel COM facade for read-only workbook access across Revit hosts. | 0dcb4d3 (not delivered to main) |
+| v0.1 | 0.0.10 | 10.05.2026 | Delivered the shared Excel COM facade for read-only workbook access across Revit hosts. | 74eccba; verified v0.0.10-beta snapshot |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current

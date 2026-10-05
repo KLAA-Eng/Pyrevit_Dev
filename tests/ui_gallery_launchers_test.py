@@ -14,6 +14,12 @@ from lib.ui_gallery.launchers import gallery_launchers, launcher_by_id
 from lib.ui_gallery.catalog import catalog_xaml_sources
 
 
+def canonical_path(path):
+    """Compare launcher identities across the development/production tab rename."""
+    prefix = 'KL&A Tools_dev.tab/'
+    return 'KL&A Tools.tab/' + path[len(prefix):] if path.startswith(prefix) else path
+
+
 class UiGalleryLaunchersTests(unittest.TestCase):
     def test_catalogs_supported_dialog_launchers(self):
         launchers = gallery_launchers()
@@ -65,12 +71,12 @@ class UiGalleryLaunchersTests(unittest.TestCase):
     def test_all_pyrevit_window_xaml_files_are_accounted_for(self):
         launchers = gallery_launchers()
         launcher_paths = set(
-            launcher['relative_path']
+            canonical_path(launcher['relative_path'])
             for launcher in launchers
             if launcher['relative_path']
         )
         window_paths = set(
-            entry['relative_path']
+            canonical_path(entry['relative_path'])
             for entry in catalog_xaml_sources(PROJECT_ROOT)
             if (entry['root_kind'] == 'Window' and
                 not entry['relative_path'].startswith('src/'))
@@ -81,12 +87,12 @@ class UiGalleryLaunchersTests(unittest.TestCase):
     def test_non_window_xaml_files_stay_catalog_only(self):
         entries = catalog_xaml_sources(PROJECT_ROOT)
         non_window_paths = set(
-            entry['relative_path']
+            canonical_path(entry['relative_path'])
             for entry in entries
             if entry['root_kind'] in ('Page', 'UserControl', 'ResourceDictionary')
         )
         launcher_paths = set(
-            launcher['relative_path']
+            canonical_path(launcher['relative_path'])
             for launcher in gallery_launchers()
             if launcher['relative_path']
         )

@@ -2,6 +2,8 @@ from __future__ import print_function
 
 import os
 import unittest
+
+from repo_paths import TAB_NAME
 from xml.etree import ElementTree
 
 
@@ -12,7 +14,7 @@ WINDOW_XAML_PATHS = (
     'lib/GUI/CustomAlert.xaml',
     'lib/GUI/Tools/CreateFromRooms.xaml',
     'lib/match/clipboard_window.xaml',
-    'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
+    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
 )
 
 ALL_WINDOW_XAML_PATHS = WINDOW_XAML_PATHS + (
@@ -20,11 +22,11 @@ ALL_WINDOW_XAML_PATHS = WINDOW_XAML_PATHS + (
     'lib/GUI/RenameViews.xaml',
     'lib/GUI/RenameSheets.xaml',
     'lib/GUI/DuplicateSheets.xaml',
-    'KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
-    'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml',
-    'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml',
-    'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml',
-    'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml',
+    TAB_NAME + '/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
+    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml',
+    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml',
+    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml',
+    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml',
 )
 
 # The UI Gallery and its static preview fixture are DevSandbox tooling, not
@@ -39,10 +41,10 @@ KL_A_TEMPLATE_WINDOW_XAML_PATHS = (
     'lib/GUI/DuplicateSheets.xaml',
     'lib/GUI/Tools/CreateFromRooms.xaml',
     'lib/match/clipboard_window.xaml',
-    'KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
-    'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml',
-    'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml',
-    'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
+    TAB_NAME + '/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
+    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml',
+    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml',
+    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
 )
 
 
@@ -65,8 +67,8 @@ class WindowBackgroundTests(unittest.TestCase):
 
     def test_editor_and_gallery_use_branded_chrome(self):
         target_paths = (
-            'KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
-            'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml',
+            TAB_NAME + '/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
+            TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml',
         )
 
         for relative_path in target_paths:
@@ -85,8 +87,8 @@ class WindowBackgroundTests(unittest.TestCase):
 
     def test_command_windows_keep_pyrevit_wpf_loader(self):
         script_paths = (
-            'KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton/script.py',
-            'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py',
+            TAB_NAME + '/03 Core Tools.panel/ViewRange.pushbutton/script.py',
+            TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py',
         )
 
         for relative_path in script_paths:
@@ -98,7 +100,7 @@ class WindowBackgroundTests(unittest.TestCase):
             self.assertNotIn('from WPF_Base import my_WPF', script, relative_path)
 
     def test_view_range_comboboxes_use_dark_template(self):
-        relative_path = 'KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml'
+        relative_path = TAB_NAME + '/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml'
         xaml_path = os.path.join(PROJECT_ROOT, relative_path)
         with open(xaml_path, 'r', encoding='utf-8') as xaml_file:
             xaml = xaml_file.read()
@@ -136,7 +138,7 @@ class WindowBackgroundTests(unittest.TestCase):
     def test_view_range_loads_the_shared_wordmark_at_runtime(self):
         script_path = os.path.join(
             PROJECT_ROOT,
-            'KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton/script.py',
+            TAB_NAME + '/03 Core Tools.panel/ViewRange.pushbutton/script.py',
         )
         with open(script_path, 'r', encoding='utf-8') as script_file:
             script = script_file.read()
@@ -160,7 +162,7 @@ class WindowBackgroundTests(unittest.TestCase):
         search_windows = (
             'lib/GUI/SelectFromDict.xaml',
             'lib/GUI/Tools/CreateFromRooms.xaml',
-            'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
+            TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
         )
         for relative_path in search_windows:
             xaml_path = os.path.join(PROJECT_ROOT, relative_path)

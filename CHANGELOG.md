@@ -6,7 +6,7 @@ tools, user-facing changes, known limits, and rollback tag.
 
 This changelog is the concise extension-release summary. Detailed independent
 command histories are kept in each command's `SPEC.md`, using the
-[`docs/tool-version-delivery-ledger.md`](docs/tool-version-delivery-ledger.md)
+[`docs/releasing/tool-version-delivery-ledger.md`](docs/releasing/tool-version-delivery-ledger.md)
 release boundaries.
 
 ## Unreleased
@@ -14,6 +14,9 @@ release boundaries.
 Development is underway for `0.0.11`. This is an untagged, unpublished `dev`
 identity, not a changelog release. The latest published release remains
 `0.0.10-beta`.
+
+- Consolidate release guidance and checks, support both ribbon layouts in tests,
+  clarify About's metadata provenance, and reconcile the `0.0.10` delivery records.
 
 ## 0.0.10 - 2026-10-05
 
@@ -51,7 +54,7 @@ identity, not a changelog release. The latest published release remains
 - **Channel:** Beta
 - **Tag:** `v0.0.9-beta`
 - **Tested Revit range:** No new live Revit claim. Carbon GWP Pull is a beta
-  workflow in the KL&A Tools panel; its deterministic logic is covered by the
+  workflow in DevSandbox; its deterministic logic is covered by the
   static test suite.
 
 ### Added

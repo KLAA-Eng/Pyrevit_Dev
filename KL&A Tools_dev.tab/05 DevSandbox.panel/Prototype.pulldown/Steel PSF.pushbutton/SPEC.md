@@ -4,11 +4,11 @@
 | --- | --- |
 | Tool ID | `devsandbox.steel-psf` |
 | Tool version | `v0.5` |
-| Status | Unreleased |
+| Status | Released prototype; live acceptance remains pending |
 | Status/origin | Prototype; KL&A custom tool. |
-| Main delivery | Unreleased |
+| Main delivery | 0.0.10 |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/Steel PSF.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml`; `lib/steel_weight/` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml`; `lib/steel_weight/`; `lib/excel_com.py` |
 
 ## Tool version history
 
@@ -19,7 +19,7 @@
 | v0.2 | 0.0.3.beta | 08.13.2026 | Deliver robust parameter/unit/ElementId handling and corrected aggregation/reporting. | d1e0c69 |
 | v0.3 | 0.0.4.beta | 08.17.2026 | Deliver branded export controls and complete raw/summary CSV and Excel history export. | 1f3dd23 |
 | v0.4 | 0.0.6beta | 09.15.2026 | Deliver the updated story-selection window and shared KL&A design resources. | 300f8d4 |
-| v0.5 | Unreleased | 10.02.2026 | Planned: make companion-workbook creation use the shared Excel COM facade across Revit hosts. | 0dcb4d3 (not delivered to main) |
+| v0.5 | 0.0.10 | 10.05.2026 | Delivered companion-workbook creation using the shared Excel COM facade across Revit hosts. | 74eccba; verified v0.0.10-beta snapshot |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current

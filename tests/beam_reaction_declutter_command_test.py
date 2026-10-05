@@ -6,11 +6,13 @@ import sys
 import types
 import unittest
 
+from repo_paths import TAB_NAME
+
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COMMAND_PATH = os.path.join(
     PROJECT_ROOT,
-    'KL&A Tools.tab',
+    TAB_NAME,
     '05 DevSandbox.panel',
     'Prototype.pulldown',
     'Beam Reaction Declutter.pushbutton',

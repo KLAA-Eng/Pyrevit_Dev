@@ -1,10 +1,12 @@
 import os
 import unittest
 
+from repo_paths import TAB_NAME
+
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
 PULLDOWN = os.path.join(
-    ROOT, 'KL&A Tools.tab', '05 DevSandbox.panel', 'Prototype.pulldown')
+    ROOT, TAB_NAME, '05 DevSandbox.panel', 'Prototype.pulldown')
 COMMAND = os.path.join(PULLDOWN, 'Excel COM Smoke Test.pushbutton')
 
 

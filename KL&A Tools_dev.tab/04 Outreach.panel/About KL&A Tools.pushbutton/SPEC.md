@@ -3,7 +3,7 @@
 ## Identity
 
 - **Tool ID:** `about-kla-tools`
-- **Path aliases:** `KL&A Tools.tab/04 Outreach.panel/About KL&A Tools.pushbutton`, `KL&A Tools.tab/05 DevSandbox.panel/About KL&A Tools.pushbutton`, `KL&A Tools_dev.tab/05 DevSandbox.panel/About KL&A Tools.pushbutton`.
+- **Path aliases:** `KL&A Tools_dev.tab/04 Outreach.panel/About KL&A Tools.pushbutton`, `KL&A Tools.tab/04 Outreach.panel/About KL&A Tools.pushbutton`, `KL&A Tools.tab/05 DevSandbox.panel/About KL&A Tools.pushbutton`, `KL&A Tools_dev.tab/05 DevSandbox.panel/About KL&A Tools.pushbutton`.
 - **Version inputs:** `KL&A Tools_dev.tab/04 Outreach.panel/About KL&A Tools.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/04 Outreach.panel/About KL&A Tools.pushbutton/script.py`.
 - **Tool version:** `v1.1`
 - **Status/origin:** Maintained production; KL&A custom command.
@@ -14,15 +14,30 @@
 
 ## Purpose
 
-Documents the current command implementation and intended user-facing behavior.
+Show the loaded extension's version identity, channel, identity date, metadata
+source commit, build date, loaded path, and Revit/pyRevit versions for support.
 
 ## Behavior
 
-This command is implemented by `script.py` in this pyRevit bundle. It runs in the Revit/pyRevit host and uses the active-document context required by its implementation. It must preserve unrelated model content and report unsupported or cancelled interactions without applying partial changes.
+This zero-document command reads generated `lib/build_info.py` and shows a
+pyRevit alert. It does not modify the model, query Git, or open Excel. The loaded
+extension path identifies the actual folder supplying the command and metadata.
+
+`VERSION_LABEL` is a display identity such as `v0.0.11-dev`; it does not assert
+that a Git tag exists. `METADATA_SOURCE_SHA` is HEAD when the metadata was
+generated, preceding any preparation commit and squash merge. It does not prove
+the loaded checkout's current HEAD. Verified release commits and tags are in
+`docs/releasing/tool-version-delivery-ledger.md`.
 
 ## Validation boundary
 
-Validate this command against a representative Revit fixture, its empty or cancelled-input path, and its documented output or transaction effect before promotion beyond development use.
+Static tests check the displayed identity and provenance labels with host stubs.
+Live acceptance must confirm the alert and expected loaded extension path in
+the intended Revit/pyRevit installation. No new live Revit claim is made.
+
+The development metadata-label clarification does not increment the independent
+tool version: metadata/documentation normalization is excluded by the tool-version
+rules. The functional delivery history below remains unchanged.
 
 ## Implementation inventory
 

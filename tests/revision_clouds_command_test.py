@@ -6,10 +6,12 @@ import sys
 import types
 import unittest
 
+from repo_paths import TAB_NAME
+
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REVISION_ROOT = os.path.join(
-    PROJECT_ROOT, 'KL&A Tools.tab', '03 Core Tools.panel',
+    PROJECT_ROOT, TAB_NAME, '03 Core Tools.panel',
     'Revision.pulldown')
 COMMAND_PATH = os.path.join(
     REVISION_ROOT, 'Hide Revision Clouds.pushbutton', 'script.py')
@@ -225,7 +227,7 @@ class RevisionCloudCommandTests(unittest.TestCase):
         with open(os.path.join(REVISION_ROOT, 'bundle.yaml'), 'r') as stream:
             revision_layout = stream.read()
         prototype_layout_path = os.path.join(
-            PROJECT_ROOT, 'KL&A Tools.tab', '05 DevSandbox.panel',
+            PROJECT_ROOT, TAB_NAME, '05 DevSandbox.panel',
             'Prototype.pulldown', 'bundle.yaml')
         with open(prototype_layout_path, 'r') as stream:
             prototype_layout = stream.read()

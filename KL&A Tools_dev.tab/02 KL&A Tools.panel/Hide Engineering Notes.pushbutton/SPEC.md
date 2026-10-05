@@ -5,9 +5,9 @@
 | Field | Value |
 | --- | --- |
 | Tool ID | `hide-engineering-notes` |
-| Path aliases | `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton`, `KL&A Tools.tab/KL&A Tools.panel/Hide Engineering Notes.pushbutton` |
-| Version inputs | `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/bundle.yaml`, `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/script.py` |
-| Bundle path | `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton` |
+| Path aliases | `KL&A Tools_dev.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton`, `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton`, `KL&A Tools.tab/KL&A Tools.panel/Hide Engineering Notes.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/script.py` |
+| Bundle path | `KL&A Tools_dev.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton` |
 | Maturity | Beta |
 | Tool version | `v1.1` |
 | Status/origin | Released KL&A beta command. Last delivered version: `v1.1`. |

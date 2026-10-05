@@ -137,7 +137,7 @@ for a useful report.
 changing it, regenerate `lib/build_info.py` with the provided script; do not
 edit the generated file directly. Release versions, beta-to-stable promotion,
 tags, validation evidence, and in-Revit verification are defined in
-[RELEASING.md](RELEASING.md). Published release notes live in
+[Release workflow](docs/releasing/RELEASING.md). Published release notes live in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Prototype promotion roadmap
@@ -164,7 +164,7 @@ tests/               Host-independent unit tests
 scripts/             Developer utilities, including build-metadata generation
 docs/guides/         Python and comment/documentation standards
 version.json         Human-edited version source
-RELEASING.md         Release and metadata-generation workflow
+docs/releasing/      Release workflow, tool-version rules, and delivery ledger
 ```
 
 Command entry points should stay thin: they adapt pyRevit/Revit, WPF, Excel,
@@ -175,8 +175,9 @@ it can be tested without Revit.
 
 Before changing a command:
 
-1. Create a short-lived topic branch from `dev`; do not push directly to
-   protected `dev` or `main`.
+1. For ordinary contributions, create a short-lived topic branch from `dev`.
+   The release owner may prepare releases and the next development cycle directly
+   on `dev`; releases reach `main` only through the owner-merged release PR.
 2. Read its `SPEC.md` and adjacent `bundle.yaml` when present.
 3. Preserve the established pyRevit bundle hierarchy and command metadata.
 4. Keep command-path Python compatible with the pyRevit engine unless the
@@ -187,8 +188,15 @@ Before changing a command:
    a pull request into `dev`.
 
 For the complete team workflow, see
-[Contributing](docs/guides/CONTRIBUTING.md), [RELEASING.md](RELEASING.md), and
+[Contributing](docs/guides/CONTRIBUTING.md), [Release workflow](docs/releasing/RELEASING.md), and
 [AGENTS.md](AGENTS.md).
+
+For release preparation and post-release verification, run the consolidated
+check described in the [release workflow](docs/releasing/RELEASING.md):
+
+```powershell
+.\.venv-rvt26\Scripts\python.exe scripts\release_check.py
+```
 
 ## Test locally
 

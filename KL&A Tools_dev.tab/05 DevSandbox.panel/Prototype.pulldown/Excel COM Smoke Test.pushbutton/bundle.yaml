@@ -3,8 +3,7 @@ title:
 tooltip:
   en_us: |-
     Version: v0.0
-    Date: 10.02.2026
-    Status: Unreleased
+    Date: 10.05.2026
     _____________________________________________________________________
     Description:
     Prototype: tests the shared Excel COM facade in the current Revit/pyRevit host using owned temporary workbook and CSV files. Reports PASS/FAIL per operation.
@@ -14,7 +13,7 @@ tooltip:
     - Review the operation table; inspect retained temporary files if a test or safe cleanup fails.
     _____________________________________________________________________
     Last update:
-    - [10.02.2026] - v0.0 (Unreleased): Planned first delivery of a disposable Excel facade lifecycle and operation smoke test.
+    - [10.05.2026] - v0.0 (0.0.10): First main delivery of a disposable Excel facade lifecycle and operation smoke test.
 author: KL&A
 engine:
   clean: true

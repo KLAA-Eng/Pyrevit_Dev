@@ -54,7 +54,7 @@ file outputs, or user workflow.
 | --- | --- | --- | --- | --- |
 | `v0.0` | Unreleased | 10.02.2026 | Planned prototype template baseline; replace with actual command evidence. | Template example; replace with development commit evidence. |
 
-Follow `docs/guides/TOOL_VERSIONING.md`. Use meaningful user-facing Git
+Follow `docs/releasing/TOOL_VERSIONING.md`. Use meaningful user-facing Git
 milestones; promote a maintained DevSandbox command to production at `v1.0`.
 Keep extension release evidence above separate from the independent tool version.
 

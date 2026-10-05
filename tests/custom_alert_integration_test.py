@@ -3,12 +3,14 @@ from __future__ import print_function
 import os
 import unittest
 
+from repo_paths import TAB_NAME
+
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GUI_DIR = os.path.join(PROJECT_ROOT, 'lib', 'GUI')
 STEEL_PSF_SCRIPT = os.path.join(
     PROJECT_ROOT,
-    'KL&A Tools.tab',
+    TAB_NAME,
     '05 DevSandbox.panel',
     'Prototype.pulldown',
     'Steel PSF.pushbutton',

@@ -2,7 +2,7 @@
 
 This is the canonical record of **mainline extension deliveries** used when
 calculating independent command versions. It is not a replacement for the
-extension [CHANGELOG.md](../CHANGELOG.md): that file is the concise release
+extension [CHANGELOG.md](../../CHANGELOG.md): that file is the concise release
 summary, while this ledger supplies the release boundaries used by each
 command's `SPEC.md` version history.
 
@@ -33,12 +33,21 @@ command's `SPEC.md` version history.
 | `0.0.7` | `2c4a3b2` | 09.28.2026 | `0.0.7` | Release #18; tag `v0.0.7-beta` | Squash-style release |
 | `0.0.8` | `34c41bc` | 09.28.2026 | `0.0.8` | Release #19; tag `v0.0.8-beta` | Squash-style release |
 | `0.0.9` | `d7185d2` | 10.01.2026 | `0.0.9` | Release #20; tag `v0.0.9-beta` | Squash-style release |
+| `0.0.10` | `74eccba29c1a8a8b6443baab0caf9a2f5ccf66e8` | 10.05.2026 | `0.0.10` | [PR #21](https://github.com/KLAA-Eng/Pyrevit_Dev/pull/21); annotated `v0.0.10-beta` peeled to this commit; [published prerelease](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.10-beta) verified 2026-10-05 | Squash-style release |
 
 ## Release-preparation handoff
 
-Before a `dev` to `main` release, convert every affected command's planned
-row from `Unreleased` to the new delivery identifier, replace `Status:
-Unreleased` in its tooltip with the intended delivery date, and add the new
-row here. After merge, verify the actual main commit and release tag evidence.
-The root changelog records the release summary; command specifications retain
-the detailed tool-version history.
+Follow [RELEASING.md](RELEASING.md) for the complete workflow. During preparation,
+add a six-column row with `Pending merge` as its main commit and
+`Pending publication; intended tag vX.Y.Z-beta` as its evidence. The identifier
+and delivery date let affected command histories pass the metadata audit. This
+is a prepared entry, not verified delivery evidence.
+
+After the owner merges the PR, verify the actual main commit, remote annotated
+tag and peeled commit, and published GitHub release. Fill in the commit, PR and
+release links, tag evidence, and verification date on `dev` during synchronization.
+Run the release check with `--delivery X.Y.Z` to verify the recorded commit and
+annotated tag against local Git objects; separately refresh the remote and
+verify the GitHub page. A release is complete only when its placeholders are
+resolved and those external checks are recorded. Existing historical entries
+retain their original evidence and formats.
