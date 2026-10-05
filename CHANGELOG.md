@@ -13,6 +13,37 @@ release boundaries.
 
 No pending published release.
 
+## 0.0.10 - 2026-10-05
+
+- **Channel:** Beta
+- **Tag:** `v0.0.10-beta`
+- **Tested Revit range:** No new live Revit claim. Carbon GWP Pull and Hide
+  Engineering Notes retain their documented live Revit and Excel acceptance
+  boundaries; their deterministic behavior is covered by the static suite.
+
+### Changed
+
+- Carbon GWP Pull is now a KL&A Tools-panel beta command with explicit Excel
+  PIA/IDispatch compatibility for raw COM wrappers, guarded workbook refresh
+  and calculation, and retained chart-render evidence.
+- Hide Engineering Notes now supports additional placed view types and
+  dependent views, and reports changed, already-correct, skipped, and failed
+  results from its plain pushbutton workflow.
+
+### Fixed
+
+- Release checks now resolve the shipped `KL&A Tools.tab` command bundles.
+
+### Known limits
+
+- Carbon GWP Pull requires Microsoft Excel COM interop and trusted,
+  formula-linked `.xlsx` or `.xlsm` workbooks.
+- Static checks do not validate Revit transactions, native dialogs, Excel
+  refresh behavior, image import, sheet placement, worksharing, undo, or
+  model reopening.
+
+**Rollback tag:** `v0.0.9-beta`
+
 ## 0.0.9 - 2026-10-01
 
 - **Channel:** Beta

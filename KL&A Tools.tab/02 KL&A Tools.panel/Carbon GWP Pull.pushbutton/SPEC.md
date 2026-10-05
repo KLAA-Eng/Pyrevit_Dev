@@ -3,16 +3,15 @@
 ## Identity
 
 - **Tool ID:** `carbon-gwp-pull`
-- **Path aliases:** `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Carbon GWP Pull.pushbutton`, `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Carbon GWP Pull.pushbutton`.
-- **Version inputs:** `KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/script.py`, `lib/carbon_gwp/workflow.py`, `lib/carbon_gwp/chart.py`, `lib/carbon_gwp/revit_chart.py`, `lib/excel_com.py`.
-- **Ribbon location:** `KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`
+- **Path aliases:** `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`; formerly `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Carbon GWP Pull.pushbutton`.
+- **Version inputs:** `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/bundle.yaml`, `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/script.py`, `lib/carbon_gwp/workflow.py`, `lib/carbon_gwp/chart.py`, `lib/carbon_gwp/revit_chart.py`, `lib/excel_com.py`.
+- **Ribbon location:** `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`
 - **Ribbon label:** Carbon GWP Pull
 - **Maturity:** Beta
-- **Status/origin:** Unreleased planned production promotion; KL&A custom replacement for an internal Dynamo workflow. Last delivered version: `v0.1` (DevSandbox).
-- **Status:** Unreleased.
+- **Status/origin:** Released KL&A Tools-panel beta command; KL&A custom replacement for an internal Dynamo workflow. Last delivered version: `v1.0`.
 - **Maintainer:** KL&A
 - **Tool version:** `v1.0`
-- **Last extension release affecting this command:** `0.0.9-beta`
+- **Last extension release affecting this command:** `0.0.10-beta`
 - **Compatibility:** Revit 2024 and later is the repository target. No
   command-specific live Revit version acceptance is recorded yet.
 
@@ -174,7 +173,7 @@ The pyRevit output window reports:
 | --- | --- | --- | --- | --- |
 | `v0.0` | `0.0.6beta` | 09.15.2026 | First delivered DevSandbox workflow: export selected schedules to Excel and update Carbon Pie.JMP family parameters from Export values. | `300f8d4` |
 | `v0.1` | `0.0.9` | 10.01.2026 | Delivered the revised DevSandbox workflow with managed GWP/material-volume charts, refresh guards, Material Accuracy reporting, and chart placement/retention safeguards. | `d7185d2` |
-| `v1.0` | Unreleased | 10.02.2026 | Planned production-panel promotion with explicit raw Excel COM support, refined refresh/workbook safeguards, chart placement, and retained generated PNGs. | `0dcb4d3`, `c7ca2f9` |
+| `v1.0` | `0.0.10` | 10.05.2026 | Delivered production-panel promotion with explicit raw Excel COM support, refined refresh/workbook safeguards, chart placement, and retained generated PNGs. | `0dcb4d3`, `c7ca2f9` |
 
 Versions follow meaningful changes between adjacent mainline release snapshots,
 including the listed version inputs. Earlier development iterations are grouped
@@ -185,9 +184,10 @@ development change date.
 
 ## Extension release history
 
-- `0.0.9-beta` — Delivered the revised DevSandbox chart workflow. The
-  production-panel promotion and raw Excel COM changes are pending on dev;
-  live Revit/Excel acceptance remains separately required.
+- `0.0.10-beta` — Delivered the production-panel promotion and raw Excel COM
+  compatibility changes. Live Revit/Excel acceptance remains separately
+  required.
+- `0.0.9-beta` — Delivered the revised DevSandbox chart workflow.
 
 ## Backlog
 

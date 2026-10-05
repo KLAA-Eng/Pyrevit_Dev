@@ -4,7 +4,7 @@ KL&A Tools is a development pyRevit extension for KL&A Revit workflows. It
 adds a **KL&A Tools** ribbon tab within Revit.
 
 > **Development / beta extension.** The current release is
-> [`0.0.9-beta`](version.json), dated October 1, 2026.
+> [`0.0.10-beta`](version.json), dated October 5, 2026.
 
 ## Ribbon tour
 
@@ -129,7 +129,7 @@ for a useful report.
 
 | Current version | Channel | Release date | Notes |
 | --- | --- | --- | --- |
-| `0.0.6beta` | Beta | 2026-09-15 | Current source version; validate changed behavior in Revit before deployment. |
+| `0.0.10` | Beta | 2026-10-05 | Current release; validate changed behavior in Revit and Excel before deployment. |
 
 `version.json` is the single human-edited extension version source. After
 changing it, regenerate `lib/build_info.py` with the provided script; do not

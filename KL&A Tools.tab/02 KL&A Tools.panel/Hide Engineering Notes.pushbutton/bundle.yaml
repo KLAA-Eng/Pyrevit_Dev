@@ -6,8 +6,7 @@ title:
 tooltip:
   en_us: |
     Version: v1.1
-    Date: 10.02.2026
-    Status: Unreleased
+    Date: 10.05.2026
     _____________________________________________________________________
     Description:
 
@@ -22,7 +21,7 @@ tooltip:
     _____________________________________________________________________
     Last update:
 
-    - [10.02.2026] v1.1 - Unreleased: Planned broader supported views and dependent-view handling; plain pushbutton with changed/already/skipped/failed output reporting.
+    - [10.05.2026] v1.1 - 0.0.10: Delivered broader supported views and dependent-view handling; plain pushbutton with changed/already/skipped/failed output reporting.
     - [07.16.2026] v1.0 - 0.0.0.beta: Delivered hide/unhide engineering-note text with eligible-sheet/view filtering, type-name normalization, action dialog, and diagnostics.
 
 author: KL&A

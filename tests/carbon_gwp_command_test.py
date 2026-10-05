@@ -9,7 +9,7 @@ import unittest
 
 COMMAND_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
-    'KL&A Tools_dev.tab',
+    'KL&A Tools.tab',
     '02 KL&A Tools.panel',
     'Carbon GWP Pull.pushbutton',
     'script.py',

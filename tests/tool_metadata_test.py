@@ -161,7 +161,7 @@ class CommandState(object):
         self.assertIn('05 DevSandbox.panel', bundles[0])
 
     def test_canonical_hidden_template_conforms(self):
-        path = os.path.join(ROOT, 'KL&A Tools_dev.tab', '05 DevSandbox.panel',
+        path = os.path.join(ROOT, 'KL&A Tools.tab', '05 DevSandbox.panel',
                             '_Templates', '_Template.pushbutton')
         self.assertEqual([], checker.validate_bundle(path))
 

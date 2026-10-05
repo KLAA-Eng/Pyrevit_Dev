@@ -6,13 +6,12 @@
 | --- | --- |
 | Tool ID | `hide-engineering-notes` |
 | Path aliases | `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton`, `KL&A Tools.tab/KL&A Tools.panel/Hide Engineering Notes.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/script.py` |
-| Bundle path | `KL&A Tools_dev.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton` |
+| Version inputs | `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/bundle.yaml`, `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton/script.py` |
+| Bundle path | `KL&A Tools.tab/02 KL&A Tools.panel/Hide Engineering Notes.pushbutton` |
 | Maturity | Beta |
 | Tool version | `v1.1` |
-| Status/origin | Unreleased planned production update; KL&A custom command. Last delivered version: `v1.0`. |
-| Status | Unreleased |
-| Last extension release affecting this command | `0.0.9-beta` |
+| Status/origin | Released KL&A beta command. Last delivered version: `v1.1`. |
+| Last extension release affecting this command | `0.0.10-beta` |
 | Maintainer | KL&A |
 | Revit versions live-tested | No exact version recorded for this command. |
 
@@ -63,7 +62,7 @@ Shift-click diagnostics identify exclusions and the first reported failures.
 
 | Date | Extension release | Revit version | Scenario | Result | Evidence link or location |
 | --- | --- | --- | --- | --- | --- |
-| 2026-10-02 | Unreleased | Not run | Static source and bundle review | Pass pending live acceptance | Current change review |
+| 2026-10-05 | 0.0.10-beta | Not run | Static source and bundle review | Pass; no live Revit claim | Current release preparation |
 
 Live Revit acceptance remains required for hide/unhide, Cancel, no matching
 notes, already-hidden notes, unhideable notes, state/write failures, each
@@ -75,7 +74,7 @@ ribbon presentation.
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
 | `v1.0` | `0.0.0.beta` | 07.16.2026 | Delivered hide/unhide engineering-note text with eligible-sheet/view filtering, type-name normalization, action dialog, and diagnostics. | `484924b` |
-| `v1.1` | Unreleased | 10.02.2026 | Planned broader supported views and dependent-view handling; plain pushbutton with changed/already/skipped/failed output reporting. | `0dcb4d3` |
+| `v1.1` | `0.0.10` | 10.05.2026 | Delivered broader supported views and dependent-view handling; plain pushbutton with changed/already/skipped/failed output reporting. | `0dcb4d3` |
 
 Versions follow meaningful changes between adjacent mainline release snapshots,
 including the listed version inputs. Earlier development iterations are grouped
@@ -88,7 +87,8 @@ development change date.
 
 | Extension release | Date | Change summary |
 | --- | --- | --- |
-| `0.0.9-beta` | 2026-10-01 | Packaged the prior delivered command unchanged. The broader views, dependent-view handling, and completion report remain Unreleased on dev. |
+| `0.0.10-beta` | 2026-10-05 | Delivered broader views, dependent-view handling, and changed/already/skipped/failed completion reporting. |
+| `0.0.9-beta` | 2026-10-01 | Packaged the prior delivered command unchanged. |
 
 ## Backlog
 
