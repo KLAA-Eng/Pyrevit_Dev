@@ -3,12 +3,12 @@
 | Field | Value |
 | --- | --- |
 | Tool ID | `devsandbox.findreplace-sheets-proto` |
-| Tool version | `v0.0` |
-| Status | Released |
+| Tool version | `v0.1` |
+| Status | Unreleased |
 | Status/origin | Prototype; locally maintained KL&A adaptation of EFTools (Erik Frits). |
-| Main delivery | 0.0.6beta |
+| Main delivery | Unreleased |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` |
+| Version inputs | Bundle `bundle.yaml`, `script.py`, `Script.xaml`; `lib/find_replace/workflow.py`, `lib/find_replace/revit_batch.py`, `lib/find_replace/window.py`; `lib/Snippets/_selection.py`; `lib/GUI/Resources/WPF_styles.xaml` |
 
 ## Tool version history
 
@@ -16,6 +16,7 @@
 | --- | --- | --- | --- | --- |
 | v1.1.EFTools | 0.0.5.beta | 08.20.2026 | First prototype delivery of the unchanged EFTools version 1.1 functionality. | 8cd45f8 |
 | v0.0 | 0.0.6beta | 09.15.2026 | First main delivery of the local KL&A prototype adaptation using shared WPF resources. | 300f8d4 |
+| v0.1 | Unreleased | 10.08.2026 | Exact-value sheet rename, per-sheet rollback, guarded batch outcomes, and in-dialog reporting. | Pending next main delivery on `dev`. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -23,42 +24,69 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 
 ## Purpose
 
-Documents the current command implementation and intended user-facing behavior.
+Rename selected sheet titles and numbers with case-sensitive Find/Replace,
+Prefix, and Suffix, or change sheet-title case directly.
 
 ## Behavior
 
-This command is implemented by `script.py` in this pyRevit bundle. It runs in the Revit/pyRevit host and uses the active-document context required by its implementation. It must preserve unrelated model content and report unsupported or cancelled interactions without applying partial changes.
+The command uses selected sheets from the Project Browser or offers a sheet
+picker. The existing SheetNumber and SheetName columns remain. UPPERCASE and
+lowercase apply to sheet titles only; sheet numbers are unaffected.
+
+Actions apply immediately to the full selection's current values. Rename
+requires Find text when Replace is nonempty and keeps matching case-sensitive.
+Each rerun recomputes from current values, including repeated prefixes or
+suffixes. Requested sheet numbers that are already occupied, swapped with
+another selected sheet, or duplicated within the batch are skipped. No `*` or
+`_` fallback is added to a requested value.
+
+One parent Revit transaction gives the batch one Undo item. A subtransaction
+changes a sheet's title and number together or rolls both back if either fails.
+Other valid sheets may still change. The dialog closes quietly when the action
+succeeds. Rename with no changes stays open. Skipped or failed items expand an
+in-dialog result area with counts and reasons; controls remain available for a
+full rerun. Results for the same action are replaced on rerun while unresolved
+results from other actions remain visible.
 
 ## Validation boundary
 
-Validate this command against a representative Revit fixture, its empty or cancelled-input path, and its documented output or transaction effect before promotion beyond development use.
+Static Python/XAML checks and host-independent tests support this prototype.
+Live acceptance in Revit 2024, 2025, and 2026 remains required: duplicate or
+invalid titles and numbers, swaps, read-only/workshared sheets, cancellation,
+reruns, partial results, Undo, quiet success, Project Browser display, and
+actual dialog layout. The owner will perform the final visual review before
+replacing the Core Tools command.
 
 ## Implementation inventory
 
 - Entry point: `script.py`
-- Direct imports: from Autodesk.Revit.DB import *;from Autodesk.Revit.Exceptions import ArgumentException;from pyrevit import forms;from Snippets._selection        import get_selected_sheets;from clr import AddReference;from System.Diagnostics.Process import Start;from System.Windows.Window      import DragMove;from System.Windows.Input       import MouseButtonState;from Autodesk.Revit.UI import DockablePanes, DockablePane;
-- Local helper functions: update_project_browser,__init__,rename,rename_sheet_name,rename_sheet_number,sheet_number_find,sheet_number_replace,sheet_number_prefix,sheet_number_suffix,sheet_name_find,sheet_name_replace,sheet_name_prefix,sheet_name_suffix,button_close,Hyperlink_RequestNavigate,header_drag,button_run,
+- Selection and WPF: local `script.py` and `Script.xaml`, with `get_selected_sheets` and shared WPF styles.
+- Planning, Revit transaction handling, and result presentation: `lib/find_replace/`.
 - Bundled external assets: None.
 
 ## GUI and interaction
 
-Static UI/API references: forms.WPFWindow,
-
-Use the command from its pyRevit button. Where it exposes a dialog or selection
-workflow, make the required selection and review the result before confirming.
+The local XAML uses shared KLCode brushes, wordmark, header, action buttons, and
+footer styles. The original labels and direct case buttons remain. A result
+panel is collapsed initially and appears only for no-change Rename or
+unresolved items. No preview or success popup is used. The footer version is
+set from `__version__` when the dialog loads.
 
 ## Current execution logic
 
-pyRevit loads the bundle and executes its entry point. The implementation uses
-the imports and helper functions listed above; inspect `script.py` for the exact
-branching order and host API calls.
+`script.py` computes exact targets and rejects initially occupied or repeated
+sheet-number targets. `apply_batch` uses a parent transaction with one
+subtransaction per changing sheet. It checks commit status and rolls back the
+parent on failure. The command attempts its Project Browser refresh only after
+a committed change.
 
 ## Model and external effects
 
-Detected mutation/external-effect patterns: No Revit transaction or direct mutation pattern detected.
+Changes `ViewSheet.Name` and `ViewSheet.SheetNumber` for Rename, or
+`ViewSheet.Name` only for case conversion. It does not write files or contact
+external services except when a footer link is clicked.
 
 ## Current status
 
-This is a development-tab command. The inventory above is statically derived
-from the current bundle and must be confirmed inside the target Revit/pyRevit
-environment before promotion or behavior changes.
+Unreleased DevSandbox prototype. Live Revit acceptance and the owner's final
+visual review are pending; the Core Tools command remains unchanged.

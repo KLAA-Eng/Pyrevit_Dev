@@ -110,6 +110,12 @@
             <Button x:Name="UI_main_button" Click="button_run" Content="Rename" Width="210" Height="32"
                     Margin="0,8,0,16" HorizontalAlignment="Center"
                     Style="{StaticResource KLCodeActionButton}"/>
+            <StackPanel x:Name="result_panel" Visibility="Collapsed" Margin="5,0,5,8">
+                <TextBlock x:Name="result_summary" TextWrapping="Wrap"
+                           Foreground="{StaticResource text_white}" Margin="0,0,0,6"/>
+                <TextBox x:Name="result_details" Height="140" IsReadOnly="True"
+                         TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+            </StackPanel>
         </StackPanel>
 
         <Grid Grid.Row="2" Style="{StaticResource KLCodeFooterGrid}">

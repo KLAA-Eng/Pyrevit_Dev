@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
 __title__ = "Find and Replace in Sheets"
-__version__ = "v0.0"
+__version__ = "v0.1"
 
 # ╦╔╦╗╔═╗╔═╗╦═╗╔╦╗╔═╗
 # ║║║║╠═╝║ ║╠╦╝ ║ ╚═╗
 # ╩╩ ╩╩  ╚═╝╩╚═ ╩ ╚═╝ IMPORTS
 # ==================================================================
 from Autodesk.Revit.DB import *
-from Autodesk.Revit.Exceptions import ArgumentException
 
 #pyRevit
 from pyrevit import forms
@@ -18,6 +17,9 @@ import wpf
 # CUSTOM
 from Snippets._selection        import get_selected_sheets
 from GUI.forms                  import my_WPF
+from find_replace.revit_batch import apply_batch
+from find_replace.window import present
+from find_replace.workflow import case_value, new_result, rename_value
 
 # .NET IMPORTS
 from clr import AddReference
@@ -60,70 +62,98 @@ class MyWindow(my_WPF):
         self.add_wpf_resource()
         wpf.LoadComponent(self, os.path.join(os.path.dirname(__file__), xaml_file_name))
         self.main_title.Text = __title__
+        self.footer_version.Text = __version__
 
 
     def rename(self):
-        t = Transaction(doc, __title__)
-        t.Start()
-        self.rename_sheet_name()
-        self.rename_sheet_number()
-        update_project_browser()
-        t.Commit()
+        """Apply exact title and number changes together for each sheet."""
+        try:
+            entries = self._rename_entries()
+        except ValueError as error:
+            result = new_result("Rename")
+            result["error"] = str(error)
+            present(self, result)
+            return
+        except Exception as error:
+            result = new_result("Rename")
+            result["error"] = "Could not plan sheet renames: {0}".format(error)
+            present(self, result)
+            return
+        self._run_batch("Rename", entries)
 
-
-    def rename_sheet_name(self):
-        """Function to rename SheetName if it is different to current one."""
-
-        for sheet in selected_sheets:
-            sheet_name_new = self.sheet_name_prefix + sheet.Name.replace(self.sheet_name_find, self.sheet_name_replace) + self.sheet_name_suffix
-            self.set_sheet_name_with_retry(sheet, sheet_name_new)
-
-
-    def set_sheet_name_with_retry(self, sheet, sheet_name_new):
-        fail_count = 0
-
-        while fail_count < 5:
-            fail_count += 1
-
-            try:
-                if sheet.Name != sheet_name_new:
-                    sheet.Name = sheet_name_new
-                    break
-            except ArgumentException:
-                sheet_name_new += "*"
-            except:
-                sheet_name_new += "_"
 
 
     def convert_sheet_names(self, case_mode):
-        t = Transaction(doc, __title__)
-        t.Start()
+        action = "UPPERCASE" if case_mode == "upper" else "lowercase"
+        entries = []
+        try:
+            for sheet in selected_sheets:
+                old = sheet.Name
+                new = case_value(old, case_mode)
+                entries.append({"element": sheet, "label": self._sheet_label(sheet),
+                                "changes": [("Name", new)] if new != old else []})
+        except Exception as error:
+            result = new_result(action)
+            result["error"] = "Could not plan case conversion: {0}".format(error)
+            present(self, result)
+        else:
+            self._run_batch(action, entries)
+
+
+
+    def _sheet_label(self, sheet):
+        return u"{0} - {1} [{2}]".format(sheet.SheetNumber, sheet.Name,
+                                          sheet.Id.IntegerValue)
+
+    def _rename_entries(self):
+        entries = []
         for sheet in selected_sheets:
-            if case_mode == "upper":
-                sheet_name_new = sheet.Name.upper()
-            else:
-                sheet_name_new = sheet.Name.lower()
+            old_name = sheet.Name
+            old_number = sheet.SheetNumber
+            new_name = rename_value(old_name, self.sheet_name_find,
+                                    self.sheet_name_replace,
+                                    self.sheet_name_prefix, self.sheet_name_suffix)
+            new_number = rename_value(old_number, self.sheet_number_find,
+                                      self.sheet_number_replace,
+                                      self.sheet_number_prefix, self.sheet_number_suffix)
+            changes = []
+            if new_name != old_name:
+                changes.append(("Name", new_name))
+            if new_number != old_number:
+                changes.append(("SheetNumber", new_number))
+            entries.append({"element": sheet, "label": self._sheet_label(sheet),
+                            "changes": changes, "number": new_number,
+                            "number_changed": new_number != old_number})
 
-            self.set_sheet_name_with_retry(sheet, sheet_name_new)
-        update_project_browser()
-        t.Commit()
+        # Check the initial state so swaps and duplicate batch targets do not
+        # depend on the order in which sheets happen to be selected.
+        all_sheets = FilteredElementCollector(doc).OfClass(ViewSheet).ToElements()
+        occupied = {sheet.SheetNumber.lower(): sheet.Id.IntegerValue
+                    for sheet in all_sheets}
+        requested = {}
+        for entry in entries:
+            if entry["number_changed"]:
+                key = entry["number"].lower()
+                requested[key] = requested.get(key, 0) + 1
+        for entry in entries:
+            if not entry["number_changed"]:
+                continue
+            key = entry["number"].lower()
+            owner = occupied.get(key)
+            if owner is not None and owner != entry["element"].Id.IntegerValue:
+                entry["issue"] = "Sheet number is already in use"
+            elif requested[key] > 1:
+                entry["issue"] = "Multiple selected sheets request this number"
+        return entries
 
-
-    def rename_sheet_number(self):
-        for sheet in selected_sheets:
-            sheet_number_new = self.sheet_number_prefix + sheet.SheetNumber.replace(self.sheet_number_find, self.sheet_number_replace) + self.sheet_number_suffix
-            fail_count = 0
-            while fail_count < 5:
-                fail_count += 1
-                try:
-                    if sheet.SheetNumber != sheet_number_new:
-                        sheet.SheetNumber = sheet_number_new
-                        break
-                except ArgumentException:
-                    sheet_number_new += "*"
-                except:
-                    sheet_number_new += "_"
-
+    def _run_batch(self, action, entries):
+        result = apply_batch(doc, action, entries)
+        if result["changed"]:
+            try:
+                update_project_browser()
+            except Exception as error:
+                result["error"] = "Project Browser refresh failed: {0}".format(error)
+        present(self, result)
 
     ### GUI PROPERTIES
     # SHEETNUMBER PROPERTIES

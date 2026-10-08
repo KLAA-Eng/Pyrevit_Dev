@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __title__ = "Find and Replace in Views"
-__version__ = "v0.0"
+__version__ = "v0.1"
 
 # ╦╔╦╗╔═╗╔═╗╦═╗╔╦╗╔═╗
 # ║║║║╠═╝║ ║╠╦╝ ║ ╚═╗
@@ -14,8 +14,10 @@ import wpf
 
 # Custom
 from Renaming.BaseClass_FindReplace import BaseRenaming
-from Snippets._context_manager import ef_Transaction, try_except
-from Snippets._selection import get_selected_views
+from Snippets._selection import select_from_dict
+from find_replace.revit_batch import apply_batch
+from find_replace.window import present
+from find_replace.workflow import case_value, new_result, rename_value
 
 # ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
 # ╚╗╔╝╠═╣╠╦╝║╠═╣╠╩╗║  ║╣ ╚═╗
@@ -52,35 +54,67 @@ class RenameViews(BaseRenaming):
             forms.alert("No matching elements for renaming were selected. \nPlease Try again.", exitscript=True, title="Script Cancelled.")
 
     def get_selected_elements(self):
-        """Get Selected Views or let user select Views from a list."""
-        return get_selected_views(uidoc, title=__title__, version=__version__)
+        """Use browser selection, or offer distinct non-template views."""
+        selected = []
+        for element_id in uidoc.Selection.GetElementIds():
+            view = doc.GetElement(element_id)
+            if isinstance(view, View) and not isinstance(view, ViewSheet):
+                selected.append(view)
+        if selected:
+            return selected
+
+        all_views = FilteredElementCollector(doc).OfCategory(
+            BuiltInCategory.OST_Views).WhereElementIsNotElementType().ToElements()
+        choices = {}
+        for view in all_views:
+            if not isinstance(view, View) or isinstance(view, ViewSheet) or view.IsTemplate:
+                continue
+            label = u"{0} [{1}]".format(view.Name, view.Id.IntegerValue)
+            choices[label] = view
+        return select_from_dict(choices, title=__title__, label="Select Views",
+                                button_name="Select", version=__version__)
 
     def rename_elements(self):
-        """Function to rename selected Views."""
-        with ef_Transaction(self.doc, __title__, debug=True):
+        """Rename every selected view from its current name."""
+        entries = []
+        try:
             for view in self.selected_elements:
-
-                with try_except(debug=True):
-                    current_name  = view.Name
-                    new_name      = self.prefix + current_name.replace(self.find,self.replace) + self.suffix
-
-                    if new_name and  new_name != current_name:
-                        view.Name = new_name
+                old = view.Name
+                new = rename_value(old, self.find, self.replace,
+                                   self.prefix, self.suffix)
+                entries.append({"element": view,
+                                "label": u"{0} [{1}]".format(old, view.Id.IntegerValue),
+                                "changes": [("Name", new)] if new != old else []})
+        except ValueError as error:
+            result = new_result("Rename")
+            result["error"] = str(error)
+        except Exception as error:
+            result = new_result("Rename")
+            result["error"] = "Could not plan view renames: {0}".format(error)
+        else:
+            result = apply_batch(self.doc, "Rename", entries)
+        present(self, result)
 
     def convert_element_names(self, case_mode):
-        """Convert selected View names to uppercase or lowercase."""
-        with ef_Transaction(self.doc, __title__, debug=True):
+        """Convert selected View names directly, without a preview."""
+        action = "UPPERCASE" if case_mode == "upper" else "lowercase"
+        entries = []
+        try:
             for view in self.selected_elements:
+                old = view.Name
+                new = case_value(old, case_mode)
+                entries.append({"element": view,
+                                "label": u"{0} [{1}]".format(old, view.Id.IntegerValue),
+                                "changes": [("Name", new)] if new != old else []})
+        except Exception as error:
+            result = new_result(action)
+            result["error"] = "Could not plan case conversion: {0}".format(error)
+        else:
+            result = apply_batch(self.doc, action, entries)
+        present(self, result)
 
-                with try_except(debug=True):
-                    current_name = view.Name
-                    if case_mode == "upper":
-                        new_name = current_name.upper()
-                    else:
-                        new_name = current_name.lower()
-
-                    if new_name and new_name != current_name:
-                        view.Name = new_name
+    def button_run(self, sender, e):
+        self.rename_elements()
 
     def button_uppercase(self, sender, e):
         """Button action: Convert selected View names to uppercase."""
