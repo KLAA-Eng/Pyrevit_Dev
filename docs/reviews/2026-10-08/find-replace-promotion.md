@@ -12,6 +12,28 @@ They use shared KLCode WPF resources. An issue panel is collapsed initially and
 expands for skipped/failed items or a no-change Rename result. A complete action
 closes quietly; no preview or success popup is used.
 
+## Design-system source review
+
+Compared both prototype `Script.xaml` files with `DESIGNSYSTEM.md`,
+`lib/GUI/_templates/KLCodeMainTemplate.xaml`, and
+`lib/GUI/Resources/WPF_styles.xaml` on 10.08.2026. Both dialogs already use the
+template's 24 px borderless header, 86 px header edge columns, 70 x 12 outlined
+wordmark, centered title, shared close/action button styles, dark palette,
+green form borders, and shared three-column footer. Their compact, one- and
+two-column forms are command-specific variants of the list-selection template.
+
+The source review aligned the window, body, and header backgrounds with the
+shared brush keys; let the input fields inherit their shared colors; matched
+the template's 216 x 32 px, 14 px-font main action; and framed the outcome panel
+with the same green border and corner radius as the form sections. The
+SheetNumber/SheetName labels and direct case buttons were preserved.
+
+This is a source comparison, not a rendered WPF review. The owner's live visual
+review still needs to check title truncation, initial compact spacing, and the
+expanded outcome panel at normal and high display scaling. In particular,
+verify that the dynamically sized outcome panel and footer remain visible when
+two action results are shown.
+
 ## Static evidence
 
 | Check | Result |

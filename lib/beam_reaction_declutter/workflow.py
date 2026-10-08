@@ -50,12 +50,7 @@ def translate_box(bounds, vector):
 
 def steps_to_clear_overlap(bounds, blocker, step_vector,
                            max_steps=MAX_MOVE_STEPS):
-    """Return the step count needed to clear a blocker, or None when capped.
-
-    The Revit adapter still re-reads each live bounding box after a move. This
-    pure calculation supplies deterministic coverage for the cap and tolerance
-    rules used by that adapter.
-    """
+    """Return the step count needed to clear one blocker, or None when capped."""
     if not boxes_overlap(bounds, blocker):
         return 0
 
@@ -65,6 +60,53 @@ def steps_to_clear_overlap(bounds, blocker, step_vector,
         if not boxes_overlap(current, blocker):
             return step_count
     return None
+
+
+def steps_to_clear_all(bounds, blockers, step_vector,
+                       max_steps=MAX_MOVE_STEPS):
+    """Find the first step that clears every supplied view-space blocker."""
+    for step_count in range(1, max_steps + 1):
+        moved = translate_box(
+            bounds,
+            (step_vector[0] * step_count, step_vector[1] * step_count),
+        )
+        if not any(boxes_overlap(moved, blocker) for blocker in blockers):
+            return step_count
+    return None
+
+
+def same_beam_mover(current_distance, other_distance, current_id, other_id,
+                    other_movable=True, current_pinned=False,
+                    other_pinned=False, tolerance=0.000001):
+    """Whether this tag is the one allowed to move in a same-beam pair."""
+    if current_pinned:
+        return False
+    if current_distance > other_distance + tolerance:
+        return True
+    if current_distance < other_distance - tolerance:
+        return False
+    if other_pinned or not other_movable:
+        return True
+    return current_id > other_id
+
+
+def shortest_clear_choice(bounds, blockers, positive_step, away_sign,
+                          max_steps=MAX_MOVE_STEPS):
+    """Return signed steps; equal clearances favor the beam's outer end."""
+    positive = steps_to_clear_all(bounds, blockers, positive_step, max_steps)
+    negative = steps_to_clear_all(
+        bounds, blockers, (-positive_step[0], -positive_step[1]), max_steps)
+    if positive is None and negative is None:
+        return None
+    if positive is None:
+        return -negative
+    if negative is None:
+        return positive
+    if positive < negative:
+        return positive
+    if negative < positive:
+        return -negative
+    return positive if away_sign >= 0 else -negative
 
 
 def should_defer_to_other_tag(current_verticality, other_verticality):

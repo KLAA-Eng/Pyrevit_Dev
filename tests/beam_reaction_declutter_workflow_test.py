@@ -15,7 +15,10 @@ from lib.beam_reaction_declutter.workflow import (
     boxes_overlap,
     is_marker_color,
     is_reaction_family,
+    same_beam_mover,
+    shortest_clear_choice,
     should_defer_to_other_tag,
+    steps_to_clear_all,
     steps_to_clear_overlap,
 )
 
@@ -59,6 +62,36 @@ class BeamReactionDeclutterWorkflowTests(unittest.TestCase):
             (2.0, 0.0, 3.0, 1.0),
             (0.2, 0.0),
         ))
+
+    def test_all_blockers_must_be_clear_at_the_same_final_position(self):
+        bounds = (0.0, 0.0, 0.2, 1.0)
+        blockers = [(0.1, 0.0, 0.3, 1.0), (0.35, 0.0, 0.75, 1.0)]
+
+        self.assertEqual(4, steps_to_clear_all(
+            bounds, blockers, (0.2, 0.0)))
+        self.assertIsNone(steps_to_clear_all(
+            bounds, blockers, (0.2, 0.0), max_steps=3))
+
+    def test_same_beam_priority_keeps_center_and_uses_stable_ties(self):
+        self.assertTrue(same_beam_mover(4.0, 1.0, 10, 20))
+        self.assertFalse(same_beam_mover(1.0, 4.0, 20, 10))
+        self.assertTrue(same_beam_mover(2.0, 2.0, 20, 10))
+        self.assertFalse(same_beam_mover(2.0, 2.0, 10, 20))
+        self.assertFalse(same_beam_mover(4.0, 1.0, 20, 10,
+                                         current_pinned=True))
+        self.assertFalse(same_beam_mover(1.0, 4.0, 10, 20,
+                                         other_pinned=True))
+        self.assertTrue(same_beam_mover(2.0, 2.0, 10, 20,
+                                        other_movable=False))
+
+    def test_shortest_same_beam_path_uses_outer_end_for_a_tie(self):
+        bounds = (0.0, 0.0, 0.2, 1.0)
+        blockers = [(-0.1, 0.0, 0.3, 1.0)]
+
+        self.assertEqual(2, shortest_clear_choice(
+            bounds, blockers, (0.2, 0.0), away_sign=1))
+        self.assertEqual(-2, shortest_clear_choice(
+            bounds, blockers, (0.2, 0.0), away_sign=-1))
 
     def test_more_vertical_beam_receives_priority(self):
         self.assertTrue(should_defer_to_other_tag(0.25, 0.75))

@@ -8,16 +8,16 @@
     ShowInTaskbar="True"
     WindowStyle="None"
     ResizeMode="NoResize"
-    Background="#1A252B">
+    Background="{StaticResource window_background}">
 
-    <Grid Background="#1A252B">
+    <Grid Background="{StaticResource window_background}">
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>
             <RowDefinition/>
             <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" MouseDown="header_drag" Background="#1A252B">
+        <Grid Grid.Row="0" MouseDown="header_drag" Background="{StaticResource header_background}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="86"/>
                 <ColumnDefinition/>
@@ -48,23 +48,19 @@
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10">
                             <DockPanel HorizontalAlignment="Left" Margin="2">
                                 <TextBlock Text="Find:" Foreground="{StaticResource text_white}" Width="60"/>
-                                <TextBox x:Name="input_sheet_number_find" Width="200" Background="{StaticResource header_background}"
-                                         Foreground="{StaticResource text_white}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="input_sheet_number_find" Width="200" VerticalAlignment="Center"/>
                             </DockPanel>
                             <DockPanel HorizontalAlignment="Left" Margin="2">
                                 <TextBlock Text="Replace:" Foreground="{StaticResource text_white}" Width="60"/>
-                                <TextBox x:Name="input_sheet_number_replace" Width="200" Background="{StaticResource header_background}"
-                                         Foreground="{StaticResource text_white}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="input_sheet_number_replace" Width="200" VerticalAlignment="Center"/>
                             </DockPanel>
                             <DockPanel HorizontalAlignment="Left" Margin="2">
                                 <TextBlock Text="Prefix:" Foreground="{StaticResource text_white}" Width="60"/>
-                                <TextBox x:Name="input_sheet_number_prefix" Width="200" Background="{StaticResource header_background}"
-                                         Foreground="{StaticResource text_white}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="input_sheet_number_prefix" Width="200" VerticalAlignment="Center"/>
                             </DockPanel>
                             <DockPanel HorizontalAlignment="Left" Margin="2">
                                 <TextBlock Text="Suffix:" Foreground="{StaticResource text_white}" Width="60"/>
-                                <TextBox x:Name="input_sheet_number_suffix" Width="200" Background="{StaticResource header_background}"
-                                         Foreground="{StaticResource text_white}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="input_sheet_number_suffix" Width="200" VerticalAlignment="Center"/>
                             </DockPanel>
                         </StackPanel>
                     </Border>
@@ -77,23 +73,19 @@
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10">
                             <DockPanel HorizontalAlignment="Left" Margin="2">
                                 <TextBlock Text="Find:" Foreground="{StaticResource text_white}" Width="60"/>
-                                <TextBox x:Name="input_sheet_name_find" Width="200" Background="{StaticResource header_background}"
-                                         Foreground="{StaticResource text_white}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="input_sheet_name_find" Width="200" VerticalAlignment="Center"/>
                             </DockPanel>
                             <DockPanel HorizontalAlignment="Left" Margin="2">
                                 <TextBlock Text="Replace:" Foreground="{StaticResource text_white}" Width="60"/>
-                                <TextBox x:Name="input_sheet_name_replace" Width="200" Background="{StaticResource header_background}"
-                                         Foreground="{StaticResource text_white}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="input_sheet_name_replace" Width="200" VerticalAlignment="Center"/>
                             </DockPanel>
                             <DockPanel HorizontalAlignment="Left" Margin="2">
                                 <TextBlock Text="Prefix:" Foreground="{StaticResource text_white}" Width="60"/>
-                                <TextBox x:Name="input_sheet_name_prefix" Width="200" Background="{StaticResource header_background}"
-                                         Foreground="{StaticResource text_white}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="input_sheet_name_prefix" Width="200" VerticalAlignment="Center"/>
                             </DockPanel>
                             <DockPanel HorizontalAlignment="Left" Margin="2">
                                 <TextBlock Text="Suffix:" Foreground="{StaticResource text_white}" Width="60"/>
-                                <TextBox x:Name="input_sheet_name_suffix" Width="200" Background="{StaticResource header_background}"
-                                         Foreground="{StaticResource text_white}" VerticalAlignment="Center"/>
+                                <TextBox x:Name="input_sheet_name_suffix" Width="200" VerticalAlignment="Center"/>
                             </DockPanel>
                         </StackPanel>
                     </Border>
@@ -107,15 +99,18 @@
                         FontSize="12" Style="{StaticResource KLCodeActionButton}"/>
             </StackPanel>
 
-            <Button x:Name="UI_main_button" Click="button_run" Content="Rename" Width="210" Height="32"
-                    Margin="0,8,0,16" HorizontalAlignment="Center"
+            <Button x:Name="UI_main_button" Click="button_run" Content="Rename" Width="216" Height="32"
+                    FontSize="14" Margin="0,8,0,16" HorizontalAlignment="Center"
                     Style="{StaticResource KLCodeActionButton}"/>
-            <StackPanel x:Name="result_panel" Visibility="Collapsed" Margin="5,0,5,8">
-                <TextBlock x:Name="result_summary" TextWrapping="Wrap"
-                           Foreground="{StaticResource text_white}" Margin="0,0,0,6"/>
-                <TextBox x:Name="result_details" Height="140" IsReadOnly="True"
-                         TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
-            </StackPanel>
+            <Border x:Name="result_panel" Visibility="Collapsed" Margin="5,0,5,8"
+                    BorderBrush="{StaticResource border_green_dark}" BorderThickness="1"
+                    CornerRadius="10" Padding="10">
+                <StackPanel>
+                    <TextBlock x:Name="result_summary" TextWrapping="Wrap" Margin="0,0,0,6"/>
+                    <TextBox x:Name="result_details" Height="140" IsReadOnly="True"
+                             TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+                </StackPanel>
+            </Border>
         </StackPanel>
 
         <Grid Grid.Row="2" Style="{StaticResource KLCodeFooterGrid}">

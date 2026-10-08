@@ -2,18 +2,20 @@ title:
   en_us: "Beam Reaction\nDeclutter"
 tooltip:
   en_us: |-
-    Version: v0.0
-    Date: 09.28.2026
+    Version: v0.1
+    Date: 10.08.2026
+    Status: Unreleased
     _____________________________________________________________________
     Description:
-    Prototype: moves overlapping Reaction structural-framing tags along their beams in selected plan views, or clears matching red markers. Revit 2024+; changes tag positions and view overrides.
+    Prototype: moves overlapping Reaction structural-framing tags along their beams in selected plan views, including same-beam tag conflicts. Unsafe or unsupported tags stay unchanged. Revit 2024+; changes tag positions and view overrides.
     _____________________________________________________________________
     How-to:
-    - Choose Move or Reset.
-    - Select one or more plan views and review the output report.
+    - Choose Move or Clear Matching Red Overrides.
+    - Select one or more plan views. Output lists only tags needing attention.
+    - Clearing exact-red overrides does not restore positions and can also clear manually applied matching red.
     _____________________________________________________________________
     Last update:
-    - [09.28.2026] - v0.0 (0.0.7): First main delivery of Move/Reset reaction-tag decluttering.
+    - [10.08.2026] - v0.1 (Unreleased): Bound movement per tag, resolve same-beam conflicts, roll back failed moves, and report only unresolved tags.
 author: KL&A
 min_revit_version: 2024
 engine:
