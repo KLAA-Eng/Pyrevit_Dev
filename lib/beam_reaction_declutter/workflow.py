@@ -75,6 +75,42 @@ def steps_to_clear_all(bounds, blockers, step_vector,
     return None
 
 
+def steps_to_clear_views(view_boxes, direction_sign=1,
+                         max_steps=MAX_MOVE_STEPS):
+    """Find one step count that clears every selected view of a shared tag.
+
+    Each entry is (tag bounds, blocker bounds, positive beam-axis step) in that
+    view's coordinates. A tag appearing in multiple dependent views therefore
+    uses one movement budget for the run.
+    """
+    for step_count in range(1, max_steps + 1):
+        if all(not any(boxes_overlap(
+                translate_box(bounds, (step[0] * step_count * direction_sign,
+                                       step[1] * step_count * direction_sign)),
+                blocker) for blocker in blockers)
+                for bounds, blockers, step in view_boxes):
+            return step_count
+    return None
+
+
+def shortest_clear_choice_for_views(view_boxes, away_sign,
+                                     max_steps=MAX_MOVE_STEPS):
+    """Return signed steps that clear all views; ties favor the outer end."""
+    positive = steps_to_clear_views(view_boxes, 1, max_steps)
+    negative = steps_to_clear_views(view_boxes, -1, max_steps)
+    if positive is None and negative is None:
+        return None
+    if positive is None:
+        return -negative
+    if negative is None:
+        return positive
+    if positive < negative:
+        return positive
+    if negative < positive:
+        return -negative
+    return positive if away_sign >= 0 else -negative
+
+
 def same_beam_mover(current_distance, other_distance, current_id, other_id,
                     other_movable=True, current_pinned=False,
                     other_pinned=False, tolerance=0.000001):
@@ -93,20 +129,8 @@ def same_beam_mover(current_distance, other_distance, current_id, other_id,
 def shortest_clear_choice(bounds, blockers, positive_step, away_sign,
                           max_steps=MAX_MOVE_STEPS):
     """Return signed steps; equal clearances favor the beam's outer end."""
-    positive = steps_to_clear_all(bounds, blockers, positive_step, max_steps)
-    negative = steps_to_clear_all(
-        bounds, blockers, (-positive_step[0], -positive_step[1]), max_steps)
-    if positive is None and negative is None:
-        return None
-    if positive is None:
-        return -negative
-    if negative is None:
-        return positive
-    if positive < negative:
-        return positive
-    if negative < positive:
-        return -negative
-    return positive if away_sign >= 0 else -negative
+    return shortest_clear_choice_for_views(
+        [(bounds, blockers, positive_step)], away_sign, max_steps)
 
 
 def should_defer_to_other_tag(current_verticality, other_verticality):

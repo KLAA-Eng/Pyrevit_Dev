@@ -1,19 +1,22 @@
 title:
   en_us: Find and Replace in Views
-author: Erik Frits
+author: KL&A
 tooltip:
   en_us: |-
-    Version: v1.2.EFTools
-    Date    = 07.16.2026
+    Version: v1.0
+    Date: 10.09.2026
+    Status: Unreleased
     _____________________________________________________________________
     Description:
 
-    Rename multiple views using find, replace, prefix, and suffix logic.
+    Rename selected views with case-sensitive Find/Replace, Prefix, Suffix,
+    Uppercase, or Lowercase. Exact conflicts are skipped and shown in the dialog.
     _____________________________________________________________________
     How-to:
 
-    -> Select views in the Project Browser, or select them in the tool.
-    -> Run the tool and enter find, replace, prefix, or suffix values.
+    -> Select views in the Project Browser, or choose from an unchecked list.
+    -> Enter Find, Replace, Prefix, or Suffix values and click Rename, or use a case button.
+    -> A complete action closes quietly; review skipped or failed views in the dialog.
     _____________________________________________________________________
     Last update:
-    - [07.16.2026] - EF Tools 1.2 release; imported unchanged locally.
+    - [10.09.2026] - v1.0 (Unreleased): Add Uppercase and Lowercase actions, an unchecked view list without IDs, exact-conflict handling, and in-dialog results.

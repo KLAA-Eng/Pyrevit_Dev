@@ -18,6 +18,26 @@ def case_value(current, mode):
     raise ValueError("Unsupported case conversion.")
 
 
+def distinct_view_labels(items):
+    """Give equal view names distinct picker labels without displaying IDs."""
+    counts = {}
+    for name, view_type in items:
+        counts[name] = counts.get(name, 0) + 1
+
+    labels = []
+    used = set()
+    for name, view_type in items:
+        base = name if counts[name] == 1 else u"{0} ({1})".format(name, view_type)
+        label = base
+        number = 2
+        while label in used or (counts[name] > 1 and label in counts):
+            label = u"{0} ({1})".format(base, number)
+            number += 1
+        used.add(label)
+        labels.append(label)
+    return labels
+
+
 def new_result(action):
     return {"action": action, "changed": [], "unchanged": [],
             "skipped": [], "failed": [], "error": None}

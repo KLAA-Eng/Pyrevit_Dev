@@ -2,12 +2,13 @@
 
 ## Current gate
 
-The Views and Sheets commands remain in DevSandbox. Their planned tool version
-is `v0.1` (Unreleased). The two Core Tools buttons have not been changed. The
-owner's final visual review and live Revit 2024, 2025, and 2026 acceptance are
-required before the prototype scripts replace the core implementations.
+The owner approved the visual review on 10.09.2026. The accepted Views and
+Sheets prototype implementations now occupy the existing Core Tools buttons
+on `dev`, with planned Core versions `v1.0` and `v1.1` respectively. Their
+DevSandbox bundles were retired. Live Revit 2024, 2025, and 2026 acceptance
+remains the next gate before release.
 
-The prototype dialogs retain their existing labels and direct action buttons.
+The promoted dialogs retain their existing labels and direct action buttons.
 They use shared KLCode WPF resources. An issue panel is collapsed initially and
 expands for skipped/failed items or a no-change Rename result. A complete action
 closes quietly; no preview or success popup is used.
@@ -23,26 +24,31 @@ green form borders, and shared three-column footer. Their compact, one- and
 two-column forms are command-specific variants of the list-selection template.
 
 The source review aligned the window, body, and header backgrounds with the
-shared brush keys; let the input fields inherit their shared colors; matched
+KLCharcoal palette; let the input fields inherit their shared colors; matched
 the template's 216 x 32 px, 14 px-font main action; and framed the outcome panel
 with the same green border and corner radius as the form sections. The
-SheetNumber/SheetName labels and direct case buttons were preserved.
+SheetNumber/SheetName labels and direct case buttons were preserved. The button
+captions now read Uppercase and Lowercase. Both fallback pickers start with no
+checked rows, and visible choices omit element IDs. Equal view names remain
+distinct through view type and, when needed, a sequence number.
 
-This is a source comparison, not a rendered WPF review. The owner's live visual
-review still needs to check title truncation, initial compact spacing, and the
-expanded outcome panel at normal and high display scaling. In particular,
-verify that the dynamically sized outcome panel and footer remain visible when
-two action results are shown.
+The owner accepted this visual review on 10.09.2026. During live Revit tests,
+verify that host rendering preserves title legibility, compact spacing, and
+visibility of the expanded outcome panel and footer, including two unresolved
+action results at normal and high display scaling.
 
 ## Static evidence
 
 | Check | Result |
 | --- | --- |
-| Focused planning, transaction-boundary, and window-state tests | 11 passed on 10.08.2026 |
-| Branded-window tests | 9 passed on 10.08.2026 |
-| Python AST and XAML XML parsing | Passed on 10.08.2026 |
-| Visible command metadata check | 36 bundles, 0 errors on 10.08.2026 |
-| `git diff --check` | Passed on 10.08.2026 |
+| Focused planning, transaction-boundary, picker-label, and window-state tests | 12 passed on 10.09.2026 |
+| Shared picker selection-state tests | 3 passed on 10.09.2026 |
+| Branded-window tests | 9 passed after promotion on 10.09.2026 |
+| Python AST and XAML XML parsing | Passed on 10.09.2026 |
+| Promoted XAML event handlers | All 6 handlers resolved for each Core dialog on 10.09.2026 |
+| UI Gallery source catalog tests | 5 passed after promotion on 10.09.2026 |
+| Visible command metadata check | 34 bundles, 0 errors after promotion on 10.09.2026 |
+| `git diff --check` | Passed on 10.09.2026 |
 
 The transaction tests use stand-ins for Revit. They confirm intended item
 rollback and batch failure reporting; they do not prove live Revit behavior.
@@ -55,7 +61,7 @@ Use a disposable local model with representative views, templates, and sheets.
 Record each host's outcome here after testing. Do not use a project central
 model for acceptance.
 
-| Host | pyRevit loads this checkout | Behavior | Visual review | Outcome |
+| Host | pyRevit loads this checkout | Behavior | Approved design renders correctly | Outcome |
 | --- | --- | --- | --- | --- |
 | Revit 2024 | Pending | Pending | Pending | Pending |
 | Revit 2025 | Pending | Pending | Pending | Pending |
@@ -68,10 +74,11 @@ edit was run. Revit 2025 and 2026 have not yet been launched for this review.
 
 ### Views
 
-- Confirm selected views are used directly; the fallback picker lists distinct
-  IDs, excludes templates by default, and allows an explicitly selected template.
-- Test Find/Replace (case sensitive), Prefix, Suffix, and direct UPPERCASE and
-  lowercase actions. Confirm a clean action closes quietly and no-change Rename
+- Confirm selected views are used directly; the fallback picker starts unchecked,
+  lists distinct names without IDs, and excludes templates by default. A
+  template selected in the Project Browser remains eligible.
+- Test Find/Replace (case sensitive), Prefix, Suffix, and direct Uppercase and
+  Lowercase actions. Confirm a clean action closes quietly and no-change Rename
   stays open.
 - Test invalid/duplicate names, read-only/workshared views, cancellation,
   partial success, exact skip reasons, full rerun from current names, and Undo.
@@ -80,6 +87,7 @@ edit was run. Revit 2025 and 2026 have not yet been launched for this review.
 
 ### Sheets
 
+- Confirm the fallback sheet picker starts unchecked and omits element IDs.
 - Test independent sheet-title and sheet-number fields. Case buttons must
   change titles only.
 - Test invalid and occupied numbers, a two-sheet number swap, duplicate batch
@@ -91,11 +99,13 @@ edit was run. Revit 2025 and 2026 have not yet been launched for this review.
   a full rerun from current values, Undo, and Project Browser display after
   commit. Inspect both the initial dialog and expanded result area visually.
 
-## Promotion after acceptance
+## Promotion completed on `dev`
 
-1. Copy the accepted prototype scripts and local XAML into the two existing
-   Core Tools bundles on `dev`, retaining the core button identities and icons.
-2. Update core `SPEC.md`, `bundle.yaml`, tool versions, UI Gallery paths, and
-   the design-system catalog to match the new implementation.
-3. Remove the two DevSandbox prototype bundles only after the owner's final
-   review, then rerun focused checks and inspect the complete diff.
+1. Copied the approved scripts and local XAML into the existing Core bundles,
+   retaining their button identities and icons.
+2. Combined each Core and prototype lineage in the Core `SPEC.md` histories;
+   updated the Core tool versions, bundle tooltips, UI Gallery, and design-system
+   catalog.
+3. Removed the two DevSandbox prototype bundles and their ribbon entries after
+   the owner's visual approval. The prior shared rename XAML remains labeled as
+   legacy gallery previews, with no active Core button using those files.

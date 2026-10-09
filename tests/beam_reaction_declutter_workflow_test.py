@@ -17,8 +17,10 @@ from lib.beam_reaction_declutter.workflow import (
     is_reaction_family,
     same_beam_mover,
     shortest_clear_choice,
+    shortest_clear_choice_for_views,
     should_defer_to_other_tag,
     steps_to_clear_all,
+    steps_to_clear_views,
     steps_to_clear_overlap,
 )
 
@@ -92,6 +94,18 @@ class BeamReactionDeclutterWorkflowTests(unittest.TestCase):
             bounds, blockers, (0.2, 0.0), away_sign=1))
         self.assertEqual(-2, shortest_clear_choice(
             bounds, blockers, (0.2, 0.0), away_sign=-1))
+
+    def test_shared_tag_uses_one_step_count_that_clears_both_views(self):
+        bounds = (0.0, 0.0, 0.2, 1.0)
+        view_boxes = [
+            (bounds, [(0.1, 0.0, 0.3, 1.0)], (0.2, 0.0)),
+            (bounds, [(0.35, 0.0, 0.75, 1.0)], (0.2, 0.0)),
+        ]
+
+        self.assertEqual(4, steps_to_clear_views(view_boxes))
+        self.assertIsNone(steps_to_clear_views(view_boxes, max_steps=3))
+        self.assertEqual(-1, shortest_clear_choice_for_views(
+            view_boxes, away_sign=1))
 
     def test_more_vertical_beam_receives_priority(self):
         self.assertTrue(should_defer_to_other_tag(0.25, 0.75))

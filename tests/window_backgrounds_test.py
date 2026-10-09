@@ -23,8 +23,8 @@ ALL_WINDOW_XAML_PATHS = WINDOW_XAML_PATHS + (
     'lib/GUI/RenameSheets.xaml',
     'lib/GUI/DuplicateSheets.xaml',
     TAB_NAME + '/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
-    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml',
-    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml',
+    TAB_NAME + '/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml',
+    TAB_NAME + '/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml',
     TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml',
     TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml',
 )
@@ -42,8 +42,8 @@ KL_A_TEMPLATE_WINDOW_XAML_PATHS = (
     'lib/GUI/Tools/CreateFromRooms.xaml',
     'lib/match/clipboard_window.xaml',
     TAB_NAME + '/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
-    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml',
-    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml',
+    TAB_NAME + '/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml',
+    TAB_NAME + '/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml',
     TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
 )
 

@@ -38,6 +38,10 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         self.assertIn('kla-steel-psf', launcher_ids)
         self.assertIn('kla-find-replace-views', launcher_ids)
         self.assertIn('kla-find-replace-sheets', launcher_ids)
+        self.assertIn('kla-legacy-rename-views', launcher_ids)
+        self.assertIn('kla-legacy-rename-sheets', launcher_ids)
+        self.assertNotIn('kla-find-replace-views-proto', launcher_ids)
+        self.assertNotIn('kla-find-replace-sheets-proto', launcher_ids)
         self.assertIn('kla-duplicate-sheets', launcher_ids)
         self.assertIn('kla-view-range', launcher_ids)
         self.assertIn('kla-startup-importer-source-picker', launcher_ids)
@@ -59,6 +63,11 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         self.assertTrue(all('can_launch' in launcher for launcher in launchers))
         self.assertTrue(all('sample_data_label' in launcher for launcher in launchers))
         self.assertTrue(all(launcher['called_by'] for launcher in launchers))
+        by_id = dict((launcher['id'], launcher) for launcher in launchers)
+        self.assertIn('/03 Core Tools.panel/Rename.pulldown/',
+                      by_id['kla-find-replace-views']['relative_path'])
+        self.assertIn('/03 Core Tools.panel/Rename.pulldown/',
+                      by_id['kla-find-replace-sheets']['relative_path'])
 
     def test_seeded_claim_only_applies_to_seeded_previews(self):
         launchers = gallery_launchers()

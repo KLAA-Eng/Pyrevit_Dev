@@ -15,7 +15,7 @@
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
 | v0.0 | 0.0.7 | 09.28.2026 | First main delivery of Move/Reset reaction-tag decluttering. | 2c4a3b2 |
-| v0.1 | Unreleased | 10.08.2026 | Planned same-beam decluttering, bounded moves, rollback safety, and failure-only reporting. | Pending next main delivery. |
+| v0.1 | Unreleased | 10.09.2026 | Planned same-beam decluttering, bounded moves, verified transaction commit, rollback safety, annotation/structural-member conflicts, failure-only reporting, and active-view or selected-sheet Move scopes. | Pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -31,16 +31,26 @@ live acceptance remains pending.
 
 ## Inputs and scope
 
-- The user chooses **Move** or **Clear Matching Red Overrides**, then selects one or more non-template
-  plan views.
+- **Move (Active View)** processes the active eligible plan view directly. If a
+  sheet is active, it processes eligible plan views placed on that sheet.
+- **Move (Select Sheets)** opens a multi-sheet picker and processes eligible
+  plan views placed on the chosen sheets. A plan view reached through more than
+  one selected sheet is included once. If no eligible plan views are found, the
+  command stops before changing the model.
+- **Clear Matching Red Overrides** retains the multi-plan-view picker.
 - Candidate tags are `OST_StructuralFramingTags` whose type family name
   contains `Reaction` (case-insensitive).
 - Move accepts candidate tags with exactly one local, straight structural-framing
   beam reference and no visible leader. Pinned tags and unsupported references
   remain unchanged when they overlap another element.
-- Each candidate is checked against every visible non-type element in its view.
-  Its own beam and the tag itself are excluded. Other tags on the same beam,
-  including non-Reaction tags, are blockers.
+- Each candidate is checked against drawn annotations (including other tags,
+  dimensions, notes, and detail items) and structural framing and columns in
+  its view. Its own beam and the tag itself are excluded. Other tags on the
+  same beam, including non-Reaction tags, are blockers. Floors, walls, doors,
+  beam-system containers, and other model categories are excluded. View and
+  datum controls (including section boxes, cameras, view markers, grids,
+  reference planes, levels, plan regions, and scope boxes) are excluded because
+  their broad bounding boxes do not represent an annotation clash.
 
 ## Move behavior
 
@@ -54,13 +64,24 @@ fixed. For different-beam tag conflicts, the more vertical beam still takes
 priority, measured relative to the view.
 
 Movement uses 0.2 ft increments with a total cap of eight steps (1.6 ft) per tag
-per run. The selected final position must clear every visible blocker; moving
+per run. The selected final position must clear every eligible blocker; moving
 past a beam endpoint is allowed within the cap. An unresolved move or failed
 marker application rolls back that tag's subtransaction, leaving its position
 and overrides unchanged. A fatal regeneration, rollback, or transaction failure
 aborts the selected-view run. Successful moves receive a fresh per-view
 projection-line override in RGB `(254, 0, 0)`. That replacement intentionally
 discards any prior element override, matching the Dynamo source behavior.
+
+Primary and dependent views may show the same tag ElementId. When more than one
+selected view shows that tag, Move evaluates the visible blockers in all those
+views and moves the tag at most once. Its one final position must clear all of
+them within the same eight-step cap. The red marker is applied in each selected
+view showing the moved tag. If any selected view cannot clear or receive the
+marker, that tag's move and overrides roll back; remaining overlaps are listed
+under their respective views. Clear Matching Red Overrides still checks each
+selected view's own override. An active plan processes only that active view;
+related views that were not selected are outside its collision check even if
+Revit displays the shared tag there.
 
 ## Clear Matching Red Overrides behavior
 

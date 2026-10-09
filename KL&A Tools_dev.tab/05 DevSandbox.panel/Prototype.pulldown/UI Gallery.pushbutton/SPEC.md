@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Tool ID | `devsandbox.ui-gallery` |
-| Tool version | `v0.3` |
-| Status | Released |
+| Tool version | `v0.4` |
+| Status | Unreleased |
 | Status/origin | Prototype; KL&A custom tool. |
-| Main delivery | 0.0.6beta |
+| Main delivery | Unreleased |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/UI Gallery.pushbutton` |
 | Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/` |
 
@@ -18,6 +18,7 @@
 | v0.1 | 0.0.4.beta | 08.17.2026 | Deliver seeded dialog previews, including rename, duplicate-sheet, and ViewRange examples. | 1f3dd23 |
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
+| v0.4 | Unreleased | 10.09.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Working-tree promotion; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -76,8 +77,11 @@ The current development checkout adds five catalog-only compiled-WPF surfaces:
 the shared KL&A alert, Family Studio, and the Startup Importer source picker,
 review, and blocking-issues dialogs. `tests/ui_gallery_launchers_test.py`
 enforces one UI Gallery entry for every repository Window XAML source under
-the pyRevit, shared-library, and compiled-add-in source roots. The next main
-delivery must assign the tool version and add the Git-backed history entry.
+the pyRevit, shared-library, and compiled-add-in source roots. These catalog
+changes are included in planned v0.4.
+The rename promotion also replaces the two prototype catalog entries with Core
+window previews and retains the former shared rename forms as labeled legacy
+previews. No gallery preview runs a rename transaction.
 
 ## Current execution logic
 

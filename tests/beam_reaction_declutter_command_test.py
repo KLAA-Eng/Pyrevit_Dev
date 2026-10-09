@@ -66,11 +66,11 @@ class FakeDocument(object):
 
 
 class FakeView(object):
-    def __init__(self, template=False, allows_overrides=True):
+    def __init__(self, template=False, allows_overrides=True, value=42):
         self.IsTemplate = template
         self.allows_overrides = allows_overrides
         self.Name = 'Level 1'
-        self.Id = FakeElementId(42)
+        self.Id = FakeElementId(value)
 
     def AreGraphicsOverridesAllowed(self):
         return self.allows_overrides
@@ -85,9 +85,12 @@ class FakeCollector(list):
     def OfClass(self, unused_class):
         return self
 
+    def WhereElementIsNotElementType(self):
+        return self
+
 
 class FakeDB(object):
-    ViewPlan = object()
+    ViewPlan = FakeView
 
     def __init__(self, views):
         self.views = views
@@ -114,6 +117,42 @@ class FakeTransactionStatus(object):
     RolledBack = 'rolled back'
 
 
+class FakeOuterTransaction(object):
+    def __init__(self, document, name):
+        self.document = document
+        self.name = name
+        self.status = None
+        self.disposed = False
+        self.calls = []
+        document.outer_transaction = self
+
+    def Start(self):
+        self.calls.append('start')
+        self.status = FakeTransactionStatus.Started
+        return self.status
+
+    def Commit(self):
+        self.calls.append('commit')
+        self.status = getattr(self.document, 'commit_result',
+                              FakeTransactionStatus.Committed)
+        return self.status
+
+    def RollBack(self):
+        self.calls.append('rollback')
+        self.status = FakeTransactionStatus.RolledBack
+        return self.status
+
+    def GetStatus(self):
+        if self.disposed:
+            raise RuntimeError('The managed object is not valid')
+        self.calls.append('status')
+        return self.status
+
+    def Dispose(self):
+        self.calls.append('dispose')
+        self.disposed = True
+
+
 class FakeSubTransaction(object):
     def __init__(self, document):
         self.document = document
@@ -122,6 +161,7 @@ class FakeSubTransaction(object):
     def Start(self):
         self.initial_position = self.document.position
         self.initial_marker = self.document.marker
+        self.initial_overrides = dict(getattr(self.document, 'overrides', {}))
         self.status = FakeTransactionStatus.Started
         return self.status
 
@@ -132,6 +172,9 @@ class FakeSubTransaction(object):
     def RollBack(self):
         self.document.position = self.initial_position
         self.document.marker = self.initial_marker
+        if hasattr(self.document, 'overrides'):
+            self.document.overrides.clear()
+            self.document.overrides.update(self.initial_overrides)
         self.status = FakeTransactionStatus.RolledBack
         return self.status
 
@@ -179,6 +222,18 @@ class FakeLink(object):
     pass
 
 
+class FakeSheet(object):
+    def __init__(self, value, placed, placeholder=False):
+        self.Id = FakeElementId(value)
+        self.SheetNumber = 'S{}'.format(value)
+        self.Name = 'Sheet {}'.format(value)
+        self.IsPlaceholder = placeholder
+        self.placed = placed
+
+    def GetAllPlacedViews(self):
+        return [FakeElementId(value) for value in self.placed]
+
+
 class FakeXYZ(object):
     def __init__(self, x, y, z):
         self.X = x
@@ -190,6 +245,55 @@ class FakeXYZ(object):
 
 
 class BeamReactionDeclutterCommandTests(unittest.TestCase):
+    def test_outer_transaction_commit_is_checked_before_disposal(self):
+        command = load_command_module()
+        command.DB = types.SimpleNamespace(
+            Transaction=FakeOuterTransaction,
+            TransactionStatus=FakeTransactionStatus,
+        )
+        document = types.SimpleNamespace()
+        expected = [{'view': object(), 'issues': []}]
+        command._move_views = lambda unused_doc, unused_views: expected
+
+        result = command._process_action(
+            document, command.MOVE_ACTIVE_ACTION, [object()])
+
+        self.assertIs(expected, result)
+        self.assertEqual(['start', 'commit', 'dispose'],
+                         document.outer_transaction.calls)
+
+    def test_outer_transaction_rolls_back_a_processing_error(self):
+        command = load_command_module()
+        command.DB = types.SimpleNamespace(
+            Transaction=FakeOuterTransaction,
+            TransactionStatus=FakeTransactionStatus,
+        )
+        document = types.SimpleNamespace()
+        command._move_views = lambda *args: (_ for _ in ()).throw(
+            RuntimeError('processing failed'))
+
+        with self.assertRaisesRegex(RuntimeError, 'processing failed'):
+            command._process_action(
+                document, command.MOVE_SHEETS_ACTION, [object()])
+
+        self.assertEqual(['start', 'status', 'rollback', 'dispose'],
+                         document.outer_transaction.calls)
+
+    def test_outer_transaction_does_not_report_a_failed_commit_as_success(self):
+        command = load_command_module()
+        command.DB = types.SimpleNamespace(
+            Transaction=FakeOuterTransaction,
+            TransactionStatus=FakeTransactionStatus,
+        )
+        document = types.SimpleNamespace(commit_result=FakeTransactionStatus.RolledBack)
+        command._clear_view = lambda unused_doc, view: {'view': view, 'issues': []}
+
+        with self.assertRaisesRegex(RuntimeError, 'did not commit'):
+            command._process_action(document, command.CLEAR_ACTION, [object()])
+
+        self.assertEqual(['start', 'commit', 'status', 'dispose'],
+                         document.outer_transaction.calls)
+
     def test_requires_revit_2024_or_newer(self):
         command = load_command_module()
 
@@ -212,6 +316,85 @@ class BeamReactionDeclutterCommandTests(unittest.TestCase):
 
         self.assertEqual([], command._select_plan_views(object()))
 
+    def test_action_switch_has_both_move_scopes(self):
+        command = load_command_module()
+        shown = []
+        command.forms = types.SimpleNamespace(CommandSwitchWindow=types.SimpleNamespace(
+            show=lambda choices, **kwargs: shown.extend(choices) or command.MOVE_ACTIVE_ACTION))
+
+        self.assertEqual(command.MOVE_ACTIVE_ACTION, command._select_action())
+        self.assertEqual([
+            'Move (Active View)', 'Move (Select Sheets)',
+            'Clear Matching Red Overrides', 'Cancel',
+        ], shown)
+
+    def test_active_plan_view_runs_without_another_picker(self):
+        command = load_command_module()
+        command.DB = types.SimpleNamespace(ViewPlan=FakeView, ViewSheet=FakeSheet)
+        plan = FakeView(value=10)
+
+        self.assertEqual([plan], command._active_plan_views(
+            types.SimpleNamespace(ActiveView=plan)))
+
+    def test_active_sheet_uses_only_eligible_placed_plan_views(self):
+        command = load_command_module()
+        command.DB = types.SimpleNamespace(ViewPlan=FakeView, ViewSheet=FakeSheet)
+        plan = FakeView(value=10)
+        template = FakeView(template=True, value=11)
+        sheet = FakeSheet(20, [10, 10, 11, 12])
+        elements = {10: plan, 11: template, 12: object()}
+        document = types.SimpleNamespace(
+            ActiveView=sheet,
+            GetElement=lambda element_id: elements[element_id.Value],
+        )
+
+        self.assertEqual([plan], command._active_plan_views(document))
+
+    def test_selected_sheets_collect_distinct_placed_plans(self):
+        command = load_command_module()
+        first = FakeView(value=10)
+        second = FakeView(value=11)
+        sheets = [FakeSheet(20, [10, 11]), FakeSheet(21, [10, 12]),
+                  FakeSheet(22, [11], placeholder=True)]
+        command.DB = types.SimpleNamespace(
+            ViewPlan=FakeView,
+            ViewSheet=FakeSheet,
+            FilteredElementCollector=lambda unused_doc: FakeCollector(sheets),
+        )
+        selected_options = []
+        command.select_from_dict = lambda options, **kwargs: (
+            selected_options.extend(options.values()) or sheets[:2])
+        elements = {10: first, 11: second, 12: object()}
+        document = types.SimpleNamespace(
+            GetElement=lambda element_id: elements[element_id.Value])
+
+        self.assertEqual([first, second], command._select_sheet_plan_views(document))
+        self.assertEqual(sheets[:2], selected_options)
+
+    def test_sheet_without_plan_stops_before_a_transaction(self):
+        command = load_command_module()
+        command.DB = types.SimpleNamespace(ViewPlan=FakeView, ViewSheet=FakeSheet)
+        sheet = FakeSheet(20, [])
+        command._stop = lambda message: (_ for _ in ()).throw(ValueError(message))
+
+        with self.assertRaisesRegex(ValueError, 'no eligible plan views'):
+            command._active_plan_views(types.SimpleNamespace(ActiveView=sheet))
+
+    def test_selected_sheets_without_plan_stop_before_a_transaction(self):
+        command = load_command_module()
+        sheet = FakeSheet(20, [])
+        command.DB = types.SimpleNamespace(
+            ViewPlan=FakeView,
+            ViewSheet=FakeSheet,
+            FilteredElementCollector=lambda unused_doc: FakeCollector([sheet]),
+        )
+        command.select_from_dict = lambda *args, **kwargs: [sheet]
+        command._stop = lambda message: (_ for _ in ()).throw(ValueError(message))
+
+        with self.assertRaisesRegex(ValueError, 'no eligible plan views'):
+            command._select_sheet_plan_views(
+                types.SimpleNamespace(GetElement=lambda unused_id: None))
+
     def test_reset_recognizes_only_the_exact_source_marker(self):
         command = load_command_module()
 
@@ -231,6 +414,45 @@ class BeamReactionDeclutterCommandTests(unittest.TestCase):
 
         self.assertEqual((0.0, 0.0, 1.0, 1.0), tag_bounds)
         self.assertEqual([other], [element for element, unused_bounds in blockers])
+
+    def test_conflicts_include_annotations_and_structural_members_only(self):
+        command = load_command_module()
+        categories = {
+            'tag': (20, 'annotation'),
+            'dimension': (21, 'annotation'),
+            'framing': (10, 'model'),
+            'column': (11, 'model'),
+            'detail': (12, 'model'),
+            'floor': (30, 'model'),
+            'beam_system': (31, 'model'),
+            'camera': (32, 'model'),
+            'section_box': (40, 'annotation'),
+            'grid': (41, 'annotation'),
+            'elevation': (42, 'annotation'),
+        }
+        elements = [types.SimpleNamespace(
+            name=name,
+            Category=types.SimpleNamespace(
+                Id=FakeElementId(category_id), CategoryType=category_type))
+            for name, (category_id, category_type) in categories.items()]
+        command.DB = types.SimpleNamespace(
+            BuiltInCategory=types.SimpleNamespace(
+                OST_StructuralFraming=10,
+                OST_StructuralColumns=11,
+                OST_DetailComponents=12,
+                OST_SectionBox=40,
+                OST_Grids=41,
+                OST_Elev=42,
+            ),
+            CategoryType=types.SimpleNamespace(Annotation='annotation'),
+            FilteredElementCollector=lambda unused_doc, unused_view: FakeCollector(elements),
+        )
+
+        filtered = command._visible_elements(object(), FakeView())
+
+        self.assertEqual(
+            {'tag', 'dimension', 'framing', 'column', 'detail'},
+            {element.name for element in filtered})
 
     def test_tagged_beam_requires_one_local_straight_structural_reference(self):
         command = load_command_module()
@@ -294,6 +516,41 @@ class BeamReactionDeclutterCommandTests(unittest.TestCase):
 
         self.assertEqual('Unresolved', result['issues'][0][0])
         self.assertEqual(1, result['issues'][0][1])
+
+    def test_shared_tag_is_planned_once_across_selected_views(self):
+        command = load_command_module()
+        tag = types.SimpleNamespace(Id=FakeElementId(1))
+        views = [FakeView(value=10), FakeView(value=11)]
+        calls = []
+        command._reaction_tags = lambda unused_doc, unused_view: [tag]
+        command._visible_elements = lambda unused_doc, unused_view: [tag]
+        command._declutter_tag = lambda *args: calls.append(args[-1]) or ('moved', '')
+        command._tag_data = lambda *args: ({'beam_id': 2}, None)
+        command._blocker_bounds = lambda *args: ((0, 0, 1, 1), [])
+
+        results = command._move_views(object(), views)
+
+        self.assertEqual(1, len(calls))
+        self.assertEqual(2, len(calls[0]))
+        self.assertEqual([], [issue for result in results for issue in result['issues']])
+
+    def test_shared_tag_failure_is_reported_in_each_overlapping_view(self):
+        command = load_command_module()
+        tag = types.SimpleNamespace(Id=FakeElementId(1))
+        blocker = types.SimpleNamespace(Id=FakeElementId(2))
+        views = [FakeView(value=10), FakeView(value=11)]
+        command._reaction_tags = lambda unused_doc, unused_view: [tag]
+        command._visible_elements = lambda unused_doc, unused_view: [tag, blocker]
+        command._declutter_tag = lambda *args: ('unresolved', 'Eight-step cap')
+        command._tag_data = lambda *args: ({'beam_id': 3}, None)
+        command._bounds = lambda *args: (0, 0, 1, 1)
+
+        results = command._move_views(object(), views)
+
+        self.assertEqual([10, 11], [result['view'].Id.Value for result in results])
+        self.assertEqual([1, 1], [result['issues'][0][1] for result in results])
+        self.assertTrue(all('Eight-step cap' in result['issues'][0][2]
+                            for result in results))
 
     def test_failed_final_clearance_rolls_back_the_tag(self):
         command = load_command_module()
@@ -372,6 +629,35 @@ class BeamReactionDeclutterCommandTests(unittest.TestCase):
         self.assertIn('marker failed', reason)
         self.assertEqual(0.0, document.position)
         self.assertIsNone(document.marker)
+
+    def test_shared_tag_marker_failure_rolls_back_all_selected_views(self):
+        command = load_command_module()
+        command.DB = types.SimpleNamespace(
+            SubTransaction=FakeSubTransaction,
+            TransactionStatus=FakeTransactionStatus,
+            ElementTransformUtils=FakeMover,
+        )
+        document = FakeMovingDocument()
+        document.overrides = {}
+        tag = types.SimpleNamespace(Id=FakeElementId(1))
+        first_view = types.SimpleNamespace(
+            SetElementOverrides=lambda unused_id, unused_settings: document.overrides.update({10: True}),
+            GetElementOverrides=lambda unused_id: FakeOverride(FakeColor(
+                254 if document.overrides.get(10) else 0, 0, 0)),
+        )
+        second_view = types.SimpleNamespace(SetElementOverrides=lambda *args: (_ for _ in ()).throw(
+            RuntimeError('second view marker failed')))
+        command._blocker_bounds = lambda *args: ((document.position, 0, document.position + 0.2, 1), [])
+        command._fresh_marker_override = lambda: object()
+
+        moved, reason = command._move_tag(
+            document, first_view, tag, [], beam_id=2, vector=0.4,
+            view_contexts=[(first_view, [], 2), (second_view, [], 2)])
+
+        self.assertFalse(moved)
+        self.assertIn('second view marker failed', reason)
+        self.assertEqual(0.0, document.position)
+        self.assertEqual({}, document.overrides)
 
     def test_move_rolls_back_if_marker_does_not_take_effect(self):
         command = load_command_module()

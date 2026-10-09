@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 __title__ = "UI Gallery"
-__version__ = "v0.3"
+__version__ = "v0.4"
 
 import os
 import sys
@@ -28,6 +28,9 @@ def _extension_root(path):
 
 EXTENSION_ROOT = _extension_root(__file__)
 LIB_DIR = os.path.join(EXTENSION_ROOT, 'lib')
+TAB_ROOT = os.path.join(EXTENSION_ROOT, 'KL&A Tools_dev.tab')
+if not os.path.isdir(TAB_ROOT):
+    TAB_ROOT = os.path.join(EXTENSION_ROOT, 'KL&A Tools.tab')
 if LIB_DIR not in sys.path:
     sys.path.insert(0, LIB_DIR)
 
@@ -186,12 +189,12 @@ class Gallery(forms.WPFWindow):
             self._launch_find_replace_preview()
         elif launcher_id == 'kla-find-replace-views':
             self._launch_find_replace_views_preview()
-        elif launcher_id == 'kla-find-replace-views-proto':
-            self._launch_find_replace_views_proto_preview()
+        elif launcher_id == 'kla-legacy-rename-views':
+            self._launch_legacy_rename_views_preview()
         elif launcher_id == 'kla-find-replace-sheets':
             self._launch_find_replace_sheets_preview()
-        elif launcher_id == 'kla-find-replace-sheets-proto':
-            self._launch_find_replace_sheets_proto_preview()
+        elif launcher_id == 'kla-legacy-rename-sheets':
+            self._launch_legacy_rename_sheets_preview()
         elif launcher_id == 'kla-duplicate-sheets':
             self._launch_duplicate_sheets_preview()
         elif launcher_id == 'kla-match-properties-recall':
@@ -312,7 +315,9 @@ class Gallery(forms.WPFWindow):
 
     def _launch_find_replace_views_preview(self):
         self._launch_rename_preview(
-            os.path.join(EXTENSION_ROOT, 'lib', 'GUI', 'RenameViews.xaml'),
+            os.path.join(TAB_ROOT, '03 Core Tools.panel',
+                         'Rename.pulldown', 'FindReplace - Views.pushbutton',
+                         'Script.xaml'),
             'Find and Replace Views — gallery preview',
             {
                 'input_find': 'Office',
@@ -321,12 +326,10 @@ class Gallery(forms.WPFWindow):
                 'input_suffix': ' - Review',
             })
 
-    def _launch_find_replace_views_proto_preview(self):
+    def _launch_legacy_rename_views_preview(self):
         self._launch_rename_preview(
-            os.path.join(EXTENSION_ROOT, 'KL&A Tools_dev.tab', '05 DevSandbox.panel',
-                         'Prototype.pulldown', 'FindReplace - Views-proto.pushbutton',
-                         'Script.xaml'),
-            'Find and Replace Views Prototype — gallery preview',
+            os.path.join(EXTENSION_ROOT, 'lib', 'GUI', 'RenameViews.xaml'),
+            'Legacy View Rename — gallery preview',
             {
                 'input_find': 'Office',
                 'input_replace': 'Studio',
@@ -336,7 +339,9 @@ class Gallery(forms.WPFWindow):
 
     def _launch_find_replace_sheets_preview(self):
         self._launch_rename_preview(
-            os.path.join(EXTENSION_ROOT, 'lib', 'GUI', 'RenameSheets.xaml'),
+            os.path.join(TAB_ROOT, '03 Core Tools.panel',
+                         'Rename.pulldown', 'FindReplace_Sheets.pushbutton',
+                         'Script.xaml'),
             'Find and Replace Sheets — gallery preview',
             {
                 'input_sheet_number_find': 'A',
@@ -349,12 +354,10 @@ class Gallery(forms.WPFWindow):
                 'input_sheet_name_suffix': ' - Review',
             })
 
-    def _launch_find_replace_sheets_proto_preview(self):
+    def _launch_legacy_rename_sheets_preview(self):
         self._launch_rename_preview(
-            os.path.join(EXTENSION_ROOT, 'KL&A Tools_dev.tab', '05 DevSandbox.panel',
-                         'Prototype.pulldown', 'FindReplace_Sheets-proto.pushbutton',
-                         'Script.xaml'),
-            'Find and Replace Sheets Prototype — gallery preview',
+            os.path.join(EXTENSION_ROOT, 'lib', 'GUI', 'RenameSheets.xaml'),
+            'Legacy Sheet Rename — gallery preview',
             {
                 'input_sheet_number_find': 'A',
                 'input_sheet_number_replace': 'S',

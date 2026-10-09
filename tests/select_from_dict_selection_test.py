@@ -15,15 +15,25 @@ def _dialog_methods():
                   if isinstance(node, ast.ClassDef) and node.name == 'SelectFromDict')
     methods = [node for node in dialog.body
                if isinstance(node, ast.FunctionDef)
-               and node.name in ('UIe_ItemChecked', 'button_select')]
-    namespace = {}
+               and node.name in ('UIe_ItemChecked', 'button_select',
+                                 'generate_list_items')]
+    namespace = {'List': _NetList, 'ListItem': _Item}
     exec(compile(ast.Module(body=methods, type_ignores=[]), SOURCE_PATH, 'exec'),
          namespace)
     return namespace
 
 
+class _NetList(list):
+    @classmethod
+    def __class_getitem__(cls, item_type):
+        return cls
+
+    def Add(self, item):
+        self.append(item)
+
+
 class _Item(object):
-    def __init__(self, name, element, checked=False):
+    def __init__(self, name='Unnamed', element=None, checked=False):
         self.Name = name
         self.element = element
         self.IsChecked = checked
@@ -42,6 +52,17 @@ class _Dialog(object):
 
 
 class SelectFromDictSelectionTests(unittest.TestCase):
+    def test_explicit_empty_initial_selection_checks_no_rows(self):
+        methods = _dialog_methods()
+        dialog = _Dialog([])
+        dialog.given_dict_items = {'A': 'a', 'B': 'b'}
+        dialog.initial_checked_names = set()
+
+        items = methods['generate_list_items'](dialog)
+
+        self.assertEqual(['A', 'B'], [item.Name for item in items])
+        self.assertFalse(any(item.IsChecked for item in items))
+
     def test_confirm_keeps_checked_items_hidden_by_a_filter(self):
         methods = _dialog_methods()
         dialog = _Dialog([

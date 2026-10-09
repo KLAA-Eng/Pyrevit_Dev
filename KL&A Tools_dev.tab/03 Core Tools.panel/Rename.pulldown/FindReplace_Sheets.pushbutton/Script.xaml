@@ -8,9 +8,9 @@
     ShowInTaskbar="True"
     WindowStyle="None"
     ResizeMode="NoResize"
-    Background="{StaticResource window_background}">
+    Background="#1A252B">
 
-    <Grid Background="{StaticResource window_background}">
+    <Grid Background="#1A252B">
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>
             <RowDefinition/>
@@ -93,9 +93,9 @@
             </Grid>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
-                <Button Click="button_uppercase" Content="UPPERCASE" Width="104" Height="26"
+                <Button Click="button_uppercase" Content="Uppercase" Width="104" Height="26"
                         FontSize="12" Margin="0,0,8,0" Style="{StaticResource KLCodeActionButton}"/>
-                <Button Click="button_lowercase" Content="lowercase" Width="104" Height="26"
+                <Button Click="button_lowercase" Content="Lowercase" Width="104" Height="26"
                         FontSize="12" Style="{StaticResource KLCodeActionButton}"/>
             </StackPanel>
 

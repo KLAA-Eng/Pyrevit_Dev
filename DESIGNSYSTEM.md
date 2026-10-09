@@ -3,6 +3,10 @@
 This file records the current visual system used by the KLCode repository. It
 covers the legacy IronPython/pyRevit dialogs, their DevSandbox gallery, and
 the compiled WPF add-ins. It does not replace host-specific runtime validation.
+The source descriptions below were rechecked on 2026-10-08 at
+`089da1b7d88e0df9dec2cc127659a24e051b9163`; see the
+[design-system reviews](docs/reviews/design-system/README.md) for dated findings
+and live-acceptance boundaries.
 
 ## Master Design Colors
 
@@ -33,11 +37,13 @@ These are the named colors used across KLCode ribbon icons and WPF GUIs. This ta
 | info-green | `#3CB371` | Medium sea green |
 
 `lib/GUI/Resources/KLCode_palette.xaml` supplies the named palette consumed by
-the compiled-WPF adapter. The legacy `WPF_styles.xaml` dictionary currently
-repeats the same legacy brush values rather than merging that file; keep the
-two palettes synchronized until that consolidation is completed. The current
+the compiled-WPF adapter: `src/KLCode.Wpf/KLCode.Wpf.csproj` links it as
+`Resources/KLCodePalette.xaml`, which `KLCodeControls.xaml` merges. The legacy
+`WPF_styles.xaml` dictionary currently
+repeats the same legacy brush values rather than merging that file. The
 repository wordmark asset is `lib/_logos/KLCode_text_1024x256px.svg` (with a
-PNG export).
+PNG export). The palette consolidation decision and test-contract mismatch are
+recorded in the [current-state review](docs/reviews/design-system/2026-10-08-current-state-review.md).
 
 | Property | Value |
 | --- | --- |
@@ -86,8 +92,7 @@ New prototype scripts should start with `lib/_icons/drill_32px_orange.png` as th
 control templates. `lib/GUI/Resources/KLCode_palette.xaml` carries matching
 palette keys for compiled WPF, and
 `src/KLCode.Wpf/Resources/KLCodeControls.xaml` merges that compiled palette.
-The duplicated legacy/compiled brush definitions are a known consolidation
-boundary, not a license to create further copies.
+The legacy and compiled palette values are currently defined in separate files.
 
 | Token | Value | KLName |
 | --- | --- | --- |
@@ -113,6 +118,10 @@ Most reusable dialogs, including the two Find and Replace prototypes, load the s
 
 ### Color Properties
 
+The unqualified `ComboBox` and `ComboBoxItem` rows below describe the legacy
+shared styles in `WPF_styles.xaml`. View Range and the compiled WPF adapter have
+different templates, summarized under [ComboBox implementation boundaries](#combobox-implementation-boundaries).
+
 | Control | UI part | XAML property | Implementation value | KLName |
 | --- | --- | --- | --- | --- |
 | `Button` | default | `Background` | `button_bg_normal` | KLGreen-dark |
@@ -134,9 +143,8 @@ Most reusable dialogs, including the two Find and Replace prototypes, load the s
 | `ComboBox` | default | `Foreground` | `White` | white |
 | `ComboBox` | selector body | `Background` | `header_background` | KLCharcoal |
 | `ComboBox` | selector border | `BorderBrush` | `border_green` | KLGreen |
-| `ComboBox` | arrow | `Fill` | `text_white` | KLWhite |
-| `ComboBox` | disabled selector body | `Background` | `#FF131313` | KLCharcoal-black |
-| `ComboBox` | disabled arrow | `Fill` | `text_gray` | gray |
+| `ComboBox` | arrow | `Fill` | `White` | white |
+| `ComboBox` | disabled selected text | `Foreground` | `#888888`; selector body and arrow have no disabled override | KLGray-disabled |
 | `ComboBox` | dropdown body | `Background` | `header_background` | KLCharcoal |
 | `ComboBox` | dropdown border | `BorderBrush` | `border_green` | KLGreen |
 | `ComboBox` | editable text field | `Background` | `#FF3F3F3F` | KLGray-dark |
@@ -177,9 +185,9 @@ Most reusable dialogs, including the two Find and Replace prototypes, load the s
 | `DockPanel` | default | `Margin` | `2` |
 | `ComboBox` | default | `MinWidth` | `120` |
 | `ComboBox` | default | `MinHeight` | `20` |
-| `ComboBox` | local dark template key | `x:Key` | `ComboBoxToggleButton` |
+| `ComboBox` | shared toggle template key | `x:Key` | `ComboBoxToggleButton` |
 | `ComboBox` | editable text host key | `x:Key` | `ComboBoxTextBox` |
-| `ComboBoxItem` | item template padding | `Padding` | `4,3` |
+| `ComboBoxItem` | shared item template padding | `Padding` | `2` |
 | `DataGrid` | headers shown | `HeadersVisibility` | `Column` |
 | `DataGrid` | selection mode | `SelectionMode` | `Single` |
 | `DataGrid` | row resize | `CanUserResizeRows` | `False` |
@@ -198,6 +206,18 @@ Selection-style branded windows use `text_white` for the filter label or icon, f
 The View Range editor uses a command-local dark `ComboBox` template for the Associated Level selectors because shallow brush setters leave the native WPF selector surface light in Revit. The selector body, arrow well, popup border, and `ComboBoxItem` highlight all use KLCode token values.
 
 The DevSandbox UI Gallery uses command-local `DataGrid` styles because table styling is not yet part of the shared WPF dictionary. Its catalog grid keeps the dark KLCharcoal body, KLGreen-dark header/grid lines, KLCharcoal-black alternating rows, and KLGreen-secondary selected cells.
+
+### ComboBox implementation boundaries
+
+| Implementation | Source | Arrow | Disabled behavior | Item padding |
+| --- | --- | --- | --- | --- |
+| Legacy shared | `lib/GUI/Resources/WPF_styles.xaml` | Literal `White` | Selected text changes to `#888888`; the selector body and arrow have no disabled override. | `2` |
+| View Range local | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | `text_white` | Selector body changes to `#FF131313`; arrow and selected text use `text_gray`. | `4,3` |
+| Compiled WPF | `src/KLCode.Wpf/Resources/KLCodeControls.xaml` | `text_green` | Selected text uses `KlaDisabledTextBrush` and selector opacity becomes `0.55`; no separate arrow/body disabled override. | `7,4` |
+
+These are separate source contracts. The View Range values do not describe the
+shared legacy template, and none of these source values establishes rendered
+behavior in a live Revit host.
 
 ### Window Defaults
 
@@ -255,10 +275,11 @@ borderless header, compact close button, palette, controls, and hover states
 are shared through `lib/GUI/Resources/WPF_styles.xaml`. `SelectFromDict.xaml`
 remains the production list-selection implementation.
 
-The following 12 user-facing KL&A custom windows use the template header
-treatment: the seven Shared GUI Windows, Match Properties Recall, View Range,
-the two Find and Replace prototypes, and Steel PSF. The DevSandbox UI Gallery
-and its preview fixture are tooling exceptions and are not part of this visual
+The following 10 user-facing KL&A custom windows use the template header
+treatment: five shared GUI windows, Match Properties Recall, View Range, the
+two Core Find and Replace windows, and Steel PSF. The two former shared rename
+forms remain as legacy gallery previews. The DevSandbox UI Gallery and its
+preview fixture are tooling exceptions and are not part of this visual
 standardization scope.
 
 ### Shared GUI Windows
@@ -268,10 +289,17 @@ standardization scope.
 | KL&A list selection | `lib/GUI/SelectFromDict.xaml` | `lib/GUI/SelectFromDict.py` | `Carbon GWP Pull.pushbutton`; `Concrete Mix Header.pushbutton`; `Create Detail Folders.pushbutton`; `Hide Revision Clouds.pushbutton`; `Highlight Changed Elements.pushbutton`; `Inspect Schedule Header.pushbutton`; `UI Gallery.pushbutton` |
 | KL&A alert | `lib/GUI/CustomAlert.xaml` | `lib/GUI/CustomAlert.py` | `UI Gallery.pushbutton` |
 | Find and replace | `lib/GUI/FindReplace.xaml` | `lib/GUI/FindReplace.py` | `UI Gallery.pushbutton` |
-| Find and replace views | `lib/GUI/RenameViews.xaml` | `lib/Renaming/BaseClass_FindReplace.py` | `FindReplace - Views.pushbutton`; `UI Gallery.pushbutton` |
-| Find and replace sheets | `lib/GUI/RenameSheets.xaml` | `lib/GUI/RenameSheets.py` | `FindReplace_Sheets.pushbutton`; `UI Gallery.pushbutton` |
 | Duplicate sheets | `lib/GUI/DuplicateSheets.xaml` | `lib/GUI/DuplicateSheets.py` | `duplicate_sheets.pushbutton`; `UI Gallery.pushbutton` |
 | Create from rooms | `lib/GUI/Tools/CreateFromRooms.xaml` | `lib/GUI/Tools/CreateFromRooms.py` | `UI Gallery.pushbutton` |
+
+### Core Rename Windows And Legacy Previews
+
+| Window | XAML path | Loader path | Tools |
+| --- | --- | --- | --- |
+| Find and replace views | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml` | Same bundle `script.py` | `FindReplace - Views.pushbutton`; `UI Gallery.pushbutton` |
+| Find and replace sheets | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml` | Same bundle `script.py` | `FindReplace_Sheets.pushbutton`; `UI Gallery.pushbutton` |
+| Legacy view rename form | `lib/GUI/RenameViews.xaml` | `lib/Renaming/BaseClass_FindReplace.py` default loader | `UI Gallery.pushbutton` legacy preview |
+| Legacy sheet rename form | `lib/GUI/RenameSheets.xaml` | `lib/GUI/RenameSheets.py` | `UI Gallery.pushbutton` legacy preview |
 
 ### One-Off Windows
 
@@ -284,49 +312,40 @@ standardization scope.
 
 | Window | XAML path | Loader path | Tools |
 | --- | --- | --- | --- |
-| Find and replace views | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/script.py` | `FindReplace - Views-proto.pushbutton`; `UI Gallery.pushbutton` |
-| Find and replace sheets | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/script.py` | `FindReplace_Sheets-proto.pushbutton`; `UI Gallery.pushbutton` |
 | Steel PSF story selection | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/script.py` | `Steel PSF.pushbutton`; `UI Gallery.pushbutton` |
 | UI Gallery | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py` | `UI Gallery.pushbutton` |
 | UI Gallery preview fixture | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py` | `UI Gallery.pushbutton` |
 
-## UI Gallery Theme Audit
+## UI Gallery source review
 
-The DevSandbox UI Gallery catalogs representative KL&A custom, DevSandbox,
-compiled add-in, and standard pyRevit windows in `lib/ui_gallery/launchers.py`.
-For the 12 user-facing KL&A custom windows, use
-`lib/GUI/_templates/KLCodeMainTemplate.xaml` as the visual reference:
-borderless dark chrome, the outlined KLCode wordmark in the 24 px header,
-KLCharcoal window background, KLGreen-dark/KLGreen/KLGreen-secondary accents,
-and readable KLWhite text. The template is also a separate gallery preview
-entry, not a thirteenth user-facing window. The five compiled WPF windows are
-cataloged with their source paths but remain disabled in the gallery because
-their constructors require compiled Revit host state.
+The DevSandbox UI Gallery records 20 repository `Window` XAML surfaces: the
+14 pyRevit/DevSandbox windows below, the separate main-template preview, and
+the five compiled WPF windows cataloged above. The compiled entries require
+their Revit host and cannot launch in the IronPython gallery. Standard pyRevit
+dialogs are external references, not repository XAML surfaces.
 
-Standard pyRevit gallery entries, the UI Gallery shell, and its preview fixture are intentional tooling/external references and are not scored for KLCode theme consistency.
+The linked source audit describes 2026-10-08; the rename rows below were
+updated for the 2026-10-09 Core promotion. This table does not
+establish rendered appearance, keyboard behavior, DPI behavior, or live Revit
+acceptance. See the [dated design-system review](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit)
+for the full audit, drift notes, and recommended actions.
 
-The gallery registry currently contains 20 repository Window XAML surfaces:
-the 14 pyRevit/DevSandbox windows audited below, the separate main-template
-preview, and the five compiled WPF windows listed above. Each surface has one
-gallery entry; only host-independent previews are launchable from the
-IronPython gallery.
-
-| Gallery title | Category | XAML path | Theme status | Notable drift | Recommended future action |
-| --- | --- | --- | --- | --- | --- |
-| Create from rooms | KL&A custom | `lib/GUI/Tools/CreateFromRooms.xaml` | Reference/aligned with local list override | Loads shared styles through `my_WPF`, uses a solid KLCharcoal window background, and locally overrides its `ListBox`/scrollbar resources. | Keep layout and behavior; update shared control values in `WPF_styles.xaml`, then retain only its list-specific override. |
-| KL&A alert | KL&A custom | `lib/GUI/CustomAlert.xaml` | Reference/aligned | Alert-specific icon, heading, and OK button are preserved inside SelectFromDict-style dark chrome. | Keep aligned with the shared palette when alert states are expanded. |
-| Duplicate sheets | KL&A custom | `lib/GUI/DuplicateSheets.xaml` | Reference/aligned with local checkbox override | Large command-specific form uses shared styles whose resource keys map to the named design tokens, plus a nested checkbox style for its option grid. | Keep command handlers in the bundle and presentation in `lib/GUI`. |
-| Find and replace | KL&A custom | `lib/GUI/FindReplace.xaml` | Reference/aligned | Compact rename form uses the solid KLCharcoal header/body and shared KLCode resources. | Keep as a compact aligned variant. |
-| Find and replace sheets | KL&A custom | `lib/GUI/RenameSheets.xaml` | Reference/aligned | Production sheet rename presentation loads the shared dictionary; command behavior remains in its bundle. | Keep handlers and Revit transactions in the command bundle. |
-| Find and replace sheets prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Explicit prototype exception | Prototype behavior remains isolated, but its XAML now consumes the shared dictionary directly. | Promote deliberate behavior changes into `lib/GUI/RenameSheets.xaml`; do not sync opportunistically. |
-| Find and replace views | KL&A custom | `lib/GUI/RenameViews.xaml` | Reference/aligned | Shared rename base now loads `WPF_styles.xaml` through `my_WPF`. | Keep production view rename presentation in `lib/GUI`. |
-| Find and replace views prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Explicit prototype exception | Prototype behavior remains isolated, but its XAML now consumes the shared dictionary directly. | Promote deliberate behavior changes into `lib/GUI/RenameViews.xaml`; do not sync opportunistically. |
-| Match properties recall | KL&A custom | `lib/match/clipboard_window.xaml` | Reference/aligned | Modeless clipboard content is hosted inside SelectFromDict-style dark chrome and loads the shared palette directly. | Keep the content host pattern so command content does not replace the KLCode shell. |
-| KL&A list selection | KL&A custom | `lib/GUI/SelectFromDict.xaml` | Reference/aligned | This is the reference theme for list-selection windows. | Keep as the base for future selection-style custom windows. |
-| Steel PSF story selection | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | Reference/aligned | Closely follows SelectFromDict list-selection chrome with a solid KLCharcoal background; footer is prototype-specific. | Keep aligned with SelectFromDict when Steel PSF controls change. |
-| View range editor | KL&A custom | `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml` | Reference/aligned with local dictionary | Uses SelectFromDict-style dark chrome and local KLCode token resources while preserving pyRevit's `forms.WPFWindow` loading path for this command-specific editor. Python applies the shared `KLCodeWordmark` template after XAML loading. The Associated Level selectors use a full local dark `ComboBox`/`ComboBoxItem` template so the selector body and popup do not fall back to native light WPF styling. | Keep command-specific behavior in the bundle; promote only reusable styles into `WPF_styles.xaml` when another command needs them. |
-| UI Gallery | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | Reference/aligned | Uses SelectFromDict-style dark chrome, local KLCode token resources, and a KLCharcoal/KLGreen dark DataGrid treatment for catalog rows. | Keep gallery-only DataGrid styling local unless another KLCode table view adopts the same pattern. |
-| UI Gallery preview fixture | DevSandbox | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | Needs future theming | Uses a KLCharcoal window background but remains an intentionally minimal fixture with default WPF chrome and text styling. | Leave plain unless the fixture is promoted to a visual-review artifact; document it as a test exception if unchanged. |
+| Window | Current source status | Detail |
+| --- | --- | --- |
+| Create from rooms | Shared styles with a local list override | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| KL&A alert | Shared KLCode styles | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Duplicate sheets | Shared styles with a local checkbox override | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Find and replace | Shared KLCode styles | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Find and replace sheets | Promoted Core dialog with shared KLCode styles and a local result panel | [Promotion record](docs/reviews/2026-10-08/find-replace-promotion.md) |
+| Legacy sheet rename form | Prior shared presentation retained for historical preview | [Source audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Find and replace views | Promoted Core dialog with shared KLCode styles and a local result panel | [Promotion record](docs/reviews/2026-10-08/find-replace-promotion.md) |
+| Legacy view rename form | Prior shared presentation retained for historical preview | [Source audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Match properties recall | Shared styles; Gallery preview omits the production chrome | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| KL&A list selection | Production reference for shared list-selection styling | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Steel PSF story selection | Shared styles in a DevSandbox selector | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| View range editor | Command-local dark resources and ComboBox templates | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| UI Gallery | Command-local palette and DataGrid styles | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| UI Gallery preview fixture | Minimal test fixture without shared KLCode chrome | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
 
 ## Style Loading And Local GUI Overrides
 
@@ -341,12 +360,12 @@ These loaders call `my_WPF.add_wpf_resource()` before `wpf.LoadComponent()`. The
 | KL&A list selection | `lib/GUI/SelectFromDict.xaml` | `lib/GUI/SelectFromDict.py` |
 | KL&A alert | `lib/GUI/CustomAlert.xaml` | `lib/GUI/CustomAlert.py` |
 | Find and replace | `lib/GUI/FindReplace.xaml` | `lib/GUI/FindReplace.py` |
-| Find and replace views | `lib/GUI/RenameViews.xaml` | `lib/Renaming/BaseClass_FindReplace.py` |
-| Find and replace sheets | `lib/GUI/RenameSheets.xaml` | `lib/GUI/RenameSheets.py` |
+| Find and replace views | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml` | Same bundle `script.py` |
+| Find and replace sheets | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml` | Same bundle `script.py` |
+| Legacy view rename form | `lib/GUI/RenameViews.xaml` | `lib/Renaming/BaseClass_FindReplace.py` default loader |
+| Legacy sheet rename form | `lib/GUI/RenameSheets.xaml` | `lib/GUI/RenameSheets.py` |
 | Match properties recall | `lib/match/clipboard_window.xaml` | `lib/match/clipboard.py` |
 | Steel PSF story selection | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/script.py` |
-| Find and replace views prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/script.py` |
-| Find and replace sheets prototype | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/script.py` |
 
 ### Local GUI Overrides
 

@@ -5,8 +5,9 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "lib"))
 
-from find_replace.workflow import (case_value, details, new_result,
-                                   record, rename_value, summary, unresolved)
+from find_replace.workflow import (case_value, details, distinct_view_labels,
+                                   new_result, record, rename_value, summary,
+                                   unresolved)
 
 
 class FindReplaceWorkflowTests(unittest.TestCase):
@@ -28,6 +29,18 @@ class FindReplaceWorkflowTests(unittest.TestCase):
         self.assertTrue(unresolved(result))
         self.assertIn("1 skipped", summary(result))
         self.assertIn("A2 - Number already in use", details(result))
+
+    def test_view_picker_labels_omit_ids_and_keep_equal_names_distinct(self):
+        labels = distinct_view_labels([
+            ("Level 1", "FloorPlan"),
+            ("Level 1", "FloorPlan"),
+            ("Level 1 (FloorPlan)", "DraftingView"),
+        ])
+        self.assertEqual([
+            "Level 1 (FloorPlan) (2)",
+            "Level 1 (FloorPlan) (3)",
+            "Level 1 (FloorPlan)",
+        ], labels)
 
 
 if __name__ == "__main__":

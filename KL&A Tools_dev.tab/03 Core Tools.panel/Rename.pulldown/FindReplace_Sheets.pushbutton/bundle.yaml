@@ -3,17 +3,21 @@ title:
 author: KL&A
 tooltip:
   en_us: |-
-    Version: v1.0
-    Date    = 09.15.2026
+    Version: v1.1
+    Date: 10.09.2026
+    Status: Unreleased
     _____________________________________________________________________
     Description:
 
-    Rename multiple sheets using find, replace, prefix, and suffix logic.
+    Rename selected sheet titles and numbers with case-sensitive Find/Replace,
+    Prefix, or Suffix, or convert titles with Uppercase and Lowercase.
+    Conflicting exact targets are skipped and shown in the dialog.
     _____________________________________________________________________
     How-to:
 
-    -> Select sheets in the Project Browser, or select them in the tool.
-    -> Run the tool and enter find, replace, prefix, or suffix values.
+    -> Select sheets in the Project Browser, or choose from an unchecked list.
+    -> Enter sheet-name or sheet-number criteria and click Rename, or use a case button for titles.
+    -> A complete action closes quietly; review skipped or failed sheets in the dialog.
     _____________________________________________________________________
     Last update:
-    - [09.15.2026] - KL&A adapted the sheet-renaming UI and resources.
+    - [10.09.2026] - v1.1 (Unreleased): Add title-only Uppercase and Lowercase actions, an unchecked sheet list without IDs, exact-conflict handling, and in-dialog results.

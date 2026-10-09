@@ -120,7 +120,8 @@ def get_selected_views(given_uidoc = uidoc, exit_if_none = False, title = '__tit
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GET SHEETS
 def get_selected_sheets(given_uidoc = uidoc, exit_if_none = False, title='__title__', label='Select Sheets',
-                        btn_name = 'Select Sheets',  version = 'Version: _'):
+                        btn_name = 'Select Sheets',  version = 'Version: _',
+                        initial_checked_names = None):
     """Function to get selected views. return list of selected views.
     LastUpdates:
     [15.02.2022] - If no sheets selected -> Select from DialogBox
@@ -136,7 +137,9 @@ def get_selected_sheets(given_uidoc = uidoc, exit_if_none = False, title='__titl
     if not selected_sheets:
         all_sheets      = FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Sheets).WhereElementIsNotElementType().ToElements()
         dict_sheets     = {'{} - {}'.format(sheet.SheetNumber, sheet.Name): sheet for sheet in all_sheets}
-        selected_sheets = select_from_dict(dict_sheets, title=title, label=label, button_name=btn_name, version=version)
+        selected_sheets = select_from_dict(dict_sheets, title=title, label=label,
+                                           button_name=btn_name, version=version,
+                                           initial_checked_names=initial_checked_names)
 
     #>>>>>>>>>> EXIT IF STILL NONE SELECTED
     if not selected_sheets and exit_if_none:
