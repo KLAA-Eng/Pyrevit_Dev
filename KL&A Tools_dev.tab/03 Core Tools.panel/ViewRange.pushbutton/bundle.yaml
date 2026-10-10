@@ -6,20 +6,22 @@ title:
 tooltip:
   fr_fr: Outil pour illustrer la profondeur de vue des vues en plan dans une vue 3D à l'aide de plans colorés. Ouvrir une vue 3D et sélectionner les vues en plan à illustrer dans le navigateur de projet.
   en_us: |-
-    Version: v1.0
-    Date    = 09.15.2026
+    Version: v1.1
+    Date: 10.09.2026
+    Status: Unreleased
     _____________________________________________________________________
     Description:
 
-    Illustrate the view range of selected plan views in a 3D view using colored planes.
+    Show a selected plan or section view's range in a 3D view using colored planes.
+    For editable plan views, review and change level offsets and associated levels.
     _____________________________________________________________________
     How-to:
 
-    -> Open a 3D view and select plan views in the Project Browser.
-    -> Run the tool to review the illustrated range.
+    -> Open a 3D view, run the tool, and select a plan or section view in the Project Browser.
+    -> Review the four plane elevations. For an editable plan view, adjust offsets or levels and apply changes.
     _____________________________________________________________________
     Last update:
-    - [09.15.2026] - KL&A adapted the shared window and branding behavior.
+    - [10.09.2026] v1.1 - Refined the View Range editor's headings, text size, column alignment, message space, and vertical spacing.
   de_de: >-
     Zunächst öffnet man eine 3D Ansicht, in der der Ansichtsbereich 
     eines Grundrisses farblich temporär mit Flächen dargestellt 
