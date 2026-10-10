@@ -26,6 +26,16 @@ Static UI/API references: forms.Reactive,forms.WPFWindow,forms.alert,forms.react
 Use the command from its pyRevit button. Where it exposes a dialog or selection
 workflow, make the required selection and review the result before confirming.
 
+The View Range window shows the four planes in a table headed **Plane**,
+**Elevation - ft**, **Level Offset**, and **Level**. These headings are static;
+the displayed elevation and offset values follow the model's length units.
+The heading text is bold 16, table values and controls are 14, and status
+messages are 12. Table content is centered by column, while numeric offsets
+remain right-aligned inside their fields. Nearby vertical gaps use 8 layout
+units, with 16 between sections. Empty status messages take no space; longer
+messages can expand the window or scroll within the content area. The footer,
+KLCode palette, and four plane colors retain their existing treatment.
+
 ## Current execution logic
 
 pyRevit loads the bundle and executes its entry point. The implementation uses
