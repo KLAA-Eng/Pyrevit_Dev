@@ -200,6 +200,8 @@
             </Setter>
         </Style>
         <Style x:Key="KLCodeActionButton" TargetType="Button">
+            <Setter Property="TextElement.FontFamily" Value="Arial"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="Background" Value="{StaticResource button_bg_normal}"/>
             <Setter Property="Foreground" Value="{StaticResource button_fg_normal}"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -295,7 +297,7 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="12,8,12,16">
-        <TextBlock Text="{Binding message}" Margin="0,0,0,8" FontSize="14" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding message}" Margin="0,0,0,8" FontSize="14" Height="40" TextWrapping="Wrap"/>
         <Separator Background="{StaticResource border_green_dark}"/>
         
         <Grid x:Name="grid_main" HorizontalAlignment="Center" Margin="0,8">
@@ -323,7 +325,8 @@
             
             <!-- Top Plane Row -->
             <Rectangle Grid.Row="1" Grid.Column="0" Width="5" Height="20" VerticalAlignment="Center" Fill="{Binding topplane_brush}" RadiusX="3" RadiusY="3"/>
-            <TextBlock Grid.Row="1" Grid.Column="1" Text="Top Plane" Style="{StaticResource ViewRangeTableCell}"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="Top Plane" Style="{StaticResource ViewRangeTableCell}"
+                       HorizontalAlignment="Left" TextAlignment="Left" Margin="5,0"/>
             <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding topplane_elevation}" Style="{StaticResource ViewRangeTableCell}"/>
             <TextBox Grid.Row="1" Grid.Column="3" x:Name="topplane_input" 
                      Text="{Binding topplane_new_value, UpdateSourceTrigger=PropertyChanged}" 
@@ -344,7 +347,8 @@
             
             <!-- Cut Plane Row -->
             <Rectangle Grid.Row="2" Grid.Column="0" Width="5" Height="20" VerticalAlignment="Center" Fill="{Binding cutplane_brush}" RadiusX="3" RadiusY="3"/>
-            <TextBlock Grid.Row="2" Grid.Column="1" Text="Cut Plane" Style="{StaticResource ViewRangeTableCell}"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="Cut Plane" Style="{StaticResource ViewRangeTableCell}"
+                       HorizontalAlignment="Left" TextAlignment="Left" Margin="5,0"/>
             <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding cutplane_elevation}" Style="{StaticResource ViewRangeTableCell}"/>
             <TextBox Grid.Row="2" Grid.Column="3" x:Name="cutplane_input" 
                      Text="{Binding cutplane_new_value, UpdateSourceTrigger=PropertyChanged}" 
@@ -360,7 +364,8 @@
             
             <!-- Bottom Plane Row -->
             <Rectangle Grid.Row="3" Grid.Column="0" Width="5" Height="20" VerticalAlignment="Center" Fill="{Binding bottomplane_brush}" RadiusX="3" RadiusY="3"/>
-            <TextBlock Grid.Row="3" Grid.Column="1" Text="Bottom Plane" Style="{StaticResource ViewRangeTableCell}"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="Bottom Plane" Style="{StaticResource ViewRangeTableCell}"
+                       HorizontalAlignment="Left" TextAlignment="Left" Margin="5,0"/>
             <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding bottomplane_elevation}" Style="{StaticResource ViewRangeTableCell}"/>
             <TextBox Grid.Row="3" Grid.Column="3" x:Name="bottomplane_input" 
                      Text="{Binding bottomplane_new_value, UpdateSourceTrigger=PropertyChanged}" 
@@ -381,7 +386,8 @@
             
             <!-- View Depth Row -->
             <Rectangle Grid.Row="4" Grid.Column="0" Width="5" Height="20" VerticalAlignment="Center" Fill="{Binding viewdepth_brush}" RadiusX="3" RadiusY="3"/>
-            <TextBlock Grid.Row="4" Grid.Column="1" Text="View Depth" Style="{StaticResource ViewRangeTableCell}"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="View Depth" Style="{StaticResource ViewRangeTableCell}"
+                       HorizontalAlignment="Left" TextAlignment="Left" Margin="5,0"/>
             <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding viewdepth_elevation}" Style="{StaticResource ViewRangeTableCell}"/>
             <TextBox Grid.Row="4" Grid.Column="3" x:Name="viewdepth_input" 
                      Text="{Binding viewdepth_new_value, UpdateSourceTrigger=PropertyChanged}" 

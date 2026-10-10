@@ -30,8 +30,11 @@ The View Range window shows the four planes in a table headed **Plane**,
 **Elevation - ft**, **Level Offset**, and **Level**. These headings are static;
 the displayed elevation and offset values follow the model's length units.
 The heading text is bold 16, table values and controls are 14, and status
-messages are 12. Table content is centered by column, while numeric offsets
-remain right-aligned inside their fields. Nearby vertical gaps use 8 layout
+messages are 12. The plane names are left-aligned under their centered header;
+other table content is centered by column, while numeric offsets remain
+right-aligned inside their fields. The instruction area reserves 40 layout
+units for its one- or two-line message. Apply and Reset use the main template's
+Arial 14 action-button text. Nearby vertical gaps use 8 layout
 units, with 16 between sections. Empty status messages take no space; longer
 messages can expand the window or scroll within the content area. The footer,
 KLCode palette, and four plane colors retain their existing treatment.
