@@ -11,12 +11,41 @@ release boundaries.
 
 ## Unreleased
 
-Development is underway for `0.0.11`. This is an untagged, unpublished `dev`
-identity, not a changelog release. The latest published release remains
-`0.0.10-beta`.
+The next development version will be `0.0.12-dev` after the `0.0.11-beta`
+release is merged and published.
 
-- Consolidate release guidance and checks, support both ribbon layouts in tests,
-  clarify About's metadata provenance, and reconcile the `0.0.10` delivery records.
+## 0.0.11 - 2026-10-12
+
+- **Channel:** Beta
+- **Tag:** `v0.0.11-beta` (intended; pending owner merge and publication)
+- **Tested Revit range:** No new live Revit claim. The changed command workflows
+  and dialogs have host-independent tests, but their current Revit/pyRevit
+  behavior has not been accepted in a representative live model.
+
+### Changed
+
+- Find and Replace in Views and Sheets now use the promoted Core workflows with
+  case conversion, unchecked pickers without element IDs, exact-value rename
+  handling, and results shown in the dialog.
+- Beam Reaction Declutter adds active-view and selected-sheet Move scopes,
+  same-beam collision handling, bounded moves, and safer transaction outcomes.
+- ViewRange refines the editor's headings, sizing, alignment, and spacing.
+- UI Gallery previews the current Views and Sheets dialogs and labels the prior
+  forms as legacy previews.
+- Release checks now cover both ribbon layouts and report version/build metadata
+  provenance more clearly in About KL&A Tools.
+
+### Known limits
+
+- The changed rename and decluttering transactions, ViewRange UI, and UI Gallery
+  previews still need live Revit acceptance. Beam Reaction Declutter remains a
+  DevSandbox prototype; pinned tags and unsupported references stay unchanged.
+- Carbon GWP Pull still requires trusted Excel workbooks and Excel COM interop.
+  This release makes no new Excel acceptance claim.
+- Static checks do not validate model transactions, worksharing, undo, dialog
+  rendering, Excel refresh, or behavior after reopening a model.
+
+**Rollback tag:** `v0.0.10-beta`
 
 ## 0.0.10 - 2026-10-05
 

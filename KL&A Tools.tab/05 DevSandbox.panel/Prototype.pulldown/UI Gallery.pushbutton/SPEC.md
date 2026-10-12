@@ -1,0 +1,100 @@
+# UI Gallery
+
+| Field | Value |
+| --- | --- |
+| Tool ID | `devsandbox.ui-gallery` |
+| Tool version | `v0.4` |
+| Status | Prepared for 0.0.11 beta; live acceptance pending |
+| Status/origin | Prototype; KL&A custom tool. |
+| Main delivery | 0.0.11 |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/UI Gallery.pushbutton` |
+| Version inputs | `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/` |
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | 0.0.1.beta | 08.13.2026 | First main delivery of safe XAML cataloging and static previews. | 78b2aee |
+| v0.1 | 0.0.4.beta | 08.17.2026 | Deliver seeded dialog previews, including rename, duplicate-sheet, and ViewRange examples. | 1f3dd23 |
+| v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
+| v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
+| v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
+## Purpose
+
+Provides a safe launcher gallery for the pyRevit and KL&A dialog families used
+by this extension. Seeded previews use fictional data and never start a Revit
+transaction or call a document-changing command. pyRevit forms that require
+active model state or an interactive Revit pick are cataloged but disabled.
+The gallery also catalogs the compiled Family Studio, Startup Importer, and
+shared compiled-alert windows. Those rows remain disabled because their
+constructors require compiled Revit host state and must not be approximated by
+the IronPython preview harness.
+
+## Behavior
+
+This command is implemented by `script.py` in this pyRevit bundle. It runs in
+the Revit/pyRevit host without requiring active-model content. It must preserve
+unrelated model content and report unsupported or cancelled interactions without
+applying partial changes.
+
+## Validation boundary
+
+Validate every launcher against a representative Revit fixture and its
+cancelled-input path before promotion beyond development use. Confirm that no
+preview starts a Revit transaction or changes the document.
+
+## Implementation inventory
+
+- Entry point: `script.py`
+- Direct imports: from __future__ import print_function;import os;import sys;from pyrevit import forms;from ui_gallery.launchers import gallery_launchers;
+- Local helper functions: _extension_root,__init__,__init__,filter_changed,selection_changed,launch_selected,close_window,_matches,_update_actions,_launch,_launch_dialog,_launch_find_replace_preview,_launch_steel_psf_preview,
+- Bundled external assets: None.
+
+## GUI and interaction
+
+Static UI/API references: forms.WPFWindow,forms.alert,forms.ask_for_color,
+forms.ask_for_string,forms.CommandSwitchWindow,forms.pick_file,
+forms.pick_folder,forms.ProgressBar,forms.SelectFromList,forms.show_balloon,
+
+Use the command from its pyRevit button, select a row, and choose **Open
+Selected Window**. Rows marked `Seeded sample data` contain fictional values.
+Rows marked `Host picker` open the native host picker. Rows marked
+`Host/model data required` or `Interactive pick required` are visible in the
+catalog but cannot be launched from the safe gallery. The gallery only opens
+dialog previews; it does not invoke the corresponding tool command.
+
+Rows marked `Compiled Revit host required` identify compiled add-in dialogs
+that are cataloged for discovery but cannot open from this IronPython command.
+
+## 0.0.11 catalog update
+
+The current development checkout adds five catalog-only compiled-WPF surfaces:
+the shared KL&A alert, Family Studio, and the Startup Importer source picker,
+review, and blocking-issues dialogs. `tests/ui_gallery_launchers_test.py`
+enforces one UI Gallery entry for every repository Window XAML source under
+the pyRevit, shared-library, and compiled-add-in source roots. These catalog
+changes are included in planned v0.4.
+The rename promotion also replaces the two prototype catalog entries with Core
+window previews and retains the former shared rename forms as labeled legacy
+previews. No gallery preview runs a rename transaction.
+
+## Current execution logic
+
+pyRevit loads the bundle and executes its entry point. The implementation uses
+the imports and helper functions listed above; inspect `script.py` for the exact
+branching order and host API calls.
+
+## Model and external effects
+
+Detected mutation/external-effect patterns: No Revit transaction or direct mutation pattern detected.
+
+## Current status
+
+This is a release-tab command. The inventory above is statically derived
+from the current bundle and must be confirmed inside the target Revit/pyRevit
+environment before promotion or behavior changes.

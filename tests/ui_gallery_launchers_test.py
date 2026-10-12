@@ -97,7 +97,7 @@ class UiGalleryLaunchersTests(unittest.TestCase):
             for entry in catalog_xaml_sources(PROJECT_ROOT)
             if (entry['root_kind'] == 'Window' and
                 entry['relative_path'].startswith(
-                    ('KL&A Tools_dev.tab/', 'lib/', 'src/')))
+                    ('KL&A Tools_dev.tab/', 'KL&A Tools.tab/', 'lib/', 'src/')))
         )
 
         self.assertEqual(sorted(window_paths), sorted(launcher_paths))

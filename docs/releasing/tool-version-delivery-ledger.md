@@ -34,6 +34,7 @@ command's `SPEC.md` version history.
 | `0.0.8` | `34c41bc` | 09.28.2026 | `0.0.8` | Release #19; tag `v0.0.8-beta` | Squash-style release |
 | `0.0.9` | `d7185d2` | 10.01.2026 | `0.0.9` | Release #20; tag `v0.0.9-beta` | Squash-style release |
 | `0.0.10` | `74eccba29c1a8a8b6443baab0caf9a2f5ccf66e8` | 10.05.2026 | `0.0.10` | [PR #21](https://github.com/KLAA-Eng/Pyrevit_Dev/pull/21); annotated `v0.0.10-beta` peeled to this commit; [published prerelease](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.10-beta) verified 2026-10-05 | Squash-style release |
+| `0.0.11` | Pending merge | 10.12.2026 | `0.0.11` | Pending publication; intended tag `v0.0.11-beta` | Pending owner-merged PR |
 
 ## Release-preparation handoff
 
