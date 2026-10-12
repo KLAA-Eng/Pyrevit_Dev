@@ -4,12 +4,12 @@
 
 - **Tool ID:** `launch-revit-standards`
 - **Path aliases:** `KL&A Tools.tab/01 KL&A Resource Links.panel/Launch Revit Standards.pushbutton`, `KL&A Tools.tab/KL&A Tools.panel/Launch Revit Standards.pushbutton`.
-- **Version inputs:** `KL&A Tools_dev.tab/01 KL&A Resource Links.panel/Launch Revit Standards.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/01 KL&A Resource Links.panel/Launch Revit Standards.pushbutton/script.py`.
+- **Version inputs:** `KL&A Tools.tab/01 KL&A Resource Links.panel/Launch Revit Standards.pushbutton/bundle.yaml`, `KL&A Tools.tab/01 KL&A Resource Links.panel/Launch Revit Standards.pushbutton/script.py`.
 - **Tool version:** `v1.0`
 - **Status/origin:** Maintained production; KL&A custom command.
 - **Status:** Released.
 - **Maintainer:** KL&A.
-- **Ribbon location:** `KL&A Tools_dev.tab/01 KL&A Resource Links.panel/Launch Revit Standards.pushbutton`.
+- **Ribbon location:** `KL&A Tools.tab/01 KL&A Resource Links.panel/Launch Revit Standards.pushbutton`.
 - **Live acceptance:** Exact-version Revit/pyRevit acceptance is not recorded.
 
 ## Purpose

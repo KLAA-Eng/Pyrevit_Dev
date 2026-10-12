@@ -82,7 +82,7 @@
 
     <DockPanel Grid.Row="1" Margin="12">
         <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
-            <TextBlock Text="Open KL&amp;A dialogs and repo-used pyRevit form patterns. Seeded previews use fictional data; host/model-dependent forms are cataloged but disabled. Gallery previews never modify the Revit document."
+            <TextBlock Text="Open KL&amp;A dialogs and repo-used pyRevit form patterns. Compiled add-in and host/model-dependent forms are cataloged but disabled. Seeded previews use fictional data; gallery previews never modify the Revit document."
                        TextWrapping="Wrap" Margin="0,0,0,6" />
             <TextBox x:Name="FilterBox" Height="25" TextChanged="filter_changed"
                      ToolTip="Filter by dialog family, title, or description" />

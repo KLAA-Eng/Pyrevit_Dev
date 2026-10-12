@@ -4,12 +4,12 @@
 
 - **Tool ID:** `prototype-request`
 - **Path aliases:** `KL&A Tools.tab/04 Outreach.panel/Prototype.pushbutton`.
-- **Version inputs:** `KL&A Tools_dev.tab/04 Outreach.panel/Prototype.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/04 Outreach.panel/Prototype.pushbutton/script.py`.
+- **Version inputs:** `KL&A Tools.tab/04 Outreach.panel/Prototype.pushbutton/bundle.yaml`, `KL&A Tools.tab/04 Outreach.panel/Prototype.pushbutton/script.py`.
 - **Tool version:** `v1.0`
 - **Status/origin:** Maintained production utility; KL&A internal derivative of the KL&A Suggestions command.
 - **Status:** Released.
 - **Maintainer:** KL&A.
-- **Ribbon location:** `KL&A Tools_dev.tab/04 Outreach.panel/Prototype.pushbutton`.
+- **Ribbon location:** `KL&A Tools.tab/04 Outreach.panel/Prototype.pushbutton`.
 - **Live acceptance:** Exact-version Revit/pyRevit acceptance is not recorded.
 
 ## Purpose

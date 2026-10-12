@@ -8,7 +8,7 @@ tooltip:
     _____________________________________________________________________
     Description:
 
-    Show the loaded KL&A Tools extension version, build metadata, extension
+    Show the loaded KL&A Tools version identity, metadata source commit, extension
     path, pyRevit version, and Revit build for support and verification.
     _____________________________________________________________________
     How-to:

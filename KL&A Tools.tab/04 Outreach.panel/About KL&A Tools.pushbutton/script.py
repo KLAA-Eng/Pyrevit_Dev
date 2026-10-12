@@ -63,11 +63,10 @@ def main():
 
     lines = [
         "Extension: KL&A Tools",
-        "Version: {0}".format(build_info.VERSION),
+        "Version identity: {0}".format(build_info.VERSION_LABEL),
         "Channel: {0}".format(getattr(build_info, "CHANNEL", "unknown") or "unknown"),
-        "Release Date: {0}".format(getattr(build_info, "RELEASE_DATE", "unknown") or "unknown"),
-        "Git Tag: {0}".format(getattr(build_info, "GIT_TAG", "unknown") or "unknown"),
-        "Git SHA: {0}".format(getattr(build_info, "GIT_SHA", "unknown") or "unknown"),
+        "Identity Date: {0}".format(getattr(build_info, "RELEASE_DATE", "unknown") or "unknown"),
+        "Metadata source commit: {0}".format(build_info.METADATA_SOURCE_SHA),
         "Build Date: {0}".format(getattr(build_info, "BUILD_DATE", "unknown") or "unknown"),
         "Loaded Extension Path: {0}".format(EXTENSION_ROOT),
         "pyRevit Version: {0}".format(get_pyrevit_version()),

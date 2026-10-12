@@ -109,14 +109,14 @@ __version__ = "v1.0"
 Rules for this block:
 
 - `__version__` is the independent tool version, not the extension release.
-  Follow [TOOL_VERSIONING.md](TOOL_VERSIONING.md) for maintained tools,
+  Follow [TOOL_VERSIONING.md](../releasing/TOOL_VERSIONING.md) for maintained tools,
   DevSandbox prototypes, and unchanged source imports.
 - Keep only the title and pure version string in script metadata. Do not add
   `__author__` or `__doc__`; `bundle.yaml` owns author and tooltip.
 - The bundle title must match `__title__` exactly, including line breaks. For
   localized titles, compare the English `en_us` value.
 - Use the FindReplace Sheets tooltip layout documented in
-  [TOOL_VERSIONING.md](TOOL_VERSIONING.md): Version, Date, Description, How-to,
+  [TOOL_VERSIONING.md](../releasing/TOOL_VERSIONING.md): Version, Date, Description, How-to,
   and Last update bullets, separated by 69 underscores. No author line belongs
   in the tooltip; attribution belongs in the bundle author and SPEC origin.
 - State destructive or externally visible side effects, required workstation
@@ -124,7 +124,7 @@ Rules for this block:
 - Update `__version__`, tooltip version/date/update bullets, and the SPEC tool
   version history together when preparing the meaningful delivery to `main`.
   Before that delivery, show the next planned version and `Status: Unreleased`
-  as defined in [TOOL_VERSIONING.md](TOOL_VERSIONING.md).
+  as defined in [TOOL_VERSIONING.md](../releasing/TOOL_VERSIONING.md).
 
 The normal Google module-docstring rule still applies to reusable `lib/` modules
 when they need module documentation. Do not add a second long user guide to a

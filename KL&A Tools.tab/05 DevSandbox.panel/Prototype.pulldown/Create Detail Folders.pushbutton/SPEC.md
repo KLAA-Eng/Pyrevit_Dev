@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.4.beta |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create View Detail Folders.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/Create Detail Folders.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/script.py`; `lib/detail_view_deliverables.py`; `lib/detail_view_folders.py`; `lib/detail_view_html.py` |
+| Version inputs | `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/bundle.yaml`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/script.py`; `lib/detail_view_deliverables.py`; `lib/detail_view_folders.py`; `lib/detail_view_html.py` |
 
 ## Tool version history
 

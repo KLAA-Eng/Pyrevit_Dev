@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.6beta |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Inspect Schedule Header.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Inspect Schedule Header.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Inspect Schedule Header.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Inspect Schedule Header.pushbutton/script.py` |
+| Version inputs | `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Inspect Schedule Header.pushbutton/bundle.yaml`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Inspect Schedule Header.pushbutton/script.py` |
 
 ## Tool version history
 

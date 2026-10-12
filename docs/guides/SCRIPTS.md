@@ -128,7 +128,7 @@ Each user-facing command should use `SPEC.md` for the operational contract:
 Keep implementation details in code comments and docstrings. Keep user behavior
 and testing expectations in `SPEC.md`. New or materially changed user-facing
 commands must use the repository template. All visible commands, including
-DevSandbox, follow [TOOL_VERSIONING.md](TOOL_VERSIONING.md). Extension release
+DevSandbox, follow [TOOL_VERSIONING.md](../releasing/TOOL_VERSIONING.md). Extension release
  evidence may remain as separate historical context. Tool versions advance per
  meaningful delivery to `main`; use the central delivery ledger rather than raw
  development commit ancestry.
@@ -153,7 +153,7 @@ docstrings, tagged comments, and ASCII-art dividers. Do not add a second
 module-level docstring to a command script solely to satisfy generic Python
 style guidance; the bundle tooltip is the user-facing command documentation.
 Keep matching title, author, and tooltip in `bundle.yaml`, following
-[TOOL_VERSIONING.md](TOOL_VERSIONING.md).
+[TOOL_VERSIONING.md](../releasing/TOOL_VERSIONING.md).
 
 Example skeleton:
 

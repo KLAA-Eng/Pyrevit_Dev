@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.3.beta |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Highlight Changed Elements.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Highlight Changed Elements.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Highlight Changed Elements.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/Highlight Changed Elements.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Highlight Changed Elements.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Highlight Changed Elements.pushbutton/script.py`; `lib/changed_elements/` |
+| Version inputs | `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Highlight Changed Elements.pushbutton/bundle.yaml`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Highlight Changed Elements.pushbutton/script.py`; `lib/changed_elements/` |
 
 ## Tool version history
 

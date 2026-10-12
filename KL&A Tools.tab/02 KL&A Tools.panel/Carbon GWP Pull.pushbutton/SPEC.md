@@ -3,7 +3,7 @@
 ## Identity
 
 - **Tool ID:** `carbon-gwp-pull`
-- **Path aliases:** `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`; formerly `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Carbon GWP Pull.pushbutton`.
+- **Path aliases:** `KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Carbon GWP Pull.pushbutton`; `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`; formerly `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Carbon GWP Pull.pushbutton`.
 - **Version inputs:** `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/bundle.yaml`, `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/script.py`, `lib/carbon_gwp/workflow.py`, `lib/carbon_gwp/chart.py`, `lib/carbon_gwp/revit_chart.py`, `lib/excel_com.py`.
 - **Ribbon location:** `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`
 - **Ribbon label:** Carbon GWP Pull

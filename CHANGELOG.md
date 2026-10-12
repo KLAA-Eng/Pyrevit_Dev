@@ -6,12 +6,46 @@ tools, user-facing changes, known limits, and rollback tag.
 
 This changelog is the concise extension-release summary. Detailed independent
 command histories are kept in each command's `SPEC.md`, using the
-[`docs/tool-version-delivery-ledger.md`](docs/tool-version-delivery-ledger.md)
+[`docs/releasing/tool-version-delivery-ledger.md`](docs/releasing/tool-version-delivery-ledger.md)
 release boundaries.
 
 ## Unreleased
 
-No pending published release.
+The next development version will be `0.0.12-dev` after the `0.0.11-beta`
+release is merged and published.
+
+## 0.0.11 - 2026-10-12
+
+- **Channel:** Beta
+- **Tag:** `v0.0.11-beta` (intended; pending owner merge and publication)
+- **Tested Revit range:** No new live Revit claim. The changed command workflows
+  and dialogs have host-independent tests, but their current Revit/pyRevit
+  behavior has not been accepted in a representative live model.
+
+### Changed
+
+- Find and Replace in Views and Sheets now use the promoted Core workflows with
+  case conversion, unchecked pickers without element IDs, exact-value rename
+  handling, and results shown in the dialog.
+- Beam Reaction Declutter adds active-view and selected-sheet Move scopes,
+  same-beam collision handling, bounded moves, and safer transaction outcomes.
+- ViewRange refines the editor's headings, sizing, alignment, and spacing.
+- UI Gallery previews the current Views and Sheets dialogs and labels the prior
+  forms as legacy previews.
+- Release checks now cover both ribbon layouts and report version/build metadata
+  provenance more clearly in About KL&A Tools.
+
+### Known limits
+
+- The changed rename and decluttering transactions, ViewRange UI, and UI Gallery
+  previews still need live Revit acceptance. Beam Reaction Declutter remains a
+  DevSandbox prototype; pinned tags and unsupported references stay unchanged.
+- Carbon GWP Pull still requires trusted Excel workbooks and Excel COM interop.
+  This release makes no new Excel acceptance claim.
+- Static checks do not validate model transactions, worksharing, undo, dialog
+  rendering, Excel refresh, or behavior after reopening a model.
+
+**Rollback tag:** `v0.0.10-beta`
 
 ## 0.0.10 - 2026-10-05
 
@@ -49,7 +83,7 @@ No pending published release.
 - **Channel:** Beta
 - **Tag:** `v0.0.9-beta`
 - **Tested Revit range:** No new live Revit claim. Carbon GWP Pull is a beta
-  workflow in the KL&A Tools panel; its deterministic logic is covered by the
+  workflow in DevSandbox; its deterministic logic is covered by the
   static test suite.
 
 ### Added

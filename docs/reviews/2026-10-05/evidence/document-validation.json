@@ -1,0 +1,16 @@
+{
+  "documents": 8,
+  "unique_findings": 54,
+  "severity": {
+    "P1": 6,
+    "P2": 36,
+    "P3": 12
+  },
+  "local_links": 178,
+  "source_line_anchors": 58,
+  "heading_anchors": 61,
+  "command_paths_present": 36,
+  "xaml_sources": 53,
+  "tracked_runtime_diff": "empty",
+  "issues": []
+}

@@ -3,8 +3,9 @@
 KL&A Tools is a development pyRevit extension for KL&A Revit workflows. It
 adds a **KL&A Tools** ribbon tab within Revit.
 
-> **Development / beta extension.** The current release is
-> [`0.0.10-beta`](version.json), dated October 5, 2026.
+> **Release preparation.** The latest published release is
+> [`0.0.10-beta`](CHANGELOG.md), dated October 5, 2026. This checkout identifies
+> itself as `v0.0.11-beta`; merge, tag, and publication are pending.
 
 ## Ribbon tour
 
@@ -49,9 +50,9 @@ appropriate model before project use.
 Each user-facing command should have a neighboring `SPEC.md` that documents its
 inputs, outputs, exclusions, and validation boundary. For example:
 
-- [Carbon GWP Pull specification](<KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/SPEC.md>)
-- [Create View Detail Folders specification](<KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/SPEC.md>)
-- [UI Gallery specification](<KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
+- [Carbon GWP Pull specification](<KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/SPEC.md>)
+- [Create View Detail Folders specification](<KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/SPEC.md>)
+- [UI Gallery specification](<KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
 
 ## Install for development
 
@@ -129,13 +130,14 @@ for a useful report.
 
 | Current version | Channel | Release date | Notes |
 | --- | --- | --- | --- |
-| `0.0.10` | Beta | 2026-10-05 | Current release; validate changed behavior in Revit and Excel before deployment. |
+| `0.0.10` | Beta | 2026-10-05 | Latest published release; validate changed behavior in Revit and Excel before deployment. |
+| `0.0.11` | Beta | 2026-10-12 | Release preparation; owner merge, tag, and publication pending. |
 
 `version.json` is the single human-edited extension version source. After
 changing it, regenerate `lib/build_info.py` with the provided script; do not
 edit the generated file directly. Release versions, beta-to-stable promotion,
 tags, validation evidence, and in-Revit verification are defined in
-[RELEASING.md](RELEASING.md). Published release notes live in
+[Release workflow](docs/releasing/RELEASING.md). Published release notes live in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Prototype promotion roadmap
@@ -155,14 +157,14 @@ Before moving a prototype into a primary panel:
 ## Repository layout
 
 ```text
-KL&A Tools_dev.tab/  pyRevit ribbon tab, panels, command bundles, and command specs
+KL&A Tools.tab/      pyRevit ribbon tab, panels, command bundles, and command specs
 lib/                 Shared Python helpers and reusable WPF/UI components
 checks/              Audit checks
 tests/               Host-independent unit tests
 scripts/             Developer utilities, including build-metadata generation
 docs/guides/         Python and comment/documentation standards
 version.json         Human-edited version source
-RELEASING.md         Release and metadata-generation workflow
+docs/releasing/      Release workflow, tool-version rules, and delivery ledger
 ```
 
 Command entry points should stay thin: they adapt pyRevit/Revit, WPF, Excel,
@@ -173,8 +175,9 @@ it can be tested without Revit.
 
 Before changing a command:
 
-1. Create a short-lived topic branch from `dev`; do not push directly to
-   protected `dev` or `main`.
+1. For ordinary contributions, create a short-lived topic branch from `dev`.
+   The release owner may prepare releases and the next development cycle directly
+   on `dev`; releases reach `main` only through the owner-merged release PR.
 2. Read its `SPEC.md` and adjacent `bundle.yaml` when present.
 3. Preserve the established pyRevit bundle hierarchy and command metadata.
 4. Keep command-path Python compatible with the pyRevit engine unless the
@@ -185,8 +188,15 @@ Before changing a command:
    a pull request into `dev`.
 
 For the complete team workflow, see
-[Contributing](docs/guides/CONTRIBUTING.md), [RELEASING.md](RELEASING.md), and
+[Contributing](docs/guides/CONTRIBUTING.md), [Release workflow](docs/releasing/RELEASING.md), and
 [AGENTS.md](AGENTS.md).
+
+For release preparation and post-release verification, run the consolidated
+check described in the [release workflow](docs/releasing/RELEASING.md):
+
+```powershell
+.\.venv-rvt26\Scripts\python.exe scripts\release_check.py
+```
 
 ## Test locally
 

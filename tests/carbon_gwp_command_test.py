@@ -6,10 +6,12 @@ import tempfile
 import types
 import unittest
 
+from repo_paths import TAB_NAME
+
 
 COMMAND_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
-    'KL&A Tools.tab',
+    TAB_NAME,
     '02 KL&A Tools.panel',
     'Carbon GWP Pull.pushbutton',
     'script.py',

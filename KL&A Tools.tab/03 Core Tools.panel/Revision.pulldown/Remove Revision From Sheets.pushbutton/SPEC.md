@@ -47,7 +47,7 @@ environment before promotion or behavior changes.
 | Field | Value |
 | --- | --- |
 | Tool ID | `core.revision.remove-revision-from-sheets` |
-| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Revision.pulldown/Remove Revision From Sheets.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/Revision.pulldown/Remove Revision From Sheets.pushbutton` |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Revision.pulldown/Remove Revision From Sheets.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools.tab/03 Core Tools.panel/Revision.pulldown/Remove Revision From Sheets.pushbutton` |
 | Version inputs | `bundle.yaml`; `script.py` |
 | Tool version | `v1.0` |
 | Status/origin | Maintained — KL&A adaptation of pyRevit. |

@@ -47,7 +47,7 @@ environment before promotion or behavior changes.
 | Field | Value |
 | --- | --- |
 | Tool ID | `core.duplicate-sheets` |
-| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/duplicate_sheets.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton` |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/duplicate_sheets.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools.tab/03 Core Tools.panel/duplicate_sheets.pushbutton` |
 | Version inputs | `bundle.yaml`; `script.py`; `lib/GUI/DuplicateSheets.py`; `lib/Snippets/_selection.py` |
 | Tool version | `v1.0` |
 | Status/origin | Maintained — KL&A adaptation of EF Tools. |

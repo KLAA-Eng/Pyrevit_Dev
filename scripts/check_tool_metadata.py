@@ -17,7 +17,7 @@ import tokenize
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VERSION = re.compile(r'^v(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:\.[A-Za-z][A-Za-z0-9_-]*)?$')
 DATE_FORMAT = '%m.%d.%Y'
-DELIVERY_LEDGER = os.path.join(ROOT, 'docs', 'tool-version-delivery-ledger.md')
+DELIVERY_LEDGER = os.path.join(ROOT, 'docs', 'releasing', 'tool-version-delivery-ledger.md')
 COMMAND_SUFFIXES = ('.pushbutton', '.smartbutton', '.urlbutton', '.invokebutton',
                     '.linkbutton', '.content')
 

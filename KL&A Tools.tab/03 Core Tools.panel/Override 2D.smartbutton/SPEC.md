@@ -47,7 +47,7 @@ environment before promotion or behavior changes.
 | Field | Value |
 | --- | --- |
 | Tool ID | `core.override-2d` |
-| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Override 2D.smartbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/Override 2D.smartbutton` |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Override 2D.smartbutton` (0.0.0.beta–0.0.9); current `KL&A Tools.tab/03 Core Tools.panel/Override 2D.smartbutton` |
 | Version inputs | `bundle.yaml`; `script.py`; `lib/graphics/overrides.py` |
 | Tool version | `v1.0` |
 | Status/origin | Maintained — KL&A adaptation of pyRevit. |

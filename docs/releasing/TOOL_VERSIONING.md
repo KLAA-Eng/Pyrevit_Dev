@@ -2,13 +2,13 @@
 
 Every visible command, including DevSandbox, follows this standard. The
 extension release in `version.json` remains independent and authoritative for
-extension packaging and releases; continue to follow `RELEASING.md`.
+extension packaging and releases; follow [RELEASING.md](RELEASING.md).
 
 ## Version decisions
 
 Tool versions describe meaningful command changes delivered to `main`, not the
 number of development commits. Reconstruct history by comparing adjacent main
-release snapshots in the [Tool-Version Delivery Ledger](../tool-version-delivery-ledger.md).
+release snapshots in the [Tool-Version Delivery Ledger](tool-version-delivery-ledger.md).
 This is essential because a squash release can deliver `dev` content without
 preserving the original development commit as a mainline ancestor.
 
