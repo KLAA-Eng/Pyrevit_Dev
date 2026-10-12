@@ -11,13 +11,13 @@ release boundaries.
 
 ## Unreleased
 
-The next development version will be `0.0.12-dev` after the `0.0.11-beta`
-release is merged and published.
+Development is underway for `0.0.12`. This is an untagged, unpublished `dev`
+identity. The latest published release is `0.0.11-beta`.
 
 ## 0.0.11 - 2026-10-12
 
 - **Channel:** Beta
-- **Tag:** `v0.0.11-beta` (intended; pending owner merge and publication)
+- **Tag:** `v0.0.11-beta`
 - **Tested Revit range:** No new live Revit claim. The changed command workflows
   and dialogs have host-independent tests, but their current Revit/pyRevit
   behavior has not been accepted in a representative live model.

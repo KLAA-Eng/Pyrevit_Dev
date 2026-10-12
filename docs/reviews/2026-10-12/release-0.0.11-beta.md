@@ -23,3 +23,7 @@ The five changed command versions are recorded once for main delivery `0.0.11` i
 - Previous published rollback tag: `v0.0.10-beta`.
 
 This is a beta preparation record. After owner merge, verify the exact main tree, annotated tag and peeled SHA, published prerelease page, installed path, and About dialog. Record the verified delivery evidence on `dev` during synchronization to `0.0.12-dev`.
+
+## Publication verification
+
+PR #23 was owner-merged on 2026-10-12 as `ea6219c3a45dcf93e7ba80f2d02c9a54f48409b4`. The main tree matched the prepared release tree. The remote annotated `v0.0.11-beta` tag peeled to that commit, and the [GitHub prerelease](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.11-beta) displayed the expected title, beta label, tag, commit, and notes. A Revit 2024.3.50 MCP listener responded, but its own extension path did not establish which KL&A Tools copy Revit had loaded. A pyRevit reload and manual About/loaded-path inspection remain pending.
