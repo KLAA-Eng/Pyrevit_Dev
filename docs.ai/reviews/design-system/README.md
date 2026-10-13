@@ -1,7 +1,7 @@
 # Design-system reviews
 
 This folder holds dated source reviews of the KLCode visual system. The living
-implementation guide is [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
+implementation guide is [DESIGNSYSTEM.md](../../../docs/guides/DESIGNSYSTEM.md).
 
 | Review | Scope |
 | --- | --- |

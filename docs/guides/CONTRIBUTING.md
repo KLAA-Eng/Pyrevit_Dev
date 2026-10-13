@@ -11,14 +11,15 @@ request, review documentation, report an issue, and provide validation
 evidence. The technical owner and backup reviewer alone may merge pull
 requests, prepare releases, and create or push release tags.
 
-Ordinary contributors use PRs into `dev`. The release owner may prepare releases
-and the next development cycle directly on `dev`. Releases reach `main` only
-through a `dev` to `main` PR personally merged by the release owner; never push
-directly to `main`. See the [release workflow](../releasing/RELEASING.md).
+Ordinary contributors use PRs into `master-dev`. The release owner may prepare
+releases and the next development cycle directly on `master-dev`. Releases reach
+`main` only through a `master-dev` to `main` PR personally merged by the release
+owner; never push directly to `main`. See the
+[release workflow](../releasing/RELEASING.md).
 
 ## Day-to-day change flow
 
-1. Start from current `dev` and create a short-lived topic branch.
+1. Start from current `master-dev` and create a short-lived topic branch.
 2. Make one focused change. Read the affected command's `SPEC.md` and
    `bundle.yaml` before changing a command.
 3. Update `SPEC.md` for every new or materially changed user-facing command.
@@ -30,10 +31,10 @@ directly to `main`. See the [release workflow](../releasing/RELEASING.md).
 5. Record relevant live Revit evidence and remaining acceptance limits for
    changed behavior. Beta releases may retain documented limits; stable promotion
    requires relevant live acceptance as defined in the release workflow.
-6. Open a pull request into `dev`. State the affected tools, user impact,
+6. Open a pull request into `master-dev`. State the affected tools, user impact,
    evidence, known limits, and rollback considerations.
 7. The technical owner or backup reviewer reviews and merges the approved pull
-   request into `dev`.
+   request into `master-dev`.
 
 ## Revit support and validation
 

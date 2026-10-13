@@ -14,7 +14,7 @@ command's `SPEC.md` version history.
 - Compare file snapshots at adjacent main deliveries. Do not use development
   commit ancestry alone: the repository includes both merge and squash-style
   releases.
-- `Unreleased` is reserved for a next planned command version on `dev`; it is
+- `Unreleased` is reserved for a next planned command version on `master-dev`; it is
   not a delivery and is intentionally absent from this table.
 - Keep a command's aliases and version inputs in its `SPEC.md`. This lets the
   release review account for renames and shared helper changes.
@@ -46,7 +46,7 @@ is a prepared entry, not verified delivery evidence.
 
 After the owner merges the PR, verify the actual main commit, remote annotated
 tag and peeled commit, and published GitHub release. Fill in the commit, PR and
-release links, tag evidence, and verification date on `dev` during synchronization.
+release links, tag evidence, and verification date on `master-dev` during synchronization.
 Run the release check with `--delivery X.Y.Z` to verify the recorded commit and
 annotated tag against local Git objects; separately refresh the remote and
 verify the GitHub page. A release is complete only when its placeholders are

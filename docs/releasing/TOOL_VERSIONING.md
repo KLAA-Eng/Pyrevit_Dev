@@ -9,7 +9,7 @@ extension packaging and releases; follow [RELEASING.md](RELEASING.md).
 Tool versions describe meaningful command changes delivered to `main`, not the
 number of development commits. Reconstruct history by comparing adjacent main
 release snapshots in the [Tool-Version Delivery Ledger](tool-version-delivery-ledger.md).
-This is essential because a squash release can deliver `dev` content without
+This is essential because a squash release can deliver `master-dev` content without
 preserving the original development commit as a mainline ancestor.
 
 | Command status | First delivered version | Later version rule |
@@ -30,13 +30,13 @@ Each version table row is one delivery even when that release contains several
 related changes. A command may have only one row per main delivery. Preserve a
 single tool identity and path aliases through moves or renames.
 
-### Planned versions on `dev`
+### Planned versions on `master-dev`
 
-When meaningful work exists on `dev` but is absent from the latest main
+When meaningful work exists on `master-dev` but is absent from the latest main
 delivery, show the **next planned** version now. Add `Status: Unreleased` to
 the bundle tooltip and use the latest meaningful development-change date in
 `MM.DD.YYYY` form. Keep all pending changes under that one planned version.
-Before the `dev` to `main` release, convert the row to the new delivery
+Before the `master-dev` to `main` release, convert the row to the new delivery
 identifier and replace the status with the intended delivery date. Verify the
 merged main commit afterward as described by the central ledger.
 

@@ -162,9 +162,11 @@ lib/                 Shared Python helpers and reusable WPF/UI components
 checks/              Audit checks
 tests/               Host-independent unit tests
 scripts/             Developer utilities, including build-metadata generation
-docs/guides/         Python and comment/documentation standards
+docs/guides/         Contributor, Python, comment, and design-system guides
 version.json         Human-edited version source
 docs/releasing/      Release workflow, tool-version rules, and delivery ledger
+docs/reviews/        Release and tool-promotion decision records
+docs.ai/             Agent guidance, technical audits, and implementation handoffs
 ```
 
 Command entry points should stay thin: they adapt pyRevit/Revit, WPF, Excel,
@@ -175,9 +177,9 @@ it can be tested without Revit.
 
 Before changing a command:
 
-1. For ordinary contributions, create a short-lived topic branch from `dev`.
+1. For ordinary contributions, create a short-lived topic branch from `master-dev`.
    The release owner may prepare releases and the next development cycle directly
-   on `dev`; releases reach `main` only through the owner-merged release PR.
+   on `master-dev`; releases reach `main` only through the owner-merged release PR.
 2. Read its `SPEC.md` and adjacent `bundle.yaml` when present.
 3. Preserve the established pyRevit bundle hierarchy and command metadata.
 4. Keep command-path Python compatible with the pyRevit engine unless the
@@ -185,11 +187,11 @@ Before changing a command:
 5. Put reusable, host-independent behavior in `lib/` and cover it with a
    focused test when practical.
 6. Check the final diff, record the applicable live-Revit validation, and open
-   a pull request into `dev`.
+   a pull request into `master-dev`.
 
 For the complete team workflow, see
-[Contributing](docs/guides/CONTRIBUTING.md), [Release workflow](docs/releasing/RELEASING.md), and
-[AGENTS.md](AGENTS.md).
+[Contributing](docs/guides/CONTRIBUTING.md), [Release workflow](docs/releasing/RELEASING.md),
+[team documentation](docs/README.md), and [agent documentation](docs.ai/README.md).
 
 For release preparation and post-release verification, run the consolidated
 check described in the [release workflow](docs/releasing/RELEASING.md):

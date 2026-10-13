@@ -5,7 +5,7 @@ covers the legacy IronPython/pyRevit dialogs, their DevSandbox gallery, and
 the compiled WPF add-ins. It does not replace host-specific runtime validation.
 The source descriptions below were rechecked on 2026-10-08 at
 `089da1b7d88e0df9dec2cc127659a24e051b9163`; see the
-[design-system reviews](docs/reviews/design-system/README.md) for dated findings
+[design-system reviews](../../docs.ai/reviews/design-system/README.md) for dated findings
 and live-acceptance boundaries.
 
 ## Master Design Colors
@@ -43,7 +43,7 @@ the compiled-WPF adapter: `src/KLCode.Wpf/KLCode.Wpf.csproj` links it as
 repeats the same legacy brush values rather than merging that file. The
 repository wordmark asset is `lib/_logos/KLCode_text_1024x256px.svg` (with a
 PNG export). The palette consolidation decision and test-contract mismatch are
-recorded in the [current-state review](docs/reviews/design-system/2026-10-08-current-state-review.md).
+recorded in the [current-state review](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md).
 
 | Property | Value |
 | --- | --- |
@@ -327,25 +327,25 @@ dialogs are external references, not repository XAML surfaces.
 The linked source audit describes 2026-10-08; the rename rows below were
 updated for the 2026-10-09 Core promotion. This table does not
 establish rendered appearance, keyboard behavior, DPI behavior, or live Revit
-acceptance. See the [dated design-system review](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit)
+acceptance. See the [dated design-system review](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit)
 for the full audit, drift notes, and recommended actions.
 
 | Window | Current source status | Detail |
 | --- | --- | --- |
-| Create from rooms | Shared styles with a local list override | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| KL&A alert | Shared KLCode styles | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Duplicate sheets | Shared styles with a local checkbox override | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Find and replace | Shared KLCode styles | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Find and replace sheets | Promoted Core dialog with shared KLCode styles and a local result panel | [Promotion record](docs/reviews/2026-10-08/find-replace-promotion.md) |
-| Legacy sheet rename form | Prior shared presentation retained for historical preview | [Source audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Find and replace views | Promoted Core dialog with shared KLCode styles and a local result panel | [Promotion record](docs/reviews/2026-10-08/find-replace-promotion.md) |
-| Legacy view rename form | Prior shared presentation retained for historical preview | [Source audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Match properties recall | Shared styles; Gallery preview omits the production chrome | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| KL&A list selection | Production reference for shared list-selection styling | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Steel PSF story selection | Shared styles in a DevSandbox selector | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| View range editor | Command-local dark resources and ComboBox templates | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| UI Gallery | Command-local palette and DataGrid styles | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| UI Gallery preview fixture | Minimal test fixture without shared KLCode chrome | [Audit](docs/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Create from rooms | Shared styles with a local list override | [Audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| KL&A alert | Shared KLCode styles | [Audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Duplicate sheets | Shared styles with a local checkbox override | [Audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Find and replace | Shared KLCode styles | [Audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Find and replace sheets | Promoted Core dialog with shared KLCode styles and a local result panel | [Promotion record](../reviews/2026-10-08/find-replace-promotion.md) |
+| Legacy sheet rename form | Prior shared presentation retained for historical preview | [Source audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Find and replace views | Promoted Core dialog with shared KLCode styles and a local result panel | [Promotion record](../reviews/2026-10-08/find-replace-promotion.md) |
+| Legacy view rename form | Prior shared presentation retained for historical preview | [Source audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Match properties recall | Shared styles; Gallery preview omits the production chrome | [Audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| KL&A list selection | Production reference for shared list-selection styling | [Audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Steel PSF story selection | Shared styles in a DevSandbox selector | [Audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| View range editor | Command-local dark resources and ComboBox templates | [Audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| UI Gallery | Command-local palette and DataGrid styles | [Audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| UI Gallery preview fixture | Minimal test fixture without shared KLCode chrome | [Audit](../../docs.ai/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
 
 ## Style Loading And Local GUI Overrides
 

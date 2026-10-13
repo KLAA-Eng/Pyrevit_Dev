@@ -4,7 +4,7 @@ Review date: 2026-10-08. Source baseline:
 `089da1b7d88e0df9dec2cc127659a24e051b9163`.
 
 This review records the UI Gallery source audit moved from
-[DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md), plus findings and follow-up actions
+[DESIGNSYSTEM.md](../../../docs/guides/DESIGNSYSTEM.md), plus findings and follow-up actions
 verified against the current Python, XAML, and C# repository state. It is a
 source review: no live Revit window, WPF rendering, keyboard navigation, DPI, or
 screen-reader acceptance is claimed.
@@ -23,7 +23,7 @@ borderless dark chrome, the outlined KLCode wordmark in the 24 px header,
 KLCharcoal window background, KLGreen-dark/KLGreen/KLGreen-secondary accents,
 and KLWhite text resources. The template is also a separate gallery preview
 entry, not a thirteenth user-facing window. The five compiled WPF windows are
-in the [compiled catalog](../../../DESIGNSYSTEM.md#compiled-wpf-windows) and
+in the [compiled catalog](../../../docs/guides/DESIGNSYSTEM.md#compiled-wpf-windows) and
 remain disabled in the gallery because their constructors require compiled
 Revit host state.
 
@@ -47,9 +47,9 @@ baseline. They do not certify rendered appearance or interaction in Revit.
 | Duplicate sheets | KL&A custom | `lib/GUI/DuplicateSheets.xaml` | Source-aligned with local checkbox override | Large command-specific form uses shared styles whose resource keys map to the named design tokens, plus a nested checkbox style for its option grid. | Keep command handlers in the bundle and presentation in `lib/GUI`. |
 | Find and replace | KL&A custom | `lib/GUI/FindReplace.xaml` | Source-aligned | Compact rename form uses the solid KLCharcoal header/body and shared KLCode resources. | Keep as a compact aligned variant. |
 | Find and replace sheets | KL&A custom | `lib/GUI/RenameSheets.xaml` | Source-aligned | Production sheet rename presentation loads the shared dictionary; command behavior remains in its bundle. | Keep handlers and Revit transactions in the command bundle. |
-| Find and replace sheets prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Shared-style prototype | The XAML uses shared window/header brushes and an initially collapsed result panel with scrollable details; its loader merges `WPF_styles.xaml`. | Complete live visual and Revit acceptance in the [promotion review](../2026-10-08/find-replace-promotion.md) before copying accepted behavior into `lib/GUI/RenameSheets.xaml`. |
+| Find and replace sheets prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton/Script.xaml` | Shared-style prototype | The XAML uses shared window/header brushes and an initially collapsed result panel with scrollable details; its loader merges `WPF_styles.xaml`. | Complete live visual and Revit acceptance in the [promotion review](../../../docs/reviews/2026-10-08/find-replace-promotion.md) before copying accepted behavior into `lib/GUI/RenameSheets.xaml`. |
 | Find and replace views | KL&A custom | `lib/GUI/RenameViews.xaml` | Source-aligned | Shared rename base now loads `WPF_styles.xaml` through `my_WPF`. | Keep production view rename presentation in `lib/GUI`. |
-| Find and replace views prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Shared-style prototype | The XAML uses shared window/header brushes and an initially collapsed result panel with scrollable details; its loader merges `WPF_styles.xaml`. | Complete live visual and Revit acceptance in the [promotion review](../2026-10-08/find-replace-promotion.md) before copying accepted behavior into `lib/GUI/RenameViews.xaml`. |
+| Find and replace views prototype | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton/Script.xaml` | Shared-style prototype | The XAML uses shared window/header brushes and an initially collapsed result panel with scrollable details; its loader merges `WPF_styles.xaml`. | Complete live visual and Revit acceptance in the [promotion review](../../../docs/reviews/2026-10-08/find-replace-promotion.md) before copying accepted behavior into `lib/GUI/RenameViews.xaml`. |
 | Match properties recall | KL&A custom | `lib/match/clipboard_window.xaml` | Shared-style production window; preview gap | Production hosts modeless clipboard content inside shared KLCode chrome, but the Gallery preview discards that chrome, as recorded in [GUI-05](../2026-10-05/design-system-and-gui.md#gui-05--p2-the-match-recall-gallery-preview-discards-the-chrome-it-intends-to-review). | Make the Gallery preview use the production chrome before treating it as visual review evidence. |
 | KL&A list selection | KL&A custom | `lib/GUI/SelectFromDict.xaml` | Source-aligned | This is the reference theme for list-selection windows. | Keep as the base for future selection-style custom windows. |
 | Steel PSF story selection | KL&A custom | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | Source-aligned | Closely follows SelectFromDict list-selection chrome with a solid KLCharcoal background; footer is prototype-specific. | Keep aligned with SelectFromDict when Steel PSF controls change. |
@@ -100,7 +100,7 @@ standard pyRevit dialogs are external references.
 Both Find and Replace prototypes changed after the October 5 review: their
 window and header backgrounds now use shared brush keys, and each has a
 collapsed outcome panel that expands for issues or a no-change result. The
-[October 8 promotion review](../2026-10-08/find-replace-promotion.md) records
+[October 8 promotion review](../../../docs/reviews/2026-10-08/find-replace-promotion.md) records
 the static checks and pending Revit/visual acceptance. No result here closes
 that acceptance gate. Other October 5 GUI findings remain in their original
 report for separate follow-up.
