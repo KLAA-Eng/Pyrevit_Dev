@@ -116,13 +116,14 @@ class FakeDocument(object):
 
 class FakeSheet(object):
     def __init__(self, value, placed_view_ids=(), additional_ids=(),
-                 revision_cloud_ids=()):
+                 revision_cloud_ids=(), scheduled_revision_ids=()):
         self.Id = FakeElementId(value)
         self.SheetNumber = 'S{}'.format(value)
         self.Name = 'Sheet {}'.format(value)
         self._placed_view_ids = list(placed_view_ids)
         self._revision_cloud_ids = list(revision_cloud_ids)
         self._additional_ids = FakeRevisionIds(additional_ids)
+        self._scheduled_revision_ids = list(scheduled_revision_ids)
         self.saved_revision_ids = None
         self.IsPlaceholder = False
         self.hidden_ids = []
@@ -136,6 +137,9 @@ class FakeSheet(object):
 
     def GetAdditionalRevisionIds(self):
         return self._additional_ids
+
+    def GetAllRevisionIds(self):
+        return self._scheduled_revision_ids
 
     def SetAdditionalRevisionIds(self, revision_ids):
         self.saved_revision_ids = list(revision_ids)
@@ -525,6 +529,20 @@ class RevisionCloudCommandTests(unittest.TestCase):
         self.assertEqual([], sheet_b.saved_revision_ids)
         self.assertEqual(3, report['schedule_entries_changed'])
 
+    def test_hide_does_not_count_failed_additional_revision_update(self):
+        revision = FakeElementId(1)
+        sheet = FakeSheet(10, additional_ids=[revision])
+        def fail_set_additional_ids(unused_ids):
+            raise RuntimeError('write failed')
+        sheet.SetAdditionalRevisionIds = fail_set_additional_ids
+        report = self._report()
+
+        self.command._update_sheet_revision_schedules(
+            [sheet], [revision], False, report)
+
+        self.assertEqual(0, report['schedule_entries_changed'])
+        self.assertEqual(1, len(report['schedule_errors']))
+
     def test_unhide_leaves_every_selected_sheet_schedule_unchanged(self):
         revision = FakeElementId(1)
         sheet = FakeSheet(10, additional_ids=[revision])
@@ -537,6 +555,117 @@ class RevisionCloudCommandTests(unittest.TestCase):
         self.assertIsNone(sheet.saved_revision_ids)
         self.assertEqual(0, report['schedule_entries_changed'])
 
+    def test_unhide_reports_revisions_added_to_sheet_schedule(self):
+        revision = FakeElementId(1)
+        sheet = FakeSheet(10)
+        report = self._report()
+        before = self.command._selected_schedule_revisions(
+            [sheet], {1}, report)
+        sheet._scheduled_revision_ids = [revision]
+        after = self.command._selected_schedule_revisions(
+            [sheet], {1}, report)
+        self.command._record_schedule_changes(before, after, report)
+
+        self.assertEqual(1, report['schedule_entries_added'])
+        self.assertEqual(0, report['schedule_entries_removed'])
+        self.assertEqual(1, report['schedule_sheets_changed'])
+        self.assertEqual(1, report['schedule_sheets_checked'])
+        self.assertEqual([], report['schedule_state_errors'])
+
+    def test_unhide_reports_no_schedule_change_when_revision_already_listed(self):
+        revision = FakeElementId(1)
+        sheet = FakeSheet(10, scheduled_revision_ids=[revision])
+        report = self._report()
+        before = self.command._selected_schedule_revisions(
+            [sheet], {1}, report)
+        after = self.command._selected_schedule_revisions(
+            [sheet], {1}, report)
+        self.command._record_schedule_changes(before, after, report)
+
+        self.assertEqual(0, report['schedule_entries_added'])
+        self.assertEqual(0, report['schedule_sheets_changed'])
+        self.assertEqual(1, report['schedule_sheets_checked'])
+
+    def test_hide_reports_revision_removed_from_sheet_schedule(self):
+        revision = FakeElementId(1)
+        sheet = FakeSheet(10, scheduled_revision_ids=[revision])
+        report = self._report()
+        before = self.command._selected_schedule_revisions(
+            [sheet], {1}, report)
+        sheet._scheduled_revision_ids = []
+        after = self.command._selected_schedule_revisions(
+            [sheet], {1}, report)
+        self.command._record_schedule_changes(before, after, report)
+
+        self.assertEqual(0, report['schedule_entries_added'])
+        self.assertEqual(1, report['schedule_entries_removed'])
+        self.assertEqual(1, report['schedule_sheets_changed'])
+        self.assertEqual(1, report['schedule_sheets_checked'])
+
+    def test_hide_does_not_claim_schedule_removal_if_revision_remains_listed(self):
+        revision = FakeElementId(1)
+        sheet = FakeSheet(10, scheduled_revision_ids=[revision])
+        report = self._report()
+        before = self.command._selected_schedule_revisions(
+            [sheet], {1}, report)
+        after = self.command._selected_schedule_revisions(
+            [sheet], {1}, report)
+        self.command._record_schedule_changes(before, after, report)
+
+        self.assertEqual(0, report['schedule_entries_removed'])
+        self.assertEqual(0, report['schedule_sheets_changed'])
+        self.assertEqual(1, report['schedule_sheets_checked'])
+
+    def test_unhide_output_describes_schedule_change_and_additional_revisions(self):
+        messages = []
+        output = types.SimpleNamespace(
+            close_others=lambda: None,
+            print_md=messages.append)
+        self.command.script = types.SimpleNamespace(
+            get_output=lambda: output)
+        self.command._revision_label = lambda unused_revision: 'R1'
+        report = self._report()
+        report['clouds_changed'] = 1
+        report['schedule_entries_added'] = 1
+        report['schedule_sheets_changed'] = 1
+        report['schedule_sheets_checked'] = 1
+
+        self.command._print_report(
+            'Unhide', 'unhidden', False, [object()], [FakeSheet(10)], report)
+
+        self.assertTrue(any(
+            'Selected revision entries added: 1' in message
+            for message in messages))
+        self.assertTrue(any(
+            'Additional revisions on sheets:** Not edited' in message
+            for message in messages))
+        self.assertFalse(any(
+            'Unchanged during Unhide' in message for message in messages))
+
+    def test_hide_output_distinguishes_schedule_from_additional_revisions(self):
+        messages = []
+        output = types.SimpleNamespace(
+            close_others=lambda: None,
+            print_md=messages.append)
+        self.command.script = types.SimpleNamespace(
+            get_output=lambda: output)
+        self.command._revision_label = lambda unused_revision: 'R1'
+        report = self._report()
+        report['schedule_entries_removed'] = 1
+        report['schedule_sheets_changed'] = 1
+        report['schedule_sheets_checked'] = 1
+        report['schedule_entries_changed'] = 1
+
+        self.command._print_report(
+            'Hide', 'hidden', True, [object()], [FakeSheet(10)], report)
+
+        self.assertTrue(any(
+            'Selected revision entries added: 0; removed: 1' in message
+            for message in messages))
+        self.assertTrue(any(
+            'Additional revisions removed from sheets:** 1' in message
+            for message in messages))
+
     def _report(self):
         return {
             'clouds_changed': 0,
@@ -548,6 +677,11 @@ class RevisionCloudCommandTests(unittest.TestCase):
             'schedule_entries_changed': 0,
             'schedule_entries_already_in_state': 0,
             'schedule_errors': [],
+            'schedule_entries_added': 0,
+            'schedule_entries_removed': 0,
+            'schedule_sheets_changed': 0,
+            'schedule_sheets_checked': 0,
+            'schedule_state_errors': [],
         }
 
 

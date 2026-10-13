@@ -3,8 +3,9 @@
 ## Purpose
 
 Hide or unhide selected revision-cloud elements on selected project sheets and
-their placed views. Hide also turns the selected revisions off in each selected
-sheet's titleblock revision schedule; Unhide leaves that schedule unchanged.
+their placed views. Hide also removes selected revisions from each selected
+sheet's additional revisions. Unhide does not edit additional revisions, but
+visible clouds can automatically add their revisions to the sheet's schedule.
 
 ## Behavior
 
@@ -19,14 +20,17 @@ primary/dependent-sheet relationships.
 Hide permanently hides visible matching clouds and removes each selected
 revision from every selected sheet's additional revisions, even if that sheet
 has no matching revision cloud. Unhide permanently unhides hidden matching
-clouds and leaves each selected sheet's titleblock revision schedule unchanged.
+clouds and leaves each selected sheet's additional revisions unchanged. For
+both actions, the report compares the selected revisions returned by
+`GetAllRevisionIds()` before and after the transaction to show schedule
+entries added or removed. It reports additional-revision edits separately.
 
 ## Validation boundary
 
 Validate the command in Revit with clouds owned directly by a sheet and by a
 placed view, plus cancellation and already-in-requested-state paths. Confirm
-the titleblock revision schedule removes entries on Hide and remains unchanged
-on Unhide.
+the schedule report agrees with visible titleblock entries after Hide and
+Unhide, including when a revision remains listed for another reason.
 
 ## Implementation inventory
 
@@ -48,7 +52,7 @@ replace live Revit acceptance.
 | Tool ID | `core.revision.hide-revision-clouds` |
 | Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Revision.pulldown/Hide Revision Clouds.pushbutton` (0.0.7–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/Revision.pulldown/Hide Revision Clouds.pushbutton` |
 | Version inputs | `bundle.yaml`; `script.py`; `lib/GUI/forms.py` |
-| Tool version | `v1.0` |
+| Tool version | `v1.1` |
 | Status/origin | Maintained — KL&A custom command. |
 
 ## Tool version history
@@ -56,3 +60,4 @@ replace live Revit acceptance.
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
 | `v1.0` | `0.0.7` | 09.28.2026 | Added the KL&A hide/unhide revision-cloud workflow. | `2c4a3b2` |
+| `v1.1` | `Unreleased` | 10.13.2026 | Report actual selected revision schedule membership after Hide and Unhide. | Pending next main delivery. |

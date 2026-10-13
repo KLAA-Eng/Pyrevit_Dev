@@ -1,8 +1,9 @@
 title: "Hide/Unhide\nRevision Clouds"
 tooltip:
   en_us: |-
-    Version: v1.0
-    Date    = 09.28.2026
+    Version: v1.1
+    Date    = 10.13.2026
+    Status: Unreleased
     _____________________________________________________________________
     Description:
 
@@ -14,7 +15,7 @@ tooltip:
     -> Choose Hide or Unhide and review the completion report.
     _____________________________________________________________________
     Last update:
-    - [09.28.2026] - Added the KL&A revision-cloud workflow.
+    - [10.13.2026] - Report schedule changes after hiding or unhiding clouds.
 author: KL&A
 engine:
   clean: true
