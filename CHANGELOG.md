@@ -11,8 +11,36 @@ release boundaries.
 
 ## Unreleased
 
-Development is underway for `0.0.12`. This is an untagged, unpublished `dev`
-identity. The latest published release is `0.0.11-beta`.
+The next development version will be `0.0.13-dev` after the `0.0.12-beta`
+release is merged and published.
+
+## 0.0.12 - 2026-10-13
+
+- **Channel:** Beta
+- **Tag:** `v0.0.12-beta` (intended; pending owner merge and publication)
+- **Tested Revit range:** No new live Revit or Excel claim. The changed revision
+  schedule report and Excel diagnostic have host-independent validation only.
+
+### Changed
+
+- Hide/Unhide Revision Clouds now lists only selected sheets whose revision
+  schedule changed, with the revisions added or removed on each sheet. It
+  reports additional-revision edits separately and identifies sheets whose
+  schedule state could not be read.
+- Excel COM Smoke Test now reports the first Excel interop assembly lookup
+  error and the identity and path of a loaded Excel interop assembly.
+- Release support and contributor documents have been reorganized under
+  `docs.ai/` and `docs/`; the metadata audit follows the new ledger location.
+
+### Known limits
+
+- The revision schedule report and Excel diagnostics still need acceptance in
+  the intended Revit and Excel hosts. Static checks do not establish titleblock
+  display, Revit transaction behavior, Excel COM loading, or cleanup in a live run.
+- Previously documented live acceptance limits for the 0.0.11-beta workflows
+  remain open.
+
+**Rollback tag:** `v0.0.11-beta`
 
 ## 0.0.11 - 2026-10-12
 
