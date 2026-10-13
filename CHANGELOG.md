@@ -11,13 +11,13 @@ release boundaries.
 
 ## Unreleased
 
-The next development version will be `0.0.13-dev` after the `0.0.12-beta`
-release is merged and published.
+Development is underway for `0.0.13-dev`. The latest published release is
+`0.0.12-beta`.
 
 ## 0.0.12 - 2026-10-13
 
 - **Channel:** Beta
-- **Tag:** `v0.0.12-beta` (intended; pending owner merge and publication)
+- **Tag:** `v0.0.12-beta`
 - **Tested Revit range:** No new live Revit or Excel claim. The changed revision
   schedule report and Excel diagnostic have host-independent validation only.
 

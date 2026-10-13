@@ -3,9 +3,9 @@
 KL&A Tools is a development pyRevit extension for KL&A Revit workflows. It
 adds a **KL&A Tools** ribbon tab within Revit.
 
-> **Release preparation.** The latest published release is
-> [`0.0.11-beta`](CHANGELOG.md), dated October 12, 2026. This checkout identifies
-> itself as `v0.0.12-beta`; owner merge, tag, and publication are pending.
+> **Development checkout.** The latest published release is
+> [`0.0.12-beta`](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.12-beta),
+> dated October 13, 2026. This checkout identifies itself as `v0.0.13-dev`.
 
 ## Ribbon tour
 
@@ -50,9 +50,9 @@ appropriate model before project use.
 Each user-facing command should have a neighboring `SPEC.md` that documents its
 inputs, outputs, exclusions, and validation boundary. For example:
 
-- [Carbon GWP Pull specification](<KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/SPEC.md>)
-- [Create View Detail Folders specification](<KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/SPEC.md>)
-- [UI Gallery specification](<KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
+- [Carbon GWP Pull specification](<KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/SPEC.md>)
+- [Create View Detail Folders specification](<KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/SPEC.md>)
+- [UI Gallery specification](<KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
 
 ## Install for development
 
@@ -130,8 +130,8 @@ for a useful report.
 
 | Current version | Channel | Release date | Notes |
 | --- | --- | --- | --- |
-| `0.0.11` | Beta | 2026-10-12 | Latest published release; changed behavior still needs live Revit acceptance. |
-| `0.0.12` | Beta | 2026-10-13 | Release preparation; owner merge, tag, and publication pending. |
+| `0.0.12` | Beta | 2026-10-13 | Latest published release; changed behavior still needs live Revit and Excel acceptance. |
+| `0.0.13` | Dev | 2026-10-13 | Current unpublished development identity. |
 
 `version.json` is the single human-edited extension version source. After
 changing it, regenerate `lib/build_info.py` with the provided script; do not
@@ -157,7 +157,7 @@ Before moving a prototype into a primary panel:
 ## Repository layout
 
 ```text
-KL&A Tools.tab/      pyRevit ribbon tab, panels, command bundles, and command specs
+KL&A Tools_dev.tab/  development ribbon tab, panels, command bundles, and command specs
 lib/                 Shared Python helpers and reusable WPF/UI components
 checks/              Audit checks
 tests/               Host-independent unit tests
