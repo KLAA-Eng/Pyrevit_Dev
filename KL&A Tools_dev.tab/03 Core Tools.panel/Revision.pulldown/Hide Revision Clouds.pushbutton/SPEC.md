@@ -23,14 +23,18 @@ has no matching revision cloud. Unhide permanently unhides hidden matching
 clouds and leaves each selected sheet's additional revisions unchanged. For
 both actions, the report compares the selected revisions returned by
 `GetAllRevisionIds()` before and after the transaction to show schedule
-entries added or removed. It reports additional-revision edits separately.
+entries added or removed. It lists only sheets with changes and identifies
+which selected revisions were added or removed on each sheet. If no selected
+revision entry changed, it says so. Sheets whose schedule state could not be
+read are reported as errors. Additional-revision edits are reported separately.
 
 ## Validation boundary
 
 Validate the command in Revit with clouds owned directly by a sheet and by a
 placed view, plus cancellation and already-in-requested-state paths. Confirm
 the schedule report agrees with visible titleblock entries after Hide and
-Unhide, including when a revision remains listed for another reason.
+Unhide, including when a revision remains listed for another reason. Confirm
+that unchanged sheets are omitted from the change list.
 
 ## Implementation inventory
 
@@ -60,4 +64,4 @@ replace live Revit acceptance.
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
 | `v1.0` | `0.0.7` | 09.28.2026 | Added the KL&A hide/unhide revision-cloud workflow. | `2c4a3b2` |
-| `v1.1` | `Unreleased` | 10.13.2026 | Report actual selected revision schedule membership after Hide and Unhide. | Pending next main delivery. |
+| `v1.1` | `Unreleased` | 10.13.2026 | List each changed sheet and its added or removed revisions after Hide and Unhide. | Pending next main delivery. |

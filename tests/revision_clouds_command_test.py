@@ -564,11 +564,11 @@ class RevisionCloudCommandTests(unittest.TestCase):
         sheet._scheduled_revision_ids = [revision]
         after = self.command._selected_schedule_revisions(
             [sheet], {1}, report)
-        self.command._record_schedule_changes(before, after, report)
+        self.command._record_schedule_changes(before, after, [sheet], report)
 
-        self.assertEqual(1, report['schedule_entries_added'])
-        self.assertEqual(0, report['schedule_entries_removed'])
-        self.assertEqual(1, report['schedule_sheets_changed'])
+        self.assertEqual([{
+            'sheet': 'S10 - Sheet 10', 'added': {1}, 'removed': set(),
+        }], report['schedule_changes'])
         self.assertEqual(1, report['schedule_sheets_checked'])
         self.assertEqual([], report['schedule_state_errors'])
 
@@ -580,10 +580,9 @@ class RevisionCloudCommandTests(unittest.TestCase):
             [sheet], {1}, report)
         after = self.command._selected_schedule_revisions(
             [sheet], {1}, report)
-        self.command._record_schedule_changes(before, after, report)
+        self.command._record_schedule_changes(before, after, [sheet], report)
 
-        self.assertEqual(0, report['schedule_entries_added'])
-        self.assertEqual(0, report['schedule_sheets_changed'])
+        self.assertEqual([], report['schedule_changes'])
         self.assertEqual(1, report['schedule_sheets_checked'])
 
     def test_hide_reports_revision_removed_from_sheet_schedule(self):
@@ -595,11 +594,11 @@ class RevisionCloudCommandTests(unittest.TestCase):
         sheet._scheduled_revision_ids = []
         after = self.command._selected_schedule_revisions(
             [sheet], {1}, report)
-        self.command._record_schedule_changes(before, after, report)
+        self.command._record_schedule_changes(before, after, [sheet], report)
 
-        self.assertEqual(0, report['schedule_entries_added'])
-        self.assertEqual(1, report['schedule_entries_removed'])
-        self.assertEqual(1, report['schedule_sheets_changed'])
+        self.assertEqual([{
+            'sheet': 'S10 - Sheet 10', 'added': set(), 'removed': {1},
+        }], report['schedule_changes'])
         self.assertEqual(1, report['schedule_sheets_checked'])
 
     def test_hide_does_not_claim_schedule_removal_if_revision_remains_listed(self):
@@ -610,10 +609,9 @@ class RevisionCloudCommandTests(unittest.TestCase):
             [sheet], {1}, report)
         after = self.command._selected_schedule_revisions(
             [sheet], {1}, report)
-        self.command._record_schedule_changes(before, after, report)
+        self.command._record_schedule_changes(before, after, [sheet], report)
 
-        self.assertEqual(0, report['schedule_entries_removed'])
-        self.assertEqual(0, report['schedule_sheets_changed'])
+        self.assertEqual([], report['schedule_changes'])
         self.assertEqual(1, report['schedule_sheets_checked'])
 
     def test_unhide_output_describes_schedule_change_and_additional_revisions(self):
@@ -626,15 +624,18 @@ class RevisionCloudCommandTests(unittest.TestCase):
         self.command._revision_label = lambda unused_revision: 'R1'
         report = self._report()
         report['clouds_changed'] = 1
-        report['schedule_entries_added'] = 1
-        report['schedule_sheets_changed'] = 1
+        report['schedule_changes'] = [{
+            'sheet': 'S10 - Sheet 10', 'added': {1}, 'removed': set(),
+        }]
         report['schedule_sheets_checked'] = 1
 
         self.command._print_report(
-            'Unhide', 'unhidden', False, [object()], [FakeSheet(10)], report)
+            'Unhide', 'unhidden', False,
+            [types.SimpleNamespace(Id=FakeElementId(1))],
+            [FakeSheet(10)], report)
 
         self.assertTrue(any(
-            'Selected revision entries added: 1' in message
+            '- **S10 - Sheet 10:** Added: R1' in message
             for message in messages))
         self.assertTrue(any(
             'Additional revisions on sheets:** Not edited' in message
@@ -651,19 +652,88 @@ class RevisionCloudCommandTests(unittest.TestCase):
             get_output=lambda: output)
         self.command._revision_label = lambda unused_revision: 'R1'
         report = self._report()
-        report['schedule_entries_removed'] = 1
-        report['schedule_sheets_changed'] = 1
+        report['schedule_changes'] = [{
+            'sheet': 'S10 - Sheet 10', 'added': set(), 'removed': {1},
+        }]
         report['schedule_sheets_checked'] = 1
         report['schedule_entries_changed'] = 1
+
+        self.command._print_report(
+            'Hide', 'hidden', True,
+            [types.SimpleNamespace(Id=FakeElementId(1))],
+            [FakeSheet(10)], report)
+
+        self.assertTrue(any(
+            '- **S10 - Sheet 10:** Removed: R1' in message
+            for message in messages))
+        self.assertTrue(any(
+            'Additional revisions removed from sheets:** 1' in message
+            for message in messages))
+
+    def test_report_lists_only_changed_sheets_and_their_revisions(self):
+        messages = []
+        output = types.SimpleNamespace(
+            close_others=lambda: None,
+            print_md=messages.append)
+        self.command.script = types.SimpleNamespace(get_output=lambda: output)
+        self.command._revision_label = lambda revision: revision.Name
+        revisions = [
+            types.SimpleNamespace(Id=FakeElementId(1), Name='Revision 1'),
+            types.SimpleNamespace(Id=FakeElementId(2), Name='Revision 2'),
+        ]
+        sheets = [FakeSheet(10), FakeSheet(11), FakeSheet(12)]
+        report = self._report()
+        report['schedule_changes'] = [
+            {'sheet': 'S10 - Sheet 10', 'added': {1}, 'removed': {2}},
+            {'sheet': 'S11 - Sheet 11', 'added': set(), 'removed': {2}},
+        ]
+        report['schedule_sheets_checked'] = 3
+
+        self.command._print_report(
+            'Hide', 'hidden', True, revisions, sheets, report)
+
+        self.assertIn(
+            '- **S10 - Sheet 10:** Added: Revision 1; Removed: Revision 2',
+            messages)
+        self.assertIn('- **S11 - Sheet 11:** Removed: Revision 2', messages)
+        self.assertFalse(any(
+            message.startswith('- **S12 - Sheet 12:**')
+            for message in messages))
+
+    def test_report_says_when_no_sheet_schedule_changed(self):
+        messages = []
+        output = types.SimpleNamespace(
+            close_others=lambda: None,
+            print_md=messages.append)
+        self.command.script = types.SimpleNamespace(get_output=lambda: output)
+        self.command._revision_label = lambda unused_revision: 'R1'
+        report = self._report()
+        report['schedule_sheets_checked'] = 1
+
+        self.command._print_report(
+            'Unhide', 'unhidden', False, [object()], [FakeSheet(10)], report)
+
+        self.assertTrue(any(
+            'No selected revision entries changed on 1 checked sheet.'
+            in message for message in messages))
+
+    def test_report_does_not_claim_no_change_when_no_sheet_was_checked(self):
+        messages = []
+        output = types.SimpleNamespace(
+            close_others=lambda: None,
+            print_md=messages.append)
+        self.command.script = types.SimpleNamespace(get_output=lambda: output)
+        self.command._revision_label = lambda unused_revision: 'R1'
+        report = self._report()
 
         self.command._print_report(
             'Hide', 'hidden', True, [object()], [FakeSheet(10)], report)
 
         self.assertTrue(any(
-            'Selected revision entries added: 0; removed: 1' in message
+            'Could not verify changes on the selected sheets' in message
             for message in messages))
-        self.assertTrue(any(
-            'Additional revisions removed from sheets:** 1' in message
+        self.assertFalse(any(
+            'No selected revision entries changed' in message
             for message in messages))
 
     def _report(self):
@@ -677,9 +747,7 @@ class RevisionCloudCommandTests(unittest.TestCase):
             'schedule_entries_changed': 0,
             'schedule_entries_already_in_state': 0,
             'schedule_errors': [],
-            'schedule_entries_added': 0,
-            'schedule_entries_removed': 0,
-            'schedule_sheets_changed': 0,
+            'schedule_changes': [],
             'schedule_sheets_checked': 0,
             'schedule_state_errors': [],
         }

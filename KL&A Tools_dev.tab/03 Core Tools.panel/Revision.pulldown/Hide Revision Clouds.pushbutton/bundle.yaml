@@ -8,6 +8,7 @@ tooltip:
     Description:
 
     Hide or unhide selected revision clouds on selected sheets and their placed views.
+    The report lists sheets with titleblock revision schedule changes.
     _____________________________________________________________________
     How-to:
 
@@ -15,7 +16,7 @@ tooltip:
     -> Choose Hide or Unhide and review the completion report.
     _____________________________________________________________________
     Last update:
-    - [10.13.2026] - Report schedule changes after hiding or unhiding clouds.
+    - [10.13.2026] - List sheets and revisions changed after Hide or Unhide.
 author: KL&A
 engine:
   clean: true

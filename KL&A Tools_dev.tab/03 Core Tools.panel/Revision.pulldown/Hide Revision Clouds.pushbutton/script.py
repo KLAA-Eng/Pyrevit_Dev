@@ -404,18 +404,24 @@ def _selected_schedule_revisions(sheets, revision_id_values, report):
     return scheduled
 
 
-def _record_schedule_changes(before, after, report):
-    for sheet_value, previous in before.items():
+def _record_schedule_changes(before, after, sheets, report):
+    for sheet in sheets:
+        sheet_value = _element_id_value(sheet.Id)
+        if sheet_value not in before:
+            continue
         if sheet_value not in after:
             continue
         report['schedule_sheets_checked'] += 1
+        previous = before[sheet_value]
         current = after[sheet_value]
         added = current - previous
         removed = previous - current
-        report['schedule_entries_added'] += len(added)
-        report['schedule_entries_removed'] += len(removed)
         if added or removed:
-            report['schedule_sheets_changed'] += 1
+            report['schedule_changes'].append({
+                'sheet': _sheet_label(sheet),
+                'added': added,
+                'removed': removed,
+            })
 
 
 def _print_report(action_label, action_word, hide_elements, revisions,
@@ -439,15 +445,37 @@ def _print_report(action_label, action_word, hide_elements, revisions,
     if report['state_check_errors']:
         output.print_md('**Cloud state check errors:** {}'.format(
             report['state_check_errors']))
-    output.print_md(
-        '**Titleblock revision schedule:** Selected revision entries '
-        'added: {}; removed: {}. Changed on {} of {} checked sheets '
-        'after {}.'.format(
-            report['schedule_entries_added'],
-            report['schedule_entries_removed'],
-            report['schedule_sheets_changed'],
-            report['schedule_sheets_checked'],
-            action_label))
+    if report['schedule_changes']:
+        revision_labels = {
+            _element_id_value(revision.Id): _revision_label(revision)
+            for revision in revisions
+        }
+        revision_order = [
+            _element_id_value(revision.Id) for revision in revisions
+        ]
+        output.print_md('### Titleblock Revision Schedule Changes')
+        for change in report['schedule_changes']:
+            details = []
+            for change_type, label in (('added', 'Added'),
+                                       ('removed', 'Removed')):
+                labels = [
+                    revision_labels[value] for value in revision_order
+                    if value in change[change_type]
+                ]
+                if labels:
+                    details.append('{}: {}'.format(label, ', '.join(labels)))
+            output.print_md('- **{}:** {}'.format(
+                change['sheet'], '; '.join(details)))
+    elif report['schedule_sheets_checked']:
+        output.print_md(
+            '**Titleblock revision schedule:** No selected revision entries '
+            'changed on {} checked sheet{}.'.format(
+                report['schedule_sheets_checked'],
+                '' if report['schedule_sheets_checked'] == 1 else 's'))
+    else:
+        output.print_md(
+            '**Titleblock revision schedule:** Could not verify changes '
+            'on the selected sheets.')
     if hide_elements:
         output.print_md('**Additional revisions removed from sheets:** {}'.format(
             report['schedule_entries_changed']))
@@ -503,9 +531,7 @@ def main():
         'schedule_entries_changed': 0,
         'schedule_entries_already_in_state': 0,
         'schedule_errors': [],
-        'schedule_entries_added': 0,
-        'schedule_entries_removed': 0,
-        'schedule_sheets_changed': 0,
+        'schedule_changes': [],
         'schedule_sheets_checked': 0,
         'schedule_state_errors': [],
     }
@@ -518,7 +544,7 @@ def main():
     _apply_changes(view_cloud_ids, sheets, revision_ids, hide_elements, report)
     schedule_after = _selected_schedule_revisions(
         sheets, revision_id_values, report)
-    _record_schedule_changes(schedule_before, schedule_after, report)
+    _record_schedule_changes(schedule_before, schedule_after, sheets, report)
     _print_report(action_label, action_word, hide_elements, revisions,
                   sheets, report)
 
