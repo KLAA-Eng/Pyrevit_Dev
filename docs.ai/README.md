@@ -1,15 +1,25 @@
-# Agent documentation
+# Agent reference documentation
 
-Start with [AGENTS.md](AGENTS.md) for repository instructions. The root
-[AGENTS.md](../AGENTS.md) remains the short discovery entry point.
+The repository's only agent instruction file is [root AGENTS.md](../AGENTS.md).
+Use this folder when a task needs a specific coding standard, release procedure,
+review record, or implementation handoff. [docs/README.md](../docs/README.md)
+maps the human-facing documentation.
 
-| Area | Purpose |
+## Folder map
+
+| Location | What to use it for |
 | --- | --- |
-| [Technical audits](reviews/2026-10-05/README.md) | Dated code, tool, GUI, and validation findings; evidence for follow-up work, not authorization to implement every finding. |
-| [Design-system audits](reviews/design-system/README.md) | Dated source checks that support the living [design-system guide](../docs/guides/DESIGNSYSTEM.md). |
-| [Family Studio and Startup Importer handoff](handoffs/design_handoff_family_studio_startup_importer/README.md) | Implementation plans and their bundled design references. |
+| [SCRIPTS.md](SCRIPTS.md) | Python and pyRevit command structure. |
+| [COMMENTS.md](COMMENTS.md) | Comments, docstrings, and command documentation style. |
+| [RELEASING.md](RELEASING.md) | Authoritative extension release workflow. |
+| [TOOL_VERSIONING.md](TOOL_VERSIONING.md) | Independent command versions and metadata rules. |
+| [releasing/tool-version-delivery-ledger.md](releasing/tool-version-delivery-ledger.md) | Mainline delivery evidence used by command version histories. |
+| [reviews/2026-10-05/](reviews/2026-10-05/README.md) | Comprehensive technical audit, finding register, validation plan, and evidence files. |
+| [reviews/design-system/](reviews/design-system/README.md) | Dated GUI and design-system source reviews. |
+| [reviews/reviews/](reviews/reviews/README.md) | Dated tool-promotion and release review records. |
+| [handoffs/design_handoff_family_studio_startup_importer/](handoffs/design_handoff_family_studio_startup_importer/README.md) | Implementation plans, status notes, HTML design references, and their assets. |
 
-Human contributor guides, release procedures, and decision records are indexed
-in [docs/README.md](../docs/README.md). Historical branch names, paths, and
-source baselines inside dated audits describe the repository at the time of
-review.
+Read the relevant command's adjacent `SPEC.md` and current source before using
+a dated review or handoff as implementation guidance. Historical branch names,
+paths, and baselines describe the repository at the time of review; findings
+and plans are evidence, not automatic authorization to change code.

@@ -137,7 +137,7 @@ for a useful report.
 changing it, regenerate `lib/build_info.py` with the provided script; do not
 edit the generated file directly. Release versions, beta-to-stable promotion,
 tags, validation evidence, and in-Revit verification are defined in
-[Release workflow](docs/releasing/RELEASING.md). Published release notes live in
+[Release workflow](docs.ai/RELEASING.md). Published release notes live in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Prototype promotion roadmap
@@ -162,11 +162,9 @@ lib/                 Shared Python helpers and reusable WPF/UI components
 checks/              Audit checks
 tests/               Host-independent unit tests
 scripts/             Developer utilities, including build-metadata generation
-docs/guides/         Contributor, Python, comment, and design-system guides
+docs/                Contributor and design-system guides
 version.json         Human-edited version source
-docs/releasing/      Release workflow, tool-version rules, and delivery ledger
-docs/reviews/        Release and tool-promotion decision records
-docs.ai/             Agent guidance, technical audits, and implementation handoffs
+docs.ai/             Agent reference guides, release records, audits, and handoffs
 ```
 
 Command entry points should stay thin: they adapt pyRevit/Revit, WPF, Excel,
@@ -190,11 +188,11 @@ Before changing a command:
    a pull request into `master-dev`.
 
 For the complete team workflow, see
-[Contributing](docs/guides/CONTRIBUTING.md), [Release workflow](docs/releasing/RELEASING.md),
+[Contributing](docs/CONTRIBUTING.md), [Release workflow](docs.ai/RELEASING.md),
 [team documentation](docs/README.md), and [agent documentation](docs.ai/README.md).
 
 For release preparation and post-release verification, run the consolidated
-check described in the [release workflow](docs/releasing/RELEASING.md):
+check described in the [release workflow](docs.ai/RELEASING.md):
 
 ```powershell
 .\.venv-rvt26\Scripts\python.exe scripts\release_check.py
@@ -214,11 +212,11 @@ the intended Revit environment.
 
 ## References and standards
 
-- [Python Script Guide](docs/guides/SCRIPTS.md) - command organization and
+- [Python Script Guide](docs.ai/SCRIPTS.md) - command organization and
   pyRevit script structure.
-- [Comment and Docstring Guide](docs/guides/COMMENTS.md) - comments,
+- [Comment and Docstring Guide](docs.ai/COMMENTS.md) - comments,
   docstrings, command metadata, and section dividers.
-- [Contributor Guide](docs/guides/CONTRIBUTING.md) - GitHub workflow,
+- [Contributor Guide](docs/CONTRIBUTING.md) - GitHub workflow,
   validation evidence, and SPEC requirements.
 - [Release History](CHANGELOG.md) - published extension releases and known
   limits.

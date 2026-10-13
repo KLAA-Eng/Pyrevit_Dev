@@ -8,7 +8,7 @@ extension packaging and releases; follow [RELEASING.md](RELEASING.md).
 
 Tool versions describe meaningful command changes delivered to `main`, not the
 number of development commits. Reconstruct history by comparing adjacent main
-release snapshots in the [Tool-Version Delivery Ledger](tool-version-delivery-ledger.md).
+release snapshots in the [Tool-Version Delivery Ledger](releasing/tool-version-delivery-ledger.md).
 This is essential because a squash release can deliver `master-dev` content without
 preserving the original development commit as a mainline ancestor.
 
@@ -108,7 +108,7 @@ Maintain a `Tool version history` table:
 For released rows, `Main delivery` must be an identifier in the central ledger
 and the date must match it. For a planned row, it must be `Unreleased`, and the
 tooltip must use `Status: Unreleased`. Record a compact user-impact summary;
-the root [CHANGELOG.md](../../CHANGELOG.md) remains the concise extension-release
+the root [CHANGELOG.md](../CHANGELOG.md) remains the concise extension-release
 summary rather than a duplicate tool history.
 
 ## Static validation

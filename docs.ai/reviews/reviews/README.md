@@ -10,4 +10,4 @@ their original branch names and baselines when reading them as history.
 | [2026-10-12 release review](2026-10-12/release-0.0.11-beta.md) | Beta preparation and publication-verification handoff. |
 
 Technical audit dossiers and implementation handoffs are indexed in
-[docs.ai](../../docs.ai/README.md).
+[docs.ai](../../README.md).

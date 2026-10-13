@@ -6,7 +6,7 @@ tools, user-facing changes, known limits, and rollback tag.
 
 This changelog is the concise extension-release summary. Detailed independent
 command histories are kept in each command's `SPEC.md`, using the
-[`docs/releasing/tool-version-delivery-ledger.md`](docs/releasing/tool-version-delivery-ledger.md)
+[`docs.ai/releasing/tool-version-delivery-ledger.md`](docs.ai/releasing/tool-version-delivery-ledger.md)
 release boundaries.
 
 ## Unreleased

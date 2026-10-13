@@ -3,8 +3,8 @@
 This is the authoritative release workflow. Start here when asked to release an
 extension version; the contributor guide and agent instructions link here.
 Supporting command-version rules are in [TOOL_VERSIONING.md](TOOL_VERSIONING.md).
-The [delivery ledger](tool-version-delivery-ledger.md) records release commits;
-the root [changelog](../../CHANGELOG.md) records user-facing release notes.
+The [delivery ledger](releasing/tool-version-delivery-ledger.md) records release commits;
+the root [changelog](../CHANGELOG.md) records user-facing release notes.
 
 ## Responsibility and authorization
 

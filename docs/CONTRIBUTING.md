@@ -15,7 +15,7 @@ Ordinary contributors use PRs into `master-dev`. The release owner may prepare
 releases and the next development cycle directly on `master-dev`. Releases reach
 `main` only through a `master-dev` to `main` PR personally merged by the release
 owner; never push directly to `main`. See the
-[release workflow](../releasing/RELEASING.md).
+[release workflow](../docs.ai/RELEASING.md).
 
 ## Day-to-day change flow
 
@@ -57,7 +57,7 @@ template for a new command. All visible commands, including DevSandbox, must
 record Tool ID, Path aliases, Version inputs, Tool version, Status/origin, and
 a history with Version, Main delivery, Date, Meaningful change, and Git
 evidence. Follow
-[Tool version rules](../releasing/TOOL_VERSIONING.md) for the exact metadata and version rules.
+[Tool version rules](../docs.ai/TOOL_VERSIONING.md) for the exact metadata and version rules.
 
 Run `python scripts/check_tool_metadata.py` to check visible command metadata.
 Its host-independent tests run with
@@ -65,7 +65,7 @@ Its host-independent tests run with
 
 ## Release flow
 
-Follow the authoritative [release workflow](../releasing/RELEASING.md) for
+Follow the authoritative [release workflow](../docs.ai/RELEASING.md) for
 preparation, checks, the owner's merge, tagging, GitHub publication, live
 verification, and the next development cycle. It defines roles, beta/stable gates,
 and extension identity; this guide does not maintain a second release checklist.
@@ -74,6 +74,6 @@ and extension identity; this guide does not maintain a second release checklist.
 
 - Team policy and plain-language navigation: the KLCode Standards Notion page.
 - Command behavior and validation: the adjacent `SPEC.md`.
-- Python and pyRevit code shape: [SCRIPTS.md](SCRIPTS.md) and
-  [COMMENTS.md](COMMENTS.md).
-- Published release record: [CHANGELOG.md](../../CHANGELOG.md).
+- Python and pyRevit code shape: [SCRIPTS.md](../docs.ai/SCRIPTS.md) and
+  [COMMENTS.md](../docs.ai/COMMENTS.md).
+- Published release record: [CHANGELOG.md](../CHANGELOG.md).

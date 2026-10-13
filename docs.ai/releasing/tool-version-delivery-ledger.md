@@ -38,7 +38,7 @@ command's `SPEC.md` version history.
 
 ## Release-preparation handoff
 
-Follow [RELEASING.md](RELEASING.md) for the complete workflow. During preparation,
+Follow [RELEASING.md](../RELEASING.md) for the complete workflow. During preparation,
 add a six-column row with `Pending merge` as its main commit and
 `Pending publication; intended tag vX.Y.Z-beta` as its evidence. The identifier
 and delivery date let affected command histories pass the metadata audit. This
