@@ -1,23 +1,51 @@
 # KL&A Tools Release History
 
-This is the canonical release record for KL&A Tools. Each controlled `dev` to
+This is the canonical release record for KL&A Tools. Each controlled `master-dev` to
 `main` release records the version, channel, tested Revit range, affected
 tools, user-facing changes, known limits, and rollback tag.
 
 This changelog is the concise extension-release summary. Detailed independent
 command histories are kept in each command's `SPEC.md`, using the
-[`docs/releasing/tool-version-delivery-ledger.md`](docs/releasing/tool-version-delivery-ledger.md)
+[`docs.ai/releasing/tool-version-delivery-ledger.md`](docs.ai/releasing/tool-version-delivery-ledger.md)
 release boundaries.
 
 ## Unreleased
 
-The next development version will be `0.0.12-dev` after the `0.0.11-beta`
+The next development version will be `0.0.13-dev` after the `0.0.12-beta`
 release is merged and published.
+
+## 0.0.12 - 2026-10-13
+
+- **Channel:** Beta
+- **Tag:** `v0.0.12-beta` (intended; pending owner merge and publication)
+- **Tested Revit range:** No new live Revit or Excel claim. The changed revision
+  schedule report and Excel diagnostic have host-independent validation only.
+
+### Changed
+
+- Hide/Unhide Revision Clouds now lists only selected sheets whose revision
+  schedule changed, with the revisions added or removed on each sheet. It
+  reports additional-revision edits separately and identifies sheets whose
+  schedule state could not be read.
+- Excel COM Smoke Test now reports the first Excel interop assembly lookup
+  error and the identity and path of a loaded Excel interop assembly.
+- Release support and contributor documents have been reorganized under
+  `docs.ai/` and `docs/`; the metadata audit follows the new ledger location.
+
+### Known limits
+
+- The revision schedule report and Excel diagnostics still need acceptance in
+  the intended Revit and Excel hosts. Static checks do not establish titleblock
+  display, Revit transaction behavior, Excel COM loading, or cleanup in a live run.
+- Previously documented live acceptance limits for the 0.0.11-beta workflows
+  remain open.
+
+**Rollback tag:** `v0.0.11-beta`
 
 ## 0.0.11 - 2026-10-12
 
 - **Channel:** Beta
-- **Tag:** `v0.0.11-beta` (intended; pending owner merge and publication)
+- **Tag:** `v0.0.11-beta`
 - **Tested Revit range:** No new live Revit claim. The changed command workflows
   and dialogs have host-independent tests, but their current Revit/pyRevit
   behavior has not been accepted in a representative live model.

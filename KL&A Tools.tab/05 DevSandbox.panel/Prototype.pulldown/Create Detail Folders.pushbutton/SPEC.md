@@ -101,6 +101,6 @@ External filesystem effects: creates destination child folders and writes
 
 ## Current status
 
-This is a development-tab command. The inventory above is statically derived
+This is a command. The inventory above is statically derived
 from the current bundle and must be confirmed inside the target Revit/pyRevit
 environment before promotion or behavior changes.

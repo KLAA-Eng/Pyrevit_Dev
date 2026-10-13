@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Tool ID | `devsandbox.excel-com-smoke-test` |
-| Tool version | `v0.0` |
-| Status | Released prototype; live acceptance remains pending |
+| Tool version | `v0.1` |
+| Status | Delivered beta diagnostic; prototype live acceptance remains pending |
 | Status/origin | Prototype; KL&A custom tool. |
-| Main delivery | 0.0.10 |
+| Main delivery | 0.0.12 |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton` |
 | Version inputs | `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton/bundle.yaml`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton/script.py`; `lib/excel_com.py` |
 
@@ -15,6 +15,7 @@
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
 | v0.0 | 0.0.10 | 10.05.2026 | First main delivery of a disposable Excel facade lifecycle and operation smoke test. | 74eccba; verified v0.0.10-beta snapshot |
+| v0.1 | 0.0.12 | 10.13.2026 | Report the first Excel assembly lookup error and the loaded assembly identity and path. | `25c3e39`; 0.0.12 delivery snapshot. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -22,7 +23,7 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 
 ## Identity
 
-- Bundle: `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton`
+- Bundle: `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton`
 - Maturity: Prototype
 - Live Revit validation: pending Revit 25 and Revit 26 acceptance
 
@@ -40,6 +41,12 @@ ranges and formulas, CSV query tables and list objects, pivot-cache creation,
 chart-object creation, refresh and calculation. Each operation is reported as
 PASS or FAIL with its runtime type and error detail. Successful runs remove
 only their exact owned assets; failed or unsafe cleanup retains them for review.
+Before creating Excel, it reports whether the first short-name interop assembly
+lookup succeeded. A failed lookup is an informational row because the shared
+facade may still succeed through its existing fallback. After the Excel startup
+attempt, it reports the identity and file location of any loaded Excel interop
+assembly. Assembly-inspection errors are informational and do not change the
+facade result or temp-file cleanup decision.
 
 ## Prerequisites and effects
 

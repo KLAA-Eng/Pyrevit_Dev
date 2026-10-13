@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 __title__ = 'Hide/Unhide\nRevision Clouds'
-__version__ = 'v1.0'
+__version__ = 'v1.1'
 
 import clr
 
@@ -84,10 +84,10 @@ def _ask_hide_or_unhide():
     result = dialog.Show()
 
     if result == TaskDialogResult.CommandLink1:
-        return True, 'Hide', 'hidden', 'off'
+        return True, 'Hide', 'hidden'
     if result == TaskDialogResult.CommandLink2:
-        return False, 'Unhide', 'unhidden', None
-    return None, None, None, None
+        return False, 'Unhide', 'unhidden'
+    return None, None, None
 
 
 def _select_revisions(doc, action_label):
@@ -328,7 +328,8 @@ def _matching_clouds_by_owner_view(doc, sheets, revision_id_values,
 
 
 def _update_sheet_revision_schedules(sheets, revision_ids, turn_on, report):
-    # Additional revision ids control the titleblock revision schedule:
+    # Additional revision ids explicitly include revisions on the sheet;
+    # visible clouds can also contribute revisions to its schedule:
     # https://help.autodesk.com/cloudhelp/2026/ENU/Revit-API-MainReference/files/html/376a4009-17f7-af8e-8c32-d95243ad8e9e.htm
     for sheet in sheets:
         try:
@@ -337,24 +338,26 @@ def _update_sheet_revision_schedules(sheets, revision_ids, turn_on, report):
                 _element_id_value(element_id) for element_id in additional_ids
             ])
             changed = False
+            entries_changed = 0
 
             for revision_id in revision_ids:
                 revision_value = _element_id_value(revision_id)
                 if turn_on and revision_value not in existing_values:
                     additional_ids.Add(revision_id)
                     existing_values.add(revision_value)
-                    report['schedule_entries_changed'] += 1
+                    entries_changed += 1
                     changed = True
                 elif not turn_on and revision_value in existing_values:
                     additional_ids.Remove(revision_id)
                     existing_values.remove(revision_value)
-                    report['schedule_entries_changed'] += 1
+                    entries_changed += 1
                     changed = True
                 else:
                     report['schedule_entries_already_in_state'] += 1
 
             if changed:
                 sheet.SetAdditionalRevisionIds(additional_ids)
+                report['schedule_entries_changed'] += entries_changed
         except Exception as error:
             report['schedule_errors'].append(
                 '{}: {}'.format(_sheet_label(sheet), error))
@@ -381,7 +384,47 @@ def _apply_changes(view_cloud_ids, sheets, revision_ids, hide_elements, report):
                 sheets, revision_ids, False, report)
 
 
-def _print_report(action_label, action_word, schedule_state, revisions,
+def _selected_schedule_revisions(sheets, revision_id_values, report):
+    """Read selected revisions participating in each sheet's schedules."""
+    scheduled = {}
+    for sheet in sheets:
+        sheet_value = _element_id_value(sheet.Id)
+        try:
+            # GetAllRevisionIds includes visible-cloud and additional revisions.
+            # https://help.autodesk.com/cloudhelp/2026/ENU/Revit-API-MainReference/files/html/e6f4e79f-c076-8085-5288-6e0b5a431177.htm
+            scheduled[sheet_value] = set([
+                _element_id_value(revision_id)
+                for revision_id in sheet.GetAllRevisionIds()
+                if _element_id_value(revision_id) in revision_id_values
+            ])
+        except Exception as error:
+            report['schedule_state_errors'].append(
+                '{}: could not read schedule revisions ({})'.format(
+                    _sheet_label(sheet), error))
+    return scheduled
+
+
+def _record_schedule_changes(before, after, sheets, report):
+    for sheet in sheets:
+        sheet_value = _element_id_value(sheet.Id)
+        if sheet_value not in before:
+            continue
+        if sheet_value not in after:
+            continue
+        report['schedule_sheets_checked'] += 1
+        previous = before[sheet_value]
+        current = after[sheet_value]
+        added = current - previous
+        removed = previous - current
+        if added or removed:
+            report['schedule_changes'].append({
+                'sheet': _sheet_label(sheet),
+                'added': added,
+                'removed': removed,
+            })
+
+
+def _print_report(action_label, action_word, hide_elements, revisions,
                   sheets, report):
     output = script.get_output()
     output.close_others()
@@ -402,13 +445,45 @@ def _print_report(action_label, action_word, schedule_state, revisions,
     if report['state_check_errors']:
         output.print_md('**Cloud state check errors:** {}'.format(
             report['state_check_errors']))
-    if schedule_state:
-        output.print_md('**Titleblock revision entries turned {}:** {}'.format(
-            schedule_state, report['schedule_entries_changed']))
-        output.print_md('**Titleblock revision entries already {}:** {}'.format(
-            schedule_state, report['schedule_entries_already_in_state']))
+    if report['schedule_changes']:
+        revision_labels = {
+            _element_id_value(revision.Id): _revision_label(revision)
+            for revision in revisions
+        }
+        revision_order = [
+            _element_id_value(revision.Id) for revision in revisions
+        ]
+        output.print_md('### Titleblock Revision Schedule Changes')
+        for change in report['schedule_changes']:
+            details = []
+            for change_type, label in (('added', 'Added'),
+                                       ('removed', 'Removed')):
+                labels = [
+                    revision_labels[value] for value in revision_order
+                    if value in change[change_type]
+                ]
+                if labels:
+                    details.append('{}: {}'.format(label, ', '.join(labels)))
+            output.print_md('- **{}:** {}'.format(
+                change['sheet'], '; '.join(details)))
+    elif report['schedule_sheets_checked']:
+        output.print_md(
+            '**Titleblock revision schedule:** No selected revision entries '
+            'changed on {} checked sheet{}.'.format(
+                report['schedule_sheets_checked'],
+                '' if report['schedule_sheets_checked'] == 1 else 's'))
     else:
-        output.print_md('**Titleblock revision schedule:** Unchanged during Unhide.')
+        output.print_md(
+            '**Titleblock revision schedule:** Could not verify changes '
+            'on the selected sheets.')
+    if hide_elements:
+        output.print_md('**Additional revisions removed from sheets:** {}'.format(
+            report['schedule_entries_changed']))
+        output.print_md('**Additional revisions already absent:** {}'.format(
+            report['schedule_entries_already_in_state']))
+    else:
+        output.print_md(
+            '**Additional revisions on sheets:** Not edited during Unhide.')
 
     if report['views_without_matching_clouds']:
         output.print_md('### Selected Sheets With No Matching Clouds To {}'.format(
@@ -425,10 +500,14 @@ def _print_report(action_label, action_word, schedule_state, revisions,
         output.print_md('### Titleblock Revision Schedule Errors')
         for error in report['schedule_errors']:
             print('- {}'.format(error))
+    if report['schedule_state_errors']:
+        output.print_md('### Schedule State Check Errors')
+        for error in report['schedule_state_errors']:
+            print('- {}'.format(error))
 
 
 def main():
-    hide_elements, action_label, action_word, schedule_state = \
+    hide_elements, action_label, action_word = \
         _ask_hide_or_unhide()
     if hide_elements is None:
         forms.alert('Operation cancelled.', exitscript=True)
@@ -452,13 +531,21 @@ def main():
         'schedule_entries_changed': 0,
         'schedule_entries_already_in_state': 0,
         'schedule_errors': [],
+        'schedule_changes': [],
+        'schedule_sheets_checked': 0,
+        'schedule_state_errors': [],
     }
 
     view_cloud_ids = _matching_clouds_by_owner_view(
         doc, sheets, revision_id_values, hide_elements, report)
 
+    schedule_before = _selected_schedule_revisions(
+        sheets, revision_id_values, report)
     _apply_changes(view_cloud_ids, sheets, revision_ids, hide_elements, report)
-    _print_report(action_label, action_word, schedule_state, revisions,
+    schedule_after = _selected_schedule_revisions(
+        sheets, revision_id_values, report)
+    _record_schedule_changes(schedule_before, schedule_after, sheets, report)
+    _print_report(action_label, action_word, hide_elements, revisions,
                   sheets, report)
 
 

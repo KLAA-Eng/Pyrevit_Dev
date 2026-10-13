@@ -51,5 +51,5 @@ issues instead of being opened.
 
 ## Current status
 
-This is a development-tab command and must be validated inside the target
+This is a command and must be validated inside the target
 Revit/pyRevit environment before promotion.

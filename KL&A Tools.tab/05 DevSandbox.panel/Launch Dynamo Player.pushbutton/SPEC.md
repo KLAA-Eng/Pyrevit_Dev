@@ -22,7 +22,7 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 
 ## Purpose
 
-Adds a development-tab pyRevit pushbutton that opens the Dynamo Player bundled
+Adds a pyRevit pushbutton that opens the Dynamo Player bundled
 with the current Revit installation.
 
 ## Compatibility

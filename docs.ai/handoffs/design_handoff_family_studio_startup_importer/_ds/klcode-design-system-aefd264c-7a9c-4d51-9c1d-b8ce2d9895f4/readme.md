@@ -9,7 +9,7 @@ desktop panel, dialog or ribbon control rendered by WPF inside Revit.
 Everything here was read from material the team supplied. Nothing was invented from memory.
 
 - **Attached codebase — `KLCode.pyRevit/`** (mounted locally): the extension itself.
-  `DESIGNSYSTEM.md` is the repo's own record of the palette ("KLName" colors), icon
+  `docs/DESIGNSYSTEM.md` is the repo's own record of the palette ("KLName" colors), icon
   conventions and shared GUI properties — it is the ground truth this system mirrors.
   Also read: `KL&A Tools_dev.tab/**/bundle.yaml`, `lib/_icons/`, `lib/_logos/`,
   `ViewRange.pushbutton/MainWindow.xaml`.
@@ -22,7 +22,7 @@ Everything here was read from material the team supplied. Nothing was invented f
   markdown output window that several tools print to.
 
 Explore the mounted folders directly if you need more than this system captures — the bundle
-YAMLs, `DESIGNSYSTEM.md` and the XAML files are the ground truth for any new KLCode surface.
+YAMLs, `docs/DESIGNSYSTEM.md` and the XAML files are the ground truth for any new KLCode surface.
 
 ## The two themes
 
@@ -116,7 +116,7 @@ empty state art, no onboarding, no encouragement.
 ## VISUAL FOUNDATIONS
 
 **Colour.** Two palettes, one per theme, both recorded as "KLName" colors in the repo's
-`DESIGNSYSTEM.md`. The green theme is built on a single dark blue-green charcoal — KLCharcoal
+`docs/DESIGNSYSTEM.md`. The green theme is built on a single dark blue-green charcoal — KLCharcoal
 `#1A252B` — that does window, header, footer, field and list backgrounds alike, plus a green
 family that does all the work: KLGreen `#33714F` for labels, input borders and icons;
 KLGreen-dark `#286048` for button fills, panel borders and checked states; KLGreen-secondary

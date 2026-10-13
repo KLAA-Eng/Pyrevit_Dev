@@ -3,22 +3,21 @@
 This is the authoritative release workflow. Start here when asked to release an
 extension version; the contributor guide and agent instructions link here.
 Supporting command-version rules are in [TOOL_VERSIONING.md](TOOL_VERSIONING.md).
-The [delivery ledger](tool-version-delivery-ledger.md) records release commits;
-the root [changelog](../../CHANGELOG.md) records user-facing release notes.
+The [delivery ledger](releasing/tool-version-delivery-ledger.md) records release commits;
+the root [changelog](../CHANGELOG.md) records user-facing release notes.
 
 ## Responsibility and authorization
 
-Ordinary contributions use topic branches and PRs into `dev`. The designated
-release owner may prepare releases, repair release checks, synchronize `main`,
-and prepare the next development version directly on `dev`. Do not push directly
-to `main` or change branch protections to make a release possible.
+Ordinary contributions use topic branches and PRs into `master-dev`. The
+designated release owner may prepare releases, repair release checks, synchronize `main`,
+and prepare the next development version directly on `master-dev`. This is the
+owner's explicit exception to the ordinary PR path; use the existing repository
+administrator bypass only for approved release work. Do not push directly to
+`main` or change branch protections to make a release possible.
 
-The owner personally reviews and merges the `dev` to `main` PR. An assistant may
-prepare the PR and perform explicitly authorized tagging, publication, and
-post-release work. When the owner reports the merge, verify it and resume that
-authorized work. Carry the approved version, channel, scope, and next development
-version across handoffs; do not ask again for already granted authorization.
-Stop for a new decision, a failed prerequisite, or a tool permission restriction.
+The owner personally reviews and merges the `master-dev` to `main` PR. Only the
+designated technical owner or backup reviewer may merge pull requests, prepare
+a release, or create and push a release tag.
 
 ## Identities and evidence
 
@@ -47,13 +46,13 @@ Development uses `KL&A Tools_dev.tab`; the released tree on `main` uses
 `KL&A Tools.tab`. Exactly one must exist in a checkout. Both retain the same
 bundle hierarchy. Tests resolve the active layout rather than hard-code one.
 
-During release preparation on `dev`, use:
+During release preparation on `master-dev`, use:
 
 ```powershell
 git mv -- "KL&A Tools_dev.tab" "KL&A Tools.tab"
 ```
 
-After the released main result is merged back into `dev`, restore:
+After the released main result is merged back into `master-dev`, restore:
 
 ```powershell
 git mv -- "KL&A Tools.tab" "KL&A Tools_dev.tab"
@@ -63,14 +62,15 @@ Review directory-rename conflicts explicitly. Keep SPEC path aliases for both
 layouts and historical names; update current-path references and README links
 when transitioning. A layout-only rename does not increment tool versions.
 
-## 1. Prepare on dev
+## 1. Prepare on master-dev
 
 1. Confirm the checkout is clean or identify and preserve unrelated work. Fetch
-   origin, verify the branch and alignment of local/remote `dev`, and review the
-   complete `origin/main` to `dev` delta. Record any unresolved scope decision.
+   origin, verify the branch and alignment of local/remote `master-dev`, and
+   review the complete `origin/main` to `master-dev` delta. Record any unresolved
+   scope decision.
 2. Confirm the release version, channel, next development version, and who will
-   merge. Merge current `origin/main` into `dev` if needed; resolve only reviewed
-   synchronization conflicts.
+   merge. Merge current `origin/main` into `master-dev` if needed; resolve only
+   reviewed synchronization conflicts.
 3. Use the production ribbon layout. Review every affected tool's SPEC and shared
    version inputs. Convert delivered planned rows to the release identifier/date,
    remove `Status: Unreleased` from matching tooltips, and retain historical rows.
@@ -99,16 +99,17 @@ when transitioning. A layout-only rename does not increment tool versions.
    It is read-only apart from ordinary test temporary files and Python caches.
    Preserve its actual counts and skip reasons; do not hard-code a previous test
    count as the expected number. It does not prove live Revit or Excel behavior.
-8. Review the complete diff, commit only release-owned changes, and push `dev`.
+8. Review the complete diff, commit only release-owned changes, and push `master-dev`
+   under the release-owner exception.
    Check the complete release delta for whitespace too:
 
    ```powershell
-   git diff --check origin/main...dev
+   git diff --check origin/main...master-dev
    ```
 
 ## 2. Validate and hand off the release PR
 
-Open a `dev` to `main` PR titled **Release X.Y.Z beta** (or stable). Include:
+Open a `master-dev` to `main` PR titled **Release X.Y.Z beta** (or stable). Include:
 
 - Approved version/channel and affected tools, including shared-helper consumers.
 - Release-check results and any existing skips; relevant live evidence.
@@ -127,8 +128,8 @@ commit. If the PR head changes after validation, recheck the new scope and check
 
 1. Fetch origin after the owner merges. Verify the PR's actual merge result,
    exact `origin/main` SHA, production layout, release identity, and approved tree.
-   Squash merges create new commits; verify content rather than require dev-head
-   ancestry. Stop if main contains unexpected work.
+   Squash merges create new commits; verify content rather than require the
+   `master-dev` head as an ancestor. Stop if main contains unexpected work.
 2. Create an annotated tag on that explicit verified SHA, then push only that tag:
 
    ```powershell
@@ -154,13 +155,13 @@ commit. If the PR head changes after validation, recheck the new scope and check
    Beta publication/synchronization can finish with this recorded follow-up.
    Required stable live acceptance must precede stable publication.
 
-## 4. Synchronize and prepare the next dev cycle
+## 4. Synchronize and prepare the next development cycle
 
-1. Return to clean, aligned `dev`; merge the verified `origin/main` release
+1. Return to clean, aligned `master-dev`; merge the verified `origin/main` release
    result into it. Resolve only synchronization conflicts and retain release content.
 2. Restore `KL&A Tools_dev.tab`. Resolve the ledger's pending row with the verified
    main SHA, PR/release links, tag evidence, and verification date. These records
-   are completed on dev because the squash SHA cannot be embedded in its own commit.
+   are completed on `master-dev` because the squash SHA cannot be embedded in its own commit.
 3. Set `version.json` to the agreed next numeric version, `channel: "dev"`, and
    synchronization date. Regenerate build metadata. Leave the next version only
    under **Unreleased** in the changelog; keep the published release as the latest
@@ -173,20 +174,21 @@ commit. If the PR head changes after validation, recheck the new scope and check
 
    This additionally checks the resolved ledger entry and annotated tag against
    local Git objects. External publication/remote verification remains step 3.
-5. Review, commit, and push directly to `dev` as release owner. Fetch and verify
-   remote dev contains the verified main release and has the next dev identity.
+5. Review, commit, and push directly to `master-dev` as release owner under the
+   approved exception. Fetch and verify remote `master-dev` contains the verified
+   main release and has the next `dev` identity.
    Verify no next-version dev tag or GitHub release exists.
-6. Report the release URL/tag/SHA, resulting dev SHA/identity, validation evidence,
-   and any precise pending live verification.
+6. Report the release URL/tag/SHA, resulting `master-dev` SHA/identity,
+   validation evidence, and any precise pending live verification.
 
 ## Completion and recovery
 
 Completion requires a verified main result, remote annotated tag/peeled SHA,
-published release page, resolved ledger evidence, synchronized remote dev,
+published release page, resolved ledger evidence, synchronized remote `master-dev`,
 next dev metadata, and recorded live-verification status.
 
 On failure, identify the last verified phase and resume there. Inspect existing
 PRs/tags/releases before retrying. Never republish, retag, force-push, or discard
 unrelated changes as a shortcut. Fix a published documentation discrepancy on
-dev and record its evidence; preserve the existing release tag unless the owner
+`master-dev` and record its evidence; preserve the existing release tag unless the owner
 explicitly directs a different recovery.

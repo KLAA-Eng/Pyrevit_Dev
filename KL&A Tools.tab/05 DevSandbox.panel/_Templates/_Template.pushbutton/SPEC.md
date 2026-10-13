@@ -4,7 +4,7 @@
 
 | Field | Value |
 | --- | --- |
-| Bundle path | `KL&A Tools_dev.tab/.../Command.pushbutton` |
+| Bundle path | `KL&A Tools.tab/.../Command.pushbutton` |
 | Tool ID | replace-with-stable-command-id |
 | Path aliases | Record current path and any previous bundle paths. |
 | Version inputs | `bundle.yaml`; `script.py`; list owned/shared helpers. |
@@ -54,7 +54,7 @@ file outputs, or user workflow.
 | --- | --- | --- | --- | --- |
 | `v0.0` | Unreleased | 10.02.2026 | Planned prototype template baseline; replace with actual command evidence. | Template example; replace with development commit evidence. |
 
-Follow `docs/releasing/TOOL_VERSIONING.md`. Use meaningful user-facing Git
+Follow `docs.ai/TOOL_VERSIONING.md`. Use meaningful user-facing Git
 milestones; promote a maintained DevSandbox command to production at `v1.0`.
 Keep extension release evidence above separate from the independent tool version.
 

@@ -4,7 +4,7 @@
 | --- | --- |
 | Tool ID | `devsandbox.ui-gallery` |
 | Tool version | `v0.4` |
-| Status | Prepared for 0.0.11 beta; live acceptance pending |
+| Status | Released in 0.0.11 beta; live acceptance pending |
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.11 |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/UI Gallery.pushbutton` |
@@ -95,6 +95,6 @@ Detected mutation/external-effect patterns: No Revit transaction or direct mutat
 
 ## Current status
 
-This is a release-tab command. The inventory above is statically derived
+This is a command. The inventory above is statically derived
 from the current bundle and must be confirmed inside the target Revit/pyRevit
 environment before promotion or behavior changes.

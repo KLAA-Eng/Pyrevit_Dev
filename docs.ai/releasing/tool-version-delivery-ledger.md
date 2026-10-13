@@ -14,7 +14,7 @@ command's `SPEC.md` version history.
 - Compare file snapshots at adjacent main deliveries. Do not use development
   commit ancestry alone: the repository includes both merge and squash-style
   releases.
-- `Unreleased` is reserved for a next planned command version on `dev`; it is
+- `Unreleased` is reserved for a next planned command version on `master-dev`; it is
   not a delivery and is intentionally absent from this table.
 - Keep a command's aliases and version inputs in its `SPEC.md`. This lets the
   release review account for renames and shared helper changes.
@@ -34,11 +34,12 @@ command's `SPEC.md` version history.
 | `0.0.8` | `34c41bc` | 09.28.2026 | `0.0.8` | Release #19; tag `v0.0.8-beta` | Squash-style release |
 | `0.0.9` | `d7185d2` | 10.01.2026 | `0.0.9` | Release #20; tag `v0.0.9-beta` | Squash-style release |
 | `0.0.10` | `74eccba29c1a8a8b6443baab0caf9a2f5ccf66e8` | 10.05.2026 | `0.0.10` | [PR #21](https://github.com/KLAA-Eng/Pyrevit_Dev/pull/21); annotated `v0.0.10-beta` peeled to this commit; [published prerelease](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.10-beta) verified 2026-10-05 | Squash-style release |
-| `0.0.11` | Pending merge | 10.12.2026 | `0.0.11` | Pending publication; intended tag `v0.0.11-beta` | Pending owner-merged PR |
+| `0.0.11` | `ea6219c3a45dcf93e7ba80f2d02c9a54f48409b4` | 10.12.2026 | `0.0.11` | [PR #23](https://github.com/KLAA-Eng/Pyrevit_Dev/pull/23); annotated `v0.0.11-beta` peeled to this commit; [published prerelease](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.11-beta) verified 2026-10-12 | Squash-style release |
+| `0.0.12` | Pending merge | 10.13.2026 | `0.0.12` | Pending publication; intended tag `v0.0.12-beta` | Pending owner-reviewed PR |
 
 ## Release-preparation handoff
 
-Follow [RELEASING.md](RELEASING.md) for the complete workflow. During preparation,
+Follow [RELEASING.md](../RELEASING.md) for the complete workflow. During preparation,
 add a six-column row with `Pending merge` as its main commit and
 `Pending publication; intended tag vX.Y.Z-beta` as its evidence. The identifier
 and delivery date let affected command histories pass the metadata audit. This
@@ -46,7 +47,7 @@ is a prepared entry, not verified delivery evidence.
 
 After the owner merges the PR, verify the actual main commit, remote annotated
 tag and peeled commit, and published GitHub release. Fill in the commit, PR and
-release links, tag evidence, and verification date on `dev` during synchronization.
+release links, tag evidence, and verification date on `master-dev` during synchronization.
 Run the release check with `--delivery X.Y.Z` to verify the recorded commit and
 annotated tag against local Git objects; separately refresh the remote and
 verify the GitHub page. A release is complete only when its placeholders are

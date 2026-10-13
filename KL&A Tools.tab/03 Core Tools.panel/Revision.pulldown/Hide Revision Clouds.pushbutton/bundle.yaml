@@ -1,12 +1,13 @@
 title: "Hide/Unhide\nRevision Clouds"
 tooltip:
   en_us: |-
-    Version: v1.0
-    Date    = 09.28.2026
+    Version: v1.1
+    Date    = 10.13.2026
     _____________________________________________________________________
     Description:
 
     Hide or unhide selected revision clouds on selected sheets and their placed views.
+    The report lists sheets with titleblock revision schedule changes.
     _____________________________________________________________________
     How-to:
 
@@ -14,7 +15,7 @@ tooltip:
     -> Choose Hide or Unhide and review the completion report.
     _____________________________________________________________________
     Last update:
-    - [09.28.2026] - Added the KL&A revision-cloud workflow.
+    - [10.13.2026] - List sheets and revisions changed after Hide or Unhide.
 author: KL&A
 engine:
   clean: true

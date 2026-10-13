@@ -11,14 +11,15 @@ request, review documentation, report an issue, and provide validation
 evidence. The technical owner and backup reviewer alone may merge pull
 requests, prepare releases, and create or push release tags.
 
-Ordinary contributors use PRs into `dev`. The release owner may prepare releases
-and the next development cycle directly on `dev`. Releases reach `main` only
-through a `dev` to `main` PR personally merged by the release owner; never push
-directly to `main`. See the [release workflow](../releasing/RELEASING.md).
+Ordinary contributors use PRs into `master-dev`. The release owner may prepare
+releases and the next development cycle directly on `master-dev`. Releases reach
+`main` only through a `master-dev` to `main` PR personally merged by the release
+owner; never push directly to `main`. See the
+[release workflow](../docs.ai/RELEASING.md).
 
 ## Day-to-day change flow
 
-1. Start from current `dev` and create a short-lived topic branch.
+1. Start from current `master-dev` and create a short-lived topic branch.
 2. Make one focused change. Read the affected command's `SPEC.md` and
    `bundle.yaml` before changing a command.
 3. Update `SPEC.md` for every new or materially changed user-facing command.
@@ -30,10 +31,10 @@ directly to `main`. See the [release workflow](../releasing/RELEASING.md).
 5. Record relevant live Revit evidence and remaining acceptance limits for
    changed behavior. Beta releases may retain documented limits; stable promotion
    requires relevant live acceptance as defined in the release workflow.
-6. Open a pull request into `dev`. State the affected tools, user impact,
+6. Open a pull request into `master-dev`. State the affected tools, user impact,
    evidence, known limits, and rollback considerations.
 7. The technical owner or backup reviewer reviews and merges the approved pull
-   request into `dev`.
+   request into `master-dev`.
 
 ## Revit support and validation
 
@@ -56,7 +57,7 @@ template for a new command. All visible commands, including DevSandbox, must
 record Tool ID, Path aliases, Version inputs, Tool version, Status/origin, and
 a history with Version, Main delivery, Date, Meaningful change, and Git
 evidence. Follow
-[Tool version rules](../releasing/TOOL_VERSIONING.md) for the exact metadata and version rules.
+[Tool version rules](../docs.ai/TOOL_VERSIONING.md) for the exact metadata and version rules.
 
 Run `python scripts/check_tool_metadata.py` to check visible command metadata.
 Its host-independent tests run with
@@ -64,7 +65,7 @@ Its host-independent tests run with
 
 ## Release flow
 
-Follow the authoritative [release workflow](../releasing/RELEASING.md) for
+Follow the authoritative [release workflow](../docs.ai/RELEASING.md) for
 preparation, checks, the owner's merge, tagging, GitHub publication, live
 verification, and the next development cycle. It defines roles, beta/stable gates,
 and extension identity; this guide does not maintain a second release checklist.
@@ -73,6 +74,6 @@ and extension identity; this guide does not maintain a second release checklist.
 
 - Team policy and plain-language navigation: the KLCode Standards Notion page.
 - Command behavior and validation: the adjacent `SPEC.md`.
-- Python and pyRevit code shape: [SCRIPTS.md](SCRIPTS.md) and
-  [COMMENTS.md](COMMENTS.md).
-- Published release record: [CHANGELOG.md](../../CHANGELOG.md).
+- Python and pyRevit code shape: [SCRIPTS.md](../docs.ai/SCRIPTS.md) and
+  [COMMENTS.md](../docs.ai/COMMENTS.md).
+- Published release record: [CHANGELOG.md](../CHANGELOG.md).

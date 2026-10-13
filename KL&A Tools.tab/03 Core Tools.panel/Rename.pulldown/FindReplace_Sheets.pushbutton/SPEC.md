@@ -5,7 +5,7 @@
 | Tool ID | `core.rename.findreplace-sheets` |
 | Former prototype Tool ID | `devsandbox.findreplace-sheets-proto` |
 | Tool version | `v1.1` |
-| Status | Prepared for 0.0.11 beta; live acceptance pending |
+| Status | Released in 0.0.11 beta; live acceptance pending |
 | Status/origin | KL&A-maintained Core command promoted from an EFTools-derived DevSandbox prototype. |
 | Main delivery | 0.0.11 |
 | Path aliases | Core release layout: `KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton`; current `KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton`; former prototype: `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton`, `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton` |

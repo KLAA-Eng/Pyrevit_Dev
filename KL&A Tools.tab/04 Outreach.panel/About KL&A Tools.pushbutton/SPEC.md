@@ -23,11 +23,11 @@ This zero-document command reads generated `lib/build_info.py` and shows a
 pyRevit alert. It does not modify the model, query Git, or open Excel. The loaded
 extension path identifies the actual folder supplying the command and metadata.
 
-`VERSION_LABEL` is a display identity such as `v0.0.11-dev`; it does not assert
+`VERSION_LABEL` is a display identity such as `v0.0.12-beta`; it does not assert
 that a Git tag exists. `METADATA_SOURCE_SHA` is HEAD when the metadata was
 generated, preceding any preparation commit and squash merge. It does not prove
 the loaded checkout's current HEAD. Verified release commits and tags are in
-`docs/releasing/tool-version-delivery-ledger.md`.
+`docs.ai/releasing/tool-version-delivery-ledger.md`.
 
 ## Validation boundary
 

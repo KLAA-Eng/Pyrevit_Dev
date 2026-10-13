@@ -4,7 +4,7 @@
 | --- | --- |
 | Tool ID | `devsandbox.beam-reaction-declutter` |
 | Tool version | `v0.1` |
-| Status | Prepared for 0.0.11 beta; live acceptance pending |
+| Status | Released in 0.0.11 beta; live acceptance pending |
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.11 |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Beam Reaction Declutter.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Beam Reaction Declutter.pushbutton` |
