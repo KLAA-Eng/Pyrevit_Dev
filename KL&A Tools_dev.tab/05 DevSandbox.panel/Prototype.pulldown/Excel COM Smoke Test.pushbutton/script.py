@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 __title__ = "Excel COM Smoke Test"
-__version__ = "v0.0"
+__version__ = "v0.1"
 
 
 import os
@@ -113,6 +113,44 @@ def _record(results, name, action):
         return None
 
 
+def _probe_excel_reference(results):
+    """Report the first Excel assembly lookup without changing facade behavior."""
+    try:
+        import clr
+        clr.AddReference('Microsoft.Office.Interop.Excel')
+    except Exception as error:
+        results.append(['Excel interop name lookup', 'INFO', '',
+                        'First lookup failed: {}'.format(_error_detail(error))])
+    else:
+        results.append(['Excel interop name lookup', 'PASS', '',
+                        'Short-name reference loaded.'])
+
+
+def _report_loaded_excel_assemblies(results):
+    """Report the identity and location of Excel PIAs loaded in this process."""
+    try:
+        from System import AppDomain
+        assemblies = [assembly for assembly in AppDomain.CurrentDomain.GetAssemblies()
+                      if assembly.GetName().Name == 'Microsoft.Office.Interop.Excel']
+        if not assemblies:
+            results.append(['Loaded Excel interop assembly', 'INFO', '',
+                            'No Excel interop assembly is loaded in this Revit process.'])
+            return
+        for assembly in assemblies:
+            try:
+                location = assembly.Location or '(no file location)'
+            except Exception as error:
+                location = 'Unavailable: {}'.format(_error_detail(error))
+            results.append(['Loaded Excel interop assembly', 'PASS',
+                            _runtime_type(assembly),
+                            'Identity: {} | Location: {}'.format(
+                                assembly.FullName, location)])
+    except Exception as error:
+        results.append(['Loaded Excel interop assembly', 'INFO', '',
+                        'Could not inspect loaded assemblies: {}'.format(
+                            _error_detail(error))])
+
+
 def _cleanup(paths, excel, workbook, results, retain_assets):
     """Release Excel first, then delete only proven-owned successful-run assets."""
     cleanup_errors = []
@@ -155,7 +193,9 @@ def main():
         output.print_md('# {}'.format(__title__))
         output.print_md('Revit: {} | Document access: none'.format(
             getattr(revit.doc.Application, 'VersionNumber', 'Unknown')))
+        _probe_excel_reference(results)
         excel = _record(results, 'Create hidden Excel application', create_excel_application)
+        _report_loaded_excel_assemblies(results)
         if excel is None:
             retain_assets = True
             return
