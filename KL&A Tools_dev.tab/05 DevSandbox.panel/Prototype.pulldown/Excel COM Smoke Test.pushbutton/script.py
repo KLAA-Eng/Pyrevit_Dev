@@ -121,13 +121,14 @@ def _probe_excel_reference(results):
         import clr
         clr.AddReference('Microsoft.Office.Interop.Excel')
     except Exception as error:
-        row = ['Excel interop name lookup', 'INFO', '',
-               'First lookup failed: {}'.format(_error_detail(error))]
+        detail = 'First lookup failed: {}'.format(_error_detail(error))
+        row = ['Excel interop name lookup', 'INFO', '', detail.splitlines()[0]]
     else:
+        detail = 'Short-name reference loaded.'
         row = ['Excel interop name lookup', 'PASS', '',
-               'Short-name reference loaded.']
+               detail]
     results.append(row)
-    return row
+    return row, detail
 
 
 def _script_fingerprint():
@@ -154,9 +155,11 @@ def _pia_file_paths():
             office, 'Office16', 'ADDINS', 'PowerPivot Excel Add-in*', filename)))
     windows = os.environ.get('WINDIR')
     if windows:
-        paths.extend(glob.glob(os.path.join(
-            windows, 'Microsoft.NET', 'assembly', 'GAC_MSIL',
-            'Microsoft.Office.Interop.Excel', '*', filename)))
+        for gac_root in (os.path.join(windows, 'Microsoft.NET', 'assembly'),
+                         os.path.join(windows, 'assembly')):
+            paths.extend(glob.glob(os.path.join(
+                gac_root, 'GAC_MSIL', 'Microsoft.Office.Interop.Excel',
+                '*', filename)))
     return sorted(set(path for path in paths if os.path.isfile(path)))
 
 
@@ -209,6 +212,11 @@ def _report_loaded_excel_assemblies(results):
                             _error_detail(error))])
 
 
+def _table_cell(value):
+    """Keep stack traces and separators inside one output-table cell."""
+    return '{}'.format(value).replace('\r', ' ').replace('\n', ' ').replace('|', ';')
+
+
 def _cleanup(paths, excel, workbook, results, retain_assets):
     """Release Excel first, then delete only proven-owned successful-run assets."""
     cleanup_errors = []
@@ -254,9 +262,9 @@ def main():
         output.print_md('Smoke script version: {}'.format(__version__))
         output.print_md('Smoke script path: {}'.format(os.path.abspath(__file__)))
         output.print_md('Smoke script SHA-256: {}'.format(_script_fingerprint()))
-        lookup_row = _probe_excel_reference(results)
+        lookup_row, lookup_detail = _probe_excel_reference(results)
         output.print_md('Excel interop name lookup: {} | {}'.format(
-            lookup_row[1], lookup_row[3]))
+            lookup_row[1], lookup_detail))
         excel = _record(results, 'Create hidden Excel application', create_excel_application)
         _report_loaded_excel_assemblies(results)
         _report_pia_files(results)
@@ -331,7 +339,8 @@ def main():
                     _record(results, 'CalculateFullRebuild', lambda: call_method(reopen_excel, 'CalculateFullRebuild'))
                 close_excel_application(reopen_excel, reopened, suppress_errors=True)
         _cleanup(paths, None, None, results, retain_assets)
-        output.print_table(results, columns=['Operation', 'Status', 'Runtime type', 'Detail'])
+        output.print_table([[_table_cell(cell) for cell in row] for row in results],
+                           columns=['Operation', 'Status', 'Runtime type', 'Detail'])
         failures = len([row for row in results if row[1] == 'FAIL'])
         if failures:
             forms.alert('{} operation(s) failed. This run retained its owned temp assets for diagnosis. Review the output table.'.format(failures), title=__title__, warn_icon=True)

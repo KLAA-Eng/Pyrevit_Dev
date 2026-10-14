@@ -44,13 +44,17 @@ PASS or FAIL with its runtime type and error detail. Successful runs remove
 only their exact owned assets; failed or unsafe cleanup retains them for review.
 Before creating Excel, it prints the running script path and SHA-256 fingerprint,
 then reports whether the first short-name interop assembly lookup succeeded in
-both the page text and result table. A failed lookup is informational because
-the shared facade may still succeed through its existing fallback. After the
+both the page text and result table. The page text keeps the full lookup error;
+the table uses its first line so multiline stack traces do not break the row.
+A failed lookup is informational because the shared facade may still succeed
+through its existing fallback. After the
 Excel startup attempt, it reports the identity and file location of any loaded
 Excel interop assembly. It also reads the assembly identity of any Excel interop
-DLL found in common Office or GAC locations, without loading those files into
-Revit. An empty file inventory is not proof that the DLL is absent from the
-machine. Assembly-inspection errors are informational and do not change the
+DLL found in common Office locations or the legacy and newer GAC paths, without
+loading those files into Revit. Output-table cells replace line breaks and
+pipe separators so each diagnostic remains in one row. An empty file inventory
+is not proof that the DLL is absent from the machine. Assembly-inspection errors
+are informational and do not change the
 facade result or temp-file cleanup decision.
 
 ## Prerequisites and effects
