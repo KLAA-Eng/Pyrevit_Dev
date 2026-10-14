@@ -7,14 +7,15 @@ tooltip:
     Status: Unreleased
     _____________________________________________________________________
     Description:
-    Prototype: tests the shared Excel COM facade in the current Revit/pyRevit host using owned temporary workbook and CSV files. Reports the running script identity, Excel interop lookup result, loaded assembly, and interop files found in common Office locations.
+    Prototype: tests the shared Excel COM facade in the current Revit/pyRevit host using owned temporary workbook and CSV files. Reports assembly lookup and locations; if name lookup fails, tries an identity-checked Office 16 interop DLL by file path.
     _____________________________________________________________________
     How-to:
     - Run with Microsoft Excel installed.
+    - Use a fresh Revit session for the explicit Office DLL load trial; close Revit after reviewing the result.
     - Review the operation table; inspect retained temporary files if a test or safe cleanup fails.
     _____________________________________________________________________
     Last update:
-    - [10.14.2026] - v0.2 (Unreleased): Show script path and fingerprint, repeat the first lookup result above the table, and inspect interop files in common Office locations without loading them.
+    - [10.14.2026] - v0.2 (Unreleased): Show script identity and assembly diagnostics; after failed name lookup, try a verified local Office 16 interop DLL by path.
     - [10.13.2026] - v0.1 (0.0.12): Added Excel interop assembly lookup and loaded-file diagnostics.
     - [10.05.2026] - v0.0 (0.0.10): First main delivery of a disposable Excel facade lifecycle and operation smoke test.
 author: KL&A
