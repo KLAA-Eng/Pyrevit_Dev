@@ -2,9 +2,11 @@
 from __future__ import print_function
 
 __title__ = "Excel COM Smoke Test"
-__version__ = "v0.1"
+__version__ = "v0.2"
 
 
+import glob
+import hashlib
 import os
 import sys
 import tempfile
@@ -119,11 +121,67 @@ def _probe_excel_reference(results):
         import clr
         clr.AddReference('Microsoft.Office.Interop.Excel')
     except Exception as error:
-        results.append(['Excel interop name lookup', 'INFO', '',
-                        'First lookup failed: {}'.format(_error_detail(error))])
+        row = ['Excel interop name lookup', 'INFO', '',
+               'First lookup failed: {}'.format(_error_detail(error))]
     else:
-        results.append(['Excel interop name lookup', 'PASS', '',
-                        'Short-name reference loaded.'])
+        row = ['Excel interop name lookup', 'PASS', '',
+               'Short-name reference loaded.']
+    results.append(row)
+    return row
+
+
+def _script_fingerprint():
+    """Identify the exact smoke script that this Revit process executed."""
+    try:
+        with open(__file__, 'rb') as source:
+            return hashlib.sha256(source.read()).hexdigest()
+    except Exception as error:
+        return 'unavailable: {}'.format(_error_detail(error))
+
+
+def _pia_file_paths():
+    """Find Excel PIA files in a few common Office and GAC locations."""
+    filename = 'Microsoft.Office.Interop.Excel.dll'
+    paths = []
+    for root in (os.environ.get('ProgramFiles'), os.environ.get('ProgramFiles(x86)')):
+        if not root:
+            continue
+        office = os.path.join(root, 'Microsoft Office', 'root')
+        paths.append(os.path.join(
+            office, 'vfs', 'ProgramFilesX86', 'Microsoft Office',
+            'Office16', 'DCF', filename))
+        paths.extend(glob.glob(os.path.join(
+            office, 'Office16', 'ADDINS', 'PowerPivot Excel Add-in*', filename)))
+    windows = os.environ.get('WINDIR')
+    if windows:
+        paths.extend(glob.glob(os.path.join(
+            windows, 'Microsoft.NET', 'assembly', 'GAC_MSIL',
+            'Microsoft.Office.Interop.Excel', '*', filename)))
+    return sorted(set(path for path in paths if os.path.isfile(path)))
+
+
+def _report_pia_files(results):
+    """Read PIA file identities without loading them into Revit."""
+    paths = _pia_file_paths()
+    if not paths:
+        results.append(['Excel interop files on disk', 'INFO', '',
+                        'None found in the checked Office and GAC locations; '
+                        'other installation paths remain possible.'])
+        return
+    try:
+        from System.Reflection import AssemblyName
+    except Exception as error:
+        results.append(['Excel interop files on disk', 'INFO', '',
+                        'Could not inspect file identities: {}'.format(
+                            _error_detail(error))])
+        return
+    for path in paths:
+        try:
+            identity = AssemblyName.GetAssemblyName(path).FullName
+        except Exception as error:
+            identity = 'Unreadable: {}'.format(_error_detail(error))
+        results.append(['Excel interop file on disk', 'INFO', '',
+                        'Identity: {} | Path: {}'.format(identity, path)])
 
 
 def _report_loaded_excel_assemblies(results):
@@ -193,9 +251,15 @@ def main():
         output.print_md('# {}'.format(__title__))
         output.print_md('Revit: {} | Document access: none'.format(
             getattr(revit.doc.Application, 'VersionNumber', 'Unknown')))
-        _probe_excel_reference(results)
+        output.print_md('Smoke script version: {}'.format(__version__))
+        output.print_md('Smoke script path: {}'.format(os.path.abspath(__file__)))
+        output.print_md('Smoke script SHA-256: {}'.format(_script_fingerprint()))
+        lookup_row = _probe_excel_reference(results)
+        output.print_md('Excel interop name lookup: {} | {}'.format(
+            lookup_row[1], lookup_row[3]))
         excel = _record(results, 'Create hidden Excel application', create_excel_application)
         _report_loaded_excel_assemblies(results)
+        _report_pia_files(results)
         if excel is None:
             retain_assets = True
             return
