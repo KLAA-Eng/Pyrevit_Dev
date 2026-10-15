@@ -16,7 +16,7 @@
 | --- | --- | --- | --- | --- |
 | v0.0 | 0.0.10 | 10.05.2026 | First main delivery of a disposable Excel facade lifecycle and operation smoke test. | 74eccba; verified v0.0.10-beta snapshot |
 | v0.1 | 0.0.12 | 10.13.2026 | Report the first Excel assembly lookup error and the loaded assembly identity and path. | `25c3e39`; 0.0.12 delivery snapshot. |
-| v0.2 | Unreleased | 10.14.2026 | Identify the running script, inspect Excel interop DLL locations, and trial an identity-checked Office 16 DLL by path after failed name lookup. | Current branch; pending main delivery. |
+| v0.2 | Unreleased | 10.14.2026 | Identify the running script, inspect Excel interop DLL locations, trial an identity-checked Office 16 DLL by path after failed name lookup, and probe direct Excel activation. | Current branch; pending main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -51,9 +51,11 @@ command validates the identity of the installed Office 16 DCF Excel interop DLL
 and tries `clr.AddReferenceToFileAndPath` on its absolute path. It skips this
 trial when loaded-assembly inspection fails or finds an existing Excel interop
 assembly, avoiding a second version in that process. It reports the trial result
-and any loaded assembly before using the unchanged shared Excel facade to create
-an application. This path-load trial is
-diagnostic; it does not alter `lib/excel_com.py`. The command also reads the
+and any loaded assembly. It then tries the unchanged shared facade. If that
+still cannot create Excel after a successful path load, it imports Excel from
+the loaded assembly and tries to create, configure, and close a hidden Excel
+instance without repeating the name lookup. These probes are diagnostic;
+they do not alter `lib/excel_com.py`. The command also reads the
 assembly identity of interop DLLs in common Office and GAC locations. Output
 table cells replace line breaks and pipe separators so each diagnostic remains
 in one row. An empty file inventory is not proof that the DLL is absent from

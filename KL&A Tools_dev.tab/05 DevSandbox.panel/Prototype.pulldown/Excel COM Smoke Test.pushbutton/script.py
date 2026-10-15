@@ -221,6 +221,37 @@ def _probe_explicit_office_pia_load(results):
     return row
 
 
+def _probe_direct_excel_activation(results):
+    """Test the loaded PIA without repeating the facade's name lookup."""
+    try:
+        from Microsoft.Office.Interop import Excel
+        application_class = Excel.ApplicationClass
+    except Exception as error:
+        row = ['Excel namespace after path load', 'FAIL', '',
+               _error_detail(error)]
+        results.append(row)
+        return row
+    results.append(['Excel namespace after path load', 'PASS',
+                    _runtime_type(application_class),
+                    'Excel.ApplicationClass resolved from the loaded assembly.'])
+    excel = None
+    try:
+        excel = application_class()
+        set_property(excel, 'Visible', False)
+        set_property(excel, 'DisplayAlerts', False)
+        row = ['Direct Excel activation after path load', 'PASS',
+               _runtime_type(excel), 'Created and configured a hidden Excel application.']
+    except Exception as error:
+        row = ['Direct Excel activation after path load', 'FAIL', '',
+               _error_detail(error)]
+    results.append(row)
+    if excel is not None:
+        errors = close_excel_application(excel, suppress_errors=True)
+        results.append(['Direct Excel cleanup',
+                        'FAIL' if errors else 'PASS', '', '; '.join(errors)])
+    return row
+
+
 def _report_pia_files(results):
     """Read PIA file identities without loading them into Revit."""
     paths = _pia_file_paths()
@@ -344,6 +375,10 @@ def main():
         if lookup_row[1] != 'PASS':
             output.print_md('Excel startup after interop check: {}'.format(
                 'PASS' if excel is not None else 'FAIL'))
+            if path_row[1] == 'PASS' and excel is None:
+                direct_row = _probe_direct_excel_activation(results)
+                output.print_md('Direct Excel activation after path load: {} | {}'.format(
+                    direct_row[1], direct_row[3]))
         _report_loaded_excel_assemblies(results)
         _report_pia_files(results)
         if excel is None:
