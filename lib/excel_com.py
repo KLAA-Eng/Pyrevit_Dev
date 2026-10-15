@@ -209,11 +209,18 @@ def _disable_automation_macros(excel):
         previous_setting = get_property(excel, 'AutomationSecurity')
     except Exception:
         return None
-    import clr
-    clr.AddReference('Office')
-    from Microsoft.Office.Core import MsoAutomationSecurity
-    set_property(excel, 'AutomationSecurity',
-                 MsoAutomationSecurity.msoAutomationSecurityForceDisable)
+    # Office's msoAutomationSecurityForceDisable value is 3. A typed Excel PIA
+    # requires the enum type; raw IDispatch accepts the underlying integer.
+    force_disable = 3
+    try:
+        setting_type = previous_setting.GetType()
+    except AttributeError:
+        pass
+    else:
+        if setting_type.IsEnum:
+            from System import Enum
+            force_disable = Enum.ToObject(setting_type, 3)
+    set_property(excel, 'AutomationSecurity', force_disable)
     return previous_setting
 
 

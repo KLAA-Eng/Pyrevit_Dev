@@ -39,7 +39,8 @@ The command creates a UUID-owned folder below the system temp folder, then
 creates an XLSX and CSV inside that exact folder. It tests Excel application
 properties, workbook Add/Open/Close/SaveAs, worksheet collections and names,
 ranges and formulas, CSV query tables and list objects, pivot-cache creation,
-chart-object creation, refresh and calculation. Each operation is reported as
+chart-object creation, the reopened application's macro-security property,
+refresh and calculation. Each operation is reported as
 PASS or FAIL with its runtime type and error detail. Successful runs remove
 only their exact owned assets; failed or unsafe cleanup retains them for review.
 Before creating Excel, it prints the running script and shared facade paths and
@@ -80,3 +81,7 @@ This verifies every public operation used by the shared facade, but it does not
 prove Carbon GWP chart placement, Steel PSF business results, or Concrete Mix
 Header schedule writes. Required acceptance is one successful run in each of
 Revit 25 and Revit 26 with Excel installed, retaining the output table.
+The affected Revit 2025 workstation passed shared Excel startup, worksheet,
+query, table, pivot, chart, and SaveAs operations on 10.15.2026. The read-only
+reopen failed at the separate `Office` assembly lookup for macro security;
+the shared facade fix for that lookup awaits a fresh live rerun.

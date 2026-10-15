@@ -136,8 +136,10 @@ The pyRevit output window reports:
   collections, ranges, query tables, refreshes, links, and calculation without
   guessing whether a raw COM member is a property or method. Automation macros
   are force-disabled only while a workbook opens, then the prior setting is
-  restored. Excel 4.0 macro prompts remain an Excel limitation; select trusted
-  workbooks and do not enable any unexpected prompt.
+  restored. The shared facade uses Office's documented force-disable value `3`,
+  preserving the returned CLR enum type when present, without a separate
+  `Office` assembly name lookup. Excel 4.0 macro prompts remain an Excel
+  limitation; select trusted workbooks and do not enable any unexpected prompt.
 - After a failed short-name Excel PIA lookup, the shared loader uses an already
   importable Excel namespace or validates and loads the installed Office 16 DCF
   PIA by file path. The legacy version 11 reference remains a last resort when
@@ -188,8 +190,10 @@ rows use the main delivery date, and Unreleased rows use the latest meaningful
 development change date.
 
 Unreleased development note (10.15.2026): the shared Excel loader now tries a
-verified Office 16 PIA path after name lookup fails. The tool version remains
-`v1.0` until its next main delivery; affected-workstation acceptance is pending.
+verified Office 16 PIA path after name lookup fails. Its workbook-open path
+also sets the macro security value using the existing Excel property type.
+The tool version remains `v1.0` until its next main delivery;
+affected-workstation acceptance is pending.
 
 ## Extension release history
 

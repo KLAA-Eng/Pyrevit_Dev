@@ -92,6 +92,7 @@ class ExcelInteropLoadingTests(unittest.TestCase):
         self.assertIn('Office16', clr.AddReferenceToFileAndPath.call_args[0][0])
         self.assertIn('DCF', clr.AddReferenceToFileAndPath.call_args[0][0])
 
+
 class DirectWorkbooks(object):
     def __init__(self):
         self.open_calls = []
@@ -135,6 +136,68 @@ class RawCom(object):
 
     def GetType(self):
         return type('RawComType', (), {'FullName': 'System.__ComObject'})()
+
+
+class ExcelMacroSecurityTests(unittest.TestCase):
+    def test_raw_com_security_setting_uses_numeric_force_disable(self):
+        excel = RawCom('excel')
+        with mock.patch.object(excel_com, '_get_property', return_value=1):
+            with mock.patch.object(excel_com, '_set_property') as set_setting:
+                self.assertEqual(1, excel_com._disable_automation_macros(excel))
+        set_setting.assert_called_once_with(excel, 'AutomationSecurity', 3)
+
+    def test_workbook_open_disables_macros_then_restores_numeric_setting(self):
+        class GuardedWorkbooks(object):
+            def __init__(self, excel):
+                self.excel = excel
+                self.observed_security = None
+
+            def Open(self, _path, **_options):
+                self.observed_security = self.excel.AutomationSecurity
+                return 'opened workbook'
+
+        excel = types.SimpleNamespace(AutomationSecurity=1)
+        excel.Workbooks = GuardedWorkbooks(excel)
+
+        self.assertEqual('opened workbook',
+                         excel_com.open_workbook(excel, 'book.xlsx', 0, True))
+        self.assertEqual(3, excel.Workbooks.observed_security)
+        self.assertEqual(1, excel.AutomationSecurity)
+
+    def test_typed_security_setting_preserves_enum_type(self):
+        setting_type = types.SimpleNamespace(IsEnum=True)
+
+        class TypedSetting(object):
+            def GetType(self):
+                return setting_type
+
+        previous = TypedSetting()
+        system = types.ModuleType('System')
+        system.Enum = types.SimpleNamespace(ToObject=mock.Mock(return_value='force enum'))
+        with mock.patch.dict(sys.modules, {'System': system}):
+            with mock.patch.object(excel_com, 'get_property', return_value=previous):
+                with mock.patch.object(excel_com, 'set_property') as set_setting:
+                    self.assertIs(previous, excel_com._disable_automation_macros(object()))
+        system.Enum.ToObject.assert_called_once_with(setting_type, 3)
+        self.assertEqual('force enum', set_setting.call_args[0][2])
+
+    def test_failed_security_setting_prevents_workbook_open(self):
+        class BlockedExcel(object):
+            def __init__(self):
+                self.Workbooks = DirectWorkbooks()
+
+            @property
+            def AutomationSecurity(self):
+                return 1
+
+            @AutomationSecurity.setter
+            def AutomationSecurity(self, _value):
+                raise RuntimeError('security setting blocked')
+
+        excel = BlockedExcel()
+        with self.assertRaises(RuntimeError):
+            excel_com.open_workbook(excel, 'book.xlsx', 0, True)
+        self.assertEqual([], excel.Workbooks.open_calls)
 
 
 class ExcelComTests(unittest.TestCase):

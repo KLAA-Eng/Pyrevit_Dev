@@ -451,6 +451,8 @@ def main():
         if os.path.isfile(paths['workbook_path']) and not retain_assets:
             reopen_excel = _record(results, 'Create Excel for reopen', create_excel_application)
             if reopen_excel is not None:
+                _record(results, 'Read reopen AutomationSecurity', lambda: get_property(
+                    reopen_excel, 'AutomationSecurity'))
                 reopened = _record(results, 'Workbooks.Open read-only', lambda: open_workbook(
                     reopen_excel, paths['workbook_path'], update_links=0, read_only=True))
                 if reopened is not None:
