@@ -16,7 +16,7 @@
 | --- | --- | --- | --- | --- |
 | v0.0 | 0.0.10 | 10.05.2026 | First main delivery of a disposable Excel facade lifecycle and operation smoke test. | 74eccba; verified v0.0.10-beta snapshot |
 | v0.1 | 0.0.12 | 10.13.2026 | Report the first Excel assembly lookup error and the loaded assembly identity and path. | `25c3e39`; 0.0.12 delivery snapshot. |
-| v0.2 | Unreleased | 10.14.2026 | Identify the running script, inspect Excel interop DLL locations, trial an identity-checked Office 16 DLL by path after failed name lookup, and probe direct Excel activation. | Current branch; pending main delivery. |
+| v0.2 | Unreleased | 10.15.2026 | Identify the running script and shared facade, inspect Excel interop DLL locations, trial an identity-checked Office 16 DLL by path after a failed shared startup, and probe direct Excel activation. | Current branch; pending main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -42,20 +42,24 @@ ranges and formulas, CSV query tables and list objects, pivot-cache creation,
 chart-object creation, refresh and calculation. Each operation is reported as
 PASS or FAIL with its runtime type and error detail. Successful runs remove
 only their exact owned assets; failed or unsafe cleanup retains them for review.
-Before creating Excel, it prints the running script path and SHA-256 fingerprint,
+Before creating Excel, it prints the running script and shared facade paths and
+SHA-256 fingerprints,
 reports whether an Excel interop assembly was already loaded, and tries the
-first short-name assembly lookup. The page text keeps the full lookup error;
-the table uses its first line so multiline stack traces do not break the row.
-If the name lookup fails and no Excel interop assembly was already loaded, the
-command validates the identity of the installed Office 16 DCF Excel interop DLL
+first short-name assembly lookup. It then tests the shared Excel loader from
+that state, so the diagnostic's own path trial cannot mask a loader failure.
+The page text keeps the full lookup error; the table uses its first line so
+multiline stack traces do not break the row.
+If shared startup fails after name lookup and no Excel interop assembly was
+loaded by that attempt, the command validates the identity of the installed
+Office 16 DCF Excel interop DLL
 and tries `clr.AddReferenceToFileAndPath` on its absolute path. It skips this
 trial when loaded-assembly inspection fails or finds an existing Excel interop
-assembly, avoiding a second version in that process. It reports the trial result
-and any loaded assembly. It then tries the unchanged shared facade. If that
-still cannot create Excel after a successful path load, it imports Excel from
+assembly after shared startup, avoiding a second version in that process. It
+reports the trial result and any loaded assembly. If the shared facade could
+not create Excel and the diagnostic path load succeeds, it imports Excel from
 the loaded assembly and tries to create, configure, and close a hidden Excel
 instance without repeating the name lookup. These probes are diagnostic;
-they do not alter `lib/excel_com.py`. The command also reads the
+they do not change the shared loader's result. The command also reads the
 assembly identity of interop DLLs in common Office and GAC locations. Output
 table cells replace line breaks and pipe separators so each diagnostic remains
 in one row. An empty file inventory is not proof that the DLL is absent from

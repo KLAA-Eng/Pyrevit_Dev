@@ -38,6 +38,7 @@ from excel_com import (
     create_pivot_cache, get_item, get_property, open_workbook, range_at,
     save_workbook, set_property, worksheet_collection,
 )
+import excel_com as excel_com_module
 
 SMOKE_ROOT_NAME = 'KLCodeExcelComSmoke'
 FILE_PREFIX = 'KLCode_Excel_Com_Smoke_'
@@ -131,10 +132,10 @@ def _probe_excel_reference(results):
     return row, detail
 
 
-def _script_fingerprint():
-    """Identify the exact smoke script that this Revit process executed."""
+def _file_fingerprint(path):
+    """Identify the exact Python source file that this Revit process loaded."""
     try:
-        with open(__file__, 'rb') as source:
+        with open(path, 'rb') as source:
             return hashlib.sha256(source.read()).hexdigest()
     except Exception as error:
         return 'unavailable: {}'.format(_error_detail(error))
@@ -352,17 +353,26 @@ def main():
             getattr(revit.doc.Application, 'VersionNumber', 'Unknown')))
         output.print_md('Smoke script version: {}'.format(__version__))
         output.print_md('Smoke script path: {}'.format(os.path.abspath(__file__)))
-        output.print_md('Smoke script SHA-256: {}'.format(_script_fingerprint()))
-        preloaded = _report_loaded_excel_assemblies(results, 'Excel interop before lookup')
+        output.print_md('Smoke script SHA-256: {}'.format(_file_fingerprint(__file__)))
+        output.print_md('Shared Excel facade path: {}'.format(
+            os.path.abspath(excel_com_module.__file__)))
+        output.print_md('Shared Excel facade SHA-256: {}'.format(
+            _file_fingerprint(excel_com_module.__file__)))
+        _report_loaded_excel_assemblies(results, 'Excel interop before lookup')
         lookup_row, lookup_detail = _probe_excel_reference(results)
         output.print_md('Excel interop name lookup: {} | {}'.format(
             lookup_row[1], lookup_detail))
-        if lookup_row[1] != 'PASS':
-            if preloaded is None:
+        excel = _record(results, 'Create hidden Excel application', create_excel_application)
+        output.print_md('Excel startup with shared loader: {}'.format(
+            'PASS' if excel is not None else 'FAIL'))
+        if lookup_row[1] != 'PASS' and excel is None:
+            after_shared = _report_loaded_excel_assemblies(
+                results, 'Excel interop after shared startup')
+            if after_shared is None:
                 path_row = ['Explicit Office 16 interop load', 'INFO', '',
                             'Skipped because loaded-assembly inspection failed.']
                 results.append(path_row)
-            elif preloaded:
+            elif after_shared:
                 path_row = ['Explicit Office 16 interop load', 'INFO', '',
                             'Skipped because an Excel interop assembly was already loaded.']
                 results.append(path_row)
@@ -371,10 +381,6 @@ def main():
             output.print_md('Explicit Office 16 interop load: {} | {}'.format(
                 path_row[1], path_row[3]))
             _report_loaded_excel_assemblies(results, 'Excel interop after path load')
-        excel = _record(results, 'Create hidden Excel application', create_excel_application)
-        if lookup_row[1] != 'PASS':
-            output.print_md('Excel startup after interop check: {}'.format(
-                'PASS' if excel is not None else 'FAIL'))
             if path_row[1] == 'PASS' and excel is None:
                 direct_row = _probe_direct_excel_activation(results)
                 output.print_md('Direct Excel activation after path load: {} | {}'.format(

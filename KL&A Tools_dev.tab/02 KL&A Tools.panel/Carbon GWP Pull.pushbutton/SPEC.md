@@ -138,6 +138,11 @@ The pyRevit output window reports:
   are force-disabled only while a workbook opens, then the prior setting is
   restored. Excel 4.0 macro prompts remain an Excel limitation; select trusted
   workbooks and do not enable any unexpected prompt.
+- After a failed short-name Excel PIA lookup, the shared loader uses an already
+  importable Excel namespace or validates and loads the installed Office 16 DCF
+  PIA by file path. The legacy version 11 reference remains a last resort when
+  the Office path is unavailable. This development change awaits a fresh Revit
+  smoke run and Carbon workbook acceptance on an affected workstation.
 - Refreshes Power Query inputs from the selected export container in the
   read-only post-processing Excel session before reading `Export`. It waits up
   to 60 seconds and stops rather than rendering a chart from still-refreshing
@@ -181,6 +186,10 @@ into the first delivery; tab/panel moves, formatting, and metadata/documentation
 changes do not create additional milestones. Dates use `MM.DD.YYYY`; released
 rows use the main delivery date, and Unreleased rows use the latest meaningful
 development change date.
+
+Unreleased development note (10.15.2026): the shared Excel loader now tries a
+verified Office 16 PIA path after name lookup fails. The tool version remains
+`v1.0` until its next main delivery; affected-workstation acceptance is pending.
 
 ## Extension release history
 

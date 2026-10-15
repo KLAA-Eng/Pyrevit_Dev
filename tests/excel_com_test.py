@@ -1,9 +1,96 @@
 import sys
 import types
 import unittest
+from unittest import mock
 
 from lib import excel_com
 
+
+class ExcelInteropLoadingTests(unittest.TestCase):
+    def test_name_lookup_uses_existing_interop(self):
+        clr = types.ModuleType('clr')
+        clr.AddReference = mock.Mock()
+        excel = object()
+        with mock.patch.dict(sys.modules, {'clr': clr}):
+            with mock.patch.object(excel_com, '_excel_namespace', return_value=excel):
+                with mock.patch.object(excel_com, '_load_office_16_excel_interop') as load:
+                    self.assertIs(excel, excel_com._excel_interop())
+        load.assert_not_called()
+
+    def test_failed_name_lookup_uses_explicit_office_path(self):
+        clr = types.ModuleType('clr')
+        clr.AddReference = mock.Mock(side_effect=IOError('name lookup failed'))
+        clr.AddReferenceByName = mock.Mock()
+        excel = object()
+        namespace = mock.Mock(side_effect=[ImportError('not loaded'), excel])
+        with mock.patch.dict(sys.modules, {'clr': clr}):
+            with mock.patch.object(excel_com, '_excel_namespace', namespace):
+                with mock.patch.object(excel_com, '_load_office_16_excel_interop') as load:
+                    self.assertIs(excel, excel_com._excel_interop())
+        load.assert_called_once_with(clr)
+        clr.AddReferenceByName.assert_not_called()
+
+    def test_existing_namespace_avoids_loading_second_pia(self):
+        clr = types.ModuleType('clr')
+        clr.AddReference = mock.Mock(side_effect=IOError('name lookup failed'))
+        excel = object()
+        with mock.patch.dict(sys.modules, {'clr': clr}):
+            with mock.patch.object(excel_com, '_excel_namespace', return_value=excel):
+                with mock.patch.object(excel_com, '_load_office_16_excel_interop') as load:
+                    self.assertIs(excel, excel_com._excel_interop())
+        load.assert_not_called()
+
+    def test_legacy_reference_remains_available_when_office_path_fails(self):
+        clr = types.ModuleType('clr')
+        clr.AddReference = mock.Mock(side_effect=IOError('name lookup failed'))
+        clr.AddReferenceByName = mock.Mock()
+        excel = object()
+        with mock.patch.dict(sys.modules, {'clr': clr}):
+            with mock.patch.object(excel_com, '_excel_namespace',
+                                   side_effect=[ImportError('not loaded'), excel]):
+                with mock.patch.object(excel_com, '_load_office_16_excel_interop',
+                                       side_effect=IOError('no Office path')):
+                    self.assertIs(excel, excel_com._excel_interop())
+        self.assertIn('Version=11.0.0.0', clr.AddReferenceByName.call_args[0][0])
+
+    def test_loader_reports_each_failed_resolution_route(self):
+        clr = types.ModuleType('clr')
+        clr.AddReference = mock.Mock(side_effect=IOError('name lookup failed'))
+        clr.AddReferenceByName = mock.Mock(side_effect=IOError('v11 missing'))
+        with mock.patch.dict(sys.modules, {'clr': clr}):
+            with mock.patch.object(excel_com, '_excel_namespace',
+                                   side_effect=ImportError('not loaded')):
+                with mock.patch.object(excel_com, '_load_office_16_excel_interop',
+                                       side_effect=IOError('Office path unavailable')):
+                    with self.assertRaises(excel_com.ExcelComCompatibilityError) as error:
+                        excel_com._excel_interop()
+        self.assertIn('name lookup failed', str(error.exception))
+        self.assertIn('Office path unavailable', str(error.exception))
+        self.assertIn('v11 missing', str(error.exception))
+
+    def test_office_path_accepts_only_expected_excel_assembly_identity(self):
+        clr = types.ModuleType('clr')
+        clr.AddReferenceToFileAndPath = mock.Mock()
+        reflection = types.ModuleType('System.Reflection')
+        identity = types.SimpleNamespace(
+            Name='Microsoft.Office.Interop.Excel',
+            Version=types.SimpleNamespace(Major=16),
+            FullName=('Microsoft.Office.Interop.Excel, Version=16.0.0.0, '
+                      'PublicKeyToken=71e9bce111e9429c'))
+        reflection.AssemblyName = types.SimpleNamespace(
+            GetAssemblyName=mock.Mock(return_value=identity))
+        with mock.patch.dict(sys.modules, {'System.Reflection': reflection}):
+            with mock.patch.dict(excel_com.os.environ,
+                                 {'ProgramFiles': 'C:\\OfficeRoot',
+                                  'ProgramFiles(x86)': ''}):
+                with mock.patch.object(excel_com.os.path, 'isfile', return_value=True):
+                    excel_com._load_office_16_excel_interop(clr)
+                    identity.Name = 'Not.Excel'
+                    with self.assertRaises(excel_com.ExcelComCompatibilityError):
+                        excel_com._load_office_16_excel_interop(clr)
+        clr.AddReferenceToFileAndPath.assert_called_once()
+        self.assertIn('Office16', clr.AddReferenceToFileAndPath.call_args[0][0])
+        self.assertIn('DCF', clr.AddReferenceToFileAndPath.call_args[0][0])
 
 class DirectWorkbooks(object):
     def __init__(self):
