@@ -25,7 +25,7 @@ from System.Collections.Generic import List
 from steel_model_review import host
 from steel_model_review.browser import ReviewWindow
 from steel_model_review.engine import CHECKS, DEFAULTS, Cancelled, assemble_report, evaluate
-from steel_model_review.records import SCHEMA_VERSION
+from steel_model_review.records import RULESET_VERSION, SCHEMA_VERSION
 from steel_model_review.reporting import CHECK_LABELS
 from steel_model_review.session import carry_exceptions, signature
 
@@ -244,8 +244,8 @@ def _versions(document):
 
 def _stamp(versions, settings, phase, options, expected, overrides):
     """Fingerprint all comparison settings and model-scope version evidence."""
-    return signature([SCHEMA_VERSION, versions, settings, host.id_value(phase), options,
-                      expected, sorted(overrides.items())])
+    return signature([SCHEMA_VERSION, RULESET_VERSION, versions, settings,
+                      host.id_value(phase), options, expected, sorted(overrides.items())])
 
 
 def _summary(coverage, settings, labels, rows, links):
@@ -373,7 +373,8 @@ def main():
     overrides = _material_overrides(elements, phase, options)
     _stage('Loading the previous session report')
     model_identity = [document.PathName, document.ProjectInformation.UniqueId]
-    cache_key = 'KLA_MODEL_CHECKER_V{0}_'.format(SCHEMA_VERSION) + signature(model_identity)
+    cache_key = 'KLA_MODEL_CHECKER_V{0}_R{1}_'.format(
+        SCHEMA_VERSION, RULESET_VERSION) + signature(model_identity)
     cached = AppDomain.CurrentDomain.GetData(cache_key)
     previous = json.loads(cached) if cached else None
     expected = dict(previous.get('expected', {})) if previous else {}

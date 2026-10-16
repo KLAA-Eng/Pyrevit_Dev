@@ -74,6 +74,72 @@ class EndpointTests(unittest.TestCase):
         self.assertEqual(['Pass', 'Pass'],
                          [r['severity'] for r in self.rows([self.column])])
 
+    def column_vertical(self, bottom, top, faces=True):
+        self.column = member('col', 'column', (100, 0, bottom),
+                             (100, 0, top), bottom, top)
+        if not faces:
+            self.column['faces'] = []
+        return self.rows([self.column])[1]
+
+    def test_shaft_requires_full_depth_not_partial_overlap(self):
+        for bottom, top, expected in ((-20, 10, 2), (2, 100, -2), (2, 10, 2)):
+            result = self.column_vertical(bottom, top)
+            self.assertEqual('Column Shaft', result['category'])
+            self.assertEqual('Warning', result['severity'])
+            self.assertEqual(expected, result['value'])
+            self.assertEqual('Shaft containment', result['measurement'])
+
+    def test_shaft_exact_boundaries_and_numerical_noise_pass(self):
+        for bottom, top in ((0, 12), (0.5e-6, 12 - 0.5e-6)):
+            self.assertEqual('Pass', self.column_vertical(bottom, top)['severity'])
+
+    def test_shaft_protrusion_uses_existing_severity_boundaries(self):
+        for gap, expected in ((1.0 / 32, 'Critical'), (1.0 / 16, 'Warning')):
+            for bottom, top, sign in ((-20, 12 - gap, 1), (gap, 100, -1)):
+                result = self.column_vertical(bottom, top)
+                self.assertEqual(expected, result['severity'])
+                self.assertEqual(sign * gap, result['value'])
+
+    def test_beam_below_column_is_not_a_shaft_pass(self):
+        result = self.column_vertical(14, 100)
+        self.assertEqual('Column Shaft', result['category'])
+        self.assertEqual(-14, result['value'])
+        self.assertEqual('Warning', result['severity'])
+
+    def test_column_top_bearing_is_separate_from_axis_and_shaft(self):
+        result = self.column_vertical(-100, 0)
+        self.assertEqual('Column Top Bearing', result['category'])
+        self.assertEqual('Bearing gap', result['measurement'])
+        self.assertEqual(0, result['value'])
+        self.assertEqual('Pass', result['severity'])
+        axis = self.rows([self.column])[0]
+        self.assertEqual('Column Axis', axis['category'])
+        self.assertNotEqual(axis['relationship_id'], result['relationship_id'])
+
+    def test_column_top_bearing_gap_and_noise(self):
+        for gap, expected in ((1.0 / 32, 'Critical'), (1.0 / 16, 'Warning'),
+                              (-0.5e-6, 'Pass')):
+            result = self.column_vertical(-100, -gap)
+            self.assertEqual('Column Top Bearing', result['category'])
+            self.assertEqual(expected, result['severity'])
+            self.assertEqual(gap, result['value'])
+
+    def test_bearing_requires_local_column_top(self):
+        result = self.column_vertical(-100, 0, faces=False)
+        self.assertEqual('Column Top Bearing', result['category'])
+        self.assertEqual('Not evaluated', result['severity'])
+        self.assertIsNone(result['value'])
+
+    def test_column_vertical_evidence_preserves_both_failed_boundaries(self):
+        self.column_vertical(2, 10)
+        relations = []
+        endpoint_checks(self.beam, SpatialIndex([self.beam, self.column]),
+                        self.settings, relations)
+        vertical = next(r for r in relations
+                        if r['category'] == 'Column Shaft' and r['end'] == 1)
+        self.assertEqual(-2, vertical['evidence']['bottom_clearance'])
+        self.assertEqual(2, vertical['evidence']['top_protrusion'])
+
     def test_endpoint_small_and_large_miss(self):
         for gap, expected in ((1.0 / 32, 'Critical'), (1.0 / 8, 'Warning')):
             self.column['start'] = (100 + gap, 0, -20)
@@ -228,6 +294,30 @@ class DuplicateTests(unittest.TestCase):
 
 
 class CoverageAndSessionTests(unittest.TestCase):
+    def test_rule_change_invalidates_previous_accepted_findings(self):
+        import ast
+        import io
+        import types
+        command = os.path.join(ROOT, 'KL&A Tools_dev.tab', '05 DevSandbox.panel',
+                               'Model Review.pulldown', 'Model Checker.pushbutton', 'script.py')
+        with io.open(command, encoding='utf-8') as stream:
+            tree = ast.parse(stream.read(), command)
+        tree.body = [node for node in tree.body
+                     if isinstance(node, ast.FunctionDef) and node.name == '_stamp']
+        scope = {'signature': signature, 'SCHEMA_VERSION': 2, 'RULESET_VERSION': 1,
+                 'host': types.SimpleNamespace(id_value=lambda phase: phase)}
+        exec(compile(tree, command, 'exec'), scope)
+        args = ({'a': 1}, DEFAULTS, 1, {}, {}, {})
+        previous_stamp = scope['_stamp'](*args)
+        scope['RULESET_VERSION'] = 2
+        current_stamp = scope['_stamp'](*args)
+        self.assertNotEqual(previous_stamp, current_stamp)
+        rows = evaluate([member()], [], dict(DEFAULTS, checks=['SMR-01']))
+        previous = {'stamp': previous_stamp, 'rows': copy.deepcopy(rows)}
+        previous['rows'][0].update(status='Accepted exception', exception='Reviewed.')
+        carry_exceptions(rows, previous, current_stamp)
+        self.assertEqual('Open', rows[0]['status'])
+
     def test_cancelled_run_cannot_return_complete_rows(self):
         def cancel(value, total):
             raise Cancelled()

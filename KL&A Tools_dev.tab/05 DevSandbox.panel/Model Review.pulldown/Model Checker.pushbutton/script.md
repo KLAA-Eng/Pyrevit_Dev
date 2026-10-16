@@ -16,6 +16,8 @@
 # Review status: beam categories and separate column targets confirmed; join API,
 # floor/roof association, z-offset transfer, SDS2 routes, and BHoM investigated.
 # Live host/export evidence and remaining policy decisions are still pending.
+# SMR-02 column review confirmed: full-depth shaft containment and a separate
+# column-top bearing check are implemented, with independent result categories.
 
 # Identity and implementation boundaries.
 # Use the Model Checker command with stable ID steel-model-review.
@@ -242,7 +244,8 @@
 # Do not assume proximity to a column axis proves the required connection.
 # Discuss web center/reference planes versus actual physical faces and how
 # justification affects each target; preserve separate axis results either way.
-# Discuss shaft framing versus bearing at the column top as separate conditions.
+# Confirmed: require full-depth containment for shaft framing; evaluate top bearing
+# separately. Partial overlap alone cannot pass. Physical bearing adequacy is pending.
 # Discuss column rotation, W/HSS sections, and beams meeting above column extent.
 # Discuss whether collinear beam ends over a column represent a splice, separate
 # supported spans, or an explicitly unresolved joint without additional evidence.
@@ -483,18 +486,26 @@
 # Allow intentional cantilevers to be accepted with a reviewer reason.
 
 # Evaluate SMR-02 vertical mismatches.
-# Require a unique support or unique near-miss candidate from SMR-01.
-# Otherwise return Not evaluated and reference the support-resolution reason.
+# Evaluate each resolved actual relationship or unique near-miss from SMR-01.
+# Missing or ambiguous support returns Not evaluated with its resolution reason.
 # At beam-to-beam framing stations, compare local top-of-steel elevations.
 # Account for different depths, instance offsets, slope, and section rotation.
 # Do not compare centerline elevations as a substitute for top alignment.
-# For beam-to-column framing, compare the beam end to finite column extent.
-# Permit framing into the column shaft without requiring column-top equality.
+# For Column Shaft, require the full local beam depth within original-solid
+# finite column extent. Partial overlap fails, including protrusion at either end.
+# Measure the greater protrusion: negative below base, positive above top; on a
+# tie use positive. Preserve both signed boundary differences in the details.
+# Contained shaft framing passes without requiring column-top equality.
+# If the underside is at/above the column upper extent within numerical zero,
+# classify Column Top Bearing and measure underside minus local column top.
+# Missing local top geometry is Not evaluated; do not infer bearing from bounds.
+# Partial upper overlap with underside below column top stays a shaft failure.
+# Keep axis, faces, shaft, and bearing categories separately linked to results.
+# Cap plates, seats, nonuniform cuts, and physical bearing area remain future work.
 # For wall bearing, compare beam underside to local wall top at the face.
 # Treat embedded or side-supported wall conditions as explicit review cases.
-# Use zero separation for compatible overlapping vertical intervals.
-# Otherwise measure distance to the nearest admissible interval boundary.
 # Preserve signed elevation differences and classify their absolute values.
+# Invalidate old session reports and acceptances when acceptance rules change.
 # Return Not evaluated when local section or support geometry is unreliable.
 # Do not fabricate a top elevation from a coarse bounding box.
 

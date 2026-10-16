@@ -33,14 +33,16 @@ Model Review uses the existing KL&A cube ribbon icon; Model Checker uses the
 existing search icon with light/dark theme variants. The findings browser shows
 descriptive check names, member/support names and IDs, and the filtered result
 count. Search includes both member and support identities. Measurements are
-labeled as Offset or Overlap length and retain eight decimal places in inches.
+labeled by purpose (Offset, Overlap length, Shaft containment, or Bearing gap)
+and retain eight decimal places in inches.
 An aligned column is described as aligned; off-grid wording is reserved for
 nonzero discrepancies. Filtering clears details from the previous selection.
 
 The reviewed beam implementation now uses versioned Member, Relationship, and
 Check Result records. Snapshots retain source geometry once, relationship
 evidence separately, and result references for browsing and exceptions. A new
-session-cache schema prevents reuse of older reports/acceptances under new rules.
+session-cache schema and independent ruleset fingerprint prevent reuse of older
+reports/acceptances under new rules.
 The browser shows relationship categories and readable Revit join/offset evidence.
 
 Girder, Splice, and Corner/End classify finite reference relationships in plan;
@@ -100,6 +102,8 @@ One command runs six independently selectable checks across the whole model:
   setbacks, cutbacks, and copes are generally completed in SDS2.
 - Eligible supports are steel beams, steel columns, and concrete walls.
 - Beam-to-beam framing normally aligns at top of steel.
+- Column-shaft framing requires full beam-depth containment; column-top bearing
+  is evaluated separately.
 - A beam supported by a concrete wall terminates at the wall face.
 - Some projects intentionally contain off-grid columns.
 - Review scope is the whole model, independent of current selection or view.
@@ -237,18 +241,35 @@ the SMR-01 reason rather than reporting a zero discrepancy.
   Different section depths may have different centerline elevations and still
   pass. Account for slope, rotation, and instance offsets; do not use only
   reference level or nominal section depth where it gives an incorrect top.
-- Beam to column: check that the beam's end section has a plausible vertical
-  relationship to the finite column extent. Do not require beam top of steel
-  to equal column top. A beam framed into a column shaft can pass.
+- Beam to column: retain the separate SMR-01 Column Axis and section-face
+  records. SMR-02 uses its own Column Shaft or Column Top Bearing relationship:
+  - Column Shaft: the entire local beam-end vertical interval must lie inside
+    the original solid's finite column vertical extent, within numerical zero.
+    Partial overlap fails. Measure the larger out-of-extent portion, negative
+    below the base and positive above the top (positive on a tie). Preserve
+    both signed boundary differences in the details, including when both fail.
+    A contained beam passes without any column-top equality requirement.
+  - Column Top Bearing: when the beam underside is at/above the column's upper
+    extent (within numerical zero), compare underside with the local original
+    column-top surface at the resolved plan target. A positive value is a gap;
+    zero is Pass. Missing local geometry, including a void at that target,
+    returns Not evaluated; the upper extent alone cannot prove bearing.
+  - Geometry selects the evaluation category, not designed connection intent.
+    A beam partly extending above the top with its underside below that top
+    remains a shaft containment failure. Cap plates, bearing seats, nonuniform
+    column-end cuts, and physical bearing area require future review; this
+    rule checks vertical placement, not connection adequacy.
 - Beam to concrete wall: default to bearing with the beam underside at the
   local wall top at the approached face. This bearing interpretation is a
   proposed default; embedded/side-supported conditions need an exception or
   future explicit support profile.
 
-For vertical intervals, an overlapping compatible interval has zero separation;
-otherwise use the distance to the nearest admissible interval boundary. Wall
-bearing uses signed underside-to-wall-top difference. Report both sign and
-absolute magnitude; severity uses absolute magnitude.
+Girder alignment and wall bearing use signed surface-elevation differences.
+Column shaft containment uses the signed governing out-of-extent portion;
+column-top bearing uses the signed underside-to-local-top difference. Severity
+uses absolute magnitude under the common offset rule. The findings browser
+labels shaft containment and bearing gap separately and shows beam underside,
+beam top, column extents, and both shaft boundary differences where resolved.
 
 Where the relevant surface, section envelope, or support relationship cannot
 be determined reliably, return Not evaluated with a reason. Do not fabricate
@@ -480,6 +501,11 @@ No upstream code or assets were copied.
 | A37 | Interior pair crossing with overlapping or separated elevations | Error or Information respectively; unavailable sections Not evaluated. |
 | A38 | Empty/failed end-join query or disallowed join | Evidence retained independently from geometric classification. |
 | A39 | Zero/absent common or end-specific z offsets | Distinct raw parameter states; no guessed SDS2 mapping. |
+| A40 | Beam only partly overlaps column vertically | Column Shaft failure; full depth must fit. Preserve both failed boundary differences. |
+| A41 | Full beam depth fits column, including exact boundaries | Column Shaft Pass within numerical zero. |
+| A42 | Beam underside matches or is above column top | Separate Column Top Bearing result using local top; gap drives common severity. |
+| A43 | Column bearing target has unresolved local top geometry | Not evaluated; no extent-only bearing Pass. |
+| A44 | Rules change with unchanged model/settings | Cached report and prior acceptances cannot carry into the new ruleset. |
 
 Host-independent tests should exercise the severity boundaries, finite geometry,
 support ambiguity, duplicate pairing, exception invalidation, and report coverage.
@@ -498,10 +524,10 @@ member counts during calibration; no performance target is claimed yet.
 The reported Revit attempt failed; no successful live acceptance or SDS2 export
 validation is claimed. Acceptance scenarios are requirements, not passing tests.
 
-Host-independent validation on 2026-10-16: 83 rule/session, mocked-host,
+Host-independent validation on 2026-10-16: 93 rule/session, mocked-host,
 failure-diagnostic, reporting, and connection-record tests passed;
 repository metadata validator checked 35 visible commands with zero errors.
-Python compilation and isolated XAML loading/rendering passed. All 11 command
+An earlier isolated XAML loading/rendering check passed. All 11 command
 and helper files also compiled with the installed IronPython 2.7 engine.
 Live Revit acceptance remains pending. Tests are in `tests/steel_model_review_test.py` and
 `tests/steel_model_review_host_test.py`, and
@@ -519,7 +545,7 @@ accepted live in Revit and has no SDS2 transfer validation.
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| `v0.0` | Unreleased | 10.16.2026 | Whole-model review; classified beam relationships, separate record contracts, column-face diagnostics, bottom-face work planes, interior crossings, and readable findings. | Baseline c994742 on dev.model-checker plus pending implementation changes; no main delivery exists. |
+| `v0.0` | Unreleased | 10.16.2026 | Whole-model review; classified beam relationships, separate record contracts, column-face diagnostics, full-depth shaft containment and separate top bearing, bottom-face work planes, interior crossings, and readable findings. | Baseline c994742 on dev.model-checker plus subsequent development work; no main delivery exists. |
 
 ## Backlog and implementation decisions
 

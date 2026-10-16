@@ -58,14 +58,43 @@ def finding(check, member, reason, level='Warning', value=None,
                     tuple(sorted(r['uid'] for r in related)))}
 
 
+def _column_vertical(member, support, point, target, epsilon):
+    """Separate full-depth shaft containment from local column-top bearing.
+
+    Partial overlap is a shaft containment failure. A beam whose underside is
+    at/above the finite column top is a bearing candidate, not a shaft Pass.
+    """
+    own = section_interval(member, point, epsilon)
+    if own is None:
+        return ('Column Vertical', None,
+                'Beam local section boundaries could not be resolved.', {})
+    low, high = support['bounds'][0][2], support['bounds'][1][2]
+    facts = {'beam_bottom': own[0], 'beam_top': own[1],
+             'column_bottom': low, 'column_top': high,
+             'bottom_clearance': own[0] - low, 'top_protrusion': own[1] - high,
+             'extent_basis': 'Original solid finite vertical extent'}
+    if own[0] >= high - epsilon:
+        other = section_interval(support, target, epsilon)
+        if other is None:
+            return ('Column Top Bearing', None,
+                    'Column-top bearing candidate; local column top could not be resolved.', facts)
+        facts.update(local_column_top=other[1], bearing_gap=own[0] - other[1])
+        return ('Column Top Bearing', facts['bearing_gap'],
+                'Beam underside minus local column top (bearing; positive is a gap).', facts)
+    below = max(low - own[0], 0.0)
+    above = max(own[1] - high, 0.0)
+    value = -below if below > above else above
+    reason = ('Full beam depth must lie within the finite column shaft. '
+              'Below-base extent {0:.8f} in; above-top extent {1:.8f} in. '
+              'Signed governing extent: negative below base, positive above top.'
+              .format(below, above))
+    return 'Column Shaft', value, reason, facts
+
+
 def _vertical(member, support, point, target, epsilon):
     own = section_interval(member, point, epsilon)
     if own is None:
         return None, 'Beam local section boundaries could not be resolved.'
-    if support['kind'] == 'column':
-        low, high = support['bounds'][0][2], support['bounds'][1][2]
-        gap = max(low - own[1], own[0] - high, 0.0)
-        return gap, 'Beam end versus finite column vertical extent.'
     other = section_interval(support, target, epsilon)
     if other is None:
         return None, 'Support local section boundaries could not be resolved.'
@@ -151,14 +180,23 @@ def endpoint_checks(member, index, settings, relationships=None):
                 rows.append(bind_result(finding('SMR-01', member, reason,
                                                  severity(gap, eps), gap, end, [support]),
                                         rel, 'Endpoint miss' if gap > eps else ''))
-                if candidate['category'] in ('Splice connection', 'Corner/End'):
+                vertical_rel, measurement = rel, 'Offset'
+                if support['kind'] == 'column':
+                    category, value, reason, facts = _column_vertical(
+                        member, support, point, target, eps)
+                    vertical_rel = relationship(member, support, category, end, **facts)
+                    relationships.append(vertical_rel)
+                    measurement = ('Bearing gap' if category == 'Column Top Bearing'
+                                   else 'Shaft containment')
+                elif candidate['category'] in ('Splice connection', 'Corner/End'):
                     value, reason = None, 'Vertical expectation for {0} is pending review.'.format(
                         candidate['category'])
                 else:
                     value, reason = _vertical(member, support, point, target, eps)
                 rows.append(bind_result(finding('SMR-02', member, reason,
                                                  severity(value, eps) if value is not None else
-                                                 'Not evaluated', value, end, [support]), rel))
+                                                 'Not evaluated', value, end, [support],
+                                                 measurement=measurement), vertical_rel))
                 if support['kind'] == 'column':
                     faces = candidate.get('faces', [])
                     for face in faces or [{'category': 'Column Face', 'target': None, 'gap': None}]:

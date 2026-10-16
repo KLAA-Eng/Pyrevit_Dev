@@ -19,6 +19,7 @@ tooltip: |
   -> Correct the model manually and rerun. Linked models are excluded.
   _____________________________________________________________________
   Last update:
+  - [10.16.2026] v0.0 - Require full-depth column-shaft containment; report column-top bearing separately.
   - [10.16.2026] v0.0 - Classify beam joints; add linked records, underside work planes, and crossing errors.
   - [10.16.2026] v0.0 - Add ribbon icons and clearer finding labels, search, and measurements.
   - [10.16.2026] v0.0 - Added whole-model steel checks under Model Review.

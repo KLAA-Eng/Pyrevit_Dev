@@ -81,7 +81,15 @@ def evidence_text(relation, member):
             details.append('Receiving member Revit structural usage: {0}'.format(facts['receiving_usage']))
         for key, label, units in (('angle_degrees', 'Plan angle', 'degrees'),
                                   ('horizontal_miss', 'Horizontal miss', 'in'),
-                                  ('vertical_gap', 'Vertical separation', 'in')):
+                                  ('vertical_gap', 'Vertical separation', 'in'),
+                                  ('beam_bottom', 'Beam underside elevation', 'in'),
+                                  ('beam_top', 'Beam top elevation', 'in'),
+                                  ('column_bottom', 'Column lower extent', 'in'),
+                                  ('column_top', 'Column upper extent', 'in'),
+                                  ('bottom_clearance', 'Underside above column base (negative below)', 'in'),
+                                  ('top_protrusion', 'Beam top above column top (negative within)', 'in'),
+                                  ('local_column_top', 'Local column bearing elevation', 'in'),
+                                  ('bearing_gap', 'Underside minus local column top', 'in')):
             if facts.get(key) is not None:
                 details.append('{0}: {1:.8f} {2}'.format(label, facts[key], units))
         if facts.get('group_size', 0) > 1:

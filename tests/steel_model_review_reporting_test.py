@@ -8,7 +8,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'lib'))
 
 from steel_model_review.engine import finding
-from steel_model_review.reporting import CHECK_LABELS, ReviewRow, filtered_rows
+from steel_model_review.reporting import CHECK_LABELS, ReviewRow, evidence_text, filtered_rows
 
 
 def row(level='Critical', value=0.000002):
@@ -30,6 +30,18 @@ class ReportingTests(unittest.TestCase):
         result = row()
         result['member'] = '12345: W12x26'
         self.assertEqual('12345: W12x26', ReviewRow(result).Member)
+
+    def test_column_vertical_details_show_both_boundaries_and_bearing(self):
+        relation = {'category': 'Column Shaft', 'evidence': {
+            'beam_bottom': 0, 'beam_top': 12, 'column_bottom': 2, 'column_top': 10,
+            'bottom_clearance': -2, 'top_protrusion': 2}}
+        details = evidence_text(relation, {})
+        self.assertIn('Underside above column base (negative below): -2.00000000 in', details)
+        self.assertIn('Beam top above column top (negative within): 2.00000000 in', details)
+        relation = {'category': 'Column Top Bearing', 'evidence': {
+            'local_column_top': -0.03125, 'bearing_gap': 0.03125}}
+        self.assertIn('Underside minus local column top: 0.03125000 in',
+                      evidence_text(relation, {}))
 
     def test_overlap_length_is_identified_separately(self):
         result = row(value=50)

@@ -3,6 +3,8 @@
 from steel_model_review.session import signature
 
 SCHEMA_VERSION = 2
+# Advance when acceptance rules change without changing the record structure.
+RULESET_VERSION = 1
 
 
 def member_record(source):
