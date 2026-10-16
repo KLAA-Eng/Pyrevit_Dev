@@ -92,6 +92,16 @@ def line_distance(point, line):
                (start[0] - point[0]) * (end[1] - start[1])) / length
 
 
+def face_contains(face, point, epsilon):
+    """Test a world-coordinate point against finite planar loops, including holes."""
+    normal, _origin, loops = face
+    drop = max(range(3), key=lambda i: abs(normal[i]))
+    axes = [i for i in range(3) if i != drop]
+    flat = tuple(point[i] for i in axes)
+    return sum(1 for loop in loops if inside(
+        flat, [tuple(p[i] for i in axes) for p in loop], epsilon)) % 2 == 1
+
+
 class SpatialIndex(object):
     """Index finite plan envelopes without exploding large diagonal envelopes.
 
@@ -121,8 +131,13 @@ class SpatialIndex(object):
 
     def query(self, point, radius):
         """Yield each nearby plan-envelope record once, in stable order."""
-        low = self._cell((point[0] - radius, point[1] - radius))
-        high = self._cell((point[0] + radius, point[1] + radius))
+        for record in self.query_bounds((point, point), radius):
+            yield record
+
+    def query_bounds(self, bounds, radius=0.0):
+        """Yield overlapping plan envelopes, including interior-crossing pairs."""
+        low = self._cell(tuple(bounds[0][i] - radius for i in (0, 1)))
+        high = self._cell(tuple(bounds[1][i] + radius for i in (0, 1)))
         keys = set(self.large)
         # An extreme user search range must not enumerate millions of cells.
         if (high[0] - low[0] + 1) * (high[1] - low[1] + 1) > 4096:
@@ -134,6 +149,7 @@ class SpatialIndex(object):
         for key in sorted(keys):
             record = self.records[key]
             lo, hi = record['bounds']
-            if all(lo[i] - radius <= point[i] <= hi[i] + radius
+            if all(lo[i] - radius <= bounds[1][i] and
+                   bounds[0][i] <= hi[i] + radius
                    for i in (0, 1)):
                 yield record

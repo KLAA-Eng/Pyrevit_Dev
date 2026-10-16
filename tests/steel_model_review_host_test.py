@@ -131,7 +131,8 @@ class HostBoundaryTests(unittest.TestCase):
         records, grids, coverage, rows = self.host.extract_model(
             None, [(bad, 'column'), (good, 'column')], None, [], {},
             ['SMR-03'], lambda *args: None)
-        self.assertEqual([{'uid': 'good'}], records)
+        self.assertEqual([{'uid': 'good', 'classification': {
+            'material': 'steel', 'reviewed_override': False}}], records)
         self.assertEqual(['Failed', 'Eligible'], [r[2] for r in coverage])
         self.assertEqual('Not evaluated', rows[0]['severity'])
         self.assertIn('Missing material asset', rows[0]['reason'])

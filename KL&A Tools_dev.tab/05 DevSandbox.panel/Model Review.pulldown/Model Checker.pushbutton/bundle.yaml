@@ -8,7 +8,8 @@ tooltip: |
   Description:
 
   Review whole-model steel geometry before SDS2 export: beam endpoints,
-  vertical alignment, column grids, and duplicate members.
+  connection roles, vertical alignment, column grids/faces, duplicates,
+  interior crossings, and floor/roof bottom-face work planes.
   Read-only prototype. Unsupported geometry is reported as Not evaluated.
   _____________________________________________________________________
   How-to:
@@ -18,6 +19,7 @@ tooltip: |
   -> Correct the model manually and rerun. Linked models are excluded.
   _____________________________________________________________________
   Last update:
+  - [10.16.2026] v0.0 - Classify beam joints; add linked records, underside work planes, and crossing errors.
   - [10.16.2026] v0.0 - Add ribbon icons and clearer finding labels, search, and measurements.
   - [10.16.2026] v0.0 - Added whole-model steel checks under Model Review.
   - [10.16.2026] v0.0 - Show failure stage and full traceback in dialog details.

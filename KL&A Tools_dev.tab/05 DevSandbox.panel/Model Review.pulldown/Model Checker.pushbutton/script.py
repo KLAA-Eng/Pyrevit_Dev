@@ -24,7 +24,8 @@ from System.Collections.Generic import List
 
 from steel_model_review import host
 from steel_model_review.browser import ReviewWindow
-from steel_model_review.engine import CHECKS, DEFAULTS, Cancelled, evaluate
+from steel_model_review.engine import CHECKS, DEFAULTS, Cancelled, assemble_report, evaluate
+from steel_model_review.records import SCHEMA_VERSION
 from steel_model_review.reporting import CHECK_LABELS
 from steel_model_review.session import carry_exceptions, signature
 
@@ -81,7 +82,7 @@ def _pick(mapping, title):
     return mapping.get(selected) if selected else None
 
 
-def _distance_prompt(label, default, epsilon=False):
+def _distance_prompt(label, default, epsilon=False, units='inches'):
     """Read a finite positive inch setting, retrying invalid input."""
     while True:
         value = forms.ask_for_string(default=str(default), prompt=label,
@@ -94,10 +95,13 @@ def _distance_prompt(label, default, epsilon=False):
                 raise ValueError()
             if epsilon and value >= 0.0001:
                 raise ValueError()
+            if units == 'degrees' and value >= 90:
+                raise ValueError()
             return value
         except ValueError:
-            forms.alert('Enter a positive decimal in inches.{0}'.format(
+            forms.alert('Enter a positive decimal in {0}.{1}'.format(units,
                 ' Numerical zero must be smaller than 0.0001 in.' if epsilon
+                else ' Angle must be smaller than 90 degrees.' if units == 'degrees'
                 else ''), title=__title__)
 
 
@@ -159,9 +163,11 @@ def _configure(document):
     for key, label, epsilon in (
             ('search', 'Support search distance in inches (proposed default 12).', False),
             ('epsilon', 'Numerical zero in inches (proposed default 0.000001).', True),
-            ('near', 'Near-duplicate range in inches (proposed default 0.0625).', False)):
+            ('near', 'Near-duplicate range in inches (proposed default 0.0625).', False),
+            ('angle_degrees', 'Plan angle tolerance in degrees (proposed default 0.01).', False)):
         _stage('Reading the {0} tolerance'.format(key))
-        value = _distance_prompt(label, settings[key], epsilon)
+        value = _distance_prompt(label, settings[key], epsilon,
+                                 'degrees' if key == 'angle_degrees' else 'inches')
         if value is None:
             return None
         settings[key] = value
@@ -173,12 +179,14 @@ def _configure(document):
         'Search: {3:g} in; zero: {4:g} in; near duplicates: {5:g} in.\n\n'
         'Nonzero offsets below 1/16 in: CRITICAL.\n'
         'Offsets at or above 1/16 in: WARNING.\n'
-        'Steel targets: reference axes/lines. Walls: face and underside bearing.\n'
+        'Beam roles: girder, splice, Corner/End. Column axes and faces are separate.\n'
+        'Bottom-face work planes are informational; crossing errors have no severity tier yet.\n'
+        'Plan angle tolerance: {6:g} degrees (proposed default).\n'
         'Links are excluded; unresolved geometry is reported.\n'
         'The model will not be modified.'
         .format(labels['phase'], '; '.join(labels['options']),
                 ', '.join(settings['checks']), settings['search'],
-                settings['epsilon'], settings['near']),
+                settings['epsilon'], settings['near'], settings['angle_degrees']),
         title=__title__, yes=True, no=True)
     return (settings, phase.Id, options, labels) if confirmed else None
 
@@ -227,7 +235,8 @@ def _versions(document):
     """Fingerprint relevant members, types, materials, grids, phases and options."""
     entries = [(e.UniqueId, str(e.VersionGuid)) for e, _kind in _elements(document)]
     for cls in (DB.FamilySymbol, DB.WallType, DB.Material, DB.PropertySetElement,
-                DB.Level, DB.Phase, DB.DesignOption):
+                DB.Level, DB.Phase, DB.DesignOption, DB.Floor, DB.RoofBase,
+                DB.SketchPlane, DB.ReferencePlane, DB.BeamSystem):
         entries.extend((e.UniqueId, str(e.VersionGuid))
                        for e in DB.FilteredElementCollector(document).OfClass(cls))
     return signature(sorted(entries))
@@ -235,7 +244,7 @@ def _versions(document):
 
 def _stamp(versions, settings, phase, options, expected, overrides):
     """Fingerprint all comparison settings and model-scope version evidence."""
-    return signature([versions, settings, host.id_value(phase), options,
+    return signature([SCHEMA_VERSION, versions, settings, host.id_value(phase), options,
                       expected, sorted(overrides.items())])
 
 
@@ -244,16 +253,17 @@ def _summary(coverage, settings, labels, rows, links):
     counts = Counter(item[2] for item in coverage)
     text = ('Phase {0}; {1}. Eligible {2}; excluded {3}; unsupported {4}; '
             'failed {5}; excluded link instances {6}.\nSearch {7:g} in; zero '
-            '{8:g} in; near duplicates {9:g} in; grid mode {10}.'
+            '{8:g} in; near duplicates {9:g} in; grid mode {10}; plan angle {11:g} degrees.'
             .format(labels['phase'], '; '.join(labels['options']),
                     counts['Eligible'], counts['Excluded'], counts['Unsupported'],
                     counts['Failed'], links, settings['search'],
-                    settings['epsilon'], settings['near'], settings['grid_mode']))
+                    settings['epsilon'], settings['near'], settings['grid_mode'],
+                    settings['angle_degrees']))
     for check in CHECKS:
         outcomes = [r for r in rows if r['check'] == check]
         done = len(set(r['uid'] for r in outcomes
                        if r['severity'] != 'Not evaluated'))
-        if check == 'SMR-04':
+        if check in ('SMR-04', 'SMR-06'):
             done = len(set([r['uid'] for r in outcomes
                             if r['severity'] != 'Not evaluated'] +
                            [item['uid'] for r in outcomes for item in r['related']
@@ -271,6 +281,7 @@ def _run(document, elements, settings, phase, options, labels, overrides,
          expected, previous, versions):
     """Run extraction and rules, retaining explicit cancellation state."""
     coverage, rows, records, grids = [], [], [], []
+    relationships = []
     state = 'Complete'
     with forms.ProgressBar(title='Model Checker: {value}/{max_value}',
                            cancellable=True, step=10) as bar:
@@ -284,19 +295,24 @@ def _run(document, elements, settings, phase, options, labels, overrides,
                 document, elements, phase, options, overrides,
                 settings['checks'], progress)
             _stage('Comparing model geometry')
-            rows.extend(evaluate(records, grids, settings, expected, progress))
+            for member in records:
+                member['source_model'] = document.ProjectInformation.UniqueId
+                member['scope'] = {'phase_id': host.id_value(phase), 'option_ids': options}
+            rows.extend(evaluate(records, grids, settings, expected, progress, relationships))
         except Cancelled:
             state = 'Cancelled - incomplete; partial extraction may be omitted'
     stamp = _stamp(versions, settings, phase, options, expected, overrides)
+    report = assemble_report(records, rows, relationships)
     if state == 'Complete':
         carry_exceptions(rows, previous, stamp)
     links = len(host.collect(document, DB.BuiltInCategory.OST_RvtLinks))
-    return {'model': document.Title, 'version': __version__,
+    report.update({'model': document.Title, 'version': __version__,
             'time': datetime.datetime.now().isoformat(), 'state': state,
             'settings': settings, 'labels': labels, 'stamp': stamp,
-            'versions': versions, 'rows': rows, 'coverage': coverage,
+            'versions': versions, 'coverage': coverage,
             'grids': grids, 'expected': expected,
-            'summary': _summary(coverage, settings, labels, rows, links)}
+            'summary': _summary(coverage, settings, labels, rows, links)})
+    return report
 
 
 def _navigate(document, row):
@@ -357,7 +373,7 @@ def main():
     overrides = _material_overrides(elements, phase, options)
     _stage('Loading the previous session report')
     model_identity = [document.PathName, document.ProjectInformation.UniqueId]
-    cache_key = 'KLA_MODEL_CHECKER_' + signature(model_identity)
+    cache_key = 'KLA_MODEL_CHECKER_V{0}_'.format(SCHEMA_VERSION) + signature(model_identity)
     cached = AppDomain.CurrentDomain.GetData(cache_key)
     previous = json.loads(cached) if cached else None
     expected = dict(previous.get('expected', {})) if previous else {}
@@ -407,8 +423,8 @@ def main():
                                columns=['Element ID', 'Kind', 'State', 'Reason'])
             forms.alert(current['summary'], title='Model Checker coverage')
         elif action == 'accept' and not stale:
-            if row['severity'] not in ('Critical', 'Warning'):
-                forms.alert('Only Critical or Warning findings may be accepted. '
+            if row['severity'] not in ('Critical', 'Error', 'Warning'):
+                forms.alert('Only Critical, Error, or Warning findings may be accepted. '
                             'Unresolved coverage remains Not evaluated.', title=__title__)
                 continue
             reason = forms.ask_for_string(prompt='Reason this condition is intentional:',

@@ -4,7 +4,7 @@
 from pyrevit import forms
 
 from steel_model_review.engine import CHECKS
-from steel_model_review.reporting import CHECK_LABELS, filtered_rows
+from steel_model_review.reporting import CHECK_LABELS, evidence_text, filtered_rows
 
 
 class ReviewWindow(forms.WPFWindow):
@@ -21,23 +21,27 @@ class ReviewWindow(forms.WPFWindow):
         self.action = None
         self.snapshot = snapshot
         self._ready = False
+        self.relationships = dict((r['relationship_id'], r)
+                                  for r in snapshot.get('relationships', []))
+        self.members = dict((m['uid'], m) for m in snapshot.get('members', []))
         rows = snapshot['rows']
         counts = dict((s, sum(1 for r in rows if r['severity'] == s))
-                      for s in ('Critical', 'Warning', 'Not evaluated', 'Pass'))
+                      for s in ('Critical', 'Warning', 'Not evaluated', 'Pass', 'Error', 'Information'))
         accepted = sum(1 for r in rows if r['status'] == 'Accepted exception')
         self.summary.Text = (
             '{0} | {1} | {2}\nCritical {3}  |  Warning {4}  |  '
-            'Not evaluated {5}  |  Pass {6}  |  Accepted exceptions {7}'
+            'Not evaluated {5}  |  Pass {6}  |  Accepted exceptions {7}  |  '
+            'Error {8}  |  Information {9}'
             .format(snapshot['model'], snapshot['time'], snapshot['state'],
                     counts['Critical'], counts['Warning'], counts['Not evaluated'],
-                    counts['Pass'], accepted))
+                    counts['Pass'], accepted, counts['Error'], counts['Information']))
         self.coverage_text.Text = snapshot['summary']
         self.stale_text.Text = (
             'STALE: model or settings changed. Rerun before accepting findings.'
             if stale else 'Read-only geometry review; no SDS2-ready certification.')
         self.accept_button.IsEnabled = not stale and snapshot['state'] == 'Complete'
-        self.severity_filter.ItemsSource = ['Issues', 'All', 'Critical', 'Warning',
-                                            'Not evaluated', 'Pass']
+        self.severity_filter.ItemsSource = ['Review', 'All', 'Critical', 'Error', 'Warning',
+                                            'Not evaluated', 'Information', 'Pass']
         self.check_filter.ItemsSource = ['All'] + [CHECK_LABELS[c] for c in CHECKS]
         self.level_filter.ItemsSource = ['All'] + sorted(set(r['level'] for r in rows))
         self.status_filter.ItemsSource = ['All', 'Open', 'Accepted exception']
@@ -90,6 +94,8 @@ class ReviewWindow(forms.WPFWindow):
                                 .format(selected.Check, selected.Member, end,
                                         selected.Reason, selected.Related or 'None',
                                         measurement, row['exception'] or 'None'))
+            relation = self.relationships.get(row.get('relationship_id'))
+            self.detail.Text += '\n' + evidence_text(relation, self.members.get(row['uid'], {}))
         else:
             self.detail.Text = ''
 

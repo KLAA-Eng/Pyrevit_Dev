@@ -7,8 +7,12 @@
 # Baseline implementation committed as c994742 on dev.model-checker.
 # Review SMR-01, SMR-02, SMR-03, and SMR-04 in that order with the user.
 # Record agreed logic and implementation changes in this comments-only file.
-# Do not apply review decisions to executable code during this review stage.
-# SPEC.md continues to describe the implemented baseline until implementation.
+# User authorized executable implementation of the reviewed beam workflow.
+# Implementation now includes separate Member/Relationship/CheckResult records,
+# classified endpoints, read-only joins/offset evidence, column-face diagnostics,
+# bottom-face work planes (SMR-05), and interior crossings (SMR-06).
+# SPEC.md describes that implementation; unagreed policies remain explicit.
+# BHoM is a future optional addition; no runtime dependency has been introduced.
 # Review status: beam categories and separate column targets confirmed; join API,
 # floor/roof association, z-offset transfer, SDS2 routes, and BHoM investigated.
 # Live host/export evidence and remaining policy decisions are still pending.
@@ -128,7 +132,8 @@
 # Treat a beam endpoint intersecting another beam as a connection relationship.
 # Distinguish girder connections from splice connections in the checker.
 # Revisit column connection logic rather than retaining axis-only reasoning as final.
-# Changes remain design notes here; the executable baseline above is unchanged.
+# The baseline description above is historical. The reviewed categories and
+# evidence strategy below are now implemented with live-host acceptance pending.
 # The interpretation and proposed details below still need user review.
 # Do not equate a checker connection relationship with a designed steel connection.
 
@@ -287,7 +292,7 @@
 # Additional requested check: floor/roof bottom-face work-plane attachment.
 # User clarified scope: determine whether the beam is attached to the work plane
 # referencing the BOTTOM face of a floor or roof. Generic hosting is insufficient.
-# New check ID and finding severity are pending; this is not yet executable.
+# Implemented as SMR-05; outcomes are informational pending severity policy.
 # Detect and report the relationship and its evidence before judging correctness.
 # Report Floor Bottom Work Plane and Roof Bottom Work Plane separately.
 # Other Work Plane, No Bottom-face Attachment Found, and Unresolved remain
@@ -420,8 +425,8 @@
 # No documented SDS2 adapter or complete checker matching these office rules was
 # found in the reviewed official toolkit/docs sources; do not infer one exists.
 # User decision: adopt Member -> Relationship -> Check Result records now as
-# the local design contract. Executable migration remains deferred during this
-# comments-only review. Evaluate a BHoM dependency later; add none at this stage.
+# the local design contract. The executable snapshot now uses this structure.
+# Evaluate a BHoM dependency as a future addition; add none at this stage.
 # Adopted local schema, not a claim of exact BHoM types or field compatibility:
 # MemberRecord: source model/IDs, reference line, physical geometry, local section,
 # material/type, phase/option, level, raw offsets/justification, and raw host facts.

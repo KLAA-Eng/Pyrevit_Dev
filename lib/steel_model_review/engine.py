@@ -10,10 +10,17 @@ from steel_model_review.geometry import (
     SpatialIndex, distance, intersection, line_distance, projection,
     section_interval,
 )
+from steel_model_review.connections import (
+    crossing_relationship, discover_end, end_relationship,
+)
+from steel_model_review.records import (
+    SCHEMA_VERSION, bind_result, member_record, relationship,
+)
 
-CHECKS = ('SMR-01', 'SMR-02', 'SMR-03', 'SMR-04')
+CHECKS = ('SMR-01', 'SMR-02', 'SMR-03', 'SMR-04', 'SMR-05', 'SMR-06')
 DEFAULTS = {'epsilon': 0.000001, 'search': 12.0, 'near': 0.0625,
-            'checks': CHECKS, 'grid_mode': 'Nearest intersection'}
+            'checks': CHECKS, 'grid_mode': 'Nearest intersection',
+            'angle_degrees': 0.01}
 
 
 class Cancelled(Exception):
@@ -38,9 +45,14 @@ def finding(check, member, reason, level='Warning', value=None,
     related = [dict((key, r[key]) for key in ('uid', 'id', 'name') if key in r)
                for r in (related or [])]
     return {'check': check, 'uid': member['uid'], 'id': member['id'],
+            'record_type': 'CheckResult', 'schema_version': SCHEMA_VERSION,
+            'member_uid': member['uid'], 'relationship_id': None,
+            'category': '', 'error_type': '',
+            'evaluation': 'Not evaluated' if level == 'Not evaluated' else 'Evaluated',
             'member': member.get('name', str(member['id'])),
             'level': member.get('level', ''), 'severity': level,
             'value': value, 'measurement': measurement, 'end': end, 'reason': reason,
+            'units': 'in' if value is not None else None,
             'related': related, 'status': 'Open', 'exception': '',
             'key': (check, member['uid'], str(end),
                     tuple(sorted(r['uid'] for r in related)))}
@@ -97,68 +109,73 @@ def _target(point, support, other_end):
     return choices[0][1], tie or support['kind'] == 'wall'
 
 
-def _collinear(a, b):
-    """Identify framing along the same plan direction with unresolved support role."""
-    if a['kind'] != 'beam' or b['kind'] != 'beam':
-        return False
-    u = tuple(a['end'][i] - a['start'][i] for i in (0, 1))
-    v = tuple(b['end'][i] - b['start'][i] for i in (0, 1))
-    denom = distance(u, (0, 0)) * distance(v, (0, 0))
-    return bool(denom and abs(sum(u[i] * v[i] for i in (0, 1))) /
-                denom > 0.999999)
-
-
-def endpoint_checks(member, index, settings):
-    """Return endpoint and vertical results, preserving unresolved evidence."""
+def endpoint_checks(member, index, settings, relationships=None):
+    """Evaluate finite exact-first relationships, retaining each actual joint role."""
     rows = []
+    relationships = relationships if relationships is not None else []
     eps, search = settings['epsilon'], settings['search']
     for end, point in enumerate((member['start'], member['end'])):
-        candidates = []
-        for support in index.query(point, search):
-            if support['uid'] == member['uid']:
-                continue
-            target, ambiguous = _target(
-                point, support, member['end'] if end == 0 else member['start'])
-            if target is None or distance(point[:2], target) > search:
-                continue
-            lo, hi = support['bounds']
-            own = section_interval(member, point, eps)
-            zlo, zhi = own if own else (point[2], point[2])
-            if zlo - hi[2] > search or lo[2] - zhi > search:
-                continue
-            candidates.append((support, target, ambiguous or
-                               _collinear(member, support)))
+        candidates = discover_end(member, end, index, settings, _target)
         if not candidates:
-            rows.append(finding('SMR-01', member,
-                                'No eligible support within {0:g} in search.'
-                                .format(search), 'Critical', end=end))
-        elif len(candidates) > 1 or candidates[0][2]:
-            rows.append(finding('SMR-01', member,
-                                'Ambiguous support or end-to-end relationship.',
-                                end=end, related=[c[0] for c in candidates]))
+            reason = 'No eligible finite support target within {0:g} in search.'.format(search)
+            rel = relationship(member, None, 'Missing support', end, search_inches=search)
+            relationships.append(rel)
+            rows.append(bind_result(finding('SMR-01', member, reason, 'Critical',
+                                             end=end), rel, 'Missing support'))
+        elif (any(c.get('ambiguous') for c in candidates) or
+              (len(candidates) > 1 and candidates[0]['proximity'] > eps)):
+            reason = 'Ambiguous near-miss or wall-face relationship.'
+            related = [c['member'] for c in candidates]
+            rel = relationship(member, None, 'Ambiguous candidates', end,
+                               candidates=[{'uid': c['member']['uid'],
+                                            'category': c['category'], 'gap': c['gap']}
+                                           for c in candidates])
+            relationships.append(rel)
+            rows.append(bind_result(finding('SMR-01', member, reason, end=end,
+                                             related=related), rel))
         else:
-            support, target, _ambiguous = candidates[0]
-            gap = distance(point[:2], target)
-            dx, dy = (target[i] - point[i] for i in (0, 1))
-            vx = member['end'][0] - member['start'][0]
-            vy = member['end'][1] - member['start'][1]
-            length = math.sqrt(vx * vx + vy * vy)
-            outward = -1 if end == 0 else 1
-            along = outward * (dx * vx + dy * vy) / length
-            lateral = (dx * vy - dy * vx) / length
-            reason = ('Endpoint plan miss; along {0:+.8f} in '
-                      '(positive shortfall), lateral {1:+.8f} in.'
-                      .format(along, lateral))
-            rows.append(finding('SMR-01', member, reason,
-                                severity(gap, eps), gap, end, [support]))
-            value, reason = _vertical(member, support, point, target, eps)
-            rows.append(finding('SMR-02', member, reason,
-                                severity(value, eps) if value is not None else
-                                'Not evaluated', value, end, [support]))
+            for candidate in candidates:
+                support, target, gap = (candidate[k] for k in ('member', 'target', 'gap'))
+                rel = end_relationship(member, end, candidate, len(candidates))
+                relationships.append(rel)
+                dx, dy = (target[i] - point[i] for i in (0, 1))
+                vx = member['end'][0] - member['start'][0]
+                vy = member['end'][1] - member['start'][1]
+                length = math.sqrt(vx * vx + vy * vy)
+                along = (-1 if end == 0 else 1) * (dx * vx + dy * vy) / length
+                lateral = (dx * vy - dy * vx) / length
+                rel['evidence'].update(along=along, lateral=lateral)
+                reason = ('{0}; reference plan miss {1:.8f} in; along {2:+.8f} in '
+                          '(positive shortfall), lateral {3:+.8f} in. Joint roles: {4}.'
+                          .format(candidate['category'], gap, along, lateral, len(candidates)))
+                rows.append(bind_result(finding('SMR-01', member, reason,
+                                                 severity(gap, eps), gap, end, [support]),
+                                        rel, 'Endpoint miss' if gap > eps else ''))
+                if candidate['category'] in ('Splice connection', 'Corner/End'):
+                    value, reason = None, 'Vertical expectation for {0} is pending review.'.format(
+                        candidate['category'])
+                else:
+                    value, reason = _vertical(member, support, point, target, eps)
+                rows.append(bind_result(finding('SMR-02', member, reason,
+                                                 severity(value, eps) if value is not None else
+                                                 'Not evaluated', value, end, [support]), rel))
+                if support['kind'] == 'column':
+                    faces = candidate.get('faces', [])
+                    for face in faces or [{'category': 'Column Face', 'target': None, 'gap': None}]:
+                        face_rel = relationship(member, support, face['category'], end,
+                                                target=face['target'], point_basis='Reference endpoint',
+                                                face_miss=face['gap'])
+                        relationships.append(face_rel)
+                        reason = ('Reference-end distance to approached finite column face; '
+                                  'physical cut-end policy pending.' if face['gap'] is not None else
+                                  'Approached finite column face could not be resolved.')
+                        rows.append(bind_result(finding('SMR-01', member, reason,
+                                                         'Information' if face['gap'] is not None else
+                                                         'Not evaluated', face['gap'], end, [support]), face_rel))
             continue
-        rows.append(finding('SMR-02', member,
-                            'Support relationship unresolved; see SMR-01.',
-                            'Not evaluated', end=end))
+        rows.append(bind_result(finding('SMR-02', member,
+                                         'Support relationship unresolved; see SMR-01.',
+                                         'Not evaluated', end=end), rel))
     return rows
 
 
@@ -250,7 +267,7 @@ def duplicate_check(a, b, settings):
     return None
 
 
-def evaluate(records, grids, settings, expected=None, progress=None):
+def evaluate(records, grids, settings, expected=None, progress=None, relationships=None):
     """Evaluate selected checks over normalized whole-model records.
 
     Args:
@@ -265,6 +282,7 @@ def evaluate(records, grids, settings, expected=None, progress=None):
         A deterministic list of findings, including Pass and Not evaluated.
     """
     rows, expected = [], expected or {}
+    relationships = relationships if relationships is not None else []
     records = sorted(records, key=lambda r: r['uid'])
     index = SpatialIndex(records)
     grid_pairs = []
@@ -281,11 +299,55 @@ def evaluate(records, grids, settings, expected=None, progress=None):
             progress(number, len(records))
         if member['kind'] == 'beam' and any(
                 c in settings['checks'] for c in ('SMR-01', 'SMR-02')):
-            rows.extend(r for r in endpoint_checks(member, index, settings)
+            rows.extend(r for r in endpoint_checks(member, index, settings, relationships)
                         if r['check'] in settings['checks'])
+        if member['kind'] == 'beam' and 'SMR-05' in settings['checks']:
+            attachment = member.get('bottom_attachment', {'state': 'Unresolved',
+                'reason': 'Bottom-face work-plane evidence is unavailable.'})
+            target = attachment.get('host')
+            rel = relationship(member, target, attachment['state'],
+                               work_plane=attachment)
+            relationships.append(rel)
+            rows.append(bind_result(finding('SMR-05', member,
+                                             attachment.get('reason', attachment['state']),
+                                             'Not evaluated' if attachment['state'] == 'Unresolved'
+                                             else 'Information', related=[target] if target else []), rel))
         if member['kind'] == 'column' and 'SMR-03' in settings['checks']:
             rows.append(grid_check(member, grids, settings,
                                    expected.get(member['uid']), grid_pairs))
+    if 'SMR-06' in settings['checks']:
+        seen, involved = set(), set()
+        for number, member in enumerate(records):
+            if progress:
+                progress(number, len(records))
+            if member['kind'] != 'beam':
+                continue
+            for other in index.query_bounds(member['bounds']):
+                key = tuple(sorted((member['uid'], other['uid'])))
+                if other['kind'] != 'beam' or member['uid'] == other['uid'] or key in seen:
+                    continue
+                seen.add(key)
+                rel = crossing_relationship(member, other, settings['epsilon'])
+                if rel is None:
+                    continue
+                involved.update(key)
+                relationships.append(rel)
+                kind = rel['category']
+                level = {'Interior Crossing': 'Error', 'Separated Plan Crossing': 'Information',
+                         'Unresolved Plan Crossing': 'Not evaluated'}[kind]
+                reason = ('Interior Crossing error: both reference spans cross internally and '
+                          'local section vertical intervals overlap. Critical/Warning policy pending.'
+                          if level == 'Error' else
+                          'Plan crossing has separated physical elevations; no interior-intersection error.'
+                          if level == 'Information' else
+                          'Plan crossing found; local section elevations could not be resolved.')
+                rows.append(bind_result(finding('SMR-06', member, reason, level,
+                                                 rel['evidence']['vertical_gap'], related=[other],
+                                                 measurement='Vertical separation'), rel,
+                                        'Interior Crossing' if level == 'Error' else ''))
+        for member in records:
+            if member['kind'] == 'beam' and member['uid'] not in involved:
+                rows.append(finding('SMR-06', member, 'No interior reference-span crossing detected.', 'Pass'))
     if 'SMR-04' in settings['checks']:
         seen = set()
         matched = set()
@@ -315,3 +377,25 @@ def evaluate(records, grids, settings, expected=None, progress=None):
                                         'No duplicate or partial overlap detected.',
                                         'Pass'))
     return rows
+
+
+def assemble_report(records, rows, relationships):
+    """Build one member registry and bind all results to relationship identities."""
+    members = dict((r['uid'], member_record(r)) for r in records)
+    for row in rows:
+        if row['uid'] not in members:
+            members[row['uid']] = member_record({'uid': row['uid'], 'id': row['id'],
+                'name': row['member'], 'level': row['level'], 'extraction': 'Not evaluated'})
+        if row.get('relationship_id'):
+            continue
+        related = row['related']
+        rel = relationship(members[row['uid']], related[0] if related else None,
+                           row.get('category') or row['check'], row['end'],
+                           participants=[r['uid'] for r in related], value=row['value'],
+                           measurement=row['measurement'])
+        relationships.append(rel)
+        bind_result(row, rel)
+    unique = dict((r['relationship_id'], r) for r in relationships)
+    return {'schema_version': SCHEMA_VERSION,
+            'members': [members[k] for k in sorted(members)],
+            'relationships': [unique[k] for k in sorted(unique)], 'rows': rows}

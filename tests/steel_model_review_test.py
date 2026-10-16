@@ -68,7 +68,7 @@ class EndpointTests(unittest.TestCase):
     def rows(self, supports):
         return [r for r in endpoint_checks(
             self.beam, SpatialIndex([self.beam] + supports), self.settings)
-                if r['end'] == 1]
+                if r['end'] == 1 and r.get('category') != 'Column Face']
 
     def test_endpoint_and_column_shaft_pass(self):
         self.assertEqual(['Pass', 'Pass'],
@@ -84,7 +84,10 @@ class EndpointTests(unittest.TestCase):
         self.assertEqual('Not evaluated', self.rows([])[1]['severity'])
         other = copy.deepcopy(self.column)
         other['uid'] = 'other'
-        self.assertEqual('Warning', self.rows([self.column, other])[0]['severity'])
+        # Actual joint roles are retained independently, not nearest-member selected.
+        related = [r for r in self.rows([self.column, other]) if r['check'] == 'SMR-01']
+        self.assertEqual(2, len(related))
+        self.assertEqual({'col', 'other'}, set(r['related'][0]['uid'] for r in related))
 
     def test_different_depths_aligned_tops_pass(self):
         support = member('girder', start=(100, -50, -12),
@@ -101,10 +104,11 @@ class EndpointTests(unittest.TestCase):
         support = member('girder', start=(100, 10, 0), end=(100, 50, 0))
         self.assertEqual('Critical', self.rows([support])[0]['severity'])
 
-    def test_end_to_end_is_ambiguous(self):
+    def test_end_to_end_is_splice_with_vertical_policy_pending(self):
         support = member('next', start=(100, 0, 0), end=(200, 0, 0))
-        self.assertEqual('Warning', self.rows([support])[0]['severity'])
-        self.assertIn('Ambiguous', self.rows([support])[0]['reason'])
+        self.assertEqual('Pass', self.rows([support])[0]['severity'])
+        self.assertEqual('Splice connection', self.rows([support])[0]['category'])
+        self.assertEqual('Not evaluated', self.rows([support])[1]['severity'])
 
     def test_wrong_floor_is_not_support(self):
         self.column['bounds'] = ((97, -3, 200), (103, 3, 300))

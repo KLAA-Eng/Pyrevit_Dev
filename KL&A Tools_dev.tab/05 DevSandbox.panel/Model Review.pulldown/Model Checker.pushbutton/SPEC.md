@@ -22,7 +22,7 @@ No live Revit acceptance or SDS2 export evidence is claimed by this prototype.
 
 ### Current implementation boundary
 
-All four checks, phase/option choices, reviewed material overrides, configurable
+All six checks, phase/option choices, reviewed material overrides, configurable
 inch tolerances, result filtering, Select/Zoom, explicit grid-pair assignment,
 session exceptions, and cancellation are implemented. Close the browser to
 correct the model manually; invoke Model Checker again to open the previous
@@ -36,6 +36,33 @@ count. Search includes both member and support identities. Measurements are
 labeled as Offset or Overlap length and retain eight decimal places in inches.
 An aligned column is described as aligned; off-grid wording is reserved for
 nonzero discrepancies. Filtering clears details from the previous selection.
+
+The reviewed beam implementation now uses versioned Member, Relationship, and
+Check Result records. Snapshots retain source geometry once, relationship
+evidence separately, and result references for browsing and exceptions. A new
+session-cache schema prevents reuse of older reports/acceptances under new rules.
+The browser shows relationship categories and readable Revit join/offset evidence.
+
+Girder, Splice, and Corner/End classify finite reference relationships in plan;
+they do not establish a designed connection or a vertical Pass. Exact targets
+take precedence over unrelated near misses; multiple actual relationships are
+retained as a joint group. Revit end-join participants and permission corroborate
+geometry without overriding it. Column-axis offsets and approached finite
+section-face diagnostics are separate. Recognized I-section web/flange labels
+require section metadata and actual face evidence; other faces stay generic.
+Face measurements currently use the reference endpoint and are informational,
+because physical cut-end acceptance remains an open policy.
+
+SMR-05 reports verified floor/roof bottom-face work-plane references as
+Information; matching elevation alone is insufficient. SMR-06 reports an
+Interior Crossing Error when finite beam reference spans cross internally and
+their local section vertical intervals overlap. Separated-elevation plan
+crossings are informational; unavailable local elevations are Not evaluated.
+This is a section-envelope test, not a general solid boolean clash solver.
+Critical/Warning mapping for crossing errors and attachment severity remain open.
+Splice and Corner/End vertical expectations remain explicitly Not evaluated.
+Z-offsets, justification, and join cutbacks are preserved as source facts; the
+actual SDS2 transfer of these values is still awaiting detailing-team evidence.
 
 Original family solid geometry supplies planar section boundaries in world
 coordinates. Curved face boundaries, multi-solid families, sloping columns,
@@ -57,12 +84,14 @@ before its intended export to SDS2. Identify actionable geometry discrepancies
 and support relationships that need a person's review. This tool does not
 certify export compatibility, connection design, or structural adequacy.
 
-One command runs four independently selectable checks across the whole model:
+One command runs six independently selectable checks across the whole model:
 
 1. Beam endpoints and their potential supports.
 2. Vertical mismatches at supported beam ends.
 3. Column alignment to grids.
 4. Duplicate members and suspicious partial overlaps.
+5. Floor/roof bottom-face work-plane associations.
+6. Interior beam crossings, distinct from duplicate members.
 
 ### Confirmed decisions
 
@@ -91,6 +120,7 @@ summary. Calibrate against representative export models before release.
 | Boundary comparison tolerance | Same as numerical zero tolerance. |
 | Support candidate search distance | 12 inches horizontally and vertically. |
 | Near-duplicate comparison distance | 1/16 inch. |
+| Plan parallel-angle tolerance | 0.01 degrees; configurable proposed default. |
 | Grid review mode | Review nearest eligible intersection; intentional offsets can be accepted individually. |
 | Linked models | Excluded from initial evaluation; report links as excluded coverage. |
 | Phase | User confirms the intended export phase before running. |
@@ -105,7 +135,7 @@ finding means no eligible candidate was found within the declared search.
 ### Reviewer workflow
 
 1. Open the project and launch Model Checker.
-2. Confirm export phase, option scope, enabled checks, and settings. All four
+2. Confirm export phase, option scope, enabled checks, and settings. All six
    checks default on. The dialog states that review covers the whole host model.
 3. Choose grid review mode: nearest intersection, explicit expected grid pairs,
    or disabled for this project. Disabling is recorded as Not run.
@@ -142,8 +172,11 @@ beam/column representation during future implementation.
 ### SMR-01: Beam endpoints
 
 Evaluate both ends of each eligible beam separately. Use the reference curve
-with relevant instance offsets and justification accounted for. Record raw
-reference information separately from derived geometry.
+for plan topology and placed original geometry for section elevations. Preserve
+raw instance offsets, justification, original reference endpoints and instance
+transforms; do not manually double-apply offsets to already placed geometry.
+Physical cut-end diagnostics and exporter-specific offset interpretation remain
+outside the implemented acceptance rules.
 
 Find candidates using a spatial index, then perform finite geometry checks:
 
@@ -157,13 +190,29 @@ Find candidates using a spatial index, then perform finite geometry checks:
 
 Do not accept an intersection of infinitely extended lines outside the support
 span. Exclude the reviewed member itself. Deduplicate candidate identities.
-Two beam ends reaching each other do not establish which member supports the
-other; treat unresolved end-to-end relationships as ambiguous.
+Classify endpoint-to-interior nonparallel framing as Girder connection,
+collinear opposite-running endpoint pairs as Splice connection, and angled
+endpoint pairs as Corner/End. Parallel side-by-side members are not splices.
+Use numerical zero for the finite endpoint region and the declared plan angle
+tolerance for parallel directions. Splice shortfalls may target a finite facing
+endpoint; infinitely extended nonparallel spans cannot establish support.
 
-Retain all plausible candidates and their evidence. A uniquely defensible
-candidate may be selected; multiple plausible candidates produce Warning
-rather than an arbitrary nearest-member assignment. A close member at another
-floor is not a confirmed support just because plan geometry aligns.
+An actual plan target (including a finite column-face target) takes precedence
+over unrelated near misses. Retain multiple actual relationships as a joint
+group; do not invent a unique force-transfer direction. Multiple near misses
+or unresolved wall faces produce Warning. A close member at another floor is
+not a confirmed support just because plan geometry aligns. Search still checks
+finite vertical envelopes; detailed vertical evaluation remains separate.
+
+Read LocationCurve.ElementsAtJoin at each beam end, joining permission, and
+available setback reference. Keep empty versus failed queries distinct. No join
+is created, removed, reordered, or enabled. These API paths require live host
+acceptance; no participant query alone proves correct geometry or export behavior.
+
+Report Column Axis separately from the approached Column Web Face, Column
+Flange Face, or generic Column Section Face. Face diagnostics measure reference
+endpoint-to-face distance, not a physical cut-end error. Unresolved face geometry
+is Not evaluated; no axis-aligned bounding box substitutes for a section face.
 
 With a unique candidate, classify the horizontal endpoint discrepancy under
 the common offset rule. Show signed along-beam shortfall/overshoot and lateral
@@ -179,8 +228,9 @@ not a general solid-clash or connection-clearance checker.
 
 ### SMR-02: Vertical mismatches
 
-Evaluate a uniquely identified beam-support relationship, including a unique
-near-miss candidate. If no support can be resolved, show Not evaluated with
+Evaluate each resolved girder/column/wall relationship, including a unique
+near-miss candidate. Splice and Corner/End vertical rules are pending review and
+return Not evaluated. If no support can be resolved, show Not evaluated with
 the SMR-01 reason rather than reporting a zero discrepancy.
 
 - Beam to beam: compare top-of-steel elevations at the actual framing station.
@@ -250,6 +300,29 @@ is not a partial overlap. Uncertain section equivalence is a Warning candidate,
 not a proven exact duplicate. Deduplicate unordered pairs; group exact
 duplicates only when all members meet the same equivalence criteria.
 
+### SMR-05: Floor/roof bottom-face work planes
+
+Resolve the beam's HostFace and any work-plane metadata, identify the target
+floor/roof, and compare its stable face reference with GetBottomFaces for that
+same host. Report Floor Bottom Work Plane, Roof Bottom Work Plane, Other Work
+Plane, No Bottom-face Attachment Found, or Unresolved. A top/side face, matching
+plane name, geometric contact, or independent coincident plane does not establish
+bottom-face association. API failures and linked targets are Not evaluated.
+Other outcomes are Information while severity policy is pending. Absence of a
+returned host-face reference is reported as absence of detected evidence, not
+proof that every possible constraint has been inspected. No work plane is created.
+
+### SMR-06: Interior crossings
+
+Use spatial envelope overlap to find finite nonparallel beam pairs; require the
+intersection strictly inside both spans. Emit one unordered pair. Resolve local
+original section intervals at the plan intersection: overlapping/touching
+intervals produce an Interior Crossing Error, positive separation produces
+Separated Plan Crossing Information, and unavailable geometry produces Not
+evaluated. This explicit Error category has no approved Critical/Warning mapping.
+Endpoint connections and collinear partial overlaps are handled by their own
+checks. A clean member retains a Pass outcome for reference-span crossing review.
+
 ## Severity and result states
 
 Let epsilon be the numerical zero tolerance and T be 1/16 inch. Compare
@@ -266,6 +339,8 @@ Require valid positive tolerances much smaller than T.
 | Exact duplicate | Critical. |
 | Ambiguous relationship or partial overlap | Warning. |
 | Required data/geometry cannot be evaluated | Not evaluated, with reason. |
+| Interior Crossing error | Error; Critical/Warning tier pending. |
+| Bottom-face attachment, column-face diagnostic, separated plan crossing | Information; no approved error policy. |
 | Disabled check | Not run. |
 
 This smaller-offset/higher-severity ordering is intentional and user-confirmed.
@@ -396,6 +471,15 @@ No upstream code or assets were copied.
 | A28 | Cancel or encounter extraction failure | Incomplete coverage visible; no complete-review claim. |
 | A29 | 1/32 inch horizontal miss and 1/8 inch vertical miss | Separate Critical and Warning; overall Critical. |
 | A30 | Review, navigate, accept exception, rerun | Model data remains unchanged. |
+| A31 | Exact girder match and an unrelated nearby beam | Exact relationship retained; no false ambiguity. |
+| A32 | Collinear facing endpoints, including reversed order | Splice connection; vertical policy Not evaluated. |
+| A33 | Angled endpoint pair | Corner/End; vertical policy Not evaluated. |
+| A34 | Multiple actual member roles at a joint | Separate linked relationships retained. |
+| A35 | Column reference endpoint and approached web/flange face | Separate axis offset and informational face distance. |
+| A36 | Floor/roof bottom-face reference versus top/independent plane | Only matching source bottom face produces bottom-plane association. |
+| A37 | Interior pair crossing with overlapping or separated elevations | Error or Information respectively; unavailable sections Not evaluated. |
+| A38 | Empty/failed end-join query or disallowed join | Evidence retained independently from geometric classification. |
+| A39 | Zero/absent common or end-specific z offsets | Distinct raw parameter states; no guessed SDS2 mapping. |
 
 Host-independent tests should exercise the severity boundaries, finite geometry,
 support ambiguity, duplicate pairing, exception invalidation, and report coverage.
@@ -414,12 +498,12 @@ member counts during calibration; no performance target is claimed yet.
 The reported Revit attempt failed; no successful live acceptance or SDS2 export
 validation is claimed. Acceptance scenarios are requirements, not passing tests.
 
-Host-independent validation on 2026-10-16: 58 rule/session, mocked-host, failure-diagnostic,
-and reporting tests passed;
+Host-independent validation on 2026-10-16: 83 rule/session, mocked-host,
+failure-diagnostic, reporting, and connection-record tests passed;
 repository metadata validator checked 35 visible commands with zero errors.
-Python compilation and XAML loading passed. Earlier prototype validation also
-included Python 2 grammar parsing; the reporting changes still require live
-IronPython acceptance. Tests are in `tests/steel_model_review_test.py` and
+Python compilation and isolated XAML loading/rendering passed. All 11 command
+and helper files also compiled with the installed IronPython 2.7 engine.
+Live Revit acceptance remains pending. Tests are in `tests/steel_model_review_test.py` and
 `tests/steel_model_review_host_test.py`, and
 `tests/steel_model_review_command_test.py`. Reporting tests are in
 `tests/steel_model_review_reporting_test.py`. An isolated .NET WPF render of
@@ -427,15 +511,29 @@ review.xaml with synthetic findings was visually inspected on 2026-10-16.
 These checks do not prove extraction, IronPython WPF binding, navigation, or
 live Revit behavior. Reload pyRevit and run a fresh review to validate the icons
 and report changes in Revit.
+New relationship, join-evidence, bottom-face and crossing fixtures are in
+`tests/steel_model_review_connections_test.py`. The beam redesign is not yet
+accepted live in Revit and has no SDS2 transfer validation.
 
 ## Tool version history
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| `v0.0` | Unreleased | 10.16.2026 | Whole-model endpoint, vertical, grid, and duplicate checks with findings browser in Model Review. | Uncommitted development changes on dev.model-checker; no main delivery exists. Add commit evidence when committed. |
+| `v0.0` | Unreleased | 10.16.2026 | Whole-model review; classified beam relationships, separate record contracts, column-face diagnostics, bottom-face work planes, interior crossings, and readable findings. | Baseline c994742 on dev.model-checker plus pending implementation changes; no main delivery exists. |
 
 ## Backlog and implementation decisions
 
+- Evaluate BHoM as a future optional dependency for schema conversion,
+  interoperability, and shared geometry/comparison capabilities. Keep the adopted
+  Member -> Relationship -> Check Result records independent of BHoM now;
+  assess licensing, SI/inch conversion, .NET deployment, and Revit-version evidence
+  before adding a dependency. No documented SDS2 adapter was found in this review.
+- Complete live ElementsAtJoin and bottom-face work-plane fixtures, including
+  rotated I/HSS columns, sloping hosts and Revit 2024 IronPython binding.
+- Investigate the detailing team's actual SDS2 importer/exporter and z-offset
+  transfer using paired source/import fixtures; determine crossing severity,
+  bottom-face attachment policy, column physical cut-end criteria, and vertical
+  expectations for Splice and Corner/End relationships.
 - Calibrate epsilon, support search bounds, duplicate distance, wall bearing
   interpretation, and grid expectation controls using representative projects.
 - Confirm material classification and necessary family/type overrides.

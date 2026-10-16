@@ -34,8 +34,9 @@
               EnableRowVirtualization="True" EnableColumnVirtualization="True">
       <DataGrid.Columns>
         <DataGridTextColumn Header="Severity" Binding="{Binding Severity}" Width="105"/>
-        <DataGridTextColumn Header="Check" Binding="{Binding Check}" Width="190"/>
-        <DataGridTextColumn Header="Member" Binding="{Binding Member}" Width="160"/>
+        <DataGridTextColumn Header="Check" Binding="{Binding Check}" Width="175"/>
+        <DataGridTextColumn Header="Relationship" Binding="{Binding Category}" Width="155"/>
+        <DataGridTextColumn Header="Member" Binding="{Binding Member}" Width="145"/>
         <DataGridTextColumn Header="End" Binding="{Binding End}" Width="35"/>
         <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="75"/>
         <DataGridTemplateColumn Header="Measurement (in)" Width="140" SortMemberPath="Value">
@@ -48,9 +49,9 @@
             </DataTemplate>
           </DataGridTemplateColumn.CellTemplate>
         </DataGridTemplateColumn>
-        <DataGridTextColumn Header="Related elements" Binding="{Binding Related}" Width="110"/>
-        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="115"/>
-        <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="*" MinWidth="180"/>
+        <DataGridTextColumn Header="Related elements" Binding="{Binding Related}" Width="100"/>
+        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="105"/>
+        <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="*" MinWidth="150"/>
       </DataGrid.Columns>
     </DataGrid>
     <TextBox x:Name="detail" Grid.Row="4" Margin="0,10,0,10" IsReadOnly="True"

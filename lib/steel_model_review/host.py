@@ -9,6 +9,7 @@ from pyrevit import DB
 
 from steel_model_review.engine import Cancelled, CHECKS, finding
 from steel_model_review.geometry import distance
+from steel_model_review import evidence
 
 
 def id_value(element_id):
@@ -235,6 +236,7 @@ def extract(element, kind):
         start = end = point(location.Point)
     else:
         raise ValueError('Reference location is unavailable.')
+    record['reference_line'] = {'start': start, 'end': end}
     if kind == 'grid':
         record.update(start=start, end=end, name=name(element))
         return record
@@ -262,7 +264,23 @@ def extract(element, kind):
         high = tuple(max(p[i] for p in vertices) for i in range(3))
         start, end = (start[0], start[1], low[2]), (start[0], start[1], high[2])
     record.update(start=start, end=end, faces=faces,
-                  vertices=vertices if reliable else [], bounds=(low, high))
+                  vertices=vertices if reliable else [], bounds=(low, high),
+                  physical_geometry={'basis': 'Original placed geometry', 'reliable': reliable})
+    if kind in ('beam', 'column'):
+        transform = element.GetTransform()
+        record['instance_transform'] = {
+            'origin': point(transform.Origin),
+            'basis': [(v.X, v.Y, v.Z) for v in
+                      (transform.BasisX, transform.BasisY, transform.BasisZ)]}
+    if kind == 'beam':
+        record.update(raw_parameters=evidence.parameters(element, DB),
+                      joins=evidence.joins(element, DB),
+                      bottom_attachment=evidence.bottom_attachment(element, DB),
+                      structural_usage=str(element.StructuralUsage))
+    if kind == 'column':
+        section = evidence.column_section(element, faces, DB)
+        record.update(section=section, web_planes=section['web_planes'],
+                      web_normals=section['web_normals'])
     if kind == 'wall':
         record['sides'] = _wall_sides(element)
     return record
@@ -288,7 +306,7 @@ def extract_model(document, elements, phase_id, options, overrides, checks,
         Cancelled: Progress callback signals cancellation.
     """
     records, grids, coverage, rows = [], [], [], []
-    applies = {'beam': ('SMR-01', 'SMR-02', 'SMR-04'),
+    applies = {'beam': ('SMR-01', 'SMR-02', 'SMR-04', 'SMR-05', 'SMR-06'),
                'column': ('SMR-03', 'SMR-04'), 'wall': ('SMR-01', 'SMR-02'),
                'grid': ('SMR-03',)}
     for number, (element, kind) in enumerate(elements):
@@ -310,6 +328,9 @@ def extract_model(document, elements, phase_id, options, overrides, checks,
                     reason = 'Material classification: {0}.'.format(material)
                 else:
                     result = extract(element, kind)
+                    if kind != 'grid':
+                        result['classification'] = {'material': material,
+                            'reviewed_override': base['type'] in overrides}
                     (grids if kind == 'grid' else records).append(result)
         except ValueError as error:
             state, reason = 'Unsupported', str(error)
