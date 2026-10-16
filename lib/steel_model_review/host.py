@@ -17,10 +17,30 @@ def id_value(element_id):
 
 
 def name(element):
-    """Return a reliable display name for a .NET element or None."""
+    """Read a name without relying on engine-specific descriptor helpers.
+
+    Args:
+        element: Revit element or None. Derived element types can expose a
+            write-only Name property in IronPython.
+
+    Returns:
+        The instance Name or type-name parameter, preserving Unicode text.
+        None inputs return an empty string.
+
+    Raises:
+        AttributeError: Neither a readable Name nor type-name parameter exists.
+    """
     if element is None:
         return ''
-    return DB.Element.Name.GetValue(element)
+    try:
+        return element.Name or ''
+    except AttributeError:
+        # Some IronPython contexts expose no GetValue on the base descriptor.
+        # The built-in type-name parameter also handles hidden type getters.
+        parameter = element.get_Parameter(DB.BuiltInParameter.SYMBOL_NAME_PARAM)
+        if parameter is not None:
+            return parameter.AsString() or ''
+        raise
 
 
 def point(xyz):

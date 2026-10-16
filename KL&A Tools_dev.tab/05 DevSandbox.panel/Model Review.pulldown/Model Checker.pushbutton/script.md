@@ -54,6 +54,8 @@
 # Do not treat family naming alone as proof of material.
 # Record excluded categories and unknown classifications in coverage.
 # Capture reference curves, transforms, offsets, justification, and rotations.
+# Read names directly; use the built-in type-name parameter for hidden getters.
+# Do not require GetValue on IronPython's Name descriptor.
 # Capture local section geometry and finite physical extents where reliable.
 # Keep raw reference placement distinct from effective physical geometry.
 # Convert coordinates and settings into one documented comparison unit system.
@@ -155,6 +157,8 @@
 # Include check IDs, element identities, ends, supports, types, and levels.
 # Explain expected relationships and show actual measured discrepancies.
 # Display enough decimal precision that a Critical offset never looks zero.
+# Label overlap length separately from offset, and describe aligned columns as aligned.
+# Display descriptive check labels, searchable member/support IDs, and filtered counts.
 # Offer filters for severity, check, level, member, and review status.
 # Sort Critical findings first and use stable secondary ordering.
 # Expose incomplete coverage even when no geometric findings were generated.
@@ -178,6 +182,8 @@
 # Keep the prior complete report accessible with its original run identity.
 # Record element-level errors without silently discarding failed coverage.
 # Stop on invalid document context and report the actual reason.
+# Include the execution stage and complete traceback in failure dialog details.
+# Write diagnostics directly to output without relying on the runtime logger.
 # Release temporary resources without changing model data.
 
 # Verify the implementation before delivery.

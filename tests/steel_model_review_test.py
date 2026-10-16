@@ -139,11 +139,14 @@ class GridTests(unittest.TestCase):
                       grid('2', (-10, 100), (10, 100))]
 
     def test_grid_and_intentional_offset(self):
-        self.assertEqual('Pass', grid_check(self.column, self.grids,
-                                           self.settings)['severity'])
+        aligned = grid_check(self.column, self.grids, self.settings)
+        self.assertEqual('Pass', aligned['severity'])
+        self.assertIn('Column aligned', aligned['reason'])
+        self.assertNotIn('Off-grid', aligned['reason'])
         self.column['start'] = (1.0 / 32, 0, 0)
-        self.assertEqual('Critical', grid_check(self.column, self.grids,
-                                               self.settings)['severity'])
+        offset = grid_check(self.column, self.grids, self.settings)
+        self.assertEqual('Critical', offset['severity'])
+        self.assertIn('Off-grid', offset['reason'])
 
     def test_explicit_pair_controls(self):
         row = grid_check(self.column, self.grids, self.settings, ('A', '2'))
@@ -201,6 +204,7 @@ class DuplicateTests(unittest.TestCase):
         row = duplicate_check(self.a, self.b, self.settings)
         self.assertEqual('Warning', row['severity'])
         self.assertEqual(50, row['value'])
+        self.assertEqual('Overlap length', row['measurement'])
         self.b['start'], self.b['end'] = (50, -50, 0), (50, 50, 0)
         self.assertIsNone(duplicate_check(self.a, self.b, self.settings))
 

@@ -33,14 +33,14 @@ def severity(value, epsilon=0.000001):
 
 
 def finding(check, member, reason, level='Warning', value=None,
-            end='', related=None):
+            end='', related=None, measurement='Offset'):
     """Build a plain result record with separate evaluation and review state."""
     related = [dict((key, r[key]) for key in ('uid', 'id', 'name') if key in r)
                for r in (related or [])]
     return {'check': check, 'uid': member['uid'], 'id': member['id'],
             'member': member.get('name', str(member['id'])),
             'level': member.get('level', ''), 'severity': level,
-            'value': value, 'end': end, 'reason': reason,
+            'value': value, 'measurement': measurement, 'end': end, 'reason': reason,
             'related': related, 'status': 'Open', 'exception': '',
             'key': (check, member['uid'], str(end),
                     tuple(sorted(r['uid'] for r in related)))}
@@ -191,11 +191,14 @@ def grid_check(member, grids, settings, expected=None, pairs=None):
     if ambiguous:
         return finding('SMR-03', member, 'Equally plausible grid intersections.')
     gap, _a, _b, point, a, b = first
-    reason = ('Off-grid column: review intended location. {0} / {1}; '
+    result = severity(gap, settings['epsilon'])
+    location = ('Column aligned to grid intersection.' if result == 'Pass' else
+                'Off-grid column: review intended location.')
+    reason = (location + ' {0} / {1}; '
               'line offsets {2:.8f}, {3:.8f} in; target ({4:.8f}, {5:.8f}) in.'
               .format(a['name'], b['name'], line_distance(member['start'], a),
                       line_distance(member['start'], b), point[0], point[1]))
-    return finding('SMR-03', member, reason, severity(gap, settings['epsilon']),
+    return finding('SMR-03', member, reason, result,
                    gap, related=[a, b])
 
 
@@ -243,7 +246,7 @@ def duplicate_check(a, b, settings):
     if overlap > eps:
         return finding('SMR-04', a, 'Collinear partial overlap; verify section '
                        'placement. Overlap {0:.8f} in.'.format(overlap),
-                       value=overlap, related=[b])
+                       value=overlap, related=[b], measurement='Overlap length')
     return None
 
 

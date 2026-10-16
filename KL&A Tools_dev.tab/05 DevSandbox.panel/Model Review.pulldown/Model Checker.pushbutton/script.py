@@ -14,6 +14,7 @@ import datetime
 import json
 import math
 import os
+import sys
 import traceback
 from collections import Counter
 
@@ -24,16 +25,12 @@ from System.Collections.Generic import List
 from steel_model_review import host
 from steel_model_review.browser import ReviewWindow
 from steel_model_review.engine import CHECKS, DEFAULTS, Cancelled, evaluate
+from steel_model_review.reporting import CHECK_LABELS
 from steel_model_review.session import carry_exceptions, signature
 
 
-CHECK_LABELS = {
-    'SMR-01': 'SMR-01 - Beam endpoints',
-    'SMR-02': 'SMR-02 - Vertical mismatches',
-    'SMR-03': 'SMR-03 - Column grid alignment',
-    'SMR-04': 'SMR-04 - Duplicates and overlaps',
-}
 BUNDLE = os.path.dirname(__file__)
+RUN_STAGE = 'Starting Model Checker'
 
 
 #  _____ _   _ _   _  ____ _____ ___ ___  _   _ ____
@@ -42,6 +39,41 @@ BUNDLE = os.path.dirname(__file__)
 # ==================================================================
 # Workflow helpers
 # ------------------------------------------------------------------
+def _stage(message):
+    """Record the current workflow boundary for actionable failure reports."""
+    global RUN_STAGE
+    RUN_STAGE = message
+
+
+def _report_failure(details):
+    """Show diagnostics directly, independent of the runtime logging service.
+
+    Args:
+        details: Captured exception traceback, preserved before further calls.
+
+    Returns:
+        None. The task dialog always receives the complete traceback, even
+        when the pyRevit logger or output renderer cannot display it.
+    """
+    context = 'Stage: {0}\nPython: {1}'.format(RUN_STAGE, sys.version)
+    report = context + '\n\n' + details
+    try:
+        script.get_logger().error(report)
+    except Exception:
+        pass
+    try:
+        output = script.get_output()
+        output.print_md('## Model Checker could not complete')
+        output.print_code(report)
+    except Exception:
+        print(report)
+    summary = details.strip().splitlines()[-1] if details.strip() else 'Unknown error'
+    forms.alert('Model Checker stopped during: {0}\n\n{1}\n\n'
+                'No model data was changed. Expand the details below for the '
+                'complete traceback.'.format(RUN_STAGE, summary),
+                expanded=report, title=__title__)
+
+
 def _pick(mapping, title):
     """Return a selected mapping value or None on dialog cancellation."""
     selected = forms.SelectFromList.show(sorted(mapping), title=title,
@@ -79,10 +111,12 @@ def _configure(document):
         Settings, chosen phase ElementId, option IDs, and scope labels;
         or None when any required choice is cancelled.
     """
+    _stage('Choosing the export phase')
     phase = _pick(dict(('{0} [{1}]'.format(host.name(p), host.id_value(p.Id)), p)
                        for p in document.Phases), 'Model Checker - Export phase')
     if phase is None:
         return None
+    _stage('Choosing design options')
     option_groups = {}
     for option in DB.FilteredElementCollector(document).OfClass(DB.DesignOption):
         set_id = option.get_Parameter(DB.BuiltInParameter.OPTION_SET_ID).AsElementId()
@@ -100,6 +134,7 @@ def _configure(document):
         if choices[label] >= 0:
             options.append(choices[label])
         option_labels.append('{0}: {1}'.format(set_id, label))
+    _stage('Choosing model checks')
     selected = forms.SelectFromList.show(
         [forms.TemplateListItem(CHECK_LABELS[c], checked=True) for c in CHECKS],
         multiselect=True,
@@ -109,6 +144,7 @@ def _configure(document):
     settings = dict(DEFAULTS)
     settings['checks'] = [c for c in CHECKS if CHECK_LABELS[c] in selected]
     if 'SMR-03' in settings['checks']:
+        _stage('Choosing the column grid mode')
         mode = forms.CommandSwitchWindow.show(
             ['Nearest intersection', 'Explicit grid pairs', 'Disabled'],
             message='Column grid review (intentional offsets can be accepted)')
@@ -124,11 +160,13 @@ def _configure(document):
             ('search', 'Support search distance in inches (proposed default 12).', False),
             ('epsilon', 'Numerical zero in inches (proposed default 0.000001).', True),
             ('near', 'Near-duplicate range in inches (proposed default 0.0625).', False)):
+        _stage('Reading the {0} tolerance'.format(key))
         value = _distance_prompt(label, settings[key], epsilon)
         if value is None:
             return None
         settings[key] = value
     labels = {'phase': host.name(phase), 'options': option_labels or ['Main model']}
+    _stage('Confirming review settings')
     confirmed = forms.alert(
         'Review the whole host model, across all views and levels.\n\n'
         'Phase: {0}\nOptions: {1}\nChecks: {2}\n'
@@ -241,9 +279,11 @@ def _run(document, elements, settings, phase, options, labels, overrides,
             if bar.cancelled:
                 raise Cancelled()
         try:
+            _stage('Extracting model geometry')
             records, grids, coverage, rows = host.extract_model(
                 document, elements, phase, options, overrides,
                 settings['checks'], progress)
+            _stage('Comparing model geometry')
             rows.extend(evaluate(records, grids, settings, expected, progress))
         except Cancelled:
             state = 'Cancelled - incomplete; partial extraction may be omitted'
@@ -299,6 +339,7 @@ def _assign_grids(row, grids, expected):
 # ------------------------------------------------------------------
 def main():
     """Review steel modeling in the whole active project without model writes."""
+    _stage('Reading the active project')
     document = revit.doc
     if document is None or document.IsFamilyDocument:
         forms.alert('Open a Revit project to run Model Checker.', title=__title__)
@@ -310,13 +351,17 @@ def main():
     if context is None:
         return
     settings, phase, options, labels = context
+    _stage('Collecting whole-model elements')
     elements = _elements(document)
+    _stage('Reviewing material classifications')
     overrides = _material_overrides(elements, phase, options)
+    _stage('Loading the previous session report')
     model_identity = [document.PathName, document.ProjectInformation.UniqueId]
     cache_key = 'KLA_MODEL_CHECKER_' + signature(model_identity)
     cached = AppDomain.CurrentDomain.GetData(cache_key)
     previous = json.loads(cached) if cached else None
     expected = dict(previous.get('expected', {})) if previous else {}
+    _stage('Fingerprinting model versions')
     versions = _versions(document)
     current = None
     if previous:
@@ -332,18 +377,22 @@ def main():
             current = _run(document, elements, settings, phase, options, labels,
                            overrides, expected, previous, versions)
             if current['state'] == 'Complete':
+                _stage('Saving the session report')
                 previous = current
                 AppDomain.CurrentDomain.SetData(cache_key, json.dumps(previous))
             else:
                 forms.alert('Review cancelled. This run is incomplete. The '
                             'previous complete report is preserved.', title=__title__)
+        _stage('Checking report freshness')
         stale = current['stamp'] != _stamp(
             _versions(document), settings, phase, options, expected, overrides)
+        _stage('Opening the findings browser')
         window = ReviewWindow(os.path.join(BUNDLE, 'review.xaml'), current, stale)
         window.ShowDialog()
         if not window.action or window.action[0] == 'close':
             return
         action, row = window.action
+        _stage('Handling the {0} action'.format(action))
         if action == 'rerun':
             elements, versions = _elements(document), _versions(document)
             current = None
@@ -372,11 +421,13 @@ def main():
             AppDomain.CurrentDomain.SetData(cache_key, json.dumps(previous))
 
 
-if __name__ == '__main__':
+def run_command():
+    """Execute the tool and surface failures without relying on logger output."""
     try:
         main()
     except Exception:
-        script.get_logger().error(traceback.format_exc())
-        forms.alert('Model Checker stopped because of an unexpected error. '
-                    'No model data was changed. See pyRevit output for details.',
-                    title=__title__)
+        _report_failure(traceback.format_exc())
+
+
+if __name__ == '__main__':
+    run_command()

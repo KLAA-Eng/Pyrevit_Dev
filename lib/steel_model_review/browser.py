@@ -4,23 +4,7 @@
 from pyrevit import forms
 
 from steel_model_review.engine import CHECKS
-
-
-class ReviewRow(object):
-    """Expose plain result fields as readable WPF binding properties."""
-
-    def __init__(self, row):
-        self.row = row
-        self.Severity = row['severity']
-        self.Check = row['check']
-        self.Member = row['member']
-        self.End = str(row['end'])
-        self.Level = row['level']
-        self.Offset = ('{0:+.8f}'.format(row['value'])
-                       if row['value'] is not None else '')
-        self.Related = ', '.join(str(r['id']) for r in row['related'])
-        self.Status = row['status']
-        self.Reason = row['reason']
+from steel_model_review.reporting import CHECK_LABELS, filtered_rows
 
 
 class ReviewWindow(forms.WPFWindow):
@@ -54,7 +38,7 @@ class ReviewWindow(forms.WPFWindow):
         self.accept_button.IsEnabled = not stale and snapshot['state'] == 'Complete'
         self.severity_filter.ItemsSource = ['Issues', 'All', 'Critical', 'Warning',
                                             'Not evaluated', 'Pass']
-        self.check_filter.ItemsSource = ['All'] + list(CHECKS)
+        self.check_filter.ItemsSource = ['All'] + [CHECK_LABELS[c] for c in CHECKS]
         self.level_filter.ItemsSource = ['All'] + sorted(set(r['level'] for r in rows))
         self.status_filter.ItemsSource = ['All', 'Open', 'Accepted exception']
         for control in (self.severity_filter, self.check_filter,
@@ -83,39 +67,31 @@ class ReviewWindow(forms.WPFWindow):
         check = str(self.check_filter.SelectedItem)
         level = str(self.level_filter.SelectedItem)
         status = str(self.status_filter.SelectedItem)
-        search = self.search_box.Text.lower()
-        output = []
-        order = {'Critical': 0, 'Warning': 1, 'Not evaluated': 2, 'Pass': 3}
-        for row in self.snapshot['rows']:
-            if severity == 'Issues' and row['severity'] == 'Pass':
-                continue
-            if severity not in ('Issues', 'All') and row['severity'] != severity:
-                continue
-            if check != 'All' and row['check'] != check:
-                continue
-            if level != 'All' and row['level'] != level:
-                continue
-            if status != 'All' and row['status'] != status:
-                continue
-            related = ' '.join(str(r['id']) for r in row['related'])
-            if search not in ('{0} {1} {2}'.format(row['member'], row['reason'],
-                                                 related)).lower():
-                continue
-            output.append(ReviewRow(row))
-        output.sort(key=lambda r: (order[r.Severity], r.Check, r.Member, r.End))
+        output = filtered_rows(self.snapshot['rows'], severity, check, level,
+                               status, self.search_box.Text)
+        self.detail.Text = ''
         self.findings.ItemsSource = output
+        self.result_count.Text = ('Showing {0} of {1} results'.format(
+            len(output), len(self.snapshot['rows'])) if output else
+            'No results match these filters ({0} total results).'.format(
+                len(self.snapshot['rows'])))
 
     def _detail(self, sender, event):
         """Show the selected finding's complete reason and exception text."""
         selected = self.findings.SelectedItem
         if selected:
             row = selected.row
-            self.detail.Text = ('{0} | {1} | End {2}\n{3}\nRelated: {4}\n'
-                                'Measured offset: {5} in\nException: {6}'
-                                .format(selected.Check, selected.Member,
-                                        selected.End, selected.Reason,
-                                        selected.Related, selected.Offset,
-                                        row['exception']))
+            end = ' | End {0}'.format(selected.End) if selected.End else ''
+            measurement = ('{0}: {1} in'.format(selected.Measurement,
+                                               selected.Offset)
+                           if selected.Offset else 'Measurement unavailable')
+            self.detail.Text = ('{0} | {1}{2}\n{3}\nRelated: {4}\n'
+                                '{5}\nException: {6}'
+                                .format(selected.Check, selected.Member, end,
+                                        selected.Reason, selected.Related or 'None',
+                                        measurement, row['exception'] or 'None'))
+        else:
+            self.detail.Text = ''
 
     def _action(self, sender, event):
         """Close the modal window and return the requested workflow action."""

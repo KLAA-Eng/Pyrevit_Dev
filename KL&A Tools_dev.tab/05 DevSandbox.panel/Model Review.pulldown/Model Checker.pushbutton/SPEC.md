@@ -10,7 +10,7 @@
 | Tool version | `v0.0` |
 | Bundle path | `KL&A Tools_dev.tab/05 DevSandbox.panel/Model Review.pulldown/Model Checker.pushbutton` |
 | Path aliases | Current bundle path above; former design name Steel Model Review, never delivered as a command. |
-| Version inputs | `bundle.yaml`; `script.py`; `review.xaml`; `script.md`; this SPEC; `lib/steel_model_review/*.py`. |
+| Version inputs | `bundle.yaml`; `script.py`; `review.xaml`; `script.md`; `icon.png`; `icon.dark.png`; parent pulldown icons; this SPEC; `lib/steel_model_review/*.py`. |
 | Maintainer | KL&A; individual owner to be assigned. |
 | Revit design target | Revit 2024 and later; no exact version has live acceptance evidence. |
 | Specification date | 2026-10-16 |
@@ -28,6 +28,14 @@ session exceptions, and cancellation are implemented. Close the browser to
 correct the model manually; invoke Model Checker again to open the previous
 report or run a fresh review. Reports and exceptions stay in Revit session
 memory, without model or external-file writes.
+
+Model Review uses the existing KL&A cube ribbon icon; Model Checker uses the
+existing search icon with light/dark theme variants. The findings browser shows
+descriptive check names, member/support names and IDs, and the filtered result
+count. Search includes both member and support identities. Measurements are
+labeled as Offset or Overlap length and retain eight decimal places in inches.
+An aligned column is described as aligned; off-grid wording is reserved for
+nonzero discrepancies. Filtering clears details from the previous selection.
 
 Original family solid geometry supplies planar section boundaries in world
 coordinates. Curved face boundaries, multi-solid families, sloping columns,
@@ -306,6 +314,12 @@ run Cancelled/incomplete. Never represent partial results as a complete scan.
 An element-level error is recorded and allows independent checks to continue;
 a document/context failure stops the run with an explicit reason.
 
+Unexpected failures show the execution stage and final exception message in
+the dialog. Expand its details to read the complete traceback and Python
+runtime version. Diagnostics are also sent directly to pyRevit output, with
+stdout fallback, independently of the logger. A blank output window must not
+be the only place a reviewer is told to find the error.
+
 ## Architecture and limits
 
 - Keep the command adapter thin: host context, extraction, UI, and navigation.
@@ -333,8 +347,14 @@ a document/context failure stops the run with an explicit reason.
 Revit 2024, 2025, and 2026 installation folders were found. The installed Revit
 2024 RevitAPI.xml was consulted for structural material classification, original
 family geometry, wall side faces, structural wall material layers, phases, and
-element version identities. The attached pyRevit engine/version could not be
-identified from this shell; verify it live before claiming host compatibility.
+element version identities. A subsequent reported failure identified pyRevit
+6.5.3.26176+2017, IronPython 2.7.12 (IPY2712PR), and Revit 2024.3.40. A standalone
+probe using the installed IronPython engine and Revit 2024 API accepted the
+name/ID access and class filters in isolation. The subsequent live traceback
+showed that the running command's Name descriptor has no GetValue method.
+The helper now reads element.Name and uses SYMBOL_NAME_PARAM for types whose
+Name getter is hidden. The isolated probe did not reproduce this host binding
+difference and does not prove the complete workflow.
 No upstream code or assets were copied.
 
 - [Autodesk: original family geometry and its coordinate transform](https://help.autodesk.com/cloudhelp/2026/ENU/Revit-API-MainReference/files/html/d28a0880-bff8-1acc-ddf1-ce3205f2e8b3.htm).
@@ -388,16 +408,25 @@ member counts during calibration; no performance target is claimed yet.
 | Date | Extension release | Revit version | Scenario | Result | Evidence |
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-15 | Not applicable | Not run | Design discussion | Requirements captured; no implementation validation. | This SPEC and companion CDD outline. |
+| 2026-10-16 | Unreleased | 2024.3.40 | User attempted Model Checker using pyRevit 6.5.3.26176+2017 | Failed; generic dialog and blank output. Original traceback unavailable. Direct failure diagnostics added; active-document rerun required. | User screenshots and local Revit journal. |
+| 2026-10-16 | Unreleased | 2024.3.40 | Rerun with detailed failure reporting | Failed while choosing export phase: Name descriptor lacks GetValue. Helper corrected; successful live rerun still pending. | User-provided expanded traceback, host.py name helper. |
 
-No live Revit or SDS2 export validation has been performed. Acceptance scenarios
-are requirements, not reports of passing tests.
+The reported Revit attempt failed; no successful live acceptance or SDS2 export
+validation is claimed. Acceptance scenarios are requirements, not passing tests.
 
-Host-independent validation on 2026-10-16: 40 rule/session and mocked-host tests passed;
+Host-independent validation on 2026-10-16: 58 rule/session, mocked-host, failure-diagnostic,
+and reporting tests passed;
 repository metadata validator checked 35 visible commands with zero errors.
-Python compilation, Python 2 grammar parsing, and XML parsing of review.xaml
-passed. Tests are in `tests/steel_model_review_test.py` and
-`tests/steel_model_review_host_test.py`. These checks do not
-prove extraction, WPF binding, navigation, or host behavior.
+Python compilation and XAML loading passed. Earlier prototype validation also
+included Python 2 grammar parsing; the reporting changes still require live
+IronPython acceptance. Tests are in `tests/steel_model_review_test.py` and
+`tests/steel_model_review_host_test.py`, and
+`tests/steel_model_review_command_test.py`. Reporting tests are in
+`tests/steel_model_review_reporting_test.py`. An isolated .NET WPF render of
+review.xaml with synthetic findings was visually inspected on 2026-10-16.
+These checks do not prove extraction, IronPython WPF binding, navigation, or
+live Revit behavior. Reload pyRevit and run a fresh review to validate the icons
+and report changes in Revit.
 
 ## Tool version history
 
@@ -411,6 +440,8 @@ prove extraction, WPF binding, navigation, or host behavior.
   interpretation, and grid expectation controls using representative projects.
 - Confirm material classification and necessary family/type overrides.
 - Validate WPF findings and navigation in the installed pyRevit engine.
+- Review support-candidate ambiguity, vertical evaluation coverage, and
+  intentional overlap examples with the user before changing check policies.
 - Add issue-resolution history and optional physical cut-end diagnostics.
 - Validate actual SDS2 export behavior and document the exporter/version used.
 - Consider durable project exceptions, exported reports, linked supports,

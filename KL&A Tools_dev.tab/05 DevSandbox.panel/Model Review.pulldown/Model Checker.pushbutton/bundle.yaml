@@ -18,4 +18,7 @@ tooltip: |
   -> Correct the model manually and rerun. Linked models are excluded.
   _____________________________________________________________________
   Last update:
+  - [10.16.2026] v0.0 - Add ribbon icons and clearer finding labels, search, and measurements.
   - [10.16.2026] v0.0 - Added whole-model steel checks under Model Review.
+  - [10.16.2026] v0.0 - Show failure stage and full traceback in dialog details.
+  - [10.16.2026] v0.0 - Fix IronPython name access when opening the phase selector.

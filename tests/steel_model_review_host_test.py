@@ -27,6 +27,38 @@ class HostBoundaryTests(unittest.TestCase):
     def setUp(self):
         self.host = load_host()
 
+    def test_phase_name_does_not_use_descriptor_getvalue(self):
+        self.host.DB.Element = types.SimpleNamespace(Name=object())
+        phase = types.SimpleNamespace(Name='New Construction')
+        self.assertEqual('New Construction', self.host.name(phase))
+
+    def test_none_name_is_empty(self):
+        self.assertEqual('', self.host.name(None))
+
+    def test_name_preserves_unicode(self):
+        element = types.SimpleNamespace(Name='Niveau \u00e9lev\u00e9')
+        self.assertEqual('Niveau \u00e9lev\u00e9', self.host.name(element))
+
+    def test_hidden_type_getter_uses_builtin_type_name(self):
+        class HiddenTypeName(object):
+            @property
+            def Name(self):
+                raise AttributeError('unreadable property')
+            def get_Parameter(self, parameter_id):
+                self.parameter_id = parameter_id
+                return types.SimpleNamespace(AsString=lambda: 'W12x26')
+        token = object()
+        self.host.DB.BuiltInParameter = types.SimpleNamespace(SYMBOL_NAME_PARAM=token)
+        element = HiddenTypeName()
+        self.assertEqual('W12x26', self.host.name(element))
+        self.assertIs(token, element.parameter_id)
+
+    def test_unavailable_name_is_not_silently_fabricated(self):
+        self.host.DB.BuiltInParameter = types.SimpleNamespace(SYMBOL_NAME_PARAM=1)
+        element = types.SimpleNamespace(get_Parameter=lambda _key: None)
+        with self.assertRaises(AttributeError):
+            self.host.name(element)
+
     def test_inches_conversion_preserves_small_offsets(self):
         value = self.host.point(types.SimpleNamespace(X=1.0 / 384, Y=2, Z=-3))
         self.assertEqual((1.0 / 32, 24, -36), value)

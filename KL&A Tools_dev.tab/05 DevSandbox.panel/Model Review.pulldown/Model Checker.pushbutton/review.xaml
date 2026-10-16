@@ -18,7 +18,7 @@
       <TextBlock Text="Severity" VerticalAlignment="Center" Margin="0,0,6,0"/>
       <ComboBox x:Name="severity_filter" Width="145" Margin="0,0,12,0"/>
       <TextBlock Text="Check" VerticalAlignment="Center" Margin="0,0,6,0"/>
-      <ComboBox x:Name="check_filter" Width="100" Margin="0,0,12,0"/>
+      <ComboBox x:Name="check_filter" Width="265" Margin="0,0,12,0"/>
       <TextBlock Text="Level" VerticalAlignment="Center" Margin="0,0,6,0"/>
       <ComboBox x:Name="level_filter" Width="150" Margin="0,0,12,0"/>
       <TextBlock Text="Status" VerticalAlignment="Center" Margin="0,0,6,0"/>
@@ -26,6 +26,7 @@
     </WrapPanel>
     <DockPanel Grid.Row="2" Margin="0,0,0,8">
       <TextBlock Text="Search member, support, or reason" VerticalAlignment="Center" Margin="0,0,12,0"/>
+      <TextBlock x:Name="result_count" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="12,0,0,0"/>
       <TextBox x:Name="search_box" MinWidth="200"/>
     </DockPanel>
     <DataGrid x:Name="findings" Grid.Row="3" AutoGenerateColumns="False"
@@ -33,14 +34,23 @@
               EnableRowVirtualization="True" EnableColumnVirtualization="True">
       <DataGrid.Columns>
         <DataGridTextColumn Header="Severity" Binding="{Binding Severity}" Width="105"/>
-        <DataGridTextColumn Header="Check" Binding="{Binding Check}" Width="70"/>
-        <DataGridTextColumn Header="Member" Binding="{Binding Member}" Width="200"/>
-        <DataGridTextColumn Header="End" Binding="{Binding End}" Width="40"/>
-        <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="95"/>
-        <DataGridTextColumn Header="Offset (in)" Binding="{Binding Offset}" Width="110"/>
-        <DataGridTextColumn Header="Related elements" Binding="{Binding Related}" Width="160"/>
-        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="130"/>
-        <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="*" MinWidth="200"/>
+        <DataGridTextColumn Header="Check" Binding="{Binding Check}" Width="190"/>
+        <DataGridTextColumn Header="Member" Binding="{Binding Member}" Width="160"/>
+        <DataGridTextColumn Header="End" Binding="{Binding End}" Width="35"/>
+        <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="75"/>
+        <DataGridTemplateColumn Header="Measurement (in)" Width="140" SortMemberPath="Value">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <StackPanel Margin="3,2">
+                <TextBlock Text="{Binding Offset}"/>
+                <TextBlock Text="{Binding Measurement}" FontSize="11"/>
+              </StackPanel>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
+        <DataGridTextColumn Header="Related elements" Binding="{Binding Related}" Width="110"/>
+        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="115"/>
+        <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="*" MinWidth="180"/>
       </DataGrid.Columns>
     </DataGrid>
     <TextBox x:Name="detail" Grid.Row="4" Margin="0,10,0,10" IsReadOnly="True"
