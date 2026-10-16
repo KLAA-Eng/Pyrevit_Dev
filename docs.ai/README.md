@@ -18,6 +18,7 @@ maps the human-facing documentation.
 | [reviews/design-system/](reviews/design-system/README.md) | Dated GUI and design-system source reviews. |
 | [reviews/reviews/](reviews/reviews/README.md) | Dated tool-promotion and release review records. |
 | [handoffs/design_handoff_family_studio_startup_importer/](handoffs/design_handoff_family_studio_startup_importer/README.md) | Implementation plans, status notes, HTML design references, and their assets. |
+| [handoffs/steel_model_review/](handoffs/steel_model_review/SPEC.md) | Model Checker specification and comment-driven outline; authoritative files live beside the DevSandbox command. |
 
 Read the relevant command's adjacent `SPEC.md` and current source before using
 a dated review or handoff as implementation guidance. Historical branch names,

@@ -1,0 +1,58 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Model Checker" Width="1260" Height="760"
+        MinWidth="900" MinHeight="550" WindowStartupLocation="CenterScreen">
+  <Grid Margin="18">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/><RowDefinition Height="*"/>
+      <RowDefinition Height="140"/><RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    <StackPanel Grid.Row="0">
+      <TextBlock Text="Model Checker" FontSize="24" FontWeight="SemiBold"/>
+      <TextBlock x:Name="summary" TextWrapping="Wrap" Margin="0,8,0,4"/>
+      <TextBlock x:Name="coverage_text" TextWrapping="Wrap" Margin="0,0,0,8"/>
+      <TextBlock x:Name="stale_text" Foreground="Firebrick" TextWrapping="Wrap"/>
+    </StackPanel>
+    <WrapPanel Grid.Row="1" Margin="0,10,0,8">
+      <TextBlock Text="Severity" VerticalAlignment="Center" Margin="0,0,6,0"/>
+      <ComboBox x:Name="severity_filter" Width="145" Margin="0,0,12,0"/>
+      <TextBlock Text="Check" VerticalAlignment="Center" Margin="0,0,6,0"/>
+      <ComboBox x:Name="check_filter" Width="100" Margin="0,0,12,0"/>
+      <TextBlock Text="Level" VerticalAlignment="Center" Margin="0,0,6,0"/>
+      <ComboBox x:Name="level_filter" Width="150" Margin="0,0,12,0"/>
+      <TextBlock Text="Status" VerticalAlignment="Center" Margin="0,0,6,0"/>
+      <ComboBox x:Name="status_filter" Width="165"/>
+    </WrapPanel>
+    <DockPanel Grid.Row="2" Margin="0,0,0,8">
+      <TextBlock Text="Search member, support, or reason" VerticalAlignment="Center" Margin="0,0,12,0"/>
+      <TextBox x:Name="search_box" MinWidth="200"/>
+    </DockPanel>
+    <DataGrid x:Name="findings" Grid.Row="3" AutoGenerateColumns="False"
+              IsReadOnly="True" SelectionMode="Single" CanUserAddRows="False"
+              EnableRowVirtualization="True" EnableColumnVirtualization="True">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Severity" Binding="{Binding Severity}" Width="105"/>
+        <DataGridTextColumn Header="Check" Binding="{Binding Check}" Width="70"/>
+        <DataGridTextColumn Header="Member" Binding="{Binding Member}" Width="200"/>
+        <DataGridTextColumn Header="End" Binding="{Binding End}" Width="40"/>
+        <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="95"/>
+        <DataGridTextColumn Header="Offset (in)" Binding="{Binding Offset}" Width="110"/>
+        <DataGridTextColumn Header="Related elements" Binding="{Binding Related}" Width="160"/>
+        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="130"/>
+        <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="*" MinWidth="200"/>
+      </DataGrid.Columns>
+    </DataGrid>
+    <TextBox x:Name="detail" Grid.Row="4" Margin="0,10,0,10" IsReadOnly="True"
+             TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+    <WrapPanel Grid.Row="5" HorizontalAlignment="Right">
+      <Button x:Name="coverage_button" Content="Coverage details" Padding="12,6" Margin="4"/>
+      <Button x:Name="grids_button" Content="Assign grid pair" Padding="12,6" Margin="4"/>
+      <Button x:Name="select_button" Content="Select / Zoom" Padding="12,6" Margin="4"/>
+      <Button x:Name="accept_button" Content="Accept exception" Padding="12,6" Margin="4"/>
+      <Button x:Name="reopen_button" Content="Reopen finding" Padding="12,6" Margin="4"/>
+      <Button x:Name="rerun_button" Content="Rerun" Padding="12,6" Margin="4"/>
+      <Button x:Name="close_button" Content="Close" Padding="12,6" Margin="4" IsCancel="True"/>
+    </WrapPanel>
+  </Grid>
+</Window>

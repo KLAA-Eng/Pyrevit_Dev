@@ -1,0 +1,21 @@
+title: Model Checker
+author: KL&A
+tooltip: |
+  Version: v0.0
+  Date: 10.16.2026
+  Status: Unreleased
+  _____________________________________________________________________
+  Description:
+
+  Review whole-model steel geometry before SDS2 export: beam endpoints,
+  vertical alignment, column grids, and duplicate members.
+  Read-only prototype. Unsupported geometry is reported as Not evaluated.
+  _____________________________________________________________________
+  How-to:
+
+  -> Confirm export phase, design options, enabled checks, and inch tolerances.
+  -> Review findings, select/zoom to members, and record intentional exceptions.
+  -> Correct the model manually and rerun. Linked models are excluded.
+  _____________________________________________________________________
+  Last update:
+  - [10.16.2026] v0.0 - Added whole-model steel checks under Model Review.
