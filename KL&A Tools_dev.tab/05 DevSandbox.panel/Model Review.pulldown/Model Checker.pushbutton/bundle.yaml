@@ -10,7 +10,8 @@ tooltip: |
   Review whole-model steel geometry before SDS2 export: beam endpoints,
   connection roles, vertical alignment, column grids/faces, duplicates,
   interior crossings, and floor/roof bottom-face work planes.
-  Read-only prototype. Unsupported geometry is reported as Not evaluated.
+  Creates a colored 3D review view; member geometry is unchanged.
+  Unsupported geometry is reported as Not evaluated.
   _____________________________________________________________________
   How-to:
 
@@ -19,9 +20,14 @@ tooltip: |
   -> Correct the model manually and rerun. Linked models are excluded.
   _____________________________________________________________________
   Last update:
+  - [10.16.2026] v0.0 - Add an isolated 3D review view with live report-filter colors and a modeless report.
   - [10.16.2026] v0.0 - Require full-depth column-shaft containment; report column-top bearing separately.
   - [10.16.2026] v0.0 - Classify beam joints; add linked records, underside work planes, and crossing errors.
   - [10.16.2026] v0.0 - Add ribbon icons and clearer finding labels, search, and measurements.
   - [10.16.2026] v0.0 - Added whole-model steel checks under Model Review.
   - [10.16.2026] v0.0 - Show failure stage and full traceback in dialog details.
   - [10.16.2026] v0.0 - Fix IronPython name access when opening the phase selector.
+engine:
+  clean: true
+  full_frame: false
+  persistent: true

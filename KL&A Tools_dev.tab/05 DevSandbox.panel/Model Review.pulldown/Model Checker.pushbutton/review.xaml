@@ -13,6 +13,9 @@
       <TextBlock x:Name="summary" TextWrapping="Wrap" Margin="0,8,0,4"/>
       <TextBlock x:Name="coverage_text" TextWrapping="Wrap" Margin="0,0,0,8"/>
       <TextBlock x:Name="stale_text" Foreground="Firebrick" TextWrapping="Wrap"/>
+      <TextBlock x:Name="view_status" TextWrapping="Wrap" Margin="0,4,0,0"/>
+      <TextBlock Text="3D colors: Critical red | Error magenta | Warning orange | Not evaluated purple | Information blue | Context/accepted gray"
+                 TextWrapping="Wrap" Margin="0,4,0,0"/>
     </StackPanel>
     <WrapPanel Grid.Row="1" Margin="0,10,0,8">
       <TextBlock Text="Severity" VerticalAlignment="Center" Margin="0,0,6,0"/>
@@ -60,10 +63,11 @@
       <Button x:Name="coverage_button" Content="Coverage details" Padding="12,6" Margin="4"/>
       <Button x:Name="grids_button" Content="Assign grid pair" Padding="12,6" Margin="4"/>
       <Button x:Name="select_button" Content="Select / Zoom" Padding="12,6" Margin="4"/>
+      <Button x:Name="view_button" Content="Open review 3D" Padding="12,6" Margin="4"/>
       <Button x:Name="accept_button" Content="Accept exception" Padding="12,6" Margin="4"/>
       <Button x:Name="reopen_button" Content="Reopen finding" Padding="12,6" Margin="4"/>
       <Button x:Name="rerun_button" Content="Rerun" Padding="12,6" Margin="4"/>
-      <Button x:Name="close_button" Content="Close" Padding="12,6" Margin="4" IsCancel="True"/>
+      <Button x:Name="close_button" Content="Close" Padding="12,6" Margin="4"/>
     </WrapPanel>
   </Grid>
 </Window>

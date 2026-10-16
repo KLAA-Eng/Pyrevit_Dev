@@ -24,10 +24,10 @@ No live Revit acceptance or SDS2 export evidence is claimed by this prototype.
 
 All six checks, phase/option choices, reviewed material overrides, configurable
 inch tolerances, result filtering, Select/Zoom, explicit grid-pair assignment,
-session exceptions, and cancellation are implemented. Close the browser to
-correct the model manually; invoke Model Checker again to open the previous
-report or run a fresh review. Reports and exceptions stay in Revit session
-memory, without model or external-file writes.
+session exceptions, and cancellation are implemented. The modeless browser stays
+open beside Revit for manual corrections and a fresh rerun. Reports and exceptions
+stay in session memory. A dedicated 3D review view, its visibility settings, and
+its graphic overrides are saved Revit document changes; member geometry is unchanged.
 
 Model Review uses the existing KL&A cube ribbon icon; Model Checker uses the
 existing search icon with light/dark theme variants. The findings browser shows
@@ -148,9 +148,12 @@ finding means no eligible candidate was found within the declared search.
    level, and review status. Critical findings sort first.
 6. Select and zoom to the member and candidate support or grid pair. Review
    measured discrepancies and why the candidate was identified.
-7. Accept intentional conditions with a reason, or close the browser and correct
-   the model manually. Assign explicit grid pairs from column grid findings.
-8. Rerun after corrections. Previous findings are a snapshot, not live results.
+7. Accept intentional conditions with a reason, or correct the model while the
+   report remains open. Assign explicit grid pairs from column grid findings.
+8. Use the dedicated 3D view alongside the report. Colors follow its filters;
+   other checked members remain gray context. Open review 3D returns to that view.
+9. Rerun after corrections. Colors and review statuses update interactively;
+   geometry findings remain a snapshot until the next completed run.
 
 ## Inputs and prerequisites
 
@@ -400,10 +403,53 @@ identities, check/end identity, settings, and version fingerprints of relevant
 members, types, materials/assets, levels, grids, phases, and options. Any
 detected model/settings change conservatively invalidates all carried acceptance.
 
-The review is read-only with respect to model data. It does not move members,
-join geometry, edit parameters, delete duplicates, create connection objects,
-change saved view graphics, export to SDS2, or invoke an exporter. Selection
-and navigation are the initial review aids. Exceptions live in session memory.
+Geometry review does not move members, join geometry, edit member parameters,
+delete duplicates, create connections, or invoke an exporter. The checker creates
+and updates one dedicated isometric 3D view for the report; visibility and color
+changes are confined to that view. The view persists when the report closes and
+will be saved with the model. Exceptions remain in session memory.
+
+### Report-linked 3D view
+
+- Include extracted eligible steel beams, steel columns, and concrete walls
+  from the report's Member registry. Grids, floors/roofs, excluded members,
+  linked models, and identity-only failed/unsupported extraction records are
+  outside the view scope. Coverage still reports those omissions.
+- Create a new view with Revit's unique generated name prefixed by
+  `KLA Model Checker - `. Reuse its stored UniqueId within the report session;
+  never adopt or modify a user's view by matching its name. A deleted review
+  view is recreated on the next graphics refresh or Open review 3D action.
+- Set the report phase, remove the default template, hide annotation/import/
+  analytical categories, hide unrelated model categories, and hide unchecked
+  instances of the three included categories. Unhide newly included members on
+  rerun. Unhideable unchecked members fail the transaction rather than silently
+  breaking isolation. No temporary-isolation mode is left active.
+- Revit's design-option/workset/phase-filter visibility can still limit display;
+  the tool does not change project option/workset configuration. Show available
+  versus requested member counts and identify the possible visibility limits.
+  The review itself remains document-wide regardless of view visibility.
+- Use solid surface/cut-fill and line overrides: Critical red, Error magenta,
+  Warning orange, Not evaluated purple, Information blue, and neutral gray for
+  context/Pass/accepted findings. Color names are accompanied by the table's
+  severity labels. Highest open severity among filtered rows controls a member.
+  Pair findings (duplicates/crossings) color both members; an endpoint error
+  colors its owning beam rather than automatically blaming the receiving support.
+- All checked members remain context when filters change. Accepting a finding
+  removes only its contribution to the color; other open filtered findings on
+  that member still apply. Reopening restores that contribution. Native Revit
+  selection highlighting can temporarily cover the tool's override color.
+- Keep the report modeless in the persistent IronPython engine. Route navigation,
+  reruns, and graphics through ExternalEvent. Coalesce filter requests and apply
+  only changed member colors. Updates occur when Revit is idle, not during an
+  active command or edit mode. Open review 3D restores isolation and colors.
+- Source-model changes mark the report stale and block acceptance until rerun.
+  Graphics transactions do not invalidate source evidence. Color refreshes alone
+  do not recalculate geometry. Switching documents blocks queued review actions;
+  closing the report/document removes handlers and disposes the external event.
+- Create no view for incomplete runs or a report without extracted members.
+  Cancelled reruns preserve the prior complete report and review view. Failed
+  view writes roll back their transaction and surface the failure; earlier
+  successful review-view changes can remain in the document.
 
 Cancel preserves any prior complete report and clearly labels the current
 run Cancelled/incomplete. Never represent partial results as a complete scan.
@@ -457,6 +503,13 @@ No upstream code or assets were copied.
 - [Autodesk: structural material classification](https://help.autodesk.com/cloudhelp/2020/ENU/Revit-API/files/Revit_API_Developers_Guide/Revit_Geometric_Elements/Material/Revit_API_Revit_API_Developers_Guide_Revit_Geometric_Elements_Material_General_Material_Information_html.html).
 - [Autodesk: wall side-face access](https://blog.autodesk.io/accessing-the-exterior-face-of-a-wall-programmatically/).
 - [pyRevit: IronPython forms, selection dialogs, and cancellable progress](https://docs.pyrevitlabs.io/reference/pyrevit/forms/_ipy/).
+- [Autodesk: External Events for modeless dialogs](https://help.autodesk.com/cloudhelp/2026/ENU/Revit-API/files/Revit_API_Developers_Guide/Advanced_Topics/Revit_API_Revit_API_Developers_Guide_Advanced_Topics_External_Events_html.html).
+- [Autodesk: element graphic overrides](https://help.autodesk.com/cloudhelp/2026/ENU/Revit-API-MainReference/files/html/a6f1ced3-1f1c-dd42-c0ca-f15f301d1cad.htm).
+
+Installed Revit 2024 RevitAPI.xml/RevitAPIUI.xml were also consulted for
+CreateIsometric, Hide/UnhideElements, category hiding, view phase, solid drafting
+fills, surface/cut override methods, ExternalEvent, RequestViewChange, and
+document/view events. No source/assets were copied from other commands.
 
 ## Acceptance scenarios
 
@@ -491,7 +544,7 @@ No upstream code or assets were copied.
 | A27 | Accept cantilever, then move member or change settings | Prior acceptance invalidated. |
 | A28 | Cancel or encounter extraction failure | Incomplete coverage visible; no complete-review claim. |
 | A29 | 1/32 inch horizontal miss and 1/8 inch vertical miss | Separate Critical and Warning; overall Critical. |
-| A30 | Review, navigate, accept exception, rerun | Model data remains unchanged. |
+| A30 | Review, navigate, accept exception, rerun | Member geometry unchanged; only the dedicated review view/graphics are written. |
 | A31 | Exact girder match and an unrelated nearby beam | Exact relationship retained; no false ambiguity. |
 | A32 | Collinear facing endpoints, including reversed order | Splice connection; vertical policy Not evaluated. |
 | A33 | Angled endpoint pair | Corner/End; vertical policy Not evaluated. |
@@ -506,6 +559,12 @@ No upstream code or assets were copied.
 | A42 | Beam underside matches or is above column top | Separate Column Top Bearing result using local top; gap drives common severity. |
 | A43 | Column bearing target has unresolved local top geometry | Not evaluated; no extent-only bearing Pass. |
 | A44 | Rules change with unchanged model/settings | Cached report and prior acceptances cannot carry into the new ruleset. |
+| A45 | Complete report with extracted beams/columns/walls | Dedicated 3D view contains only that eligible scope; visibility limits are reported. |
+| A46 | Change table filters, accept/reopen a finding | Colors follow filtered open findings; highest severity wins; other checked members stay gray. |
+| A47 | Duplicate/crossing pair versus endpoint support | Pair colors both members; endpoint error colors its owning beam. |
+| A48 | Model edits while report remains open | Stale banner and blocked acceptance; rerun refreshes findings and view. |
+| A49 | Cancel rerun, close report/document, or activate another document | Prior complete view preserved; handlers cleaned up; no cross-document mutations. |
+| A50 | View write failure or unhideable unchecked member | Graphics transaction rolls back with explicit failure. |
 
 Host-independent tests should exercise the severity boundaries, finite geometry,
 support ambiguity, duplicate pairing, exception invalidation, and report coverage.
@@ -524,10 +583,10 @@ member counts during calibration; no performance target is claimed yet.
 The reported Revit attempt failed; no successful live acceptance or SDS2 export
 validation is claimed. Acceptance scenarios are requirements, not passing tests.
 
-Host-independent validation on 2026-10-16: 93 rule/session, mocked-host,
+Host-independent validation on 2026-10-16: 113 rule/session, mocked-host,
 failure-diagnostic, reporting, and connection-record tests passed;
 repository metadata validator checked 35 visible commands with zero errors.
-An earlier isolated XAML loading/rendering check passed. All 11 command
+An isolated WPF/IronPython interaction and layout check passed. All 13 command
 and helper files also compiled with the installed IronPython 2.7 engine.
 Live Revit acceptance remains pending. Tests are in `tests/steel_model_review_test.py` and
 `tests/steel_model_review_host_test.py`, and
@@ -540,12 +599,20 @@ and report changes in Revit.
 New relationship, join-evidence, bottom-face and crossing fixtures are in
 `tests/steel_model_review_connections_test.py`. The beam redesign is not yet
 accepted live in Revit and has no SDS2 transfer validation.
+Filtered color aggregation, isolation, queued requests, document guards,
+stale acceptance, cancelled reruns, transaction rollback, and event disposal
+are covered by `tests/steel_model_review_view_test.py`. Actual browser filtering,
+non-closing navigation requests, and stale acceptance controls were exercised
+with WPF using the installed IronPython engine, and the revised layout was
+rendered and visually inspected. Live 3D creation, graphics, group/phase/option/
+workset visibility, modeless lifetime, worksharing, and large-model performance
+remain unaccepted in Revit; no successful host run is claimed.
 
 ## Tool version history
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| `v0.0` | Unreleased | 10.16.2026 | Whole-model review; classified beam relationships, separate record contracts, column-face diagnostics, full-depth shaft containment and separate top bearing, bottom-face work planes, interior crossings, and readable findings. | Baseline c994742 on dev.model-checker plus subsequent development work; no main delivery exists. |
+| `v0.0` | Unreleased | 10.16.2026 | Whole-model review; classified beam relationships, separate records, full-depth shaft containment and separate top bearing, underside work planes, crossings, and a modeless report with an isolated 3D view and filtered severity colors. | Baseline c994742 on dev.model-checker plus subsequent development work; no main delivery exists. |
 
 ## Backlog and implementation decisions
 
@@ -564,6 +631,10 @@ accepted live in Revit and has no SDS2 transfer validation.
   interpretation, and grid expectation controls using representative projects.
 - Confirm material classification and necessary family/type overrides.
 - Validate WPF findings and navigation in the installed pyRevit engine.
+- Validate modeless view/color synchronization in Revit, including worksharing,
+  group isolation, visibility counts, document closure, Undo, and busy edit modes.
+  Evaluate explicit design-option view configuration and large-model refresh
+  performance before promising complete display or automatic geometry reruns.
 - Review support-candidate ambiguity, vertical evaluation coverage, and
   intentional overlap examples with the user before changing check policies.
 - Add issue-resolution history and optional physical cut-end diagnostics.

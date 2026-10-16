@@ -18,6 +18,8 @@
 # Live host/export evidence and remaining policy decisions are still pending.
 # SMR-02 column review confirmed: full-depth shaft containment and a separate
 # column-top bearing check are implemented, with independent result categories.
+# Tangent confirmed: dedicated 3D review view with modeless report interaction.
+# User selected colors that follow report filters; all checked members stay context.
 
 # Identity and implementation boundaries.
 # Use the Model Checker command with stable ID steel-model-review.
@@ -29,7 +31,8 @@
 # Verify version-specific behavior against official documentation.
 # Keep command paths compatible with the repository IronPython target.
 # Put deterministic comparisons in host-independent library helpers.
-# INVARIANT: Review must not modify model data or run an SDS2 export.
+# INVARIANT: Do not edit member geometry/data or run an SDS2 export.
+# Authorized writes are limited to the dedicated review view and its graphics.
 
 # Establish the review context.
 # Require an active project document and record its stable model identity.
@@ -558,7 +561,28 @@
 # Navigate and record reviewer decisions.
 # Resolve current elements before each Select or Zoom action.
 # Explain when an element was deleted or cannot be navigated to.
-# Use selection and navigation without saved graphic overrides or new views.
+# Create/reuse a tool-created isometric review view identified by stored UniqueId.
+# Never adopt a user's view by matching its name. Recreate a deleted review view.
+# Include extracted steel beams/columns and concrete walls; exclude grids, links,
+# floor/roof hosts, and identity-only failed extraction records from view scope.
+# Set report phase and persist category/element isolation in that view only.
+# Report visible versus requested member counts; phase filters, design options,
+# and worksets can restrict visibility without changing document-wide checking.
+# Fail isolation if unchecked members cannot be hidden; roll back failed writes.
+# Show filtered open severities with surface/cut fills and line colors:
+# Critical red, Error magenta, Warning orange, Not evaluated purple, Information
+# blue. All other checked members stay gray context, including Pass/accepted.
+# Highest open severity wins. Pair errors color both participants; endpoint
+# errors color the owning beam without assigning blame to its receiving support.
+# Accepting one finding removes only its contribution; reopening restores it.
+# Keep the report modeless with persistent-engine ExternalEvent requests.
+# Coalesce filter updates, apply changed colors only, and guard document identity.
+# Select/Zoom, accept/reopen, grid assignment, and rerun keep the report open.
+# Colors update when Revit is idle; source geometry is recalculated only on rerun.
+# Mark source changes stale, but exclude the tool's own view-write transactions.
+# Preserve prior complete report/view on cancellation; create none for partial runs.
+# Closing report/document unsubscribes handlers and disposes queued event access.
+# The review view persists in Revit after closing and is saved with the project.
 # Require a reason before marking an intentional condition Accepted exception.
 # Keep exceptions in session memory for the initial version.
 # Key acceptance to model, stable element identities, check, end, and geometry.
@@ -574,10 +598,10 @@
 # Stop on invalid document context and report the actual reason.
 # Include the execution stage and complete traceback in failure dialog details.
 # Write diagnostics directly to output without relying on the runtime logger.
-# Release temporary resources without changing model data.
+# Release event resources; do not leave handlers attached to a closed report.
 
 # Verify the implementation before delivery.
-# Map SPEC acceptance scenarios A01 through A30 to evidence.
+# Map SPEC acceptance scenarios A01 through A50 to evidence.
 # Test zero, 1/32 inch, 1/16 inch, 1/8 inch, and boundary normalization.
 # Test finite targets, ambiguous candidates, and reference versus physical ends.
 # Test different beam depths with aligned tops and valid column-shaft framing.

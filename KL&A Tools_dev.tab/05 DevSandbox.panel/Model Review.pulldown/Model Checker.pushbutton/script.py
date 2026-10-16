@@ -23,7 +23,7 @@ from System import AppDomain
 from System.Collections.Generic import List
 
 from steel_model_review import host
-from steel_model_review.browser import ReviewWindow
+from steel_model_review.live import ReviewSession
 from steel_model_review.engine import CHECKS, DEFAULTS, Cancelled, assemble_report, evaluate
 from steel_model_review.records import RULESET_VERSION, SCHEMA_VERSION
 from steel_model_review.reporting import CHECK_LABELS
@@ -70,7 +70,7 @@ def _report_failure(details):
         print(report)
     summary = details.strip().splitlines()[-1] if details.strip() else 'Unknown error'
     forms.alert('Model Checker stopped during: {0}\n\n{1}\n\n'
-                'No model data was changed. Expand the details below for the '
+                'Review-view graphics may have changed. Expand the details below for the '
                 'complete traceback.'.format(RUN_STAGE, summary),
                 expanded=report, title=__title__)
 
@@ -183,7 +183,8 @@ def _configure(document):
         'Bottom-face work planes are informational; crossing errors have no severity tier yet.\n'
         'Plan angle tolerance: {6:g} degrees (proposed default).\n'
         'Links are excluded; unresolved geometry is reported.\n'
-        'The model will not be modified.'
+        'Creates/updates a dedicated 3D review view and its color overrides.\n'
+        'Member geometry is reviewed without edits.'
         .format(labels['phase'], '; '.join(labels['options']),
                 ', '.join(settings['checks']), settings['search'],
                 settings['epsilon'], settings['near'], settings['angle_degrees']),
@@ -308,7 +309,7 @@ def _run(document, elements, settings, phase, options, labels, overrides,
     links = len(host.collect(document, DB.BuiltInCategory.OST_RvtLinks))
     report.update({'model': document.Title, 'version': __version__,
             'time': datetime.datetime.now().isoformat(), 'state': state,
-            'settings': settings, 'labels': labels, 'stamp': stamp,
+            'settings': settings, 'labels': labels, 'stamp': stamp, 'phase_id': host.id_value(phase),
             'versions': versions, 'coverage': coverage,
             'grids': grids, 'expected': expected,
             'summary': _summary(coverage, settings, labels, rows, links)})
@@ -316,7 +317,7 @@ def _run(document, elements, settings, phase, options, labels, overrides,
 
 
 def _navigate(document, row):
-    """Select and zoom existing finding elements after closing the modal UI."""
+    """Select and zoom existing finding elements inside a Revit API callback."""
     identities = [row['uid']] + [r['uid'] for r in row['related']]
     elements = [document.GetElement(uid) for uid in identities]
     missing = sum(1 for e in elements if e is None)
@@ -354,7 +355,7 @@ def _assign_grids(row, grids, expected):
 # Main workflow
 # ------------------------------------------------------------------
 def main():
-    """Review steel modeling in the whole active project without model writes."""
+    """Review steel geometry and open its modeless report with a colored 3D view."""
     _stage('Reading the active project')
     document = revit.doc
     if document is None or document.IsFamilyDocument:
@@ -362,6 +363,11 @@ def main():
         return
     if int(document.Application.VersionNumber) < 2024:
         forms.alert('Model Checker targets Revit 2024 and later.', title=__title__)
+        return
+    registry_key = 'KLA_MODEL_CHECKER_WINDOW_' + str(document.GetHashCode())
+    existing = AppDomain.CurrentDomain.GetData(registry_key)
+    if existing is not None and not existing.closed and not existing.closing:
+        existing.window.Activate()
         return
     context = _configure(document)
     if context is None:
@@ -389,53 +395,51 @@ def main():
             return
         if action == 'Open previous report':
             current = previous
-    while True:
-        if current is None:
-            current = _run(document, elements, settings, phase, options, labels,
-                           overrides, expected, previous, versions)
-            if current['state'] == 'Complete':
-                _stage('Saving the session report')
-                previous = current
-                AppDomain.CurrentDomain.SetData(cache_key, json.dumps(previous))
-            else:
-                forms.alert('Review cancelled. This run is incomplete. The '
-                            'previous complete report is preserved.', title=__title__)
-        _stage('Checking report freshness')
-        stale = current['stamp'] != _stamp(
+    if current is None:
+        current = _run(document, elements, settings, phase, options, labels,
+                       overrides, expected, previous, versions)
+    if current['state'] != 'Complete':
+        forms.alert('Review cancelled. This run is incomplete. The previous '
+                    'complete report is preserved; no review view will be created.', title=__title__)
+
+    def fresh(snapshot):
+        return snapshot['stamp'] == _stamp(
             _versions(document), settings, phase, options, expected, overrides)
-        _stage('Opening the findings browser')
-        window = ReviewWindow(os.path.join(BUNDLE, 'review.xaml'), current, stale)
-        window.ShowDialog()
-        if not window.action or window.action[0] == 'close':
-            return
-        action, row = window.action
-        _stage('Handling the {0} action'.format(action))
-        if action == 'rerun':
-            elements, versions = _elements(document), _versions(document)
-            current = None
-        elif action == 'select':
-            _navigate(document, row)
-        elif action == 'grids':
-            _assign_grids(row, current['grids'], expected)
-        elif action == 'coverage':
-            output = script.get_output()
-            output.print_md('## Model Checker coverage - {0}'.format(current['state']))
-            output.print_table(table_data=current['coverage'],
-                               columns=['Element ID', 'Kind', 'State', 'Reason'])
-            forms.alert(current['summary'], title='Model Checker coverage')
-        elif action == 'accept' and not stale:
-            if row['severity'] not in ('Critical', 'Error', 'Warning'):
-                forms.alert('Only Critical, Error, or Warning findings may be accepted. '
-                            'Unresolved coverage remains Not evaluated.', title=__title__)
-                continue
-            reason = forms.ask_for_string(prompt='Reason this condition is intentional:',
-                                           title=__title__)
-            if reason and reason.strip():
-                row['status'], row['exception'] = 'Accepted exception', reason.strip()
-        elif action == 'reopen':
-            row['status'], row['exception'] = 'Open', ''
-        if current is previous:
-            AppDomain.CurrentDomain.SetData(cache_key, json.dumps(previous))
+
+    def run_review(prior):
+        _stage('Rerunning the model checks')
+        return _run(document, _elements(document), settings, phase, options, labels,
+                    overrides, expected, prior, _versions(document))
+
+    def save(snapshot):
+        if snapshot['state'] == 'Complete':
+            AppDomain.CurrentDomain.SetData(cache_key, json.dumps(snapshot))
+
+    def grids(row, snapshot):
+        _assign_grids(row, snapshot['grids'], expected)
+        snapshot['expected'] = dict(expected)
+
+    def coverage(snapshot):
+        output = script.get_output()
+        output.print_md('## Model Checker coverage - {0}'.format(snapshot['state']))
+        output.print_table(table_data=snapshot['coverage'],
+                           columns=['Element ID', 'Kind', 'State', 'Reason'])
+        forms.alert(snapshot['summary'], title='Model Checker coverage')
+
+    def failure():
+        _stage('Updating the modeless report or review view')
+        _report_failure(traceback.format_exc())
+
+    _stage('Opening the modeless report and 3D review view')
+    callbacks = {'fresh': fresh, 'run': run_review, 'save': save,
+                 'navigate': lambda row: _navigate(document, row),
+                 'grids': grids, 'coverage': coverage, 'failure': failure}
+    session = ReviewSession(revit.uidoc.Application, document,
+                            os.path.join(BUNDLE, 'review.xaml'), current,
+                            callbacks, registry_key)
+    AppDomain.CurrentDomain.SetData(registry_key, session)
+    save(current)
+    session.show()
 
 
 def run_command():

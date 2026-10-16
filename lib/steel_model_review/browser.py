@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Modal findings browser; host navigation runs after the window closes."""
+"""Modeless findings browser; Revit operations are queued by the controller."""
 
 from pyrevit import forms
 
@@ -8,7 +8,7 @@ from steel_model_review.reporting import CHECK_LABELS, evidence_text, filtered_r
 
 
 class ReviewWindow(forms.WPFWindow):
-    """Display filtered findings and return an action to the command adapter.
+    """Display filtered findings and send requests to the modeless controller.
 
     Args:
         xaml: Absolute path to the bundle's review.xaml.
@@ -16,11 +16,39 @@ class ReviewWindow(forms.WPFWindow):
         stale: Whether relevant model or settings evidence has changed.
     """
 
-    def __init__(self, xaml, snapshot, stale=False):
+    def __init__(self, xaml, snapshot, stale=False, request=None):
         forms.WPFWindow.__init__(self, xaml)
         self.action = None
-        self.snapshot = snapshot
+        self.request = request
         self._ready = False
+        self._display_rows = []
+        self.set_snapshot(snapshot, stale)
+        self.severity_filter.ItemsSource = ['Review', 'All', 'Critical', 'Error', 'Warning',
+                                            'Not evaluated', 'Information', 'Pass']
+        self.check_filter.ItemsSource = ['All'] + [CHECK_LABELS[c] for c in CHECKS]
+        self.status_filter.ItemsSource = ['All', 'Open', 'Accepted exception']
+        for control in (self.severity_filter, self.check_filter,
+                        self.level_filter, self.status_filter):
+            control.SelectedIndex = 0
+            control.SelectionChanged += self._filter
+        self.search_box.TextChanged += self._filter
+        self.findings.SelectionChanged += self._detail
+        for button, action in ((self.coverage_button, 'coverage'),
+                               (self.grids_button, 'grids'),
+                               (self.select_button, 'select'),
+                               (self.view_button, 'view'),
+                               (self.accept_button, 'accept'),
+                               (self.reopen_button, 'reopen'),
+                               (self.rerun_button, 'rerun'),
+                               (self.close_button, 'close')):
+            button.Tag = action
+            button.Click += self._action
+        self._ready = True
+        self._filter(None, None)
+
+    def set_snapshot(self, snapshot, stale=False):
+        """Refresh a run or review state without closing the report window."""
+        self.snapshot = snapshot
         self.relationships = dict((r['relationship_id'], r)
                                   for r in snapshot.get('relationships', []))
         self.members = dict((m['uid'], m) for m in snapshot.get('members', []))
@@ -36,32 +64,23 @@ class ReviewWindow(forms.WPFWindow):
                     counts['Critical'], counts['Warning'], counts['Not evaluated'],
                     counts['Pass'], accepted, counts['Error'], counts['Information']))
         self.coverage_text.Text = snapshot['summary']
-        self.stale_text.Text = (
-            'STALE: model or settings changed. Rerun before accepting findings.'
-            if stale else 'Read-only geometry review; no SDS2-ready certification.')
-        self.accept_button.IsEnabled = not stale and snapshot['state'] == 'Complete'
-        self.severity_filter.ItemsSource = ['Review', 'All', 'Critical', 'Error', 'Warning',
-                                            'Not evaluated', 'Information', 'Pass']
-        self.check_filter.ItemsSource = ['All'] + [CHECK_LABELS[c] for c in CHECKS]
+        self.set_stale(stale)
+        selected_level = self.level_filter.SelectedItem
         self.level_filter.ItemsSource = ['All'] + sorted(set(r['level'] for r in rows))
-        self.status_filter.ItemsSource = ['All', 'Open', 'Accepted exception']
-        for control in (self.severity_filter, self.check_filter,
-                        self.level_filter, self.status_filter):
-            control.SelectedIndex = 0
-            control.SelectionChanged += self._filter
-        self.search_box.TextChanged += self._filter
-        self.findings.SelectionChanged += self._detail
-        for button, action in ((self.coverage_button, 'coverage'),
-                               (self.grids_button, 'grids'),
-                               (self.select_button, 'select'),
-                               (self.accept_button, 'accept'),
-                               (self.reopen_button, 'reopen'),
-                               (self.rerun_button, 'rerun'),
-                               (self.close_button, 'close')):
-            button.Tag = action
-            button.Click += self._action
-        self._ready = True
-        self._filter(None, None)
+        self.level_filter.SelectedItem = (selected_level if selected_level in
+                                          list(self.level_filter.ItemsSource) else 'All')
+        if self._ready:
+            self._filter(None, None)
+
+    def set_stale(self, stale):
+        """Separate snapshot freshness from asynchronously updated view colors."""
+        self.stale_text.Text = (
+            'STALE: model or settings changed. Colors show previous results; rerun the checks.'
+            if stale else 'Colors follow report filters. Geometry results update when you rerun.')
+        self.accept_button.IsEnabled = not stale and self.snapshot['state'] == 'Complete'
+
+    def visible_rows(self):
+        return list(self._display_rows)
 
     def _filter(self, sender, event):
         """Refresh sorted rows when a reviewer changes any filter control."""
@@ -73,12 +92,15 @@ class ReviewWindow(forms.WPFWindow):
         status = str(self.status_filter.SelectedItem)
         output = filtered_rows(self.snapshot['rows'], severity, check, level,
                                status, self.search_box.Text)
+        self._display_rows = [item.row for item in output]
         self.detail.Text = ''
         self.findings.ItemsSource = output
         self.result_count.Text = ('Showing {0} of {1} results'.format(
             len(output), len(self.snapshot['rows'])) if output else
             'No results match these filters ({0} total results).'.format(
                 len(self.snapshot['rows'])))
+        if self.request:
+            self.request('colors', None)
 
     def _detail(self, sender, event):
         """Show the selected finding's complete reason and exception text."""
@@ -100,11 +122,14 @@ class ReviewWindow(forms.WPFWindow):
             self.detail.Text = ''
 
     def _action(self, sender, event):
-        """Close the modal window and return the requested workflow action."""
+        """Queue Revit work while leaving the report available for interaction."""
         action = str(sender.Tag)
         selected = self.findings.SelectedItem
         if action in ('select', 'accept', 'reopen', 'grids') and not selected:
             forms.alert('Select a finding first.', title='Model Checker')
             return
         self.action = (action, selected.row if selected else None)
-        self.Close()
+        if self.request and action != 'close':
+            self.request(*self.action)
+        else:
+            self.Close()
