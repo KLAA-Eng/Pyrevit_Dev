@@ -11,6 +11,7 @@ PALETTE = {'Critical': (220, 40, 40), 'Error': (200, 30, 120),
            'Warning': (245, 155, 30), 'Not evaluated': (145, 85, 190),
            'Information': (45, 125, 200), 'Context': (185, 185, 185)}
 KINDS = ('beam', 'column', 'wall')
+REVIEW_SCALE = 48  # 1/4 inch on paper represents 1 foot in the model.
 
 
 def scope_members(snapshot):
@@ -51,9 +52,17 @@ def create(document, db, phase_id=None):
     if not types:
         raise ValueError('No 3D view family type is available.')
     view = db.View3D.CreateIsometric(document, types[0].Id)
-    # Revit's generated name is unique; never adopt an existing view by name.
-    view.Name = 'KLA Model Checker - ' + view.Name
+    # A unique default name can collide once prefixed (for example on reruns).
+    # Reserve all view/template names; never adopt an existing view by name.
+    names = set(v.Name.lower() for v in db.FilteredElementCollector(document).OfClass(db.View))
+    base = 'KLA Model Checker - ' + view.Name
+    name, counter = base, 2
+    while name.lower() in names:
+        name = '{0} ({1})'.format(base, counter)
+        counter += 1
+    view.Name = name
     view.ViewTemplateId = db.ElementId.InvalidElementId
+    view.Scale = REVIEW_SCALE
     view.DisplayStyle = db.DisplayStyle.FlatColors
     view.AreAnnotationCategoriesHidden = True
     view.AreImportCategoriesHidden = True
@@ -73,6 +82,7 @@ def isolate(document, db, view, snapshot):
     members = scope_members(snapshot)
     if not members:
         raise ValueError('The report contains no extracted beams, columns, or walls.')
+    view.Scale = REVIEW_SCALE
     allowed = set(int(c) for c in (db.BuiltInCategory.OST_StructuralFraming,
                                   db.BuiltInCategory.OST_StructuralColumns,
                                   db.BuiltInCategory.OST_Walls))
@@ -101,7 +111,10 @@ def isolate(document, db, view, snapshot):
 
 
 def apply_colors(document, db, view, plan):
-    """Assign solid surface/cut fills and lines in the dedicated review view."""
+    """Assign only solid surface foreground patterns in the review view.
+
+    Fresh settings also clear line/cut overrides from earlier tool versions.
+    """
     fills = [f for f in db.FilteredElementCollector(document).OfClass(db.FillPatternElement)
              if f.GetFillPattern().IsSolidFill and
              f.GetFillPattern().Target == db.FillPatternTarget.Drafting]
@@ -111,14 +124,9 @@ def apply_colors(document, db, view, plan):
     for severity, rgb in PALETTE.items():
         color = db.Color(*rgb)
         style = db.OverrideGraphicSettings()
-        style.SetProjectionLineColor(color)
-        style.SetCutLineColor(color)
         style.SetSurfaceForegroundPatternId(fills[0].Id)
         style.SetSurfaceForegroundPatternColor(color)
         style.SetSurfaceForegroundPatternVisible(True)
-        style.SetCutForegroundPatternId(fills[0].Id)
-        style.SetCutForegroundPatternColor(color)
-        style.SetCutForegroundPatternVisible(True)
         styles[severity] = style
     missing = 0
     for uid, severity in plan.items():

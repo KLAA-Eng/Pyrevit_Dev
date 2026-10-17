@@ -73,6 +73,73 @@ class ColorPlanTests(unittest.TestCase):
         self.assertEqual('Not evaluated', view.color_plan(report, [result])['a'])
 
 
+class ViewCreationTests(unittest.TestCase):
+    def create(self, occupied):
+        """Enforce view-name uniqueness at the actual adapter's Name setter."""
+        class Collector(list):
+            def OfClass(self, kind):
+                return self
+        class NamedView(object):
+            def __init__(self, document, name):
+                self.document = document
+                self._name = name
+                self.IsTemplate = False
+
+            @property
+            def Name(self):
+                return self._name
+
+            @Name.setter
+            def Name(self, value):
+                if any(v is not self and v.Name.lower() == value.lower()
+                       for v in self.document.views):
+                    raise ValueError('Name must be unique. Parameter name: name')
+                self._name = value
+        document = types.SimpleNamespace(views=[])
+        for name in occupied:
+            document.views.append(NamedView(document, name))
+        # A template participates in the same collision search as any view.
+        if document.views:
+            document.views[-1].IsTemplate = True
+        original = list(document.views)
+        new = NamedView(document, '{3D}')
+        def create_isometric(doc, type_id):
+            doc.views.append(new)
+            return new
+        family = types.SimpleNamespace(ViewFamily='3D', Id=42)
+        view_class = object()
+        type_class = object()
+        def collector(doc):
+            result = Collector()
+            result.OfClass = lambda kind: Collector(
+                [family] if kind is type_class else doc.views)
+            return result
+        db = types.SimpleNamespace(FilteredElementCollector=collector,
+            View=view_class, ViewFamilyType=type_class,
+            ViewFamily=types.SimpleNamespace(ThreeDimensional='3D'),
+            View3D=types.SimpleNamespace(CreateIsometric=mock.Mock(side_effect=create_isometric)),
+            ElementId=types.SimpleNamespace(InvalidElementId=-1),
+            DisplayStyle=types.SimpleNamespace(FlatColors='FlatColors'))
+        result = view.create(document, db)
+        self.assertIs(new, result)
+        self.assertEqual(occupied, [v.Name for v in original])
+        self.assertEqual(48, result.Scale)
+        db.View3D.CreateIsometric.assert_called_once_with(document, 42)
+        return result.Name
+
+    def test_unoccupied_prefixed_name_is_retained(self):
+        self.assertEqual('KLA Model Checker - {3D}', self.create([]))
+
+    def test_existing_review_name_gets_numbered_suffix(self):
+        self.assertEqual('KLA Model Checker - {3D} (2)',
+                          self.create(['KLA Model Checker - {3D}']))
+
+    def test_existing_numbered_suffixes_are_skipped_including_case_only_matches(self):
+        self.assertEqual('KLA Model Checker - {3D} (4)', self.create([
+            'KLA Model Checker - {3D}', 'KLA Model Checker - {3D} (2)',
+            'kla model checker - {3d} (3)']))
+
+
 class ViewIsolationTests(unittest.TestCase):
     def fixture(self):
         class Collector(list):

@@ -416,9 +416,14 @@ will be saved with the model. Exceptions remain in session memory.
   linked models, and identity-only failed/unsupported extraction records are
   outside the view scope. Coverage still reports those omissions.
 - Create a new view with Revit's unique generated name prefixed by
-  `KLA Model Checker - `. Reuse its stored UniqueId within the report session;
+  `KLA Model Checker - `. Check all existing view/template names without regard
+  to case and add an available numbered suffix `(2)`, `(3)`, etc. when needed;
+  the prefix alone does not preserve the uniqueness of Revit's generated name.
+  Reuse its stored UniqueId within the report session;
   never adopt or modify a user's view by matching its name. A deleted review
   view is recreated on the next graphics refresh or Open review 3D action.
+- Set the review view to 1/4 inch = 1 foot (1:48) on creation and scope refresh
+  (Open review 3D or rerun), including reused review views.
 - Set the report phase, remove the default template, hide annotation/import/
   analytical categories, hide unrelated model categories, and hide unchecked
   instances of the three included categories. Unhide newly included members on
@@ -428,12 +433,15 @@ will be saved with the model. Exceptions remain in session memory.
   the tool does not change project option/workset configuration. Show available
   versus requested member counts and identify the possible visibility limits.
   The review itself remains document-wide regardless of view visibility.
-- Use solid surface/cut-fill and line overrides: Critical red, Error magenta,
+- Use only solid surface foreground pattern overrides: Critical red, Error magenta,
   Warning orange, Not evaluated purple, Information blue, and neutral gray for
   context/Pass/accepted findings. Color names are accompanied by the table's
   severity labels. Highest open severity among filtered rows controls a member.
   Pair findings (duplicates/crossings) color both members; an endpoint error
   colors its owning beam rather than automatically blaming the receiving support.
+  Fresh override settings remove earlier tool-applied projection-line, cut-line,
+  and cut-pattern overrides when the view is refreshed. Lines and cut patterns
+  then use their normal view/category appearance.
 - All checked members remain context when filters change. Accepting a finding
   removes only its contribution to the color; other open filtered findings on
   that member still apply. Reopening restores that contribution. Native Revit
@@ -565,6 +573,7 @@ document/view events. No source/assets were copied from other commands.
 | A48 | Model edits while report remains open | Stale banner and blocked acceptance; rerun refreshes findings and view. |
 | A49 | Cancel rerun, close report/document, or activate another document | Prior complete view preserved; handlers cleaned up; no cross-document mutations. |
 | A50 | View write failure or unhideable unchecked member | Graphics transaction rolls back with explicit failure. |
+| A51 | Proposed review-view name already exists, including numbered/case-only/template matches | Use the next available numbered suffix; existing views/templates are unchanged. |
 
 Host-independent tests should exercise the severity boundaries, finite geometry,
 support ambiguity, duplicate pairing, exception invalidation, and report coverage.
@@ -579,11 +588,12 @@ member counts during calibration; no performance target is claimed yet.
 | 2026-10-15 | Not applicable | Not run | Design discussion | Requirements captured; no implementation validation. | This SPEC and companion CDD outline. |
 | 2026-10-16 | Unreleased | 2024.3.40 | User attempted Model Checker using pyRevit 6.5.3.26176+2017 | Failed; generic dialog and blank output. Original traceback unavailable. Direct failure diagnostics added; active-document rerun required. | User screenshots and local Revit journal. |
 | 2026-10-16 | Unreleased | 2024.3.40 | Rerun with detailed failure reporting | Failed while choosing export phase: Name descriptor lacks GetValue. Helper corrected; successful live rerun still pending. | User-provided expanded traceback, host.py name helper. |
+| 2026-10-16 | Unreleased | 2024.3.40 | Create the 3D review view through the modeless report | Failed at view.Name: Name must be unique. Prefixed name now checked against all view/template names, with numbered suffixes. Successful host rerun pending. | Three user-provided screenshots; adapter regression failed at the same setter before the fix. |
 
 The reported Revit attempt failed; no successful live acceptance or SDS2 export
 validation is claimed. Acceptance scenarios are requirements, not passing tests.
 
-Host-independent validation on 2026-10-16: 113 rule/session, mocked-host,
+Host-independent validation on 2026-10-16: 116 rule/session, mocked-host,
 failure-diagnostic, reporting, and connection-record tests passed;
 repository metadata validator checked 35 visible commands with zero errors.
 An isolated WPF/IronPython interaction and layout check passed. All 13 command
@@ -607,6 +617,10 @@ with WPF using the installed IronPython engine, and the revised layout was
 rendered and visually inspected. Live 3D creation, graphics, group/phase/option/
 workset visibility, modeless lifetime, worksharing, and large-model performance
 remain unaccepted in Revit; no successful host run is claimed.
+View-name collision regressions exercise the real create adapter with a mocked
+Name setter that rejects duplicate names, including templates and case-only
+matches. Both collision scenarios failed before the fix and pass afterward;
+the unoccupied-name case also passes. These fixtures do not prove live creation.
 
 ## Tool version history
 

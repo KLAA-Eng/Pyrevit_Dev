@@ -563,15 +563,21 @@
 # Explain when an element was deleted or cannot be navigated to.
 # Create/reuse a tool-created isometric review view identified by stored UniqueId.
 # Never adopt a user's view by matching its name. Recreate a deleted review view.
+# Check prefixed names against all view/template names, ignoring case; append
+# the first unused numbered suffix when needed. A default unique name can collide
+# after adding the checker prefix, especially when earlier review views persist.
 # Include extracted steel beams/columns and concrete walls; exclude grids, links,
 # floor/roof hosts, and identity-only failed extraction records from view scope.
 # Set report phase and persist category/element isolation in that view only.
+# Set new/reused review views to 1/4 inch = 1 foot (1:48) on scope refresh.
 # Report visible versus requested member counts; phase filters, design options,
 # and worksets can restrict visibility without changing document-wide checking.
 # Fail isolation if unchecked members cannot be hidden; roll back failed writes.
-# Show filtered open severities with surface/cut fills and line colors:
+# Show filtered open severities with surface foreground pattern overrides only:
 # Critical red, Error magenta, Warning orange, Not evaluated purple, Information
 # blue. All other checked members stay gray context, including Pass/accepted.
+# Fresh settings clear earlier tool line/cut overrides on refresh; leave normal
+# category/view line and cut graphics in effect.
 # Highest open severity wins. Pair errors color both participants; endpoint
 # errors color the owning beam without assigning blame to its receiving support.
 # Accepting one finding removes only its contribution; reopening restores it.
@@ -601,7 +607,7 @@
 # Release event resources; do not leave handlers attached to a closed report.
 
 # Verify the implementation before delivery.
-# Map SPEC acceptance scenarios A01 through A50 to evidence.
+# Map SPEC acceptance scenarios A01 through A51 to evidence.
 # Test zero, 1/32 inch, 1/16 inch, 1/8 inch, and boundary normalization.
 # Test finite targets, ambiguous candidates, and reference versus physical ends.
 # Test different beam depths with aligned tops and valid column-shaft framing.
