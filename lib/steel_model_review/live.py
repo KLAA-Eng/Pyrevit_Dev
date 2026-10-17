@@ -2,6 +2,7 @@
 
 from pyrevit import DB, UI, forms
 from System import AppDomain, EventHandler
+from System.Collections.Generic import List
 
 from steel_model_review.browser import ReviewWindow
 from steel_model_review import view as review_view
@@ -28,6 +29,8 @@ class ReviewSession(UI.IExternalEventHandler):
         self.document_dirty = True
         self.colors_dirty = True
         self.scope_dirty = True
+        self.selection_dirty = True
+        self.setting_selection = False
         self.actions = []
         self.stale = callbacks['fresh'](snapshot) is False
         self.view_uid = snapshot.get('review_view_uid')
@@ -38,9 +41,11 @@ class ReviewSession(UI.IExternalEventHandler):
         self._changed_handler = EventHandler[DB.Events.DocumentChangedEventArgs](self._changed)
         self._closing_handler = EventHandler[DB.Events.DocumentClosingEventArgs](self._document_closing)
         self._view_handler = EventHandler[UI.Events.ViewActivatedEventArgs](self._view_activated)
+        self._selection_handler = EventHandler[UI.Events.SelectionChangedEventArgs](self._selection_changed)
         self.application.DocumentChanged += self._changed_handler
         self.application.DocumentClosing += self._closing_handler
         self.uiapp.ViewActivated += self._view_handler
+        self.uiapp.SelectionChanged += self._selection_handler
 
     def show(self):
         self.window.Show()
@@ -58,6 +63,13 @@ class ReviewSession(UI.IExternalEventHandler):
             self.actions = [('close', None)]
         elif action == 'colors':
             self.colors_dirty = True
+            self.selection_dirty = True
+        elif action == 'selection':
+            self.selection_dirty = True
+            self.actions = [(a, r) for a, r in self.actions if a != 'highlight']
+        elif action == 'highlight':
+            self.actions = [(a, r) for a, r in self.actions if a != 'highlight']
+            self.actions.append((action, row))
         elif action == 'refresh':
             self.document_dirty = True
         else:
@@ -86,13 +98,23 @@ class ReviewSession(UI.IExternalEventHandler):
 
     def _view_activated(self, sender, args):
         if not self.closed and not self.closing:
+            self.selection_dirty = True
             self.request('refresh', None)
+
+    def _selection_changed(self, sender, args):
+        """Queue a read; this restricted event must never set Revit selection."""
+        if self.closed or self.closing or self.setting_selection:
+            return
+        uidoc = self.uiapp.ActiveUIDocument
+        if uidoc is not None and uidoc.Document.Equals(self.document):
+            self.request('selection', None)
 
     def _dispose(self):
         """Unsubscribe inside API context; no queued request may outlive the UI."""
         self.application.DocumentChanged -= self._changed_handler
         self.application.DocumentClosing -= self._closing_handler
         self.uiapp.ViewActivated -= self._view_handler
+        self.uiapp.SelectionChanged -= self._selection_handler
         self.closed = True
         self.actions = []
         AppDomain.CurrentDomain.SetData(self.registry_key, None)
@@ -117,6 +139,7 @@ class ReviewSession(UI.IExternalEventHandler):
         self.window.IsEnabled = False
         try:
             actions, self.actions = self.actions, []
+            previous_view_uid = self.snapshot.get('review_view_uid')
             if self.document_dirty or any(a == 'accept' for a, _r in actions):
                 self.stale = not self.callbacks['fresh'](self.snapshot)
                 self.document_dirty = False
@@ -140,6 +163,9 @@ class ReviewSession(UI.IExternalEventHandler):
                         self.window.view_status.Text = 'Rerun cancelled; previous report and view preserved.'
                 elif action == 'select':
                     self.callbacks['navigate'](row)
+                    self.selection_dirty = True
+                elif action == 'highlight':
+                    self._highlight(uidoc, row)
                 elif action == 'coverage':
                     self.callbacks['coverage'](self.snapshot)
                 elif action == 'grids':
@@ -153,13 +179,36 @@ class ReviewSession(UI.IExternalEventHandler):
                 return
             if self.colors_dirty or self.scope_dirty:
                 self._update_view(uidoc, open_view)
-            self.callbacks['save'](self.snapshot)
+            if self.selection_dirty:
+                elements = [self.document.GetElement(identity)
+                            for identity in uidoc.Selection.GetElementIds()]
+                self.window.select_members([e.UniqueId for e in elements if e is not None])
+                self.selection_dirty = False
+            if (any(a in ('rerun', 'grids', 'accept', 'reopen') for a, _r in actions) or
+                    previous_view_uid != self.snapshot.get('review_view_uid')):
+                self.callbacks['save'](self.snapshot)
         except Exception:
             self.window.view_status.Text = 'View/report update failed. Expand the failure dialog for details.'
             self.callbacks['failure']()
         finally:
             if not self.closed:
                 self.window.IsEnabled = True
+
+    def _highlight(self, uidoc, row):
+        """Select only the finding's owning member, preserving the camera."""
+        if not any(current is row for current in self.snapshot['rows']):
+            return
+        element = self.document.GetElement(row['uid'])
+        if element is None:
+            self.window.selection_status.Text = 'Member no longer exists; rerun the checks.'
+            return
+        if list(uidoc.Selection.GetElementIds()) != [element.Id]:
+            self.setting_selection = True
+            try:
+                uidoc.Selection.SetElementIds(List[DB.ElementId]([element.Id]))
+            finally:
+                self.setting_selection = False
+        self.selection_dirty = True
 
     def _review(self, action, row):
         if not any(current is row for current in self.snapshot['rows']):

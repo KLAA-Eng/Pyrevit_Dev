@@ -450,6 +450,28 @@ will be saved with the model. Exceptions remain in session memory.
   reruns, and graphics through ExternalEvent. Coalesce filter requests and apply
   only changed member colors. Updates occur when Revit is idle, not during an
   active command or edit mode. Open review 3D restores isolation and colors.
+- Synchronize member selection in both directions while the report is open.
+  Clicking a finding selects only its owning member in Revit without zooming
+  or changing the active view. Select / Zoom remains an explicit action that
+  also includes the finding's related elements. Table selection stays visible
+  while Revit holds keyboard focus; updating the table does not focus it.
+- A selection change in the report's project chooses and scrolls to the first
+  matching visible finding in the current table order. Prefer rows owned by a
+  selected member, then rows referencing it as a related element. Keep the
+  current row if it is still among the preferred matches. For several selected
+  members, show one matching finding under that same policy.
+- Preserve severity/check/level/status/search filters. If no visible row matches,
+  clear the old row and explain that no match exists under current filters.
+  Empty Revit selection clears the table selection; clearing/rebuilding the
+  table during filtering does not clear native selection. Filter refreshes and
+  completed reruns rematch the current native selection.
+- SelectionChanged queues a read through ExternalEvent; the restricted callback
+  performs no document or selection writes. Suppress native selection echoes and
+  programmatic table-selection feedback; coalesce rapid table clicks, and let a
+  newer model selection cancel a pending table-selection request. Ignore other
+  projects, closed reports, deleted members, and rows from an obsolete snapshot.
+  Selection-only events do not reserialize the cached geometry report or rerun
+  checks. Remove the selection subscription with the other session handlers.
 - Source-model changes mark the report stale and block acceptance until rerun.
   Graphics transactions do not invalidate source evidence. Color refreshes alone
   do not recalculate geometry. Switching documents blocks queued review actions;
@@ -518,6 +540,10 @@ Installed Revit 2024 RevitAPI.xml/RevitAPIUI.xml were also consulted for
 CreateIsometric, Hide/UnhideElements, category hiding, view phase, solid drafting
 fills, surface/cut override methods, ExternalEvent, RequestViewChange, and
 document/view events. No source/assets were copied from other commands.
+The installed Revit 2024 RevitAPIUI.xml confirms UIApplication.SelectionChanged
+and Selection.SetElementIds, including the prohibition on writing selection or
+opening a transaction inside SelectionChanged. The event exists since Revit 2023;
+the command continues to target Revit 2024 and later.
 
 ## Acceptance scenarios
 
@@ -574,6 +600,10 @@ document/view events. No source/assets were copied from other commands.
 | A49 | Cancel rerun, close report/document, or activate another document | Prior complete view preserved; handlers cleaned up; no cross-document mutations. |
 | A50 | View write failure or unhideable unchecked member | Graphics transaction rolls back with explicit failure. |
 | A51 | Proposed review-view name already exists, including numbered/case-only/template matches | Use the next available numbered suffix; existing views/templates are unchanged. |
+| A52 | Pick a checked member in Revit with the report open | Select/scroll a matching visible row, preferring owning-member rows and preserving a current match. |
+| A53 | Click a report finding | Select only its owning member; keep the camera and active view; Select / Zoom remains explicit. |
+| A54 | Pick unmatched/filtered-out members, several members, or clear native selection | Preserve filters; select one preferred visible match or clear the table row with an explanatory status. |
+| A55 | Selection echoes, rapid clicks, document switch, deleted/stale row, or report closure | No feedback loop, cross-document selection, stale-row action, lingering handler, or per-pick geometry-cache serialization. |
 
 Host-independent tests should exercise the severity boundaries, finite geometry,
 support ambiguity, duplicate pairing, exception invalidation, and report coverage.
@@ -593,7 +623,7 @@ member counts during calibration; no performance target is claimed yet.
 The reported Revit attempt failed; no successful live acceptance or SDS2 export
 validation is claimed. Acceptance scenarios are requirements, not passing tests.
 
-Host-independent validation on 2026-10-16: 116 rule/session, mocked-host,
+Host-independent validation on 2026-10-16: 131 rule/session, mocked-host,
 failure-diagnostic, reporting, and connection-record tests passed;
 repository metadata validator checked 35 visible commands with zero errors.
 An isolated WPF/IronPython interaction and layout check passed. All 13 command
@@ -621,12 +651,20 @@ View-name collision regressions exercise the real create adapter with a mocked
 Name setter that rejects duplicate names, including templates and case-only
 matches. Both collision scenarios failed before the fix and pass afterward;
 the unoccupied-name case also passes. These fixtures do not prove live creation.
+Bidirectional selection fixtures are in `tests/steel_model_review_selection_test.py`.
+They cover preferred/current matches, hidden/unmatched/empty selections,
+programmatic feedback suppression, native-event deferral, latest-click ordering,
+deleted/unchanged members, document switching, and avoiding per-pick cache writes.
+Actual WPF selection events, preserving filters/current rows, and suppressing
+programmatic echoes passed under IronPython 2.7; the updated selected-row layout
+was rendered and inspected. Native Revit selection synchronization remains pending
+host acceptance. This was self-reviewed; no independent review is claimed.
 
 ## Tool version history
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| `v0.0` | Unreleased | 10.16.2026 | Whole-model review; classified beam relationships, separate records, full-depth shaft containment and separate top bearing, underside work planes, crossings, and a modeless report with an isolated 3D view and filtered severity colors. | Baseline c994742 on dev.model-checker plus subsequent development work; no main delivery exists. |
+| `v0.0` | Unreleased | 10.16.2026 | Whole-model review; classified beam relationships, separate records, shaft containment/top bearing, underside work planes, crossings, and a modeless report with an isolated colored 3D view and two-way member selection. | Baseline c994742 on dev.model-checker plus subsequent development work; no main delivery exists. |
 
 ## Backlog and implementation decisions
 

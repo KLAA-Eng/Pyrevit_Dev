@@ -4,7 +4,7 @@
 from pyrevit import forms
 
 from steel_model_review.engine import CHECKS
-from steel_model_review.reporting import CHECK_LABELS, evidence_text, filtered_rows
+from steel_model_review.reporting import CHECK_LABELS, evidence_text, filtered_rows, selection_match
 
 
 class ReviewWindow(forms.WPFWindow):
@@ -21,6 +21,7 @@ class ReviewWindow(forms.WPFWindow):
         self.action = None
         self.request = request
         self._ready = False
+        self._syncing_selection = False
         self._display_rows = []
         self.set_snapshot(snapshot, stale)
         self.severity_filter.ItemsSource = ['Review', 'All', 'Critical', 'Error', 'Warning',
@@ -82,6 +83,25 @@ class ReviewWindow(forms.WPFWindow):
     def visible_rows(self):
         return list(self._display_rows)
 
+    def select_members(self, uids):
+        """Select a matching visible finding without sending selection back to Revit."""
+        items = list(self.findings.Items)
+        current = self.findings.SelectedItem
+        match = selection_match([item.row for item in items], uids,
+                                current.row if current else None)
+        target = next((item for item in items if item.row is match), None)
+        self._syncing_selection = True
+        try:
+            self.findings.SelectedItem = target
+            if target:
+                self.findings.ScrollIntoView(target)
+        finally:
+            self._syncing_selection = False
+        self.selection_status.Text = (
+            'Model selection matched a visible finding; filters unchanged.' if target else
+            'No findings match the selected members under current filters.' if uids else
+            'Select a member or a finding to synchronize selection.')
+
     def _filter(self, sender, event):
         """Refresh sorted rows when a reviewer changes any filter control."""
         if not self._ready:
@@ -94,7 +114,11 @@ class ReviewWindow(forms.WPFWindow):
                                status, self.search_box.Text)
         self._display_rows = [item.row for item in output]
         self.detail.Text = ''
-        self.findings.ItemsSource = output
+        self._syncing_selection = True
+        try:
+            self.findings.ItemsSource = output
+        finally:
+            self._syncing_selection = False
         self.result_count.Text = ('Showing {0} of {1} results'.format(
             len(output), len(self.snapshot['rows'])) if output else
             'No results match these filters ({0} total results).'.format(
@@ -118,6 +142,8 @@ class ReviewWindow(forms.WPFWindow):
                                         measurement, row['exception'] or 'None'))
             relation = self.relationships.get(row.get('relationship_id'))
             self.detail.Text += '\n' + evidence_text(relation, self.members.get(row['uid'], {}))
+            if self.request and not self._syncing_selection:
+                self.request('highlight', row)
         else:
             self.detail.Text = ''
 

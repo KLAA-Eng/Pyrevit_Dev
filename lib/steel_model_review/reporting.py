@@ -71,6 +71,21 @@ def filtered_rows(rows, severity='Issues', check='All', level='All',
     return output
 
 
+def selection_match(rows, selected_uids, current=None):
+    """Choose a visible owned finding, falling back to a related-element match.
+
+    Preserve the current row within the best matching group so repeated native
+    selection events do not jump between a member's findings.
+    """
+    selected = set(selected_uids)
+    matches = [r for r in rows if r['uid'] in selected]
+    if not matches:
+        matches = [r for r in rows if any(item['uid'] in selected for item in r['related'])]
+    if any(r is current for r in matches):
+        return current
+    return matches[0] if matches else None
+
+
 def evidence_text(relation, member):
     """Explain source evidence in reviewer language without serializing internals."""
     details = []

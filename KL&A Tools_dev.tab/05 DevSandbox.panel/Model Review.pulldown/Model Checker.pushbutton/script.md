@@ -584,6 +584,21 @@
 # Keep the report modeless with persistent-engine ExternalEvent requests.
 # Coalesce filter updates, apply changed colors only, and guard document identity.
 # Select/Zoom, accept/reopen, grid assignment, and rerun keep the report open.
+# Synchronize member selection bidirectionally while preserving table filters.
+# Clicking a finding selects its owning member without zooming/changing views.
+# Keep Select/Zoom as the explicit camera action, including related elements.
+# Revit selection selects/scrolls one visible finding, preferring owned rows
+# over related-element matches. Preserve the current preferred match if possible.
+# For multiple selected members use that same one-row policy and table ordering.
+# Unmatched/empty native selections clear the table row and explain filter limits.
+# Do not clear native selection when rebuilding the table during filtering.
+# Rematch native selection after filters change or a completed rerun.
+# Queue SelectionChanged reads through ExternalEvent; never set selection or
+# start a transaction in its restricted callback. Guard programmatic echoes.
+# Coalesce table clicks; a newer model selection cancels pending table selection.
+# Guard document ownership and snapshot membership; skip deleted elements.
+# Unsubscribe the selection handler with the other session handlers on close.
+# Do not reserialize geometry snapshots on selection-only events.
 # Colors update when Revit is idle; source geometry is recalculated only on rerun.
 # Mark source changes stale, but exclude the tool's own view-write transactions.
 # Preserve prior complete report/view on cancellation; create none for partial runs.
@@ -607,7 +622,7 @@
 # Release event resources; do not leave handlers attached to a closed report.
 
 # Verify the implementation before delivery.
-# Map SPEC acceptance scenarios A01 through A51 to evidence.
+# Map SPEC acceptance scenarios A01 through A55 to evidence.
 # Test zero, 1/32 inch, 1/16 inch, 1/8 inch, and boundary normalization.
 # Test finite targets, ambiguous candidates, and reference versus physical ends.
 # Test different beam depths with aligned tops and valid column-shaft framing.

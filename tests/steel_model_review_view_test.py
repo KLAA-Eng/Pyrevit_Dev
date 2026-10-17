@@ -237,7 +237,7 @@ def live_scope():
     transaction.GetStatus.return_value = 'Started'
     db.Transaction = mock.Mock(return_value=transaction)
     ui = types.SimpleNamespace(IExternalEventHandler=object,
-        Events=types.SimpleNamespace(ViewActivatedEventArgs=object),
+        Events=types.SimpleNamespace(ViewActivatedEventArgs=object, SelectionChangedEventArgs=object),
         ExternalEvent=types.SimpleNamespace(Create=lambda handler: event))
     graphics = types.SimpleNamespace(scope_members=view.scope_members, color_plan=view.color_plan,
         create=mock.Mock(return_value=FakeView()), isolate=mock.Mock(),
@@ -248,6 +248,10 @@ def live_scope():
     scope = {'UI': ui, 'DB': db, 'EventHandler': Delegate, 'AppDomain': domain,
              'review_view': graphics, 'ReviewWindow': mock.Mock(return_value=window),
              'forms': mock.Mock()}
+    class GenericList(object):
+        def __class_getitem__(cls, kind):
+            return list
+    scope['List'] = GenericList
     exec(compile(tree, path, 'exec'), scope)
     return scope, event, transaction
 
@@ -257,9 +261,11 @@ class LiveSessionTests(unittest.TestCase):
         self.scope, self.event, self.transaction = live_scope()
         self.document = Document()
         self.application = types.SimpleNamespace(DocumentChanged=Hook(), DocumentClosing=Hook())
-        self.uidoc = types.SimpleNamespace(Document=self.document, RequestViewChange=mock.Mock())
+        self.uidoc = types.SimpleNamespace(Document=self.document, RequestViewChange=mock.Mock(),
+                                          Selection=mock.Mock())
+        self.uidoc.Selection.GetElementIds.return_value = []
         self.uiapp = types.SimpleNamespace(Application=self.application,
-                                          ViewActivated=Hook(), ActiveUIDocument=self.uidoc)
+            ViewActivated=Hook(), SelectionChanged=Hook(), ActiveUIDocument=self.uidoc)
         self.callbacks = dict((key, mock.Mock()) for key in
             ('fresh', 'run', 'save', 'navigate', 'grids', 'coverage', 'failure'))
         self.callbacks['fresh'].return_value = True
@@ -350,6 +356,7 @@ class LiveSessionTests(unittest.TestCase):
         self.assertEqual([], self.application.DocumentChanged.handlers)
         self.assertEqual([], self.application.DocumentClosing.handlers)
         self.assertEqual([], self.uiapp.ViewActivated.handlers)
+        self.assertEqual([], self.uiapp.SelectionChanged.handlers)
         self.event.Dispose.assert_called_once()
         self.scope['DB'].Transaction.assert_not_called()
 

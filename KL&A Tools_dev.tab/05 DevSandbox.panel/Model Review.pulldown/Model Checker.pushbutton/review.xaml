@@ -14,6 +14,8 @@
       <TextBlock x:Name="coverage_text" TextWrapping="Wrap" Margin="0,0,0,8"/>
       <TextBlock x:Name="stale_text" Foreground="Firebrick" TextWrapping="Wrap"/>
       <TextBlock x:Name="view_status" TextWrapping="Wrap" Margin="0,4,0,0"/>
+      <TextBlock x:Name="selection_status" Text="Select a member or a finding to synchronize selection."
+                 TextWrapping="Wrap" Margin="0,4,0,0"/>
       <TextBlock Text="3D colors: Critical red | Error magenta | Warning orange | Not evaluated purple | Information blue | Context/accepted gray"
                  TextWrapping="Wrap" Margin="0,4,0,0"/>
     </StackPanel>
@@ -35,6 +37,16 @@
     <DataGrid x:Name="findings" Grid.Row="3" AutoGenerateColumns="False"
               IsReadOnly="True" SelectionMode="Single" CanUserAddRows="False"
               EnableRowVirtualization="True" EnableColumnVirtualization="True">
+      <DataGrid.CellStyle>
+        <Style TargetType="DataGridCell">
+          <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+              <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+              <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+            </Trigger>
+          </Style.Triggers>
+        </Style>
+      </DataGrid.CellStyle>
       <DataGrid.Columns>
         <DataGridTextColumn Header="Severity" Binding="{Binding Severity}" Width="105"/>
         <DataGridTextColumn Header="Check" Binding="{Binding Check}" Width="175"/>

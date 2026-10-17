@@ -17,9 +17,11 @@ tooltip: |
 
   -> Confirm export phase, design options, enabled checks, and inch tolerances.
   -> Review findings, select/zoom to members, and record intentional exceptions.
+  -> Click a member or report row to synchronize selection without zooming.
   -> Correct the model manually and rerun. Linked models are excluded.
   _____________________________________________________________________
   Last update:
+  - [10.16.2026] v0.0 - Synchronize report/member selection in both directions while preserving filters.
   - [10.16.2026] v0.0 - Avoid review-view name collisions with numbered suffixes.
   - [10.16.2026] v0.0 - Set review views to 1/4 inch = 1 foot; apply only surface-pattern colors.
   - [10.16.2026] v0.0 - Add an isolated 3D review view with live report-filter colors and a modeless report.
