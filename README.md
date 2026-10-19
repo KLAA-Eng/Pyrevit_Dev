@@ -162,9 +162,11 @@ lib/                 Shared Python helpers and reusable WPF/UI components
 checks/              Audit checks
 tests/               Host-independent unit tests
 scripts/             Developer utilities, including build-metadata generation
-docs/                Contributor and design-system guides
+docs/                Contributor/design guides, active plans, and durable knowledge
+docs/plans/          Active plans and task ledgers
+docs/knowledge/      Reusable knowledge, decisions, and new handoff snapshots
 version.json         Human-edited version source
-docs.ai/             Agent reference guides, release records, audits, and handoffs
+docs.ai/             Agent documentation routing and authoritative release governance
 ```
 
 Command entry points should stay thin: they adapt pyRevit/Revit, WPF, Excel,
@@ -212,9 +214,9 @@ the intended Revit environment.
 
 ## References and standards
 
-- [Python Script Guide](docs.ai/SCRIPTS.md) - command organization and
+- [Python Script Guide](docs/knowledge/python-pyrevit.md) - command organization and
   pyRevit script structure.
-- [Comment and Docstring Guide](docs.ai/COMMENTS.md) - comments,
+- [Comment and Docstring Guide](docs/knowledge/python-comments.md) - comments,
   docstrings, command metadata, and section dividers.
 - [Contributor Guide](docs/CONTRIBUTING.md) - GitHub workflow,
   validation evidence, and SPEC requirements.

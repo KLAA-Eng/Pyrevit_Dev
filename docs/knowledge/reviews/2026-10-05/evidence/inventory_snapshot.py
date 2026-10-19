@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ET
 
 from PIL import Image
 
-ROOT = Path(__file__).resolve().parents[4]
+ROOT = Path(__file__).resolve().parents[5]
 OUT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / 'scripts'))
 import check_tool_metadata as metadata
