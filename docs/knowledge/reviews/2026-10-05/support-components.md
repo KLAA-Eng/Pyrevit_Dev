@@ -53,25 +53,25 @@ No additional host-free test suite was added or executed for this supplement. Fi
 | `lib/Snippets/_views.py` | No tracked consumer found. | Boundary | View/section construction and rename-retry boundaries inspected. Caller owns transactions; naming exhaustion and geometry validity need acceptance before use. |
 | `lib/Snippets/__init__.py` | Package initializer. | Inventory | No activation side effect. |
 
-Active-consumer anchors: [Find/Replace Views](<../../../KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/script.py#L13>), [Find/Replace Sheets](<../../../KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/script.py#L15>), and [Duplicate Sheets](<../../../KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/script.py#L20>). The [gallery's Recall metadata](../../../lib/ui_gallery/launchers.py#L130) is not production activation; GUI-05 traces the separate preview content replacement.
+Active-consumer anchors: [Find/Replace Views](<../../../../KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/script.py#L13>), [Find/Replace Sheets](<../../../../KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/script.py#L15>), and [Duplicate Sheets](<../../../../KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton/script.py#L20>). The [gallery's Recall metadata](../../../../lib/ui_gallery/launchers.py#L130) is not production activation; GUI-05 traces the separate preview content replacement.
 
 ## Findings requiring correction before activation
 
 ### SUP-01 — P3: Custom Properties applies displayed fields rather than the user's changes
 
-**Confidence: confirmed source behavior; dormant component.** Evidence: [numeric display](../../../lib/customprops/custom_props_pane.py#L499), lines 499–503; [Apply](../../../lib/customprops/custom_props_pane.py#L1376), lines 1376–1391; [pending collection](../../../lib/customprops/custom_props_pane.py#L1393), lines 1393–1450.
+**Confidence: confirmed source behavior; dormant component.** Evidence: [numeric display](../../../../lib/customprops/custom_props_pane.py#L499), lines 499–503; [Apply](../../../../lib/customprops/custom_props_pane.py#L1376), lines 1376–1391; [pending collection](../../../../lib/customprops/custom_props_pane.py#L1393), lines 1393–1450.
 
 `_collect_pending()` collects every non-empty editable field without consulting the existing dirty-state comparison. Doubles are first converted to display units and rounded to six decimals. Applying an unrelated edit therefore sends unchanged numeric fields through the setter using their rounded display values. The collector also skips empty strings, so intentionally clearing an editable string cannot be distinguished from leaving a field untouched. It strips leading/trailing spaces from every text value regardless of edit intent.
 
 **Trigger if activated:** display a writable double whose value needs more than six display-unit decimals, change another field, then Apply; or clear a string field and Apply. **Consequence:** unrelated numeric precision can change, while the requested string clearing is omitted. There is no current production exposure established by this review.
 
-**Remedy:** represent untouched, set-value, and clear-value separately. Use actual dirty-state tracking to build pending edits, preserve raw numeric values until intentionally changed, and define normalization by parameter type. Capture per-element setter results rather than discarding them at [lines 1452–1460](../../../lib/customprops/custom_props_pane.py#L1452).
+**Remedy:** represent untouched, set-value, and clear-value separately. Use actual dirty-state tracking to build pending edits, preserve raw numeric values until intentionally changed, and define normalization by parameter type. Capture per-element setter results rather than discarding them at [lines 1452–1460](../../../../lib/customprops/custom_props_pane.py#L1452).
 
 **Acceptance:** an unrelated edit leaves exact numeric values unchanged; blanking a writable string clears it; unchanged and mixed fields produce no writes; deliberate zero/false values apply; pasted values obey the destination units and parameter type; rejected writes appear in an explicit failed outcome. Run multi-selection, type/instance, read-only, workset, and document-switch fixtures before enabling the pane.
 
 ### SUP-02 — P3: Recall persistence silently preserves old selections and can truncate its existing file
 
-**Confidence: confirmed source behavior; dormant component.** Evidence: [close/save path](../../../lib/match/clipboard.py#L478), lines 478–506.
+**Confidence: confirmed source behavior; dormant component.** Evidence: [close/save path](../../../../lib/match/clipboard.py#L478), lines 478–506.
 
 `_save_recall()` returns immediately when no items are selected. If the memory file previously held selections, clearing every checkbox and closing leaves those selections on disk. Non-empty saves open the existing path with `wb` before serialization; a serialization or write failure can truncate that file, and the catch suppresses the failure entirely.
 
@@ -83,7 +83,7 @@ Active-consumer anchors: [Find/Replace Views](<../../../KL&A Tools_dev.tab/03 Co
 
 ### SUP-03 — P3: The generic region styling helper deletes its input when styling fails
 
-**Confidence: confirmed source behavior; no tracked caller.** Evidence: [override helper](../../../lib/Snippets/_overrides.py#L3), lines 3–38.
+**Confidence: confirmed source behavior; no tracked caller.** Evidence: [override helper](../../../../lib/Snippets/_overrides.py#L3), lines 3–38.
 
 `override_graphics_region()` accepts an existing `region` and documents a graphics operation. Its bare exception handler calls `doc.Delete(region.Id)` for any error raised while building or applying overrides. The helper neither creates the supplied region nor establishes ownership of it.
 
@@ -95,7 +95,7 @@ Active-consumer anchors: [Find/Replace Views](<../../../KL&A Tools_dev.tab/03 Co
 
 ### SUP-04 — P3: Temporary section-box changes can commit without a durable restore state
 
-**Confidence: confirmed operation ordering; dormant component.** Evidence: [temporary-box flow](../../../lib/sbox/sbox_actions.py#L201), lines 201–229; [restore flow](../../../lib/sbox/sbox_actions.py#L175), lines 175–194.
+**Confidence: confirmed operation ordering; dormant component.** Evidence: [temporary-box flow](../../../../lib/sbox/sbox_actions.py#L201), lines 201–229; [restore flow](../../../../lib/sbox/sbox_actions.py#L175), lines 175–194.
 
 The initial temporary-box branch commits the new box before opening/writing the restore cache. If that write fails, the model has already changed while the prior box exists only in local memory. The exception is logged and the function returns no successful state. The restore branch likewise commits the restored model before rewriting the cache; failed cache cleanup can leave an already-consumed restore entry. Subsequent load errors are treated as an empty cache.
 
@@ -107,9 +107,9 @@ The initial temporary-box branch commits the new box before opening/writing the 
 
 ## Additional readiness notes, not production defect findings
 
-- **Selection cancellation:** [family selection](../../../lib/Selection/select_similar_family.py#L44) wraps the invalid-selection `exitscript=True` alert in a bare catch, then refers to `selected_element` before its assignment at line 50. A terminating exit/error before that assignment can become a second unbound-local error. Separate validation/cancellation from supported-element error handling before reuse.
+- **Selection cancellation:** [family selection](../../../../lib/Selection/select_similar_family.py#L44) wraps the invalid-selection `exitscript=True` alert in a bare catch, then refers to `selected_element` before its assignment at line 50. A terminating exit/error before that assignment can become a second unbound-local error. Separate validation/cancellation from supported-element error handling before reuse.
 - **Special-case selection:** `lib/Selection/super_select.py` repeats the Plan Region category value in the following MatchLine branch. Confirm the intended category and host behavior before connecting this selector; the current branch cannot provide its intended distinct match-line behavior.
-- **Batch lifetime:** [the standalone 3D-view script](../../../commands/make3dview_command.py#L1) opens and saves documents without a close/finally policy, existing-name policy, per-model result, or continuation strategy. Its injected `__models__` execution contract is unspecified in this checkout. Do not advertise it as a supported batch command without an owner and fixtures.
+- **Batch lifetime:** [the standalone 3D-view script](../../../../commands/make3dview_command.py#L1) opens and saves documents without a close/finally policy, existing-name policy, per-model result, or continuation strategy. Its injected `__models__` execution contract is unspecified in this checkout. Do not advertise it as a supported batch command without an owner and fixtures.
 - **Event lifecycle:** Custom Properties subscribes selection/document/view events on construction and unsubscribes on `Unloaded`. Reload/resubscribe behavior, callback ownership across document changes, and stale element references need live pane lifecycle tests. No current registered pane was found, so a live event leak or lost subscription is not asserted.
 - **Cross-document clipboard:** raw ElementId values and displayed parameter values are not portable identity/unit contracts. Before allowing paste across documents, define compatible parameter identity, destination-unit conversion, category/type scope, and invalid-ID rejection. The present repository does not establish a production cross-document workflow.
 - **Snippet reuse:** the examples intentionally contain global host context, caller-owned transactions, legacy API forms, and incomplete utilities. Preserve their provenance and distinguish examples from supported library APIs. Refactoring all snippets or treating hidden template placeholders as current production failures is not justified by this review.

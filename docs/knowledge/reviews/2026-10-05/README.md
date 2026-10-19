@@ -1,5 +1,10 @@
 # Comprehensive design system, GUI, and tools review
 
+> Historical review; filed under `docs/knowledge/reviews/` on 2026-10-18.
+> Dates, revisions, finding IDs, and measured results below retain their original
+> baseline. The [review index](../README.md) explains evidence ownership; current
+> tasks belong to a named plan or tracker, not this finding register.
+
 **Review date:** 2026-10-05 (America/Denver). **Reviewed source:** `1562e96a5f6e23b7368c80e317868a0c059dc165`, extension `0.0.11-dev`. **Review branch:** `codex/comprehensive-design-tools-review`.
 
 The repository has a coherent visual identity, reusable legacy and compiled GUI foundations, complete metadata for its 36 visible tools, and meaningful automated tests. The most important findings concern **correct model outcomes and trustworthy reporting**, followed by keyboard accessibility, text readability, long-message handling, and the gaps in compiled release validation. Cosmetic normalization should follow those repairs.

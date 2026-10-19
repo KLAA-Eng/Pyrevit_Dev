@@ -1,5 +1,16 @@
 # Implementation Plan: Family Studio Green Browser And Supported Features
 
+> Historical planning baseline; filed 2026-10-18. Original location:
+> `docs.ai/handoffs/design_handoff_family_studio_startup_importer/01_family_studio_implementation_plan.md`.
+> The proposal, amendments, and checkpoint claims below are retained as history.
+> Their task/status sections are superseded for completion tracking by the
+> [compiled-tools acceptance plan](../compiled-tools-acceptance.md).
+> Read the current command SPEC before using a historical design assumption.
+> Original [design package](../../knowledge/handoffs/family-studio-startup-importer/README.md),
+> [decision and validation record](../../knowledge/compiled-wpf-decision.md), and
+> [handoff snapshot](../../knowledge/family-studio-startup-importer-handoff.md)
+> are filed separately. These links locate the records named in the original text.
+
 - Repository / evidence commit: `KLCode.pyRevit`, `e856ca3`; design source: `Family Studio.dc.html` and this handoff's `README.md`.
 - Owner / priority / scope: KL&A engineering, next after the shared design-system foundation. Command remains `KL&A Tools_dev.tab/05 DevSandbox.panel/Family Studio.invokebutton`.
 - Status: `SUPPORTED FS-1 SLICE IMPLEMENTED — LIVE REVIT ACCEPTANCE PENDING`.

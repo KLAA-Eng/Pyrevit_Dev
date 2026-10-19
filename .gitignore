@@ -4,6 +4,10 @@
 # Local Codex agent workspace state
 .agents/
 
+# Machine-specific KLCode overrides and hook runtime state
+/.klcode/config.local.json
+/.klcode/state/
+
 # Local ManaAi planning and delivery artifacts
 .local.manaai/
 
@@ -65,3 +69,4 @@ pyrightconfig.json
 
 .venv*
 .vscode
+.klcode
