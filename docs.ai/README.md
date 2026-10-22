@@ -43,6 +43,7 @@ superseded task/status sections to that authority.
 | [Comment guide](../docs/knowledge/python-comments.md) | Comments, docstrings, and command documentation style. |
 | [RELEASING.md](RELEASING.md) | Authoritative extension release workflow. |
 | [TOOL_VERSIONING.md](TOOL_VERSIONING.md) | Independent command versions and metadata rules. |
+| [EXCEL_COM_RELIABILITY_PLAN.md](EXCEL_COM_RELIABILITY_PLAN.md) | Affected-host smoke evidence checklist and proposed Excel connection design. |
 | [releasing/tool-version-delivery-ledger.md](releasing/tool-version-delivery-ledger.md) | Mainline delivery evidence used by command version histories. |
 | [2026-10-05 technical review](../docs/knowledge/reviews/2026-10-05/README.md) | Comprehensive technical audit, finding register, validation plan, and evidence files. |
 | [Design-system reviews](../docs/knowledge/reviews/design-system/README.md) | Dated GUI and design-system source reviews. |

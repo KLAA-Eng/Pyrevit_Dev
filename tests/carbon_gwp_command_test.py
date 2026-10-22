@@ -116,6 +116,7 @@ class FakeExportWorksheet(object):
 class FakeExportWorkbook(FakeWorkbook):
     def __init__(self):
         FakeWorkbook.__init__(self)
+        self.ReadOnly = False
         self.refresh_count = 0
         self.updated_links = []
         self.Worksheets = type('Worksheets', (), {
@@ -221,7 +222,7 @@ class CarbonGwpCommandTests(unittest.TestCase):
 
         self.assertEqual('Select Export Workbook (DYN Out sheets will be replaced)',
                          command.EXPORT_WORKBOOK_PICKER_TITLE)
-        self.assertEqual('Select Post-processing',
+        self.assertEqual('Select Post-processing Workbook (will be refreshed and saved)',
                          command.POST_PROCESSING_WORKBOOK_PICKER_TITLE)
 
     def test_local_model_folder_starts_first_workbook_picker(self):
@@ -392,7 +393,7 @@ class CarbonGwpCommandTests(unittest.TestCase):
 
         self.assertEqual([(excel, temporary_file.name)], calls)
 
-    def test_export_read_updates_formula_links_before_charting_rows(self):
+    def test_export_read_updates_links_and_saves_calculated_workbook(self):
         command = load_command_module()
         workbook = FakeExportWorkbook()
         excel = FakeExcel(workbook)
@@ -406,8 +407,10 @@ class CarbonGwpCommandTests(unittest.TestCase):
         self.assertEqual([('container.xlsx',)], workbook.updated_links)
         self.assertEqual(1, excel.async_calculation_count)
         self.assertEqual(1, excel.full_rebuild_count)
+        self.assertEqual(1, workbook.save_count)
+        self.assertEqual([False], workbook.close_arguments)
         self.assertEqual(
-            {'UpdateLinks': 3, 'ReadOnly': True},
+            {'UpdateLinks': 3, 'ReadOnly': False},
             excel.Workbooks.open_arguments[0][1],
         )
 
@@ -426,8 +429,41 @@ class CarbonGwpCommandTests(unittest.TestCase):
 
         self.assertEqual(
             [(excel, 'post-processing.xlsm', {
-                'update_links': 3, 'read_only': True})],
+                'update_links': 3, 'read_only': False})],
             calls)
+
+    def test_post_processing_read_only_open_stops_without_refresh_or_save(self):
+        command = load_command_module()
+        workbook = FakeExportWorkbook()
+        workbook.ReadOnly = True
+        excel = FakeExcel(workbook)
+        command._load_excel_application = lambda: excel
+
+        with self.assertRaisesRegex(ValueError, 'opened read-only'):
+            command._read_export_rows('post-processing.xlsx')
+
+        self.assertEqual(0, workbook.refresh_count)
+        self.assertEqual(0, workbook.save_count)
+        self.assertEqual([False], workbook.close_arguments)
+        self.assertTrue(excel.quit_called)
+
+    def test_post_processing_save_failure_stops_and_closes_without_resaving(self):
+        command = load_command_module()
+        workbook = FakeExportWorkbook()
+        excel = FakeExcel(workbook)
+        command._load_excel_application = lambda: excel
+        command._worksheet_by_name = lambda _book, _name: FakeExportWorksheet()
+
+        def fail_save():
+            raise RuntimeError('save failed')
+
+        workbook.Save = fail_save
+
+        with self.assertRaisesRegex(RuntimeError, 'save failed'):
+            command._read_export_rows('post-processing.xlsx')
+
+        self.assertEqual([False], workbook.close_arguments)
+        self.assertTrue(excel.quit_called)
 
     def test_export_read_stops_when_refresh_fails(self):
         command = load_command_module()
@@ -443,6 +479,7 @@ class CarbonGwpCommandTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             command._read_export_rows('post-processing.xlsx')
 
+        self.assertEqual(0, workbook.save_count)
         self.assertEqual([False], workbook.close_arguments)
         self.assertTrue(excel.quit_called)
 

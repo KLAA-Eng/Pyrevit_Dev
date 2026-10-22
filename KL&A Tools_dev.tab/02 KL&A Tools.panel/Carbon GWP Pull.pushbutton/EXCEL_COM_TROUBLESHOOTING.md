@@ -90,12 +90,11 @@ Sources: [Microsoft: Type.InvokeMember](https://learn.microsoft.com/en-us/dotnet
 
 ## Remaining live diagnostic
 
-First run `Dev-Sandbox > Prototypes > Excel COM Smoke Test` once in each
-affected Revit host. It creates only a UUID-owned temporary XLSX and CSV,
-reports every façade operation in one table, reopens the workbook read-only,
-and removes successful-run assets. A failed run preserves only its exact owned
-assets for diagnosis. Record the Revit build and the table output before
-running Carbon, Steel, or Concrete again.
+Coworkers B (Revit 2025) and L (Revit 2026) passed the complete disposable
+`Dev-Sandbox > Prototypes > Excel COM Smoke Test` lifecycle on 10.22.2026,
+including read-only reopen, refresh, calculation, and cleanup. The first
+short-name interop lookup still failed, while the shared Office 16 path loader
+succeeded. Retain both complete output tables for release review.
 
 If the smoke test fails, retain the runtime type and operation detail from its
 table. A strongly typed .NET PIA probe is then appropriate only when its result
@@ -104,7 +103,11 @@ boundary. Do not use a user workbook for that diagnosis.
 
 ## Release acceptance still required
 
-Record a Revit 25 and Revit 26 live smoke-test case before release acceptance,
-then record Carbon's trusted-workbook case for open, write, save, read-only
-refresh, close, and quit. If the smoke test fails, retain its complete table
-before investigating Office/PIA registration or repair.
+The Revit 2025 and 2026 disposable smoke cases are recorded. B's subsequent
+Carbon run produced accurate charts, but the post-processing workbook stayed
+blank on disk because the command refreshed it read-only and closed without
+saving. The planned `v1.1` correction opens that workbook for editing and saves
+after a successful refresh and `Export` read. Before release acceptance, rerun
+Carbon with a trusted workbook pair, then reopen the post-processing workbook
+and verify its persisted values, along with chart totals and Revit placement.
+Also verify refusal of a locked/read-only workbook and cleanup on save failure.
