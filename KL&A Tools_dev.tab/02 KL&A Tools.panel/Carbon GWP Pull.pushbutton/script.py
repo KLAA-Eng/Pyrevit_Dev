@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 __title__ = 'Carbon\nGWP Pull'
-__version__ = 'v1.0'
+__version__ = 'v1.1'
 
 # ╦╔╦╗╔═╗╔═╗╦═╗╔╦╗╔═╗
 # ║║║║╠═╝║ ║╠╦╝ ║ ╚═╗
@@ -35,7 +35,8 @@ MATERIAL_ACCURACY_FIRST_ROW = 41
 MATERIAL_ACCURACY_LAST_ROW = 70
 MATERIAL_ACCURACY_COLUMN = 'F'
 EXPORT_WORKBOOK_PICKER_TITLE = 'Select Export Workbook (DYN Out sheets will be replaced)'
-POST_PROCESSING_WORKBOOK_PICKER_TITLE = 'Select Post-processing'
+POST_PROCESSING_WORKBOOK_PICKER_TITLE = (
+    'Select Post-processing Workbook (will be refreshed and saved)')
 EXCEL_WORKBOOK_FILTER = (
     'Excel Workbook (*.xlsx)|*.xlsx|'
     'Excel Macro-Enabled Workbook (*.xlsm)|*.xlsm')
@@ -727,10 +728,10 @@ def _material_accuracy_check(workbook):
 
 
 def _read_export_rows(workbook_path, include_material_accuracy_check=False):
-    """Refresh links and read rows from the post-processing Export sheet.
+    """Refresh, save, and read rows from the post-processing Export sheet.
 
-    Opens Excel read-only, updates external formula links in memory, and closes
-    without saving after recalculation.
+    Opens the selected workbook for editing, updates its links and queries,
+    and saves the calculated result after reading Export.
 
     Args:
         workbook_path: Path to the post-processing Excel workbook.
@@ -756,12 +757,16 @@ def _read_export_rows(workbook_path, include_material_accuracy_check=False):
         # retain its last saved (often zero) values even though this command has
         # just written fresh schedule data to the selected container workbook.
         workbook = open_workbook(
-            excel, workbook_path, update_links=3, read_only=True)
-        # Open the analyst workbook read-only. This command needs calculated
-        # values but must not overwrite its formulas or source data.
+            excel, workbook_path, update_links=3, read_only=False)
+        if bool(get_property(workbook, 'ReadOnly')):
+            raise ValueError(
+                'Post-processing workbook opened read-only and cannot be saved. '
+                'Close it in Excel or request edit access, then rerun Carbon GWP Pull.')
+        # Keep the refreshed analyst workbook for later review. Save only after
+        # refresh, calculation, and the Export read have succeeded.
         # The new post-processing workbook uses Power Query to read the three
         # DYN Out sheets from the container workbook. RefreshAll normally runs
-        # those queries in the background; make the read-only session
+        # those queries in the background; make this Excel session
         # foreground-only before refreshing so Export cannot be read while its
         # query inputs are temporarily blank.
         _make_query_refresh_foreground(workbook)
@@ -783,15 +788,18 @@ def _read_export_rows(workbook_path, include_material_accuracy_check=False):
         column_count = int(get_property(get_property(used_range, 'Columns'), 'Count'))
         rows = _com_range_values_to_rows(get_property(used_range, 'Value2'), row_count, column_count)
         if include_material_accuracy_check:
-            return rows, _material_accuracy_check(workbook)
+            material_accuracy_check = _material_accuracy_check(workbook)
+        save_workbook(workbook)
+        if include_material_accuracy_check:
+            return rows, material_accuracy_check
         return rows
     except Exception:
         operation_failed = True
         raise
     finally:
-        # INVARIANT: This reader never saves analyst-owned workbook changes.
-        # The shared helper quits Excel even if Close(False) fails, avoiding a
-        # lingering hidden process and a locked analyst workbook.
+        # Save above is the only persistence point. Close(False) avoids writing
+        # partial refresh/calculation state after an earlier failure. The shared
+        # helper still quits Excel if closing the workbook fails.
         close_excel_application(excel, workbook, suppress_errors=operation_failed)
 
 
@@ -1063,6 +1071,8 @@ def main():
     output.print_md('Refreshing and calculating the post-processing workbook...')
     export_rows, material_accuracy_check = _read_export_rows(
         post_processing_workbook, include_material_accuracy_check=True)
+    output.print_md('Saved refreshed post-processing workbook: {}'.format(
+        post_processing_workbook))
     gwp_slices, gwp_skipped = chart_slices_from_export_rows(export_rows, 1, 'GWP')
     volume_slices, volume_skipped = chart_slices_from_export_rows(
         export_rows, 2, 'material volume')

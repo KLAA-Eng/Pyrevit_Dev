@@ -8,9 +8,9 @@
 - **Ribbon location:** `KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`
 - **Ribbon label:** Carbon GWP Pull
 - **Maturity:** Beta
-- **Status/origin:** Released KL&A Tools-panel beta command; KL&A custom replacement for an internal Dynamo workflow. Last delivered version: `v1.0`.
+- **Status/origin:** Released KL&A Tools-panel beta command; KL&A custom replacement for an internal Dynamo workflow. Planned `v1.1` changes are unreleased; last delivered version: `v1.0`.
 - **Maintainer:** KL&A
-- **Tool version:** `v1.0`
+- **Tool version:** `v1.1` (Unreleased)
 - **Last extension release affecting this command:** `0.0.10-beta`
 - **Compatibility:** Revit 2024 and later is the repository target. No
   command-specific live Revit version acceptance is recorded yet.
@@ -19,7 +19,10 @@
 
 Beta pyRevit replacement for the Dynamo `x_Team Carbon GWP Pull_RVT 24.dyn` workflow.
 
-The command exports selected Revit schedule table data to an Excel container workbook, reads calculated GWP and material-volume values from a post-processing workbook, and creates or updates two rendered doughnut charts on the `SYNC TO CENTRAL` sheet.
+The command exports selected Revit schedule table data to an Excel container
+workbook, refreshes and saves the selected post-processing workbook, reads its
+calculated GWP and material-volume values, and creates or updates two rendered
+doughnut charts on the `SYNC TO CENTRAL` sheet.
 
 ## Inputs
 
@@ -38,8 +41,9 @@ The command exports selected Revit schedule table data to an Excel container wor
   unavailable. Server, detached, and unsaved models use the configured
   Carbon-folder fallback.
 - Post-processing workbook selected by file picker. The second picker opens in
-  the folder selected for the export workbook. It must be a different file from
-  the export workbook.
+  the folder selected for the export workbook and states that the selected file
+  will be refreshed and saved. It must be a different file from the export
+  workbook and must be available for editing.
 
 The tool prompts every run. It does not save paths or run an unattended job.
 
@@ -116,7 +120,8 @@ the existing managed chart intact.
 The pyRevit output window reports:
 
 - Selected schedules.
-- Export and post-processing workbook paths.
+- Export and post-processing workbook paths, plus confirmation that the
+  post-processing workbook was saved after refresh and calculation.
 - Exported worksheet names.
 - Target sheet and whether each managed chart was created or updated.
 - GWP and material-volume chart slices as row, source, material, and a
@@ -143,11 +148,16 @@ The pyRevit output window reports:
 - After a failed short-name Excel PIA lookup, the shared loader uses an already
   importable Excel namespace or validates and loads the installed Office 16 DCF
   PIA by file path. The legacy version 11 reference remains a last resort when
-  the Office path is unavailable. This development change awaits a fresh Revit
-  smoke run and Carbon workbook acceptance on an affected workstation.
-- Refreshes Power Query inputs from the selected export container in the
-  read-only post-processing Excel session before reading `Export`. It waits up
-  to 60 seconds and stops rather than rendering a chart from still-refreshing
+  the Office path is unavailable. This development change passed the disposable
+  Excel COM smoke lifecycle on affected Revit 2025 and 2026 workstations on
+  10.22.2026. Carbon workbook refresh and chart acceptance remain pending.
+- Opens the post-processing workbook for editing and refuses an actual
+  read-only open. It refreshes Power Query inputs from the selected export
+  container, updates links, recalculates, reads `Export`, and explicitly saves
+  the workbook so refreshed values remain visible after the command closes.
+  Close(False) prevents a failed refresh, calculation, or read from saving
+  partial work. It waits up to 60 seconds and stops rather than rendering a
+  chart from still-refreshing
   (stale or temporary zero) values. Refresh, external-link update, or
   calculation errors also stop the command before it reads `Export` or changes
   Revit.
@@ -162,7 +172,8 @@ The pyRevit output window reports:
 ## Validation evidence
 
 - Static unit coverage verifies schedule/worksheet normalization, chart data
-  parsing and geometry, workbook-control flow, macro-security handoff, PIA and
+  parsing and geometry, workbook-control flow, writable post-processing save,
+  macro-security handoff, PIA and
   raw-COM explicit-member dispatch, output-folder uniqueness, and command-path
   loading. The DevSandbox `Excel COM Smoke Test` is the required one-run live
   façade diagnostic before troubleshooting a Carbon workbook-specific failure.
@@ -171,7 +182,9 @@ The pyRevit output window reports:
   undo, or the native dialogs.
 - Before release acceptance, validate with a trusted `.xlsx` and `.xlsm`
   fixture: first run, rerun, no-data, same-workbook rejection, cancelled picker,
-  workbook refresh failure, sheet placement, worksharing, undo, reopen, and
+  workbook refresh failure, persisted post-processing values after Excel
+  closes, read-only/locked file refusal, sheet placement, worksharing, undo,
+  reopen, and
   keyboard use of the schedule selector.
 
 ## Tool version history
@@ -181,6 +194,7 @@ The pyRevit output window reports:
 | `v0.0` | `0.0.6beta` | 09.15.2026 | First delivered DevSandbox workflow: export selected schedules to Excel and update Carbon Pie.JMP family parameters from Export values. | `300f8d4` |
 | `v0.1` | `0.0.9` | 10.01.2026 | Delivered the revised DevSandbox workflow with managed GWP/material-volume charts, refresh guards, Material Accuracy reporting, and chart placement/retention safeguards. | `d7185d2` |
 | `v1.0` | `0.0.10` | 10.05.2026 | Delivered production-panel promotion with explicit raw Excel COM support, refined refresh/workbook safeguards, chart placement, and retained generated PNGs. | `0dcb4d3`, `c7ca2f9` |
+| `v1.1` | Unreleased | 10.22.2026 | Planned Excel assembly compatibility and saving of successfully refreshed post-processing workbooks. | Current `dev.ben-debug` branch; pending main delivery. |
 
 Versions follow meaningful changes between adjacent mainline release snapshots,
 including the listed version inputs. Earlier development iterations are grouped

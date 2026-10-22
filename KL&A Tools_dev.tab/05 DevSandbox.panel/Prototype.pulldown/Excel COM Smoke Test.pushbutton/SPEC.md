@@ -4,7 +4,7 @@
 | --- | --- |
 | Tool ID | `devsandbox.excel-com-smoke-test` |
 | Tool version | `v0.2` |
-| Status | Unreleased diagnostic update; prototype live acceptance remains pending |
+| Status | Unreleased diagnostic update; disposable lifecycle passed on affected Revit 2025 and 2026 hosts |
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.12 |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton` |
@@ -26,7 +26,9 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 
 - Bundle: `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton`
 - Maturity: Prototype
-- Live Revit validation: pending Revit 25 and Revit 26 acceptance
+- Live Revit validation: disposable lifecycle passed on coworker B's Revit 2025
+  host and coworker L's Revit 2026 host on 10.22.2026; Carbon workbook behavior
+  remains outside this smoke test.
 
 ## Purpose
 
@@ -83,5 +85,10 @@ Header schedule writes. Required acceptance is one successful run in each of
 Revit 25 and Revit 26 with Excel installed, retaining the output table.
 The affected Revit 2025 workstation passed shared Excel startup, worksheet,
 query, table, pivot, chart, and SaveAs operations on 10.15.2026. The read-only
-reopen failed at the separate `Office` assembly lookup for macro security;
-the shared facade fix for that lookup awaits a fresh live rerun.
+reopen then failed at a separate `Office` assembly lookup for macro security.
+After the shared facade fix, coworkers B (Revit 2025) and L (Revit 2026)
+reported complete smoke passes on 10.22.2026, including read-only reopen,
+`AutomationSecurity`, `RefreshAll`, calculation, and owned-temp cleanup. Both
+used the same smoke-script and shared-facade SHA-256 values matching the
+current `dev.ben-debug` files. This does not validate an analyst workbook or
+Carbon chart results.
