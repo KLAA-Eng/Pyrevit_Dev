@@ -11,8 +11,27 @@ release boundaries.
 
 ## Unreleased
 
-Development is underway for `0.0.13-dev`. The latest published release is
-`0.0.12-beta`.
+Preparing `0.0.13-beta`; next development identity is `0.0.14-dev`.
+
+## 0.0.13 - 2026-10-22
+
+- **Channel:** Beta
+- **Tag:** `v0.0.13-beta`
+- **Tested Revit range:** Existing SPEC evidence records disposable Excel COM smoke passes on affected Revit 2025 and 2026 hosts on October 22. No new live Revit claim from release preparation.
+
+### Changed
+
+- Carbon GWP Pull v1.1 refreshes and saves the post-processing workbook, refuses read-only opens, and stops on refresh/save failures.
+- Shared Excel compatibility reuses loaded interop or validates an Office 16 DLL before legacy fallback and preserves macro-security typing. Also delivered in Concrete Mix Header v0.2 and Steel PSF v0.6.
+- Excel COM Smoke Test v0.2 adds script/helper identity and assembly/startup diagnostics.
+- Documentation separates active plans, durable knowledge, and dated review evidence.
+
+### Known limits
+
+- Carbon workbook refresh, persisted values, chart placement, transactions, undo, and reopening require representative live acceptance. Concrete Mix Header and Steel PSF business workflows remain unaccepted.
+- Existing beta live-validation limits remain open. About/loaded-path verification pending.
+
+**Rollback tag:** `v0.0.12-beta`
 
 ## 0.0.12 - 2026-10-13
 

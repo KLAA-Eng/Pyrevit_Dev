@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 __title__ = "Steel PSF"
-__version__ = "v0.5"
+__version__ = "v0.6"
 
 import datetime
 import os

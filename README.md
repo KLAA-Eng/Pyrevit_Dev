@@ -3,9 +3,9 @@
 KL&A Tools is a development pyRevit extension for KL&A Revit workflows. It
 adds a **KL&A Tools** ribbon tab within Revit.
 
-> **Development checkout.** The latest published release is
-> [`0.0.12-beta`](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.12-beta),
-> dated October 13, 2026. This checkout identifies itself as `v0.0.13-dev`.
+> **Beta release.** The latest published release is
+> [`0.0.13-beta`](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.13-beta),
+> dated October 22, 2026. This checkout identifies itself as `v0.0.13-beta`.
 
 ## Ribbon tour
 
@@ -50,9 +50,9 @@ appropriate model before project use.
 Each user-facing command should have a neighboring `SPEC.md` that documents its
 inputs, outputs, exclusions, and validation boundary. For example:
 
-- [Carbon GWP Pull specification](<KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/SPEC.md>)
-- [Create View Detail Folders specification](<KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/SPEC.md>)
-- [UI Gallery specification](<KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
+- [Carbon GWP Pull specification](<KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/SPEC.md>)
+- [Create View Detail Folders specification](<KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Create Detail Folders.pushbutton/SPEC.md>)
+- [UI Gallery specification](<KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
 
 ## Install for development
 
@@ -157,7 +157,7 @@ Before moving a prototype into a primary panel:
 ## Repository layout
 
 ```text
-KL&A Tools_dev.tab/  development ribbon tab, panels, command bundles, and command specs
+KL&A Tools.tab/  development ribbon tab, panels, command bundles, and command specs
 lib/                 Shared Python helpers and reusable WPF/UI components
 checks/              Audit checks
 tests/               Host-independent unit tests

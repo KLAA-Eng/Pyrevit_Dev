@@ -5,13 +5,13 @@
 - **Tool ID:** `carbon-gwp-pull`
 - **Path aliases:** `KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Carbon GWP Pull.pushbutton`; `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`; formerly `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Carbon GWP Pull.pushbutton`.
 - **Version inputs:** `KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton/script.py`, `lib/carbon_gwp/workflow.py`, `lib/carbon_gwp/chart.py`, `lib/carbon_gwp/revit_chart.py`, `lib/excel_com.py`.
-- **Ribbon location:** `KL&A Tools_dev.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`
+- **Ribbon location:** `KL&A Tools.tab/02 KL&A Tools.panel/Carbon GWP Pull.pushbutton`
 - **Ribbon label:** Carbon GWP Pull
 - **Maturity:** Beta
-- **Status/origin:** Released KL&A Tools-panel beta command; KL&A custom replacement for an internal Dynamo workflow. Planned `v1.1` changes are unreleased; last delivered version: `v1.0`.
+- **Status/origin:** Released KL&A Tools-panel beta command; KL&A custom replacement for an internal Dynamo workflow. Delivered v1.1 in 0.0.13-beta; Carbon live acceptance remains pending.
 - **Maintainer:** KL&A
-- **Tool version:** `v1.1` (Unreleased)
-- **Last extension release affecting this command:** `0.0.10-beta`
+- **Tool version:** `v1.1`
+- **Last extension release affecting this command:** `0.0.13-beta`
 - **Compatibility:** Revit 2024 and later is the repository target. No
   command-specific live Revit version acceptance is recorded yet.
 
@@ -194,7 +194,7 @@ The pyRevit output window reports:
 | `v0.0` | `0.0.6beta` | 09.15.2026 | First delivered DevSandbox workflow: export selected schedules to Excel and update Carbon Pie.JMP family parameters from Export values. | `300f8d4` |
 | `v0.1` | `0.0.9` | 10.01.2026 | Delivered the revised DevSandbox workflow with managed GWP/material-volume charts, refresh guards, Material Accuracy reporting, and chart placement/retention safeguards. | `d7185d2` |
 | `v1.0` | `0.0.10` | 10.05.2026 | Delivered production-panel promotion with explicit raw Excel COM support, refined refresh/workbook safeguards, chart placement, and retained generated PNGs. | `0dcb4d3`, `c7ca2f9` |
-| `v1.1` | Unreleased | 10.22.2026 | Planned Excel assembly compatibility and saving of successfully refreshed post-processing workbooks. | Current `dev.ben-debug` branch; pending main delivery. |
+| `v1.1` | `0.0.13` | 10.22.2026 | Excel assembly compatibility and saving of successfully refreshed post-processing workbooks. | `2026d02`; main result tracked in delivery ledger. |
 
 Versions follow meaningful changes between adjacent mainline release snapshots,
 including the listed version inputs. Earlier development iterations are grouped
@@ -203,13 +203,12 @@ changes do not create additional milestones. Dates use `MM.DD.YYYY`; released
 rows use the main delivery date, and Unreleased rows use the latest meaningful
 development change date.
 
-Unreleased development note (10.15.2026): the shared Excel loader now tries a
-verified Office 16 PIA path after name lookup fails. Its workbook-open path
-also sets the macro security value using the existing Excel property type.
-The tool version remains `v1.0` until its next main delivery;
-affected-workstation acceptance is pending.
+Delivery note (10.22.2026): v1.1 includes the shared Excel compatibility fix.
+Disposable smoke passes are recorded above; Carbon workflow acceptance remains pending.
 
 ## Extension release history
+
+- `0.0.13-beta` - Excel compatibility and persisted post-processing refresh values; live Carbon acceptance pending.
 
 - `0.0.10-beta` — Delivered the production-panel promotion and raw Excel COM
   compatibility changes. Live Revit/Excel acceptance remains separately

@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Tool ID | `devsandbox.steel-psf` |
-| Tool version | `v0.5` |
+| Tool version | `v0.6` |
 | Status | Released prototype; live acceptance remains pending |
 | Status/origin | Prototype; KL&A custom tool. |
-| Main delivery | 0.0.10 |
+| Main delivery | 0.0.13 |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/Steel PSF.pushbutton` |
 | Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml`; `lib/steel_weight/`; `lib/excel_com.py` |
 
@@ -20,6 +20,8 @@
 | v0.3 | 0.0.4.beta | 08.17.2026 | Deliver branded export controls and complete raw/summary CSV and Excel history export. | 1f3dd23 |
 | v0.4 | 0.0.6beta | 09.15.2026 | Deliver the updated story-selection window and shared KL&A design resources. | 300f8d4 |
 | v0.5 | 0.0.10 | 10.05.2026 | Delivered companion-workbook creation using the shared Excel COM facade across Revit hosts. | 74eccba; verified v0.0.10-beta snapshot |
+
+| v0.6 | 0.0.13 | 10.22.2026 | Shared Office 16 Excel loading and macro-security compatibility; workflow live acceptance pending. | `2026d02`; delivery ledger records main result. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current

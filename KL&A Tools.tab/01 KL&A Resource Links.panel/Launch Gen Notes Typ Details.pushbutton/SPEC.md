@@ -9,7 +9,7 @@
 - **Status/origin:** Maintained production; KL&A custom command.
 - **Status:** Released.
 - **Maintainer:** KL&A.
-- **Ribbon location:** `KL&A Tools_dev.tab/01 KL&A Resource Links.panel/Launch Gen Notes Typ Details.pushbutton`.
+- **Ribbon location:** `KL&A Tools.tab/01 KL&A Resource Links.panel/Launch Gen Notes Typ Details.pushbutton`.
 - **Live acceptance:** Exact-version Revit/pyRevit acceptance is not recorded.
 
 ## Purpose

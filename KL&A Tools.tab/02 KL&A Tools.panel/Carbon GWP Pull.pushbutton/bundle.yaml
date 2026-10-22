@@ -7,7 +7,6 @@ tooltip:
   en_us: |
     Version: v1.1
     Date: 10.22.2026
-    Status: Unreleased
     _____________________________________________________________________
     Description:
 
@@ -25,6 +24,6 @@ tooltip:
     _____________________________________________________________________
     Last update:
 
-    - [10.22.2026] v1.1 - Planned Excel compatibility and post-processing workbook persistence correction.
+    - [10.22.2026] v1.1 - Excel compatibility and post-processing workbook persistence correction.
 
 author: KL&A

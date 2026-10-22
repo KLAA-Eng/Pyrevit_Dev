@@ -4,9 +4,9 @@
 | --- | --- |
 | Tool ID | `devsandbox.excel-com-smoke-test` |
 | Tool version | `v0.2` |
-| Status | Unreleased diagnostic update; disposable lifecycle passed on affected Revit 2025 and 2026 hosts |
+| Status | Released diagnostic update; disposable lifecycle passed on affected Revit 2025 and 2026 hosts |
 | Status/origin | Prototype; KL&A custom tool. |
-| Main delivery | 0.0.12 |
+| Main delivery | 0.0.13 |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton` |
 | Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton/script.py`; `lib/excel_com.py` |
 
@@ -16,7 +16,7 @@
 | --- | --- | --- | --- | --- |
 | v0.0 | 0.0.10 | 10.05.2026 | First main delivery of a disposable Excel facade lifecycle and operation smoke test. | 74eccba; verified v0.0.10-beta snapshot |
 | v0.1 | 0.0.12 | 10.13.2026 | Report the first Excel assembly lookup error and the loaded assembly identity and path. | `25c3e39`; 0.0.12 delivery snapshot. |
-| v0.2 | Unreleased | 10.15.2026 | Identify the running script and shared facade, inspect Excel interop DLL locations, trial an identity-checked Office 16 DLL by path after a failed shared startup, and probe direct Excel activation. | Current branch; pending main delivery. |
+| v0.2 | 0.0.13 | 10.22.2026 | Identify the running script and shared facade, inspect Excel interop DLL locations, trial an identity-checked Office 16 DLL by path after a failed shared startup, and probe direct Excel activation. | `2026d02`; main result tracked in delivery ledger. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -24,7 +24,7 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 
 ## Identity
 
-- Bundle: `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton`
+- Bundle: `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton`
 - Maturity: Prototype
 - Live Revit validation: disposable lifecycle passed on coworker B's Revit 2025
   host and coworker L's Revit 2026 host on 10.22.2026; Carbon workbook behavior

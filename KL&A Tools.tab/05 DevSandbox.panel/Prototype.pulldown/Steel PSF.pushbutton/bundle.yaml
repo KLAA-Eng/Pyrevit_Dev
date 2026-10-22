@@ -1,0 +1,19 @@
+title:
+  en_us: "Steel PSF"
+tooltip:
+  en_us: |-
+    Version: v0.6
+    Date: 10.22.2026
+    _____________________________________________________________________
+    Description:
+    Prototype: reports host-model steel weight per computed floor area by selected stories. Includes raw and summary CSV export, with a companion Excel workbook when Excel is available.
+    _____________________________________________________________________
+    How-to:
+    - Select stories and choose Review Selected Stories, Initialize CSV, or Append CSV.
+    - Review the report; for export modes, choose the output folder after the report.
+    _____________________________________________________________________
+    Last update:
+    - [10.22.2026] - v0.6 (0.0.13): Improve shared Excel loading and macro-security compatibility.
+author: KL&A
+engine:
+  clean: true
