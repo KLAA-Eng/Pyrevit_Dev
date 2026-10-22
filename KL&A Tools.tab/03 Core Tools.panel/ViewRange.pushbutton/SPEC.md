@@ -60,7 +60,7 @@ environment before promotion or behavior changes.
 | Field | Value |
 | --- | --- |
 | Tool ID | `core.viewrange` |
-| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton` |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton` |
 | Version inputs | `bundle.yaml`; `script.py`; `MainWindow.xaml`; `lib/GUI/Resources/WPF_styles.xaml` |
 | Tool version | `v1.1` |
 | Status/origin | Maintained — KL&A adaptation of pyRevit; View Range UI refinement released in the 0.0.11 beta. |

@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.7 |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Startup Importer.invokebutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Startup Importer.invokebutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Startup Importer.invokebutton` |
-| Version inputs | `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Startup Importer.invokebutton/bundle.yaml`; `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.Core/`; `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.Revit/`; `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Startup Importer.invokebutton/bundle.yaml`; `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.Core/`; `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.Revit/`; `src/KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/` |
 
 ## Tool version history
 

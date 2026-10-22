@@ -2,9 +2,11 @@
 from __future__ import print_function
 
 __title__ = "Excel COM Smoke Test"
-__version__ = "v0.1"
+__version__ = "v0.2"
 
 
+import glob
+import hashlib
 import os
 import sys
 import tempfile
@@ -36,6 +38,7 @@ from excel_com import (
     create_pivot_cache, get_item, get_property, open_workbook, range_at,
     save_workbook, set_property, worksheet_collection,
 )
+import excel_com as excel_com_module
 
 SMOKE_ROOT_NAME = 'KLCodeExcelComSmoke'
 FILE_PREFIX = 'KLCode_Excel_Com_Smoke_'
@@ -119,36 +122,191 @@ def _probe_excel_reference(results):
         import clr
         clr.AddReference('Microsoft.Office.Interop.Excel')
     except Exception as error:
-        results.append(['Excel interop name lookup', 'INFO', '',
-                        'First lookup failed: {}'.format(_error_detail(error))])
+        detail = 'First lookup failed: {}'.format(_error_detail(error))
+        row = ['Excel interop name lookup', 'INFO', '', detail.splitlines()[0]]
     else:
-        results.append(['Excel interop name lookup', 'PASS', '',
-                        'Short-name reference loaded.'])
+        detail = 'Short-name reference loaded.'
+        row = ['Excel interop name lookup', 'PASS', '',
+               detail]
+    results.append(row)
+    return row, detail
 
 
-def _report_loaded_excel_assemblies(results):
+def _file_fingerprint(path):
+    """Identify the exact Python source file that this Revit process loaded."""
+    try:
+        with open(path, 'rb') as source:
+            return hashlib.sha256(source.read()).hexdigest()
+    except Exception as error:
+        return 'unavailable: {}'.format(_error_detail(error))
+
+
+def _office_pia_candidates():
+    """Return installed Office 16 PIA paths, without loading their assemblies."""
+    filename = 'Microsoft.Office.Interop.Excel.dll'
+    paths = []
+    for root in (os.environ.get('ProgramFiles'), os.environ.get('ProgramFiles(x86)')):
+        if not root:
+            continue
+        paths.append(os.path.join(
+            root, 'Microsoft Office', 'root', 'vfs', 'ProgramFilesX86',
+            'Microsoft Office', 'Office16', 'DCF', filename))
+    return sorted(set(path for path in paths if os.path.isfile(path)))
+
+
+def _pia_file_paths():
+    """Find Excel PIA files in a few common Office and GAC locations."""
+    filename = 'Microsoft.Office.Interop.Excel.dll'
+    paths = _office_pia_candidates()
+    for root in (os.environ.get('ProgramFiles'), os.environ.get('ProgramFiles(x86)')):
+        if not root:
+            continue
+        office = os.path.join(root, 'Microsoft Office', 'root')
+        paths.extend(glob.glob(os.path.join(
+            office, 'Office16', 'ADDINS', 'PowerPivot Excel Add-in*', filename)))
+    windows = os.environ.get('WINDIR')
+    if windows:
+        for gac_root in (os.path.join(windows, 'Microsoft.NET', 'assembly'),
+                         os.path.join(windows, 'assembly')):
+            paths.extend(glob.glob(os.path.join(
+                gac_root, 'GAC_MSIL', 'Microsoft.Office.Interop.Excel',
+                '*', filename)))
+    return sorted(set(path for path in paths if os.path.isfile(path)))
+
+
+def _probe_explicit_office_pia_load(results):
+    """Try one verified Office 16 PIA path after name lookup fails."""
+    operation = 'Explicit Office 16 interop load'
+    candidates = _office_pia_candidates()
+    if not candidates:
+        row = [operation, 'INFO', '', 'No Office 16 DCF Excel interop file found.']
+        results.append(row)
+        return row
+    try:
+        from System.Reflection import AssemblyName
+        import clr
+    except Exception as error:
+        row = [operation, 'FAIL', '', _error_detail(error)]
+        results.append(row)
+        return row
+    for path in candidates:
+        try:
+            identity = AssemblyName.GetAssemblyName(path)
+        except Exception as error:
+            results.append([operation, 'INFO', '',
+                            'Could not read identity at {}: {}'.format(
+                                path, _error_detail(error))])
+            continue
+        if (identity.Name != 'Microsoft.Office.Interop.Excel' or
+                identity.Version.Major != 16 or
+                'PublicKeyToken=71e9bce111e9429c' not in identity.FullName):
+            results.append([operation, 'INFO', '',
+                            'Skipped unexpected identity {} at {}'.format(
+                                identity.FullName, path)])
+            continue
+        try:
+            assembly = clr.AddReferenceToFileAndPath(path)
+        except Exception as error:
+            row = [operation, 'FAIL', '',
+                   'Verified {} at {} but load failed: {}'.format(
+                       identity.FullName, path, _error_detail(error))]
+        else:
+            row = [operation, 'PASS', _runtime_type(assembly),
+                   'Verified {} at {}; path load succeeded.'.format(
+                       identity.FullName, path)]
+        results.append(row)
+        return row
+    row = [operation, 'FAIL', '',
+           'No found Office 16 DCF file had the expected Excel interop identity.']
+    results.append(row)
+    return row
+
+
+def _probe_direct_excel_activation(results):
+    """Test the loaded PIA without repeating the facade's name lookup."""
+    try:
+        from Microsoft.Office.Interop import Excel
+        application_class = Excel.ApplicationClass
+    except Exception as error:
+        row = ['Excel namespace after path load', 'FAIL', '',
+               _error_detail(error)]
+        results.append(row)
+        return row
+    results.append(['Excel namespace after path load', 'PASS',
+                    _runtime_type(application_class),
+                    'Excel.ApplicationClass resolved from the loaded assembly.'])
+    excel = None
+    try:
+        excel = application_class()
+        set_property(excel, 'Visible', False)
+        set_property(excel, 'DisplayAlerts', False)
+        row = ['Direct Excel activation after path load', 'PASS',
+               _runtime_type(excel), 'Created and configured a hidden Excel application.']
+    except Exception as error:
+        row = ['Direct Excel activation after path load', 'FAIL', '',
+               _error_detail(error)]
+    results.append(row)
+    if excel is not None:
+        errors = close_excel_application(excel, suppress_errors=True)
+        results.append(['Direct Excel cleanup',
+                        'FAIL' if errors else 'PASS', '', '; '.join(errors)])
+    return row
+
+
+def _report_pia_files(results):
+    """Read PIA file identities without loading them into Revit."""
+    paths = _pia_file_paths()
+    if not paths:
+        results.append(['Excel interop files on disk', 'INFO', '',
+                        'None found in the checked Office and GAC locations; '
+                        'other installation paths remain possible.'])
+        return
+    try:
+        from System.Reflection import AssemblyName
+    except Exception as error:
+        results.append(['Excel interop files on disk', 'INFO', '',
+                        'Could not inspect file identities: {}'.format(
+                            _error_detail(error))])
+        return
+    for path in paths:
+        try:
+            identity = AssemblyName.GetAssemblyName(path).FullName
+        except Exception as error:
+            identity = 'Unreadable: {}'.format(_error_detail(error))
+        results.append(['Excel interop file on disk', 'INFO', '',
+                        'Identity: {} | Path: {}'.format(identity, path)])
+
+
+def _report_loaded_excel_assemblies(results, operation='Loaded Excel interop assembly'):
     """Report the identity and location of Excel PIAs loaded in this process."""
     try:
         from System import AppDomain
         assemblies = [assembly for assembly in AppDomain.CurrentDomain.GetAssemblies()
                       if assembly.GetName().Name == 'Microsoft.Office.Interop.Excel']
         if not assemblies:
-            results.append(['Loaded Excel interop assembly', 'INFO', '',
+            results.append([operation, 'INFO', '',
                             'No Excel interop assembly is loaded in this Revit process.'])
-            return
+            return []
         for assembly in assemblies:
             try:
                 location = assembly.Location or '(no file location)'
             except Exception as error:
                 location = 'Unavailable: {}'.format(_error_detail(error))
-            results.append(['Loaded Excel interop assembly', 'PASS',
+            results.append([operation, 'PASS',
                             _runtime_type(assembly),
                             'Identity: {} | Location: {}'.format(
                                 assembly.FullName, location)])
+        return assemblies
     except Exception as error:
-        results.append(['Loaded Excel interop assembly', 'INFO', '',
+        results.append([operation, 'INFO', '',
                         'Could not inspect loaded assemblies: {}'.format(
                             _error_detail(error))])
+        return None
+
+
+def _table_cell(value):
+    """Keep stack traces and separators inside one output-table cell."""
+    return '{}'.format(value).replace('\r', ' ').replace('\n', ' ').replace('|', ';')
 
 
 def _cleanup(paths, excel, workbook, results, retain_assets):
@@ -193,9 +351,42 @@ def main():
         output.print_md('# {}'.format(__title__))
         output.print_md('Revit: {} | Document access: none'.format(
             getattr(revit.doc.Application, 'VersionNumber', 'Unknown')))
-        _probe_excel_reference(results)
+        output.print_md('Smoke script version: {}'.format(__version__))
+        output.print_md('Smoke script path: {}'.format(os.path.abspath(__file__)))
+        output.print_md('Smoke script SHA-256: {}'.format(_file_fingerprint(__file__)))
+        output.print_md('Shared Excel facade path: {}'.format(
+            os.path.abspath(excel_com_module.__file__)))
+        output.print_md('Shared Excel facade SHA-256: {}'.format(
+            _file_fingerprint(excel_com_module.__file__)))
+        _report_loaded_excel_assemblies(results, 'Excel interop before lookup')
+        lookup_row, lookup_detail = _probe_excel_reference(results)
+        output.print_md('Excel interop name lookup: {} | {}'.format(
+            lookup_row[1], lookup_detail))
         excel = _record(results, 'Create hidden Excel application', create_excel_application)
+        output.print_md('Excel startup with shared loader: {}'.format(
+            'PASS' if excel is not None else 'FAIL'))
+        if lookup_row[1] != 'PASS' and excel is None:
+            after_shared = _report_loaded_excel_assemblies(
+                results, 'Excel interop after shared startup')
+            if after_shared is None:
+                path_row = ['Explicit Office 16 interop load', 'INFO', '',
+                            'Skipped because loaded-assembly inspection failed.']
+                results.append(path_row)
+            elif after_shared:
+                path_row = ['Explicit Office 16 interop load', 'INFO', '',
+                            'Skipped because an Excel interop assembly was already loaded.']
+                results.append(path_row)
+            else:
+                path_row = _probe_explicit_office_pia_load(results)
+            output.print_md('Explicit Office 16 interop load: {} | {}'.format(
+                path_row[1], path_row[3]))
+            _report_loaded_excel_assemblies(results, 'Excel interop after path load')
+            if path_row[1] == 'PASS' and excel is None:
+                direct_row = _probe_direct_excel_activation(results)
+                output.print_md('Direct Excel activation after path load: {} | {}'.format(
+                    direct_row[1], direct_row[3]))
         _report_loaded_excel_assemblies(results)
+        _report_pia_files(results)
         if excel is None:
             retain_assets = True
             return
@@ -260,6 +451,8 @@ def main():
         if os.path.isfile(paths['workbook_path']) and not retain_assets:
             reopen_excel = _record(results, 'Create Excel for reopen', create_excel_application)
             if reopen_excel is not None:
+                _record(results, 'Read reopen AutomationSecurity', lambda: get_property(
+                    reopen_excel, 'AutomationSecurity'))
                 reopened = _record(results, 'Workbooks.Open read-only', lambda: open_workbook(
                     reopen_excel, paths['workbook_path'], update_links=0, read_only=True))
                 if reopened is not None:
@@ -267,7 +460,8 @@ def main():
                     _record(results, 'CalculateFullRebuild', lambda: call_method(reopen_excel, 'CalculateFullRebuild'))
                 close_excel_application(reopen_excel, reopened, suppress_errors=True)
         _cleanup(paths, None, None, results, retain_assets)
-        output.print_table(results, columns=['Operation', 'Status', 'Runtime type', 'Detail'])
+        output.print_table([[_table_cell(cell) for cell in row] for row in results],
+                           columns=['Operation', 'Status', 'Runtime type', 'Detail'])
         failures = len([row for row in results if row[1] == 'FAIL'])
         if failures:
             forms.alert('{} operation(s) failed. This run retained its owned temp assets for diagnosis. Review the output table.'.format(failures), title=__title__, warn_icon=True)

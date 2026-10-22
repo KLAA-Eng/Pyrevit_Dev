@@ -4,7 +4,7 @@
 
 - **Tool ID:** `about-kla-tools`
 - **Path aliases:** `KL&A Tools_dev.tab/04 Outreach.panel/About KL&A Tools.pushbutton`, `KL&A Tools.tab/04 Outreach.panel/About KL&A Tools.pushbutton`, `KL&A Tools.tab/05 DevSandbox.panel/About KL&A Tools.pushbutton`, `KL&A Tools_dev.tab/05 DevSandbox.panel/About KL&A Tools.pushbutton`.
-- **Version inputs:** `KL&A Tools.tab/04 Outreach.panel/About KL&A Tools.pushbutton/bundle.yaml`, `KL&A Tools.tab/04 Outreach.panel/About KL&A Tools.pushbutton/script.py`.
+- **Version inputs:** `KL&A Tools_dev.tab/04 Outreach.panel/About KL&A Tools.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/04 Outreach.panel/About KL&A Tools.pushbutton/script.py`.
 - **Tool version:** `v1.1`
 - **Status/origin:** Maintained production; KL&A custom command.
 - **Status:** Released.
@@ -23,7 +23,7 @@ This zero-document command reads generated `lib/build_info.py` and shows a
 pyRevit alert. It does not modify the model, query Git, or open Excel. The loaded
 extension path identifies the actual folder supplying the command and metadata.
 
-`VERSION_LABEL` is a display identity such as `v0.0.12-beta`; it does not assert
+`VERSION_LABEL` is a display identity such as `v0.0.13-dev`; it does not assert
 that a Git tag exists. `METADATA_SOURCE_SHA` is HEAD when the metadata was
 generated, preceding any preparation commit and squash merge. It does not prove
 the loaded checkout's current HEAD. Verified release commits and tags are in

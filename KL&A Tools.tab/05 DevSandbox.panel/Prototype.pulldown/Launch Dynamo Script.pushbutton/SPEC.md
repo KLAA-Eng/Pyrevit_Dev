@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.0.beta |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Launch Dynamo Script.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Launch Dynamo Script.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/Launch Dynamo Script.pushbutton` |
-| Version inputs | `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton/bundle.yaml`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton/script.py`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton/script.dyn` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Launch Dynamo Script.pushbutton/script.dyn` |
 
 ## Tool version history
 

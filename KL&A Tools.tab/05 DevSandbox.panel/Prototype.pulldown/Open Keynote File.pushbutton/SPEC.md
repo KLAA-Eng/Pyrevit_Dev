@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.5.beta |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Open Keynote File.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Open Keynote File.pushbutton` |
-| Version inputs | `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Open Keynote File.pushbutton/bundle.yaml`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Open Keynote File.pushbutton/script.py` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Open Keynote File.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Open Keynote File.pushbutton/script.py` |
 
 ## Tool version history
 

@@ -47,7 +47,7 @@ environment before promotion or behavior changes.
 | Field | Value |
 | --- | --- |
 | Tool ID | `core.who-did-that` |
-| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Who Did That.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools.tab/03 Core Tools.panel/Who Did That.pushbutton` |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Who Did That.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/Who Did That.pushbutton` |
 | Version inputs | `bundle.yaml`; `script.py` (no KL&A-owned shared helper inputs) |
 | Tool version | `v1.0.pyRevit` |
 | Status/origin | Special — imported unchanged from pyRevit. |

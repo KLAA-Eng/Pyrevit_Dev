@@ -3,8 +3,8 @@
 ## Identity
 
 - **Tool ID:** `suggestions`
-- **Path aliases:** `KL&A Tools.tab/04 Outreach.panel/Suggestions.pushbutton`.
-- **Version inputs:** `KL&A Tools.tab/04 Outreach.panel/Suggestions.pushbutton/bundle.yaml`, `KL&A Tools.tab/04 Outreach.panel/Suggestions.pushbutton/script.py`.
+- **Path aliases:** `KL&A Tools.tab/04 Outreach.panel/Suggestions.pushbutton`; current `KL&A Tools_dev.tab/04 Outreach.panel/Suggestions.pushbutton`.
+- **Version inputs:** `KL&A Tools_dev.tab/04 Outreach.panel/Suggestions.pushbutton/bundle.yaml`, `KL&A Tools_dev.tab/04 Outreach.panel/Suggestions.pushbutton/script.py`.
 - **Tool version:** `v1.0`
 - **Status/origin:** Maintained production utility; KL&A custom command.
 - **Status:** Released.

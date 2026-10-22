@@ -8,6 +8,8 @@ member usage from normal attribute access. Use the explicit operations below.
 """
 from __future__ import unicode_literals
 
+import os
+
 
 class ExcelComCompatibilityError(RuntimeError):
     """Raised when an Excel PIA or IDispatch operation cannot be completed."""
@@ -18,12 +20,64 @@ def _excel_interop():
     import clr
     try:
         clr.AddReference('Microsoft.Office.Interop.Excel')
-    except Exception:
-        clr.AddReferenceByName(
-            'Microsoft.Office.Interop.Excel, Version=11.0.0.0, '
-            'Culture=neutral, PublicKeyToken=71e9bce111e9429c')
+    except Exception as name_error:
+        # Another Revit add-in may already have loaded a usable Excel PIA.
+        try:
+            return _excel_namespace()
+        except Exception:
+            pass
+        try:
+            _load_office_16_excel_interop(clr)
+        except Exception as path_error:
+            # Preserve the older Office installation route when no verified
+            # Office 16 PIA can be loaded from disk.
+            try:
+                clr.AddReferenceByName(
+                    'Microsoft.Office.Interop.Excel, Version=11.0.0.0, '
+                    'Culture=neutral, PublicKeyToken=71e9bce111e9429c')
+            except Exception as legacy_error:
+                raise ExcelComCompatibilityError(
+                    'Excel interop could not load by name ({}) or from Office '
+                    '16 ({}) or by legacy reference ({}).'.format(
+                        name_error, path_error, legacy_error))
+    return _excel_namespace()
+
+
+def _excel_namespace():
+    """Resolve Excel from a PIA already referenced by this IronPython engine."""
     from Microsoft.Office.Interop import Excel
     return Excel
+
+
+def _load_office_16_excel_interop(clr):
+    """Reference a verified Office 16 Excel PIA by path when name lookup fails."""
+    from System.Reflection import AssemblyName
+
+    filename = 'Microsoft.Office.Interop.Excel.dll'
+    attempted = []
+    roots = (os.environ.get('ProgramFiles'), os.environ.get('ProgramFiles(x86)'))
+    for root in roots:
+        if not root:
+            continue
+        path = os.path.join(root, 'Microsoft Office', 'root', 'vfs',
+                            'ProgramFilesX86', 'Microsoft Office', 'Office16',
+                            'DCF', filename)
+        if not os.path.isfile(path):
+            continue
+        try:
+            identity = AssemblyName.GetAssemblyName(path)
+            if (identity.Name != 'Microsoft.Office.Interop.Excel' or
+                    identity.Version.Major != 16 or
+                    'PublicKeyToken=71e9bce111e9429c' not in identity.FullName):
+                attempted.append('Unexpected Excel PIA identity at {}'.format(path))
+                continue
+            clr.AddReferenceToFileAndPath(path)
+            return
+        except Exception as error:
+            attempted.append('{}: {}'.format(path, error))
+    if not attempted:
+        attempted.append('No Office 16 DCF Excel interop DLL found')
+    raise ExcelComCompatibilityError('; '.join(attempted))
 
 
 def _missing_value():
@@ -155,11 +209,18 @@ def _disable_automation_macros(excel):
         previous_setting = get_property(excel, 'AutomationSecurity')
     except Exception:
         return None
-    import clr
-    clr.AddReference('Office')
-    from Microsoft.Office.Core import MsoAutomationSecurity
-    set_property(excel, 'AutomationSecurity',
-                 MsoAutomationSecurity.msoAutomationSecurityForceDisable)
+    # Office's msoAutomationSecurityForceDisable value is 3. A typed Excel PIA
+    # requires the enum type; raw IDispatch accepts the underlying integer.
+    force_disable = 3
+    try:
+        setting_type = previous_setting.GetType()
+    except AttributeError:
+        pass
+    else:
+        if setting_type.IsEnum:
+            from System import Enum
+            force_disable = Enum.ToObject(setting_type, 3)
+    set_property(excel, 'AutomationSecurity', force_disable)
     return previous_setting
 
 

@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.0.beta |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Element Takeoff.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Element Takeoff.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Element Takeoff.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Element Takeoff.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/Element Takeoff.pushbutton` |
-| Version inputs | `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Element Takeoff.pushbutton/bundle.yaml`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Element Takeoff.pushbutton/script.py` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Element Takeoff.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Element Takeoff.pushbutton/script.py` |
 
 ## Tool version history
 

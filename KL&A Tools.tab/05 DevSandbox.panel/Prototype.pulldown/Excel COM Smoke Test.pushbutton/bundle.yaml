@@ -2,17 +2,19 @@ title:
   en_us: "Excel COM Smoke Test"
 tooltip:
   en_us: |-
-    Version: v0.1
-    Date: 10.13.2026
+    Version: v0.2
+    Date: 10.22.2026
     _____________________________________________________________________
     Description:
-    Prototype: tests the shared Excel COM facade in the current Revit/pyRevit host using owned temporary workbook and CSV files. Reports the first Excel assembly lookup error and the loaded assembly identity and location.
+    Prototype: tests the shared Excel COM facade in the current Revit/pyRevit host using owned temporary workbook and CSV files. Prints both source fingerprints and tests the shared loader first; if startup fails, tries a verified Office 16 interop DLL by path and direct Excel activation.
     _____________________________________________________________________
     How-to:
     - Run with Microsoft Excel installed.
+    - Use a fresh Revit session for the explicit Office DLL load trial; close Revit after reviewing the result.
     - Review the operation table; inspect retained temporary files if a test or safe cleanup fails.
     _____________________________________________________________________
     Last update:
+    - [10.22.2026] - v0.2 (0.0.13): Show script identity and assembly diagnostics; test shared startup before trying a verified local Office 16 interop DLL by path and direct Excel activation.
     - [10.13.2026] - v0.1 (0.0.12): Added Excel interop assembly lookup and loaded-file diagnostics.
     - [10.05.2026] - v0.0 (0.0.10): First main delivery of a disposable Excel facade lifecycle and operation smoke test.
 author: KL&A

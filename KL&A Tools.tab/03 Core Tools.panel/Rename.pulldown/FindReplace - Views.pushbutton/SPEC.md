@@ -8,7 +8,7 @@
 | Status | Released in 0.0.11 beta; live acceptance pending |
 | Status/origin | KL&A-maintained Core command promoted from an EFTools-derived DevSandbox prototype. |
 | Main delivery | 0.0.11 |
-| Path aliases | Core release layout: `KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton`; current `KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton`; former prototype: `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton`, `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton` |
+| Path aliases | Core release layout: `KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton`; current `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton`; former prototype: `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton`, `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton` |
 | Version inputs | Core `bundle.yaml`, `script.py`, `Script.xaml`; former prototype bundle files; `lib/find_replace/workflow.py`, `lib/find_replace/revit_batch.py`, `lib/find_replace/window.py`; `lib/Snippets/_selection.py`; `lib/Renaming/BaseClass_FindReplace.py`; `lib/GUI/Resources/WPF_styles.xaml` |
 
 ## Tool version history

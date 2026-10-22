@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.6beta |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Trial.urlbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Trial.urlbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Trial.urlbutton` |
-| Version inputs | `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Trial.urlbutton/bundle.yaml` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Trial.urlbutton/bundle.yaml` |
 
 ## Tool version history
 

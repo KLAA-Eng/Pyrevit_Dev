@@ -3,9 +3,9 @@
 KL&A Tools is a development pyRevit extension for KL&A Revit workflows. It
 adds a **KL&A Tools** ribbon tab within Revit.
 
-> **Release preparation.** The latest published release is
-> [`0.0.11-beta`](CHANGELOG.md), dated October 12, 2026. This checkout identifies
-> itself as `v0.0.12-beta`; owner merge, tag, and publication are pending.
+> **Beta release.** The latest published release is
+> [`0.0.13-beta`](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.13-beta),
+> dated October 22, 2026. This checkout identifies itself as `v0.0.13-beta`.
 
 ## Ribbon tour
 
@@ -130,8 +130,8 @@ for a useful report.
 
 | Current version | Channel | Release date | Notes |
 | --- | --- | --- | --- |
-| `0.0.11` | Beta | 2026-10-12 | Latest published release; changed behavior still needs live Revit acceptance. |
-| `0.0.12` | Beta | 2026-10-13 | Release preparation; owner merge, tag, and publication pending. |
+| `0.0.12` | Beta | 2026-10-13 | Latest published release; changed behavior still needs live Revit and Excel acceptance. |
+| `0.0.13` | Dev | 2026-10-13 | Current unpublished development identity. |
 
 `version.json` is the single human-edited extension version source. After
 changing it, regenerate `lib/build_info.py` with the provided script; do not
@@ -157,14 +157,16 @@ Before moving a prototype into a primary panel:
 ## Repository layout
 
 ```text
-KL&A Tools.tab/      pyRevit ribbon tab, panels, command bundles, and command specs
+KL&A Tools.tab/  development ribbon tab, panels, command bundles, and command specs
 lib/                 Shared Python helpers and reusable WPF/UI components
 checks/              Audit checks
 tests/               Host-independent unit tests
 scripts/             Developer utilities, including build-metadata generation
-docs/                Contributor and design-system guides
+docs/                Contributor/design guides, active plans, and durable knowledge
+docs/plans/          Active plans and task ledgers
+docs/knowledge/      Reusable knowledge, decisions, and new handoff snapshots
 version.json         Human-edited version source
-docs.ai/             Agent reference guides, release records, audits, and handoffs
+docs.ai/             Agent documentation routing and authoritative release governance
 ```
 
 Command entry points should stay thin: they adapt pyRevit/Revit, WPF, Excel,
@@ -212,9 +214,9 @@ the intended Revit environment.
 
 ## References and standards
 
-- [Python Script Guide](docs.ai/SCRIPTS.md) - command organization and
+- [Python Script Guide](docs/knowledge/python-pyrevit.md) - command organization and
   pyRevit script structure.
-- [Comment and Docstring Guide](docs.ai/COMMENTS.md) - comments,
+- [Comment and Docstring Guide](docs/knowledge/python-comments.md) - comments,
   docstrings, command metadata, and section dividers.
 - [Contributor Guide](docs/CONTRIBUTING.md) - GitHub workflow,
   validation evidence, and SPEC requirements.

@@ -54,7 +54,7 @@ replace live Revit acceptance.
 | Field | Value |
 | --- | --- |
 | Tool ID | `core.revision.hide-revision-clouds` |
-| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Revision.pulldown/Hide Revision Clouds.pushbutton` (0.0.7–0.0.9 and current); `KL&A Tools_dev.tab/03 Core Tools.panel/Revision.pulldown/Hide Revision Clouds.pushbutton` (development) |
+| Path aliases | `KL&A Tools.tab/03 Core Tools.panel/Revision.pulldown/Hide Revision Clouds.pushbutton` (0.0.7–0.0.12 release); current `KL&A Tools_dev.tab/03 Core Tools.panel/Revision.pulldown/Hide Revision Clouds.pushbutton` |
 | Version inputs | `bundle.yaml`; `script.py`; `lib/GUI/forms.py` |
 | Tool version | `v1.1` |
 | Status/origin | Maintained — KL&A custom command. |

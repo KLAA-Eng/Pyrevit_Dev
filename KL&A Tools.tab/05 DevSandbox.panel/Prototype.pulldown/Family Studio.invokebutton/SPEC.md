@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | 0.0.7 |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Family Studio.invokebutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Family Studio.invokebutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Family Studio.invokebutton` |
-| Version inputs | `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Family Studio.invokebutton/bundle.yaml`; `src/KLCode.FamilyStudio/App/`; `src/KLCode.FamilyStudio/Library/`; `src/KLCode.FamilyStudio/Revit/` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Family Studio.invokebutton/bundle.yaml`; `src/KLCode.FamilyStudio/App/`; `src/KLCode.FamilyStudio/Library/`; `src/KLCode.FamilyStudio/Revit/` |
 
 ## Tool version history
 

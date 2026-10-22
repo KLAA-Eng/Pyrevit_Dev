@@ -1,7 +1,7 @@
 # 0.0.12 beta release review
 
 - **Review date:** 2026-10-13
-- **Release identity:** `0.0.12`, beta; intended tag `v0.0.12-beta`
+- **Release identity:** `0.0.12`, beta; published tag `v0.0.12-beta`
 - **Comparison:** `origin/main` at `ea6219c3a45dcf93e7ba80f2d02c9a54f48409b4` through `master-dev` at `9570018c510f2eefd6cf9b6b17831384d29a4522` plus this preparation
 - **Owner handoff:** The designated release owner reviews and personally merges the `master-dev` to `main` PR. Tag and publish only after verifying the merged `main` result.
 
@@ -18,4 +18,9 @@
 - There is **no new live Revit or Excel claim**. The revision schedule report still needs comparison with visible titleblock entries after Hide and Unhide in representative models, including clouds on sheets and placed views, unchanged sheets, cancellation, and already-correct states. The Excel diagnostic still needs runs in the intended Revit and Excel hosts.
 - The prior `0.0.11-beta` live-acceptance limits remain open. The previous published rollback tag is `v0.0.11-beta`.
 
-This is a beta preparation record. After the owner merge, verify the exact main tree, annotated tag and remote peeled SHA, published prerelease page, installed extension path, and About dialog. Resolve the pending ledger row on `master-dev` while preparing `0.0.13-dev`.
+## Publication and synchronization
+
+- The owner merged [PR #24](https://github.com/KLAA-Eng/Pyrevit_Dev/pull/24) as `8b83e6a0a2698bdeaa91084d7326de193a595b23`. Its tree exactly matched the prepared `master-dev` tree, with the production ribbon and `0.0.12-beta` identity.
+- The remote annotated `v0.0.12-beta` tag peels to that main commit. The [GitHub prerelease](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.12-beta) was verified on 2026-10-13 with the Beta label, tag, commit, notes, known live limits, and rollback tag.
+- About and loaded-extension-path verification in Revit are pending. The automation connection was unavailable; no conclusion about the Revit process or installed path was inferred.
+- `master-dev` is synchronized with that main result and prepared as `0.0.13-dev`. The resolved delivery ledger and next-development validation are recorded there.
