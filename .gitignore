@@ -65,3 +65,4 @@ pyrightconfig.json
 
 .venv*
 .vscode
+/.klcode
