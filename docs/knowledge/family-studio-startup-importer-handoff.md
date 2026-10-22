@@ -1,6 +1,12 @@
 # Family Studio and Startup Importer implementation status
 
-## Current gate
+> Historical handoff snapshot, with validation dated 2026-09-01; filed
+> 2026-10-18 from `docs.ai/handoffs/design_handoff_family_studio_startup_importer/IMPLEMENTATION_STATUS.md`.
+> This is recorded evidence, not current task status or a fresh verification.
+> The [acceptance plan](../plans/compiled-tools-acceptance.md) owns follow-up work
+> and identifies later audit evidence that must be reconciled.
+
+## Recorded gate at the handoff date
 
 **Source, Windows compile, and pyRevit packaging are complete. Live Revit visual
 and workflow acceptance is the remaining release gate.** Both commands remain in

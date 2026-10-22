@@ -1,5 +1,15 @@
 # Handoff: Family Studio & Startup Importer — KLCode green-theme windows + feature expansion
 
+> Historical design reference package, filed 2026-10-18 from
+> `docs.ai/handoffs/design_handoff_family_studio_startup_importer/`.
+> The original proposal below includes concepts that were deferred or narrowed.
+> It is not the current implementation contract or a task ledger.
+> Use the [acceptance plan](../../../plans/compiled-tools-acceptance.md),
+> [archived implementation plans](../../../plans/archive/README.md),
+> [recorded decision](../../compiled-wpf-decision.md), and
+> [handoff snapshot](../../family-studio-startup-importer-handoff.md).
+> HTML prototypes and their relative assets remain together in this package.
+
 ## Overview
 
 Two KLCode DevSandbox tools get a full UI pass **and** a feature expansion:
@@ -21,6 +31,17 @@ into their `PLAN.md`/`SPEC.md` (see **Boundaries** at the end — read it before
 build; several requested surfaces are intentionally *concepts*, not shippable claims).
 
 ## About the design files
+
+| Filed asset | Purpose |
+| --- | --- |
+| [Family Studio prototype](<Family Studio.dc.html>) | Historical browser and feature-design reference. |
+| [Startup Importer prototype](<Startup Importer.dc.html>) | Historical picker, review, import, and deferred-feature reference. |
+| [Embedded design-system notes](_ds/klcode-design-system-aefd264c-7a9c-4d51-9c1d-b8ce2d9895f4/readme.md) | Original prototype tokens, fonts, and source attribution; the living guide remains `docs/DESIGNSYSTEM.md`. |
+
+The supplied HTML files reference `./support.js`, which was absent from the
+original package and remains unavailable. The prototypes are preserved design
+references; standalone interactive playback has not been established. Their
+included HTML, JavaScript, CSS, font, and token assets were moved intact.
 
 The two `.dc.html` files in this bundle are **design references** — HTML prototypes
 that show the intended look, layout, copy, and interaction of each window. They are

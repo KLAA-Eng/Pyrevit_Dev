@@ -74,6 +74,6 @@ and extension identity; this guide does not maintain a second release checklist.
 
 - Team policy and plain-language navigation: the KLCode Standards Notion page.
 - Command behavior and validation: the adjacent `SPEC.md`.
-- Python and pyRevit code shape: [SCRIPTS.md](../docs.ai/SCRIPTS.md) and
-  [COMMENTS.md](../docs.ai/COMMENTS.md).
+- Python and pyRevit code shape: [Python guide](knowledge/python-pyrevit.md) and
+  [comment guide](knowledge/python-comments.md).
 - Published release record: [CHANGELOG.md](../CHANGELOG.md).

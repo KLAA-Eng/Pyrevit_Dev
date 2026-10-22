@@ -1,8 +1,19 @@
 # KLCode compiled-WPF design-system validation
 
+> Recorded decision: compiled adapter with a shared data-only palette; owner:
+> KL&A engineering, source checkpoint initiated 2026-08-31. Status: recorded
+> source-checkpoint decision, with live host acceptance outstanding. Filed
+> 2026-10-18 from the handoff package's `DESIGN_SYSTEM_VALIDATION.md`.
+> The matrix below preserves historical results. The later
+> [October 5 validation record](reviews/2026-10-05/validation-and-acceptance.md)
+> reports a palette-contract mismatch; this record does not establish that it
+> is resolved. Current verification belongs to the
+> [acceptance plan](../plans/compiled-tools-acceptance.md); current UI guidance
+> belongs to the [design-system guide](../DESIGNSYSTEM.md).
+
 ## Completed foundation decision record
 
-- Plan/version: `00_design_system_implementation_plan.md` at evidence commit
+- Plan/version: [archived foundation plan](../plans/archive/compiled-wpf-foundation.md) at evidence commit
   `e856ca3`.
 - Decision owner: KL&A engineering, initiated by the repository owner on
   2026-08-31 for this source checkpoint.
