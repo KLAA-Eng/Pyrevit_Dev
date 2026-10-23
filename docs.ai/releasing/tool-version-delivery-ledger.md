@@ -37,7 +37,7 @@ command's `SPEC.md` version history.
 | `0.0.11` | `ea6219c3a45dcf93e7ba80f2d02c9a54f48409b4` | 10.12.2026 | `0.0.11` | [PR #23](https://github.com/KLAA-Eng/Pyrevit_Dev/pull/23); annotated `v0.0.11-beta` peeled to this commit; [published prerelease](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.11-beta) verified 2026-10-12 | Squash-style release |
 | `0.0.12` | `8b83e6a0a2698bdeaa91084d7326de193a595b23` | 10.13.2026 | `0.0.12` | [PR #24](https://github.com/KLAA-Eng/Pyrevit_Dev/pull/24); annotated `v0.0.12-beta` peeled to this commit; [published prerelease](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.12-beta) verified 2026-10-13 | Squash-style release |
 
-| `0.0.13` | Pending merge | 10.22.2026 | `0.0.13` | Pending publication; intended tag v0.0.13-beta | Squash-style release |
+| `0.0.13` | `9fa18cd6378f816776929156e4865b7d7af82e6a` | 10.22.2026 | `0.0.13` | [PR #26](https://github.com/KLAA-Eng/Pyrevit_Dev/pull/26); annotated `v0.0.13-beta` peeled to this commit; [published prerelease](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.13-beta) verified 2026-10-22 | Squash-style release |
 
 ## Release-preparation handoff
 

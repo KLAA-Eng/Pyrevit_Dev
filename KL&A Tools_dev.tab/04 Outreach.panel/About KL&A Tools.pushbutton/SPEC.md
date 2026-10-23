@@ -9,7 +9,7 @@
 - **Status/origin:** Maintained production; KL&A custom command.
 - **Status:** Released.
 - **Maintainer:** KL&A.
-- **Ribbon location:** `KL&A Tools.tab/04 Outreach.panel/About KL&A Tools.pushbutton`.
+- **Ribbon location:** `KL&A Tools_dev.tab/04 Outreach.panel/About KL&A Tools.pushbutton`.
 - **Live acceptance:** Exact-version Revit/pyRevit acceptance is not recorded.
 
 ## Purpose

@@ -2,9 +2,9 @@
 # Do not edit by hand; update version.json and regenerate instead.
 # METADATA_SOURCE_SHA is HEAD at generation, not the resulting release commit.
 
-VERSION = "0.0.13"
-CHANNEL = "beta"
+VERSION = "0.0.14"
+CHANNEL = "dev"
 RELEASE_DATE = "2026-10-22"
-VERSION_LABEL = "v0.0.13-beta"
-METADATA_SOURCE_SHA = "2026d02f5c951d8f3be357e0d3052b55f669cb23"
+VERSION_LABEL = "v0.0.14-dev"
+METADATA_SOURCE_SHA = "101406143392371f96bdb7de56c0a739b1bc5ef9"
 BUILD_DATE = "2026-10-22"

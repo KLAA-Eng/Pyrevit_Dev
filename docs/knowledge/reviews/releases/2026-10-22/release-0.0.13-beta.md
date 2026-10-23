@@ -29,9 +29,17 @@ Concrete Mix Header and Steel PSF acceptance and prior beta limits.
 
 Rollback: `v0.0.12-beta`. About/loaded-path verification pending.
 
-## Publication handoff
+## Publication and synchronization
 
-Owner reviews and personally merges master-dev to main. After verifying the
-actual main tree, create and verify annotated `v0.0.13-beta`, publish the GitHub
-prerelease, resolve the delivery ledger on master-dev, restore the development
-ribbon, and generate 0.0.14-dev metadata. Publication is pending.
+The owner merged [PR #26](https://github.com/KLAA-Eng/Pyrevit_Dev/pull/26) as
+`9fa18cd6378f816776929156e4865b7d7af82e6a`. Its tree exactly matched the
+validated preparation at `a7e63fd`. The remote annotated `v0.0.13-beta`
+(tag object `aee90b2325c8adb28acd3031541a9201ef7ac200`) peels to that main
+commit. The [GitHub prerelease](https://github.com/KLAA-Eng/Pyrevit_Dev/releases/tag/v0.0.13-beta)
+was verified on 2026-10-22 with the approved title, Pre-release label, tag,
+commit, notes, acceptance limits, and rollback tag.
+
+The main result was merged back into master-dev, the development ribbon restored,
+and 0.0.14-dev metadata generated. The resolved ledger and delivery check
+record this release. About/loaded-path verification and the live acceptance
+limits above remain pending. No 0.0.14 development tag or release is intended.

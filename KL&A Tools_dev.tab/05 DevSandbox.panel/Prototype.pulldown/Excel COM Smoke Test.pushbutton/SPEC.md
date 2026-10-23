@@ -24,7 +24,7 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 
 ## Identity
 
-- Bundle: `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton`
+- Bundle: `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Excel COM Smoke Test.pushbutton`
 - Maturity: Prototype
 - Live Revit validation: disposable lifecycle passed on coworker B's Revit 2025
   host and coworker L's Revit 2026 host on 10.22.2026; Carbon workbook behavior

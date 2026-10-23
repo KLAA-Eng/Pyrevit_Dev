@@ -11,7 +11,8 @@ release boundaries.
 
 ## Unreleased
 
-Preparing `0.0.13-beta`; next development identity is `0.0.14-dev`.
+Development is underway for `0.0.14-dev`. The latest published release is
+`0.0.13-beta`.
 
 ## 0.0.13 - 2026-10-22
 
