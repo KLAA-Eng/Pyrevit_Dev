@@ -1,0 +1,21 @@
+title:
+  en_us: "ForteWEB\nExport"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 10.26.2026
+    Status: Unreleased
+    _____________________________________________________________________
+    Description:
+    Prototype: exports selected structural framing members and beam systems to a ForteWEB .4wf file built from a template, detecting joist/flush/drop kind, end supports, clear span, and beam-system joist spacing. Read-only; writes only the .4wf file.
+    _____________________________________________________________________
+    How-to:
+    - Select framing members or beam systems (or pick them when prompted), click, and save the .4wf.
+    - Shift+Click for settings: template .4wf, bearing tolerance, hanger family, floor/roof override.
+    - Review the output table and warnings, then confirm supports in ForteWEB.
+    _____________________________________________________________________
+    Last update:
+    - [10.26.2026] - v0.0 (Unreleased): First DevSandbox version of the Revit to ForteWEB exporter.
+author: KL&A
+engine:
+  clean: true
