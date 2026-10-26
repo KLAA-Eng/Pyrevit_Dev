@@ -1,6 +1,6 @@
 # Model Checker: comment-driven implementation outline.
 # This file contains comments only; it is not an executable command.
-# Contract: SPEC.md in this directory, updated 2026-10-23.
+# Contract: SPEC.md in this directory, updated 2026-10-26.
 # Read the complete specification before implementing any phase below.
 
 # Working logic review: 2026-10-16.
@@ -553,6 +553,12 @@
 # Compare finite extents, orientation, section placement, and justification.
 # Compare members across type boundaries and report type differences.
 # Return Critical for proven exact duplicates within numerical zero tolerance.
+# Identity review 2026-10-26: original placed section geometry and full span control.
+# Different type IDs, reference lines, or justification cannot exclude proven equivalents.
+# Matching reference endpoints or sampled vertices alone are not equivalence proof.
+# Connection cuts/copes/cutbacks do not hide duplicated original member geometry.
+# Follow SPEC.md's agreed duplicate-identity subsection and scenarios A90-A93.
+# Coincident different/unknown sections, partial-overlap safeguards, and near limits remain open.
 # Measure maximum corresponding placement discrepancy for near duplicates.
 # Apply the common classifier within the configured near-duplicate distance.
 # Report collinear positive partial overlaps as Warning with overlap length.

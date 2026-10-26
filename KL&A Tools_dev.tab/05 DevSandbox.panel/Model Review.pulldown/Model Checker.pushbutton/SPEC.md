@@ -13,7 +13,7 @@
 | Version inputs | `bundle.yaml`; `script.py`; `review.xaml`; `script.md`; `icon.png`; `icon.dark.png`; parent pulldown icons; this SPEC; `lib/steel_model_review/*.py`. |
 | Maintainer | KL&A; individual owner to be assigned. |
 | Revit design target | Revit 2024 and later; no exact version has live acceptance evidence. |
-| Specification date | 2026-10-23 |
+| Specification date | 2026-10-26 |
 
 This is the authoritative adjacent specification for Model Checker. The user
 requested a runnable tool in a new dropdown beside Prototypes. Model Review
@@ -33,6 +33,11 @@ The automatic closest-grid-pair rule, bulk permitted-grid-offset rules, and
 project-level persistence agreed on 2026-10-23 below are not yet implemented.
 The current grid check still measures distance to an intersection and supports
 explicit grid-pair assignments and individual accepted exceptions.
+
+The SMR-04 duplicate-identity rules agreed on 2026-10-26 are also pending
+implementation. The current duplicate check requires matching reference
+endpoints and original-geometry vertices, and treats different type IDs as
+Warning candidates even when their sampled geometry coincides.
 
 Model Review uses the existing KL&A cube ribbon icon; Model Checker uses the
 existing search icon with light/dark theme variants. The findings browser shows
@@ -451,6 +456,32 @@ is not a partial overlap. Uncertain section equivalence is a Warning candidate,
 not a proven exact duplicate. Deduplicate unordered pairs; group exact
 duplicates only when all members meet the same equivalence criteria.
 
+#### Duplicate identity: agreed logic, implementation pending
+
+The 2026-10-26 review confirmed the following foundation for SMR-04:
+
+- An exact duplicate represents the same original steel section in the same
+  physical position, placed orientation, and full finite span, within numerical
+  zero tolerance. Proven exact duplicates are Critical.
+- Different family/type names or IDs do not prevent a Critical exact-duplicate
+  result when equivalence of the original placed member geometry is proven.
+  Matching names, reference endpoints, or sampled vertices alone do not prove
+  that equivalence.
+- Reference lines and justification settings are evidence rather than duplicate
+  identity. Different reference/justification setups that produce the same
+  original placed geometry must remain candidates for a proven exact duplicate.
+- Matching reference lines do not establish duplication when physical section
+  placement is side by side, as in adjacent built-up members.
+- Compare original member geometry before connection cuts, copes, and cutbacks.
+  Those end preparations must not hide an otherwise duplicated original member.
+  Reversed endpoint order must not change the physical-equivalence result.
+
+These requirements extend the current endpoint/vertex/type-based implementation;
+they are not evidence that complete geometry equivalence has been implemented
+or validated. Coincident members with known different sections, unresolved
+section equivalence, partial-overlap safeguards, and near-duplicate distance
+boundaries remain to be reviewed with the user.
+
 ### SMR-05: Floor/roof bottom-face work planes
 
 Resolve the beam's HostFace and any work-plane metadata, identify the target
@@ -770,6 +801,10 @@ the command continues to target Revit 2024 and later.
 | A87 | The closest intersection is nearer than the next distinct candidate by more than numerical-zero tolerance | Use the actual closest intersection, even if the difference is otherwise small; no broader ambiguity margin; implementation pending. |
 | A88 | Different grid pairs share the closest intersection and produce different pass/finding or severity outcomes | Warning with reason 'Ambiguous closest grids'; show each pair's measurements and classifications, including candidate Critical outcomes; do not silently choose the passing pair; implementation pending. |
 | A89 | A column lies exactly on the common closest intersection of three or more eligible straight grids | All valid pair offsets are zero and agree: Pass with reason 'On grid'; coincident intersection alone does not create ambiguity; implementation pending. |
+| A90 | Differently named/identified family types have proven equivalent original placed section geometry and full span | Critical exact duplicate; names/type IDs cannot downgrade a proven duplicate; implementation pending. |
+| A91 | Different reference-line or justification setups produce proven equivalent original placed member geometry | Retain the pair as an exact-duplicate candidate and report Critical when equivalence is proven; implementation pending. |
+| A92 | Matching reference lines belong to physically side-by-side sections | No exact-duplicate result solely from the matching references; implementation pending. |
+| A93 | Original member geometry is duplicated but connection cuts, copes, or cutbacks differ | Original geometry controls duplicate identity; end preparation does not hide the duplicate; implementation pending. |
 
 Host-independent tests should exercise the severity boundaries, finite geometry,
 support ambiguity, duplicate pairing, exception invalidation, and report coverage.
@@ -783,6 +818,7 @@ member counts during calibration; no performance target is claimed yet.
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-15 | Not applicable | Not run | Design discussion | Requirements captured; no implementation validation. | This SPEC and companion CDD outline. |
 | 2026-10-23 | Unreleased | Not run | SMR-03 logic review with the user | Agreed automatic closest-pair selection, ambiguity handling, independent grid offsets, bulk allowances, default/override editing, and project DataStorage persistence. Requirements only; implementation and validation pending. | SMR-03 agreed-rule subsections, A56-A89, and companion outline. |
+| 2026-10-26 | Unreleased | Not run | SMR-04 duplicate-identity review with the user | Agreed original placed geometry as the basis for exact duplicates, including cross-type/reference differences and differing connection end preparation. Remaining SMR-04 policies are still under review; implementation and validation pending. | SMR-04 agreed-identity subsection, A90-A93, and companion outline. |
 | 2026-10-16 | Unreleased | 2024.3.40 | User attempted Model Checker using pyRevit 6.5.3.26176+2017 | Failed; generic dialog and blank output. Original traceback unavailable. Direct failure diagnostics added; active-document rerun required. | User screenshots and local Revit journal. |
 | 2026-10-16 | Unreleased | 2024.3.40 | Rerun with detailed failure reporting | Failed while choosing export phase: Name descriptor lacks GetValue. Helper corrected; successful live rerun still pending. | User-provided expanded traceback, host.py name helper. |
 | 2026-10-16 | Unreleased | 2024.3.40 | Create the 3D review view through the modeless report | Failed at view.Name: Name must be unique. Prefixed name now checked against all view/template names, with numbered suffixes. Successful host rerun pending. | Three user-provided screenshots; adapter regression failed at the same setter before the fix. |
