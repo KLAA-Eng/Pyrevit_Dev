@@ -1,6 +1,6 @@
 # Model Checker: comment-driven implementation outline.
 # This file contains comments only; it is not an executable command.
-# Contract: SPEC.md in this directory, updated 2026-10-16.
+# Contract: SPEC.md in this directory, updated 2026-10-23.
 # Read the complete specification before implementing any phase below.
 
 # Working logic review: 2026-10-16.
@@ -32,7 +32,8 @@
 # Keep command paths compatible with the repository IronPython target.
 # Put deterministic comparisons in host-independent library helpers.
 # INVARIANT: Do not edit member geometry/data or run an SDS2 export.
-# Authorized writes are limited to the dedicated review view and its graphics.
+# Authorized writes cover the dedicated review view and its graphics, plus the
+# agreed project-level allowance container when the bulk-offset extension is implemented.
 
 # Establish the review context.
 # Require an active project document and record its stable model identity.
@@ -46,7 +47,8 @@
 
 # Configure checks and expectations.
 # Enable beam endpoints, vertical mismatches, grids, and duplicates by default.
-# Offer nearest-intersection, explicit-grid-pair, and disabled grid modes.
+# Planned grid modes are automatic closest-pair review or disabled.
+# Remove the current executable's explicit-grid-pair assignment mode.
 # Explain that off-grid columns may represent intentional design conditions.
 # Show the confirmed top-of-steel and concrete-wall-face conventions.
 # Show the proposed underside-to-wall-top bearing interpretation separately.
@@ -518,14 +520,31 @@
 # Locate each column reference axis at its base reference elevation in plan.
 # Build eligible intersections from nonparallel grid datum lines.
 # Permit datum extension in plan while rejecting unstable near-parallel pairs.
-# Apply an explicit expected grid pair before considering nearest intersections.
-# Otherwise choose the nearest unambiguous valid grid intersection.
-# Return Warning when equally plausible expectations remain unresolved.
+# Always choose the pair whose reliable intersection is closest to the column in plan.
+# Ignore previous explicit grid-pair assignments; remove manual assignment controls.
+# Choose by geometry before evaluating allowances; do not seek a farther passing pair.
+# Report Ambiguous closest grids Warning for distinct intersections tied within epsilon.
+# Show tied candidates; otherwise use the measurably closest intersection without a wider margin.
 # Return a coverage review item when no reliable grid pair exists.
-# Measure planar distance to the expected intersection for severity.
+# Current implementation measures planar distance to the intersection for severity.
 # Also display both grid names and separate offsets to each grid line.
 # Describe the result as a review of intended column location.
 # Allow acceptance of intentional offsets without changing measured severity.
+# Logic review 2026-10-23: bulk permitted offsets agreed, not yet implemented.
+# Use independent unsigned perpendicular grid distances for permitted-value matching.
+# Classify each discrepancy from its nearest permitted value, including zero.
+# Preserve component severities; any Critical component makes the overall result Critical.
+# Label passing grid results On grid or Permitted grid offset; show distances/matches.
+# Do not add allowance parameters to member instances or member types.
+# Persist allowance values/column references in a dedicated project DataStorage container.
+# Freeze selected/filtered column membership at Apply; whole-model defaults include new columns.
+# Specific column lists replace project defaults; zero always remains permitted.
+# Support Add, Remove, Replace, and Use project default per the owning SPEC.
+# Preserve the distinction between empty specific lists and default inheritance.
+# Evaluate coincident closest grid pairs independently; disagreement is Ambiguous closest grids.
+# Show each candidate pair's measurements/classifications rather than selecting a passing pair.
+# Follow SPEC.md's closest-pair/bulk-offset subsections and scenarios A56-A89.
+# Grid logic review is captured; revised implementation and verification remain pending.
 
 # Evaluate SMR-04 duplicate members.
 # Compare eligible steel beams and columns within the declared export scope.
@@ -583,7 +602,7 @@
 # Accepting one finding removes only its contribution; reopening restores it.
 # Keep the report modeless with persistent-engine ExternalEvent requests.
 # Coalesce filter updates, apply changed colors only, and guard document identity.
-# Select/Zoom, accept/reopen, grid assignment, and rerun keep the report open.
+# Select/Zoom, accept/reopen, allowance edits, and rerun keep the report open.
 # Synchronize member selection bidirectionally while preserving table filters.
 # Clicking a finding selects its owning member without zooming/changing views.
 # Keep Select/Zoom as the explicit camera action, including related elements.
@@ -627,7 +646,7 @@
 # Test finite targets, ambiguous candidates, and reference versus physical ends.
 # Test different beam depths with aligned tops and valid column-shaft framing.
 # Test wall-face targeting and the proposed bearing interpretation in Revit.
-# Test off-grid exceptions and explicit grid pairs on representative projects.
+# Test closest-grid-pair selection and bulk permitted offsets on representative projects.
 # Test reversed duplicate endpoints and intentional adjacent member placement.
 # Test mixed Critical and Warning measurements without severity masking.
 # Test coverage, cancellation, stale results, and acceptance invalidation.

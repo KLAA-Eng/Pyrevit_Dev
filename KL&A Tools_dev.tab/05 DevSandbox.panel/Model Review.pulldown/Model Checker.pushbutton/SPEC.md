@@ -13,7 +13,7 @@
 | Version inputs | `bundle.yaml`; `script.py`; `review.xaml`; `script.md`; `icon.png`; `icon.dark.png`; parent pulldown icons; this SPEC; `lib/steel_model_review/*.py`. |
 | Maintainer | KL&A; individual owner to be assigned. |
 | Revit design target | Revit 2024 and later; no exact version has live acceptance evidence. |
-| Specification date | 2026-10-16 |
+| Specification date | 2026-10-23 |
 
 This is the authoritative adjacent specification for Model Checker. The user
 requested a runnable tool in a new dropdown beside Prototypes. Model Review
@@ -28,6 +28,11 @@ session exceptions, and cancellation are implemented. The modeless browser stays
 open beside Revit for manual corrections and a fresh rerun. Reports and exceptions
 stay in session memory. A dedicated 3D review view, its visibility settings, and
 its graphic overrides are saved Revit document changes; member geometry is unchanged.
+
+The automatic closest-grid-pair rule, bulk permitted-grid-offset rules, and
+project-level persistence agreed on 2026-10-23 below are not yet implemented.
+The current grid check still measures distance to an intersection and supports
+explicit grid-pair assignments and individual accepted exceptions.
 
 Model Review uses the existing KL&A cube ribbon icon; Model Checker uses the
 existing search icon with light/dark theme variants. The findings browser shows
@@ -136,7 +141,7 @@ The search distance locates candidates; it is not an acceptance tolerance.
 Do not silently enlarge it or invent a support outside it. A missing-support
 finding means no eligible candidate was found within the declared search.
 
-### Reviewer workflow
+### Current reviewer workflow
 
 1. Open the project and launch Model Checker.
 2. Confirm export phase, option scope, enabled checks, and settings. All six
@@ -286,6 +291,10 @@ The first version targets vertical columns and straight grid intersections.
 Sloping columns, curved grids, and unresolved multi-segment grids are Not
 evaluated unless their handling is implemented and validated explicitly.
 
+The following describes current behavior; the agreed closest-pair and
+bulk-offset rules below supersede its assignment and measurement policies
+when implemented.
+
 In nearest-intersection mode, find the nearest valid intersection of two
 nonparallel eligible grid lines. Grid datum lines may be extended in plan:
 their drawn extents are not physical support boundaries. Show both grid names,
@@ -301,6 +310,124 @@ Use language such as 'Off-grid column: review intended location.' Off-grid
 does not establish an error. Intentional conditions retain their measured
 severity and can be marked Accepted exception. The project may disable this
 check entirely without disabling the other checks.
+
+#### Automatic closest-pair selection: agreed logic, not yet implemented
+
+- Always find the closest eligible grid pair automatically. Closest means the
+  pair whose valid intersection has the smallest unrounded planar distance
+  from the column reference axis. Retain the existing straight-grid scope,
+  datum extension, and rejection of unstable near-parallel intersections.
+- Remove manual grid-pair assignment from the planned workflow. Previously
+  assigned pairs must not override the closest geometric pair. The current
+  executable still supports explicit assignment; that behavior is superseded
+  by this decision when the extension is implemented.
+- Select the pair before applying permitted-offset rules. Do not switch to a
+  farther pair because its offsets would match an allowance or yield a Pass.
+- If no reliable eligible pair exists, report Not evaluated with a reason.
+- When distinct nearest intersections have distances tied within the
+  numerical-zero tolerance, report Warning with reason 'Ambiguous closest
+  grids' and show the tied candidates. Do not arbitrarily choose a pair and
+  report a Pass. When one intersection is measurably closer, use it; no
+  separate practical-ambiguity margin is introduced.
+- If multiple eligible pairs share the closest intersection, evaluate each
+  pair's perpendicular offsets. When their pass/finding or severity outcomes
+  disagree, report Warning with reason 'Ambiguous closest grids' and show each
+  pair's measurements and classifications. Do not discard pairs solely because
+  their intersections coincide, or silently select the pair that passes.
+  A coincident point alone does not make differently oriented pairs equivalent.
+
+#### Bulk permitted offsets: agreed logic, not yet implemented
+
+The 2026-10-23 logic review confirmed the following requirements. These extend
+the current grid check; they do not describe delivered behavior.
+
+- Allow a list of multiple specific permitted offset values without requiring
+  intentional target positions to be assigned column by column.
+- Allowance storage must not add parameters to member instances or member
+  types. The user explicitly rejected member parameters for this purpose.
+- Persist allowance configuration in a dedicated project-level DataStorage
+  element using Extensible Storage. Keep project-default permitted values,
+  column references for specific assignments, and a data-format version in
+  that container. Do not attach allowance data to the members themselves.
+  Manage the settings through Model Checker. Saved settings survive
+  saving/reopening the Revit project;
+  normal synchronization and Reload Latest share changes in workshared models.
+  Reports and manually accepted exceptions retain their current session-only
+  lifetime; this persistence decision concerns allowance configuration.
+- Match a specific permitted value using numerical-zero tolerance only; do
+  not turn it into a maximum allowable distance or a broad tolerance band.
+- Measure unsigned perpendicular distance from the column reference axis to
+  each of the two grids independently. A permitted magnitude applies on either
+  side of either grid. Each distance must be effectively zero or match a
+  permitted value; radial distance to the intersection cannot establish a match.
+- With 6 inches permitted, distances of (6, 0) and (6, 6) inches both match.
+  Distances of (6, 1/32) inches still produce a Critical finding for the 1/32-inch
+  miss; a match on one grid cannot mask a nonmatch on the other. Distances of
+  (3.6, 4.8) inches on perpendicular grids do not match a 6-inch allowance even
+  though the radial distance to the intersection is 6 inches.
+- A measured offset of 6 inches can match a permitted 6-inch value. An offset
+  of 6 1/8 inches still produces a finding, as do small accidental misses that
+  do not match an allowance or numerical zero.
+- For each grid independently, let d be its unsigned perpendicular distance
+  and P be the applicable permitted values together with zero. The discrepancy
+  is min(abs(d - p) for p in P). Apply the common offset severity rule to this
+  discrepancy, using unrounded measurements and the existing numerical-zero
+  and 1/16-inch boundary normalization. With 6 inches permitted, 6 1/32 and
+  5 31/32 inches are both Critical (1/32-inch discrepancy); 6 1/8 inches is
+  Warning (1/8-inch discrepancy). A 1/32-inch distance remains Critical against
+  zero. Retain each grid's classification; overall severity is Critical if
+  either component is Critical, even when the other discrepancy is larger.
+- When both distances are effectively zero, report severity Pass with the
+  reason 'On grid'. When both components pass and at least one matches a
+  nonzero allowance, report severity Pass with the reason 'Permitted grid
+  offset'. Show the actual grid distances and matched permitted values in the
+  details. These are automatic rule outcomes and require no manual exception
+  acceptance. A nonmatching component retains its Critical or Warning result;
+  permitted matches do not accept or suppress other findings on the column.
+- Support all three application scopes: selected columns, all columns in the
+  filtered results, and the whole eligible host-model column scope. Show the
+  affected column count before applying. The review itself remains whole-model;
+  choosing an allowance scope does not restrict the scan to that group.
+- For selected or filtered application, capture the affected column references
+  when Apply is clicked. Later selection/filter changes do not change that
+  assignment, and newly added columns do not inherit it automatically.
+- Whole-model application sets a saved project default. It applies to newly
+  added eligible columns as well as existing eligible columns without a
+  column-specific list.
+- A column-specific list replaces the project default for that column rather
+  than merging with it. Zero remains permitted independently of either list.
+  For example, with a 6-inch project default and a 12-inch specific list, that
+  column permits zero or 12 inches, while other columns retain the default.
+  Include both 6 and 12 inches in a specific list when both should be permitted.
+  Later changes to the project default do not change a column-specific list.
+
+Support the following bulk-edit operations:
+
+| Action | Agreed behavior |
+| --- | --- |
+| Add values | Preserve the current effective permitted values and add the entered values. |
+| Remove values | Remove only the entered values; zero always remains permitted. |
+| Replace list | Set the list to exactly the entered values, with zero independently permitted. |
+| Use project default | Remove column-specific assignments and restore inheritance from the project default. |
+
+For selected/filtered columns, Add and Remove start from each column's current
+effective list, then save a specific override for each affected column. Replace
+also saves a specific override. An empty specific list permits only on-grid
+placement and must remain distinct from an absent specific assignment. Use
+project default removes that assignment rather than saving an empty list.
+Whole-model Add, Remove, and Replace change the project default and preserve
+existing column-specific overrides; Use project default concerns specific
+assignments rather than the project-default list itself.
+
+The grid logic review is captured in these agreed requirements and acceptance
+scenarios. Implementation and verification of the revised rules remain pending.
+
+Persistence API evidence: the installed Revit 2024 RevitAPI.xml confirms
+Autodesk.Revit.DB.ExtensibleStorage.DataStorage and its Create(Document) method;
+Autodesk documents [model-saved Extensible Storage](https://help.autodesk.com/cloudhelp/2024/ENU/Revit-API/files/Revit_API_Developers_Guide/Advanced_Topics/Storing_Data_in_the_Revit_model/Revit_API_Revit_API_Developers_Guide_Advanced_Topics_Storing_Data_in_the_Revit_model_Extensible_Storage_html.html)
+and [dedicated DataStorage containers](https://help.autodesk.com/cloudhelp/2026/ENU/Revit-API-MainReference/files/html/015081b6-3a45-1b4c-991a-93419e9acd51.htm).
+Autodesk also describes [synchronization and borrowing of Extensible Storage](https://blog.autodesk.io/revit-api-extensible-storage-syncing-conflicts-and-best-practice-behaviors/).
+No live storage or worksharing validation has been performed for Model Checker.
 
 ### SMR-04: Duplicates and partial overlaps
 
@@ -408,6 +535,11 @@ delete duplicates, create connections, or invoke an exporter. The checker create
 and updates one dedicated isometric 3D view for the report; visibility and color
 changes are confined to that view. The view persists when the report closes and
 will be saved with the model. Exceptions remain in session memory.
+
+The agreed bulk-offset extension will additionally create/update a dedicated
+DataStorage container for allowance configuration. Those document writes are
+limited to the settings container; they add no parameters or allowance data to
+member instances or types. This extension is not yet implemented.
 
 ### Report-linked 3D view
 
@@ -566,7 +698,7 @@ the command continues to target Revit 2024 and later.
 | A15 | Steel geometry overlaps its valid support | No clash finding solely from uncut geometry. |
 | A16 | Column is exactly on expected grid intersection | Pass. |
 | A17 | Column is off-grid by 1/32 or 1/8 inch | Critical or Warning; may accept intentional offset. |
-| A18 | Explicit grid pair differs from nearest pair | Explicit expectation controls. |
+| A18 | Explicit grid pair differs from nearest pair | Current behavior only: explicit expectation controls. Superseded by the agreed closest-pair rule and A83 when implemented. |
 | A19 | Grid check disabled | Not run; other checks still run. |
 | A20 | Exact duplicates, including reversed beam endpoints | Critical, one unordered pair/group. |
 | A21 | Nearly coincident duplicates displaced 1/32 inch | Critical near-duplicate finding. |
@@ -604,6 +736,40 @@ the command continues to target Revit 2024 and later.
 | A53 | Click a report finding | Select only its owning member; keep the camera and active view; Select / Zoom remains explicit. |
 | A54 | Pick unmatched/filtered-out members, several members, or clear native selection | Preserve filters; select one preferred visible match or clear the table row with an explanatory status. |
 | A55 | Selection echoes, rapid clicks, document switch, deleted/stale row, or report closure | No feedback loop, cross-document selection, stale-row action, lingering handler, or per-pick geometry-cache serialization. |
+| A56 | Configure multiple specific permitted grid offsets | Multiple values can apply in bulk without assigning individual intentional target positions; implementation pending. |
+| A57 | Configure a permitted 6-inch grid offset, then evaluate perpendicular distances of 6 inches and 6 1/8 inches | Only the 6-inch value matches within numerical-zero tolerance; 6 1/8 inches produces a Warning for a 1/8-inch discrepancy; implementation pending. |
+| A58 | Apply grid allowances to selected columns | Show the affected column count and capture the column references at Apply; implementation pending. |
+| A59 | Apply grid allowances to all columns in filtered results | Show the affected column count and capture the column references at Apply; implementation pending. |
+| A60 | Apply grid allowances to the whole model | Show the current affected column count and save a project default across eligible host-model columns, independently of current selection or result filters; implementation pending. |
+| A61 | A column is 6 inches from either grid on either side, with 6 inches permitted | The unsigned perpendicular distance matches the allowance independently of grid identity or side; implementation pending. |
+| A62 | Distances to the two grids are (6, 0) or (6, 6) inches, with 6 inches permitted | Both components match numerical zero or a permitted value; implementation pending. |
+| A63 | Distances to the two grids are (6, 1/32) inches, with 6 inches permitted | The 6-inch match does not mask the Critical 1/32-inch miss on the other grid; implementation pending. |
+| A64 | Distances to two perpendicular grids are (3.6, 4.8) inches, with only 6 inches permitted | Neither component matches; a radial distance of 6 inches cannot establish a permitted match; implementation pending. |
+| A65 | With 6 inches permitted, a grid distance is 6 1/32 or 5 31/32 inches | Both produce a Critical 1/32-inch discrepancy from the nearest permitted value; implementation pending. |
+| A66 | With 6 and 12 inches permitted, a grid distance is 11 31/32 inches | Use the nearest permitted value, 12 inches: Critical for a 1/32-inch discrepancy; implementation pending. |
+| A67 | With 6 inches permitted, distances to the two grids are (6 1/32, 6 1/8) inches | Retain Critical and Warning component classifications; overall Critical. The larger discrepancy cannot mask the Critical component; implementation pending. |
+| A68 | Both perpendicular grid distances are effectively zero | Pass with reason 'On grid'; implementation pending. |
+| A69 | Both grid components pass and at least one matches a nonzero permitted value | Pass with reason 'Permitted grid offset'; show actual distances and matched values without requiring manual exception acceptance; implementation pending. |
+| A70 | A permitted grid component coexists with an unmatched component or another finding on the column | Retain the unmatched component's Critical or Warning result and preserve other findings; a permitted match does not automatically accept them; implementation pending. |
+| A71 | Store or edit permitted grid offsets | Persist configuration in a dedicated project-level DataStorage container using Extensible Storage; no allowance parameters or data are added to member instances or member types; implementation pending. |
+| A72 | Save and reopen a project after configuring grid allowances | Model Checker loads the saved permitted values and column references from the project container; member geometry and parameters remain unchanged; implementation pending and live Revit acceptance required. |
+| A73 | Synchronize saved grid-allowance changes, then another reviewer reloads latest | Model Checker can read the shared configuration from the project container; implementation pending and live worksharing acceptance required. |
+| A74 | Change selection/filters or add columns after applying selected/filtered allowances | The captured column assignment stays fixed; changed selection/filters and new columns do not acquire that assignment automatically; implementation pending. |
+| A75 | Add an eligible column after saving a whole-model allowance default | The new eligible column receives the project default without another bulk application; implementation pending. |
+| A76 | A 6-inch project default coexists with a 12-inch column-specific list | The specific column permits zero or 12 inches; 6 inches produces a finding. Columns without a specific list retain the 6-inch default; implementation pending. |
+| A77 | Change the project default after assigning a column-specific list | Preserve the specific list; subsequent default changes affect columns using the default; implementation pending. |
+| A78 | Assign a specific list containing both 6 and 12 inches | Both values and zero are permitted independently of the project-default list; implementation pending. |
+| A79 | Bulk Add 18 inches to selected columns where one inherits a 6-inch default and another has a 12-inch specific list | Save specific lists of (6, 18) and (12, 18) inches respectively; preserve each column's previous effective values; implementation pending. |
+| A80 | Remove the last nonzero value from a specific list | Save an explicit empty list, permitting on-grid placement only; do not restore project-default inheritance; implementation pending. |
+| A81 | Bulk Replace selected/filtered columns' lists with 12 inches | Save exactly 12 inches as each specific list; previously permitted nonzero values are removed and zero remains permitted; implementation pending. |
+| A82 | Use project default for columns with specific lists, including explicit empty lists | Remove the specific assignments; these columns inherit the current project default and its subsequent changes; implementation pending. |
+| A83 | A previous explicit grid-pair assignment differs from the closest eligible pair | Always choose the closest eligible intersection automatically; no manual-assignment precedence or assignment control in the planned workflow; implementation pending. |
+| A84 | The closest pair produces an offset finding while a farther pair would match an allowance | Keep the closest pair and its finding; allowance matching cannot select a farther pair; implementation pending. |
+| A85 | No reliable eligible grid pair exists | Not evaluated with a reason; do not invent a target or report a false Pass; implementation pending. |
+| A86 | Distinct nearest intersections have distances tied within numerical-zero tolerance | Warning with reason 'Ambiguous closest grids'; show tied candidates rather than arbitrarily selecting a passing pair; implementation pending. |
+| A87 | The closest intersection is nearer than the next distinct candidate by more than numerical-zero tolerance | Use the actual closest intersection, even if the difference is otherwise small; no broader ambiguity margin; implementation pending. |
+| A88 | Different grid pairs share the closest intersection and produce different pass/finding or severity outcomes | Warning with reason 'Ambiguous closest grids'; show each pair's measurements and classifications, including candidate Critical outcomes; do not silently choose the passing pair; implementation pending. |
+| A89 | A column lies exactly on the common closest intersection of three or more eligible straight grids | All valid pair offsets are zero and agree: Pass with reason 'On grid'; coincident intersection alone does not create ambiguity; implementation pending. |
 
 Host-independent tests should exercise the severity boundaries, finite geometry,
 support ambiguity, duplicate pairing, exception invalidation, and report coverage.
@@ -616,6 +782,7 @@ member counts during calibration; no performance target is claimed yet.
 | Date | Extension release | Revit version | Scenario | Result | Evidence |
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-15 | Not applicable | Not run | Design discussion | Requirements captured; no implementation validation. | This SPEC and companion CDD outline. |
+| 2026-10-23 | Unreleased | Not run | SMR-03 logic review with the user | Agreed automatic closest-pair selection, ambiguity handling, independent grid offsets, bulk allowances, default/override editing, and project DataStorage persistence. Requirements only; implementation and validation pending. | SMR-03 agreed-rule subsections, A56-A89, and companion outline. |
 | 2026-10-16 | Unreleased | 2024.3.40 | User attempted Model Checker using pyRevit 6.5.3.26176+2017 | Failed; generic dialog and blank output. Original traceback unavailable. Direct failure diagnostics added; active-document rerun required. | User screenshots and local Revit journal. |
 | 2026-10-16 | Unreleased | 2024.3.40 | Rerun with detailed failure reporting | Failed while choosing export phase: Name descriptor lacks GetValue. Helper corrected; successful live rerun still pending. | User-provided expanded traceback, host.py name helper. |
 | 2026-10-16 | Unreleased | 2024.3.40 | Create the 3D review view through the modeless report | Failed at view.Name: Name must be unique. Prefixed name now checked against all view/template names, with numbered suffixes. Successful host rerun pending. | Three user-provided screenshots; adapter regression failed at the same setter before the fix. |
