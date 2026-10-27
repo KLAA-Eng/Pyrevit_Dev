@@ -64,7 +64,7 @@ def parse_size(text):
     size = {'plies': None, 'width': None, 'depth': None, 'material': None}
     if not text:
         return size
-    text = text.replace(u'×', 'x').replace('"', ' ').replace("''", ' ')
+    text = text.replace(u'\u00d7', 'x').replace('"', ' ').replace("''", ' ')
     size['material'] = _material(text)
     text = _SERIES.sub(' ', text)
     ply = _PLY.search(text)

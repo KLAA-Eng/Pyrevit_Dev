@@ -82,5 +82,22 @@ class MismatchLabelTest(unittest.TestCase):
         self.assertFalse(is_problem({'status': STATUS_OK, 'mismatch': ''}))
 
 
+class SourceEncodingTest(unittest.TestCase):
+    def test_sources_are_ascii_for_ironpython(self):
+        # IronPython 2.7 refuses non-ASCII source without a coding line.
+        folders = [os.path.join(PROJECT_ROOT, 'lib', 'hanger_check')]
+        pulldown = os.path.join(PROJECT_ROOT, 'KL&A Tools_dev.tab', '05 DevSandbox.panel',
+                                'Prototype.pulldown')
+        folders += [os.path.join(pulldown, name) for name in
+                    ('Check Hanger Locations.pushbutton', 'Hanger Highlights.pushbutton')]
+        for folder in folders:
+            for name in os.listdir(folder):
+                if name.endswith('.py'):
+                    with open(os.path.join(folder, name), 'rb') as stream:
+                        data = stream.read()
+                    self.assertFalse(any(byte > 127 for byte in bytearray(data)),
+                                     '%s contains non-ASCII text' % name)
+
+
 if __name__ == '__main__':
     unittest.main()
