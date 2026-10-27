@@ -51,6 +51,17 @@ in the active view, and reports hangers that do not match their framing.
 - Status: `OK`, `No framing at hanger`, `Hanger not aligned with member`,
   `No supported member`, `No supporting member`, or `Shared member end` when two
   or more hangers claim the same end of the same member.
+- Size check: the hanger's `Joist` value is compared with the supported member
+  and its `Header` value with the supporting member. Values are the Smart
+  Hanger schedule text (for example `6 3/4x15 GLB`, `(3)14" LVL`), read from
+  the instance, then the type. Plies, width, depth, and material are parsed
+  and compared with the member's `Family: Type` name when it contains a
+  `W x D` size, otherwise its width/depth parameters (`b`, `Width`, `d`,
+  `Depth`, ...). Depth must agree within 1/8". Width is checked when the
+  hanger gives one, or plies of 1 3/4" LVL/LSL; a member modeled as one ply also
+  matches. Material is checked only when both name GLB, LVL, PSL, LSL, or TJI.
+  Values that cannot be parsed are noted as not compared, never as mismatches.
+- A hanger is a problem when its status is not `OK` or it has a size mismatch.
 
 ## Output and model effects
 
@@ -61,20 +72,25 @@ run lose their highlight:
 - Members (projection and cut line color plus solid surface fill): supported
   = blue, supporting = yellow, supported by one hanger and supporting another
   = green.
-- Hangers with any non-`OK` status: halftone with red projection lines, no
-  fill, so hanger text stays readable.
+- Problem hangers: halftone with red projection lines, no fill, so hanger text
+  stays readable.
 
 Existing overrides on colored elements are replaced. No other model data
 changes. Views that do not allow graphic overrides are reported and left
 uncolored. `Hanger Highlights` turns these colors off or back on.
 
 The pyRevit output lists each hanger, problems first, with columns Hanger,
-Hanger info (type name, Mark, Comments, and non-empty family text
-parameters), Status, Location match (`Yes`, `Yes (skewed n deg)`, or `No`),
-Supported member and Supporting member (Id link plus `Family: Type`), and
-Notes, plus a link that selects all problem hangers. The pyRevit zoom icon
-frames an element's full bounding box, so the report tells users to select a
-hanger and re-run to zoom to it.
+Hanger info (`Designation`, `Header`, `Joist` only), Status, Location match
+(`Yes`, `Yes (skewed n deg)`, or `No`), Size mismatch (blank,
+`Supported member mismatch`, `Supporting member mismatch`, or
+`Both mismatch`), Supported member and Supporting member (Id link plus
+`Family: Type`), and Notes, plus a link that selects all problem hangers.
+
+Report links use pyRevit's handler: clicking an Id selects the element and the
+zoom icon also runs Revit's `ShowElements`, which frames the element's full
+bounding box. The selection stays until the user presses Esc; the command
+cannot change that behavior, so the report says so and tells users to select
+a hanger and re-run to zoom to it.
 
 ## Implementation inventory
 
@@ -84,6 +100,8 @@ hanger and re-run to zoom to it.
 - `lib/hanger_check/classify.py`: host-independent supported/supporting
   decisions, skew, shared-end flags, and member roles, covered by
   `tests/hanger_check_test.py`.
+- `lib/hanger_check/sizes.py`: host-independent Header/Joist size parsing and
+  mismatch labels, covered by `tests/hanger_sizes_test.py`.
 
 ## Validation boundary
 
@@ -96,7 +114,5 @@ re-running clears highlights for fixed hangers.
 
 - Make the hanger family name and box size configurable if other hanger
   families are adopted.
-- Compare hanger model/size parameters with the supported member size once the
-  hanger family parameters are confirmed.
 - Optionally report framing ends that frame into another member without a
   hanger.

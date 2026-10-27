@@ -177,6 +177,11 @@ def classify_hanger(point, members, text_dir=None):
     return result
 
 
+def is_problem(result):
+    """A hanger needs attention: location status or a Header/Joist size mismatch."""
+    return result['status'] != STATUS_OK or bool(result.get('mismatch'))
+
+
 def match_label(result):
     """Short Yes/No answer for whether the hanger and its framing agree."""
     if result['status'] not in (STATUS_OK, STATUS_SHARED):

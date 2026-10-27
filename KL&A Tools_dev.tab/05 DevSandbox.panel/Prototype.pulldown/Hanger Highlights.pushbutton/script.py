@@ -6,7 +6,7 @@ __version__ = "v0.0"
 
 from pyrevit import forms, revit, script
 
-from hanger_check.classify import STATUS_OK
+from hanger_check.classify import is_problem
 from hanger_check.revit_check import (
     check_hangers,
     clear_highlights,
@@ -39,7 +39,7 @@ def main():
     elements = {}
     results = check_hangers(doc, hangers, elements)
     refresh_highlights(doc, view, results, elements, revit.Transaction)
-    problems = sum(1 for r in results.values() if r['status'] != STATUS_OK)
+    problems = sum(1 for r in results.values() if is_problem(r))
     forms.alert('Hanger highlights on: {} hanger(s) checked, {} with a problem. Run Check '
                 'Hanger Locations for the report.'.format(len(results), problems),
                 title=COMMAND_TITLE)
