@@ -62,11 +62,23 @@ class CompareSizeTest(unittest.TestCase):
     def test_glulam_header_wrong_depth(self):
         ok, reason = compare_size('6 3/4x15 GLB', 'Glulam: 6 3/4" x 13 1/2"')
         self.assertFalse(ok)
-        self.assertEqual(reason, 'depth differs')
+        self.assertEqual(reason, 'depth differs (hanger vs member: depth 15" vs 13 1/2" '
+                                 'from type name)')
 
-    def test_ply_lvl_matches_built_up_or_single_ply(self):
+    def test_type_name_depth_wins_over_parameter(self):
+        # '(2)11 7/8" LVL' type whose depth parameter holds something else.
+        self.assertTrue(compare_size('(2)11 7/8" LVL', 'LVL: (2)11 7/8" LVL', 3.5, 24.0)[0])
+        self.assertTrue(compare_size('(2)11 7/8" LVL', 'LVL 2.0E: (2)11 7/8"', 3.5, 9.25)[0])
+        self.assertEqual(compare_size('(2)11 7/8" LVL', 'LVL: (2)9 1/2" LVL', 3.5, 11.875),
+                         (False, 'depth differs (hanger vs member: depth 11 7/8" vs 9 1/2" '
+                                 'from type name)'))
+        ok, reason = compare_size('6 3/4x15 GLB', 'Glulam: GL-1', 6.75, 12.0)
+        self.assertIn('from depth parameter', reason)
+
+    def test_ply_lvl_must_be_modeled_full_width(self):
         self.assertTrue(compare_size('(3)14" LVL', 'LVL: 5 1/4" x 14"')[0])
-        self.assertTrue(compare_size('(3)14" LVL', 'LVL: 1 3/4" x 14"')[0])
+        self.assertEqual(compare_size('(3)14" LVL', 'LVL: 1 3/4" x 14"'),
+                         (False, 'width differs (hanger vs member: width 5 1/4" vs 1 3/4")'))
         self.assertFalse(compare_size('(3)14" LVL', 'LVL: 3 1/2" x 14"')[0])
 
     def test_material_mismatch(self):
@@ -78,8 +90,12 @@ class CompareSizeTest(unittest.TestCase):
         self.assertTrue(compare_size('6 3/4x15 GLB', 'Glulam: GL-1', 6.75, 15.0)[0])
         self.assertFalse(compare_size('6 3/4x15 GLB', 'Glulam: GL-1', 6.75, 12.0)[0])
 
-    def test_sawn_lumber_nominal(self):
-        self.assertTrue(compare_size('(2)2x10', 'Dimension Lumber: 2x10')[0])
+    def test_sawn_lumber_plies_are_1_1_2_inch(self):
+        self.assertTrue(compare_size('(2)2x10', 'Dimension Lumber: 3x10')[0])
+        self.assertTrue(compare_size('(2)2x10', 'Dimension Lumber: (2)2x10')[0])
+        self.assertTrue(compare_size('(2)2x10', 'Dimension Lumber: Double', 3.0, 9.25)[0])
+        self.assertTrue(compare_size('(1)2x8', 'Dimension Lumber: 2x8')[0])
+        self.assertFalse(compare_size('(2)2x10', 'Dimension Lumber: 2x10')[0])
 
     def test_undecided_without_sizes(self):
         self.assertIsNone(compare_size('SEE PLAN', 'LVL: 1 3/4" x 14"')[0])
@@ -98,9 +114,24 @@ class StrictSupportedTest(unittest.TestCase):
         self.assertTrue(compare_size('2x10', 'Dimension Lumber: 2x10')[0])
         self.assertFalse(compare_size('2x10', 'Dimension Lumber: 1 1/2" x 7 1/4"')[0])
 
-    def test_single_ply_and_unknown_material_are_noted(self):
-        self.assertEqual(compare_size('(3)14" LVL', 'LVL: 1 3/4" x 14"'),
-                         (True, 'member modeled as one ply of (3)'))
+    def test_ply_type_name_with_full_width_parameter(self):
+        # '(2)11 7/8" LVL' type modeled as one member 3 1/2" wide.
+        for label, width in (('LVL: (2)11 7/8" LVL', 3.5), ('LVL: 2-PLY 11 7/8', 3.5)):
+            self.assertTrue(compare_size('(2)11 7/8" LVL', label, width, 11.875)[0], label)
+        self.assertTrue(compare_size('(3)11 7/8" LVL', 'LVL: (3)11 7/8" LVL', 5.25, 11.875)[0])
+        self.assertTrue(compare_size('(2)11 7/8" LVL', 'LVL: (2)1 3/4" x 11 7/8"')[0])
+
+    def test_member_type_plies_vs_modeled_width(self):
+        self.assertEqual(compare_size('(2)11 7/8" LVL', 'LVL: (2)11 7/8" LVL', 1.75, 11.875),
+                         (False, 'member width/width differs (hanger vs member: type (2) '
+                                 'needs 3 1/2", modeled 1 3/4", width 3 1/2" vs 1 3/4")'))
+
+    def test_hanger_and_member_plies_must_agree(self):
+        self.assertEqual(compare_size('(3)11 7/8" LVL', 'LVL: (2)11 7/8" LVL', 3.5, 11.875),
+                         (False, 'plies/width differs (hanger vs member: (3) vs (2), '
+                                 'width 5 1/4" vs 3 1/2")'))
+
+    def test_unknown_material_is_noted(self):
         self.assertEqual(compare_size('(2)11 7/8" LVL', 'Rectangular: 3 1/2" x 11 7/8"'),
                          (True, 'material LVL not confirmed'))
 

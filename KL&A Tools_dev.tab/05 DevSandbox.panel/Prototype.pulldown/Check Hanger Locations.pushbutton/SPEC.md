@@ -57,16 +57,27 @@ in the active view, and reports hangers that do not match their framing.
   end` when two or more hangers claim the same end of the same member.
 - Size check: values are the Smart Hanger schedule text, read from the
   instance, then the type. Plies, width, depth, material, and I-joist series
-  are parsed and compared with the member's `Family: Type` name when it
-  contains a `W x D` size, otherwise its width/depth parameters (`b`, `Width`,
-  `d`, `Depth`, ...). Values that cannot be parsed are noted as not compared,
+  are parsed and compared with the member's `Family: Type` name. Member depth
+  comes from the type name (`W x D`, or a lone size such as `(2)11 7/8" LVL`);
+  a depth parameter (`d`, `Depth`, `h`, `Height`, ...) is used only when the
+  name gives no depth or only a number under 3" (a grade or mark such as
+  `2.0E` or `GL-1`). Member width comes from the type name's `W x D`,
+  otherwise the width parameter (`b`, `Width`, ...). Depth notes say which
+  source was used. Values that cannot be parsed are noted as not compared,
   never as mismatches.
   - `Joist` vs supported member is strict: depth within 1/8" (nominal sawn
-    lumber such as `2x8` also matches its actual size), width when the hanger
-    gives one or plies of 1 3/4" LVL/LSL, material (GLB, LVL, PSL, LSL, TJI),
-    and I-joist series (`TJI 360`) when both name one. A member modeled as one
-    ply of a built-up size matches with a note; an unconfirmed material is
-    noted.
+    lumber such as `2x8` also matches its actual size), material (GLB, LVL,
+    PSL, LSL, TJI), and I-joist series (`TJI 360`) when both name one; an
+    unconfirmed material is noted.
+  - Width follows KL&A modeling: a built-up member is one element the full
+    width of all plies, plies x 1 3/4" for LVL/LSL and plies x 1 1/2" for
+    sawn lumber. The hanger width (explicit, or its plies x ply width) must
+    equal the member's full width, so `(2)11 7/8" LVL` needs a 3 1/2" member
+    and `(2)2x10` a 3" member. The member width is its width parameter, or the
+    `W x D` in its type name; a type name with plies and a one-ply size
+    (`(2)1 3/4" x 11 7/8"`, `(2)2x10`) means plies x ply width. When the type
+    name gives plies, they must match the hanger's plies and the modeled width
+    (plies x ply width). Mismatch notes list the hanger and member sizes.
   - `Header` vs supporting member is loose, because schedules name the
     supporting member generally (`(2)LVL OR PACKOUT`, `LVL OR 2x8`): each `OR`
     alternative is tried for material and depth only, any match passes, and a

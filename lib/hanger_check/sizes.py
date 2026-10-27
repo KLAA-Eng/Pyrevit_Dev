@@ -9,8 +9,11 @@ back to its width/depth parameters.
 Joist vs supported member is strict:
   * Depth must agree within SIZE_TOL_IN whenever both are known; nominal sawn
     lumber (2x10) also matches its actual size (1 1/2 x 9 1/4).
-  * Width is checked when the hanger gives one (explicitly, or as plies of
-    1 3/4" LVL/LSL); a member modeled as a single ply also matches, with a note.
+  * Members are modeled as one element the full width of all plies: plies x
+    1 3/4" for LVL/LSL, plies x 1 1/2" for sawn lumber. The hanger width
+    (explicit, or its plies x ply width) must equal the member's full width,
+    and a type name giving plies must agree with the hanger's plies and with
+    its own modeled width.
   * Material and I-joist series must agree when both are named.
 Header vs supporting member is loose: the Header may list alternatives
 ('LVL OR 2x8'), and only material, depth and steel/wall kind are compared.
@@ -24,6 +27,8 @@ import re
 
 SIZE_TOL_IN = 0.125
 PLY_WIDTH_IN = 1.75
+SAWN_PLY_WIDTH_IN = 1.5
+MIN_NAME_DEPTH_IN = 3.0          # smaller lone numbers in a type name are grades or marks
 PLY_MATERIALS = ('LVL', 'LSL')
 MATERIALS = (
     ('GLB', ('GLB', 'GLULAM', 'GLU-LAM')),
@@ -52,6 +57,7 @@ _PLY = re.compile(r'\(\s*(\d+)\s*\)|(\d+)\s*-?\s*PLY\b', re.I)
 _SERIES = re.compile(r'\b(TJI|NI|BCI|LPI)\s*-?\s*(\d+)\b', re.I)
 _NUMBER = re.compile(r'(\d+)\s*[- ]\s*(\d+)\s*/\s*(\d+)|(\d+)\s*/\s*(\d+)|(\d+(?:\.\d+)?)')
 _ALTERNATIVES = re.compile(r'\bOR\b', re.I)
+_SAWN_WORDS = re.compile(r'\b(DIMENSION|LUMBER|SAWN|DF|SPF|HF|SYP)\b')
 _STEEL_SHAPE = re.compile(r'(^|[^A-Z])W\s*\d+(\.\d+)?\s*X\s*\d+')
 _STEEL_WORDS = re.compile(r'\bWF\b|WIDE\s*-?\s*FLANGE|\bSTEEL\b')
 _WALL_WORDS = re.compile(r'\b(PLATE|LEDGER|LEDGE|WALL|CONCRETE|CMU|MASONRY)\b')
@@ -117,20 +123,65 @@ def _actual(nominal):
     return nominal - (0.5 if nominal <= 6 else 0.75)
 
 
-def _hanger_widths(size):
+def _ply_width(material, sawn):
+    """Width of one ply: 1 3/4" for LVL/LSL, 1 1/2" for sawn lumber, else None."""
+    if material in PLY_MATERIALS:
+        return PLY_WIDTH_IN
+    if material is None and sawn:
+        return SAWN_PLY_WIDTH_IN
+    return None
+
+
+def _hanger_widths(size, ply_width):
     plies = size['plies'] or 1
     if size['width'] is not None:
         widths = [size['width'] * plies]
         if _is_nominal(size):
             widths.append(_actual(size['width']) * plies)
         return widths
-    if size['plies'] and size['material'] in PLY_MATERIALS:
-        return [size['plies'] * PLY_WIDTH_IN]
+    if size['plies'] and ply_width:
+        return [size['plies'] * ply_width]
     return []
+
+
+def _member_depth(member, member_depth_in):
+    """(depth, source). The type name wins; a depth parameter is used only when
+    the name gives none, or only a grade/mark number such as GL-1 or 2.0E."""
+    if member['depth'] is not None and (member['width'] is not None
+                                        or member['depth'] >= MIN_NAME_DEPTH_IN):
+        return member['depth'], 'type name'
+    if member_depth_in is not None:
+        return member_depth_in, 'depth parameter'
+    return member['depth'], 'type name'
+
+
+def _member_width(member, member_width_in, ply_width):
+    """Full modeled width. A width parameter is the full width of all plies; a
+    'W x D' type name with plies may give one ply (1 3/4, or nominal 2) or the
+    full width."""
+    if member['width'] is None:
+        return member_width_in
+    width, plies = member['width'], member['plies']
+    if plies and ply_width and (_close(width, ply_width)
+                                or (_is_nominal(member) and _close(_actual(width), ply_width))):
+        return ply_width * plies
+    return width
 
 
 def _close(a, b):
     return abs(a - b) <= SIZE_TOL_IN
+
+
+def format_inches(value):
+    """Inches to the nearest 1/16 as text, e.g. 11.875 -> '11 7/8"'."""
+    sixteenths = int(round(value * 16))
+    whole, rest = divmod(sixteenths, 16)
+    if not rest:
+        return '%d"' % whole
+    den = 16
+    while rest % 2 == 0:
+        rest, den = rest // 2, den // 2
+    return ('%d %d/%d"' % (whole, rest, den)) if whole else ('%d/%d"' % (rest, den))
 
 
 def compare_size(hanger_text, member_label, member_width_in=None, member_depth_in=None,
@@ -138,18 +189,16 @@ def compare_size(hanger_text, member_label, member_width_in=None, member_depth_i
     """(True | False | None, reason) for a hanger Header/Joist value vs one member.
 
     strict also checks width, plies and I-joist series. A True result may carry
-    a reason worth noting (for example a built-up member modeled as one ply).
+    a reason worth noting (for example an unconfirmed material).
     """
     hanger = parse_size(hanger_text)
     member = parse_size(member_label)
-    if member['width'] is not None:                  # 'W x D' in the type name
-        width, depth = member['width'], member['depth']
-    else:                                            # grades/marks make lone numbers unreliable
-        width = member_width_in
-        depth = member_depth_in if member_depth_in is not None else member['depth']
-    if member['plies'] and width is not None:
-        width *= member['plies']
-    problems, notes = [], []
+    depth, depth_source = _member_depth(member, member_depth_in)
+    sawn = _is_nominal(hanger) or _is_nominal(member) or bool(_SAWN_WORDS.search(
+        (member_label or '').upper()))
+    ply_width = _ply_width(member['material'] or hanger['material'], sawn)
+    member_width = _member_width(member, member_width_in, ply_width)
+    problems, notes, details = [], [], []
     if hanger['material'] and member['material'] and hanger['material'] != member['material']:
         problems.append('material')
     if strict and hanger['series'] and member['series'] and hanger['series'] != member['series']:
@@ -159,16 +208,26 @@ def compare_size(hanger_text, member_label, member_width_in=None, member_depth_i
     if depth_known and not (_close(hanger['depth'], depth)
                             or (nominal and _close(_actual(hanger['depth']), depth))):
         problems.append('depth')
-    if strict and width is not None:
-        widths = _hanger_widths(hanger)
-        if widths and not any(_close(w, width) for w in widths):
-            single = [w / hanger['plies'] for w in widths] if hanger['plies'] else []
-            if any(_close(w, width) for w in single):
-                notes.append('member modeled as one ply of (%d)' % hanger['plies'])
-            else:
-                problems.append('width')
+        details.append('depth %s vs %s from %s' % (
+            format_inches(hanger['depth']), format_inches(depth), depth_source))
+    if strict and hanger['plies'] and member['plies'] and hanger['plies'] != member['plies']:
+        problems.append('plies')
+        details.append('(%d) vs (%d)' % (hanger['plies'], member['plies']))
+    if strict and member['plies'] and ply_width and member_width is not None and not _close(
+            member_width, member['plies'] * ply_width):
+        problems.append('member width')
+        details.append('type (%d) needs %s, modeled %s' % (
+            member['plies'], format_inches(member['plies'] * ply_width),
+            format_inches(member_width)))
+    widths = _hanger_widths(hanger, ply_width)
+    if strict and member_width is not None and widths and not any(
+            _close(w, member_width) for w in widths):
+        problems.append('width')
+        nearest = min(widths, key=lambda w: abs(w - member_width))
+        details.append('width %s vs %s' % (format_inches(nearest), format_inches(member_width)))
     if problems:
-        return False, '%s differs' % '/'.join(problems)
+        reason = '%s differs' % '/'.join(problems)
+        return False, '%s (hanger vs member: %s)' % (reason, ', '.join(details)) if details else reason
     if not depth_known:
         if not strict and hanger['material'] and member['material']:
             return True, ''
