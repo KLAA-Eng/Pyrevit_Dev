@@ -6,7 +6,12 @@ __version__ = "v0.0"
 
 from pyrevit import forms, revit, script
 
-from hanger_check.classify import DEFAULT_HANGER_FAMILY, is_problem, match_label
+from hanger_check.classify import (
+    DEFAULT_HANGER_FAMILY,
+    STATUS_REVIEW_DETAILS,
+    is_problem,
+    match_label,
+)
 from hanger_check.revit_check import (
     check_hangers,
     hanger_info,
@@ -36,9 +41,11 @@ def _member_cell(output, doc, elements, member_id):
 
 def _print_report(output, doc, view, source, results, elements, colored):
     problems = [i for i, r in results.items() if is_problem(r)]
+    details = [i for i, r in results.items() if r['status'] == STATUS_REVIEW_DETAILS]
     output.print_md('# {}'.format(COMMAND_TITLE))
-    output.print_md('**Hangers reported:** {} ({}) | **Problems:** {} | **View:** {}'.format(
-        len(results), source, len(problems), view.Name))
+    output.print_md('**Hangers reported:** {} ({}) | **Problems:** {} | **Review details:** {} | '
+                    '**View:** {}'.format(len(results), source, len(problems), len(details),
+                                          view.Name))
     if colored:
         output.print_md('Colors: supported member = blue, supporting member = yellow, '
                         'both = green, hanger with a problem = halftone red. Use '
@@ -51,16 +58,19 @@ def _print_report(output, doc, view, source, results, elements, colored):
         output.print_md('Select problem hangers: {}'.format(
             output.linkify([elements[i].Id for i in problems])))
     rows = []
-    for hanger_id in sorted(results, key=lambda i: (not is_problem(results[i]), i)):
+    order = lambda i: (not is_problem(results[i]),
+                       results[i]['status'] != STATUS_REVIEW_DETAILS, i)
+    for hanger_id in sorted(results, key=order):
         result = results[hanger_id]
         hanger = elements[hanger_id]
         rows.append([output.linkify(hanger.Id), hanger_info(result['hanger_values']),
                      result['status'], match_label(result), result['mismatch'],
+                     result['mounting'],
                      _member_cell(output, doc, elements, result['supported']),
                      _member_cell(output, doc, elements, result['supporting']),
                      '; '.join(result['notes']) or '-'])
     output.print_table(rows, columns=['Hanger', 'Hanger info', 'Status', 'Location match',
-                                      'Size mismatch', 'Supported member',
+                                      'Size mismatch', 'Mounting', 'Supported member',
                                       'Supporting member', 'Notes'])
 
 

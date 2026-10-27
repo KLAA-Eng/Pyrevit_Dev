@@ -14,7 +14,7 @@
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| v0.0 | Unreleased | 10.27.2026 | First DevSandbox port of the Check Hanger Locations Dynamo graph, with orientation-based member roles, highlight refresh, and the Hanger Highlights toggle. | Pending commit on `dev.hangers`; pending next main delivery. |
+| v0.0 | Unreleased | 10.27.2026 | First DevSandbox port of the Check Hanger Locations Dynamo graph, with orientation-based member roles, strict Joist and loose Header size checks, Review/Review details status, wall and steel mounting, highlight refresh, and the Hanger Highlights toggle. | Pending commit on `dev.hangers`; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -48,20 +48,40 @@ in the active view, and reports hangers that do not match their framing.
   wins. The skew between supported and supporting members is reported.
 - Only structural framing with a location line is considered; walls, columns,
   and ledgers are not supporting members. Curved members use their chord.
-- Status: `OK`, `No framing at hanger`, `Hanger not aligned with member`,
-  `No supported member`, `No supporting member`, or `Shared member end` when two
-  or more hangers claim the same end of the same member.
-- Size check: the hanger's `Joist` value is compared with the supported member
-  and its `Header` value with the supporting member. Values are the Smart
-  Hanger schedule text (for example `6 3/4x15 GLB`, `(3)14" LVL`), read from
-  the instance, then the type. Plies, width, depth, and material are parsed
-  and compared with the member's `Family: Type` name when it contains a
-  `W x D` size, otherwise its width/depth parameters (`b`, `Width`, `d`,
-  `Depth`, ...). Depth must agree within 1/8". Width is checked when the
-  hanger gives one, or plies of 1 3/4" LVL/LSL; a member modeled as one ply also
-  matches. Material is checked only when both name GLB, LVL, PSL, LSL, or TJI.
-  Values that cannot be parsed are noted as not compared, never as mismatches.
-- A hanger is a problem when its status is not `OK` or it has a size mismatch.
+- Location status: `OK`, `No framing at hanger`, `Hanger not aligned with
+  member`, `No supported member`, `No supporting member`, or `Shared member
+  end` when two or more hangers claim the same end of the same member.
+- Size check: values are the Smart Hanger schedule text, read from the
+  instance, then the type. Plies, width, depth, material, and I-joist series
+  are parsed and compared with the member's `Family: Type` name when it
+  contains a `W x D` size, otherwise its width/depth parameters (`b`, `Width`,
+  `d`, `Depth`, ...). Values that cannot be parsed are noted as not compared,
+  never as mismatches.
+  - `Joist` vs supported member is strict: depth within 1/8" (nominal sawn
+    lumber such as `2x8` also matches its actual size), width when the hanger
+    gives one or plies of 1 3/4" LVL/LSL, material (GLB, LVL, PSL, LSL, TJI),
+    and I-joist series (`TJI 360`) when both name one. A member modeled as one
+    ply of a built-up size matches with a note; an unconfirmed material is
+    noted.
+  - `Header` vs supporting member is loose, because schedules name the
+    supporting member generally (`(2)LVL OR PACKOUT`, `LVL OR 2x8`): each `OR`
+    alternative is tried for material and depth only, any match passes, and a
+    mismatch needs every alternative to disagree. `WF BEAM` must be a steel W
+    shape. A wood alternative on a steel beam (packout) is not compared.
+- Support kind comes from the Header and the supporting member: steel (`WF`,
+  `STEEL`, or a `W12X26` style member), wall (`PLATE`, `LEDGER`, `LEDGE`,
+  `WALL`, `CONCRETE`, `CMU`, `MASONRY`), or column (`COLUMN`, `POST`). Walls
+  and columns are not modeled framing, so a missing supporting member is
+  expected for them.
+- Mounting (from `Fastener-TF`; blank, `-`, or `--` means none): steel with
+  top-flange fasteners is `Top flange mounted`, steel without them is `Face
+  mounted - needs web packout`; other hangers with top-flange fasteners are
+  `Top flange mounted`; otherwise walls show `Wall - ledger or plate` and
+  columns `Column - see detail`.
+- Reported status: a location problem first, then `Review` for any size
+  mismatch, then `Review details` for wall or column supports, else `OK`.
+- A hanger is a problem when its status is not `OK` or `Review details`, or it
+  has a size mismatch.
 
 ## Output and model effects
 
@@ -79,11 +99,12 @@ Existing overrides on colored elements are replaced. No other model data
 changes. Views that do not allow graphic overrides are reported and left
 uncolored. `Hanger Highlights` turns these colors off or back on.
 
-The pyRevit output lists each hanger, problems first, with columns Hanger,
+The pyRevit output lists each hanger, problems first, then `Review details`,
+with columns Hanger,
 Hanger info (`Designation`, `Header`, `Joist` only), Status, Location match
 (`Yes`, `Yes (skewed n deg)`, or `No`), Size mismatch (blank,
 `Supported member mismatch`, `Supporting member mismatch`, or
-`Both mismatch`), Supported member and Supporting member (Id link plus
+`Both mismatch`), Mounting, Supported member and Supporting member (Id link plus
 `Family: Type`), and Notes, plus a link that selects all problem hangers.
 
 Report links use pyRevit's handler: clicking an Id selects the element and the

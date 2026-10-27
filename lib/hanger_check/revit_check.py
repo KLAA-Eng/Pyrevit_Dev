@@ -15,13 +15,21 @@ from .classify import (
     ROLE_SUPPORTING,
     SEARCH_RADIUS_FT,
     VERTICAL_REACH_FT,
+    apply_review,
     classify_hanger,
     flag_shared_ends,
     is_problem,
     matches_family,
     member_roles,
 )
-from .sizes import compare_size, mismatch_label
+from .sizes import (
+    DETAIL_KINDS,
+    compare_size,
+    compare_supporting,
+    mismatch_label,
+    mounting_label,
+    support_kind,
+)
 
 
 PROBLEM_KEY = 'problem'
@@ -33,6 +41,7 @@ COLORS = {
 }
 ZOOM_MARGIN_FT = 4.0
 HANGER_FIELDS = ('Designation', 'Header', 'Joist')
+TOP_FLANGE_FIELD = 'Fastener-TF'
 WIDTH_PARAMS = ('b', 'Width', 'B', 'Beam Width', 'Nominal Width')
 DEPTH_PARAMS = ('d', 'Depth', 'h', 'Height', 'Beam Depth', 'Nominal Depth')
 
@@ -69,9 +78,10 @@ def _text_param(sources, name):
 
 
 def hanger_values(doc, hanger):
-    """{Designation, Header, Joist} from the hanger instance, then its type."""
+    """{Designation, Header, Joist, Fastener-TF} from the hanger instance, then its type."""
     sources = (hanger, doc.GetElement(hanger.GetTypeId()))
-    return dict((name, _text_param(sources, name)) for name in HANGER_FIELDS)
+    return dict((name, _text_param(sources, name))
+                for name in HANGER_FIELDS + (TOP_FLANGE_FIELD,))
 
 
 def hanger_info(values):
@@ -89,12 +99,12 @@ def _length_in(doc, element, names):
     return None
 
 
-def _compare_member(doc, hanger_text, element):
+def _compare_member(doc, hanger_text, element, compare):
     if element is None or not hanger_text:
         return None, None
-    return compare_size(hanger_text, member_label(doc, element),
-                        _length_in(doc, element, WIDTH_PARAMS),
-                        _length_in(doc, element, DEPTH_PARAMS))
+    return compare(hanger_text, member_label(doc, element),
+                   _length_in(doc, element, WIDTH_PARAMS),
+                   _length_in(doc, element, DEPTH_PARAMS))
 
 
 def is_hanger(element):
@@ -155,19 +165,26 @@ def check_hangers(doc, hangers, elements):
 
 
 def _add_size_check(doc, result, values, elements):
-    """Joist value vs supported member, Header value vs supporting member."""
+    """Joist vs supported member (strict), Header vs supporting member (loose)."""
     result['hanger_values'] = values
     checks = []
-    for field, key in (('Joist', 'supported'), ('Header', 'supporting')):
+    for field, key, compare in (('Joist', 'supported', compare_size),
+                                ('Header', 'supporting', compare_supporting)):
         member = elements.get(result[key]) if result[key] is not None else None
-        ok, reason = _compare_member(doc, values.get(field), member)
+        ok, reason = _compare_member(doc, values.get(field), member, compare)
         checks.append(ok)
         if ok is False:
             result['notes'].append('%s "%s" vs %s: %s' % (
                 field, values[field], member_label(doc, member), reason))
         elif ok is None and member is not None and values.get(field):
             result['notes'].append('%s "%s" not compared: %s' % (field, values[field], reason))
-    result['mismatch'] = mismatch_label(checks[0], checks[1])
+        elif ok and reason:
+            result['notes'].append('%s: %s' % (field, reason))
+    supporting = elements.get(result['supporting']) if result['supporting'] is not None else None
+    kind = support_kind(values.get('Header'),
+                        member_label(doc, supporting) if supporting is not None else None)
+    result['mounting'] = mounting_label(kind, values.get(TOP_FLANGE_FIELD))
+    apply_review(result, mismatch_label(checks[0], checks[1]), kind in DETAIL_KINDS)
 
 
 def _solid_fill_id(doc):

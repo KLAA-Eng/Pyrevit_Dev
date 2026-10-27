@@ -7,7 +7,7 @@ tooltip:
     Status: Unreleased
     _____________________________________________________________________
     Description:
-    Prototype: uses each Hangers_Clever_KLAA hanger's text orientation to find the supported member (along the top or base of the text) and the supporting member (across the text, skew allowed), checks the hanger's Header and Joist sizes against them, colors them in the active view, and reports Designation/Header/Joist, member types, location match, and size mismatch. Port of the Check Hanger Locations Dynamo graph.
+    Prototype: uses each Hangers_Clever_KLAA hanger's text orientation to find the supported member (along the top or base of the text) and the supporting member (across the text, skew allowed), checks the Joist strictly against the supported member and the Header loosely against the supporting member, flags wall/column supports for detail review and steel beams as top flange or web packout, colors them in the active view, and reports status (OK, Review, Review details), Designation/Header/Joist, member types, location match, size mismatch, and mounting. Port of the Check Hanger Locations Dynamo graph.
     _____________________________________________________________________
     How-to:
     - Select nothing to report every hanger in the active view, or select hangers to zoom to them and report only those.

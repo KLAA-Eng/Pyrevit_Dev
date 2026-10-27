@@ -10,26 +10,44 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 
-from lib.hanger_check.classify import STATUS_OK, is_problem
+from lib.hanger_check.classify import (
+    STATUS_NO_SUPPORTING,
+    STATUS_OK,
+    STATUS_REVIEW,
+    STATUS_REVIEW_DETAILS,
+    apply_review,
+    is_problem,
+    match_label,
+)
 from lib.hanger_check.sizes import (
+    KIND_COLUMN,
+    KIND_STEEL,
+    KIND_WALL,
     MISMATCH_BOTH,
     MISMATCH_SUPPORTED,
     MISMATCH_SUPPORTING,
+    MOUNT_TOP_FLANGE,
+    MOUNT_WALL,
+    MOUNT_WEB_PACKOUT,
     compare_size,
+    compare_supporting,
+    has_top_flange,
     mismatch_label,
+    mounting_label,
     parse_size,
+    support_kind,
 )
 
 
 class ParseSizeTest(unittest.TestCase):
     def test_hanger_key_formats(self):
         self.assertEqual(parse_size('6 3/4x15 GLB'),
-                         {'plies': None, 'width': 6.75, 'depth': 15.0, 'material': 'GLB'})
+                         {'plies': None, 'width': 6.75, 'depth': 15.0, 'material': 'GLB', 'series': None})
         self.assertEqual(parse_size('(3)14" LVL'),
-                         {'plies': 3, 'width': None, 'depth': 14.0, 'material': 'LVL'})
+                         {'plies': 3, 'width': None, 'depth': 14.0, 'material': 'LVL', 'series': None})
         self.assertEqual(parse_size('(2)9 1/2" LVL')['depth'], 9.5)
         self.assertEqual(parse_size('(2)2x10'),
-                         {'plies': 2, 'width': 2.0, 'depth': 10.0, 'material': None})
+                         {'plies': 2, 'width': 2.0, 'depth': 10.0, 'material': None, 'series': None})
 
     def test_revit_type_labels(self):
         self.assertEqual(parse_size('Glulam: 6 3/4" x 15"')['width'], 6.75)
@@ -66,6 +84,94 @@ class CompareSizeTest(unittest.TestCase):
     def test_undecided_without_sizes(self):
         self.assertIsNone(compare_size('SEE PLAN', 'LVL: 1 3/4" x 14"')[0])
         self.assertIsNone(compare_size('(3)14" LVL', 'LVL: Custom')[0])
+
+
+class StrictSupportedTest(unittest.TestCase):
+    def test_tji_series_must_agree(self):
+        self.assertTrue(compare_size('11 7/8" TJI 360', 'TJI 360: 11 7/8"')[0])
+        ok, reason = compare_size('11 7/8" TJI 360', 'TJI 210: 11 7/8"')
+        self.assertFalse(ok)
+        self.assertEqual(reason, 'series differs')
+
+    def test_nominal_lumber_matches_actual_size(self):
+        self.assertTrue(compare_size('2x8', 'Dimension Lumber: 1 1/2" x 7 1/4"')[0])
+        self.assertTrue(compare_size('2x10', 'Dimension Lumber: 2x10')[0])
+        self.assertFalse(compare_size('2x10', 'Dimension Lumber: 1 1/2" x 7 1/4"')[0])
+
+    def test_single_ply_and_unknown_material_are_noted(self):
+        self.assertEqual(compare_size('(3)14" LVL', 'LVL: 1 3/4" x 14"'),
+                         (True, 'member modeled as one ply of (3)'))
+        self.assertEqual(compare_size('(2)11 7/8" LVL', 'Rectangular: 3 1/2" x 11 7/8"'),
+                         (True, 'material LVL not confirmed'))
+
+
+class LooseSupportingTest(unittest.TestCase):
+    def test_alternatives(self):
+        self.assertTrue(compare_supporting('LVL OR 2x8', 'Dimension Lumber: 2x8')[0])
+        self.assertTrue(compare_supporting('(2)LVL OR PACKOUT', 'LVL: 3 1/2" x 14"')[0])
+        self.assertIsNone(compare_supporting('(2)LVL OR PACKOUT', 'Parallam PSL: 5 1/4" x 14"')[0])
+        self.assertFalse(compare_supporting('LVL', 'Parallam PSL: 5 1/4" x 14"')[0])
+
+    def test_width_not_checked(self):
+        self.assertTrue(compare_supporting('6 3/4x15 GLB', 'Glulam: 5 1/8" x 15"')[0])
+
+    def test_steel(self):
+        self.assertTrue(compare_supporting('WF BEAM', 'W Shapes: W12X26')[0])
+        self.assertFalse(compare_supporting('WF BEAM', 'LVL: 3 1/2" x 14"')[0])
+        self.assertIsNone(compare_supporting('(2)LVL OR PACKOUT', 'W Shapes: W12X26')[0])
+
+    def test_wall_supports_not_compared(self):
+        for header in ('2x PLATE', '(2)LVL LEDGE', 'CONCRETE WALL', 'HSS COLUMN'):
+            self.assertIsNone(compare_supporting(header, 'LVL: 3 1/2" x 14"')[0], header)
+
+
+class MountingTest(unittest.TestCase):
+    def test_support_kind(self):
+        self.assertEqual(support_kind('WF BEAM'), KIND_STEEL)
+        self.assertEqual(support_kind('(2)LVL OR PACKOUT', 'W-Wide Flange: W16X31'), KIND_STEEL)
+        self.assertEqual(support_kind('2x PLATE'), KIND_WALL)
+        self.assertEqual(support_kind('(2)LVL LEDGE'), KIND_WALL)
+        self.assertEqual(support_kind('CONCRETE WALL'), KIND_WALL)
+        self.assertEqual(support_kind('HSS COLUMN'), KIND_COLUMN)
+        self.assertIsNone(support_kind('(1)LVL FASCIA'))
+        self.assertIsNone(support_kind('(2)LVL OR PACKOUT', 'LVL: 3 1/2" x 14"'))
+
+    def test_top_flange(self):
+        self.assertFalse(has_top_flange('--'))
+        self.assertFalse(has_top_flange(None))
+        self.assertTrue(has_top_flange('(6)1 1/2"x0.148"'))
+
+    def test_labels(self):
+        self.assertEqual(mounting_label(KIND_STEEL, '(6)1 1/2"x0.148"'), MOUNT_TOP_FLANGE)
+        self.assertEqual(mounting_label(KIND_STEEL, '--'), MOUNT_WEB_PACKOUT)
+        self.assertEqual(mounting_label(KIND_WALL, '--'), MOUNT_WALL)
+        self.assertEqual(mounting_label(None, '--'), '')
+
+
+class ReviewStatusTest(unittest.TestCase):
+    def _result(self, status=STATUS_OK):
+        return {'status': status, 'skew_deg': None, 'notes': []}
+
+    def test_mismatch_is_review(self):
+        result = apply_review(self._result(), MISMATCH_SUPPORTED)
+        self.assertEqual(result['status'], STATUS_REVIEW)
+        self.assertTrue(is_problem(result))
+        self.assertEqual(match_label(result), 'Yes')
+
+    def test_wall_is_review_details_not_problem(self):
+        result = apply_review(self._result(STATUS_NO_SUPPORTING), '', wall_or_column=True)
+        self.assertEqual(result['status'], STATUS_REVIEW_DETAILS)
+        self.assertFalse(is_problem(result))
+        self.assertEqual(match_label(result), 'Yes')
+
+    def test_wall_mismatch_is_review(self):
+        result = apply_review(self._result(), MISMATCH_SUPPORTED, wall_or_column=True)
+        self.assertEqual(result['status'], STATUS_REVIEW)
+
+    def test_location_problem_wins(self):
+        result = apply_review(self._result(STATUS_NO_SUPPORTING), MISMATCH_SUPPORTED)
+        self.assertEqual(result['status'], STATUS_NO_SUPPORTING)
+        self.assertEqual(apply_review(self._result(), '')['status'], STATUS_OK)
 
 
 class MismatchLabelTest(unittest.TestCase):

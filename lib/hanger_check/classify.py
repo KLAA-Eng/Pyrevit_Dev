@@ -40,6 +40,8 @@ STATUS_ORIENTATION = 'Hanger not aligned with member'
 STATUS_NO_SUPPORTED = 'No supported member'
 STATUS_NO_SUPPORTING = 'No supporting member'
 STATUS_SHARED = 'Shared member end'
+STATUS_REVIEW = 'Review'
+STATUS_REVIEW_DETAILS = 'Review details'
 
 ROLE_SUPPORTED = 'supported'
 ROLE_SUPPORTING = 'supporting'
@@ -177,14 +179,40 @@ def classify_hanger(point, members, text_dir=None):
     return result
 
 
+def apply_review(result, mismatch, wall_or_column=False):
+    """Set the reported status after the size check.
+
+    The location status is kept in 'location_status'. A location problem wins,
+    then a size mismatch ('Review'), then a wall or column support ('Review
+    details': confirm the ledger, plate or connection detail). A wall or column
+    support is not modeled framing, so a missing supporting member is expected.
+    """
+    location = result['status']
+    if wall_or_column and location == STATUS_NO_SUPPORTING:
+        location = STATUS_OK
+        result['notes'].append('Supported by a wall or column; no framing member expected')
+    result['location_status'] = location
+    result['mismatch'] = mismatch
+    if location != STATUS_OK:
+        result['status'] = location
+    elif mismatch:
+        result['status'] = STATUS_REVIEW
+    elif wall_or_column:
+        result['status'] = STATUS_REVIEW_DETAILS
+    else:
+        result['status'] = STATUS_OK
+    return result
+
+
 def is_problem(result):
     """A hanger needs attention: location status or a Header/Joist size mismatch."""
-    return result['status'] != STATUS_OK or bool(result.get('mismatch'))
+    return (result['status'] not in (STATUS_OK, STATUS_REVIEW_DETAILS)
+            or bool(result.get('mismatch')))
 
 
 def match_label(result):
     """Short Yes/No answer for whether the hanger and its framing agree."""
-    if result['status'] not in (STATUS_OK, STATUS_SHARED):
+    if result.get('location_status', result['status']) not in (STATUS_OK, STATUS_SHARED):
         return 'No'
     if result['skew_deg'] is not None and result['skew_deg'] >= SKEW_NOTE_DEG:
         return 'Yes (skewed %.1f deg)' % result['skew_deg']
