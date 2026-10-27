@@ -11,7 +11,7 @@ tooltip:
     _____________________________________________________________________
     How-to:
     - Select nothing to report every hanger in the active view, or select hangers to zoom to them and report only those.
-    - Review colors: supported blue, supporting yellow, both green, problem hanger halftone red.
+    - Review colors: supported blue, supporting orange, both purple; hexagon outlined red for problems, teal for review details.
     - Re-run after fixing framing to clear resolved highlights. Hanger Highlights turns the colors on or off.
     _____________________________________________________________________
     Last update:

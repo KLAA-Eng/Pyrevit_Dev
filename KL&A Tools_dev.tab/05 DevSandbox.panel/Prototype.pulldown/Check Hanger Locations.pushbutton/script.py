@@ -47,9 +47,9 @@ def _print_report(output, doc, view, source, results, elements, colored):
                     '**View:** {}'.format(len(results), source, len(problems), len(details),
                                           view.Name))
     if colored:
-        output.print_md('Colors: supported member = blue, supporting member = yellow, '
-                        'both = green, hanger with a problem = halftone red. Use '
-                        'Hanger Highlights to turn them off.')
+        output.print_md('Colors: supported member = blue, supporting member = orange, '
+                        'both = purple. Hanger hexagon outline: red = problem, teal = '
+                        'review details. Use Hanger Highlights to turn them off.')
     else:
         output.print_md('Graphics overrides are not allowed in this view; nothing was colored.')
     output.print_md('Click an Id to select it (press Esc in Revit to clear the selection). '
@@ -89,7 +89,7 @@ def main():
     hangers = in_view + [h for h in picked if id_value(h.Id) not in view_ids]
 
     elements = {}
-    results = check_hangers(doc, hangers, elements)
+    results = check_hangers(doc, view, hangers, elements)
     colored = view.AreGraphicsOverridesAllowed()
     if colored:
         refresh_highlights(doc, view, results, elements, revit.Transaction)

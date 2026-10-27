@@ -37,7 +37,11 @@ in the active view, and reports hangers that do not match their framing.
 - Orientation: the hanger text direction is the family's local X axis in plan.
 - Supported member: structural framing that runs along the top or base of the
   hanger text (within 30 deg of the text) and has an end inside the hanger box:
-  2'-0" either way along the text, 1'-0" across it, 2'-0" vertically. The end
+  2'-0" either way along the text, 1'-0" across it. In plan views the hanger
+  height is ignored and only framing the view shows is considered, matching
+  the Dynamo graph's projection onto the level, so hangers placed at a level
+  or offset different from the framing still find it; other views also
+  require the end within 2'-0" vertically of the hanger. The end
   closest to the hanger wins; a second end within 1" of that distance is noted
   as ambiguous. A member ending at the hanger but running more than 30 deg off
   the text gives `Hanger not aligned with member`.
@@ -86,18 +90,25 @@ in the active view, and reports hangers that do not match their framing.
 ## Output and model effects
 
 One transaction first resets every override in the active view that uses a
-hanger check color, then sets new overrides, so hangers fixed since the last
-run lose their highlight:
+hanger check color (current or earlier palette) and deletes the check's
+hexagon outlines, then highlights again, so hangers fixed since the last run
+lose their highlight:
 
-- Members (projection and cut line color plus solid surface fill): supported
-  = blue, supporting = yellow, supported by one hanger and supporting another
-  = green.
-- Problem hangers: halftone with red projection lines, no fill, so hanger text
-  stays readable.
+- Members (heavier projection line, cut line color, and solid surface fill):
+  supported = blue, supporting = orange, supported by one hanger and
+  supporting another = purple.
+- Hangers: the hexagon found in the hanger's plan linework (a closed loop of
+  six roughly equal sides) is traced with view-specific detail lines in a
+  heavy line style, red `KLA Hanger Check - Problem` for problems and teal
+  `KLA Hanger Check - Review details` for wall/column supports. The hanger
+  itself is not overridden, so its text keeps its own color. A hanger without
+  a recognizable hexagon falls back to halftone with colored projection lines.
 
-Existing overrides on colored elements are replaced. No other model data
-changes. Views that do not allow graphic overrides are reported and left
-uncolored. `Hanger Highlights` turns these colors off or back on.
+Existing overrides on colored elements are replaced. The two line styles are
+created in the project on first use; outline detail lines exist only in the
+checked view and are removed by re-running or by `Hanger Highlights`. No
+other model data changes. Views that do not allow graphic overrides are
+reported and left uncolored.
 
 The pyRevit output lists each hanger, problems first, then `Review details`,
 with columns Hanger,
@@ -123,13 +134,16 @@ a hanger and re-run to zoom to it.
   `tests/hanger_check_test.py`.
 - `lib/hanger_check/sizes.py`: host-independent Header/Joist size parsing and
   mismatch labels, covered by `tests/hanger_sizes_test.py`.
+- `lib/hanger_check/outline.py`: host-independent hexagon detection, covered
+  by `tests/hanger_outline_test.py`.
 
 ## Validation boundary
 
 Live Revit 2024+ acceptance must confirm that the hanger text runs along the
 family's local X axis, the hanger box size on representative joist-to-header,
-skewed, and header-to-girder framing, the halftone override, zoom, and that
-re-running clears highlights for fixed hangers.
+skewed, and header-to-girder framing, plan-only matching on projects with
+level offsets, that the hexagon is found and traced in plan, the fallback
+override, zoom, and that re-running clears highlights for fixed hangers.
 
 ## Future development
 

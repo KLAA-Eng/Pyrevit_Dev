@@ -2,8 +2,13 @@
 
 Elements are tracked in an {int id: element} dict so reports and overrides
 reuse the real ElementIds. Highlights are always rebuilt for every hanger
-visible in the view: existing check colors are cleared first, so hangers that
-were fixed since the last run lose their highlight.
+visible in the view: existing check colors and hexagon outlines are cleared
+first, so hangers that were fixed since the last run lose their highlight.
+
+In plan views framing is taken from what the view shows and compared in plan,
+ignoring the hanger's height (the Dynamo graph projected onto the level).
+Hangers are highlighted by tracing their hexagon with heavy colored detail
+lines, so the hanger text keeps its own color.
 """
 
 from pyrevit import DB
@@ -14,6 +19,7 @@ from .classify import (
     ROLE_SUPPORTED,
     ROLE_SUPPORTING,
     SEARCH_RADIUS_FT,
+    STATUS_REVIEW_DETAILS,
     VERTICAL_REACH_FT,
     apply_review,
     classify_hanger,
@@ -22,6 +28,7 @@ from .classify import (
     matches_family,
     member_roles,
 )
+from .outline import find_hexagons, loop_segments
 from .sizes import (
     DETAIL_KINDS,
     compare_size,
@@ -33,12 +40,20 @@ from .sizes import (
 
 
 PROBLEM_KEY = 'problem'
+DETAILS_KEY = 'details'
 COLORS = {
-    ROLE_SUPPORTED: (0, 67, 255),
-    ROLE_SUPPORTING: (255, 255, 0),
-    ROLE_BOTH: (0, 176, 80),
-    PROBLEM_KEY: (206, 1, 1),
+    ROLE_SUPPORTED: (0, 102, 255),
+    ROLE_SUPPORTING: (255, 128, 0),
+    ROLE_BOTH: (153, 51, 255),
+    PROBLEM_KEY: (230, 0, 0),
+    DETAILS_KEY: (0, 160, 160),
 }
+LEGACY_COLORS = ((0, 67, 255), (255, 255, 0), (0, 176, 80), (206, 1, 1))
+MEMBER_LINE_WEIGHT = 6
+HEXAGON_LINE_WEIGHT = 10
+LINE_STYLE_PREFIX = 'KLA Hanger Check - '
+LINE_STYLES = {PROBLEM_KEY: 'Problem', DETAILS_KEY: 'Review details'}
+PLAN_Z_REACH_FT = 10000.0
 ZOOM_MARGIN_FT = 4.0
 HANGER_FIELDS = ('Designation', 'Header', 'Joist')
 TOP_FLANGE_FIELD = 'Fastener-TF'
@@ -130,12 +145,19 @@ def text_direction(hanger):
     return (basis.X, basis.Y)
 
 
-def framing_near(doc, point, elements):
-    low = DB.XYZ(point.X - SEARCH_RADIUS_FT, point.Y - SEARCH_RADIUS_FT,
-                 point.Z - VERTICAL_REACH_FT)
-    high = DB.XYZ(point.X + SEARCH_RADIUS_FT, point.Y + SEARCH_RADIUS_FT,
-                  point.Z + VERTICAL_REACH_FT)
-    collector = (DB.FilteredElementCollector(doc)
+def is_plan(view):
+    return isinstance(view, DB.ViewPlan)
+
+
+def framing_near(doc, view, point, elements):
+    """Framing near the hanger: in plan views, at any height the view shows."""
+    plan = is_plan(view)
+    reach = PLAN_Z_REACH_FT if plan else VERTICAL_REACH_FT
+    low = DB.XYZ(point.X - SEARCH_RADIUS_FT, point.Y - SEARCH_RADIUS_FT, point.Z - reach)
+    high = DB.XYZ(point.X + SEARCH_RADIUS_FT, point.Y + SEARCH_RADIUS_FT, point.Z + reach)
+    collector = (DB.FilteredElementCollector(doc, view.Id) if plan
+                 else DB.FilteredElementCollector(doc))
+    collector = (collector
                  .OfCategory(DB.BuiltInCategory.OST_StructuralFraming)
                  .WhereElementIsNotElementType()
                  .WherePasses(DB.BoundingBoxIntersectsFilter(DB.Outline(low, high))))
@@ -150,14 +172,15 @@ def framing_near(doc, point, elements):
     return members
 
 
-def check_hangers(doc, hangers, elements):
+def check_hangers(doc, view, hangers, elements):
     """Classify each hanger. Returns {hanger id: result}; fills elements."""
     results = {}
     for hanger in hangers:
         point = hanger.Location.Point
         elements[id_value(hanger.Id)] = hanger
+        xyz = (point.X, point.Y, None) if is_plan(view) else _xyz(point)
         results[id_value(hanger.Id)] = classify_hanger(
-            _xyz(point), framing_near(doc, point, elements), text_direction(hanger))
+            xyz, framing_near(doc, view, point, elements), text_direction(hanger))
     flag_shared_ends(results)
     for hanger_id, result in results.items():
         _add_size_check(doc, result, hanger_values(doc, elements[hanger_id]), elements)
@@ -198,6 +221,7 @@ def _member_override(rgb, solid_fill_id):
     color = DB.Color(*rgb)
     settings = DB.OverrideGraphicSettings()
     settings.SetProjectionLineColor(color)
+    settings.SetProjectionLineWeight(MEMBER_LINE_WEIGHT)
     settings.SetCutLineColor(color)
     if solid_fill_id is not None:
         settings.SetSurfaceForegroundPatternId(solid_fill_id)
@@ -205,10 +229,10 @@ def _member_override(rgb, solid_fill_id):
     return settings
 
 
-def _hanger_override():
-    """Halftoned red lines only, so hanger text stays readable."""
+def _hanger_override(key):
+    """Fallback when no hexagon is found: halftoned colored lines only."""
     settings = DB.OverrideGraphicSettings()
-    settings.SetProjectionLineColor(DB.Color(*COLORS[PROBLEM_KEY]))
+    settings.SetProjectionLineColor(DB.Color(*COLORS[key]))
     settings.SetHalftone(True)
     return settings
 
@@ -216,7 +240,8 @@ def _hanger_override():
 def _is_check_color(settings):
     try:
         color = settings.ProjectionLineColor
-        return color.IsValid and (color.Red, color.Green, color.Blue) in COLORS.values()
+        rgb = (color.Red, color.Green, color.Blue)
+        return color.IsValid and (rgb in COLORS.values() or rgb in LEGACY_COLORS)
     except Exception:
         return False
 
@@ -226,35 +251,128 @@ def _highlighted_ids(doc, view):
             if _is_check_color(view.GetElementOverrides(e.Id))]
 
 
+def _outline_ids(doc, view):
+    """Detail lines drawn by the check (line styles named LINE_STYLE_PREFIX...)."""
+    ids = []
+    for curve in DB.FilteredElementCollector(doc, view.Id).OfClass(DB.CurveElement):
+        style = curve.LineStyle
+        if style is not None and style.Name.startswith(LINE_STYLE_PREFIX):
+            ids.append(curve.Id)
+    return ids
+
+
 def has_highlights(doc, view):
-    return bool(_highlighted_ids(doc, view))
+    return bool(_highlighted_ids(doc, view) or _outline_ids(doc, view))
 
 
-def _reset(view, element_ids):
+def _reset(doc, view, element_ids, outline_ids):
     for element_id in element_ids:
         view.SetElementOverrides(element_id, DB.OverrideGraphicSettings())
+    for outline_id in outline_ids:
+        doc.Delete(outline_id)
 
 
 def clear_highlights(doc, view, transaction):
-    """Reset overrides that use a hanger check color. Returns the count cleared."""
-    highlighted = _highlighted_ids(doc, view)
+    """Reset check colors and delete hexagon outlines. Returns the count cleared."""
+    highlighted, outlines = _highlighted_ids(doc, view), _outline_ids(doc, view)
     with transaction('Clear hanger check highlights', doc=doc):
-        _reset(view, highlighted)
-    return len(highlighted)
+        _reset(doc, view, highlighted, outlines)
+    return len(highlighted) + len(outlines)
+
+
+def _line_style(doc, key):
+    """Projection GraphicsStyle of the check's line style, created on first use."""
+    categories = doc.Settings.Categories
+    lines = categories.get_Item(DB.BuiltInCategory.OST_Lines)
+    name = LINE_STYLE_PREFIX + LINE_STYLES[key]
+    if lines.SubCategories.Contains(name):
+        sub = lines.SubCategories.get_Item(name)
+    else:
+        sub = categories.NewSubcategory(lines, name)
+    sub.LineColor = DB.Color(*COLORS[key])
+    sub.SetLineWeight(HEXAGON_LINE_WEIGHT, DB.GraphicsStyleType.Projection)
+    return sub.GetGraphicsStyle(DB.GraphicsStyleType.Projection)
+
+
+def _plan_segments(element, view):
+    """Plan line pieces of the element's geometry as seen in the view."""
+    options = DB.Options()
+    options.View = view
+    segments = []
+
+    def add(curve):
+        if isinstance(curve, DB.Line):
+            p, q = curve.GetEndPoint(0), curve.GetEndPoint(1)
+            segments.append(((p.X, p.Y), (q.X, q.Y)))
+
+    def walk(geometry):
+        for item in geometry:
+            if isinstance(item, DB.GeometryInstance):
+                walk(item.GetInstanceGeometry())
+            elif isinstance(item, DB.Line):
+                add(item)
+            elif isinstance(item, DB.PolyLine):
+                points = list(item.GetCoordinates())
+                for p, q in zip(points, points[1:]):
+                    segments.append(((p.X, p.Y), (q.X, q.Y)))
+            elif isinstance(item, DB.Solid):
+                for edge in item.Edges:
+                    add(edge.AsCurve())
+
+    geometry = element.get_Geometry(options)
+    if geometry is not None:
+        walk(geometry)
+    return segments
+
+
+def _plan_z(view):
+    level = view.GenLevel if is_plan(view) else None
+    return level.Elevation if level is not None else view.Origin.Z
+
+
+def _trace_hexagon(doc, view, hanger, style):
+    """Draw detail lines over the hanger's hexagon. False when none is found."""
+    hexagons = find_hexagons(_plan_segments(hanger, view))
+    if not hexagons:
+        return False
+    z = _plan_z(view)
+    try:
+        for (x1, y1), (x2, y2) in loop_segments(hexagons[0]):
+            curve = doc.Create.NewDetailCurve(
+                view, DB.Line.CreateBound(DB.XYZ(x1, y1, z), DB.XYZ(x2, y2, z)))
+            curve.LineStyle = style
+    except Exception:
+        return False
+    return True
+
+
+def _hanger_key(result):
+    if is_problem(result):
+        return PROBLEM_KEY
+    if result['status'] == STATUS_REVIEW_DETAILS:
+        return DETAILS_KEY
+    return None
 
 
 def refresh_highlights(doc, view, results, elements, transaction):
-    """Clear old check colors, then color members by role and problem hangers."""
+    """Clear old check colors, then color members by role and outline hangers to review."""
     solid_fill_id = _solid_fill_id(doc)
-    highlighted = _highlighted_ids(doc, view)
+    highlighted, outlines = _highlighted_ids(doc, view), _outline_ids(doc, view)
     with transaction('Refresh hanger check highlights', doc=doc):
-        _reset(view, highlighted)
+        _reset(doc, view, highlighted, outlines)
         for member_id, role in member_roles(results).items():
             view.SetElementOverrides(elements[member_id].Id,
                                      _member_override(COLORS[role], solid_fill_id))
+        styles = {}
         for hanger_id, result in results.items():
-            if is_problem(result):
-                view.SetElementOverrides(elements[hanger_id].Id, _hanger_override())
+            key = _hanger_key(result)
+            if key is None:
+                continue
+            if key not in styles:
+                styles[key] = _line_style(doc, key)
+            hanger = elements[hanger_id]
+            if not _trace_hexagon(doc, view, hanger, styles[key]):
+                view.SetElementOverrides(hanger.Id, _hanger_override(key))
 
 
 def zoom_to(uidoc, view, hangers):

@@ -16,6 +16,9 @@ The hanger text direction (the family's local X axis in plan) decides roles:
     SUPPORT_REACH_FT of the supported member's end. Members that run through
     are preferred over members that only end there, then the closest wins.
   * Without a text direction both checks fall back to the member geometry.
+  * A hanger point with z None is compared in plan only (as the Dynamo graph
+    did by projecting onto the level); the supporting member is then still
+    checked against the height of the supported member's end.
 """
 
 from __future__ import division
@@ -88,7 +91,7 @@ def _end_offset(point, end_point, text_dir):
     """(inside hanger box, plan distance) for one member end."""
     dx, dy = end_point[0] - point[0], end_point[1] - point[1]
     plan = math.hypot(dx, dy)
-    if abs(end_point[2] - point[2]) > VERTICAL_REACH_FT:
+    if point[2] is not None and abs(end_point[2] - point[2]) > VERTICAL_REACH_FT:
         return False, plan
     if text_dir is None:
         return plan <= ACROSS_REACH_FT, plan
@@ -157,7 +160,8 @@ def classify_hanger(point, members, text_dir=None):
         if angle is not None and angle < SUPPORTING_MIN_ANGLE_DEG:
             continue
         t, z, plan = closest_on_segment(anchor, member['start'], member['end'])
-        if plan > SUPPORT_REACH_FT or abs(z - anchor[2]) > VERTICAL_REACH_FT:
+        if plan > SUPPORT_REACH_FT or (anchor[2] is not None
+                                       and abs(z - anchor[2]) > VERTICAL_REACH_FT):
             continue
         ends_here = min(math.hypot(anchor[0] - p[0], anchor[1] - p[1])
                         for p in (member['start'], member['end'])) <= SUPPORT_REACH_FT

@@ -37,7 +37,7 @@ def main():
         forms.alert('No hangers are visible in "{}".'.format(view.Name), title=COMMAND_TITLE)
         return
     elements = {}
-    results = check_hangers(doc, hangers, elements)
+    results = check_hangers(doc, view, hangers, elements)
     refresh_highlights(doc, view, results, elements, revit.Transaction)
     problems = sum(1 for r in results.values() if is_problem(r))
     forms.alert('Hanger highlights on: {} hanger(s) checked, {} with a problem. Run Check '
