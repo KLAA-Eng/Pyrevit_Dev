@@ -123,7 +123,7 @@ class Gallery(forms.WPFWindow):
                 Gallery().ShowDialog()
                 result = 'Gallery preview closed.'
             elif row.Origin == 'Repository custom':
-                result = launch_custom(EXTENSION_ROOT, row.Entry, state)
+                result = launch_custom(EXTENSION_ROOT, dict(row.Entry, tool_version=__version__), state)
             else:
                 result = launch_builtin(row.Entry, state)
             self.LastResult.Text = result or 'Preview closed. No tool command was run.'

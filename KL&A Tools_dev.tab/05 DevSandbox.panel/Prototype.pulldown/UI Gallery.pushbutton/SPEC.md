@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | Unreleased |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/UI Gallery.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/`; `lib/GUI/_templates/`; `lib/GUI/Resources/KLCodeFoundation.xaml`; `lib/GUI/Resources/KLCodeFoundationTokens.xaml`; `lib/GUI/window_chrome.py`; `lib/GUI/window_metadata.py` |
 
 ## Tool version history
 
@@ -19,7 +19,7 @@
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
 | v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
-| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, tool callers, interactive sample states, faithful Recall composition, and deferred compiled status. | Gallery source/tests and the 2026-10-27 verification record; pending next main delivery. |
+| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, and the shared main-template reference. | Gallery source/tests and the 2026-10-27 verification records; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -67,6 +67,16 @@ Supported custom states are Normal, Empty, Error, Disabled, and Long content.
 The static fixture and Gallery shell offer Normal only. Controls support
 filtering/checking, sample rename validation/results, duplicate options, numeric
 validation, and local outcomes as applicable. No production command is invoked.
+
+The **KLCode main template** preview uses the opt-in custom-window foundation:
+equal 24-unit header/footer, Segoe UI, fixed buttons, shared spacing and the
+existing semantic Search icon. It receives the Gallery's actual tool version
+as caller metadata; footer navigation remains simulated. Long content shows
+title ellipsis without a tooltip. Empty, Error and Disabled states are fictional.
+Other production forms and the Gallery catalog shell keep their existing
+layouts pending review of this first reference. See the
+[template guide](../../../../lib/GUI/_templates/KLCodeMainTemplate.md) and
+[consolidation plan](../../../../docs/plans/custom-window-consolidation.md).
 
 Recall preserves the actual recall shell and hosts the actual clipboard
 UserControl inside `content_host`; its search, selection, sample load, and
@@ -122,6 +132,8 @@ build the correct runtime assemblies, and validate in the matching Revit hosts.
 - `lib/ui_gallery/windows.py`: explicitly allowlisted custom-XAML preview handlers.
 - `lib/ui_gallery/builtin.py`: real built-in/native dialog examples with discarded results.
 - `scripts/validate_ui_gallery_wpf.ps1` and `.py`: isolated IronPython/WPF validation.
+- `scripts/validate_ui_foundation_wpf.py`: reference-shell geometry, bindings,
+  simulated actions/navigation, routed Close, and state-render checks.
 
 ## Model and external effects
 

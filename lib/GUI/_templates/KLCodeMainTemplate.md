@@ -1,113 +1,92 @@
-# KLCode Main Template
+﻿# KLCode Main Template
 
-`KLCodeMainTemplate.xaml` is the visual authority for KL&A custom-window
-styling. It is currently displayed through the DevSandbox UI Gallery with
-fictional drawing types; production commands retain their own workflow layouts
-while consuming the same shared chrome and control styles.
+This is the first opt-in reference for the approved custom-window foundation.
+Open **KLCode main template** in UI Gallery to review it with fictional data.
+The [consolidation plan](../../../docs/plans/custom-window-consolidation.md)
+owns delivery status; [DESIGNSYSTEM.md](../../../docs/DESIGNSYSTEM.md#custom-window-foundation)
+owns the shared design rules. Other production windows still use their existing
+resources and layouts until the owner reviews this reference.
 
-The template has no code-behind. The UI Gallery supplies the sample data,
-sets preview text, loads the search icon, and provides the event handlers.
-`GUI.forms.my_WPF` loads the shared WPF resource dictionary before loading this
-XAML.
+## Responsibilities
 
-## Window Frame
-
-| Setting | Current value |
+| Source | Owns |
 | --- | --- |
-| Initial size | `432 x 576` |
-| Minimum size | `432 x 576` |
-| Maximum height | `576` |
-| Maximum width | Not set |
-| Startup position | Center screen |
-| Chrome | Borderless WPF window with transparency enabled |
-| Taskbar | Shown |
-| Main rows | 24 px header, 32 px filter, flexible body, 24 px footer |
+| `KLCodeMainTemplate.xaml` | Workflow body: search, sample list, selection controls and centered action arrangement |
+| `../Resources/KLCodeFoundation.xaml` | Reusable `KlaWindowShell`, header/footer composition, and explicitly named control styles |
+| `../Resources/KLCodeFoundationTokens.xaml` | Typed WPF spacing, typography, sizes, readable semantic brushes, and `KlaIconSearch` |
+| `../window_metadata.py` | Caller title/pure version and the two shared footer destinations; host-independent |
+| `../window_chrome.py` | Opt-in Python loading and shared close/drag/navigation events; does not show the window |
 
-The body begins at the top of its flexible row and uses a `12,6,12,6` margin.
+The foundation reuses the legacy dictionary's palette, vector wordmark and
+scrollbars. It does not edit that dictionary or change existing consumers.
+`Tag` on `window_shell` is reserved for `WindowMetadata`; the body retains its
+own `DataContext`. Do not copy header/footer markup into a new form.
 
-## Header
+## Reference geometry
 
-The header is `24` px high with a `100`, `*`, `66` column layout.
+Values are WPF device-independent units, not physical screen pixels.
 
-| Part | Current design |
+| Part | Reference |
 | --- | --- |
-| Wordmark | Embedded `/KLCode` outlined geometry in a `70 x 12` Viewbox, left aligned with `Margin="8,0,0,0"`. It has no font or external image dependency. |
-| Title | `main_title`, 14 px KLWhite, centered across the full header, 180 px maximum width, character ellipsis. The 86 px edge columns reserve clear space for the logo and Close button. |
-| Close button | `60 x 18`, Arial 10 px, 6 px radius, centered in the right column. |
-| Dragging | The header calls `header_drag`. |
+| Window | 432 wide x 576 high; fixed by the reference style, centered on screen |
+| Header and footer | 24 high each |
+| Header | 86 / flexible / 86 columns; existing 70 x 12 outlined wordmark, centered title, Close button |
+| Title | Segoe UI 14; uses the available center lane, with ellipsis and no tooltip |
+| Close | 60 x 18, Segoe UI 10; deliberate chrome exception |
+| Body | 16 padding on all sides; list uses remaining height rather than a fixed height |
+| Search | 32-high input; existing 16-unit search icon with an 8-unit gap |
+| Typography | Segoe UI 12 body/controls; 14 main action |
+| Section / label / related gaps | 16 / 4 / 8 |
+| Select All / Select None | 104 x 28 each, 8 apart, centered |
+| Main action | 216 x 32, centered, 8 below the pair, 16 before footer |
+| Footer | Prototype left, caller tool version center, Outreach right; functional shared links |
 
-## Filter and Selection List
+The pair still matches the main action width: 104 + 8 + 104 = 216. Main and
+secondary actions retain their arrangement. Long item names wrap and scroll;
+long titles trim instead of increasing the header height. No full-title hover
+text is added. Buttons use fixed role widths; future wider variants must be
+shared named styles rather than unexplained per-window values.
 
-The filter row has an 8 px left inset and 12 px right inset. Its columns are a
-24 px icon zone, a 6 px gap, and the filter field.
+## Create a window
 
-| Part | Current design |
-| --- | --- |
-| Search icon | `filter_icon`, the native `lib/_icons/search_16px_light.png` bitmap, displayed at `16 x 16` without scaling. |
-| Search field | `textbox_filter`, 14 px KLWhite text on a transparent, borderless TextBox. The outer `template_filter_border` supplies a continuous 1 px KLGreen outline, KLCharcoal fill, and 6 px radius. |
-| Prompt | `text_label`, 14 px KLWhite label above the list. |
-| List | `main_ListBox`, 360 px high, KLCharcoal fill, vertical scrolling only, and a KLGreen-dark outline. |
-| List item | A 16 px checkbox with a 9 px KLWhite checkmark and 12 px text. Unchecked boxes have a KLCharcoal fill and 1 px KLGreen outline. |
-| Scrollbar | KLCharcoal track with a KLGreen thumb, using 10 px track and 8 px thumb radii. |
+Use a normal WPF `Window` or a compatible host window. Supply a body XAML
+following this template, keeping `window_shell` as its named ContentControl.
+The loader merges the foundation before resolving XAML static resources.
 
-Typing in the search field filters the gallery's fictional items by name.
+```python
+from System.Windows import Window
+from GUI.window_chrome import load_window
 
-## Actions
+class ExampleWindow(Window):
+    def __init__(self, body_path, title, version):
+        load_window(self, body_path, title, version)
+        # Supply workflow data and body event handlers here.
 
-The shared `KLCodeActionButton` style uses Arial, no border, a KLGreen-dark
-fill, KLWhite text, and a KLGreen-secondary hover fill.
+window = ExampleWindow(body_path, __title__, __version__)
+window.ShowDialog()  # The caller chooses modal/modeless behavior.
+```
 
-| Button | Size and placement | Gallery behavior |
-| --- | --- | --- |
-| Select All | `104 x 26`, 12 px text | Checks every sample item. |
-| Select None | `104 x 26`, 12 px text | Clears every sample item. |
-| Close preview | `216 x 32`, 14 px text | Closes the gallery preview. |
+Pass a pure tool version such as `v1.3`. A missing/blank version leaves the
+footer center empty. The loader does not infer an extension version, use a
+placeholder, access a document, or show the window. The body supplies only
+its own workflow event handlers. Existing command-specific close behavior
+must be reviewed before migration; this reference's close simply closes.
 
-The two secondary buttons have an 8 px gap and form a centered 216 px-wide
-group. All three action buttons use an 8 px radius. The primary action has an
-8 px top margin and a 16 px bottom margin before the footer.
+For a Gallery preview, supply a `navigate(uri)` callback to simulate links.
+Ordinary callers omit it to use the existing OS navigation behavior. Gallery
+passes its own `__version__` as caller metadata; none is hardcoded in XAML.
 
-## Footer
+## Verification
 
-The footer is `24` px high with `100`, `*`, `100` columns.
+Run the existing isolated probe from the repository root:
 
-| Part | Current design |
-| --- | --- |
-| Left link | `Prototype`, medium weight and KLGreen-secondary, with a 10 px left inset. |
-| Center text | `footer_version`, centered gray text with character ellipsis and 4 px horizontal margins. |
-| Right link | `Outreach`, medium weight and KLGreen-secondary, with a 10 px right inset. |
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate_ui_gallery_wpf.ps1
+```
 
-Both links use the shared hyperlink navigation handler and their configured
-Microsoft Forms destinations.
-
-## Color Reference
-
-| Token or value | Current use |
-| --- | --- |
-| `#1A252B` KLCharcoal | Window, header, filter fill, list, scrollbar track, and footer. |
-| `text_white` `#E5E4E2` | Header title, selection prompt, search text, list text, and checkbox checkmark. |
-| `text_green` `#33714F` | Wordmark slash, filter outline, checkbox outline, and scrollbar thumb. |
-| `border_green_dark` and `button_bg_normal` `#286048` | List outline, separator, default action fills, and checked checkbox fill. |
-| `button_bg_hover` `#407058` | Action hover state and footer links. |
-| `text_gray` `Gray` | Footer center text. |
-
-## UI Gallery Values
-
-The XAML supplies generic defaults. In the UI Gallery preview, the adapter
-replaces them with these values and fictional data:
-
-| Element | Gallery value or behavior |
-| --- | --- |
-| `main_title` | `Main template — gallery preview` |
-| `text_label` | `Select fictional drawing types:` |
-| `button_main` | `Close preview` |
-| `footer_version` | `UI Gallery — fictional data only` |
-| `main_ListBox` | Fictional drawing-type rows, with the first item's checkbox checked initially. |
-
-## Editing Scope
-
-Use this XAML for window-specific layout, controls, and preview-facing labels.
-Shared color tokens, the outlined wordmark, and baseline WPF styles live in
-`lib/GUI/Resources/WPF_styles.xaml`. The template consumes the shared close,
-filter, action-button, checkbox, list, and scrollbar styles so future changes
-are applied consistently to KL&A custom windows.
+This process-only execution-policy override does not change machine settings.
+An optional `-OutputDirectory` saves the Gallery renders and five template
+state renders. Actual WPF bindings/geometry and routed click/navigation events
+are checked without showing a window or using a Revit document. The pyRevit
+loader/alert boundary is a stand-in; keyboard/focus, dragging, native ownership,
+external navigation and DPI acceptance still require live-host checks.

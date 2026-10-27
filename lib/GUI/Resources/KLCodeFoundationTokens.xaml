@@ -1,0 +1,41 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!-- Shared WPF values; no Python, Revit, or compiled-add-in dependency. -->
+    <sys:Double x:Key="KlaSpace4">4</sys:Double>
+    <sys:Double x:Key="KlaSpace8">8</sys:Double>
+    <sys:Double x:Key="KlaSpace12">12</sys:Double>
+    <sys:Double x:Key="KlaSpace16">16</sys:Double>
+    <sys:Double x:Key="KlaSpace24">24</sys:Double>
+    <!-- GridLength is required for row/column definitions; WPF does not coerce Double resources. -->
+    <GridLength x:Key="KlaChromeRow">24</GridLength>
+    <GridLength x:Key="KlaControlRow">32</GridLength>
+    <GridLength x:Key="KlaCompactRow">28</GridLength>
+    <GridLength x:Key="KlaGridSpace4">4</GridLength>
+    <GridLength x:Key="KlaGridSpace8">8</GridLength>
+    <GridLength x:Key="KlaGridSpace16">16</GridLength>
+    <Thickness x:Key="KlaBodyInset">16</Thickness>
+    <Thickness x:Key="KlaLabelPadding">0</Thickness>
+    <Thickness x:Key="KlaPairGap">0,0,8,0</Thickness>
+    <Thickness x:Key="KlaInputPadding">8,0</Thickness>
+    <Thickness x:Key="KlaListPadding">4</Thickness>
+    <Thickness x:Key="KlaItemPadding">4</Thickness>
+    <Thickness x:Key="KlaBrandInset">8,0,0,0</Thickness>
+    <Thickness x:Key="KlaFooterInset">12,0</Thickness>
+    <sys:Double x:Key="KlaChromeHeight">24</sys:Double>
+    <sys:Double x:Key="KlaControlHeight">32</sys:Double>
+    <sys:Double x:Key="KlaCompactHeight">28</sys:Double>
+    <sys:Double x:Key="KlaButtonWidth">104</sys:Double>
+    <sys:Double x:Key="KlaMainButtonWidth">216</sys:Double>
+    <sys:Double x:Key="KlaIconSize">16</sys:Double>
+    <sys:Double x:Key="KlaBodyFontSize">12</sys:Double>
+    <sys:Double x:Key="KlaTitleFontSize">14</sys:Double>
+    <FontFamily x:Key="KlaBodyFont">Segoe UI</FontFamily>
+    <SolidColorBrush x:Key="KlaReadableMutedBrush" Color="#B5C2BD"/>
+    <SolidColorBrush x:Key="KlaLinkBrush" Color="#9CC5AC"/>
+    <SolidColorBrush x:Key="KlaFocusBrush" Color="#E5E4E2"/>
+    <SolidColorBrush x:Key="KlaPressedBrush" Color="#204D3A"/>
+    <SolidColorBrush x:Key="KlaDisabledFillBrush" Color="#303C40"/>
+    <SolidColorBrush x:Key="KlaDisabledTextBrush" Color="#A6B0AD"/>
+    <BitmapImage x:Key="KlaIconSearch" UriSource="../../_icons/search_16px_light.png"/>
+</ResourceDictionary>

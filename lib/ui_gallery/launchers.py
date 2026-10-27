@@ -118,7 +118,7 @@ _LAUNCHERS = (
         'title': 'KLCode main template',
         'relative_path': 'lib/GUI/_templates/KLCodeMainTemplate.xaml',
         'called_by': 'UI Gallery.pushbutton template preview',
-        'description': 'Editable SelectFromDict baseline with fictional selectable items.',
+        'description': 'Opt-in shared custom-window foundation with fictional selectable items. Review this reference before migrating other windows.',
         'uses_seed_data': True,
         'can_launch': True,
     },

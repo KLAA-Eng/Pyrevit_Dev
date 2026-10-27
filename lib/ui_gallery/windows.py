@@ -232,11 +232,21 @@ def _window_type():
             self._sample_numbers = ['A{:03d}'.format(i + 101)
                                     for i in range(len(self._sample_names))]
             self._duplicate_option = 'Duplicate'
-            if self.preview_id not in ('kla-view-range', 'kla-model-checker'):
+            if self.preview_id == 'kla-main-template':
+                from GUI.window_chrome import load_window
+                title = launcher.get('title', 'KLCode main template')
+                if state == 'Long content':
+                    title += ' - a deliberately long title to review ellipsis'
+                load_window(self, path, title, launcher.get('tool_version'),
+                            navigate=self._preview_navigation)
+            elif self.preview_id not in ('kla-view-range', 'kla-model-checker'):
                 merge(self, os.path.join(root, 'lib', 'GUI', 'Resources', 'WPF_styles.xaml'))
-            wpf.LoadComponent(self, path)
+                wpf.LoadComponent(self, path)
+            else:
+                wpf.LoadComponent(self, path)
             self.Title = '{} [Gallery: {}]'.format(launcher.get('title', 'Preview'), state)
-            self.ToolTip = 'Fictional data preview. Model, file, and navigation actions are simulated.'
+            if self.preview_id != 'kla-main-template':
+                self.ToolTip = 'Fictional data preview. Model, file, and navigation actions are simulated.'
             if hasattr(self, 'main_title'):
                 self.main_title.Text = launcher.get('title', 'Preview')
             if hasattr(self, 'footer_version'):
@@ -269,7 +279,13 @@ def _window_type():
                     name = group + suffix
                     if hasattr(self, name):
                         getattr(self, name).Text = values[suffix]
-            if self.preview_id == 'kla-custom-alert':
+            if self.preview_id == 'kla-main-template':
+                self.text_label.Content = ('No sample items available.' if self.preview_state == 'Empty'
+                                           else 'Sample validation: select an item.' if self.preview_state == 'Error'
+                                           else 'Select elements:')
+                if self.preview_state == 'Error':
+                    set_checked(self._items, False)
+            elif self.preview_id == 'kla-custom-alert':
                 self.alert_heading.Text = 'Warning' if self.preview_state == 'Error' else 'Information'
                 self.alert_icon.Text = '!' if self.preview_state == 'Error' else 'i'
                 self.alert_icon.Foreground = (Brushes.Goldenrod if self.preview_state == 'Error'
@@ -295,6 +311,9 @@ def _window_type():
                     self._show_result('Sample: multiple items need attention.', alert_message('Long content'))
 
         def _disable_body(self):
+            if self.preview_id == 'kla-main-template':
+                self.window_body.IsEnabled = False
+                return
             content = self.Content
             if hasattr(content, 'Child'):
                 content = content.Child
@@ -302,6 +321,9 @@ def _window_type():
                 for child in content.Children:
                     if Grid.GetRow(child) > 0:
                         child.IsEnabled = False
+
+        def _preview_navigation(self, uri):
+            self.preview_result = 'Footer navigation simulated; no external page opened.'
 
         def _initialize_review(self):
             self._review_rows = review_items(self.preview_state)

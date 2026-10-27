@@ -3,10 +3,49 @@
 This file records the current visual system used by the KLCode repository. It
 covers the legacy IronPython/pyRevit dialogs, their DevSandbox gallery, and
 the compiled WPF add-ins. It does not replace host-specific runtime validation.
-The source descriptions below were rechecked on 2026-10-08 at
+The legacy source descriptions below were rechecked on 2026-10-08 at
 `089da1b7d88e0df9dec2cc127659a24e051b9163`; see the
 [design-system reviews](knowledge/reviews/design-system/README.md) for dated findings
 and live-acceptance boundaries.
+
+## Custom window foundation
+
+The owner approved a shared custom-window standard on 2026-10-27. Its first
+delivery is opt-in: the main template and its Gallery preview use the new
+foundation; existing production Python and compiled windows retain their
+current implementation until the reference is reviewed. The
+[consolidation plan](plans/custom-window-consolidation.md) owns migration status.
+
+| Role | Approved rule |
+| --- | --- |
+| Identity | Preserve charcoal/green and the existing outlined KLCode wordmark |
+| Header/footer | Both 24 WPF units high; shared composition, not copied markup |
+| Header | Wordmark left, centered title, text Close right; ellipsis without a tooltip |
+| Footer | Functional shared Prototype/Outreach links; calling-tool version centered; omit missing versions |
+| Typography | Segoe UI 12 body/controls, 14 header/main action; compact Close remains 10 |
+| Buttons | Fixed 104 x 28 standard role and 216 x 32 wide main role; preserve action placement |
+| Controls | 32-high standard fields; 28-high compact controls |
+| Spacing | 4/8/12/16/24 scale; body inset 16, sections 16, related controls 8, label-to-field 4 |
+| Icons | Semantic resource names; existing Search at 16 units initially; replacement artwork selected with owner |
+| States | Shared hover/pressed/disabled/focus treatments, readable text and wrapped/scrollable long content |
+
+`lib/GUI/Resources/KLCodeFoundationTokens.xaml` owns typed WPF token data.
+`KLCodeFoundation.xaml` owns the shell and explicit control styles. It merges
+the existing `WPF_styles.xaml` for its wordmark, palette and scrollbars, without
+editing that dictionary or changing existing consumers. Semantic link, muted,
+focus and disabled brushes supplement brand colors for readable UI text.
+This is a transition seam, not a claim that every legacy control is consolidated.
+
+`GUI.window_chrome.load_window()` is a small Python adapter with no import-time
+pyRevit/document dependency. It binds shared close/drag/navigation events;
+the caller retains body data, showing/dismissal semantics and model operations.
+Compiled WPF adoption is later work and keeps its own host adapter.
+
+The [main template guide](../lib/GUI/_templates/KLCodeMainTemplate.md) explains
+the 432 x 576 reference and creating a new body. The
+[first-delivery verification](knowledge/reviews/design-system/2026-10-27-custom-window-foundation.md)
+contains actual WPF renders and proof limits. Native/pyRevit dialogs, ribbon
+icon redesign and the five deferred compiled previews are outside this delivery.
 
 ## Master Design Colors
 
@@ -110,9 +149,12 @@ The legacy and compiled palette values are currently defined in separate files.
 | `checkbox_checked_colour` | `#286048` | KLGreen-dark |
 | `footer_donate` | `#407058` | KLGreen-secondary |
 
-## GUI Properties
+## Legacy GUI Properties
 
-`lib/GUI/_templates/KLCodeMainTemplate.xaml` is the visual authority for these values. The shared dictionary exposes its outlined wordmark, compact close control, action buttons, filter field, checkbox, list, and scrollbar treatments. These values apply to windows that load the shared dictionary through `my_WPF.add_wpf_resource()` unless a nested or window-level resource overrides them.
+These values describe existing `WPF_styles.xaml` consumers, not the new
+opt-in foundation. Its wordmark, close/action controls, filter, checkbox, list
+and scrollbar rules apply through `my_WPF.add_wpf_resource()` unless locally
+overridden. The approved standard and migration status are described above.
 
 Most reusable dialogs, including the two Find and Replace prototypes, load the shared dictionary through `my_WPF.add_wpf_resource()`. The View Range editor instead uses `forms.WPFWindow` with its own `Window.Resources`; after loading it assigns the shared `KLCodeWordmark` template to `wordmark_host` in Python. The UI Gallery is a separate DevSandbox surface with its own local resources.
 
@@ -270,10 +312,9 @@ host-specific bindings and event handlers.
 ## Windows
 
 **Canonical example:** `lib/GUI/_templates/KLCodeMainTemplate.xaml` is the
-visual source for KL&A custom-window styling. Its outlined wordmark, 24 px
-borderless header, compact close button, palette, controls, and hover states
-are shared through `lib/GUI/Resources/WPF_styles.xaml`. `SelectFromDict.xaml`
-remains the production list-selection implementation.
+opt-in foundation reference. It consumes shared shell/control styles instead
+of copying chrome. `SelectFromDict.xaml` remains the existing production
+list-selection implementation and has not yet been migrated.
 
 The following 10 user-facing KL&A custom windows use the template header
 treatment: five shared GUI windows, Match Properties Recall, View Range, the
@@ -355,7 +396,10 @@ for the full audit, drift notes, and recommended actions.
 
 ## Style Loading And Local GUI Overrides
 
-The visual baseline is `lib/GUI/_templates/KLCodeMainTemplate.xaml`: a `432 x 576` list-selection window with a 24 px borderless header, 86 px edge columns, a `70 x 12` outlined wordmark, a centered title spanning all three columns, and `KLCodeCloseButton`. It also defines the search-icon/filter-shell pattern used by the list-selection variants. `SelectFromDict.xaml` is the production implementation of that pattern.
+The opt-in reference is `lib/GUI/_templates/KLCodeMainTemplate.xaml`, 432 x 576
+with `KlaWindowShell` and new explicit foundation styles. Its title uses the
+flexible center column; header/footer heights remain 24. The inventory below
+describes older loading paths and copied chrome still awaiting migration.
 
 ### Windows that load shared properties without local resource copies
 
@@ -385,4 +429,7 @@ These entries are not pure shared-style consumers. Some define local resources a
 | UI Gallery | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml` | Independent local palette and `DataGrid` styles; it does not merge `WPF_styles.xaml`. | DevSandbox catalog tooling has table-specific styling not yet shared by another window. |
 | UI Gallery preview fixture | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | No shared dictionary or KLCode header treatment. | A deliberately minimal preview/test fixture. |
 
-Future user-facing KL&A custom dialogs should start from `KLCodeMainTemplate.xaml` and use `WPF_styles.xaml`. Keep a local resource scope only for a documented command-specific control template or an isolated prototype; promote it into the shared dictionary when a second reusable window needs the same behavior.
+Future custom-window work should follow the approved foundation and
+[main template guide](../lib/GUI/_templates/KLCodeMainTemplate.md), with adoption
+scheduled through the consolidation plan after owner review. Keep workflow
+content local; promote reusable visual rules into the shared foundation.

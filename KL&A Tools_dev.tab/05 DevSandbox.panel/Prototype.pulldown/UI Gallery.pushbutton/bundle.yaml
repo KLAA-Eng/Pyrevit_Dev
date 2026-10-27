@@ -13,7 +13,8 @@ tooltip:
     - Search by window or tool name, or filter the origin.
     - Select a row to see the calling tools and preview availability.
     - Choose a supported preview state and Open preview. All tool actions are simulated.
+    - Review KLCode main template for the shared custom-window foundation.
     _____________________________________________________________________
     Last update:
-    - [10.27.2026] - v0.5 (Unreleased): Add origin labels, source-backed tool callers, interactive states, faithful Recall composition, and automatic standalone-window coverage.
+    - [10.27.2026] - v0.5 (Unreleased): Add origins, source paths, tool callers, interactive states, faithful Recall, standalone coverage, and the shared main-template reference.
 author: KL&A

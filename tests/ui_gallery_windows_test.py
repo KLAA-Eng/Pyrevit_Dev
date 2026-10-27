@@ -68,6 +68,11 @@ def host_modules(alerts):
                 widget.Text = element.attrib.get('Text', '')
                 setattr(control, name, widget)
 
+    def load_shell(control, path, title, version=None, navigate=None):
+        # The shared shell's real resource/template/event bindings run in the WPF probe.
+        load(control, path)
+        control.Title = title
+
     class Bitmap(object):
         def BeginInit(self):
             pass
@@ -81,6 +86,7 @@ def host_modules(alerts):
     brushes = module(**dict((key, key) for key in (
         'Goldenrod', 'MediumSeaGreen', 'DodgerBlue', 'Orange', 'SeaGreen', 'MediumPurple')))
     return {
+        'GUI.window_chrome': module(load_window=load_shell),
         'pyrevit': module(forms=module(alert=lambda *a, **k: alerts.append((a, k)))),
         'wpf': module(LoadComponent=load),
         'System': module(Uri=lambda *a: a, UriKind=module(Absolute='absolute')),
