@@ -1,0 +1,20 @@
+title:
+  en_us: "Hanger\nHighlights"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 10.27.2026
+    Status: Unreleased
+    _____________________________________________________________________
+    Description:
+    Prototype: turns the Check Hanger Locations highlights on or off in the active view. When highlights are on it clears them; when they are off it re-checks every visible hanger and colors the framing and problem hangers.
+    _____________________________________________________________________
+    How-to:
+    - Click to toggle hanger check colors in the active view.
+    - Run Check Hanger Locations for the full report.
+    _____________________________________________________________________
+    Last update:
+    - [10.27.2026] - v0.0 (Unreleased): First DevSandbox highlight toggle for Check Hanger Locations.
+author: KL&A
+engine:
+  clean: true

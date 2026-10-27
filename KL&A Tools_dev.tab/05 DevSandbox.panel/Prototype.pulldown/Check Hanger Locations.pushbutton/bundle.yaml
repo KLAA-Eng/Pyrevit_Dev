@@ -7,12 +7,12 @@ tooltip:
     Status: Unreleased
     _____________________________________________________________________
     Description:
-    Prototype: finds the supported and supporting structural framing member at each Hangers_Clever_KLAA hanger, colors them in the active view, and reports hangers with a missing or shared member. Port of the Check Hanger Locations Dynamo graph.
+    Prototype: uses each Hangers_Clever_KLAA hanger's text orientation to find the supported member (along the top or base of the text) and the supporting member (across the text, skew allowed), colors them in the active view, and reports hanger info, member types, and whether hanger and location match. Port of the Check Hanger Locations Dynamo graph.
     _____________________________________________________________________
     How-to:
-    - Select hangers, or select nothing to check every hanger visible in the active view.
-    - Review colors: supported blue, supporting yellow, both green, problem hanger red.
-    - Use the report links to select problem hangers. Shift+Click clears the check colors in the active view.
+    - Select nothing to report every hanger in the active view, or select hangers to zoom to them and report only those.
+    - Review colors: supported blue, supporting yellow, both green, problem hanger halftone red.
+    - Re-run after fixing framing to clear resolved highlights. Hanger Highlights turns the colors on or off.
     _____________________________________________________________________
     Last update:
     - [10.27.2026] - v0.0 (Unreleased): First DevSandbox port of the Check Hanger Locations Dynamo graph.

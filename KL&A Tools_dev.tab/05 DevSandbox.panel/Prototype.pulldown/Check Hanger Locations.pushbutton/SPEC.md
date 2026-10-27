@@ -14,7 +14,7 @@
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| v0.0 | Unreleased | 10.27.2026 | First DevSandbox port of the Check Hanger Locations Dynamo graph. | Pending commit on `dev.hangers`; pending next main delivery. |
+| v0.0 | Unreleased | 10.27.2026 | First DevSandbox port of the Check Hanger Locations Dynamo graph, with orientation-based member roles, highlight refresh, and the Hanger Highlights toggle. | Pending commit on `dev.hangers`; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -23,64 +23,80 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 ## Purpose
 
 `Check Hanger Locations` confirms that every placed hanger family sits where a
-framing member frames into another member. For each hanger it identifies the
-**supported** member (the member hung by the hanger) and the **supporting**
-member (the member the hanger hangs from), colors them in the active view, and
-reports hangers that are missing either one.
+framing member frames into another member and is oriented with it. For each
+hanger it identifies the **supported** member (the member hung by the hanger)
+and the **supporting** member (the member the hanger hangs from), colors them
+in the active view, and reports hangers that do not match their framing.
 
 ## Scope and detection
 
-- Hangers: selected instances whose family name contains `Hangers_Clever_KLAA`
-  (case-insensitive); with no hanger selected, every such hanger visible in the
-  active view. Other selected elements are ignored.
-- Search box: the hanger insertion point +/- 1'-0" in plan and +/- 2'-0"
-  vertically, matching the Dynamo graph's D1/D2 inputs. Only structural
-  framing with a location line is considered; walls, columns, and ledgers are
-  not supporting members.
-- Supported member: the framing member whose start or end point lies in the
-  box; the end closest to the hanger in plan wins. A second non-parallel member
-  end within 1" of the same distance is noted as ambiguous.
-- Supporting member: another framing member, not parallel to the supported
-  member, whose location line passes through the box. Members that run through
-  the hanger are preferred over members that only end there, then the closest
-  in plan wins.
-- Status: `OK`, `No framing at hanger`, `No supported member`,
-  `No supporting member`, or `Shared member end` when two or more hangers claim
-  the same end of the same member.
+- Hangers: every instance visible in the active view whose family name
+  contains `Hangers_Clever_KLAA` (case-insensitive) is checked and colored.
+  With hangers selected, the view zooms to them and the report lists only
+  them; otherwise the report lists every visible hanger.
+- Orientation: the hanger text direction is the family's local X axis in plan.
+- Supported member: structural framing that runs along the top or base of the
+  hanger text (within 30 deg of the text) and has an end inside the hanger box:
+  2'-0" either way along the text, 1'-0" across it, 2'-0" vertically. The end
+  closest to the hanger wins; a second end within 1" of that distance is noted
+  as ambiguous. A member ending at the hanger but running more than 30 deg off
+  the text gives `Hanger not aligned with member`.
+- Supporting member: another framing member crossing the hanger text at 30 deg
+  or more (square, or skewed up to 60 deg) whose location line passes within
+  1'-0" in plan (2'-0" vertically) of the supported member's end. Members that
+  run through are preferred over members that only end there, then the closest
+  wins. The skew between supported and supporting members is reported.
+- Only structural framing with a location line is considered; walls, columns,
+  and ledgers are not supporting members. Curved members use their chord.
+- Status: `OK`, `No framing at hanger`, `Hanger not aligned with member`,
+  `No supported member`, `No supporting member`, or `Shared member end` when two
+  or more hangers claim the same end of the same member.
 
 ## Output and model effects
 
-One transaction sets element graphic overrides in the active view (projection
-and cut line color plus solid surface fill): supported = blue, supporting =
-yellow, a member that is supported by one hanger and supporting another =
-green, hanger with any non-`OK` status = red. Existing overrides on those
-elements are replaced. No other model data changes. Views that do not allow
-graphic overrides are reported and left uncolored.
+One transaction first resets every override in the active view that uses a
+hanger check color, then sets new overrides, so hangers fixed since the last
+run lose their highlight:
 
-The pyRevit output lists each hanger with status, supported and supporting
-member links, and notes, problems first, plus a link that selects all problem
-hangers.
+- Members (projection and cut line color plus solid surface fill): supported
+  = blue, supporting = yellow, supported by one hanger and supporting another
+  = green.
+- Hangers with any non-`OK` status: halftone with red projection lines, no
+  fill, so hanger text stays readable.
 
-Shift+Click clears overrides in the active view whose projection line color is
-one of this command's check colors.
+Existing overrides on colored elements are replaced. No other model data
+changes. Views that do not allow graphic overrides are reported and left
+uncolored. `Hanger Highlights` turns these colors off or back on.
+
+The pyRevit output lists each hanger, problems first, with columns Hanger,
+Hanger info (type name, Mark, Comments, and non-empty family text
+parameters), Status, Location match (`Yes`, `Yes (skewed n deg)`, or `No`),
+Supported member and Supporting member (Id link plus `Family: Type`), and
+Notes, plus a link that selects all problem hangers. The pyRevit zoom icon
+frames an element's full bounding box, so the report tells users to select a
+hanger and re-run to zoom to it.
 
 ## Implementation inventory
 
-- Entry point: `script.py` (hanger and framing collection, overrides, report).
+- Entry point: `script.py` (selection, report).
+- `lib/hanger_check/revit_check.py`: Revit collection, hanger info, overrides,
+  zoom; shared with `Hanger Highlights`.
 - `lib/hanger_check/classify.py`: host-independent supported/supporting
-  decisions, shared-end flags, and member roles, covered by
+  decisions, skew, shared-end flags, and member roles, covered by
   `tests/hanger_check_test.py`.
 
 ## Validation boundary
 
-Live Revit 2024+ acceptance must confirm hanger insertion points relative to
-member ends on representative joist-to-header and header-to-girder framing,
-the search box size, and the color overrides. Curved members are evaluated on
-their end-to-end chord.
+Live Revit 2024+ acceptance must confirm that the hanger text runs along the
+family's local X axis, the hanger box size on representative joist-to-header,
+skewed, and header-to-girder framing, the halftone override, zoom, and that
+re-running clears highlights for fixed hangers.
 
 ## Future development
 
-- Make the hanger family name and search box size configurable if other
-  hanger families are adopted.
+- Make the hanger family name and box size configurable if other hanger
+  families are adopted.
+- Compare hanger model/size parameters with the supported member size once the
+  hanger family parameters are confirmed.
 - Optionally report framing ends that frame into another member without a
   hanger.
