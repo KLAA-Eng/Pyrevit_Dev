@@ -46,6 +46,12 @@ Search by window name, source path, tool name, or calling-tool path. Filter by:
 - Revit/Windows native: host/system dialogs, including native dialogs opened
   through pyRevit wrappers.
 
+The table includes a **Window source** column showing the repository-relative
+XAML path for custom windows (for example, `lib/GUI/SelectFromDict.xaml`) or the
+API reference for built-in/native dialogs. Long values wrap and are available
+in full on hover; columns can be resized and the table scrolls horizontally
+when needed.
+
 Select a window to see its description, source/API, calling tools with friendly
 titles and command paths, and an explicit reason if its preview is unavailable.
 The calling-tool list is built from source imports/calls, following shared helpers,
