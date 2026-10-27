@@ -191,8 +191,8 @@ different templates, summarized under [ComboBox implementation boundaries](#comb
 | `DataGrid` | headers shown | `HeadersVisibility` | `Column` |
 | `DataGrid` | selection mode | `SelectionMode` | `Single` |
 | `DataGrid` | row resize | `CanUserResizeRows` | `False` |
-| `DataGridColumnHeader` | header padding | `Padding` | `6,4` |
-| `DataGridCell` | cell padding | `Padding` | `6,3` |
+| `DataGridColumnHeader` (UI Gallery local) | header padding | `Padding` | `8,6` |
+| `DataGridCell` (UI Gallery local) | cell padding | `Padding` | `6,4` |
 | `ListBox` | default | `ScrollViewer.VerticalScrollBarVisibility` | `Visible` |
 | `ListBox` | default | `ScrollViewer.HorizontalScrollBarVisibility` | `Hidden` |
 | `ListBox` | border style | `CornerRadius` | `10` |
@@ -320,9 +320,15 @@ standardization scope.
 
 The DevSandbox UI Gallery records 20 repository `Window` XAML surfaces: the
 14 pyRevit/DevSandbox windows below, the separate main-template preview, and
-the five compiled WPF windows cataloged above. The compiled entries require
-their Revit host and cannot launch in the IronPython gallery. Standard pyRevit
-dialogs are external references, not repository XAML surfaces.
+the five compiled WPF windows cataloged above. The compiled entries remain
+disabled by the owner's 2026-10-27 scope decision; working compiled previews are
+future work. Standard pyRevit/native dialogs are external sources, not
+repository XAML surfaces. The Gallery now labels origins, lists source-backed
+calling tools, and offers interactive fictional states for supported windows.
+It also catalogs newly discovered Window sources without enabling arbitrary XAML.
+See the [current Gallery SPEC](<../KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
+and [verification record](knowledge/reviews/design-system/2026-10-27-ui-gallery-verification.md)
+for current behavior and evidence.
 
 The linked source audit describes 2026-10-08; the rename rows below were
 updated for the 2026-10-09 Core promotion. This table does not
@@ -340,7 +346,7 @@ for the full audit, drift notes, and recommended actions.
 | Legacy sheet rename form | Prior shared presentation retained for historical preview | [Source audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
 | Find and replace views | Promoted Core dialog with shared KLCode styles and a local result panel | [Promotion record](knowledge/reviews/releases/2026-10-08/find-replace-promotion.md) |
 | Legacy view rename form | Prior shared presentation retained for historical preview | [Source audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Match properties recall | Shared styles; Gallery preview omits the production chrome | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Match properties recall | Shared styles; Gallery now preserves the shell and actual clipboard content with simulated handlers | [Current verification](knowledge/reviews/design-system/2026-10-27-ui-gallery-verification.md) |
 | KL&A list selection | Production reference for shared list-selection styling | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
 | Steel PSF story selection | Shared styles in a DevSandbox selector | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
 | View range editor | Command-local dark resources and ComboBox templates | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |

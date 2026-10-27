@@ -12,6 +12,7 @@ if PROJECT_ROOT not in sys.path:
 
 from lib.ui_gallery.launchers import gallery_launchers, launcher_by_id
 from lib.ui_gallery.catalog import catalog_xaml_sources
+from lib.ui_gallery.registry import gallery_entries
 
 
 def canonical_path(path):
@@ -86,7 +87,7 @@ class UiGalleryLaunchersTests(unittest.TestCase):
                          by_id['kla-family-studio']['sample_data_label'])
 
     def test_all_repository_window_xaml_files_are_accounted_for(self):
-        launchers = gallery_launchers()
+        launchers = gallery_entries(PROJECT_ROOT, {})
         launcher_paths = set(
             canonical_path(launcher['relative_path'])
             for launcher in launchers
@@ -111,7 +112,7 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         )
         launcher_paths = set(
             canonical_path(launcher['relative_path'])
-            for launcher in gallery_launchers()
+            for launcher in gallery_entries(PROJECT_ROOT, {})
             if launcher['relative_path']
         )
 
