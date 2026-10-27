@@ -22,11 +22,11 @@ current implementation until the reference is reviewed. The
 | Header/footer | Both 24 WPF units high; shared composition, not copied markup |
 | Header | Wordmark left, centered title, text Close right; ellipsis without a tooltip |
 | Footer | Functional shared Prototype/Outreach links; pure calling-tool version (vX.X) centered; omit missing versions; use Create from rooms green/gray |
-| Typography | Segoe UI 12 body/controls, 14 header/main action; compact Close remains 10 |
+| Typography | Segoe UI 12 body/controls, 14 header/main action/selection prompt; constant labels use Title Case; compact Close remains 10 |
 | Buttons | Fixed 104 x 28 standard role and 216 x 32 wide main role; preserve action placement |
 | Controls | 32-high standard fields; 28-high compact controls; search field 24 high, matching Create from rooms |
-| Spacing | 4/8/12/16/24 scale; body inset 16 horizontally/below, 4 under header; sections 16, related controls 8, label-to-field 4 |
-| Checkbox list | Match Create from rooms: single-line rows 20 high and 4-unit box-to-label gap; long names wrap |
+| Spacing | 4/8/12/16/24 scale; body inset 16 horizontally, 8 below header/last action; sections 16, related controls 8, label-to-field 4 |
+| Checkbox list | Create from rooms spacing: rows 20 high, 4-unit box-to-label gap; native KL&A list-selection row template supplies blue hover/selection; long names wrap |
 | Icons | Semantic resource names; existing Search at 16 units initially; replacement artwork selected with owner |
 | States | Shared hover/pressed/disabled/focus treatments, readable text and wrapped/scrollable long content |
 

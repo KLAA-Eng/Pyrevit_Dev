@@ -64,6 +64,9 @@
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
         <Setter Property="Padding" Value="{StaticResource KlaLabelPadding}"/>
     </Style>
+    <Style x:Key="KlaFoundationPromptLabel" TargetType="Label" BasedOn="{StaticResource KlaFoundationLabel}">
+        <Setter Property="FontSize" Value="{StaticResource KlaTitleFontSize}"/>
+    </Style>
     <Style x:Key="KlaFoundationInput" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
@@ -115,15 +118,7 @@
         <Setter Property="Foreground" Value="{StaticResource text_white}"/>
         <Setter Property="Padding" Value="{StaticResource KlaItemPadding}"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ListBoxItem">
-            <Border x:Name="RowBorder" BorderThickness="1" BorderBrush="Transparent" Background="Transparent" Padding="{TemplateBinding Padding}">
-                <ContentPresenter/>
-            </Border>
-            <ControlTemplate.Triggers>
-                <Trigger Property="IsSelected" Value="True"><Setter TargetName="RowBorder" Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
-                <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="RowBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}"/></Trigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate></Setter.Value></Setter>
+        <!-- Keep the native WPF row template used by SelectFromDict, including its blue hover/selection. -->
     </Style>
     <Style x:Key="KlaFoundationList" TargetType="ListBox">
         <Setter Property="Background" Value="{StaticResource header_background}"/>

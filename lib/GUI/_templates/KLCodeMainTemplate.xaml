@@ -22,7 +22,7 @@
                 <Image Source="{StaticResource KlaIconSearch}" Width="{StaticResource KlaIconSize}" Height="{StaticResource KlaIconSize}" VerticalAlignment="Center" IsHitTestVisible="False"/>
                 <TextBox x:Name="textbox_filter" Grid.Column="2" Style="{StaticResource KlaFoundationFilter}" TextChanged="text_filter_updated" AutomationProperties.Name="Search sample items"/>
             </Grid>
-            <Label x:Name="text_label" Grid.Row="2" Content="Select elements:" Target="{Binding ElementName=main_ListBox}" Style="{StaticResource KlaFoundationLabel}"/>
+            <Label x:Name="text_label" Grid.Row="2" Content="Select Elements:" Target="{Binding ElementName=main_ListBox}" Style="{StaticResource KlaFoundationPromptLabel}"/>
             <ListBox x:Name="main_ListBox" Grid.Row="4" Style="{StaticResource KlaFoundationList}" SelectionMode="Single" AutomationProperties.Name="Sample items">
                 <ListBox.ItemTemplate><DataTemplate>
                     <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}" Checked="UIe_ItemChecked" Style="{StaticResource KlaFoundationCheckBox}"/>

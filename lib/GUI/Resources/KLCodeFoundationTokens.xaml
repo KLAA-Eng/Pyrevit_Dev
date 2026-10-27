@@ -15,7 +15,7 @@
     <GridLength x:Key="KlaGridSpace4">4</GridLength>
     <GridLength x:Key="KlaGridSpace8">8</GridLength>
     <GridLength x:Key="KlaGridSpace16">16</GridLength>
-    <Thickness x:Key="KlaBodyInset">16,4,16,16</Thickness>
+    <Thickness x:Key="KlaBodyInset">16,8,16,8</Thickness>
     <Thickness x:Key="KlaLabelPadding">0</Thickness>
     <Thickness x:Key="KlaPairGap">0,0,8,0</Thickness>
     <Thickness x:Key="KlaInputPadding">8,0</Thickness>

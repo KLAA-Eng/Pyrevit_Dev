@@ -33,13 +33,15 @@ Values are WPF device-independent units, not physical screen pixels.
 | Header | 86 / flexible / 86 columns; existing 70 x 12 outlined wordmark, centered title, Close button |
 | Title | Segoe UI 14; uses the available center lane, with ellipsis and no tooltip |
 | Close | 60 x 18, Segoe UI 10; deliberate chrome exception |
-| Body | 16 horizontal/bottom padding, 4 below header; list uses remaining height rather than a fixed height |
+| Body | 16 horizontal padding; 8 below header and last action; list uses remaining height rather than a fixed height |
 | Search | 24-high visible field, matching Create from rooms; 14-unit text and existing 16-unit icon |
 | Typography | Segoe UI 12 body/controls; 14 main action |
+| Selection prompt | 14, matching KL&A list selection; constant labels use Title Case (`Select Elements:`) |
 | Section / label / related gaps | 16 / 4 / 8; compact search-to-prompt gap is 8 |
 | Checkbox rows | 20 high for single-line items, matching Create from rooms; 4 between box and label |
+| Row interaction | Native WPF row template, matching KL&A list selection's blue hover/selection |
 | Select All / Select None | 104 x 28 each, 8 apart, centered |
-| Main action | 216 x 32, centered, 8 below the pair, 16 before footer |
+| Main action | 216 x 32, centered, 8 below the pair, 8 before footer |
 | Footer | Prototype left, pure caller version such as v0.5 center, Outreach right; same green/gray as Create from rooms |
 
 The pair still matches the main action width: 104 + 8 + 104 = 216. Main and

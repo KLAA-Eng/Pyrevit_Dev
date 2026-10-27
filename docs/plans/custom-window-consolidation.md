@@ -1,6 +1,8 @@
 # Custom window consolidation
 
-Owner-approved design: 2026-10-27. Work directly on `master-dev` as requested.
+Owner-approved design: 2026-10-27. Current work branch: `dev.GUI-Clean`.
+The owner requested moving all local GUI commits off `master-dev` on 2026-10-27;
+initial work was performed directly there under the earlier authorization.
 This file owns task status. [DESIGNSYSTEM.md](../DESIGNSYSTEM.md) owns the
 shared design rules; the [main template guide](../../lib/GUI/_templates/KLCodeMainTemplate.md)
 owns the reference-window implementation and usage.
@@ -26,7 +28,7 @@ to the foundation; specific replacement artwork will be selected with the owner.
 | GUI-01 | Confirm shared design and delivery boundary | Confirmed by owner | Interview: equal 24-unit chrome, Segoe UI, fixed button roles, normalized spacing, preserved placements, title ellipsis without tooltip |
 | GUI-02 | Create shared shell, tokens, controls, and caller metadata | Implemented; locally verified | Host-free imports; no show/model side effects; existing resources/DataContext preserved; real WPF part bindings/events |
 | GUI-03 | Apply foundation to main template and Gallery preview | Implemented; locally verified | Actual 432 x 576 renders; five fictional states; measured header/footer, padding, button dimensions/gaps; simulated navigation |
-| GUI-04 | Review template appearance with owner | Owner refinements implemented; ready for another visual review | [Current refinement and renders](../knowledge/reviews/design-system/2026-10-27-main-template-refinement.md); [initial delivery](../knowledge/reviews/design-system/2026-10-27-custom-window-foundation.md) |
+| GUI-04 | Review template appearance with owner | Follow-up refinements implemented; ready for visual review | 8-unit top/bottom gaps, 14-unit Title Case prompt, native row hover; [current renders](../knowledge/reviews/design-system/2026-10-27-main-template-refinement.md); [initial delivery](../knowledge/reviews/design-system/2026-10-27-custom-window-foundation.md) |
 | GUI-05 | Migrate other Python custom windows | Waiting for GUI-04 | Review each window's body/lifecycle/callers before adopting the shell; preserve command operations |
 | GUI-06 | Adopt foundation in compiled WPF adapters/windows | Waiting for GUI-04 | Share source design resources; preserve CLR/host boundaries; build and matching-host evidence required |
 | GUI-07 | Select additional in-window artwork | Pending owner selection | Reuse existing Search asset initially; keep semantic keys and 16-unit default |

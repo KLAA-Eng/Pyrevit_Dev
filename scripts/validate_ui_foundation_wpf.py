@@ -38,6 +38,18 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
     if output_directory:
         render(rooms, os.path.join(output_directory, 'create-from-rooms-reference.png'), 400, 406)
     rooms.Close()
+    selection_entry = next(entry for entry in entries if entry['id'] == 'kla-select-from-dict')
+    selection = create_custom(root, selection_entry, 'Normal')
+    selection.Content.Measure(Size(432, 576))
+    selection.Content.Arrange(Rect(0, 0, 432, 576))
+    selection.Content.UpdateLayout()
+    native_row = selection.main_ListBox.ItemContainerGenerator.ContainerFromIndex(0)
+    native_row_template = native_row.Template
+    prompt_font_size = selection.text_label.FontSize
+    assert prompt_font_size == 14
+    if output_directory:
+        render(selection, os.path.join(output_directory, 'list-selection-reference.png'), 432, 576)
+    selection.Close()
     template = next(entry for entry in entries if entry['id'] == 'kla-main-template')
     for state in template['states']:
         window = create_custom(root, dict(template, tool_version=tool_version), state)
@@ -52,6 +64,8 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
             text = next(item for item in descendants(check) if isinstance(item, TextBlock))
             bars = [item for item in descendants(window.main_ListBox) if isinstance(item, ScrollBar)]
             assert row.ActualHeight == room_row_height
+            assert row.Template == native_row_template
+            assert window.text_label.Content == 'Select Elements:'
             assert text.TranslatePoint(Point(0, 0), check).X - 16 == room_text_gap
             print('Main template: search {} high at y={}; row {} high, padding {}; checkbox text gap {}; list {} x {}; text width {}; scrollbars {}.'.format(
                 window.textbox_filter.ActualHeight, window.textbox_filter.TranslatePoint(Point(0, 0), shell).Y,
@@ -67,7 +81,8 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
         assert str(chrome.outreach.Foreground) == '#FF407058'
         assert window.textbox_filter.ActualHeight == room_filter_height
         assert window.textbox_filter.FontSize == 14
-        assert window.textbox_filter.TranslatePoint(Point(0, 0), shell).Y == 28
+        assert window.textbox_filter.TranslatePoint(Point(0, 0), shell).Y == 32
+        assert window.text_label.FontSize == prompt_font_size
         window.button_main.ApplyTemplate()
         assert window.button_main.Template.FindName('ButtonBorder', window.button_main).BorderBrush.Color.A == 0
         assert str(window.FontFamily) == 'Segoe UI'
@@ -76,13 +91,13 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
         buttons = list(window.UI_Buttons_all_none.Children)
         assert all(button.ActualWidth == 104 and button.ActualHeight == 28 for button in buttons)
         body_origin = window.window_body.TranslatePoint(Point(0, 0), shell)
-        assert body_origin.X == 16 and body_origin.Y == 28
+        assert body_origin.X == 16 and body_origin.Y == 32
         first = buttons[0].TranslatePoint(Point(0, 0), shell)
         second = buttons[1].TranslatePoint(Point(0, 0), shell)
         main = window.button_main.TranslatePoint(Point(0, 0), shell)
         assert second.X - first.X - 104 == 8
         assert main.X == first.X and main.Y - first.Y - 28 == 8
-        assert chrome.footer.TranslatePoint(Point(0, 0), shell).Y - main.Y - 32 == 16
+        assert chrome.footer.TranslatePoint(Point(0, 0), shell).Y - main.Y - 32 == 8
         assert window.window_body.IsEnabled == (state != 'Disabled')
         assert chrome.close_button.IsEnabled
         if state == 'Long content':

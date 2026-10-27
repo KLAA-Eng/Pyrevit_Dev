@@ -1,6 +1,8 @@
 # UI Gallery standalone coverage
 
-Owner-approved scope: 2026-10-27. Work branch: `master-dev`.
+Owner-approved scope: 2026-10-27. Current work branch: `dev.GUI-Clean`.
+Initial work was performed on `master-dev`; the owner requested moving all local
+GUI commits to the dedicated branch on 2026-10-27.
 This plan owns task status. The [Gallery SPEC](<../../KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
 owns behavior; the [verification record](../knowledge/reviews/design-system/2026-10-27-ui-gallery-verification.md)
 owns dated evidence. The [2026-10-26 review](../knowledge/reviews/design-system/2026-10-26-design-system-and-gui-review.md)

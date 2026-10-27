@@ -280,10 +280,10 @@ def _window_type():
                     if hasattr(self, name):
                         getattr(self, name).Text = values[suffix]
             if self.preview_id == 'kla-main-template':
-                self.text_label.Content = ('No sample items available.' if self.preview_state == 'Empty'
-                                           else 'Sample validation: select an item.' if self.preview_state == 'Error'
-                                           else 'Select elements:')
-                if self.preview_state == 'Error':
+                if self.preview_state == 'Empty':
+                    self.text_label.Content = 'No Sample Items Available.'
+                elif self.preview_state == 'Error':
+                    self.text_label.Content = 'Sample Validation: Select an Item.'
                     set_checked(self._items, False)
             elif self.preview_id == 'kla-custom-alert':
                 self.alert_heading.Text = 'Warning' if self.preview_state == 'Error' else 'Information'
