@@ -21,19 +21,21 @@ current implementation until the reference is reviewed. The
 | Identity | Preserve charcoal/green and the existing outlined KLCode wordmark |
 | Header/footer | Both 24 WPF units high; shared composition, not copied markup |
 | Header | Wordmark left, centered title, text Close right; ellipsis without a tooltip |
-| Footer | Functional shared Prototype/Outreach links; calling-tool version centered; omit missing versions |
+| Footer | Functional shared Prototype/Outreach links; pure calling-tool version (vX.X) centered; omit missing versions; use Create from rooms green/gray |
 | Typography | Segoe UI 12 body/controls, 14 header/main action; compact Close remains 10 |
 | Buttons | Fixed 104 x 28 standard role and 216 x 32 wide main role; preserve action placement |
-| Controls | 32-high standard fields; 28-high compact controls |
-| Spacing | 4/8/12/16/24 scale; body inset 16, sections 16, related controls 8, label-to-field 4 |
+| Controls | 32-high standard fields; 28-high compact controls; search field 24 high, matching Create from rooms |
+| Spacing | 4/8/12/16/24 scale; body inset 16 horizontally/below, 4 under header; sections 16, related controls 8, label-to-field 4 |
+| Checkbox list | Match Create from rooms: single-line rows 20 high and 4-unit box-to-label gap; long names wrap |
 | Icons | Semantic resource names; existing Search at 16 units initially; replacement artwork selected with owner |
 | States | Shared hover/pressed/disabled/focus treatments, readable text and wrapped/scrollable long content |
 
 `lib/GUI/Resources/KLCodeFoundationTokens.xaml` owns typed WPF token data.
 `KLCodeFoundation.xaml` owns the shell and explicit control styles. It merges
 the existing `WPF_styles.xaml` for its wordmark, palette and scrollbars, without
-editing that dictionary or changing existing consumers. Semantic link, muted,
-focus and disabled brushes supplement brand colors for readable UI text.
+editing that dictionary or changing existing consumers. Focus, pressed and
+disabled brushes supplement brand colors. Footer links and version
+use the existing `footer_donate` and `text_gray` colors, per owner review.
 This is a transition seam, not a claim that every legacy control is consolidated.
 
 `GUI.window_chrome.load_window()` is a small Python adapter with no import-time
@@ -46,6 +48,9 @@ the 432 x 576 reference and creating a new body. The
 [first-delivery verification](knowledge/reviews/design-system/2026-10-27-custom-window-foundation.md)
 contains actual WPF renders and proof limits. Native/pyRevit dialogs, ribbon
 icon redesign and the five deferred compiled previews are outside this delivery.
+The [owner-requested refinement](knowledge/reviews/design-system/2026-10-27-main-template-refinement.md)
+records the current compact search/list spacing, footer appearance, prefix-free
+version, and removal of the default-button outline.
 
 ## Master Design Colors
 

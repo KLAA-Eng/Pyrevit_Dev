@@ -11,28 +11,28 @@
     <GridLength x:Key="KlaChromeRow">24</GridLength>
     <GridLength x:Key="KlaControlRow">32</GridLength>
     <GridLength x:Key="KlaCompactRow">28</GridLength>
+    <GridLength x:Key="KlaFilterRow">24</GridLength>
     <GridLength x:Key="KlaGridSpace4">4</GridLength>
     <GridLength x:Key="KlaGridSpace8">8</GridLength>
     <GridLength x:Key="KlaGridSpace16">16</GridLength>
-    <Thickness x:Key="KlaBodyInset">16</Thickness>
+    <Thickness x:Key="KlaBodyInset">16,4,16,16</Thickness>
     <Thickness x:Key="KlaLabelPadding">0</Thickness>
     <Thickness x:Key="KlaPairGap">0,0,8,0</Thickness>
     <Thickness x:Key="KlaInputPadding">8,0</Thickness>
-    <Thickness x:Key="KlaListPadding">4</Thickness>
-    <Thickness x:Key="KlaItemPadding">4</Thickness>
+    <Thickness x:Key="KlaListPadding">1</Thickness>
+    <Thickness x:Key="KlaItemPadding">4,1</Thickness>
     <Thickness x:Key="KlaBrandInset">8,0,0,0</Thickness>
     <Thickness x:Key="KlaFooterInset">12,0</Thickness>
     <sys:Double x:Key="KlaChromeHeight">24</sys:Double>
     <sys:Double x:Key="KlaControlHeight">32</sys:Double>
     <sys:Double x:Key="KlaCompactHeight">28</sys:Double>
+    <sys:Double x:Key="KlaFilterHeight">24</sys:Double>
     <sys:Double x:Key="KlaButtonWidth">104</sys:Double>
     <sys:Double x:Key="KlaMainButtonWidth">216</sys:Double>
     <sys:Double x:Key="KlaIconSize">16</sys:Double>
     <sys:Double x:Key="KlaBodyFontSize">12</sys:Double>
     <sys:Double x:Key="KlaTitleFontSize">14</sys:Double>
     <FontFamily x:Key="KlaBodyFont">Segoe UI</FontFamily>
-    <SolidColorBrush x:Key="KlaReadableMutedBrush" Color="#B5C2BD"/>
-    <SolidColorBrush x:Key="KlaLinkBrush" Color="#9CC5AC"/>
     <SolidColorBrush x:Key="KlaFocusBrush" Color="#E5E4E2"/>
     <SolidColorBrush x:Key="KlaPressedBrush" Color="#204D3A"/>
     <SolidColorBrush x:Key="KlaDisabledFillBrush" Color="#303C40"/>

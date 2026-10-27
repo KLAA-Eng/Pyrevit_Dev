@@ -73,6 +73,9 @@ equal 24-unit header/footer, Segoe UI, fixed buttons, shared spacing and the
 existing semantic Search icon. It receives the Gallery's actual tool version
 as caller metadata; footer navigation remains simulated. Long content shows
 title ellipsis without a tooltip. Empty, Error and Disabled states are fictional.
+Owner refinement matches Create from rooms' 24-high search field and compact
+checkbox rows, uses its footer green/gray, omits the version prefix, and removes
+the default main-button outline. The gap below the header is 4 units.
 Other production forms and the Gallery catalog shell keep their existing
 layouts pending review of this first reference. See the
 [template guide](../../../../lib/GUI/_templates/KLCodeMainTemplate.md) and

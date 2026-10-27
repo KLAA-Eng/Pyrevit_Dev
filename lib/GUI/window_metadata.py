@@ -12,6 +12,6 @@ class WindowMetadata(object):
     def __init__(self, title, version=None):
         self.Title = (title or '').strip()
         version = (version or '').strip()
-        self.VersionText = 'Version: {}'.format(version) if version else ''
+        self.VersionText = version
         self.PrototypeUri = PROTOTYPE_URI
         self.OutreachUri = OUTREACH_URI

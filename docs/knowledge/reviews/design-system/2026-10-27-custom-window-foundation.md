@@ -1,5 +1,9 @@
 # Custom-window foundation: first-delivery verification
 
+This record preserves the initial delivery. The subsequent
+[owner-requested refinement](2026-10-27-main-template-refinement.md) owns the
+updated reference appearance and validation; initial renders below are historical.
+
 Date: 2026-10-27. Baseline: `bad8c50` on `master-dev`, plus this delivery's
 working changes. The owner confirmed the design and authorized the first
 delivery: shared foundations and the main template/Gallery reference before

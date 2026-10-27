@@ -12,7 +12,7 @@ class WindowMetadataTests(unittest.TestCase):
     def test_footer_uses_the_calling_tools_pure_version(self):
         metadata = WindowMetadata('Find and replace views', 'v1.3')
         self.assertEqual('Find and replace views', metadata.Title)
-        self.assertEqual('Version: v1.3', metadata.VersionText)
+        self.assertEqual('v1.3', metadata.VersionText)
 
     def test_missing_version_is_omitted_instead_of_invented(self):
         for version in (None, '', '   '):
@@ -22,7 +22,7 @@ class WindowMetadataTests(unittest.TestCase):
         title = 'A long window title that should remain available to automation'
         metadata = WindowMetadata('  ' + title + '  ', ' v0.5 ')
         self.assertEqual(title, metadata.Title)
-        self.assertEqual('Version: v0.5', metadata.VersionText)
+        self.assertEqual('v0.5', metadata.VersionText)
 
     def test_shared_footer_destinations_are_actual_existing_forms(self):
         metadata = WindowMetadata('Preview')

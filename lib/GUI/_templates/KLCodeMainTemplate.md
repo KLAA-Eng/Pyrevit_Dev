@@ -33,19 +33,26 @@ Values are WPF device-independent units, not physical screen pixels.
 | Header | 86 / flexible / 86 columns; existing 70 x 12 outlined wordmark, centered title, Close button |
 | Title | Segoe UI 14; uses the available center lane, with ellipsis and no tooltip |
 | Close | 60 x 18, Segoe UI 10; deliberate chrome exception |
-| Body | 16 padding on all sides; list uses remaining height rather than a fixed height |
-| Search | 32-high input; existing 16-unit search icon with an 8-unit gap |
+| Body | 16 horizontal/bottom padding, 4 below header; list uses remaining height rather than a fixed height |
+| Search | 24-high visible field, matching Create from rooms; 14-unit text and existing 16-unit icon |
 | Typography | Segoe UI 12 body/controls; 14 main action |
-| Section / label / related gaps | 16 / 4 / 8 |
+| Section / label / related gaps | 16 / 4 / 8; compact search-to-prompt gap is 8 |
+| Checkbox rows | 20 high for single-line items, matching Create from rooms; 4 between box and label |
 | Select All / Select None | 104 x 28 each, 8 apart, centered |
 | Main action | 216 x 32, centered, 8 below the pair, 16 before footer |
-| Footer | Prototype left, caller tool version center, Outreach right; functional shared links |
+| Footer | Prototype left, pure caller version such as v0.5 center, Outreach right; same green/gray as Create from rooms |
 
 The pair still matches the main action width: 104 + 8 + 104 = 216. Main and
 secondary actions retain their arrangement. Long item names wrap and scroll;
 long titles trim instead of increasing the header height. No full-title hover
 text is added. Buttons use fixed role widths; future wider variants must be
 shared named styles rather than unexplained per-window values.
+
+The default Select button has no outline. Keyboard focus uses a small underline
+instead of an enclosing white border. The list has 1-unit inner padding and
+compact row padding; wrapped text uses the available width to within 8 units
+of the scrollbar. Short labels naturally leave unused horizontal width, and
+few rows leave unused vertical space because the reference remains 432 x 576.
 
 ## Create a window
 
@@ -67,7 +74,7 @@ window.ShowDialog()  # The caller chooses modal/modeless behavior.
 ```
 
 Pass a pure tool version such as `v1.3`. A missing/blank version leaves the
-footer center empty. The loader does not infer an extension version, use a
+footer center empty. Version text has no `Version:` prefix. The loader does not infer an extension version, use a
 placeholder, access a document, or show the window. The body supplies only
 its own workflow event handlers. Existing command-specific close behavior
 must be reviewed before migration; this reference's close simply closes.

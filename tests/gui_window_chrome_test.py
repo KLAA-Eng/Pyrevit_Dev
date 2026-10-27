@@ -96,7 +96,7 @@ class WindowChromeTests(unittest.TestCase):
         self.assertIs(existing, self.window.Resources.MergedDictionaries[0])
         self.assertEqual(2, len(self.window.Resources.MergedDictionaries))
         self.assertEqual([(self.window, 'body.xaml')], self.loads)
-        self.assertEqual('Version: v1.3', chrome.shell.Tag.VersionText)
+        self.assertEqual('v1.3', chrome.shell.Tag.VersionText)
         self.assertIs(chrome, self.window._kla_chrome)
         self.assertFalse(self.window.closed)
 

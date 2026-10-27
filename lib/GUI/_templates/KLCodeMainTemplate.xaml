@@ -7,8 +7,8 @@
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
-                <RowDefinition Height="{StaticResource KlaControlRow}"/>
-                <RowDefinition Height="{StaticResource KlaGridSpace16}"/>
+                <RowDefinition Height="{StaticResource KlaFilterRow}"/>
+                <RowDefinition Height="{StaticResource KlaGridSpace8}"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="{StaticResource KlaGridSpace4}"/>
                 <RowDefinition Height="*"/>
@@ -20,7 +20,7 @@
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaGridSpace16}"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <Image Source="{StaticResource KlaIconSearch}" Width="{StaticResource KlaIconSize}" Height="{StaticResource KlaIconSize}" VerticalAlignment="Center" IsHitTestVisible="False"/>
-                <TextBox x:Name="textbox_filter" Grid.Column="2" Style="{StaticResource KlaFoundationInput}" TextChanged="text_filter_updated" AutomationProperties.Name="Search sample items"/>
+                <TextBox x:Name="textbox_filter" Grid.Column="2" Style="{StaticResource KlaFoundationFilter}" TextChanged="text_filter_updated" AutomationProperties.Name="Search sample items"/>
             </Grid>
             <Label x:Name="text_label" Grid.Row="2" Content="Select elements:" Target="{Binding ElementName=main_ListBox}" Style="{StaticResource KlaFoundationLabel}"/>
             <ListBox x:Name="main_ListBox" Grid.Row="4" Style="{StaticResource KlaFoundationList}" SelectionMode="Single" AutomationProperties.Name="Sample items">
