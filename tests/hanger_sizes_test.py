@@ -34,6 +34,7 @@ from lib.hanger_check.sizes import (
     has_top_flange,
     mismatch_label,
     mounting_label,
+    parse_member,
     parse_size,
     support_kind,
 )
@@ -64,6 +65,17 @@ class CompareSizeTest(unittest.TestCase):
         self.assertFalse(ok)
         self.assertEqual(reason, 'depth differs (hanger vs member: depth 15" vs 13 1/2" '
                                  'from type name)')
+
+    def test_family_name_and_codes_are_not_sizes(self):
+        member = parse_member('Framing_KLAA_15SE: (2)11 7/8" LVL')
+        self.assertEqual((member['plies'], member['depth'], member['material']),
+                         (2, 11.875, 'LVL'))
+        self.assertIsNone(parse_member('Framing_KLAA_15SE: Custom')['depth'])
+        self.assertIsNone(parse_size('LVL 15SE')['depth'])
+        self.assertEqual(parse_member('TJI 210: 11 7/8"')['series'], 'TJI 210')
+        self.assertTrue(compare_size('(2)11 7/8" LVL', 'Framing_KLAA_15SE: (2)11 7/8" LVL',
+                                     3.5, 15.0)[0])
+        self.assertTrue(compare_size('(2)11 7/8" LVL', 'Framing_KLAA_15SE: 3 1/2" x 11 7/8"')[0])
 
     def test_type_name_depth_wins_over_parameter(self):
         # '(2)11 7/8" LVL' type whose depth parameter holds something else.

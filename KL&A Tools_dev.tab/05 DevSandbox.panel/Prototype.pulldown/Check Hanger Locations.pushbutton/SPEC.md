@@ -57,7 +57,11 @@ in the active view, and reports hangers that do not match their framing.
   end` when two or more hangers claim the same end of the same member.
 - Size check: values are the Smart Hanger schedule text, read from the
   instance, then the type. Plies, width, depth, material, and I-joist series
-  are parsed and compared with the member's `Family: Type` name. Member depth
+  are parsed and compared with the member's `Family: Type` name. Sizes and
+  plies come from the type name only, never the family name (for example
+  `Framing_KLAA_15SE`); material and I-joist series may come from either.
+  Numbers glued to letters or underscores (`15SE`, `2.0E`) are codes, not
+  sizes. Member depth
   comes from the type name (`W x D`, or a lone size such as `(2)11 7/8" LVL`);
   a depth parameter (`d`, `Depth`, `h`, `Height`, ...) is used only when the
   name gives no depth or only a number under 3" (a grade or mark such as

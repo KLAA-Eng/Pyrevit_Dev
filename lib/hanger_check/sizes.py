@@ -55,7 +55,9 @@ NO_FASTENER = ('', 'N/A', 'NA', 'NONE', 'NO')
 
 _PLY = re.compile(r'\(\s*(\d+)\s*\)|(\d+)\s*-?\s*PLY\b', re.I)
 _SERIES = re.compile(r'\b(TJI|NI|BCI|LPI)\s*-?\s*(\d+)\b', re.I)
-_NUMBER = re.compile(r'(\d+)\s*[- ]\s*(\d+)\s*/\s*(\d+)|(\d+)\s*/\s*(\d+)|(\d+(?:\.\d+)?)')
+# Numbers glued to letters or underscores (15SE, 2.0E, KLAA_15) are codes, not sizes.
+_NUMBER = re.compile(r'(?<![A-Za-z_\d.])(?:(\d+)\s*[- ]\s*(\d+)\s*/\s*(\d+)|(\d+)\s*/\s*(\d+)'
+                     r'|(\d+(?:\.\d+)?))(?![A-Za-z_\d.])')
 _ALTERNATIVES = re.compile(r'\bOR\b', re.I)
 _SAWN_WORDS = re.compile(r'\b(DIMENSION|LUMBER|SAWN|DF|SPF|HF|SYP)\b')
 _STEEL_SHAPE = re.compile(r'(^|[^A-Z])W\s*\d+(\.\d+)?\s*X\s*\d+')
@@ -109,6 +111,19 @@ def parse_size(text):
     else:
         numbers = _numbers(text)
         size['depth'] = max(numbers) if numbers else None
+    return size
+
+
+def parse_member(label):
+    """parse_size for a 'Family: Type' label: sizes and plies come from the type
+    name only (family names such as Framing_KLAA_15SE are not sizes); material
+    and series may come from either."""
+    if not label or ':' not in label:
+        return parse_size(label)
+    size = parse_size(label.split(':', 1)[1])
+    whole = parse_size(label)
+    size['material'] = size['material'] or whole['material']
+    size['series'] = size['series'] or whole['series']
     return size
 
 
@@ -192,7 +207,7 @@ def compare_size(hanger_text, member_label, member_width_in=None, member_depth_i
     a reason worth noting (for example an unconfirmed material).
     """
     hanger = parse_size(hanger_text)
-    member = parse_size(member_label)
+    member = parse_member(member_label)
     depth, depth_source = _member_depth(member, member_depth_in)
     sawn = _is_nominal(hanger) or _is_nominal(member) or bool(_SAWN_WORDS.search(
         (member_label or '').upper()))
