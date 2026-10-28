@@ -10,9 +10,8 @@ and live-acceptance boundaries.
 
 ## Custom window foundation
 
-The owner approved a shared custom-window standard on 2026-10-27. Its first
-delivery is opt-in: the main template and its Gallery preview use the new
-foundation; existing production Python and compiled windows retain their
+The owner approved a shared custom-window standard on 2026-10-27. Its reference family is opt-in: five templates and their Gallery previews use the
+new foundation; existing production Python and compiled windows retain their
 current implementation until the reference is reviewed. The
 [consolidation plan](plans/custom-window-consolidation.md) owns migration status.
 
@@ -38,12 +37,18 @@ disabled brushes supplement brand colors. Footer links and version
 use the existing `footer_donate` and `text_gray` colors, per owner review.
 This is a transition seam, not a claim that every legacy control is consolidated.
 
+`KLCodeComponents.xaml` merges the foundation and adds opt-in field/group,
+readout, dropdown, radio/toggle, status/banner, table and splitter styles.
+The [five reference templates](../lib/GUI/_templates/README.md) compose these
+parts with safe Gallery presenters. The generic FindReplace example was adapted
+into Form and its unused wrapper retired; current Core tools were not migrated.
+
 `GUI.window_chrome.load_window()` is a small Python adapter with no import-time
 pyRevit/document dependency. It binds shared close/drag/navigation events;
 the caller retains body data, showing/dismissal semantics and model operations.
 Compiled WPF adoption is later work and keeps its own host adapter.
 
-The [main template guide](../lib/GUI/_templates/KLCodeMainTemplate.md) explains
+The [main template guide](../lib/GUI/_templates/KLCodeSelectionTemplate.md) explains
 the 432 x 576 reference and creating a new body. The
 [first-delivery verification](knowledge/reviews/design-system/2026-10-27-custom-window-foundation.md)
 contains actual WPF renders and proof limits. Native/pyRevit dialogs, ribbon
@@ -61,8 +66,8 @@ assemble shared visual parts instead of copying their formatting.
 | Layer | Plain-English job | Code owner |
 | --- | --- | --- |
 | Shared values | Names for sizes, gaps, fonts and state colors | [KLCodeFoundationTokens.xaml](../lib/GUI/Resources/KLCodeFoundationTokens.xaml) |
-| Shared parts/frame | Styles format controls; control templates draw their inner pieces and states; `KlaWindowShell` supplies header/footer around a body | [KLCodeFoundation.xaml](../lib/GUI/Resources/KLCodeFoundation.xaml) |
-| Window body | The tool's arrangement of search, fields, lists and actions | [Main template example](../lib/GUI/_templates/KLCodeMainTemplate.xaml) and each tool's own XAML |
+| Shared parts/frame | Styles format controls; templates draw their inner pieces/states; `KlaWindowShell` supplies header/footer around a body | [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) and [Components](../lib/GUI/Resources/KLCodeComponents.xaml) |
+| Window body | The tool's arrangement of search, fields, lists and actions | [Main template example](../lib/GUI/_templates/KLCodeSelectionTemplate.xaml) and each tool's own XAML |
 | Assembly/events | Load the resources/body and connect Close, dragging and footer navigation | [window_chrome.py](../lib/GUI/window_chrome.py) |
 | Caller identity | Supply title, pure tool version and shared link destinations | [window_metadata.py](../lib/GUI/window_metadata.py) |
 | Tool logic | Supply data, filtering/validation, showing/lifetime and Revit operations | Each tool's Python/C# code |
@@ -87,7 +92,7 @@ flowchart LR
 ```
 
 There are currently three shared-style paths: most older Python forms use
-`WPF_styles.xaml`, the main reference opts into the new foundation, and compiled
+`WPF_styles.xaml`, the reference templates opt into the new foundation, and compiled
 windows use `KLCode.Wpf` styles plus `ThemeBootstrapper`. There are also local
 exceptions: View Range owns its control resources and borrows only the shared
 wordmark; the Gallery catalog owns its local resources. Editing a foundation
@@ -364,13 +369,13 @@ host-specific bindings and event handlers.
 
 ## Windows
 
-**Canonical example:** `lib/GUI/_templates/KLCodeMainTemplate.xaml` is the
+**Canonical example:** `lib/GUI/_templates/KLCodeSelectionTemplate.xaml` is the
 opt-in foundation reference. It consumes shared shell/control styles instead
 of copying chrome. `SelectFromDict.xaml` remains the existing production
 list-selection implementation and has not yet been migrated.
 
-The following 10 user-facing KL&A custom windows use the template header
-treatment: five shared GUI windows, Match Properties Recall, View Range, the
+The following 9 user-facing KL&A custom windows use the template header
+treatment: four shared GUI windows, Match Properties Recall, View Range, the
 two Core Find and Replace windows, and Steel PSF. The former shared rename
 forms were removed on 2026-10-28 at the owner's request. The DevSandbox UI Gallery and its
 preview fixture are tooling exceptions and are not part of this visual
@@ -382,7 +387,6 @@ standardization scope.
 | --- | --- | --- | --- |
 | KL&A list selection | `lib/GUI/SelectFromDict.xaml` | `lib/GUI/SelectFromDict.py` | `Carbon GWP Pull.pushbutton`; `Concrete Mix Header.pushbutton`; `Create Detail Folders.pushbutton`; `Hide Revision Clouds.pushbutton`; `Highlight Changed Elements.pushbutton`; `Inspect Schedule Header.pushbutton`; `UI Gallery.pushbutton` |
 | KL&A alert | `lib/GUI/CustomAlert.xaml` | `lib/GUI/CustomAlert.py` | `UI Gallery.pushbutton` |
-| Find and replace | `lib/GUI/FindReplace.xaml` | `lib/GUI/FindReplace.py` | `UI Gallery.pushbutton` |
 | Duplicate sheets | `lib/GUI/DuplicateSheets.xaml` | `lib/GUI/DuplicateSheets.py` | `duplicate_sheets.pushbutton`; `UI Gallery.pushbutton` |
 | Create from rooms | `lib/GUI/Tools/CreateFromRooms.xaml` | `lib/GUI/Tools/CreateFromRooms.py` | `UI Gallery.pushbutton` |
 
@@ -410,8 +414,8 @@ standardization scope.
 
 ## UI Gallery source review
 
-The DevSandbox UI Gallery records 18 repository `Window` XAML surfaces: the
-12 pyRevit/DevSandbox windows below, the separate main-template preview, and
+The DevSandbox UI Gallery records 21 repository `Window` XAML surfaces: the
+11 production/tooling Python windows, five reference templates, and
 the five compiled WPF windows cataloged above. The compiled entries remain
 disabled by the owner's 2026-10-27 scope decision; working compiled previews are
 future work. Standard pyRevit/native dialogs are external sources, not
@@ -449,7 +453,7 @@ for the full audit, drift notes, and recommended actions.
 
 ## Style Loading And Local GUI Overrides
 
-The opt-in reference is `lib/GUI/_templates/KLCodeMainTemplate.xaml`, 432 x 576
+The opt-in reference is `lib/GUI/_templates/KLCodeSelectionTemplate.xaml`, 432 x 576
 with `KlaWindowShell` and new explicit foundation styles. Its title uses the
 flexible center column; header/footer heights remain 24. The inventory below
 describes older loading paths and copied chrome still awaiting migration.
@@ -462,7 +466,6 @@ These loaders call `my_WPF.add_wpf_resource()` before `wpf.LoadComponent()`. The
 | --- | --- | --- |
 | KL&A list selection | `lib/GUI/SelectFromDict.xaml` | `lib/GUI/SelectFromDict.py` |
 | KL&A alert | `lib/GUI/CustomAlert.xaml` | `lib/GUI/CustomAlert.py` |
-| Find and replace | `lib/GUI/FindReplace.xaml` | `lib/GUI/FindReplace.py` |
 | Find and replace views | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml` | Same bundle `script.py` |
 | Find and replace sheets | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml` | Same bundle `script.py` |
 | Match properties recall | `lib/match/clipboard_window.xaml` | `lib/match/clipboard.py` |
@@ -481,6 +484,6 @@ These entries are not pure shared-style consumers. Some define local resources a
 | UI Gallery preview fixture | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | No shared dictionary or KLCode header treatment. | A deliberately minimal preview/test fixture. |
 
 Future custom-window work should follow the approved foundation and
-[main template guide](../lib/GUI/_templates/KLCodeMainTemplate.md), with adoption
+[main template guide](../lib/GUI/_templates/KLCodeSelectionTemplate.md), with adoption
 scheduled through the consolidation plan after owner review. Keep workflow
 content local; promote reusable visual rules into the shared foundation.

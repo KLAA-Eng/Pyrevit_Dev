@@ -18,7 +18,6 @@ WINDOW_XAML_PATHS = (
 )
 
 ALL_WINDOW_XAML_PATHS = WINDOW_XAML_PATHS + (
-    'lib/GUI/FindReplace.xaml',
     'lib/GUI/DuplicateSheets.xaml',
     TAB_NAME + '/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
     TAB_NAME + '/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml',
@@ -33,7 +32,6 @@ ALL_WINDOW_XAML_PATHS = WINDOW_XAML_PATHS + (
 KL_A_TEMPLATE_WINDOW_XAML_PATHS = (
     'lib/GUI/SelectFromDict.xaml',
     'lib/GUI/CustomAlert.xaml',
-    'lib/GUI/FindReplace.xaml',
     'lib/GUI/DuplicateSheets.xaml',
     'lib/GUI/Tools/CreateFromRooms.xaml',
     'lib/match/clipboard_window.xaml',

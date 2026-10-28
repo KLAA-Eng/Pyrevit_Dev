@@ -1,0 +1,53 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="KLCode Form Template" Width="600" Height="620" MinWidth="520" MinHeight="540"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip"
+        Style="{StaticResource KlaFoundationWindow}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+        <Grid x:Name="window_body">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                <RowDefinition Height="{StaticResource KlaControlRow}"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Edit Naming Rules" Style="{StaticResource KlaSectionHeading}"/>
+            <Border Grid.Row="2" Style="{StaticResource KlaSection}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaFieldLabelColumn}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="{StaticResource KlaControlRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                        <RowDefinition Height="{StaticResource KlaControlRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                        <RowDefinition Height="{StaticResource KlaControlRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                        <RowDefinition Height="{StaticResource KlaControlRow}"/>
+                    </Grid.RowDefinitions>
+                    <Label Content="Find" Target="{Binding ElementName=input_find}" Style="{StaticResource KlaFieldLabel}"/>
+                    <TextBox x:Name="input_find" Grid.Column="1" Style="{StaticResource KlaFoundationInput}" AutomationProperties.Name="Find text"/>
+                    <Label Grid.Row="2" Content="Replace" Target="{Binding ElementName=input_replace}" Style="{StaticResource KlaFieldLabel}"/>
+                    <TextBox x:Name="input_replace" Grid.Row="2" Grid.Column="1" Style="{StaticResource KlaFoundationInput}" AutomationProperties.Name="Replacement text"/>
+                    <Label Grid.Row="4" Content="Prefix" Target="{Binding ElementName=input_prefix}" Style="{StaticResource KlaFieldLabel}"/>
+                    <TextBox x:Name="input_prefix" Grid.Row="4" Grid.Column="1" Style="{StaticResource KlaFoundationInput}" AutomationProperties.Name="Name prefix"/>
+                    <Label Grid.Row="6" Content="Suffix" Target="{Binding ElementName=input_suffix}" Style="{StaticResource KlaFieldLabel}"/>
+                    <TextBox x:Name="input_suffix" Grid.Row="6" Grid.Column="1" Style="{StaticResource KlaFoundationInput}" AutomationProperties.Name="Name suffix"/>
+                </Grid>
+            </Border>
+            <Grid Grid.Row="4">
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                <Label Content="Sample Preview" Target="{Binding ElementName=preview_lines}" Style="{StaticResource KlaFoundationPromptLabel}"/>
+                <TextBox x:Name="preview_lines" Grid.Row="2" Style="{StaticResource KlaMultilineReadout}" AutomationProperties.Name="Sample naming preview"/>
+            </Grid>
+            <Border Grid.Row="6" Style="{StaticResource KlaBanner}">
+                <TextBlock x:Name="form_feedback" Style="{StaticResource KlaInfoText}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite"/>
+            </Border>
+            <Grid Grid.Row="8">
+                <Button Content="Reset" Click="reset_form" Style="{StaticResource KlaSecondaryButton}" HorizontalAlignment="Left"/>
+                <Button x:Name="primary_action" Content="Apply Rules" Click="apply_form" Style="{StaticResource KlaFoundationMainButton}" HorizontalAlignment="Right" IsDefault="True"/>
+            </Grid>
+        </Grid>
+    </ContentControl>
+</Window>

@@ -9,6 +9,8 @@ from __future__ import unicode_literals
 
 import os
 
+from .template_data import TEMPLATE_FILES
+
 from ui_gallery.scenarios import (PreviewItem, alert_message, filtered_items, naming_values,
                                   parse_offset, recall_items, rename_samples,
                                   review_items, selection_items, set_checked, validate_state)
@@ -23,10 +25,8 @@ SOURCES = {
     'kla-create-from-rooms': 'lib/GUI/Tools/CreateFromRooms.xaml',
     'kla-custom-alert': 'lib/GUI/CustomAlert.xaml',
     'kla-duplicate-sheets': 'lib/GUI/DuplicateSheets.xaml',
-    'kla-find-replace': 'lib/GUI/FindReplace.xaml',
     'kla-find-replace-views': 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml',
     'kla-find-replace-sheets': 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml',
-    'kla-main-template': 'lib/GUI/_templates/KLCodeMainTemplate.xaml',
     'kla-match-properties-recall': 'lib/match/clipboard_window.xaml',
     'kla-select-from-dict': 'lib/GUI/SelectFromDict.xaml',
     'kla-steel-psf': 'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
@@ -35,6 +35,8 @@ SOURCES = {
     'ui-gallery-preview-fixture': 'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml',
 }
 
+
+SOURCES.update((identity, 'lib/GUI/_templates/' + filename) for identity, filename in TEMPLATE_FILES.items())
 
 def source_path(extension_root, relative_path):
     """Resolve the stable tab alias without allowing paths outside the repo."""
@@ -65,6 +67,9 @@ def create_custom(extension_root, launcher, state='Normal'):
     path = source_path(extension_root, SOURCES[identifier])
     if not os.path.isfile(path):
         raise ValueError('This window source is not present in this checkout.')
+    if identifier in TEMPLATE_FILES:
+        from .templates import create_template
+        return create_template(launcher, state, path)
     window_type = _window_type()
     return window_type(extension_root, launcher, state, path)
 
@@ -230,21 +235,11 @@ def _window_type():
             self._sample_numbers = ['A{:03d}'.format(i + 101)
                                     for i in range(len(self._sample_names))]
             self._duplicate_option = 'Duplicate'
-            if self.preview_id == 'kla-main-template':
-                from GUI.window_chrome import load_window
-                title = launcher.get('title', 'KLCode main template')
-                if state == 'Long content':
-                    title += ' - a deliberately long title to review ellipsis'
-                load_window(self, path, title, launcher.get('tool_version'),
-                            navigate=self._preview_navigation)
-            elif self.preview_id not in ('kla-view-range', 'kla-model-checker'):
+            if self.preview_id not in ('kla-view-range', 'kla-model-checker'):
                 merge(self, os.path.join(root, 'lib', 'GUI', 'Resources', 'WPF_styles.xaml'))
-                wpf.LoadComponent(self, path)
-            else:
-                wpf.LoadComponent(self, path)
+            wpf.LoadComponent(self, path)
             self.Title = '{} [Gallery: {}]'.format(launcher.get('title', 'Preview'), state)
-            if self.preview_id != 'kla-main-template':
-                self.ToolTip = 'Fictional data preview. Model, file, and navigation actions are simulated.'
+            self.ToolTip = 'Fictional data preview. Model, file, and navigation actions are simulated.'
             if hasattr(self, 'main_title'):
                 self.main_title.Text = launcher.get('title', 'Preview')
             if hasattr(self, 'footer_version'):
@@ -277,13 +272,7 @@ def _window_type():
                     name = group + suffix
                     if hasattr(self, name):
                         getattr(self, name).Text = values[suffix]
-            if self.preview_id == 'kla-main-template':
-                if self.preview_state == 'Empty':
-                    self.text_label.Content = 'No Sample Items Available.'
-                elif self.preview_state == 'Error':
-                    self.text_label.Content = 'Sample Validation: Select an Item.'
-                    set_checked(self._items, False)
-            elif self.preview_id == 'kla-custom-alert':
+            if self.preview_id == 'kla-custom-alert':
                 self.alert_heading.Text = 'Warning' if self.preview_state == 'Error' else 'Information'
                 self.alert_icon.Text = '!' if self.preview_state == 'Error' else 'i'
                 self.alert_icon.Foreground = (Brushes.Goldenrod if self.preview_state == 'Error'
@@ -309,9 +298,6 @@ def _window_type():
                     self._show_result('Sample: multiple items need attention.', alert_message('Long content'))
 
         def _disable_body(self):
-            if self.preview_id == 'kla-main-template':
-                self.window_body.IsEnabled = False
-                return
             content = self.Content
             if hasattr(content, 'Child'):
                 content = content.Child

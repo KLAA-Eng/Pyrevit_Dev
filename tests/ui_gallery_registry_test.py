@@ -74,6 +74,20 @@ class GalleryRegistryTests(unittest.TestCase):
         self.assertEqual([], matching_entries(rows, 'shared', preview='Deferred'))
         self.assertEqual(rows, matching_entries(rows, preview='All previews'))
 
+    def test_five_templates_replace_generic_find_replace_and_main_reference(self):
+        rows = gallery_entries(ROOT, {})
+        templates = [row for row in rows if row['category'] == 'Template']
+        self.assertEqual(5, len(templates))
+        self.assertEqual({'Template - ' + name for name in ('Selection', 'Form', 'Message', 'Options', 'Review')},
+                         {row['title'] for row in templates})
+        for row in templates:
+            self.assertTrue(row['can_launch'])
+            self.assertTrue(os.path.isfile(row['source_path']))
+            self.assertEqual(5, len(row['states']))
+        for old in ('lib/GUI/FindReplace.xaml', 'lib/GUI/FindReplace.py',
+                    'lib/GUI/_templates/KLCodeMainTemplate.xaml'):
+            self.assertFalse(os.path.exists(os.path.join(ROOT, old)))
+
     def test_retired_rename_forms_are_absent_from_source_and_catalog(self):
         rows = gallery_entries(ROOT, {})
         for name in ('RenameViews.xaml', 'RenameSheets.xaml', 'RenameSheets.py'):

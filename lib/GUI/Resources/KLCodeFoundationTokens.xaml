@@ -38,4 +38,15 @@
     <SolidColorBrush x:Key="KlaDisabledFillBrush" Color="#303C40"/>
     <SolidColorBrush x:Key="KlaDisabledTextBrush" Color="#A6B0AD"/>
     <BitmapImage x:Key="KlaIconSearch" UriSource="../../_icons/search_16px_light.png"/>
+    <!-- Component roles supplement the shared brand palette; all styles are opt-in. -->
+    <GridLength x:Key="KlaFieldLabelColumn">112</GridLength>
+    <GridLength x:Key="KlaActionColumn">104</GridLength>
+    <SolidColorBrush x:Key="KlaComponentSurfaceBrush" Color="#22303A"/>
+    <SolidColorBrush x:Key="KlaComponentBorderBrush" Color="#52675D"/>
+    <SolidColorBrush x:Key="KlaMutedBrush" Color="#B5C2BD"/>
+    <SolidColorBrush x:Key="KlaInfoBrush" Color="#A3C3E8"/>
+    <SolidColorBrush x:Key="KlaReadyBrush" Color="#91C8A6"/>
+    <SolidColorBrush x:Key="KlaWarningBrush" Color="#E8C66A"/>
+    <SolidColorBrush x:Key="KlaErrorBrush" Color="#E89E96"/>
+
 </ResourceDictionary>

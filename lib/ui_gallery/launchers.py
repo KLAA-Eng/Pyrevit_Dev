@@ -6,6 +6,8 @@ of Revit and prevents filesystem XAML discovery from becoming executable.
 """
 from __future__ import unicode_literals
 
+from .template_data import TEMPLATE_FILES
+
 
 _LAUNCHERS = (
     {
@@ -63,16 +65,6 @@ _LAUNCHERS = (
         'can_launch': False,
     },
     {
-        'id': 'kla-find-replace',
-        'category': 'KL&A custom',
-        'title': 'Find and replace',
-        'relative_path': 'lib/GUI/FindReplace.xaml',
-        'called_by': 'lib/GUI/FindReplace.py',
-        'description': 'Branded rename form in safe preview mode.',
-        'uses_seed_data': True,
-        'can_launch': True,
-    },
-    {
         'id': 'kla-find-replace-sheets',
         'category': 'KL&A custom',
         'title': 'Find and replace sheets',
@@ -89,16 +81,6 @@ _LAUNCHERS = (
         'relative_path': 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml',
         'called_by': 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/script.py',
         'description': 'View rename form with fictional drawing names.',
-        'uses_seed_data': True,
-        'can_launch': True,
-    },
-    {
-        'id': 'kla-main-template',
-        'category': 'KL&A custom',
-        'title': 'KLCode main template',
-        'relative_path': 'lib/GUI/_templates/KLCodeMainTemplate.xaml',
-        'called_by': 'UI Gallery.pushbutton template preview',
-        'description': 'Opt-in shared custom-window foundation with fictional selectable items. Review this reference before migrating other windows.',
         'uses_seed_data': True,
         'can_launch': True,
     },
@@ -383,12 +365,19 @@ def _with_sample_data_label(launcher):
 
 def gallery_launchers():
     """Return independent launcher dictionaries ordered by identifier."""
-    return [_with_sample_data_label(launcher) for launcher in _LAUNCHERS]
+    templates = [dict(id=identity, category='Template', title='Template - ' + identity.split('-')[1].title(),
+                      relative_path='lib/GUI/_templates/' + filename,
+                      called_by='UI Gallery reference template',
+                      description='Shared {} reference with fictional data and local actions.'.format(identity.split('-')[1]),
+                      uses_seed_data=True, can_launch=True)
+                 for identity, filename in TEMPLATE_FILES.items()]
+    return [_with_sample_data_label(launcher)
+            for launcher in sorted(list(_LAUNCHERS) + templates, key=lambda item: item['id'])]
 
 
 def launcher_by_id(launcher_id):
     """Return a launcher definition for an exact identifier, if available."""
-    for launcher in _LAUNCHERS:
+    for launcher in gallery_launchers():
         if launcher['id'] == launcher_id:
             return _with_sample_data_label(launcher)
     return None

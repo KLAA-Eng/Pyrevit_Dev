@@ -22,7 +22,7 @@ def load_window(window, xaml_path, title, version=None, navigate=None):
 
     resources = ResourceDictionary()
     resources.Source = Uri(os.path.join(os.path.dirname(__file__), 'Resources',
-                                       'KLCodeFoundation.xaml'))
+                                       'KLCodeComponents.xaml'))
     window.Resources.MergedDictionaries.Add(resources)
     wpf.LoadComponent(window, xaml_path)
     chrome = WindowChrome(window, WindowMetadata(title, version), navigate)

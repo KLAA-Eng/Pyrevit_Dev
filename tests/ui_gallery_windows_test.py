@@ -21,6 +21,7 @@ class Control(object):
         self.Children = []
         self.IsEnabled = True
         self.IsChecked = False
+        self.SelectedItem = None
 
 
 class Resources(dict):
@@ -121,6 +122,8 @@ class GalleryWindowTests(unittest.TestCase):
         with open(os.path.join(ROOT, 'lib', 'ui_gallery', 'windows.py'),
                   encoding='utf-8') as stream:
             tree = ast.parse(stream.read())
+        with open(os.path.join(ROOT, 'lib', 'ui_gallery', 'templates.py'), encoding='utf-8') as stream:
+            tree.body.extend(ast.parse(stream.read()).body)
         methods = {node.name for node in ast.walk(tree)
                    if isinstance(node, ast.FunctionDef)}
         events = {'Click', 'Checked', 'Unchecked', 'MouseDown', 'TextChanged',
@@ -218,7 +221,7 @@ class GalleryWindowTests(unittest.TestCase):
 
     def test_rename_family_states_seed_visible_empty_invalid_and_long_fields(self):
         groups = {
-            'kla-find-replace': 'input_',
+            'template-form': 'input_',
             'kla-find-replace-views': 'input_',
             'kla-find-replace-sheets': 'input_sheet_name_',
             'kla-duplicate-sheets': 'UI_sheet_name_',

@@ -4,7 +4,7 @@ Owner-approved design: 2026-10-27. Current work branch: `dev.GUI-Clean`.
 The owner requested moving all local GUI commits off `master-dev` on 2026-10-27;
 initial work was performed directly there under the earlier authorization.
 This file owns task status. [DESIGNSYSTEM.md](../DESIGNSYSTEM.md) owns the
-shared design rules; the [main template guide](../../lib/GUI/_templates/KLCodeMainTemplate.md)
+shared design rules; the [Selection template guide](../../lib/GUI/_templates/KLCodeSelectionTemplate.md)
 owns the reference-window implementation and usage.
 
 ## Delivery boundaries
@@ -16,10 +16,12 @@ and existing action placement. pyRevit/native dialogs, ribbon icon redesign,
 docked panels, and model-operation changes are excluded. The five compiled
 Gallery previews remain deferred under the separate Gallery plan.
 
-Only the first delivery is authorized for implementation now: opt-in shared
-foundations and the main template/Gallery preview. The owner reviews this
-reference before propagation to other custom windows. Icon names/sizes belong
-to the foundation; specific replacement artwork will be selected with the owner.
+The first delivery introduced opt-in foundations and the Selection reference.
+On 2026-10-28 the owner approved all five reference templates followed by
+grilling to refine their elements. Current scope is reference construction and
+review; propagation to production windows still waits for reference acceptance.
+Icon names/sizes belong to the foundation; specific replacement artwork will
+be selected with the owner.
 
 ## Task ledger
 
@@ -33,7 +35,9 @@ to the foundation; specific replacement artwork will be selected with the owner.
 | GUI-06 | Adopt foundation in compiled WPF adapters/windows | Waiting for GUI-04 | Share source design resources; preserve CLR/host boundaries; build and matching-host evidence required |
 | GUI-07 | Select additional in-window artwork | Pending owner selection | Reuse existing Search asset initially; keep semantic keys and 16-unit default |
 | GUI-08 | Live pyRevit/Revit acceptance | Pending host availability | Real ownership, keyboard/focus, drag, footer navigation, DPI/work-area and accessibility checks |
-| GUI-09 | Review remaining custom-window components and explain implementation | Reviewed; proposals await selection | [2026-10-28 review](../knowledge/reviews/design-system/2026-10-28-custom-window-components-review.md): 19 remaining windows, migration risks and candidate primitives; Close label corrected; no production migration |
+| GUI-09 | Review remaining custom-window components and explain implementation | Reviewed; five template additions selected | [2026-10-28 review](../knowledge/reviews/design-system/2026-10-28-custom-window-components-review.md): 19 remaining windows at its baseline, migration risks and candidate primitives; Close label corrected; no production migration |
+| GUI-10 | Create five shared reference templates | Implemented; locally verified | Owner approved all five on 2026-10-28; [family guide](../../lib/GUI/_templates/README.md), [verification](../knowledge/reviews/design-system/2026-10-28-template-family.md) |
+| GUI-11 | Refine template elements with owner using grilling | Interview in progress | Selection keeps settled baseline; review new Form, Message, Options and Review decisions before production migration |
 
 ## Implementation boundaries and recovery
 

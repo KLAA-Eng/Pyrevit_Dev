@@ -11,7 +11,8 @@ import os
 import sys
 import types
 import wpf
-from System import Uri
+from System import Uri, Action
+from System.Windows.Threading import Dispatcher, DispatcherFrame, DispatcherPriority
 from System.Windows import Window, Size, Rect
 from System.Windows.Media import PixelFormats
 from System.Windows.Media.Imaging import RenderTargetBitmap, PngBitmapEncoder, BitmapFrame
@@ -38,11 +39,21 @@ from ui_gallery.windows import create_custom
 from ui_gallery.scenarios import STATES
 
 
+def settle_layout(content):
+    # DataGrid star-column sizing is queued at Render priority; finish it before capture.
+    frame = DispatcherFrame()
+    Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background,
+        Action(lambda: setattr(frame, 'Continue', False)))
+    Dispatcher.PushFrame(frame)
+    content.UpdateLayout()
+
+
 def render_content(window, filename, width, height):
     content = window.Content
     content.Measure(Size(width, height))
     content.Arrange(Rect(0, 0, width, height))
     content.UpdateLayout()
+    settle_layout(content)
     bitmap = RenderTargetBitmap(int(width), int(height), 96, 96, PixelFormats.Pbgra32)
     bitmap.Render(content)
     encoder = PngBitmapEncoder()
@@ -122,5 +133,6 @@ for entry in entries:
         window.Close()
 gallery.Close()
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_foundation_wpf.py'))
+execfile(os.path.join(repo_root, 'scripts', 'validate_ui_templates_wpf.py'))
 print('IronPython {}: {} catalog entries; {} real-WPF custom/state constructions; Gallery filters/deferred selection passed.'.format(sys.version.split()[0], len(entries), count))
 print('No window was shown. Native dialogs and pyRevit/Revit integration remain host checks.')

@@ -13,7 +13,7 @@ tooltip:
     - Search by window or tool name, or filter Origin and Preview availability.
     - Select a row to see the calling tools and preview availability.
     - Choose a supported preview state and Open preview. All tool actions are simulated.
-    - Review KLCode main template for the shared custom-window foundation.
+    - Search Template - to review Selection, Form, Message, Options, and Review references.
     _____________________________________________________________________
     Last update:
     - [10.27.2026] - v0.5 (Unreleased): Add origins, source paths, tool callers, interactive states, faithful Recall, standalone coverage, and the shared main-template reference.

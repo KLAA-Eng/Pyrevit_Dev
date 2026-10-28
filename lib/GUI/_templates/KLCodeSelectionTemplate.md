@@ -1,7 +1,9 @@
-﻿# KLCode Main Template
+# KLCode Selection Template
 
-This is the first opt-in reference for the approved custom-window foundation.
-Open **KLCode main template** in UI Gallery to review it with fictional data.
+See the [template family](README.md) for the other reference windows.
+
+This is the selection reference for the approved custom-window foundation.
+Open **Template - Selection** in UI Gallery to review it with fictional data.
 The [consolidation plan](../../../docs/plans/custom-window-consolidation.md)
 owns delivery status; [DESIGNSYSTEM.md](../../../docs/DESIGNSYSTEM.md#custom-window-foundation)
 owns the shared design rules. Other production windows still use their existing
@@ -11,8 +13,9 @@ resources and layouts until the owner reviews this reference.
 
 | Source | Owns |
 | --- | --- |
-| `KLCodeMainTemplate.xaml` | Workflow body: search, sample list, selection controls and centered action arrangement |
+| `KLCodeSelectionTemplate.xaml` | Workflow body: search, sample list, selection controls and centered action arrangement |
 | `../Resources/KLCodeFoundation.xaml` | Reusable `KlaWindowShell`, header/footer composition, and explicitly named control styles |
+| `../Resources/KLCodeComponents.xaml` | Shared extended components; loader entry dictionary that merges Foundation |
 | `../Resources/KLCodeFoundationTokens.xaml` | Typed WPF spacing, typography, sizes, readable semantic brushes, and `KlaIconSearch` |
 | `../window_metadata.py` | Caller title/pure version and the two shared footer destinations; host-independent |
 | `../window_chrome.py` | Opt-in Python loading and shared close/drag/navigation events; does not show the window |

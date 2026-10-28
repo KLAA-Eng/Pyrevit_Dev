@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | Unreleased |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/UI Gallery.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/`; `lib/GUI/_templates/`; `lib/GUI/Resources/KLCodeFoundation.xaml`; `lib/GUI/Resources/KLCodeFoundationTokens.xaml`; `lib/GUI/window_chrome.py`; `lib/GUI/window_metadata.py` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/`; `lib/GUI/_templates/`; `lib/GUI/Resources/KLCodeFoundation.xaml`; `lib/GUI/Resources/KLCodeFoundationTokens.xaml`; `lib/GUI/Resources/KLCodeComponents.xaml`; `lib/GUI/window_chrome.py`; `lib/GUI/window_metadata.py` |
 
 ## Tool version history
 
@@ -19,7 +19,7 @@
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
 | v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
-| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, and the shared main-template reference. | Gallery source/tests and the 2026-10-27 verification records; pending next main delivery. |
+| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, and the five shared reference templates. | Gallery source/tests and the 2026-10-27 verification records; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -78,7 +78,7 @@ The static fixture and Gallery shell offer Normal only. Controls support
 filtering/checking, sample rename validation/results, duplicate options, numeric
 validation, and local outcomes as applicable. No production command is invoked.
 
-The **KLCode main template** preview uses the opt-in custom-window foundation:
+The **Template - Selection** preview uses the opt-in custom-window foundation:
 equal 24-unit header/footer, Segoe UI, fixed buttons, shared spacing and the
 existing semantic Search icon. It receives the Gallery's actual tool version
 as caller metadata; footer navigation remains simulated. Long content shows
@@ -90,9 +90,20 @@ the default main-button outline. Gaps below the header and last action are
 Title Case. Checkbox rows reuse its native WPF hover/selection template.
 The shared Close label has an optical alignment correction; isolated WPF checks
 measure its visible glyph center without changing button dimensions.
+The full reference family consists of **Template - Selection**, **Template -
+Form**, **Template - Message**, **Template - Options**, and **Template - Review**.
+All five offer the same five fictional states and share the shell, token data,
+and component styles. The old main reference is renamed Selection; the generic
+FindReplace form is adapted into Form. Its unused Python wrapper/export is
+retired, while the actual Core rename commands keep their own windows.
+See the [template family guide](../../../../lib/GUI/_templates/README.md) for
+composition, interactions and source ownership. Browse uses fictional paths,
+Message supports severity/details, Form previews naming, and Review separates
+checked items from selected detail. Sample operations remain local.
+
 Other production forms and the Gallery catalog shell keep their existing
-layouts pending review of this first reference. See the
-[template guide](../../../../lib/GUI/_templates/KLCodeMainTemplate.md) and
+layouts pending review of the references. See the
+[template guide](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.md) and
 [consolidation plan](../../../../docs/plans/custom-window-consolidation.md).
 
 Recall preserves the actual recall shell and hosts the actual clipboard
@@ -146,11 +157,15 @@ build the correct runtime assemblies, and validate in the matching Revit hosts.
 - `lib/ui_gallery/registry.py`: source inventory, origins, availability, and search.
 - `lib/ui_gallery/callers.py`: host-independent static caller discovery.
 - `lib/ui_gallery/scenarios.py`: deterministic fictional data and interactions.
+- `lib/ui_gallery/template_data.py` and `templates.py`: reference identities,
+  fictional fixtures, validation and safe presenters.
 - `lib/ui_gallery/windows.py`: explicitly allowlisted custom-XAML preview handlers.
 - `lib/ui_gallery/builtin.py`: real built-in/native dialog examples with discarded results.
 - `scripts/validate_ui_gallery_wpf.ps1` and `.py`: isolated IronPython/WPF validation.
 - `scripts/validate_ui_foundation_wpf.py`: reference-shell geometry, bindings,
   simulated actions/navigation, routed Close, and state-render checks.
+- `scripts/validate_ui_templates_wpf.py`: 25 template-state layouts, sample
+  interactions, generated checkbox bindings and minimum-size evidence.
 
 ## Model and external effects
 

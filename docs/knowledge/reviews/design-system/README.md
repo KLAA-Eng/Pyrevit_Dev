@@ -5,6 +5,7 @@ implementation guide is [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
 
 | Review | Scope |
 | --- | --- |
+| [2026-10-28 template family](2026-10-28-template-family.md) | Selection/Form/Message/Options/Review references, safe interactions, shared components, state/minimum-size WPF evidence, and pending human refinement. |
 | [2026-10-28 legacy retirement and Preview filter](2026-10-28-gallery-retirement-and-preview-filter.md) | Removal of retired rename forms, preserved Core callers, combined availability filtering and current WPF evidence. |
 | [2026-10-28 remaining-component review](2026-10-28-custom-window-components-review.md) | All 19 remaining standalone windows, missing component families, behavioral/compiled migration boundaries, and measured Close-label correction. |
 | [2026-10-27 main-template refinement](2026-10-27-main-template-refinement.md) | Owner-requested Create from rooms sizing/spacing, footer colors, button treatment, pure version text, and revised WPF comparison renders. |

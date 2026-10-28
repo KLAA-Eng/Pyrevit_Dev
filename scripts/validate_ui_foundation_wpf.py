@@ -71,7 +71,7 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
     if output_directory:
         render(selection, os.path.join(output_directory, 'list-selection-reference.png'), 432, 576)
     selection.Close()
-    template = next(entry for entry in entries if entry['id'] == 'kla-main-template')
+    template = next(entry for entry in entries if entry['id'] == 'template-selection')
     for state in template['states']:
         window = create_custom(root, dict(template, tool_version=tool_version), state)
         shell = window.window_shell

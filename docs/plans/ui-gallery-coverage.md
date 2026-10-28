@@ -28,6 +28,7 @@ windows remain visible and disabled by explicit owner decision.
 | GAL-05 | Update SPEC/version and review evidence | Implemented; locally verified | Planned v0.5; dated verification record; targeted metadata and diff checks |
 | GAL-06 | Live Revit acceptance | Pending host availability | Every supported family/state, input/dismissal, native pickers, DPI, and no production side effects |
 | GAL-07 | Remove retired rename forms and add Preview filter | Implemented; locally verified | 2026-10-28 owner request; source/caller regression checks and real WPF filter intersections; [verification](../knowledge/reviews/design-system/2026-10-28-gallery-retirement-and-preview-filter.md) |
+| GAL-08 | Register five template references | Implemented; locally verified | Selection/Form replace old main/generic FindReplace; Message/Options/Review add shared specimens; [family verification](../knowledge/reviews/design-system/2026-10-28-template-family.md) |
 | GAL-F01 | Enable five compiled previews | Deferred by owner | Future actual-view providers/actions, runtime builds, and matching-host validation |
 
 GAL-F01 covers Family Studio, Startup Importer source picker/review/blocking
