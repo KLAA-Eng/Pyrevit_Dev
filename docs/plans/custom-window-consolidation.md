@@ -33,6 +33,7 @@ to the foundation; specific replacement artwork will be selected with the owner.
 | GUI-06 | Adopt foundation in compiled WPF adapters/windows | Waiting for GUI-04 | Share source design resources; preserve CLR/host boundaries; build and matching-host evidence required |
 | GUI-07 | Select additional in-window artwork | Pending owner selection | Reuse existing Search asset initially; keep semantic keys and 16-unit default |
 | GUI-08 | Live pyRevit/Revit acceptance | Pending host availability | Real ownership, keyboard/focus, drag, footer navigation, DPI/work-area and accessibility checks |
+| GUI-09 | Review remaining custom-window components and explain implementation | Reviewed; proposals await selection | [2026-10-28 review](../knowledge/reviews/design-system/2026-10-28-custom-window-components-review.md): 19 remaining windows, migration risks and candidate primitives; Close label corrected; no production migration |
 
 ## Implementation boundaries and recovery
 

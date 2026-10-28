@@ -52,6 +52,54 @@ The [owner-requested refinement](knowledge/reviews/design-system/2026-10-27-main
 records the current compact search/list spacing, footer appearance, prefix-free
 version, and removal of the default-button outline.
 
+### How the code fits together
+
+WPF is the Windows interface toolkit. XAML describes what to draw; Python or
+C# supplies data and handles user actions. The design system lets windows
+assemble shared visual parts instead of copying their formatting.
+
+| Layer | Plain-English job | Code owner |
+| --- | --- | --- |
+| Shared values | Names for sizes, gaps, fonts and state colors | [KLCodeFoundationTokens.xaml](../lib/GUI/Resources/KLCodeFoundationTokens.xaml) |
+| Shared parts/frame | Styles format controls; control templates draw their inner pieces and states; `KlaWindowShell` supplies header/footer around a body | [KLCodeFoundation.xaml](../lib/GUI/Resources/KLCodeFoundation.xaml) |
+| Window body | The tool's arrangement of search, fields, lists and actions | [Main template example](../lib/GUI/_templates/KLCodeMainTemplate.xaml) and each tool's own XAML |
+| Assembly/events | Load the resources/body and connect Close, dragging and footer navigation | [window_chrome.py](../lib/GUI/window_chrome.py) |
+| Caller identity | Supply title, pure tool version and shared link destinations | [window_metadata.py](../lib/GUI/window_metadata.py) |
+| Tool logic | Supply data, filtering/validation, showing/lifetime and Revit operations | Each tool's Python/C# code |
+| Review harness | Use the real visual source with fictional data and simulated actions | `lib/ui_gallery/` and UI Gallery |
+
+For example, `Height="{StaticResource KlaControlHeight}"` means "look up the
+standard height" rather than writing `32` into each form. The main template is
+a working example assembled from those parts. Its body references shared
+styles; the shell draws the header/footer. The loader does not show a window,
+query a document or replace the tool's DataContext. The caller retains those
+responsibilities. A common appearance does not imply a common selection rule.
+
+```mermaid
+flowchart LR
+    Values[Named values] --> Parts[Styles and shell]
+    Legacy[Existing palette and wordmark] --> Parts
+    Parts --> Loader[Window loader]
+    Body[Body XAML] --> Loader
+    Identity[Caller title and version] --> Loader
+    Loader --> Window[Assembled WPF window]
+    Tool[Tool data and actions] --> Window
+```
+
+There are currently three shared-style paths: most older Python forms use
+`WPF_styles.xaml`, the main reference opts into the new foundation, and compiled
+windows use `KLCode.Wpf` styles plus `ThemeBootstrapper`. There are also local
+exceptions: View Range owns its control resources and borrows only the shared
+wordmark; the Gallery catalog owns its local resources. Editing a foundation
+style affects opted-in consumers; the other windows still need migration.
+The foundation reuses legacy resources. Compiled adoption must package compatible
+resources/assets and keep its C# event/localization adapter.
+
+The [2026-10-28 component review](knowledge/reviews/design-system/2026-10-28-custom-window-components-review.md)
+maps the missing parts. The shared Close style now moves its text upward by one
+unit for optical centering in the fixed 18-unit control; the WPF probe measures
+the visible glyph bounds rather than only the surrounding text box.
+
 ## Master Design Colors
 
 These are the named colors used across KLCode ribbon icons and WPF GUIs. This table defines the color names used throughout this document; usage guidance belongs in the relevant icon and GUI sections.

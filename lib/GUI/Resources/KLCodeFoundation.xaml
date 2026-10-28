@@ -57,6 +57,12 @@
         <!-- Chrome is the deliberate compact exception to form control sizes. -->
         <Setter Property="Width" Value="60"/><Setter Property="Height" Value="18"/>
         <Setter Property="FontSize" Value="10"/><Setter Property="Padding" Value="0"/>
+        <Setter Property="ContentTemplate"><Setter.Value><DataTemplate>
+            <!-- Segoe UI's line box is centered, but its visible glyphs sit lower in this 18-unit control. -->
+            <TextBlock Text="{Binding}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}">
+                <TextBlock.RenderTransform><TranslateTransform Y="-1"/></TextBlock.RenderTransform>
+            </TextBlock>
+        </DataTemplate></Setter.Value></Setter>
     </Style>
     <Style x:Key="KlaFoundationLabel" TargetType="Label">
         <Setter Property="Foreground" Value="{StaticResource text_white}"/>

@@ -3,11 +3,15 @@
 from __future__ import print_function
 
 from System import Uri
-from System.Windows import Point, RoutedEventArgs, Size, Rect
+from System.Windows import Point, RoutedEventArgs, Size, Rect, FlowDirection
 from System.Windows.Controls.Primitives import ButtonBase
 from System.Windows.Controls import TextBlock, CheckBox
 from System.Windows.Controls.Primitives import ScrollBar
-from System.Windows.Media import VisualTreeHelper
+from System.Windows.Media import (VisualTreeHelper, FormattedText, Typeface,
+                                  DrawingVisual, VisualBrush, PixelFormats)
+from System.Windows.Media.Imaging import RenderTargetBitmap, PngBitmapEncoder, BitmapFrame
+from System.IO import FileStream, FileMode
+from System.Globalization import CultureInfo
 from System.Windows.Documents import Hyperlink
 from System.Windows.Navigation import RequestNavigateEventArgs
 
@@ -17,6 +21,23 @@ def descendants(parent):
         yield child
         for nested in descendants(child):
             yield nested
+
+
+def render_close_detail(button, filename):
+    """Render the actual control at 4x density without changing its layout."""
+    visual = DrawingVisual()
+    context = visual.RenderOpen()
+    context.DrawRectangle(VisualBrush(button), None, Rect(0, 0, 60, 18))
+    context.Close()
+    bitmap = RenderTargetBitmap(240, 72, 384, 384, PixelFormats.Pbgra32)
+    bitmap.Render(visual)
+    encoder = PngBitmapEncoder()
+    encoder.Frames.Add(BitmapFrame.Create(bitmap))
+    stream = FileStream(filename, FileMode.Create)
+    try:
+        encoder.Save(stream)
+    finally:
+        stream.Dispose()
 
 
 def validate_foundation(root, entries, tool_version, output_directory, render):
@@ -66,6 +87,18 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
             assert row.ActualHeight == room_row_height
             assert row.Template == native_row_template
             assert window.text_label.Content == 'Select Elements:'
+            label = next(part for part in descendants(chrome.close_button) if isinstance(part, TextBlock))
+            glyphs = FormattedText(label.Text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
+                                   Typeface(label.FontFamily, label.FontStyle, label.FontWeight, label.FontStretch),
+                                   label.FontSize, label.Foreground).BuildGeometry(Point(0, 0)).Bounds
+            origin = label.TranslatePoint(Point(0, 0), chrome.close_button)
+            center_x = origin.X + glyphs.X + glyphs.Width / 2
+            center_y = origin.Y + glyphs.Y + glyphs.Height / 2
+            assert abs(center_x - chrome.close_button.ActualWidth / 2) < 0.25
+            assert abs(center_y - chrome.close_button.ActualHeight / 2) < 0.25
+            print('Close visible-text center: {:.2f}, {:.2f}; button center: 30, 9.'.format(center_x, center_y))
+            if output_directory:
+                render_close_detail(chrome.close_button, os.path.join(output_directory, 'close-control-4x.png'))
             assert text.TranslatePoint(Point(0, 0), check).X - 16 == room_text_gap
             print('Main template: search {} high at y={}; row {} high, padding {}; checkbox text gap {}; list {} x {}; text width {}; scrollbars {}.'.format(
                 window.textbox_filter.ActualHeight, window.textbox_filter.TranslatePoint(Point(0, 0), shell).Y,

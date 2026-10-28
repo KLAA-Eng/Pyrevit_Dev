@@ -32,7 +32,7 @@ Values are WPF device-independent units, not physical screen pixels.
 | Header and footer | 24 high each |
 | Header | 86 / flexible / 86 columns; existing 70 x 12 outlined wordmark, centered title, Close button |
 | Title | Segoe UI 14; uses the available center lane, with ellipsis and no tooltip |
-| Close | 60 x 18, Segoe UI 10; deliberate chrome exception |
+| Close | 60 x 18, Segoe UI 10; one-unit upward optical text adjustment in the shared style |
 | Body | 16 horizontal padding; 8 below header and last action; list uses remaining height rather than a fixed height |
 | Search | 24-high visible field, matching Create from rooms; 14-unit text and existing 16-unit icon |
 | Typography | Segoe UI 12 body/controls; 14 main action |

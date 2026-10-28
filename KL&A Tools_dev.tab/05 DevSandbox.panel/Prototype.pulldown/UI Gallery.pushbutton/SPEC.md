@@ -78,6 +78,8 @@ checkbox rows, uses its footer green/gray, omits the version prefix, and removes
 the default main-button outline. Gaps below the header and last action are
 8 units. The selection prompt uses the KL&A list-selection font size (14) and
 Title Case. Checkbox rows reuse its native WPF hover/selection template.
+The shared Close label has an optical alignment correction; isolated WPF checks
+measure its visible glyph center without changing button dimensions.
 Other production forms and the Gallery catalog shell keep their existing
 layouts pending review of this first reference. See the
 [template guide](../../../../lib/GUI/_templates/KLCodeMainTemplate.md) and

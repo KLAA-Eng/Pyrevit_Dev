@@ -5,6 +5,7 @@ implementation guide is [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
 
 | Review | Scope |
 | --- | --- |
+| [2026-10-28 remaining-component review](2026-10-28-custom-window-components-review.md) | All 19 remaining standalone windows, missing component families, behavioral/compiled migration boundaries, and measured Close-label correction. |
 | [2026-10-27 main-template refinement](2026-10-27-main-template-refinement.md) | Owner-requested Create from rooms sizing/spacing, footer colors, button treatment, pure version text, and revised WPF comparison renders. |
 | [2026-10-27 custom-window foundation](2026-10-27-custom-window-foundation.md) | First opt-in shared shell/main-template delivery, five actual WPF state renders, focused checks and pending owner/live-host acceptance. |
 | [2026-10-27 Gallery verification](2026-10-27-ui-gallery-verification.md) | Approved standalone Gallery expansion, origin/caller/state coverage, isolated IronPython/WPF renders, and remaining live-host checks. |
