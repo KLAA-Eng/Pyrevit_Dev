@@ -61,6 +61,16 @@ try:
         stem_from_image_name,
     )
     from pdf_overlay.style import DEFAULT_OPACITY, DEFAULT_TINT, TINTS, clamp_opacity, tint_rgb
+    from pdf_overlay.members import (
+        CONFLICT,
+        MATCH,
+        MISMATCH,
+        UNREADABLE,
+        match_members,
+        parse_size,
+        size_labels,
+    )
+    from pdf_overlay.pdftext import PdfError, read_pdf_page_text
 except Exception:
     log('import failed:\n' + traceback.format_exc())
     raise
@@ -401,6 +411,141 @@ def set_overlay_visibility(uiapp, overlay, visible):
 
 
 
+# -- Member check ------------------------------------------------------------
+
+STATUS_LABELS = {
+    MISMATCH: 'Size differs',
+    CONFLICT: 'PDF labels disagree',
+    UNREADABLE: 'Revit size not recognized',
+}
+MAX_UNLABELLED_ROWS = 200
+
+
+def _member_size(doc, element):
+    """Return (size text, parse_size key or None) from the member's type."""
+    symbol = doc.GetElement(element.GetTypeId())
+    type_name = DB.Element.Name.GetValue(symbol) if symbol is not None else ''
+    family_name = getattr(symbol, 'FamilyName', '') or ''
+    for text in (type_name, family_name + ' ' + type_name):
+        parsed = parse_size(text)
+        if parsed:
+            return parsed[1], parsed[0]
+    return (type_name or family_name or '?'), None
+
+
+def collect_members(doc, view):
+    """Return framing visible in view as 2D member lines for matching."""
+    members = []
+    collector = (DB.FilteredElementCollector(doc, view.Id)
+                 .OfCategory(DB.BuiltInCategory.OST_StructuralFraming)
+                 .WhereElementIsNotElementType())
+    for element in collector:
+        curve = getattr(getattr(element, 'Location', None), 'Curve', None)
+        if curve is None:
+            continue
+        start = _to_view_2d(view, curve.GetEndPoint(0))
+        end = _to_view_2d(view, curve.GetEndPoint(1))
+        if math.hypot(end[0] - start[0], end[1] - start[1]) < 0.01:
+            continue  # Seen end-on in this view.
+        size, key = _member_size(doc, element)
+        members.append({'id': element.Id, 'size': size, 'key': key, 'start': start, 'end': end})
+    return members
+
+
+def _crop_rect(view):
+    """Return the active crop region as a view-space rectangle, or None."""
+    if not view.CropBoxActive:
+        return None
+    box = view.CropBox
+    corners = [_to_view_2d(view, box.Transform.OfPoint(point)) for point in (box.Min, box.Max)]
+    xs, ys = [corner[0] for corner in corners], [corner[1] for corner in corners]
+    return (min(xs), min(ys), max(xs), max(ys))
+
+
+def check_members(uiapp, overlay):
+    """Compare framing sizes in the active view with the overlay's PDF labels."""
+    uidoc = uiapp.ActiveUIDocument
+    doc = _overlay_document(uiapp, overlay)
+    view = _active_overlay_view(uidoc)
+    instances = overlay_instances(doc, overlay.image_type, view)
+    if not instances:
+        raise UserError('This overlay is not placed in the active view.')
+    state = overlay.state
+    _sync_pose_from_instance(instances[0], view, state)
+    try:
+        page_text = read_pdf_page_text(state['pdf_path'], state['page'])
+    except (IOError, OSError):
+        raise UserError('The PDF is no longer at {}.'.format(state['pdf_path']))
+    except PdfError as error:
+        raise UserError('Could not read the PDF text: {}'.format(error))
+
+    labels = size_labels(page_text, state['pose'], state['page_size'])
+    if not labels:
+        raise UserError('No steel size labels (like W12x26) were found as text in this PDF page.')
+    crop = _crop_rect(view)
+    outside = 0
+    if crop is not None:
+        inside = [label for label in labels
+                  if crop[0] <= label['center'][0] <= crop[2] and crop[1] <= label['center'][1] <= crop[3]]
+        outside = len(labels) - len(inside)
+        labels = inside
+    members = collect_members(doc, view)
+    result = match_members(labels, members)
+    result.update({'labels': len(labels), 'members': len(members), 'outside': outside,
+                   'aspect_warning': _aspect_warning(page_text, state['page_size'])})
+    return result
+
+
+def _aspect_warning(page_text, page_size):
+    width, height = page_text.display_size()
+    pdf_aspect = width / height
+    raster_aspect = float(page_size[0]) / page_size[1]
+    if abs(pdf_aspect / raster_aspect - 1.0) > 0.02:
+        return ('The PDF page shape ({:.3f}) differs from the imported image ({:.3f}); '
+                'label positions may be off.').format(pdf_aspect, raster_aspect)
+    return None
+
+
+def report_member_check(output, overlay, result):
+    """Print the review list to the pyRevit output window; return ids to select."""
+    rows = result['rows']
+    review = [row for row in rows if row['status'] != MATCH]
+    matched = len(rows) - len(review)
+    output.print_md('## PDF member check: {}'.format(os.path.basename(overlay.state['pdf_path'])))
+    output.print_md(
+        '{} size labels read; {} labelled members match, **{} need review**, '
+        '{} labels found no member, {} members in the view had no label.'.format(
+            result['labels'], matched, len(review), len(result['unmatched_labels']),
+            len(result['unlabelled'])))
+    if result['outside']:
+        output.print_md('{} labels outside the crop region were ignored.'.format(result['outside']))
+    if result['aspect_warning']:
+        output.print_md('**Warning:** ' + result['aspect_warning'])
+    if review:
+        output.print_table(
+            table_data=[[output.linkify(row['id']), row['revit'], row['pdf'],
+                         STATUS_LABELS.get(row['status'], row['status'])] for row in review],
+            columns=['Member', 'Revit size', 'PDF size', 'Review'],
+            title='Members to review')
+    if result['unmatched_labels']:
+        counts = {}
+        for label in result['unmatched_labels']:
+            counts[label['text']] = counts.get(label['text'], 0) + 1
+        output.print_table(
+            table_data=[[text, count] for text, count in sorted(counts.items())],
+            columns=['PDF size', 'Labels'],
+            title='PDF labels with no member nearby (missing members or loose alignment)')
+    if result['unlabelled']:
+        shown = result['unlabelled'][:MAX_UNLABELLED_ROWS]
+        output.print_table(
+            table_data=[[output.linkify(member['id']), member['size']] for member in shown],
+            columns=['Member', 'Revit size'],
+            title='Members with no PDF label (not checked)')
+        if len(result['unlabelled']) > len(shown):
+            output.print_md('...and {} more.'.format(len(result['unlabelled']) - len(shown)))
+    return [row['id'] for row in review]
+
+
 # -- Palette -----------------------------------------------------------------
 
 class OverlayActionHandler(UI.IExternalEventHandler):
@@ -432,9 +577,11 @@ class OverlayActionHandler(UI.IExternalEventHandler):
 
 
 class PdfOverlayPalette(my_WPF):
-    def __init__(self, handler, action_event):
+    def __init__(self, handler, action_event, output):
         self.handler = handler
         self.action_event = action_event
+        # Captured at launch; pyRevit binds output to the running command.
+        self.output = output
         self.overlays = []
         self._loading = False
         self.add_wpf_resource()
@@ -561,6 +708,19 @@ class PdfOverlayPalette(my_WPF):
                 math.degrees(pose['rotation'])))
         self.run(action, ALIGN_STEPS[0])
 
+    def button_check(self, sender, e):
+        overlay = self._usable_overlay()
+        if overlay is None:
+            return
+
+        def action(uiapp):
+            result = check_members(uiapp, overlay)
+            review_ids = report_member_check(self.output, overlay, result)
+            uiapp.ActiveUIDocument.Selection.SetElementIds(List[DB.ElementId](review_ids))
+            self.set_status('{} member(s) to review are selected; see the report window.'.format(len(review_ids))
+                            if review_ids else 'No size differences found; see the report window.')
+        self.run(action, 'Reading PDF labels and checking members...')
+
     def opacity_changed(self, sender, e):
         self.opacity_text.Text = '{}%'.format(int(self.opacity_slider.Value))
         if self._loading:
@@ -608,7 +768,7 @@ class PdfOverlayPalette(my_WPF):
 
 def main():
     handler = OverlayActionHandler()
-    palette = PdfOverlayPalette(handler, UI.ExternalEvent.Create(handler))
+    palette = PdfOverlayPalette(handler, UI.ExternalEvent.Create(handler), script.get_output())
     log('palette loaded')
     handler.palette = palette
     palette.load_overlays(HOST_APP.uiapp)

@@ -14,7 +14,7 @@
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| v0.0 | Unreleased | 10.28.2026 | First DevSandbox PDF overlay: PDF page import with transparent paper and tinted linework, two-point alignment, and an opacity, color, and visibility palette. | Pending commit on `dev.pdf-overlay`; pending next main delivery. |
+| v0.0 | Unreleased | 10.28.2026 | First DevSandbox PDF overlay: PDF page import with transparent paper and tinted linework, two-point alignment, an opacity, color, and visibility palette, and a member size check against the PDF's text labels. | Pending commit on `dev.pdf-overlay`; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -65,8 +65,50 @@ lets the user blend or blink the two for review.
    the same ImageType. Its instances are re-placed, so alignment is kept. Show
    overlay hides or unhides the overlay in the active view only.
 
+4. **Check Members.** Compares framing sizes in the active view with the size
+   labels printed in the PDF (see Member check). Members to review are
+   selected in Revit and listed in the pyRevit output window.
+
 The palette is modeless and stays open beside Revit. Actions run through an
 `ExternalEvent`, one at a time.
+
+## Member check
+
+The labels come from the PDF's text, not the image. `lib/pdf_overlay/pdftext.py`
+is a small standard-library PDF reader that runs under IronPython and CPython.
+It handles FlateDecode streams, object streams, incremental updates, simple and
+Type0 fonts with ToUnicode maps, Form XObjects, and `/Rotate` and CropBox. It
+returns positioned words for the overlay's page. Characters are joined into
+words by direction (within 3°), baseline, and gap. Encrypted PDFs, scanned
+pages, and text exported as outlines have no readable labels; the check then
+says so.
+
+Steel sizes are found with one pattern: W, M, S, HP, C, MC, WT, MT, ST, L, 2L,
+and HSS shapes, with decimal or fractional dimensions (`HSS5x5x3/8`). Run-together
+labels such as `W12x26W12x19` are split, and each part keeps its own glyph
+positions. Sizes compare numerically, so case, `X` vs `x`, leading marks
+(`*W18x65`), and `3/8` vs `.375` do not matter.
+
+Each label is placed in the view through the displayed page, the raster size,
+and the overlay pose. It goes to the nearest structural framing line in the
+active view that is within 15° of the label's direction and within 3 text
+heights. Framing comes from a view-filtered collector, using each member's
+location curve and the size parsed from its type name, or failing that, its
+family and type names. Labels outside an active crop region are ignored.
+Results:
+
+- **Size differs**: the member's Revit size differs from its PDF label.
+- **PDF labels disagree**: two or more different sizes were assigned to one
+  member.
+- **Revit size not recognized**: the type name has no steel size to compare.
+- PDF labels with no member nearby (a missing member or loose alignment),
+  counted by size.
+- Members with no PDF label (not checked), listed up to 200.
+
+The review members are selected in Revit and listed with clickable ids in the
+pyRevit output window. Nothing in the model changes. The check reads the PDF
+from its original path at check time. A warning is printed if the PDF page
+shape and the imported image differ by more than 2%.
 
 ## Rendering
 
