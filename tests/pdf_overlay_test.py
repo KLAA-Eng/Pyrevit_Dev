@@ -18,6 +18,9 @@ from lib.pdf_overlay.geometry import (
     image_size_feet,
     initial_feet_per_pixel,
     make_pose,
+    marker_radius_feet,
+    max_dpi_for_page,
+    page_pixels_allowed,
     pixel_to_view,
     rotated_canvas_size,
     snap_rotation,
@@ -49,6 +52,19 @@ class PdfOverlayGeometryTests(unittest.TestCase):
     def assertPointAlmostEqual(self, expected, actual, places=6):
         self.assertAlmostEqual(expected[0], actual[0], places=places)
         self.assertAlmostEqual(expected[1], actual[1], places=places)
+
+    def test_page_size_limit_allows_400_but_not_600_dpi_on_arch_d(self):
+        # A 36x24 inch sheet.
+        self.assertTrue(page_pixels_allowed(36 * 400, 24 * 400))
+        self.assertFalse(page_pixels_allowed(36 * 600, 24 * 600))
+        self.assertTrue(page_pixels_allowed(17 * 600, 11 * 600))
+        best = max_dpi_for_page(36 * 600, 24 * 600, 600)
+        self.assertTrue(page_pixels_allowed(36 * best, 24 * best))
+        self.assertFalse(page_pixels_allowed(36 * (best + 2), 24 * (best + 2)))
+
+    def test_marker_radius_prints_an_eighth_inch(self):
+        self.assertAlmostEqual(1.0, marker_radius_feet(96))
+        self.assertAlmostEqual(0.125 / 12.0, marker_radius_feet(0))
 
     def test_initial_scale_matches_printed_view_scale(self):
         # 1/8" = 1'-0" is scale 96: one inch on paper is eight feet.

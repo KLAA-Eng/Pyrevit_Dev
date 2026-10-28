@@ -30,8 +30,11 @@ lets the user blend or blink the two for review.
 
 ## Workflow
 
-1. **Import PDF.** The palette's Page and DPI (100, 150, 200, or 300; default
-   150) choose what to import. Revit rasterizes the page through
+1. **Import PDF.** The palette's Page and DPI (100, 150, 200, 300, 400, or 600;
+   default 150) choose what to import. A rendered page above 160 million pixels
+   is refused with the highest DPI that fits (a 36x24 sheet fits at 400 DPI, not
+   600), because rendering holds three full-page copies in memory; an
+   out-of-memory failure also asks for a lower DPI. Revit rasterizes the page through
    `ImageType.Create` in a transaction that is rolled back after
    `ImageType.GetImage()` copies the pixels, so no page-only type is left in the
    model. The page is flattened onto white and cached locally. The tool renders
@@ -49,6 +52,14 @@ lets the user blend or blink the two for review.
    the tool reads the image's current center and width, so a manual move or
    resize in Revit is respected. Align can be repeated to refine. Esc cancels
    without changes.
+
+   The four clicks are numbered steps. The palette status and the Revit status
+   bar name the next click ("Step 2 of 4: click the SAME point IN THE MODEL")
+   and confirm the last one. Each click leaves a temporary 1/8-inch (printed)
+   circle: blue on the PDF, green in the model. The circles are detail lines
+   with per-view color overrides, made and deleted in their own transactions,
+   and are removed when Align finishes or is cancelled. If a view cannot take
+   detail lines, the circles are skipped and the steps still run.
 3. **Review.** The Opacity slider (0–100%, default 60%) and the Color choice
    (Red, Magenta, Blue, Green, or Original) re-render the PNG and reload it into
    the same ImageType. Its instances are re-placed, so alignment is kept. Show
@@ -65,6 +76,15 @@ strongest. A tint replaces the RGB with a constant color; Original keeps the
 source colors. Rotation is applied in the same pass on a canvas sized to the
 rotated page, so the Revit image always stays axis-aligned and the tool does
 not rely on rotating image instances.
+
+## Diagnostics
+
+Startup steps and failures are appended to
+`%LOCALAPPDATA%\KLA Tools\PDF Overlay\pdf_overlay.log`, because the pyRevit
+output window can render blank. A startup failure also shows the error in an
+alert. In pyRevit 6, `wpf` must be taken from `pyrevit.framework`, which loads
+the engine's IronPython.Wpf assembly; a bare `import wpf` before that fails with
+`No module named _wpf`.
 
 ## Storage and sharing
 

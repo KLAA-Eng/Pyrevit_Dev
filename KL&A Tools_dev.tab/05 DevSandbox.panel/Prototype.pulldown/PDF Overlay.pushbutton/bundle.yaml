@@ -11,7 +11,8 @@ tooltip:
     _____________________________________________________________________
     How-to:
     - Open the plan view, run the command, set the page and DPI, and click Import PDF.
-    - Click Align (2 Points): pick a grid intersection on the PDF, then the same intersection in the model; repeat for a second, far-apart point.
+    - Click Align (2 Points) and follow the 4 numbered steps in the palette: a point on the PDF, the same point in the model, then a second far-apart pair. Blue and green circles mark each click until Align finishes.
+    - DPI up to 600 for small sheets; large sheets are limited to the DPI that fits in memory (about 400 for 36x24).
     - Drag the Opacity slider, change Color, or untick Show overlay to compare.
     _____________________________________________________________________
     Last update:

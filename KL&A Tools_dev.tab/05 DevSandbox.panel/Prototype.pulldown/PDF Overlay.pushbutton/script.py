@@ -4,48 +4,79 @@ from __future__ import print_function
 __title__ = "PDF Overlay"
 __version__ = "v0.0"
 
+import datetime
 import math
 import os
 import traceback
 import uuid
 
-import wpf
-from Autodesk.Revit.Exceptions import InvalidOperationException, OperationCanceledException
-from pyrevit import DB, HOST_APP, UI, forms, script
-from System import TimeSpan
-from System.Collections.Generic import List
-from System.Windows.Interop import WindowInteropHelper
-from System.Windows.Threading import DispatcherTimer
+# The pyRevit output window can render blank, so startup steps and errors are
+# also written to a log file that is readable without Revit.
+LOG_PATH = os.path.join(os.environ.get('LOCALAPPDATA') or os.environ.get('TEMP') or '.',
+                        'KLA Tools', 'PDF Overlay', 'pdf_overlay.log')
 
-from GUI.WPF_Base import my_WPF
-from pdf_overlay import raster
-from pdf_overlay.geometry import (
-    fit_pose,
-    image_size_feet,
-    initial_feet_per_pixel,
-    make_pose,
-    rotated_canvas_size,
-    view_to_pixel,
-)
-from pdf_overlay.state import (
-    default_cache_root,
-    load_state,
-    make_state,
-    overlay_paths,
-    overlay_stem,
-    save_state,
-    stem_from_image_name,
-)
-from pdf_overlay.style import DEFAULT_OPACITY, DEFAULT_TINT, TINTS, clamp_opacity, tint_rgb
+
+def log(message):
+    try:
+        folder = os.path.dirname(LOG_PATH)
+        if not os.path.isdir(folder):
+            os.makedirs(folder)
+        with open(LOG_PATH, 'a') as log_file:
+            log_file.write('{:%Y-%m-%d %H:%M:%S} {}\n'.format(datetime.datetime.now(), message))
+    except Exception:
+        pass
+
+
+log('--- start')
+try:
+    from Autodesk.Revit.Exceptions import InvalidOperationException, OperationCanceledException
+    from pyrevit import DB, HOST_APP, UI, forms, script
+    # pyrevit.framework loads the engine's IronPython.Wpf assembly that backs wpf.
+    from pyrevit.framework import wpf
+    from System import Action, TimeSpan
+    from System.Collections.Generic import List
+    from System.Windows.Interop import WindowInteropHelper
+    from System.Windows.Threading import DispatcherPriority, DispatcherTimer
+
+    from GUI.WPF_Base import my_WPF
+    from pdf_overlay import raster
+    from pdf_overlay.geometry import (
+        fit_pose,
+        image_size_feet,
+        initial_feet_per_pixel,
+        make_pose,
+        marker_radius_feet,
+        max_dpi_for_page,
+        page_pixels_allowed,
+        rotated_canvas_size,
+        view_to_pixel,
+    )
+    from pdf_overlay.state import (
+        default_cache_root,
+        load_state,
+        make_state,
+        overlay_paths,
+        overlay_stem,
+        save_state,
+        stem_from_image_name,
+    )
+    from pdf_overlay.style import DEFAULT_OPACITY, DEFAULT_TINT, TINTS, clamp_opacity, tint_rgb
+except Exception:
+    log('import failed:\n' + traceback.format_exc())
+    raise
+log('imports ok')
 
 
 COMMAND_TITLE = 'PDF Overlay'
-DPI_CHOICES = (100, 150, 200, 300)
+DPI_CHOICES = (100, 150, 200, 300, 400, 600)
 DEFAULT_DPI = 150
 OPACITY_DELAY_MS = 400
 CACHE_ROOT = default_cache_root()
 # 'None' is a Python keyword, so the enum member is read by name.
 NO_SNAPS = getattr(UI.Selection.ObjectSnapTypes, 'None')
+PDF_MARK_RGB = (0, 90, 255)
+MODEL_MARK_RGB = (0, 160, 60)
+MARK_LINE_WEIGHT = 8
 
 logger = script.get_logger()
 
@@ -201,6 +232,11 @@ def import_pdf(uiapp, pdf_path, page, dpi):
         page_image = page_type.GetImage()
         if page_image is None:
             raise UserError('Revit could not read page {} of that PDF.'.format(page))
+        width, height = page_image.Width, page_image.Height
+        if not page_pixels_allowed(width, height):
+            page_image.Dispose()
+            raise UserError('Page {} at {} DPI is too large ({} x {} px). Use {} DPI or lower.'.format(
+                page, dpi, width, height, max_dpi_for_page(width, height, dpi)))
         try:
             source = raster.flatten_on_white(page_image)
         finally:
@@ -253,10 +289,61 @@ def refresh_overlay(uiapp, overlay, pose=None):
     save_state(overlay.paths['state'], state)
 
 
-def align_overlay(uiapp, overlay):
+def _add_marker(doc, view, point, rgb):
+    """Draw a temporary colored circle at a picked point; return its id or None."""
+    center = _to_model(view, _to_view_2d(view, point))
+    transaction = DB.Transaction(doc, 'PDF Overlay - Pick Marker')
+    transaction.Start()
+    try:
+        circle = DB.Arc.Create(center, marker_radius_feet(view.Scale), 0.0, 2.0 * math.pi,
+                               view.RightDirection, view.UpDirection)
+        curve = doc.Create.NewDetailCurve(view, circle)
+        overrides = DB.OverrideGraphicSettings()
+        overrides.SetProjectionLineColor(DB.Color(*rgb))
+        overrides.SetProjectionLineWeight(MARK_LINE_WEIGHT)
+        view.SetElementOverrides(curve.Id, overrides)
+        transaction.Commit()
+        return curve.Id
+    except Exception:
+        transaction.RollBack()
+        log('pick marker skipped:\n' + traceback.format_exc())
+        return None
+
+
+def _clear_markers(doc, marker_ids):
+    marker_ids = [marker_id for marker_id in marker_ids if marker_id is not None]
+    if not marker_ids:
+        return
+    transaction = DB.Transaction(doc, 'PDF Overlay - Clear Pick Markers')
+    transaction.Start()
+    try:
+        doc.Delete(List[DB.ElementId](marker_ids))
+        transaction.Commit()
+    except Exception:
+        transaction.RollBack()
+        log('pick marker cleanup failed:\n' + traceback.format_exc())
+
+
+ALIGN_STEPS = (
+    u'Step 1 of 4: click a point ON THE PDF (a grid intersection works best).',
+    u'✓ PDF point 1 set (blue circle).\nStep 2 of 4: click the SAME point IN THE MODEL.',
+    u'✓ Model point 1 set (green circle).\nStep 3 of 4: click a second point ON THE PDF, far from the first.',
+    u'✓ PDF point 2 set (blue circle).\nStep 4 of 4: click the SAME point IN THE MODEL.',
+    u'✓ All 4 points set. Fitting the PDF...',
+)
+ALIGN_PROMPTS = (
+    'PDF Overlay step 1 of 4: click a point ON THE PDF. Esc cancels.',
+    'PDF Overlay step 2 of 4: click the SAME point IN THE MODEL. Esc cancels.',
+    'PDF Overlay step 3 of 4: click a second point ON THE PDF, far from the first. Esc cancels.',
+    'PDF Overlay step 4 of 4: click the SAME point IN THE MODEL. Esc cancels.',
+)
+
+
+def align_overlay(uiapp, overlay, progress):
     uidoc = uiapp.ActiveUIDocument
+    doc = _overlay_document(uiapp, overlay)
     view = _active_overlay_view(uidoc)
-    instances = overlay_instances(_overlay_document(uiapp, overlay), overlay.image_type, view)
+    instances = overlay_instances(doc, overlay.image_type, view)
     if not instances:
         raise UserError('This overlay is not placed in the active view.')
     instance = instances[0]
@@ -265,18 +352,26 @@ def align_overlay(uiapp, overlay):
     state = overlay.state
     _sync_pose_from_instance(instance, view, state)
 
-    pixels, targets = [], []
-    for index in (1, 2):
-        try:
-            on_pdf = uidoc.Selection.PickPoint(
-                NO_SNAPS,
-                'PDF Overlay: pick point {} of 2 ON THE PDF (e.g. a grid intersection). Esc cancels.'.format(index))
-            in_model = uidoc.Selection.PickPoint(
-                'PDF Overlay: pick the matching point {} of 2 IN THE MODEL. Esc cancels.'.format(index))
-        except InvalidOperationException:
-            raise UserError('This view has no work plane to pick on.')
-        pixels.append(view_to_pixel(state['pose'], state['page_size'], _to_view_2d(view, on_pdf)))
-        targets.append(_to_view_2d(view, in_model))
+    pixels, targets, marker_ids = [], [], []
+    try:
+        for step, prompt in enumerate(ALIGN_PROMPTS):
+            on_pdf = step % 2 == 0
+            progress(ALIGN_STEPS[step])
+            try:
+                if on_pdf:
+                    point = uidoc.Selection.PickPoint(NO_SNAPS, prompt)
+                else:
+                    point = uidoc.Selection.PickPoint(prompt)
+            except InvalidOperationException as error:
+                raise UserError('Revit would not start picking: {}'.format(error))
+            marker_ids.append(_add_marker(doc, view, point, PDF_MARK_RGB if on_pdf else MODEL_MARK_RGB))
+            if on_pdf:
+                pixels.append(view_to_pixel(state['pose'], state['page_size'], _to_view_2d(view, point)))
+            else:
+                targets.append(_to_view_2d(view, point))
+        progress(ALIGN_STEPS[-1])
+    finally:
+        _clear_markers(doc, marker_ids)
     try:
         pose = fit_pose(state['page_size'], pixels, targets)
     except ValueError as error:
@@ -323,10 +418,13 @@ class OverlayActionHandler(UI.IExternalEventHandler):
             action(uiapp)
         except OperationCanceledException:
             self.palette.set_status('Cancelled; nothing changed.')
+        except MemoryError:
+            log('out of memory:\n' + traceback.format_exc())
+            self.palette.set_status('Out of memory. Try a lower DPI.')
         except UserError as error:
             self.palette.set_status(str(error))
         except Exception as error:
-            logger.error('PDF Overlay failed:\n%s', traceback.format_exc())
+            log('action failed:\n' + traceback.format_exc())
             self.palette.set_status('Failed: {}'.format(error))
 
     def GetName(self):
@@ -363,6 +461,11 @@ class PdfOverlayPalette(my_WPF):
 
     def set_status(self, message):
         self.status_text.Text = message
+
+    def show_progress(self, message):
+        """Show a status message immediately, even while Revit waits for a pick."""
+        self.set_status(message)
+        self.Dispatcher.Invoke(Action(lambda: None), DispatcherPriority.Render)
 
     def selected_overlay(self):
         index = self.overlay_list.SelectedIndex
@@ -453,10 +556,10 @@ class PdfOverlayPalette(my_WPF):
             return
 
         def action(uiapp):
-            pose = align_overlay(uiapp, overlay)
+            pose = align_overlay(uiapp, overlay, self.show_progress)
             self.set_status('Aligned. Rotation {:.2f} deg. Run Align again to refine.'.format(
                 math.degrees(pose['rotation'])))
-        self.run(action, 'Pick a point on the PDF, then the matching point in the model (twice).')
+        self.run(action, ALIGN_STEPS[0])
 
     def opacity_changed(self, sender, e):
         self.opacity_text.Text = '{}%'.format(int(self.opacity_slider.Value))
@@ -506,14 +609,17 @@ class PdfOverlayPalette(my_WPF):
 def main():
     handler = OverlayActionHandler()
     palette = PdfOverlayPalette(handler, UI.ExternalEvent.Create(handler))
+    log('palette loaded')
     handler.palette = palette
     palette.load_overlays(HOST_APP.uiapp)
+    log('overlays listed: {}'.format(len(palette.overlays)))
     palette.Show()
+    log('palette shown')
 
 
 try:
     main()
-except Exception:
-    logger.error('PDF Overlay could not start:\n%s', traceback.format_exc())
-    forms.alert('PDF Overlay could not start. See the pyRevit output for details.',
+except Exception as error:
+    log('startup failed:\n' + traceback.format_exc())
+    forms.alert('PDF Overlay could not start:\n{}\n\nDetails: {}'.format(error, LOG_PATH),
                 title=COMMAND_TITLE, warn_icon=True)

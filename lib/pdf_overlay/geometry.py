@@ -18,6 +18,25 @@ SNAP_DEGREES = 0.5
 MIN_PICK_PIXELS = 10.0
 MIN_PICK_FEET = 0.1
 INCHES_PER_FOOT = 12.0
+# Each full-page copy is 4 bytes per pixel and rendering holds three at once;
+# 160 MP (~640 MB per copy) fits a 36x24 sheet at 400 DPI but not at 600 DPI.
+MAX_PAGE_PIXELS = 160 * 1000 * 1000
+MARKER_PAPER_INCHES = 0.125
+
+
+def page_pixels_allowed(width, height, limit=MAX_PAGE_PIXELS):
+    return width * height <= limit
+
+
+def max_dpi_for_page(width, height, dpi, limit=MAX_PAGE_PIXELS):
+    """Return the highest whole DPI that keeps a page rendered at dpi within limit."""
+    scale = math.sqrt(float(limit) / (width * height))
+    return int(dpi * scale)
+
+
+def marker_radius_feet(view_scale):
+    """Return a pick marker radius that prints 1/8 inch at the view scale."""
+    return max(view_scale, 1) * MARKER_PAPER_INCHES / INCHES_PER_FOOT
 
 
 def make_pose(center, feet_per_pixel, rotation=0.0):
