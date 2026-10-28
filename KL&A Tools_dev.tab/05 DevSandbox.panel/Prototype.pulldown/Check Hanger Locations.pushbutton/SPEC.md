@@ -193,6 +193,26 @@ bold, to zoom from the printing plan view rather than from a sheet.
   mismatch labels, covered by `tests/hanger_sizes_test.py`.
 - `lib/hanger_check/outline.py`: host-independent hexagon detection, covered
   by `tests/hanger_outline_test.py`.
+- `lib/hanger_check/spatial.py`: host-independent plan grid index of member
+  bounding boxes, covered by `tests/hanger_spatial_test.py`.
+
+## Performance
+
+Each run does its Revit work once, not once per hanger:
+
+- Framing is collected in one pass for all hangers (one view-scoped collector
+  in plan views, bounded by all hangers plus the search reach), indexed by
+  model bounding box in a 6'-0" plan grid; each hanger's candidates are the
+  members whose box meets its search box, the same test as Revit's
+  `BoundingBoxIntersectsFilter` used before.
+- Each member's `Family: Type`, width parameter, parsed width and (when
+  compared) depth parameter are read once and reused for half widths, size
+  checks, notes, support kind, and the report.
+- Each hanger type's hexagon is read from geometry once, kept in family
+  coordinates, and placed at later instances with their transform (mirrored
+  and rotated instances included). This assumes the hexagon does not change
+  with instance parameters; a type with no hexagon found is read per
+  instance.
 
 ## Validation boundary
 

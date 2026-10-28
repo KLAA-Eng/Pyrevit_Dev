@@ -7,6 +7,9 @@ first, so hangers that were fixed since the last run lose their highlight.
 
 In plan views framing is taken from what the view shows and compared in plan,
 ignoring the hanger's height (the Dynamo graph projected onto the level).
+Each run collects the framing once for all hangers and indexes it in plan,
+reads each member's name and size parameters once, and finds each hanger
+type's hexagon once (reused at every instance of that type).
 The hanger's hexagon is found in its plan linework; its flat sides along the
 text locate the supported member, and highlights trace it with heavy colored
 detail lines, so the hanger text keeps its own color.
@@ -33,6 +36,7 @@ from .classify import (
     slope_label,
 )
 from .outline import find_hexagons, flat_side_offsets, loop_segments
+from .spatial import BoxIndex
 from .sizes import (
     DETAIL_KINDS,
     compare_size,
@@ -123,12 +127,32 @@ def _length_in(doc, element, names):
     return None
 
 
-def _compare_member(doc, hanger_text, element, compare):
+def _member_info(doc, element, cache):
+    """Name and sizes of one framing member, read once per run: {'label',
+    'width_param', 'width'} plus 'depth_param' on first use."""
+    key = id_value(element.Id)
+    info = cache.get(key)
+    if info is None:
+        label = member_label(doc, element)
+        width_param = _length_in(doc, element, WIDTH_PARAMS)
+        info = {'label': label, 'width_param': width_param,
+                'width': member_width(label, width_param)}
+        cache[key] = info
+    return info
+
+
+def _depth_param(doc, element, info):
+    if 'depth_param' not in info:
+        info['depth_param'] = _length_in(doc, element, DEPTH_PARAMS)
+    return info['depth_param']
+
+
+def _compare_member(doc, hanger_text, element, compare, cache):
     if element is None or not hanger_text:
         return None, None
-    return compare(hanger_text, member_label(doc, element),
-                   _length_in(doc, element, WIDTH_PARAMS),
-                   _length_in(doc, element, DEPTH_PARAMS))
+    info = _member_info(doc, element, cache)
+    return compare(hanger_text, info['label'], info['width_param'],
+                   _depth_param(doc, element, info))
 
 
 def is_hanger(element):
@@ -158,71 +182,92 @@ def is_plan(view):
     return isinstance(view, DB.ViewPlan)
 
 
-def framing_near(doc, view, point, elements):
-    """Framing near the hanger: in plan views, at any height the view shows."""
-    plan = is_plan(view)
-    reach = PLAN_Z_REACH_FT if plan else VERTICAL_REACH_FT
-    low = DB.XYZ(point.X - SEARCH_RADIUS_FT, point.Y - SEARCH_RADIUS_FT, point.Z - reach)
-    high = DB.XYZ(point.X + SEARCH_RADIUS_FT, point.Y + SEARCH_RADIUS_FT, point.Z + reach)
-    collector = (DB.FilteredElementCollector(doc, view.Id) if plan
+def _framing_index(doc, view, hangers, reach):
+    """All framing near any of the hangers, collected in one pass (in plan
+    views, only what the view shows) and indexed by model bounding box."""
+    index = BoxIndex()
+    points = [h.Location.Point for h in hangers]
+    if not points:
+        return index
+    low = DB.XYZ(min(p.X for p in points) - SEARCH_RADIUS_FT,
+                 min(p.Y for p in points) - SEARCH_RADIUS_FT, min(p.Z for p in points) - reach)
+    high = DB.XYZ(max(p.X for p in points) + SEARCH_RADIUS_FT,
+                  max(p.Y for p in points) + SEARCH_RADIUS_FT, max(p.Z for p in points) + reach)
+    collector = (DB.FilteredElementCollector(doc, view.Id) if is_plan(view)
                  else DB.FilteredElementCollector(doc))
     collector = (collector
                  .OfCategory(DB.BuiltInCategory.OST_StructuralFraming)
                  .WhereElementIsNotElementType()
                  .WherePasses(DB.BoundingBoxIntersectsFilter(DB.Outline(low, high))))
-    members = []
     for framing in collector:
-        if isinstance(framing.Location, DB.LocationCurve):
+        box = framing.get_BoundingBox(None)
+        if isinstance(framing.Location, DB.LocationCurve) and box is not None:
             curve = framing.Location.Curve
-            elements[id_value(framing.Id)] = framing
-            width_in = member_width(member_label(doc, framing),
-                                    _length_in(doc, framing, WIDTH_PARAMS))
-            members.append({'id': id_value(framing.Id),
-                            'start': _xyz(curve.GetEndPoint(0)),
-                            'end': _xyz(curve.GetEndPoint(1)),
-                            'half_width': width_in / 24.0 if width_in else 0.0})
+            member = {'id': id_value(framing.Id),
+                      'start': _xyz(curve.GetEndPoint(0)),
+                      'end': _xyz(curve.GetEndPoint(1))}
+            index.add((framing, member), _xyz(box.Min), _xyz(box.Max))
+    return index
+
+
+def _framing_near(doc, index, point, reach, elements, cache):
+    """Members whose bounding box meets the hanger's search box (the same test
+    as Revit's BoundingBoxIntersectsFilter), with half widths filled in."""
+    low = (point.X - SEARCH_RADIUS_FT, point.Y - SEARCH_RADIUS_FT, point.Z - reach)
+    high = (point.X + SEARCH_RADIUS_FT, point.Y + SEARCH_RADIUS_FT, point.Z + reach)
+    members = []
+    for framing, member in index.near(low, high):
+        elements[member['id']] = framing
+        if 'half_width' not in member:
+            width_in = _member_info(doc, framing, cache)['width']
+            member['half_width'] = width_in / 24.0 if width_in else 0.0
+        members.append(member)
     return members
 
 
 def check_hangers(doc, view, hangers, elements):
     """Classify each hanger. Returns {hanger id: result}; fills elements."""
-    results = {}
+    plan = is_plan(view)
+    reach = PLAN_Z_REACH_FT if plan else VERTICAL_REACH_FT
+    index = _framing_index(doc, view, hangers, reach)
+    members, hexagons, results = {}, {}, {}
     for hanger in hangers:
         point = hanger.Location.Point
         elements[id_value(hanger.Id)] = hanger
-        xyz = (point.X, point.Y, None) if is_plan(view) else _xyz(point)
-        hexagon = _hexagon(hanger, view)
-        flat_sides = (flat_side_offsets(hexagon, text_direction(hanger), (point.X, point.Y))
+        xyz = (point.X, point.Y, None) if plan else _xyz(point)
+        text_dir = text_direction(hanger)
+        hexagon = _type_hexagon(hanger, view, hexagons)
+        flat_sides = (flat_side_offsets(hexagon, text_dir, (point.X, point.Y))
                       if hexagon else None)
-        result = classify_hanger(xyz, framing_near(doc, view, point, elements),
-                                 text_direction(hanger), flat_sides)
+        result = classify_hanger(xyz, _framing_near(doc, index, point, reach, elements, members),
+                                 text_dir, flat_sides)
         result['hexagon'] = hexagon
         results[id_value(hanger.Id)] = result
     flag_shared_ends(results)
     for hanger_id, result in results.items():
-        _add_size_check(doc, result, hanger_values(doc, elements[hanger_id]), elements)
+        _add_size_check(doc, result, hanger_values(doc, elements[hanger_id]), elements, members)
     return results
 
 
-def _add_size_check(doc, result, values, elements):
-    """Joist vs supported member (strict), Header vs supporting member (loose)."""
+def _add_size_check(doc, result, values, elements, cache):
+    """Joist vs supported member (strict), Header vs supporting member (loose).
+    Also stores each member's 'Family: Type' as supported_label/supporting_label."""
     result['hanger_values'] = values
     checks = []
     for field, key, compare in (('Joist', 'supported', compare_size),
                                 ('Header', 'supporting', compare_supporting)):
         member = elements.get(result[key]) if result[key] is not None else None
-        ok, reason = _compare_member(doc, values.get(field), member, compare)
+        label = _member_info(doc, member, cache)['label'] if member is not None else None
+        result[key + '_label'] = label
+        ok, reason = _compare_member(doc, values.get(field), member, compare, cache)
         checks.append(ok)
         if ok is False:
-            result['notes'].append('%s "%s" vs %s: %s' % (
-                field, values[field], member_label(doc, member), reason))
+            result['notes'].append('%s "%s" vs %s: %s' % (field, values[field], label, reason))
         elif ok is None and member is not None and values.get(field):
             result['notes'].append('%s "%s" not compared: %s' % (field, values[field], reason))
         elif ok and reason:
             result['notes'].append('%s: %s' % (field, reason))
-    supporting = elements.get(result['supporting']) if result['supporting'] is not None else None
-    kind = support_kind(values.get('Header'),
-                        member_label(doc, supporting) if supporting is not None else None)
+    kind = support_kind(values.get('Header'), result['supporting_label'])
     result['mounting'] = mounting_label(kind, values.get(TOP_FLANGE_FIELD))
     supported = elements.get(result['supported']) if result['supported'] is not None else None
     result['supported_slope'] = member_slope(supported)
@@ -430,6 +475,23 @@ def _hexagon(hanger, view):
     """The hanger's hexagon (6 plan points) from its linework in the view, else None."""
     hexagons = find_hexagons(_plan_segments(hanger, view))
     return hexagons[0] if hexagons else None
+
+
+def _type_hexagon(hanger, view, by_type):
+    """The hanger's hexagon, reading geometry once per hanger type: the first
+    hexagon found for a type is kept in family coordinates and placed at each
+    later instance with its transform. Instances whose type has no hexagon yet
+    are read individually."""
+    transform = hanger.GetTransform()
+    local = by_type.get(id_value(hanger.GetTypeId()))
+    if local is not None:
+        return [(p.X, p.Y) for p in (transform.OfPoint(DB.XYZ(x, y, 0.0)) for x, y in local)]
+    hexagon = _hexagon(hanger, view)
+    if hexagon:
+        inverse, z = transform.Inverse, transform.Origin.Z
+        by_type[id_value(hanger.GetTypeId())] = [
+            (p.X, p.Y) for p in (inverse.OfPoint(DB.XYZ(x, y, z)) for x, y in hexagon)]
+    return hexagon
 
 
 def _trace_hexagon(doc, view, hexagon, style):

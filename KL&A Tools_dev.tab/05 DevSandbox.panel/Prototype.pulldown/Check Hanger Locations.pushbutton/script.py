@@ -18,7 +18,6 @@ from hanger_check.revit_check import (
     hangers_in_view,
     id_value,
     joint_targets,
-    member_label,
     refresh_highlights,
     ribbon_control_id,
     selected_hangers,
@@ -58,11 +57,10 @@ def _zoom_button(output):
     return output.buttonify(_RibbonButton(control_id), 'Zoom to selection')
 
 
-def _member_cell(doc, elements, member_id):
-    if member_id is None:
+def _member_cell(elements, result, key):
+    if result[key] is None:
         return '-'
-    element = elements[member_id]
-    return '{} {}'.format(_select_link(element), member_label(doc, element))
+    return '{} {}'.format(_select_link(elements[result[key]]), result[key + '_label'])
 
 
 def _print_report(output, doc, view, source, results, elements, colored):
@@ -97,9 +95,9 @@ def _print_report(output, doc, view, source, results, elements, colored):
         hanger = elements[hanger_id]
         rows.append([_select_link(hanger), hanger_info(result['hanger_values']),
                      result['status'], result['mismatch'] or '-', result['mounting'],
-                     _member_cell(doc, elements, result['supported']),
+                     _member_cell(elements, result, 'supported'),
                      result['supported_slope'],
-                     _member_cell(doc, elements, result['supporting']),
+                     _member_cell(elements, result, 'supporting'),
                      '; '.join(result['notes']) or '-'])
     output.print_table(rows, columns=['Hanger', 'Hanger info', 'Status', 'Size mismatch',
                                       'Mounting', 'Supported member', 'Supported slope',
