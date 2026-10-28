@@ -7,10 +7,11 @@ tooltip:
     Status: Unreleased
     _____________________________________________________________________
     Description:
-    Prototype: uses each Hangers_Clever_KLAA hanger's text orientation to find the supported member (along the top or base of the text) and the supporting member (across the text, skew allowed), checks the Joist strictly against the supported member and the Header loosely against the supporting member, flags wall/column supports for detail review and steel beams as top flange or web packout, colors them in the active view, and reports status (OK, Review, Review details), Designation/Header/Joist, member types, location match, size mismatch, and mounting. Port of the Check Hanger Locations Dynamo graph.
+    Prototype: uses each Hangers_Clever_KLAA hanger's text orientation to find the supported member (along the top or base of the text) and the supporting member (across the text, skew allowed), checks the Joist strictly against the supported member and the Header loosely against the supporting member, flags wall/column supports for detail review, reports every hanger as top flange or face mounted from its top-flange fasteners (steel face mounts need a web packout), colors them in the active view, and reports status (OK, Review, Review details), hanger type and Designation/Header/Joist, size mismatch, mounting, member types, and whether the supported member is flat or sloped. Port of the Check Hanger Locations Dynamo graph.
     _____________________________________________________________________
     How-to:
     - Select nothing to report every hanger in the active view, or select hangers to zoom to them and report only those.
+    - Click an Id in the report to select it, then Zoom to selection to zoom the view to it.
     - Review colors: supported blue, supporting orange, both purple; hexagon outlined red for problems, teal for review details.
     - Re-run after fixing framing to clear resolved highlights. Hanger Highlights turns the colors on or off.
     _____________________________________________________________________

@@ -26,6 +26,7 @@ from lib.hanger_check.classify import (
     match_label,
     matches_family,
     member_roles,
+    slope_label,
 )
 
 
@@ -80,6 +81,7 @@ class ClassifyHangerTest(unittest.TestCase):
         self.assertEqual(result['status'], STATUS_OK)
         self.assertEqual(result['skew_deg'], 30.0)
         self.assertEqual(match_label(result), 'Yes (skewed 30.0 deg)')
+        self.assertIn('Skewed 30.0 deg', result['notes'])
 
     def test_skew_beyond_limit_is_not_supporting(self):
         too_skewed = _line_at(1, (2.0, 0.0), 70.0)
@@ -144,6 +146,14 @@ class ResultSetTest(unittest.TestCase):
         self.assertTrue(matches_family('HANGERS_CLEVER_KLAA - Face'))
         self.assertFalse(matches_family('Simpson LUS'))
         self.assertFalse(matches_family(None))
+
+
+class SlopeLabelTest(unittest.TestCase):
+    def test_flat_and_sloped(self):
+        self.assertEqual(slope_label((0.0, 0.0, 10.0), (12.0, 0.0, 10.0)), 'Flat')
+        self.assertEqual(slope_label((0.0, 0.0, 10.0), (20.0, 0.0, 10.05)), 'Flat')
+        self.assertEqual(slope_label((0.0, 0.0, 10.0), (12.0, 0.0, 14.0)), 'Sloped 4.0:12 (18.4 deg)')
+        self.assertEqual(slope_label((0.0, 12.0, 14.0), (0.0, 0.0, 10.0)), 'Sloped 4.0:12 (18.4 deg)')
 
 
 if __name__ == '__main__':

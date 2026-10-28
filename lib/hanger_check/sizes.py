@@ -48,9 +48,11 @@ KIND_COLUMN = 'column'
 DETAIL_KINDS = (KIND_WALL, KIND_COLUMN)
 
 MOUNT_TOP_FLANGE = 'Top flange mounted'
-MOUNT_WEB_PACKOUT = 'Face mounted - needs web packout'
-MOUNT_WALL = 'Wall - ledger or plate'
-MOUNT_COLUMN = 'Column - see detail'
+MOUNT_FACE = 'Face mounted'
+MOUNT_WEB_PACKOUT = MOUNT_FACE + ' - needs web packout'
+MOUNT_NOTES = {KIND_WALL: 'wall ledger or plate', KIND_COLUMN: 'column, see detail'}
+# Schedule text may use non-breaking or thin spaces (7&nbsp;1/4"), which IronPython's \s misses.
+_ODD_SPACES = re.compile(u'[\u00a0\u2007\u2009\u202f]')
 NO_FASTENER = ('', 'N/A', 'NA', 'NONE', 'NO')
 
 _PLY = re.compile(r'\(\s*(\d+)\s*\)|(\d+)\s*-?\s*PLY\b', re.I)
@@ -93,7 +95,7 @@ def parse_size(text):
     size = {'plies': None, 'width': None, 'depth': None, 'material': None, 'series': None}
     if not text:
         return size
-    text = text.replace(u'\u00d7', 'x').replace('"', ' ').replace("''", ' ')
+    text = _ODD_SPACES.sub(' ', text.replace(u'\u00d7', 'x')).replace('"', ' ').replace("''", ' ')
     size['material'] = _material(text)
     series = _SERIES.search(text)
     if series:
@@ -304,16 +306,15 @@ def has_top_flange(fastener_text):
 
 
 def mounting_label(kind, fastener_tf):
-    """How the hanger mounts: top flange, face mount on steel, or wall/column detail."""
-    if kind == KIND_STEEL:
-        return MOUNT_TOP_FLANGE if has_top_flange(fastener_tf) else MOUNT_WEB_PACKOUT
-    if has_top_flange(fastener_tf):
-        return MOUNT_TOP_FLANGE
-    if kind == KIND_WALL:
-        return MOUNT_WALL
-    if kind == KIND_COLUMN:
-        return MOUNT_COLUMN
-    return ''
+    """Top flange mounted when Fastener-TF has fasteners, else face mounted, plus
+    the support's note: steel face mounts need a web packout, walls a ledger or
+    plate, columns a detail."""
+    top = has_top_flange(fastener_tf)
+    if kind == KIND_STEEL and not top:
+        return MOUNT_WEB_PACKOUT
+    label = MOUNT_TOP_FLANGE if top else MOUNT_FACE
+    note = MOUNT_NOTES.get(kind)
+    return '%s - %s' % (label, note) if note else label
 
 
 def mismatch_label(supported_ok, supporting_ok):

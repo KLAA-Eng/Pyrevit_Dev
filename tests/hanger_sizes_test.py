@@ -26,8 +26,8 @@ from lib.hanger_check.sizes import (
     MISMATCH_BOTH,
     MISMATCH_SUPPORTED,
     MISMATCH_SUPPORTING,
+    MOUNT_FACE,
     MOUNT_TOP_FLANGE,
-    MOUNT_WALL,
     MOUNT_WEB_PACKOUT,
     compare_size,
     compare_supporting,
@@ -54,6 +54,12 @@ class ParseSizeTest(unittest.TestCase):
         self.assertEqual(parse_size('Glulam: 6 3/4" x 15"')['width'], 6.75)
         self.assertEqual(parse_size('LVL 2.0E: 1-3/4" x 11-7/8"')['depth'], 11.875)
         self.assertEqual(parse_size('TJI 210: 11 7/8"')['depth'], 11.875)
+
+    def test_non_breaking_space_in_fraction(self):
+        # Hanger schedules write 7<no-break space>1/4"; IronPython's regex space misses it.
+        joist = u'7' + chr(0xa0) + u'1/4" LVL'
+        self.assertEqual(parse_size(joist)['depth'], 7.25)
+        self.assertTrue(compare_size(joist, 'LVL_Framing_KLAA_15SE: 7 1/4" LVL', 1.75, 7.25)[0])
 
 
 class CompareSizeTest(unittest.TestCase):
@@ -187,8 +193,11 @@ class MountingTest(unittest.TestCase):
     def test_labels(self):
         self.assertEqual(mounting_label(KIND_STEEL, '(6)1 1/2"x0.148"'), MOUNT_TOP_FLANGE)
         self.assertEqual(mounting_label(KIND_STEEL, '--'), MOUNT_WEB_PACKOUT)
-        self.assertEqual(mounting_label(KIND_WALL, '--'), MOUNT_WALL)
-        self.assertEqual(mounting_label(None, '--'), '')
+        self.assertEqual(mounting_label(KIND_WALL, '--'), 'Face mounted - wall ledger or plate')
+        self.assertEqual(mounting_label(KIND_WALL, '(4)10d'), 'Top flange mounted - wall ledger or plate')
+        self.assertEqual(mounting_label(KIND_COLUMN, ''), 'Face mounted - column, see detail')
+        self.assertEqual(mounting_label(None, '--'), MOUNT_FACE)
+        self.assertEqual(mounting_label(None, '(4)10d'), MOUNT_TOP_FLANGE)
 
 
 class ReviewStatusTest(unittest.TestCase):
@@ -238,7 +247,8 @@ class SourceEncodingTest(unittest.TestCase):
         pulldown = os.path.join(PROJECT_ROOT, 'KL&A Tools_dev.tab', '05 DevSandbox.panel',
                                 'Prototype.pulldown')
         folders += [os.path.join(pulldown, name) for name in
-                    ('Check Hanger Locations.pushbutton', 'Hanger Highlights.pushbutton')]
+                    ('Check Hanger Locations.pushbutton', 'Hanger Highlights.pushbutton',
+                     'Zoom to Selection.pushbutton')]
         for folder in folders:
             for name in os.listdir(folder):
                 if name.endswith('.py'):

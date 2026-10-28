@@ -35,6 +35,8 @@ SEARCH_RADIUS_FT = ALONG_REACH_FT + SUPPORT_REACH_FT
 SUPPORTED_MAX_ANGLE_DEG = 30.0
 SUPPORTING_MIN_ANGLE_DEG = 30.0
 SKEW_NOTE_DEG = 2.0
+FLAT_SLOPE_DEG = 0.5
+SLOPE_FLAT = 'Flat'
 AMBIGUOUS_FT = 1.0 / 12.0
 
 STATUS_OK = 'OK'
@@ -175,6 +177,8 @@ def classify_hanger(point, members, text_dir=None):
         if supported is not None:
             skew = 90.0 - axis_angle_deg(plan_direction(supported), plan_direction(supporting))
             result['skew_deg'] = round(skew, 1)
+            if result['skew_deg'] >= SKEW_NOTE_DEG:
+                result['notes'].append('Skewed %.1f deg' % result['skew_deg'])
 
     if supported is None:
         result['status'] = STATUS_ORIENTATION if misaligned else STATUS_NO_SUPPORTED
@@ -221,6 +225,17 @@ def match_label(result):
     if result['skew_deg'] is not None and result['skew_deg'] >= SKEW_NOTE_DEG:
         return 'Yes (skewed %.1f deg)' % result['skew_deg']
     return 'Yes'
+
+
+def slope_label(start, end):
+    """'Flat', or 'Sloped r:12 (a deg)' for a member's location line (x, y, z in feet)."""
+    run = math.hypot(end[0] - start[0], end[1] - start[1])
+    rise = abs(end[2] - start[2])
+    if run <= 1e-9:
+        return 'Vertical'
+    if math.degrees(math.atan2(rise, run)) < FLAT_SLOPE_DEG:
+        return SLOPE_FLAT
+    return 'Sloped %.1f:12 (%.1f deg)' % (12.0 * rise / run, math.degrees(math.atan2(rise, run)))
 
 
 def flag_shared_ends(results):

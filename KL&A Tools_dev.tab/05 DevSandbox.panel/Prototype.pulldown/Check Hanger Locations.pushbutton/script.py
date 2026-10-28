@@ -4,13 +4,12 @@ from __future__ import print_function
 __title__ = "Check Hanger\nLocations"
 __version__ = "v0.0"
 
-from pyrevit import forms, revit, script
+from pyrevit import EXEC_PARAMS, coreutils, forms, revit, script
 
 from hanger_check.classify import (
     DEFAULT_HANGER_FAMILY,
     STATUS_REVIEW_DETAILS,
     is_problem,
-    match_label,
 )
 from hanger_check.revit_check import (
     check_hangers,
@@ -25,6 +24,15 @@ from hanger_check.revit_check import (
 
 
 COMMAND_TITLE = 'Check Hanger Locations'
+ZOOM_COMMAND = 'Zoom to Selection'
+SELECT_LINK = ('<a class="elementlink" title="Click to select in Revit" '
+               'href="revit://outputhelpers?command=select&element[]={0}&show=false">{0}</a>')
+
+
+class _RibbonButton(object):
+    """Stand-in for output.buttonify: only the control id is needed."""
+    def __init__(self, control_id):
+        self.Id = control_id
 
 
 def _stop(message):
@@ -32,11 +40,26 @@ def _stop(message):
     script.exit()
 
 
-def _member_cell(output, doc, elements, member_id):
+def _select_link(element):
+    """Select-only Id link: pyRevit's magnifier uses Revit's ShowElements, which
+    does not reliably zoom, so zooming goes through the Zoom to Selection button."""
+    return coreutils.prepare_html_str(SELECT_LINK.format(id_value(element.Id)))
+
+
+def _zoom_button(output):
+    # Sibling buttons share the pulldown's control id prefix.
+    control_id = EXEC_PARAMS.command_controlid
+    if not control_id or '%' not in control_id:
+        return ''
+    sibling = control_id.rsplit('%', 1)[0] + '%' + ZOOM_COMMAND
+    return output.buttonify(_RibbonButton(sibling), 'Zoom to selection')
+
+
+def _member_cell(doc, elements, member_id):
     if member_id is None:
         return '-'
     element = elements[member_id]
-    return '{} {}'.format(output.linkify(element.Id), member_label(doc, element))
+    return '{} {}'.format(_select_link(element), member_label(doc, element))
 
 
 def _print_report(output, doc, view, source, results, elements, colored):
@@ -52,8 +75,10 @@ def _print_report(output, doc, view, source, results, elements, colored):
                         'review details. Use Hanger Highlights to turn them off.')
     else:
         output.print_md('Graphics overrides are not allowed in this view; nothing was colored.')
-    output.print_md('Click an Id to select it (press Esc in Revit to clear the selection). '
-                    'To zoom to a hanger, select it and run this command again.')
+    zoom = _zoom_button(output)
+    output.print_md('Click an Id to select it in Revit, then {} to zoom the view to it. '
+                    'Press Esc in Revit to clear the selection.'.format(
+                        zoom or 'run Zoom to Selection'))
     if problems:
         output.print_md('Select problem hangers: {}'.format(
             output.linkify([elements[i].Id for i in problems])))
@@ -63,15 +88,17 @@ def _print_report(output, doc, view, source, results, elements, colored):
     for hanger_id in sorted(results, key=order):
         result = results[hanger_id]
         hanger = elements[hanger_id]
-        rows.append([output.linkify(hanger.Id), hanger_info(result['hanger_values']),
-                     result['status'], match_label(result), result['mismatch'],
-                     result['mounting'],
-                     _member_cell(output, doc, elements, result['supported']),
-                     _member_cell(output, doc, elements, result['supporting']),
+        rows.append([_select_link(hanger), hanger_info(result['hanger_values']),
+                     result['status'], result['mismatch'] or '-', result['mounting'],
+                     _member_cell(doc, elements, result['supported']),
+                     result['supported_slope'],
+                     _member_cell(doc, elements, result['supporting']),
                      '; '.join(result['notes']) or '-'])
-    output.print_table(rows, columns=['Hanger', 'Hanger info', 'Status', 'Location match',
-                                      'Size mismatch', 'Mounting', 'Supported member',
+    output.print_table(rows, columns=['Hanger', 'Hanger info', 'Status', 'Size mismatch',
+                                      'Mounting', 'Supported member', 'Supported slope',
                                       'Supporting member', 'Notes'])
+    if zoom and len(rows) > 10:
+        output.print_md('Zoom the view to the selected element: {}'.format(zoom))
 
 
 def main():

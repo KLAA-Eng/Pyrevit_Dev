@@ -1,0 +1,20 @@
+title:
+  en_us: "Zoom to\nSelection"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 10.28.2026
+    Status: Unreleased
+    _____________________________________________________________________
+    Description:
+    Prototype: zooms the active view to the selected elements. Hangers zoom to their insertion point and framing to its location line, with a 4'-0" margin. Used by the Zoom to selection button in the Check Hanger Locations report.
+    _____________________________________________________________________
+    How-to:
+    - Click a hanger or member Id in the Check Hanger Locations report to select it.
+    - Click Zoom to selection in the report, or run this command.
+    _____________________________________________________________________
+    Last update:
+    - [10.28.2026] - v0.0 (Unreleased): First DevSandbox zoom companion for Check Hanger Locations.
+author: KL&A
+engine:
+  clean: true

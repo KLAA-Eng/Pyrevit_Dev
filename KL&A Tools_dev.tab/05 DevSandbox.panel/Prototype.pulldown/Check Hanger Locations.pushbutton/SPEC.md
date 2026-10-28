@@ -61,7 +61,8 @@ in the active view, and reports hangers that do not match their framing.
   plies come from the type name only, never the family name (for example
   `Framing_KLAA_15SE`); material and I-joist series may come from either.
   Numbers glued to letters or underscores (`15SE`, `2.0E`) are codes, not
-  sizes. Member depth
+  sizes. Non-breaking and thin spaces in schedule text (`7&nbsp;1/4"`) are
+  read as spaces. Member depth
   comes from the type name (`W x D`, or a lone size such as `(2)11 7/8" LVL`);
   a depth parameter (`d`, `Depth`, `h`, `Height`, ...) is used only when the
   name gives no depth or only a number under 3" (a grade or mark such as
@@ -92,11 +93,14 @@ in the active view, and reports hangers that do not match their framing.
   `WALL`, `CONCRETE`, `CMU`, `MASONRY`), or column (`COLUMN`, `POST`). Walls
   and columns are not modeled framing, so a missing supporting member is
   expected for them.
-- Mounting (from `Fastener-TF`; blank, `-`, or `--` means none): steel with
-  top-flange fasteners is `Top flange mounted`, steel without them is `Face
-  mounted - needs web packout`; other hangers with top-flange fasteners are
-  `Top flange mounted`; otherwise walls show `Wall - ledger or plate` and
-  columns `Column - see detail`.
+- Mounting, for every hanger, from `Fastener-TF` (blank, `-`, `--`, `N/A`,
+  `NONE` mean none): `Top flange mounted` with top-flange fasteners, otherwise
+  `Face mounted`. Steel face mounts read `Face mounted - needs web packout`;
+  wall supports add `- wall ledger or plate` and columns `- column, see
+  detail`.
+- Supported slope: `Flat` when the supported member's location line rises
+  less than 0.5 deg, otherwise `Sloped r:12 (a deg)`.
+- Skew of 2 deg or more between supported and supporting members is noted.
 - Reported status: a location problem first, then `Review` for any size
   mismatch, then `Review details` for wall or column supports, else `OK`.
 - A hanger is a problem when its status is not `OK` or `Review details`, or it
@@ -127,21 +131,22 @@ reported and left uncolored.
 
 The pyRevit output lists each hanger, problems first, then `Review details`,
 with columns Hanger,
-Hanger info (`Designation`, `Header`, `Joist` only), Status, Location match
-(`Yes`, `Yes (skewed n deg)`, or `No`), Size mismatch (blank,
-`Supported member mismatch`, `Supporting member mismatch`, or
-`Both mismatch`), Mounting, Supported member and Supporting member (Id link plus
-`Family: Type`), and Notes, plus a link that selects all problem hangers.
+Hanger info (hanger `Type` name, `Designation`, `Header`, `Joist`), Status,
+Size mismatch (`-`, `Supported member mismatch`, `Supporting member mismatch`,
+or `Both mismatch`), Mounting, Supported member, Supported slope, Supporting
+member (Id link plus `Family: Type`), and Notes, plus a link that selects all
+problem hangers. The location result is carried by Status and Notes.
 
-Report links use pyRevit's handler: clicking an Id selects the element and the
-zoom icon also runs Revit's `ShowElements`, which frames the element's full
-bounding box. The selection stays until the user presses Esc; the command
-cannot change that behavior, so the report says so and tells users to select
-a hanger and re-run to zoom to it.
+Hanger and member Ids are select-only links. pyRevit's magnifier runs Revit's
+`ShowElements`, which did not reliably zoom to hangers or members, so the
+report instead shows a `Zoom to selection` button (top, and again below long
+tables) that runs the sibling `Zoom to Selection` command on the current
+selection. The selection stays until the user presses Esc.
 
 ## Implementation inventory
 
-- Entry point: `script.py` (selection, report).
+- Entry point: `script.py` (selection, report, zoom button).
+- `Zoom to Selection.pushbutton`: zoom companion run by the report button.
 - `lib/hanger_check/revit_check.py`: Revit collection, hanger info, overrides,
   zoom; shared with `Hanger Highlights`.
 - `lib/hanger_check/classify.py`: host-independent supported/supporting
@@ -158,7 +163,8 @@ Live Revit 2024+ acceptance must confirm that the hanger text runs along the
 family's local X axis, the hanger box size on representative joist-to-header,
 skewed, and header-to-girder framing, plan-only matching on projects with
 level offsets, that the hexagon is found and traced in plan, the fallback
-override, zoom, and that re-running clears highlights for fixed hangers.
+override, the Zoom to selection button, the non-breaking space fix on
+real schedule text, slope on sloped joists, and that re-running clears highlights for fixed hangers.
 
 ## Future development
 

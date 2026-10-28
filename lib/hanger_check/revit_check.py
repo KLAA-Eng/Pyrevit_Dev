@@ -27,6 +27,7 @@ from .classify import (
     is_problem,
     matches_family,
     member_roles,
+    slope_label,
 )
 from .outline import find_hexagons, loop_segments
 from .sizes import (
@@ -93,14 +94,18 @@ def _text_param(sources, name):
 
 
 def hanger_values(doc, hanger):
-    """{Designation, Header, Joist, Fastener-TF} from the hanger instance, then its type."""
+    """{Type, Designation, Header, Joist, Fastener-TF}: the hanger's type name, then
+    schedule values from the instance, then its type."""
     sources = (hanger, doc.GetElement(hanger.GetTypeId()))
-    return dict((name, _text_param(sources, name))
-                for name in HANGER_FIELDS + (TOP_FLANGE_FIELD,))
+    values = dict((name, _text_param(sources, name))
+                  for name in HANGER_FIELDS + (TOP_FLANGE_FIELD,))
+    values['Type'] = type_name(doc, hanger)
+    return values
 
 
 def hanger_info(values):
-    return '; '.join('%s: %s' % (name, values.get(name) or '-') for name in HANGER_FIELDS)
+    return '; '.join('%s: %s' % (name, values.get(name) or '-')
+                     for name in ('Type',) + HANGER_FIELDS)
 
 
 def _length_in(doc, element, names):
@@ -207,6 +212,8 @@ def _add_size_check(doc, result, values, elements):
     kind = support_kind(values.get('Header'),
                         member_label(doc, supporting) if supporting is not None else None)
     result['mounting'] = mounting_label(kind, values.get(TOP_FLANGE_FIELD))
+    supported = elements.get(result['supported']) if result['supported'] is not None else None
+    result['supported_slope'] = member_slope(supported)
     apply_review(result, mismatch_label(checks[0], checks[1]), kind in DETAIL_KINDS)
 
 
@@ -375,16 +382,35 @@ def refresh_highlights(doc, view, results, elements, transaction):
                 view.SetElementOverrides(hanger.Id, _hanger_override(key))
 
 
-def zoom_to(uidoc, view, hangers):
-    """Zoom the active view around the hangers' insertion points."""
-    points = [h.Location.Point for h in hangers]
-    if not points:
-        return
+def member_slope(element):
+    """'Flat' or 'Sloped r:12 (a deg)' from a framing member's location line, else '-'."""
+    if element is None or not isinstance(element.Location, DB.LocationCurve):
+        return '-'
+    curve = element.Location.Curve
+    return slope_label(_xyz(curve.GetEndPoint(0)), _xyz(curve.GetEndPoint(1)))
+
+
+def _zoom_points(element):
+    location = element.Location
+    if isinstance(location, DB.LocationPoint):
+        return [location.Point]
+    if isinstance(location, DB.LocationCurve):
+        return [location.Curve.GetEndPoint(0), location.Curve.GetEndPoint(1)]
+    box = element.get_BoundingBox(None)
+    return [box.Min, box.Max] if box is not None else []
+
+
+def zoom_to(uidoc, view, elements):
+    """Zoom the active view to the elements: hanger insertion points, member
+    location lines, else bounding boxes, plus a margin. Returns False when the
+    view is not open or nothing has a location."""
+    points = [p for e in elements for p in _zoom_points(e)]
     ui_views = [v for v in uidoc.GetOpenUIViews() if v.ViewId == view.Id]
-    if not ui_views:
-        return
+    if not points or not ui_views:
+        return False
     low = DB.XYZ(min(p.X for p in points) - ZOOM_MARGIN_FT,
                  min(p.Y for p in points) - ZOOM_MARGIN_FT, min(p.Z for p in points))
     high = DB.XYZ(max(p.X for p in points) + ZOOM_MARGIN_FT,
                   max(p.Y for p in points) + ZOOM_MARGIN_FT, max(p.Z for p in points))
     ui_views[0].ZoomAndCenterRectangle(low, high)
+    return True
