@@ -63,6 +63,10 @@
         </ControlTemplate></Setter.Value></Setter>
     </Style>
 
+    <Style x:Key="KlaCompactReadOnlyField" TargetType="TextBox" BasedOn="{StaticResource KlaReadOnlyField}">
+        <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}"/>
+    </Style>
+
     <Style x:Key="KlaComboBoxItem" TargetType="ComboBoxItem">
         <Setter Property="Foreground" Value="{StaticResource text_white}"/>
         <Setter Property="Background" Value="{StaticResource header_background}"/>
@@ -129,6 +133,10 @@
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate></Setter.Value></Setter>
+    </Style>
+
+    <Style x:Key="KlaCompactComboBox" TargetType="ComboBox" BasedOn="{StaticResource KlaComboBox}">
+        <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}"/>
     </Style>
 
     <Style x:Key="KlaRadioButton" TargetType="RadioButton">

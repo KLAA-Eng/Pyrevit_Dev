@@ -57,6 +57,12 @@ def validate_template_family():
                     assert window.message_scroll.VerticalOffset > 0
                     window.message_scroll.ScrollToTop()
                     settle_layout(shell)
+            if identity == 'template-options':
+                for field in (window.option_category, window.option_offset, window.option_path):
+                    assert field.ActualHeight == 24, (state, field.Name, field.ActualHeight)
+                for prompt in (window.options_prompt, window.output_prompt):
+                    assert prompt.Style == window.Resources['KlaFoundationPromptLabel']
+                    assert prompt.FontSize == 14 and str(prompt.FontWeight) == 'Normal'
             if identity == 'template-options' and state == 'Disabled':
                 for widget in (window.option_category, window.scope_selected, window.option_toggle):
                     labels = [item for item in descendants(widget) if isinstance(item, TextBlock) and item.Text]

@@ -75,6 +75,22 @@ cover growth/shrinkage, cap/scrolling, width refit, expanded Details and prompt
 styling. Next interview frontier: Options, then Review. Production windows retain
 their current behavior during this interview.
 
+Options round 1: owner accepted 24-high dropdown/offset/path fields and the
+shared Selection/Form prompt style. Implemented those independent choices
+using opt-in shared styles, with centered field labels. The owner rejected a
+112-wide label column without selecting a replacement; the proposed checkbox
+replacement was unanswered. Both choices remain pending, with the existing
+column/toggle temporarily retained. Follow-up asks whether labels should size
+to their longest text or use Form's 60 units, and whether Include Existing should
+be a checkbox or retain its toggle. Do not treat omitted answers as acceptance.
+
+Partial Options verification: Gallery 63 run/62 passed/1 skipped; actual WPF
+25 template states, normal interactions, minimum-size renders and 71 custom/
+state constructions passed. All five Options states measure the three fields
+at height 24 and both prompts resolve the exact shared style, size 14, normal
+weight. [Current partial render](../knowledge/reviews/design-system/2026-10-28-template-family-evidence/template-options-compact-fields.png)
+was inspected. Live input/DPI acceptance remains pending.
+
 ## Implementation boundaries and recovery
 
 `KLCodeFoundation.xaml` is opt-in and merges the existing legacy dictionary

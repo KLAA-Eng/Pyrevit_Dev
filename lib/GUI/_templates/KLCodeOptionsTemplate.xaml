@@ -8,33 +8,33 @@
             <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/><RowDefinition Height="{StaticResource KlaControlRow}"/></Grid.RowDefinitions>
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel>
-                    <TextBlock Text="Configure Sample Options" Style="{StaticResource KlaSectionHeading}" Margin="0,0,0,8"/>
+                    <Label x:Name="options_prompt" Content="Configure Sample Options" Target="{Binding ElementName=option_category}" Style="{StaticResource KlaFoundationPromptLabel}" Margin="0,0,0,8"/>
                     <Border Style="{StaticResource KlaSection}">
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaFieldLabelColumn}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="{StaticResource KlaControlRow}"/><RowDefinition Height="{StaticResource KlaGridSpace16}"/>
+                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace16}"/>
                                 <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
                                 <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace16}"/>
                                 <RowDefinition Height="{StaticResource KlaCompactRow}"/><RowDefinition Height="{StaticResource KlaGridSpace16}"/>
-                                <RowDefinition Height="{StaticResource KlaControlRow}"/>
+                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/>
                             </Grid.RowDefinitions>
-                            <Label Content="Category" Target="{Binding ElementName=option_category}" Style="{StaticResource KlaFieldLabel}"/>
-                            <ComboBox x:Name="option_category" Grid.Column="1" Style="{StaticResource KlaComboBox}" AutomationProperties.Name="Sample category"/>
-                            <Label Grid.Row="2" Content="Scope" Target="{Binding ElementName=scope_selected}" Style="{StaticResource KlaFieldLabel}"/>
+                            <Label Content="Category" Target="{Binding ElementName=option_category}" Style="{StaticResource KlaCompactFieldLabel}"/>
+                            <ComboBox x:Name="option_category" Grid.Column="1" Style="{StaticResource KlaCompactComboBox}" AutomationProperties.Name="Sample category"/>
+                            <Label Grid.Row="2" Content="Scope" Target="{Binding ElementName=scope_selected}" Style="{StaticResource KlaCompactFieldLabel}"/>
                             <RadioButton x:Name="scope_selected" Grid.Row="2" Grid.Column="1" GroupName="Scope" Content="Selected Items" IsChecked="True" Style="{StaticResource KlaRadioButton}"/>
                             <RadioButton x:Name="scope_all" Grid.Row="4" Grid.Column="1" GroupName="Scope" Content="All Available Items" Style="{StaticResource KlaRadioButton}"/>
-                            <Label Grid.Row="6" Content="Include Existing" Target="{Binding ElementName=option_toggle}" Style="{StaticResource KlaFieldLabel}"/>
+                            <Label Grid.Row="6" Content="Include Existing" Target="{Binding ElementName=option_toggle}" Style="{StaticResource KlaCompactFieldLabel}"/>
                             <ToggleButton x:Name="option_toggle" Grid.Row="6" Grid.Column="1" Content="Existing" Style="{StaticResource KlaToggle}" HorizontalAlignment="Left" AutomationProperties.Name="Include existing items"/>
-                            <Label Grid.Row="8" Content="Offset (mm)" Target="{Binding ElementName=option_offset}" Style="{StaticResource KlaFieldLabel}"/>
-                            <TextBox x:Name="option_offset" Grid.Row="8" Grid.Column="1" Text="0" Style="{StaticResource KlaFoundationInput}" HorizontalContentAlignment="Right" AutomationProperties.Name="Sample offset in millimeters"/>
+                            <Label Grid.Row="8" Content="Offset (mm)" Target="{Binding ElementName=option_offset}" Style="{StaticResource KlaCompactFieldLabel}"/>
+                            <TextBox x:Name="option_offset" Grid.Row="8" Grid.Column="1" Text="0" Style="{StaticResource KlaCompactFieldInput}" HorizontalContentAlignment="Right" AutomationProperties.Name="Sample offset in millimeters"/>
                         </Grid>
                     </Border>
-                    <TextBlock Text="Output Location" Style="{StaticResource KlaSectionHeading}" Margin="0,16,0,8"/>
+                    <Label x:Name="output_prompt" Content="Output Location" Target="{Binding ElementName=option_path}" Style="{StaticResource KlaFoundationPromptLabel}" Margin="0,16,0,8"/>
                     <Border Style="{StaticResource KlaSection}">
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="8"/><ColumnDefinition Width="{StaticResource KlaActionColumn}"/></Grid.ColumnDefinitions>
-                            <TextBox x:Name="option_path" Style="{StaticResource KlaReadOnlyField}" AutomationProperties.Name="Fictional output location"/>
+                            <TextBox x:Name="option_path" Style="{StaticResource KlaCompactReadOnlyField}" AutomationProperties.Name="Fictional output location"/>
                             <Button Grid.Column="2" Content="Browse" Click="browse_sample" Style="{StaticResource KlaSecondaryButton}" AutomationProperties.Name="Choose a fictional sample location"/>
                         </Grid>
                     </Border>

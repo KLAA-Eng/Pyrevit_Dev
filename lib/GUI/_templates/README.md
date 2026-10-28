@@ -64,6 +64,14 @@ These size limits are reference defaults for review. `window_chrome.fit_window_h
 is an opt-in helper for chromeless shared-shell windows; the caller invokes it
 when content, expansion or width changes. It never shows the window.
 
+Options also uses the compact 24-high field role for category, numeric offset
+and read-only path, through opt-in `KlaCompactComboBox`, `KlaCompactFieldInput`
+and `KlaCompactReadOnlyField`. Its two section prompts reuse
+`KlaFoundationPromptLabel`. The owner rejected the proposed 112-wide label
+column; its replacement width/layout and the checkbox-versus-toggle choice
+are still being clarified in the active plan. The existing column/toggle remain
+temporarily while those choices are open.
+
 Message severity changes its tone without changing banner geometry. Message
 and details have bounded scrolling. Review columns have useful minimum widths;
 the table can scroll horizontally at narrow sizes. Existing Search artwork and
