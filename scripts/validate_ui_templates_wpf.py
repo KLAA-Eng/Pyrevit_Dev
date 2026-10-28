@@ -58,13 +58,17 @@ def validate_template_family():
                     window.message_scroll.ScrollToTop()
                     settle_layout(shell)
             if identity == 'template-options':
+                assert window.options_fields.ColumnDefinitions[0].ActualWidth == 60
+                assert isinstance(window.option_include_existing, CheckBox)
+                assert window.option_include_existing.Content == 'Include Existing'
+                assert not hasattr(window, 'option_toggle')
                 for field in (window.option_category, window.option_offset, window.option_path):
                     assert field.ActualHeight == 24, (state, field.Name, field.ActualHeight)
                 for prompt in (window.options_prompt, window.output_prompt):
                     assert prompt.Style == window.Resources['KlaFoundationPromptLabel']
                     assert prompt.FontSize == 14 and str(prompt.FontWeight) == 'Normal'
             if identity == 'template-options' and state == 'Disabled':
-                for widget in (window.option_category, window.scope_selected, window.option_toggle):
+                for widget in (window.option_category, window.scope_selected, window.option_include_existing):
                     labels = [item for item in descendants(widget) if isinstance(item, TextBlock) and item.Text]
                     assert labels and all(str(label.Foreground) == '#FFA6B0AD' for label in labels), (widget.Name, [(label.Text, str(label.Foreground)) for label in labels])
             if hasattr(window, 'primary_action'):
@@ -123,8 +127,13 @@ def validate_template_family():
                     assert 'offset' in window.options_feedback.Text.lower()
                     window.option_offset.Text = '-12.5'
                     window.scope_all.IsChecked = True
+                    window.option_include_existing.IsChecked = False
                     window.apply_options(None, None)
                     assert 'All Available Items' in window.options_feedback.Text
+                    assert 'include existing False' in window.options_feedback.Text
+                    window.option_include_existing.IsChecked = True
+                    window.apply_options(None, None)
+                    assert 'include existing True' in window.options_feedback.Text
                     window.browse_sample(None, None)
                     assert 'Alternate Example' in window.option_path.Text
                 elif identity == 'template-review':

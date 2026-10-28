@@ -9,7 +9,7 @@ They all use the same shell and opt-in shared component resources.
 | Template - Selection | [KLCodeSelectionTemplate.xaml](KLCodeSelectionTemplate.xaml) | Compact filter, checked list, All/None and main action; [detailed guide](KLCodeSelectionTemplate.md) |
 | Template - Form | [KLCodeFormTemplate.xaml](KLCodeFormTemplate.xaml) | Compact labeled Find/Replace/Prefix/Suffix group and inline validation; no Sample Preview |
 | Template - Message | [KLCodeMessageTemplate.xaml](KLCodeMessageTemplate.xaml) | Information/Warning/Error severity, bounded long message, expandable details and dismissal |
-| Template - Options | [KLCodeOptionsTemplate.xaml](KLCodeOptionsTemplate.xaml) | Dropdown, exclusive scope, toggle, numeric unit field and read-only path/Browse row |
+| Template - Options | [KLCodeOptionsTemplate.xaml](KLCodeOptionsTemplate.xaml) | Dropdown, exclusive scope, Include Existing checkbox, numeric unit field and read-only path/Browse row |
 | Template - Review | [KLCodeReviewTemplate.xaml](KLCodeReviewTemplate.xaml) | Filtered checkable table, severity chips, splitter, selected-item detail and action group |
 
 The former main template was renamed Selection. The generic FindReplace visual
@@ -67,10 +67,10 @@ when content, expansion or width changes. It never shows the window.
 Options also uses the compact 24-high field role for category, numeric offset
 and read-only path, through opt-in `KlaCompactComboBox`, `KlaCompactFieldInput`
 and `KlaCompactReadOnlyField`. Its two section prompts reuse
-`KlaFoundationPromptLabel`. The owner rejected the proposed 112-wide label
-column; its replacement width/layout and the checkbox-versus-toggle choice
-are still being clarified in the active plan. The existing column/toggle remain
-temporarily while those choices are open.
+`KlaFoundationPromptLabel`. Its label column shares Form's 60-unit token, and
+Include Existing uses the standard self-labelled checkbox. Offset keeps its
+`mm` unit beside the input so its label fits the compact column. Options inputs
+still fill the available width; Form's naming inputs remain fixed at 240.
 
 Message severity changes its tone without changing banner geometry. Message
 and details have bounded scrolling. Review columns have useful minimum widths;

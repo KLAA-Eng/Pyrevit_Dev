@@ -55,7 +55,7 @@ def create_template(launcher, state, path):
                 self.option_category.SelectedItem = data['category'] or None
                 self.option_offset.Text = data['offset']
                 self.option_path.Text = data['path']
-                self.option_toggle.IsChecked = True
+                self.option_include_existing.IsChecked = True
                 self.apply_options(None, None)
             else:
                 self._review_rows = review_rows(self.preview_state)
@@ -155,7 +155,7 @@ def create_template(launcher, state, path):
             error = validate_options(self.option_category.SelectedItem, self.option_offset.Text)
             scope = 'Selected Items' if self.scope_selected.IsChecked else 'All Available Items'
             self.options_feedback.Text = error or 'Sample options applied: {}; offset {} mm; include existing {}. No files or model changed.'.format(
-                scope, self.option_offset.Text, bool(self.option_toggle.IsChecked))
+                scope, self.option_offset.Text, bool(self.option_include_existing.IsChecked))
             self.options_feedback.Foreground = self.Resources['KlaErrorBrush' if error else 'KlaMutedBrush']
             self.preview_result = self.options_feedback.Text
 

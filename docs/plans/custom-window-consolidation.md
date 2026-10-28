@@ -77,19 +77,25 @@ their current behavior during this interview.
 
 Options round 1: owner accepted 24-high dropdown/offset/path fields and the
 shared Selection/Form prompt style. Implemented those independent choices
-using opt-in shared styles, with centered field labels. The owner rejected a
-112-wide label column without selecting a replacement; the proposed checkbox
-replacement was unanswered. Both choices remain pending, with the existing
-column/toggle temporarily retained. Follow-up asks whether labels should size
-to their longest text or use Form's 60 units, and whether Include Existing should
-be a checkbox or retain its toggle. Do not treat omitted answers as acceptance.
+using opt-in shared styles, with centered field labels. The follow-up settled
+the remaining choices: use Form's 60-unit label column and replace the toggle
+with a self-labelled Include Existing checkbox. Implemented using the existing
+shared column token and checkbox style. Offset's unit moved beside its input
+so the label fits without clipping. No production windows were changed.
 
 Partial Options verification: Gallery 63 run/62 passed/1 skipped; actual WPF
 25 template states, normal interactions, minimum-size renders and 71 custom/
 state constructions passed. All five Options states measure the three fields
 at height 24 and both prompts resolve the exact shared style, size 14, normal
-weight. [Current partial render](../knowledge/reviews/design-system/2026-10-28-template-family-evidence/template-options-compact-fields.png)
-was inspected. Live input/DPI acceptance remains pending.
+weight. The [earlier partial render](../knowledge/reviews/design-system/2026-10-28-template-family-evidence/template-options-compact-fields.png)
+retains the former label column/toggle for historical comparison.
+
+Final Options verification: the same Gallery and WPF suites pass after the
+follow-up. All five states measure a 60-unit label column and use the actual
+Include Existing CheckBox. Checked/unchecked feedback and disabled text pass;
+Normal, Disabled and minimum-size renders were inspected.
+[Current render](../knowledge/reviews/design-system/2026-10-28-template-family-evidence/template-options-confirmed.png).
+Live input/DPI acceptance remains pending. Next interview frontier: Review.
 
 ## Implementation boundaries and recovery
 

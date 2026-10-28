@@ -36,9 +36,10 @@ class TemplateInteractionTests(unittest.TestCase):
             self.assertIn('offset', window.preview_result.lower())
             window.option_offset.Text = '-12.5'
             window.scope_selected.IsChecked = False
-            window.option_toggle.IsChecked = False
+            window.option_include_existing.IsChecked = False
             window.apply_options(None, None)
             self.assertIn('All Available Items', window.preview_result)
+            self.assertIn('include existing False', window.preview_result)
             window.browse_sample(None, None)
             self.assertIn('Alternate Example', window.option_path.Text)
         self.assertEqual([], alerts)
