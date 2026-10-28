@@ -26,8 +26,6 @@ SOURCES = {
     'kla-find-replace': 'lib/GUI/FindReplace.xaml',
     'kla-find-replace-views': 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml',
     'kla-find-replace-sheets': 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml',
-    'kla-legacy-rename-views': 'lib/GUI/RenameViews.xaml',
-    'kla-legacy-rename-sheets': 'lib/GUI/RenameSheets.xaml',
     'kla-main-template': 'lib/GUI/_templates/KLCodeMainTemplate.xaml',
     'kla-match-properties-recall': 'lib/match/clipboard_window.xaml',
     'kla-select-from-dict': 'lib/GUI/SelectFromDict.xaml',

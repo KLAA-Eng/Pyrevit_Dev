@@ -5,7 +5,6 @@
 # ╩╩ ╩╩  ╚═╝╩╚═ ╩ ╚═╝ IMPORTS
 #====================================================================================================
 from abc import ABCMeta, abstractmethod, abstractproperty
-from pyrevit import forms
 from GUI.forms import my_WPF
 
 # .NET IMPORTS
@@ -15,8 +14,6 @@ from System.Diagnostics.Process import Start
 from System.Windows.Window import DragMove
 from System.Windows.Input import MouseButtonState
 
-import os
-import wpf
 
 # ╔╗ ╔═╗╔═╗╔═╗  ╔═╗╦  ╔═╗╔═╗╔═╗
 # ╠╩╗╠═╣╚═╗║╣   ║  ║  ╠═╣╚═╗╚═╗
@@ -24,21 +21,10 @@ import wpf
 #====================================================================================================
 
 class BaseRenaming(my_WPF):
-    """GUI for [Views: Find and Replace]"""
+    """Shared view-renaming behavior; concrete commands own their window source."""
+    @abstractmethod
     def start(self, title, version="Version: _"):
-        gui_dir_abs_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'GUI'))
-        xaml_file_name = os.path.join(gui_dir_abs_path, 'RenameViews.xaml')
-
-        self.add_wpf_resource()
-        wpf.LoadComponent(self, xaml_file_name)
-        self.main_title.Text     = title
-        self.footer_version.Text = version
-        self.selected_elements   = self.get_selected_elements()
-
-        if self.selected_elements:
-            self.ShowDialog()
-        else:
-            forms.alert("No matching elements for renaming were selected. \nPlease Try again.", exitscript=True, title="Script Cancelled.")
+        raise NotImplementedError('Concrete rename commands must load their own XAML.')
 
     # ╔═╗╔╗ ╔═╗╔╦╗╦═╗╔═╗╔═╗╔╦╗
     # ╠═╣╠╩╗╚═╗ ║ ╠╦╝╠═╣║   ║

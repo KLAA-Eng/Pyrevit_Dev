@@ -1,5 +1,9 @@
 # Remaining custom-window component review
 
+This review preserves its `e366db7` baseline. The owner subsequently removed
+both legacy rename forms; the [retirement/filter record](2026-10-28-gallery-retirement-and-preview-filter.md)
+owns that later change. Its two legacy inventory rows below are historical.
+
 Date: 2026-10-28. Baseline: `e366db7` on `dev.GUI-Clean`, plus the requested
 Close-label correction. The source inventory contains 20 standalone Window
 XAML files: the main template and the 19 remaining windows reviewed below.

@@ -10,7 +10,7 @@ tooltip:
     Prototype: reviews standalone windows by origin, calling tools, and interactive sample state. Custom previews reuse repository XAML. Native picker selections are discarded; compiled previews remain deferred.
     _____________________________________________________________________
     How-to:
-    - Search by window or tool name, or filter the origin.
+    - Search by window or tool name, or filter Origin and Preview availability.
     - Select a row to see the calling tools and preview availability.
     - Choose a supported preview state and Open preview. All tool actions are simulated.
     - Review KLCode main template for the shared custom-window foundation.

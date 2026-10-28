@@ -65,6 +65,23 @@ class GalleryRegistryTests(unittest.TestCase):
         self.assertEqual([rows[1]], matching_entries(rows, '', 'pyRevit built-in'))
         self.assertEqual([], matching_entries(rows, 'missing'))
 
+    def test_preview_status_combines_with_origin_and_search(self):
+        rows = [dict(title='Family Studio', origin='Repository custom', preview_status='Deferred'),
+                dict(title='Shared selector', origin='Repository custom', preview_status='Interactive preview'),
+                dict(title='Shared host list', origin='pyRevit built-in', preview_status='Interactive preview')]
+        self.assertEqual([rows[0]], matching_entries(rows, preview='Deferred'))
+        self.assertEqual([rows[1]], matching_entries(rows, 'shared', 'Repository custom', 'Interactive preview'))
+        self.assertEqual([], matching_entries(rows, 'shared', preview='Deferred'))
+        self.assertEqual(rows, matching_entries(rows, preview='All previews'))
+
+    def test_retired_rename_forms_are_absent_from_source_and_catalog(self):
+        rows = gallery_entries(ROOT, {})
+        for name in ('RenameViews.xaml', 'RenameSheets.xaml', 'RenameSheets.py'):
+            self.assertFalse(os.path.exists(os.path.join(ROOT, 'lib', 'GUI', name)))
+        self.assertFalse(any(row['id'].startswith('kla-legacy-rename-') for row in rows))
+        self.assertTrue(any(row['id'] == 'kla-find-replace-views' for row in rows))
+        self.assertTrue(any(row['id'] == 'kla-find-replace-sheets' for row in rows))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -71,6 +71,27 @@ gallery.FilterBox.Text = ''
 gallery.OriginFilter.SelectedItem = 'pyRevit built-in'
 assert all(row.Origin == 'pyRevit built-in' for row in gallery.EntriesGrid.Items)
 gallery.OriginFilter.SelectedItem = 'All origins'
+gallery.PreviewFilter.SelectedItem = 'Deferred'
+assert gallery.EntriesGrid.Items.Count == 5
+assert all(row.PreviewStatus == 'Deferred' for row in gallery.EntriesGrid.Items)
+assert not gallery.LaunchButton.IsEnabled
+gallery.OriginFilter.SelectedItem = 'pyRevit built-in'
+assert gallery.EntriesGrid.Items.Count == 0
+assert not gallery.LaunchButton.IsEnabled
+gallery.OriginFilter.SelectedItem = 'All origins'
+gallery.FilterBox.Text = 'FamilyStudioWindow.xaml'
+assert gallery.EntriesGrid.Items.Count == 1
+assert gallery.EntriesGrid.Items[0].Entry['id'] == 'kla-family-studio'
+gallery.FilterBox.Text = ''
+if output_directory:
+    if not os.path.isdir(output_directory):
+        os.makedirs(output_directory)
+    render_content(gallery, os.path.join(output_directory, 'gallery-deferred.png'), 1060, 706)
+gallery.PreviewFilter.SelectedItem = 'Interactive preview'
+assert all(row.CanLaunch for row in gallery.EntriesGrid.Items)
+gallery.PreviewFilter.SelectedItem = 'All previews'
+assert gallery.EntriesGrid.Items.Count == len(entries)
+
 deferred = next(row for row in gallery.EntriesGrid.Items if row.Entry['id'] == 'kla-family-studio')
 gallery.EntriesGrid.SelectedItem = deferred
 assert not gallery.LaunchButton.IsEnabled

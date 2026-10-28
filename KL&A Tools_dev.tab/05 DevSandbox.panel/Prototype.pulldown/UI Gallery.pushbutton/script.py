@@ -61,6 +61,9 @@ class Gallery(forms.WPFWindow):
         self._entries = gallery_entries(EXTENSION_ROOT)
         self.OriginFilter.ItemsSource = ['All origins'] + list(ORIGINS)
         self.OriginFilter.SelectedIndex = 0
+        self.PreviewFilter.ItemsSource = ['All previews'] + sorted(
+            set(entry['preview_status'] for entry in self._entries))
+        self.PreviewFilter.SelectedIndex = 0
         self._ready = True
         self._filter()
 
@@ -79,11 +82,16 @@ class Gallery(forms.WPFWindow):
         if self._ready:
             self._filter()
 
+    def preview_changed(self, sender, args):
+        if self._ready:
+            self._filter()
+
     def _filter(self):
         previous = self.EntriesGrid.SelectedItem
         previous_id = previous.Entry['id'] if previous else None
         entries = matching_entries(self._entries, self.FilterBox.Text,
-                                   self.OriginFilter.SelectedItem or 'All origins')
+                                   self.OriginFilter.SelectedItem or 'All origins',
+                                   self.PreviewFilter.SelectedItem or 'All previews')
         rows = [GalleryRow(entry) for entry in entries]
         self.EntriesGrid.ItemsSource = rows
         self.CountText.Text = '{} standalone entries; {} available; {} deferred'.format(

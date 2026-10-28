@@ -66,6 +66,8 @@ quiet success.
 
 - Entry point: `script.py`
 - Selection and WPF: local `script.py` and `Script.xaml`, with `BaseRenaming` and shared WPF styles.
+- The command overrides `BaseRenaming.start` and loads its local XAML. The
+  removed legacy `RenameViews.xaml` is not a fallback or runtime dependency.
 - Planning, Revit transaction handling, and result presentation: `lib/find_replace/`.
 - Bundled external assets: None.
 

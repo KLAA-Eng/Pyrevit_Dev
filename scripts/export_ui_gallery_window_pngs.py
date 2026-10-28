@@ -85,10 +85,9 @@ def _profile_for(launcher, window_path):
         return _profile((440, 520), PALETTE['background'], _draw_selection)
     if launcher_id == 'kla-create-from-rooms':
         return _profile((440, 520), PALETTE['background'], _draw_create_from_rooms)
-    if launcher_id in ('kla-find-replace', 'kla-find-replace-views',
-                       'kla-legacy-rename-views'):
+    if launcher_id in ('kla-find-replace', 'kla-find-replace-views'):
         return _profile((520, 420), PALETTE['background'], _draw_find_replace)
-    if launcher_id in ('kla-find-replace-sheets', 'kla-legacy-rename-sheets'):
+    if launcher_id == 'kla-find-replace-sheets':
         return _profile((620, 560), PALETTE['background'], _draw_find_replace_sheets)
     if launcher_id == 'kla-duplicate-sheets':
         return _profile((720, 620), PALETTE['background'], _draw_duplicate_sheets)

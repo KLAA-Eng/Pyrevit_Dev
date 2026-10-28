@@ -219,8 +219,6 @@ class GalleryWindowTests(unittest.TestCase):
     def test_rename_family_states_seed_visible_empty_invalid_and_long_fields(self):
         groups = {
             'kla-find-replace': 'input_',
-            'kla-legacy-rename-views': 'input_',
-            'kla-legacy-rename-sheets': 'input_sheet_name_',
             'kla-find-replace-views': 'input_',
             'kla-find-replace-sheets': 'input_sheet_name_',
             'kla-duplicate-sheets': 'UI_sheet_name_',

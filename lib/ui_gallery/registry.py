@@ -134,12 +134,14 @@ def gallery_entries(extension_root, caller_index=None):
     return sorted(rows, key=lambda item: (item['origin'], item['title'].lower()))
 
 
-def matching_entries(entries, query='', origin='All origins'):
-    """Filter by origin or any visible identity, caller name/path, and metadata."""
+def matching_entries(entries, query='', origin='All origins', preview='All previews'):
+    """Combine origin/preview status with identity, caller and metadata search."""
     query = (query or '').lower().strip()
     result = []
     for row in entries:
         if origin != 'All origins' and row.get('origin') != origin:
+            continue
+        if preview != 'All previews' and row.get('preview_status') != preview:
             continue
         values = [row.get(key, '') for key in ('title', 'origin', 'relative_path',
                   'description', 'called_by', 'preview_status', 'unavailable_reason')]

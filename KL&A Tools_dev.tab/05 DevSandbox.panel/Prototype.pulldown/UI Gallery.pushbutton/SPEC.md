@@ -46,6 +46,16 @@ Search by window name, source path, tool name, or calling-tool path. Filter by:
 - Revit/Windows native: host/system dialogs, including native dialogs opened
   through pyRevit wrappers.
 
+The **Preview** filter uses the catalog's current availability labels, such as
+**Interactive preview**, **Deferred**, **Source unavailable**, and **Needs preview
+adapter** when present. **All previews** resets it. Search, Origin, and Preview
+combine; an empty intersection clears details and disables Open preview.
+Availability filtering is separate from choosing a fictional preview state.
+
+The legacy sheet/view rename forms were removed on 10.28.2026 at the owner's
+request. Their Gallery entries and unused sheet wrapper were removed too.
+The active Core rename commands retain their own command-local `Script.xaml`.
+
 The table includes a **Window source** column showing the repository-relative
 XAML path for custom windows (for example, `lib/GUI/SelectFromDict.xaml`) or the
 API reference for built-in/native dialogs. Long values wrap and are available
@@ -131,7 +141,7 @@ build the correct runtime assemblies, and validate in the matching Revit hosts.
 ## Implementation inventory
 
 - `script.py`: thin pyRevit Gallery adapter, filtering, selection, and dispatch.
-- `Gallery.xaml`: local Gallery layout, origin filter, caller details, state selector.
+- `Gallery.xaml`: local layout, origin/preview filters, caller details, state selector.
 - `lib/ui_gallery/launchers.py`: stable known dialog identities.
 - `lib/ui_gallery/registry.py`: source inventory, origins, availability, and search.
 - `lib/ui_gallery/callers.py`: host-independent static caller discovery.

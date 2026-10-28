@@ -371,8 +371,8 @@ list-selection implementation and has not yet been migrated.
 
 The following 10 user-facing KL&A custom windows use the template header
 treatment: five shared GUI windows, Match Properties Recall, View Range, the
-two Core Find and Replace windows, and Steel PSF. The two former shared rename
-forms remain as legacy gallery previews. The DevSandbox UI Gallery and its
+two Core Find and Replace windows, and Steel PSF. The former shared rename
+forms were removed on 2026-10-28 at the owner's request. The DevSandbox UI Gallery and its
 preview fixture are tooling exceptions and are not part of this visual
 standardization scope.
 
@@ -386,14 +386,12 @@ standardization scope.
 | Duplicate sheets | `lib/GUI/DuplicateSheets.xaml` | `lib/GUI/DuplicateSheets.py` | `duplicate_sheets.pushbutton`; `UI Gallery.pushbutton` |
 | Create from rooms | `lib/GUI/Tools/CreateFromRooms.xaml` | `lib/GUI/Tools/CreateFromRooms.py` | `UI Gallery.pushbutton` |
 
-### Core Rename Windows And Legacy Previews
+### Core Rename Windows
 
 | Window | XAML path | Loader path | Tools |
 | --- | --- | --- | --- |
 | Find and replace views | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml` | Same bundle `script.py` | `FindReplace - Views.pushbutton`; `UI Gallery.pushbutton` |
 | Find and replace sheets | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml` | Same bundle `script.py` | `FindReplace_Sheets.pushbutton`; `UI Gallery.pushbutton` |
-| Legacy view rename form | `lib/GUI/RenameViews.xaml` | `lib/Renaming/BaseClass_FindReplace.py` default loader | `UI Gallery.pushbutton` legacy preview |
-| Legacy sheet rename form | `lib/GUI/RenameSheets.xaml` | `lib/GUI/RenameSheets.py` | `UI Gallery.pushbutton` legacy preview |
 
 ### One-Off Windows
 
@@ -412,14 +410,16 @@ standardization scope.
 
 ## UI Gallery source review
 
-The DevSandbox UI Gallery records 20 repository `Window` XAML surfaces: the
-14 pyRevit/DevSandbox windows below, the separate main-template preview, and
+The DevSandbox UI Gallery records 18 repository `Window` XAML surfaces: the
+12 pyRevit/DevSandbox windows below, the separate main-template preview, and
 the five compiled WPF windows cataloged above. The compiled entries remain
 disabled by the owner's 2026-10-27 scope decision; working compiled previews are
 future work. Standard pyRevit/native dialogs are external sources, not
 repository XAML surfaces. The Gallery now labels origins, lists source-backed
 calling tools, and offers interactive fictional states for supported windows.
 It also catalogs newly discovered Window sources without enabling arbitrary XAML.
+Search combines with Origin and Preview availability filters; the latter uses
+the current catalog statuses independently of the fictional state selector.
 See the [current Gallery SPEC](<../KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
 and [verification record](knowledge/reviews/design-system/2026-10-27-ui-gallery-verification.md)
 for current behavior and evidence.
@@ -465,8 +465,6 @@ These loaders call `my_WPF.add_wpf_resource()` before `wpf.LoadComponent()`. The
 | Find and replace | `lib/GUI/FindReplace.xaml` | `lib/GUI/FindReplace.py` |
 | Find and replace views | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml` | Same bundle `script.py` |
 | Find and replace sheets | `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml` | Same bundle `script.py` |
-| Legacy view rename form | `lib/GUI/RenameViews.xaml` | `lib/Renaming/BaseClass_FindReplace.py` default loader |
-| Legacy sheet rename form | `lib/GUI/RenameSheets.xaml` | `lib/GUI/RenameSheets.py` |
 | Match properties recall | `lib/match/clipboard_window.xaml` | `lib/match/clipboard.py` |
 | Steel PSF story selection | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml` | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/script.py` |
 

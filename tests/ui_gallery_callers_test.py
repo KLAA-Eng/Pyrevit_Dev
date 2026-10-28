@@ -162,6 +162,10 @@ class CallerDiscoveryTests(unittest.TestCase):
         native_titles = [row['title'] for row in result['native:OpenFileDialog']]
         self.assertIn('Family Studio', native_titles)
         self.assertIn('Startup Importer', native_titles)
+        for folder, title in (('FindReplace - Views.pushbutton', 'Find and Replace in Views'),
+                              ('FindReplace_Sheets.pushbutton', 'Find and Replace in Sheets')):
+            key = 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/' + folder + '/Script.xaml'
+            self.assertIn(title, [row['title'] for row in result[key]])
 
 
 if __name__ == '__main__':

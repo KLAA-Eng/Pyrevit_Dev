@@ -77,11 +77,13 @@
             <TextBlock Text="Review actual window layouts with fictional data. Production tool commands are never run. Five compiled previews are deferred; docked panels and overlays are outside this Gallery."
                        TextWrapping="Wrap" Margin="0,0,0,8" Foreground="{StaticResource text_gray}"/>
             <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="210"/></Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="180"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="190"/></Grid.ColumnDefinitions>
                 <Label Content="_Search" Target="{Binding ElementName=FilterBox}" Foreground="#E5E4E2" VerticalAlignment="Center"/>
                 <TextBox x:Name="FilterBox" Grid.Column="1" Height="28" TextChanged="filter_changed" AutomationProperties.Name="Search windows and calling tools"/>
                 <Label Grid.Column="3" Content="_Origin" Target="{Binding ElementName=OriginFilter}" Foreground="#E5E4E2" VerticalAlignment="Center"/>
                 <ComboBox x:Name="OriginFilter" Grid.Column="4" Height="28" SelectionChanged="origin_changed" AutomationProperties.Name="Window origin"/>
+                <Label Grid.Column="6" Content="_Preview" Target="{Binding ElementName=PreviewFilter}" Foreground="#E5E4E2" VerticalAlignment="Center"/>
+                <ComboBox x:Name="PreviewFilter" Grid.Column="7" Height="28" SelectionChanged="preview_changed" AutomationProperties.Name="Preview availability"/>
             </Grid>
             <DataGrid x:Name="EntriesGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" SelectionChanged="selection_changed"
                       CanUserAddRows="False" CanUserResizeRows="False" HeadersVisibility="Column" Background="#1A252B" Foreground="#E5E4E2"
