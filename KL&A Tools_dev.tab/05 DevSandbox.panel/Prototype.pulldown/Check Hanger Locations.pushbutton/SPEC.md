@@ -153,8 +153,18 @@ Hanger and member Ids are select-only links. pyRevit's magnifier runs Revit's
 `ShowElements`, which did not reliably zoom to hangers or members, so the
 report instead shows a `Zoom to selection` button (top, and again below long
 tables) that runs the sibling `Zoom to Selection` command on the current
-selection. With hangers selected, this command zooms to them the same way
-(their bounding boxes in the active view). The selection stays until the user presses Esc.
+selection. pyRevit runs the button by looking up its ribbon control id and
+silently does nothing when the id is not found, so the report reads the real
+id from the loaded Revit ribbon (an item whose id ends in `%Zoom to
+Selection`, preferring this command's pulldown) instead of deriving it; the
+report also tells users to run `Prototypes > Zoom to Selection` if the button
+does nothing. With hangers selected, this command zooms to them the same way.
+
+The check records each hanger's framing joint: the supported member's end
+projected onto the supporting member's location line (the supported end when
+there is no supporting member). Zooms frame a hanger's insertion point and its
+joint. The joint is an output only; the members are still found from the
+hanger insertion point, text direction, and hexagon. The selection stays until the user presses Esc.
 
 ## Implementation inventory
 

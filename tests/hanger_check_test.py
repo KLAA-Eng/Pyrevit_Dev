@@ -57,6 +57,13 @@ class ClassifyHangerTest(unittest.TestCase):
         self.assertEqual(result['supporting'], 1)
         self.assertEqual(result['skew_deg'], 0.0)
         self.assertEqual(match_label(result), 'Yes')
+        # The joint is the supported end projected onto the supporting member's line.
+        self.assertEqual(result['joint'], (2.0, 0.0, 10.0))
+
+    def test_joint_without_supporting_member(self):
+        result = classify_hanger(HANGER, [JOIST], ALONG_Y)
+        self.assertEqual(result['joint'], JOIST['start'])
+        self.assertIsNone(classify_hanger(HANGER, [HEADER], ALONG_Y)['joint'])
 
     def test_text_direction_sign_does_not_matter(self):
         result = classify_hanger(HANGER, [HEADER, JOIST], (0.0, -1.0))

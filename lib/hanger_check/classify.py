@@ -146,9 +146,12 @@ def classify_hanger(point, members, text_dir=None, flat_sides=None):
     point is the hanger insertion point and text_dir its plan text direction
     (any sign); both in feet/model coordinates. flat_sides is the hexagon's
     [bottom, top] flat side offsets across the text (see side_alignment).
+    The result's joint is where the supported member meets the supporting
+    member's line (or the supported member's end when there is no supporting
+    member): the framing connection the hanger stands for.
     """
     text_dir = unit_plan(text_dir)
-    result = {'supported': None, 'supported_end': None, 'supporting': None,
+    result = {'supported': None, 'supported_end': None, 'supporting': None, 'joint': None,
               'skew_deg': None, 'status': STATUS_OK, 'notes': []}
     if not members:
         result['status'] = STATUS_NO_FRAMING
@@ -217,6 +220,11 @@ def classify_hanger(point, members, text_dir=None, flat_sides=None):
             result['skew_deg'] = round(skew, 1)
             if result['skew_deg'] >= SKEW_NOTE_DEG:
                 result['notes'].append('Skewed %.1f deg' % result['skew_deg'])
+            start, end = supporting['start'], supporting['end']
+            t = closest_on_segment(anchor, start, end)[0]
+            result['joint'] = tuple(start[i] + t * (end[i] - start[i]) for i in range(3))
+    elif supported is not None:
+        result['joint'] = anchor
 
     if supported is None:
         result['status'] = STATUS_ORIENTATION if misaligned else STATUS_NO_SUPPORTED

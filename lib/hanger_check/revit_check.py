@@ -59,6 +59,7 @@ HEXAGON_LINE_WEIGHT = 10
 LINE_STYLE_PREFIX = 'KLA Hanger Check - '
 LINE_STYLES = {PROBLEM_KEY: 'Problem', DETAILS_KEY: 'Review details'}
 PLAN_Z_REACH_FT = 10000.0
+ZOOM_MARGIN_FT = 3.0
 HANGER_FIELDS = ('Designation', 'Header', 'Joist')
 TOP_FLANGE_FIELD = 'Fastener-TF'
 WIDTH_PARAMS = ('b', 'Width', 'B', 'Beam Width', 'Nominal Width')
@@ -406,25 +407,77 @@ def member_slope(element):
     return slope_label(_xyz(curve.GetEndPoint(0)), _xyz(curve.GetEndPoint(1)))
 
 
-def zoom_to(uidoc, view, elements):
-    """Select the elements and zoom the active view to their bounding boxes in
-    that view (ZoomAndCenterRectangle, as in the pyRevit forum "Zoom / Go to
-    element" solution). Returns the elements not visible in the view; nothing
-    zooms when none are visible or the view is not open."""
+def _zoom_points(element, view, targets):
+    """Points to frame for one element: a hanger's insertion point plus its
+    framing joint when known; a member's location line; else its bounding box
+    in the view."""
+    location = element.Location
+    if isinstance(location, DB.LocationPoint):
+        target = targets.get(id_value(element.Id))
+        return [location.Point] + ([DB.XYZ(*target)] if target is not None else [])
+    if isinstance(location, DB.LocationCurve):
+        return [location.Curve.GetEndPoint(0), location.Curve.GetEndPoint(1)]
+    box = element.get_BoundingBox(view)
+    return [box.Min, box.Max]
+
+
+def zoom_to(uidoc, view, elements, targets=None):
+    """Select the elements and zoom the active view to them with
+    ZoomAndCenterRectangle (pyRevit forum "Zoom / Go to element"), plus a
+    ZOOM_MARGIN_FT margin so the framing around a hanger stays in view.
+    targets: {hanger id: (x, y, z)} framing joints from check_hangers.
+    Elements with no bounding box in the view are not visible there; they are
+    skipped and returned. Nothing zooms when none are visible."""
+    targets = targets or {}
     ui_view = next((v for v in uidoc.GetOpenUIViews() if v.ViewId == view.Id), None)
-    boxes, hidden = [], []
+    points, hidden = [], []
     for element in elements:
-        box = element.get_BoundingBox(view)
-        if box is None:
+        if element.get_BoundingBox(view) is None:
             hidden.append(element)
         else:
-            boxes.append(box)
-    if ui_view is None or not boxes:
+            points.extend(_zoom_points(element, view, targets))
+    if ui_view is None or not points:
         return list(elements)
     uidoc.Selection.SetElementIds(List[DB.ElementId]([e.Id for e in elements]))
-    low = DB.XYZ(min(b.Min.X for b in boxes), min(b.Min.Y for b in boxes),
-                 min(b.Min.Z for b in boxes))
-    high = DB.XYZ(max(b.Max.X for b in boxes), max(b.Max.Y for b in boxes),
-                  max(b.Max.Z for b in boxes))
+    low = DB.XYZ(min(p.X for p in points) - ZOOM_MARGIN_FT,
+                 min(p.Y for p in points) - ZOOM_MARGIN_FT, min(p.Z for p in points))
+    high = DB.XYZ(max(p.X for p in points) + ZOOM_MARGIN_FT,
+                  max(p.Y for p in points) + ZOOM_MARGIN_FT, max(p.Z for p in points))
     ui_view.ZoomAndCenterRectangle(low, high)
     return hidden
+
+
+def joint_targets(results):
+    """{hanger id: framing joint} for check_hangers results that found one."""
+    return dict((i, r['joint']) for i, r in results.items() if r.get('joint') is not None)
+
+
+def _ribbon_ids(items, suffix, found):
+    for item in items:
+        item_id = getattr(item, 'Id', None) or ''
+        if item_id.endswith(suffix):
+            found.append(item_id)
+        children = getattr(item, 'Items', None)
+        if children is not None:
+            _ribbon_ids(children, suffix, found)
+
+
+def ribbon_control_id(button_name, near_id=None):
+    """The Revit ribbon's own control id for a pyRevit button bundle name, read
+    from the loaded ribbon (pyRevit's report button links silently do nothing
+    when the id is wrong). Prefers a match in the same pulldown as near_id."""
+    try:
+        from pyrevit.api import AdWindows
+        tabs = AdWindows.ComponentManager.Ribbon.Tabs
+    except Exception:
+        return None
+    found = []
+    for tab in tabs:
+        for panel in tab.Panels:
+            _ribbon_ids(panel.Source.Items, '%' + button_name, found)
+    if near_id and '%' in near_id:
+        prefix = near_id.rsplit('%', 1)[0] + '%'
+        for item_id in found:
+            if item_id.startswith(prefix):
+                return item_id
+    return found[0] if found else None

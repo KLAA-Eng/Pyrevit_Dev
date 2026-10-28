@@ -6,7 +6,7 @@ __version__ = "v0.0"
 
 from pyrevit import forms, revit, script
 
-from hanger_check.revit_check import zoom_to
+from hanger_check.revit_check import check_hangers, is_hanger, joint_targets, zoom_to
 
 
 COMMAND_TITLE = 'Zoom to Selection'
@@ -19,7 +19,9 @@ def main():
         forms.alert('Select a hanger or member (click its Id in the Check Hanger Locations '
                     'report) and run again.', title=COMMAND_TITLE, warn_icon=True)
         script.exit()
-    hidden = zoom_to(uidoc, view, elements)
+    hangers = [e for e in elements if is_hanger(e)]
+    targets = joint_targets(check_hangers(doc, view, hangers, {})) if hangers else {}
+    hidden = zoom_to(uidoc, view, elements, targets)
     if len(hidden) == len(elements):
         forms.alert('None of the selected elements is visible in "{}". Open a view that '
                     'shows them and run again.'.format(view.Name),

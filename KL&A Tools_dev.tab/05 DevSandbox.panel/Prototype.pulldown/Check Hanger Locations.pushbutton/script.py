@@ -16,8 +16,10 @@ from hanger_check.revit_check import (
     hanger_info,
     hangers_in_view,
     id_value,
+    joint_targets,
     member_label,
     refresh_highlights,
+    ribbon_control_id,
     selected_hangers,
     zoom_to,
 )
@@ -47,12 +49,11 @@ def _select_link(element):
 
 
 def _zoom_button(output):
-    # Sibling buttons share the pulldown's control id prefix.
-    control_id = EXEC_PARAMS.command_controlid
-    if not control_id or '%' not in control_id:
+    # The link runs the ribbon item with this exact id, so read it from the ribbon.
+    control_id = ribbon_control_id(ZOOM_COMMAND, EXEC_PARAMS.command_controlid)
+    if not control_id:
         return ''
-    sibling = control_id.rsplit('%', 1)[0] + '%' + ZOOM_COMMAND
-    return output.buttonify(_RibbonButton(sibling), 'Zoom to selection')
+    return output.buttonify(_RibbonButton(control_id), 'Zoom to selection')
 
 
 def _member_cell(doc, elements, member_id):
@@ -76,9 +77,10 @@ def _print_report(output, doc, view, source, results, elements, colored):
     else:
         output.print_md('Graphics overrides are not allowed in this view; nothing was colored.')
     zoom = _zoom_button(output)
-    output.print_md('Click an Id to select it in Revit, then {} to zoom the view to it. '
-                    'Press Esc in Revit to clear the selection.'.format(
-                        zoom or 'run Zoom to Selection'))
+    output.print_md('Click an Id to select it in Revit, then {} to zoom the view to it '
+                    '(hangers zoom to the supported/supporting member joint). If the button '
+                    'does nothing, run Prototypes > Zoom to Selection. Press Esc in Revit to '
+                    'clear the selection.'.format(zoom or 'run Prototypes > Zoom to Selection'))
     if problems:
         output.print_md('Select problem hangers: {}'.format(
             output.linkify([elements[i].Id for i in problems])))
@@ -122,7 +124,7 @@ def main():
         refresh_highlights(doc, view, results, elements, revit.Transaction)
 
     if picked:
-        zoom_to(uidoc, view, picked)
+        zoom_to(uidoc, view, picked, joint_targets(results))
         results = dict((i, r) for i, r in results.items() if i in picked_ids)
     _print_report(script.get_output(), doc, view, 'selection' if picked else 'active view',
                   results, elements, colored)

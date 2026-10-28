@@ -31,10 +31,14 @@ forum thread "Zoom / Go to element"
 
 ## Behavior
 
-- Takes each selected element's bounding box in the active view
-  (`get_BoundingBox(view)`); an element without one is not visible there.
+- An element with no bounding box in the active view (`get_BoundingBox(view)`)
+  is not visible there and is skipped.
+- Frames: hangers by insertion point plus their framing joint (the supported
+  member end on the supporting member's line, from the hanger check run on the
+  selected hangers); framing by its location line; anything else by its view
+  bounding box. A 3'-0" margin keeps the surrounding framing in view.
 - Re-selects the elements and calls `ZoomAndCenterRectangle` on the open UI
-  view of the active view with the combined box, with no added margin.
+  view of the active view.
 - Nothing selected: an alert asks the user to select a hanger or member.
 - None of the selection visible in the view: an alert says so and nothing
   zooms. Some not visible: the view zooms to the rest and an alert gives the
@@ -54,6 +58,7 @@ forum thread "Zoom / Go to element"
 ## Validation boundary
 
 Live Revit 2024+ acceptance must confirm the report button runs this command,
-that the zoom frames a hanger and a long member in plan, whether the tight
-fit (no margin) shows enough context, and behavior in
+that the zoom frames a hanger and a long member in plan, whether the 3'-0"
+margin shows enough context, that the report button now finds the ribbon
+item, and behavior in
 sections and 3D views.
