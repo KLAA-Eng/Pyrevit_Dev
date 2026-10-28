@@ -37,8 +37,15 @@ forum thread "Zoom / Go to element"
   member end on the supporting member's line, from the hanger check run on the
   selected hangers); framing by its location line; anything else by its view
   bounding box. A 3'-0" margin keeps the surrounding framing in view.
-- Re-selects the elements and calls `ZoomAndCenterRectangle` on the open UI
-  view of the active view.
+- Sheets: a model element is framed through the first viewport on the sheet
+  whose view shows it (non-null `get_BoundingBox` in that view), preferring a
+  viewport whose outline contains the mapped points. Points map model ->
+  projection -> sheet with `View.GetModelToProjectionTransforms` and
+  `Viewport.GetProjectionToSheetTransform` (Revit 2022+), and the 3'-0" margin
+  is divided by that view's scale. Hanger joints are checked in the
+  viewport's view. Elements owned by the sheet frame by their sheet box.
+- Re-selects the elements (ignored if Revit refuses the selection on a sheet)
+  and calls `ZoomAndCenterRectangle` on the open UI view of the active view.
 - Nothing selected: an alert asks the user to select a hanger or member.
 - None of the selection visible in the view: an alert says so and nothing
   zooms. Some not visible: the view zooms to the rest and an alert gives the
@@ -50,15 +57,16 @@ forum thread "Zoom / Go to element"
 - Entry point: `script.py`.
 - Shared Revit adapter: `zoom_to` in `lib/hanger_check/revit_check.py`, also
   used by `Check Hanger Locations` when run with hangers selected.
-- The report button targets this command by control id: the running command's
-  control id with its last `%` segment replaced by `Zoom to Selection`, so the
-  bundle folder name must stay `Zoom to Selection.pushbutton` in the same
-  pulldown as `Check Hanger Locations`.
+- The report button targets this command by the control id read from the
+  loaded Revit ribbon (an item id ending in `%Zoom to Selection`), so the
+  bundle folder name must stay `Zoom to Selection.pushbutton`.
 
 ## Validation boundary
 
 Live Revit 2024+ acceptance must confirm the report button runs this command,
 that the zoom frames a hanger and a long member in plan, whether the 3'-0"
 margin shows enough context, that the report button now finds the ribbon
-item, and behavior in
-sections and 3D views.
+item, sheet zoom through
+viewports (including rotated or multi-segment views, where only the first
+projection transform is used, and whether a selection made from the report
+survives on a sheet), and behavior in sections and 3D views.

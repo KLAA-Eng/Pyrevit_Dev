@@ -421,28 +421,100 @@ def _zoom_points(element, view, targets):
     return [box.Min, box.Max]
 
 
+def _sheet_viewports(doc, sheet):
+    """(viewport, its view) for every viewport placed on the sheet."""
+    viewports = [doc.GetElement(i) for i in sheet.GetAllViewports()]
+    return [(vp, doc.GetElement(vp.ViewId)) for vp in viewports]
+
+
+def _to_sheet(viewport, view, points):
+    """Model points -> sheet points through the viewport, else None (Revit 2022+)."""
+    try:
+        transforms = view.GetModelToProjectionTransforms()
+        to_sheet = viewport.GetProjectionToSheetTransform()
+    except Exception:
+        return None
+    if not transforms:
+        return None
+    to_projection = transforms[0].GetModelToProjectionTransform()
+    return [to_sheet.OfPoint(to_projection.OfPoint(p)) for p in points]
+
+
+def _inside(outline, point):
+    return (outline.MinimumPoint.X <= point.X <= outline.MaximumPoint.X
+            and outline.MinimumPoint.Y <= point.Y <= outline.MaximumPoint.Y)
+
+
+def view_showing(doc, view, element):
+    """(viewport, model view) where the element shows: the view itself, or on a
+    sheet the first viewport whose view shows it, else (None, None)."""
+    if not isinstance(view, DB.ViewSheet):
+        return None, view if element.get_BoundingBox(view) is not None else None
+    for viewport, model_view in _sheet_viewports(doc, view):
+        if element.get_BoundingBox(model_view) is not None:
+            return viewport, model_view
+    return None, None
+
+
+def _sheet_frame(doc, sheet, element, targets):
+    """(sheet points, margin) for an element on a sheet, else None. Sheet
+    elements frame by their own box; model elements through the viewport that
+    shows them, preferring one whose outline contains the mapped points."""
+    if element.OwnerViewId == sheet.Id:
+        box = element.get_BoundingBox(sheet)
+        return ([box.Min, box.Max], 0.0) if box is not None else None
+    fallback = None
+    for viewport, model_view in _sheet_viewports(doc, sheet):
+        if element.get_BoundingBox(model_view) is None:
+            continue
+        mapped = _to_sheet(viewport, model_view,
+                           _zoom_points(element, model_view, targets))
+        if mapped is None:
+            continue
+        frame = (mapped, ZOOM_MARGIN_FT / max(model_view.Scale, 1))
+        outline = viewport.GetBoxOutline()
+        if all(_inside(outline, p) for p in mapped):
+            return frame
+        fallback = fallback or frame
+    return fallback
+
+
 def zoom_to(uidoc, view, elements, targets=None):
     """Select the elements and zoom the active view to them with
     ZoomAndCenterRectangle (pyRevit forum "Zoom / Go to element"), plus a
     ZOOM_MARGIN_FT margin so the framing around a hanger stays in view.
     targets: {hanger id: (x, y, z)} framing joints from check_hangers.
-    Elements with no bounding box in the view are not visible there; they are
-    skipped and returned. Nothing zooms when none are visible."""
+    On a sheet, model elements are framed through the viewport that shows
+    them, with the margin at the viewport's scale. Elements not visible in the
+    view (or any viewport on the sheet) are skipped and returned. Nothing
+    zooms when none are visible."""
     targets = targets or {}
+    doc = uidoc.Document
     ui_view = next((v for v in uidoc.GetOpenUIViews() if v.ViewId == view.Id), None)
-    points, hidden = [], []
+    frames, hidden = [], []
     for element in elements:
-        if element.get_BoundingBox(view) is None:
+        if isinstance(view, DB.ViewSheet):
+            frame = _sheet_frame(doc, view, element, targets)
+        elif element.get_BoundingBox(view) is not None:
+            frame = (_zoom_points(element, view, targets), ZOOM_MARGIN_FT)
+        else:
+            frame = None
+        if frame is None:
             hidden.append(element)
         else:
-            points.extend(_zoom_points(element, view, targets))
-    if ui_view is None or not points:
+            frames.append(frame)
+    if ui_view is None or not frames:
         return list(elements)
-    uidoc.Selection.SetElementIds(List[DB.ElementId]([e.Id for e in elements]))
-    low = DB.XYZ(min(p.X for p in points) - ZOOM_MARGIN_FT,
-                 min(p.Y for p in points) - ZOOM_MARGIN_FT, min(p.Z for p in points))
-    high = DB.XYZ(max(p.X for p in points) + ZOOM_MARGIN_FT,
-                  max(p.Y for p in points) + ZOOM_MARGIN_FT, max(p.Z for p in points))
+    try:
+        uidoc.Selection.SetElementIds(List[DB.ElementId]([e.Id for e in elements]))
+    except Exception:
+        pass
+    low = DB.XYZ(min(p.X - m for pts, m in frames for p in pts),
+                 min(p.Y - m for pts, m in frames for p in pts),
+                 min(p.Z for pts, m in frames for p in pts))
+    high = DB.XYZ(max(p.X + m for pts, m in frames for p in pts),
+                  max(p.Y + m for pts, m in frames for p in pts),
+                  max(p.Z for pts, m in frames for p in pts))
     ui_view.ZoomAndCenterRectangle(low, high)
     return hidden
 
@@ -450,6 +522,20 @@ def zoom_to(uidoc, view, elements, targets=None):
 def joint_targets(results):
     """{hanger id: framing joint} for check_hangers results that found one."""
     return dict((i, r['joint']) for i, r in results.items() if r.get('joint') is not None)
+
+
+def hanger_joints(doc, view, hangers):
+    """{hanger id: framing joint} for hangers, each checked in the view that
+    shows it (on a sheet, its viewport's view)."""
+    groups = {}
+    for hanger in hangers:
+        model_view = view_showing(doc, view, hanger)[1]
+        if model_view is not None:
+            groups.setdefault(id_value(model_view.Id), (model_view, []))[1].append(hanger)
+    joints = {}
+    for model_view, group in groups.values():
+        joints.update(joint_targets(check_hangers(doc, model_view, group, {})))
+    return joints
 
 
 def _ribbon_ids(items, suffix, found):
