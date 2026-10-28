@@ -6,6 +6,11 @@ refine their elements. The [consolidation plan](../../../plans/custom-window-con
 owns task status and interview progress. The [family guide](../../../../lib/GUI/_templates/README.md)
 owns the template compositions and interaction contracts.
 
+This records the initial five-template build. The subsequent [owner-confirmed
+Form refinement](2026-10-28-form-template-refinement.md) removes Sample Preview
+and replaces Form's field geometry; the initial Form renders below remain
+historical evidence.
+
 ## Delivered reference family
 
 | Gallery entry | Normal render | Additional evidence |

@@ -3,7 +3,8 @@
 from __future__ import print_function
 
 from ui_gallery.template_data import TEMPLATE_FILES
-from System.Windows.Controls import CheckBox
+from System.Windows import Thickness
+from System.Windows.Controls import CheckBox, Label
 
 
 def validate_template_family():
@@ -21,6 +22,19 @@ def validate_template_family():
             assert window._kla_chrome.header.ActualHeight == window._kla_chrome.footer.ActualHeight == 24
             assert window._kla_chrome.title.ToolTip is None
             assert window.window_body.IsEnabled == (state != 'Disabled')
+            if identity == 'template-form':
+                fields = [getattr(window, 'input_' + name) for name in ('find', 'replace', 'prefix', 'suffix')]
+                assert not hasattr(window, 'preview_lines')
+                assert window.naming_group.Padding == Thickness(12)
+                for field in fields:
+                    assert field.ActualWidth == 240 and field.ActualHeight == 24, (state, field.Name, field.ActualWidth, field.ActualHeight)
+                    label = next(control for control in window.naming_group.Child.Children
+                                 if isinstance(control, Label) and control.Target == field)
+                    assert label.ActualWidth == 60 and str(label.VerticalContentAlignment) == 'Center'
+                    assert label.Content.endswith(':')
+                for previous, following in zip(fields, fields[1:]):
+                    gap = following.TranslatePoint(Point(0, 0), shell).Y - previous.TranslatePoint(Point(0, previous.ActualHeight), shell).Y
+                    assert gap == 8, gap
             if identity == 'template-options' and state == 'Disabled':
                 for widget in (window.option_category, window.scope_selected, window.option_toggle):
                     labels = [item for item in descendants(widget) if isinstance(item, TextBlock) and item.Text]
@@ -41,7 +55,8 @@ def validate_template_family():
                     window.reset_form(None, None)
                     window.input_prefix.Text = 'QA-'
                     window.apply_form(None, None)
-                    assert 'QA-' in window.preview_lines.Text
+                    assert window.input_prefix.Text == 'QA-'
+                    assert window.form_feedback.Text == 'Rules accepted for 4 sample names. No elements were renamed.'
                 elif identity == 'template-message':
                     window.message_severity.SelectedItem = 'Warning'
                     assert 'Warning' in window.message_heading.Text

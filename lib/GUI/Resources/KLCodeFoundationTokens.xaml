@@ -40,6 +40,10 @@
     <BitmapImage x:Key="KlaIconSearch" UriSource="../../_icons/search_16px_light.png"/>
     <!-- Component roles supplement the shared brand palette; all styles are opt-in. -->
     <GridLength x:Key="KlaFieldLabelColumn">112</GridLength>
+    <GridLength x:Key="KlaCompactFieldLabelColumn">60</GridLength>
+    <GridLength x:Key="KlaCompactFieldInputColumn">240</GridLength>
+    <GridLength x:Key="KlaCompactFieldRow">24</GridLength>
+    <sys:Double x:Key="KlaCompactFieldHeight">24</sys:Double>
     <GridLength x:Key="KlaActionColumn">104</GridLength>
     <SolidColorBrush x:Key="KlaComponentSurfaceBrush" Color="#22303A"/>
     <SolidColorBrush x:Key="KlaComponentBorderBrush" Color="#52675D"/>

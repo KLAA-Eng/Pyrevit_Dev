@@ -98,7 +98,8 @@ FindReplace form is adapted into Form. Its unused Python wrapper/export is
 retired, while the actual Core rename commands keep their own windows.
 See the [template family guide](../../../../lib/GUI/_templates/README.md) for
 composition, interactions and source ownership. Browse uses fictional paths,
-Message supports severity/details, Form previews naming, and Review separates
+Message supports severity/details, Form validates compact naming-rule fields
+without a Sample Preview, and Review separates
 checked items from selected detail. Sample operations remain local.
 
 Other production forms and the Gallery catalog shell keep their existing

@@ -39,6 +39,32 @@ be selected with the owner.
 | GUI-10 | Create five shared reference templates | Implemented; locally verified | Owner approved all five on 2026-10-28; [family guide](../../lib/GUI/_templates/README.md), [verification](../knowledge/reviews/design-system/2026-10-28-template-family.md) |
 | GUI-11 | Refine template elements with owner using grilling | Interview in progress | Selection keeps settled baseline; review new Form, Message, Options and Review decisions before production migration |
 
+## Template refinement interview — 2026-10-28
+
+Form round 1 owner answers:
+
+- Keep labels in an aligned left column and keep the bordered field group.
+- Remove the Sample Preview from Form. This supersedes the proposed live naming
+  preview; preview row count/height is no longer applicable.
+- Prefer the existing Core Find/Replace tools' field labels and input boxes.
+  Settle their sizing and spacing before implementing the Form refinement.
+
+Read-only isolated WPF measurement on baseline `51105f0`: both Views and Sheets
+Find/Replace use Segoe UI 12, 200-wide inputs with Auto height realized as 17.96,
+a 60-wide label column, and 4-unit gaps between input boxes. Form uses the same
+font size with 32-high inputs, a 112-wide label column, and 8-unit row gaps;
+its inputs stretch to 430 at the initial 600-wide window size. Both use input
+padding `8,0` and a 1-unit border. Existing labels include a trailing colon.
+These are isolated WPF measurements, not live pyRevit/DPI acceptance.
+
+Form sizing confirmed by the owner: input height 24, label/input widths 60/240,
+row gap 8, vertically centered colon labels, group inset 12. Implemented with
+opt-in compact field styles and no Sample Preview; the reference starts at
+360 x 352. [Verification and renders](../knowledge/reviews/design-system/2026-10-28-form-template-refinement.md)
+cover actual geometry in all five states and retained validation/Reset actions.
+Next interview frontier: Message, then Options and Review. Other template bodies
+and production windows retain their current behavior during this interview.
+
 ## Implementation boundaries and recovery
 
 `KLCodeFoundation.xaml` is opt-in and merges the existing legacy dictionary

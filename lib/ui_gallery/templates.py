@@ -102,9 +102,7 @@ def create_template(launcher, state, path):
             names = form_names(self.preview_state)
             values = [getattr(self, 'input_' + name).Text for name in ('find', 'replace', 'prefix', 'suffix')]
             targets, error = rename_samples(names, *values)
-            self.preview_lines.Text = '\n'.join('{} -> {}'.format(before, after)
-                                                for before, after in zip(names, targets or []))
-            self.form_feedback.Text = error or ('{} sample names previewed. No elements were renamed.'.format(len(names))
+            self.form_feedback.Text = error or ('Rules accepted for {} sample names. No elements were renamed.'.format(len(targets))
                                                if names else 'No Sample Names Available.')
             self.form_feedback.Foreground = self.Resources['KlaErrorBrush' if error else 'KlaMutedBrush']
             self.preview_result = self.form_feedback.Text

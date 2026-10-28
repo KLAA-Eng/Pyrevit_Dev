@@ -20,6 +20,12 @@
         <Setter Property="TextWrapping" Value="Wrap"/>
     </Style>
     <Style x:Key="KlaFieldLabel" TargetType="Label" BasedOn="{StaticResource KlaFoundationLabel}"/>
+    <Style x:Key="KlaCompactFieldLabel" TargetType="Label" BasedOn="{StaticResource KlaFieldLabel}">
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style x:Key="KlaCompactFieldInput" TargetType="TextBox" BasedOn="{StaticResource KlaFoundationInput}">
+        <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}"/>
+    </Style>
     <Style x:Key="KlaInfoText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>

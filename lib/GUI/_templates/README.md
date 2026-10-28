@@ -7,7 +7,7 @@ They all use the same shell and opt-in shared component resources.
 | Reference | Source | Purpose |
 | --- | --- | --- |
 | Template - Selection | [KLCodeSelectionTemplate.xaml](KLCodeSelectionTemplate.xaml) | Compact filter, checked list, All/None and main action; [detailed guide](KLCodeSelectionTemplate.md) |
-| Template - Form | [KLCodeFormTemplate.xaml](KLCodeFormTemplate.xaml) | Labeled Find/Replace/Prefix/Suffix group, selectable naming preview and inline validation |
+| Template - Form | [KLCodeFormTemplate.xaml](KLCodeFormTemplate.xaml) | Compact labeled Find/Replace/Prefix/Suffix group and inline validation; no Sample Preview |
 | Template - Message | [KLCodeMessageTemplate.xaml](KLCodeMessageTemplate.xaml) | Information/Warning/Error severity, bounded long message, expandable details and dismissal |
 | Template - Options | [KLCodeOptionsTemplate.xaml](KLCodeOptionsTemplate.xaml) | Dropdown, exclusive scope, toggle, numeric unit field and read-only path/Browse row |
 | Template - Review | [KLCodeReviewTemplate.xaml](KLCodeReviewTemplate.xaml) | Filtered checkable table, severity chips, splitter, selected-item detail and action group |
@@ -44,6 +44,13 @@ items, preserves checks across filtering, and Check All checks eligible items
 across the whole sample collection. Blocked samples are not user-checkable;
 the Error fixture intentionally starts with an invalid blocked check so the
 validation/recovery path can be reviewed.
+
+Form's owner-confirmed compact field role uses Segoe UI 12, 24-high inputs,
+60-wide label and 240-wide input columns, 8-unit row gaps and 12-unit group
+padding. Colon labels center vertically against the inputs. The reference now
+starts at 360 x 352 after removing Sample Preview; Reset/Apply and inline feedback
+remain. `KlaCompactFieldLabel` and `KlaCompactFieldInput` are explicit shared
+styles, so other templates keep their current standard sizing until reviewed.
 
 Message severity changes its tone without changing banner geometry. Message
 and details have bounded scrolling. Review columns have useful minimum widths;

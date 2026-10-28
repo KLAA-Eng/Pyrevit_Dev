@@ -24,8 +24,9 @@ class TemplateInteractionTests(unittest.TestCase):
             window.reset_form(None, None)
             window.input_prefix.Text = 'Reviewed-'
             window.apply_form(None, None)
-            self.assertIn('Reviewed-', window.preview_lines.Text)
-            self.assertIn('Studio Plan', window.preview_lines.Text)
+            self.assertFalse(hasattr(window, 'preview_lines'))
+            self.assertEqual('Reviewed-', window.input_prefix.Text)
+            self.assertEqual('Rules accepted for 4 sample names. No elements were renamed.', window.preview_result)
             self.assertEqual(names, [row.Name for row in window._items])
 
     def test_options_validate_and_browse_only_changes_fictional_path(self):
