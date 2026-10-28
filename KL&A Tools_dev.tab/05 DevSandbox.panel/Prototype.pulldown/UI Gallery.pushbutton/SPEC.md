@@ -101,6 +101,10 @@ composition, interactions and source ownership. Browse uses fictional paths,
 Message supports severity/details, Form validates compact naming-rule fields
 without a Sample Preview, and Review separates
 checked items from selected detail. Sample operations remain local.
+Message fits its height to content up to a cap and scrolls overflow. Details
+starts collapsed, including for Error, and severity changes preserve user
+expansion. Heading/body text colors remain stable; heading wording and border
+color identify severity. Form's Edit Naming Rules prompt shares Selection's style.
 
 Other production forms and the Gallery catalog shell keep their existing
 layouts pending review of the references. See the

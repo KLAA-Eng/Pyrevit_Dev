@@ -10,6 +10,9 @@ This records the initial five-template build. The subsequent [owner-confirmed
 Form refinement](2026-10-28-form-template-refinement.md) removes Sample Preview
 and replaces Form's field geometry; the initial Form renders below remain
 historical evidence.
+The subsequent [Message refinement](2026-10-28-message-template-refinement.md)
+also supersedes the initial fixed-size/expanded-error Message behavior and
+matches Form's heading to Selection's prompt style.
 
 ## Delivered reference family
 

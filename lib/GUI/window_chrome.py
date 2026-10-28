@@ -30,6 +30,21 @@ def load_window(window, xaml_path, title, version=None, navigate=None):
     return chrome
 
 
+def fit_window_height(window):
+    """Fit a chromeless shared-shell window within caller height limits.
+
+    Call after content, expansion or width changes. A bounded window with a
+    star-row ScrollViewer keeps long content accessible once MaxHeight is hit.
+    """
+    from math import ceil
+    from System.Windows import Size
+
+    window.Content.Measure(Size(window.Width, float('inf')))
+    height = max(window.MinHeight, min(window.MaxHeight, ceil(window.Content.DesiredSize.Height)))
+    window.Height = height
+    return height
+
+
 class WindowChrome(object):
     """Bind KlaWindowShell named parts without workflow inheritance."""
     def __init__(self, window, metadata, navigate):

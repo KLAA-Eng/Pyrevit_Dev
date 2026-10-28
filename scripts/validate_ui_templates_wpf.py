@@ -23,6 +23,8 @@ def validate_template_family():
             assert window._kla_chrome.title.ToolTip is None
             assert window.window_body.IsEnabled == (state != 'Disabled')
             if identity == 'template-form':
+                assert window.form_prompt.Style == window.Resources['KlaFoundationPromptLabel']
+                assert window.form_prompt.FontSize == 14 and str(window.form_prompt.FontWeight) == 'Normal'
                 fields = [getattr(window, 'input_' + name) for name in ('find', 'replace', 'prefix', 'suffix')]
                 assert not hasattr(window, 'preview_lines')
                 assert window.naming_group.Padding == Thickness(12)
@@ -35,6 +37,26 @@ def validate_template_family():
                 for previous, following in zip(fields, fields[1:]):
                     gap = following.TranslatePoint(Point(0, 0), shell).Y - previous.TranslatePoint(Point(0, previous.ActualHeight), shell).Y
                     assert gap == 8, gap
+            if identity == 'template-message':
+                assert not window.message_expander.IsExpanded
+                assert window.MinHeight <= window.Height <= window.MaxHeight == 640
+                assert window.message_scroll.ActualHeight >= 16, (state, window.Height, window.message_scroll.ActualHeight, shell.DesiredSize.Height)
+                if state == 'Long content':
+                    print('Message long-content fit: height {}, viewport {}, overflow {}.'.format(window.Height, window.message_scroll.ActualHeight, window.message_scroll.ScrollableHeight))
+                    window.message_body.Text = '\n\n'.join([window.message_body.Text] * 4)
+                    window._fit_message()
+                    height = window.Height
+                    shell.Measure(Size(width, height))
+                    shell.Arrange(Rect(0, 0, width, height))
+                    shell.UpdateLayout()
+                    settle_layout(shell)
+                    assert window.Height == 640
+                    assert window.message_scroll.ScrollableHeight > 0
+                    window.message_scroll.ScrollToEnd()
+                    settle_layout(shell)
+                    assert window.message_scroll.VerticalOffset > 0
+                    window.message_scroll.ScrollToTop()
+                    settle_layout(shell)
             if identity == 'template-options' and state == 'Disabled':
                 for widget in (window.option_category, window.scope_selected, window.option_toggle):
                     labels = [item for item in descendants(widget) if isinstance(item, TextBlock) and item.Text]
@@ -58,9 +80,37 @@ def validate_template_family():
                     assert window.input_prefix.Text == 'QA-'
                     assert window.form_feedback.Text == 'Rules accepted for 4 sample names. No elements were renamed.'
                 elif identity == 'template-message':
+                    collapsed_height = window.Height
+                    assert collapsed_height < 400
+                    body_color = str(window.message_body.Foreground)
+                    heading_color = str(window.message_heading.Foreground)
                     window.message_severity.SelectedItem = 'Warning'
                     assert 'Warning' in window.message_heading.Text
+                    assert str(window.message_body.Foreground) == body_color
+                    assert str(window.message_heading.Foreground) == heading_color
+                    assert window.message_banner.BorderBrush == window.Resources['KlaWarningBrush']
                     window.message_expander.IsExpanded = True
+                    settle_layout(shell)
+                    assert collapsed_height < window.Height <= 640
+                    assert window.MinHeight == 424
+                    window.message_severity.SelectedItem = 'Error'
+                    assert window.message_expander.IsExpanded
+                    window.message_expander.IsExpanded = False
+                    settle_layout(shell)
+                    assert window.Height == collapsed_height and window.MinHeight == 288
+                    window.Width = window.MinWidth
+                    window._fit_message()
+                    assert window.Height >= collapsed_height
+                    window.Width = width
+                    window._fit_message()
+                    window.message_expander.IsExpanded = True
+                    settle_layout(shell)
+                    shell.Measure(Size(window.Width, window.Height))
+                    shell.Arrange(Rect(0, 0, window.Width, window.Height))
+                    shell.UpdateLayout()
+                    if output_directory:
+                        render_content(window, os.path.join(output_directory, 'template-message-expanded.png'), window.Width, window.Height)
+                    assert str(window.message_details.Visibility) == 'Visible' and window.message_details.ActualHeight == 128
                 elif identity == 'template-options':
                     window.option_offset.Text = 'invalid'
                     window.apply_options(None, None)

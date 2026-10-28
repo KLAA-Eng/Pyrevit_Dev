@@ -48,6 +48,16 @@ The owner refined Form's compact field role on 2026-10-28: 24-high inputs,
 padding. Labels include colons and center vertically. Explicit compact styles
 preserve standard-field sizing elsewhere. Form has inline validation and Reset/
 Apply actions, with no Sample Preview. See the [Form refinement evidence](knowledge/reviews/design-system/2026-10-28-form-template-refinement.md).
+Form's Edit Naming Rules heading uses the same `KlaFoundationPromptLabel` as
+Selection's Select Elements prompt, including normal weight and zero padding.
+
+Message fits its content up to a caller-defined height cap, then scrolls.
+Details begins collapsed even for errors and remains a user choice when severity
+changes. Heading/body text colors stay consistent; severity uses heading wording
+and border color. Current reference defaults are 288 minimum/640 maximum height,
+with 424 minimum while its 128-high Details readout is open. The opt-in shared
+`fit_window_height` helper measures the chromeless shell without showing it.
+See the [Message refinement evidence](knowledge/reviews/design-system/2026-10-28-message-template-refinement.md).
 
 `GUI.window_chrome.load_window()` is a small Python adapter with no import-time
 pyRevit/document dependency. It binds shared close/drag/navigation events;

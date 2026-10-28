@@ -68,6 +68,9 @@ class TemplateInteractionTests(unittest.TestCase):
             window.message_kind_changed(None, None)
             self.assertIn('Warning', window.message_heading.Text)
             self.assertFalse(window.message_expander.IsExpanded)
+            for state in ('Error', 'Long content'):
+                message = self.preview('message', state)
+                self.assertFalse(message.message_expander.IsExpanded)
             disabled = self.preview('message', 'Disabled')
             self.assertFalse(disabled.window_body.IsEnabled)
             disabled.dismiss_template(None, None)

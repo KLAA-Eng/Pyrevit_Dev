@@ -14,7 +14,7 @@
                 <RowDefinition Height="{StaticResource KlaGridSpace8}"/>
                 <RowDefinition Height="{StaticResource KlaControlRow}"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Edit Naming Rules" Style="{StaticResource KlaSectionHeading}"/>
+            <Label x:Name="form_prompt" Content="Edit Naming Rules" Target="{Binding ElementName=input_find}" Style="{StaticResource KlaFoundationPromptLabel}"/>
             <Border x:Name="naming_group" Grid.Row="2" Style="{StaticResource KlaSection}">
                 <Grid HorizontalAlignment="Left">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}"/><ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}"/></Grid.ColumnDefinitions>

@@ -51,6 +51,18 @@ padding. Colon labels center vertically against the inputs. The reference now
 starts at 360 x 352 after removing Sample Preview; Reset/Apply and inline feedback
 remain. `KlaCompactFieldLabel` and `KlaCompactFieldInput` are explicit shared
 styles, so other templates keep their current standard sizing until reviewed.
+Its Edit Naming Rules prompt uses `KlaFoundationPromptLabel`, exactly matching
+Selection's Select Elements prompt (Segoe UI 14, normal weight, zero padding).
+
+Message starts with Details collapsed in every state, including Error. It fits
+content at its current width between 288 and 640 units high, then scrolls the
+message body when the cap is reached. Opening Details reserves its 128-high
+readout plus margin, raising the minimum to 424; closing it restores the compact
+minimum. It retains user expansion when severity changes. Heading/body colors
+stay consistent; heading wording and the banner border distinguish severity.
+These size limits are reference defaults for review. `window_chrome.fit_window_height`
+is an opt-in helper for chromeless shared-shell windows; the caller invokes it
+when content, expansion or width changes. It never shows the window.
 
 Message severity changes its tone without changing banner geometry. Message
 and details have bounded scrolling. Review columns have useful minimum widths;

@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'lib'))
-from GUI.window_chrome import load_window
+from GUI.window_chrome import load_window, fit_window_height
 
 
 class Event:
@@ -104,6 +104,19 @@ class WindowChromeTests(unittest.TestCase):
         chrome = self.load()
         chrome.close_button.Click.emit(None, None)
         self.assertTrue(self.window.closed)
+
+    def test_content_height_uses_current_width_and_clamps_to_caller_limits(self):
+        measurements = []
+        content = types.SimpleNamespace(Measure=measurements.append,
+                                        DesiredSize=types.SimpleNamespace(Height=0))
+        window = types.SimpleNamespace(Content=content, Width=560, MinHeight=240, MaxHeight=640)
+        host = {'System.Windows': module(Size=lambda width, height: (width, height))}
+        with patch.dict(sys.modules, host):
+            for natural, expected in ((100, 240), (300.2, 301), (2000, 640)):
+                content.DesiredSize.Height = natural
+                self.assertEqual(expected, fit_window_height(window))
+                self.assertEqual(expected, window.Height)
+        self.assertEqual([(560, float('inf'))] * 3, measurements)
 
     def test_only_a_pressed_left_button_starts_dragging(self):
         chrome = self.load()

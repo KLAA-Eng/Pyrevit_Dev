@@ -5,6 +5,7 @@ implementation guide is [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
 
 | Review | Scope |
 | --- | --- |
+| [2026-10-28 Message and Form prompt refinement](2026-10-28-message-template-refinement.md) | Content-fitting Message height, capped scrolling, user-controlled Details, stable severity text colors, and exact shared Form prompt styling. |
 | [2026-10-28 Form refinement](2026-10-28-form-template-refinement.md) | Owner-confirmed compact fields, no Sample Preview, opt-in component styles and actual WPF geometry/state evidence. |
 | [2026-10-28 template family](2026-10-28-template-family.md) | Selection/Form/Message/Options/Review references, safe interactions, shared components, state/minimum-size WPF evidence, and pending human refinement. |
 | [2026-10-28 legacy retirement and Preview filter](2026-10-28-gallery-retirement-and-preview-filter.md) | Removal of retired rename forms, preserved Core callers, combined availability filtering and current WPF evidence. |

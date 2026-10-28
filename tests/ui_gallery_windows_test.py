@@ -62,6 +62,7 @@ def host_modules(alerts):
     def load(control, path):
         root = ElementTree.parse(path).getroot()
         control.Height = float(root.attrib.get('Height', 400))
+        control.MinHeight = float(root.attrib.get('MinHeight', 0))
         for element in root.iter():
             name = element.attrib.get('{http://schemas.microsoft.com/winfx/2006/xaml}Name')
             if name:
@@ -87,7 +88,7 @@ def host_modules(alerts):
     brushes = module(**dict((key, key) for key in (
         'Goldenrod', 'MediumSeaGreen', 'DodgerBlue', 'Orange', 'SeaGreen', 'MediumPurple')))
     return {
-        'GUI.window_chrome': module(load_window=load_shell),
+        'GUI.window_chrome': module(load_window=load_shell, fit_window_height=lambda window: window.Height),
         'pyrevit': module(forms=module(alert=lambda *a, **k: alerts.append((a, k)))),
         'wpf': module(LoadComponent=load),
         'System': module(Uri=lambda *a: a, UriKind=module(Absolute='absolute')),
@@ -127,7 +128,7 @@ class GalleryWindowTests(unittest.TestCase):
         methods = {node.name for node in ast.walk(tree)
                    if isinstance(node, ast.FunctionDef)}
         events = {'Click', 'Checked', 'Unchecked', 'MouseDown', 'TextChanged',
-                  'PreviewTextInput', 'RequestNavigate'}
+                  'PreviewTextInput', 'RequestNavigate', 'Expanded', 'Collapsed', 'SizeChanged'}
         for relative in list(windows.SOURCES.values()) + ['lib/match/clipboard_content.xaml']:
             path = windows.source_path(ROOT, relative)
             if not os.path.isfile(path):

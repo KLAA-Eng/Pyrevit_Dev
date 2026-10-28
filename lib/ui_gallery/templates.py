@@ -11,7 +11,7 @@ TEMPLATE_IDS = frozenset(TEMPLATE_FILES)
 def create_template(launcher, state, path):
     # Host imports occur only after windows.create_custom validates the source/state.
     from System.Windows import Window
-    from GUI.window_chrome import load_window
+    from GUI.window_chrome import load_window, fit_window_height
     from pyrevit import forms
 
     class TemplateWindow(Window):
@@ -44,8 +44,10 @@ def create_template(launcher, state, path):
                 self._set_form(naming_values(self.preview_state))
                 self.apply_form(None, None)
             elif self.preview_id == 'template-message':
+                self._message_min_height = self.MinHeight
                 self.message_severity.ItemsSource = ['Information', 'Warning', 'Error']
                 self.message_severity.SelectedItem = message_data(self.preview_state)['kind']
+                self.message_expander.IsExpanded = False
                 self._message()
             elif self.preview_id == 'template-options':
                 data = option_data(self.preview_state)
@@ -112,9 +114,33 @@ def create_template(launcher, state, path):
             self.message_heading.Text = data['heading']
             self.message_body.Text = data['body']
             self.message_details.Text = data['details']
-            self.message_expander.IsExpanded = self.preview_state in ('Error', 'Long content')
             brush = {'Information': 'KlaInfoBrush', 'Warning': 'KlaWarningBrush', 'Error': 'KlaErrorBrush'}[data['kind']]
             self.message_banner.BorderBrush = self.Resources[brush]
+            self._fit_message()
+
+        def _fit_message(self):
+            if getattr(self, '_fitting_message', False):
+                return
+            self._fitting_message = True
+            try:
+                # Reserve the details pane at minimum size while preserving a message viewport.
+                details = self.message_details
+                extra = details.Height + details.Margin.Top + details.Margin.Bottom if self.message_expander.IsExpanded else 0
+                self.MinHeight = self._message_min_height + extra
+                fit_window_height(self)
+            finally:
+                self._fitting_message = False
+
+        def message_details_changed(self, sender, args):
+            if self._ready:
+                # Expander raises its event before its template finishes changing visibility.
+                from System import Action
+                from System.Windows.Threading import DispatcherPriority
+                self.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, Action(self._fit_message))
+
+        def message_window_size_changed(self, sender, args):
+            if self._ready and args.WidthChanged:
+                self._fit_message()
 
         def message_kind_changed(self, sender, args):
             if self._ready:

@@ -62,8 +62,18 @@ row gap 8, vertically centered colon labels, group inset 12. Implemented with
 opt-in compact field styles and no Sample Preview; the reference starts at
 360 x 352. [Verification and renders](../knowledge/reviews/design-system/2026-10-28-form-template-refinement.md)
 cover actual geometry in all five states and retained validation/Reset actions.
-Next interview frontier: Message, then Options and Review. Other template bodies
-and production windows retain their current behavior during this interview.
+Follow-up: owner requested Edit Naming Rules match Selection's Select Elements
+styling. Implemented with the exact same prompt Label style, including normal
+weight. The field geometry stays settled.
+
+Message round 1: owner confirmed content-fitting height with bounded overflow
+scrolling, Details initially collapsed even for errors, and stable text colors
+with heading/border severity distinctions. Implemented with an opt-in shared
+height-fit helper. Review defaults: minimum 288, maximum 640; opening its Details
+readout raises the minimum to 424. [Verification and renders](../knowledge/reviews/design-system/2026-10-28-message-template-refinement.md)
+cover growth/shrinkage, cap/scrolling, width refit, expanded Details and prompt
+styling. Next interview frontier: Options, then Review. Production windows retain
+their current behavior during this interview.
 
 ## Implementation boundaries and recovery
 

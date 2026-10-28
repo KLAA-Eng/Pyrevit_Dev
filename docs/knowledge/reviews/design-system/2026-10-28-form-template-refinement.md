@@ -5,6 +5,11 @@ The [active plan](../../../plans/custom-window-consolidation.md) owns interview
 decisions and task status. This supersedes the Form composition in the
 [initial template-family evidence](2026-10-28-template-family.md).
 
+The subsequent [Message/prompt refinement](2026-10-28-message-template-refinement.md)
+changes Edit Naming Rules to Selection's exact prompt style. The original
+semibold heading shown in this record's renders is superseded; field geometry
+and Sample Preview removal remain current.
+
 The owner retained left labels and the bordered group, removed Sample Preview,
 and confirmed 24-high inputs, 60/240 label/input widths, 8-unit row gaps,
 vertically centered colon labels and 12-unit group padding. Segoe UI remains 12.
