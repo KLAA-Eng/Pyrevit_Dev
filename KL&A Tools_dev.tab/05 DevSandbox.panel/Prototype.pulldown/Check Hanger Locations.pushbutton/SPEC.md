@@ -41,9 +41,21 @@ in the active view, and reports hangers that do not match their framing.
   height is ignored and only framing the view shows is considered, matching
   the Dynamo graph's projection onto the level, so hangers placed at a level
   or offset different from the framing still find it; other views also
-  require the end within 2'-0" vertically of the hanger. The end
-  closest to the hanger wins; a second end within 1" of that distance is noted
-  as ambiguous. A member ending at the hanger but running more than 30 deg off
+  require the end within 2'-0" vertically of the hanger.
+- Hexagon alignment: the KL&A standard places the hanger hexagon beside the
+  supported member, with its top or bottom flat side (the two sides running
+  along the text) on the member's side face, not overlapping the member. When
+  the hexagon is found in the hanger's plan linework and has flat sides along
+  the text (within 10 deg), candidates whose nearer side face lies within 1" of
+  either flat side win over closer candidates that do not. The face is the
+  member's location line offset by half its modeled width (type name `W x D`,
+  width parameter, or type plies x ply width; the centerline when unknown).
+  The chosen member is noted when the hexagon overlaps it (`Hexagon overlaps
+  the supported member; align its top or bottom side with the member edge`)
+  or when its edge is more than 1" off the flat sides. Without a usable
+  hexagon the closest end wins, as before.
+- Among equally aligned candidates the end closest to the hanger wins; a
+  second end within 1" of that distance is noted as ambiguous. A member ending at the hanger but running more than 30 deg off
   the text gives `Hanger not aligned with member`.
 - Supporting member: another framing member crossing the hanger text at 30 deg
   or more (square, or skewed up to 60 deg) whose location line passes within
@@ -116,7 +128,7 @@ lose their highlight:
 - Members (heavier projection line, cut line color, and solid surface fill):
   supported = blue, supporting = orange, supported by one hanger and
   supporting another = purple.
-- Hangers: the hexagon found in the hanger's plan linework (a closed loop of
+- Hangers: the hexagon found in the hanger's plan linework during the check (a closed loop of
   six roughly equal sides) is traced with view-specific detail lines in a
   heavy line style, red `KLA Hanger Check - Problem` for problems and teal
   `KLA Hanger Check - Review details` for wall/column supports. The hanger
@@ -141,7 +153,8 @@ Hanger and member Ids are select-only links. pyRevit's magnifier runs Revit's
 `ShowElements`, which did not reliably zoom to hangers or members, so the
 report instead shows a `Zoom to selection` button (top, and again below long
 tables) that runs the sibling `Zoom to Selection` command on the current
-selection. The selection stays until the user presses Esc.
+selection. With hangers selected, this command zooms to them the same way
+(their bounding boxes in the active view). The selection stays until the user presses Esc.
 
 ## Implementation inventory
 
@@ -164,7 +177,7 @@ family's local X axis, the hanger box size on representative joist-to-header,
 skewed, and header-to-girder framing, plan-only matching on projects with
 level offsets, that the hexagon is found and traced in plan, the fallback
 override, the Zoom to selection button, the non-breaking space fix on
-real schedule text, slope on sloped joists, and that re-running clears highlights for fixed hangers.
+real schedule text, hexagon flat-side alignment on real hanger linework, slope on sloped joists, and that re-running clears highlights for fixed hangers.
 
 ## Future development
 

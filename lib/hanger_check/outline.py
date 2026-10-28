@@ -14,6 +14,7 @@ import math
 HEXAGON_SIDES = 6
 POINT_TOL_FT = 1.0 / 384.0          # 1/32"
 SIDE_TOLERANCE = 0.25
+FLAT_SIDE_DEG = 10.0
 
 
 def _length(segment):
@@ -72,3 +73,22 @@ def find_hexagons(segments, tol=POINT_TOL_FT):
 def loop_segments(loop):
     """Closed loop points -> list of plan segments."""
     return [(loop[i], loop[(i + 1) % len(loop)]) for i in range(len(loop))]
+
+
+def flat_side_offsets(loop, text_dir, origin):
+    """[bottom, top]: across-text offsets (feet, from origin) of the two hexagon
+    sides that run along the hanger text, or None when the hexagon has no such
+    pair (for example a point-up hexagon)."""
+    length = math.hypot(text_dir[0], text_dir[1])
+    if length < 1e-9:
+        return None
+    tx, ty = text_dir[0] / length, text_dir[1] / length
+    min_dot = math.cos(math.radians(FLAT_SIDE_DEG))
+    offsets = []
+    for a, b in loop_segments(loop):
+        side = _length((a, b))
+        if side <= 0 or abs((b[0] - a[0]) * tx + (b[1] - a[1]) * ty) / side < min_dot:
+            continue
+        mid_x, mid_y = (a[0] + b[0]) / 2 - origin[0], (a[1] + b[1]) / 2 - origin[1]
+        offsets.append(-mid_x * ty + mid_y * tx)
+    return sorted(offsets) if len(offsets) == 2 else None

@@ -3,14 +3,19 @@
 Ported from the KL&A Dynamo graph "Check Hanger Locations 1.0.3". Members are
 plain dicts in feet, using the framing location line:
 
-    {'id': 123, 'start': (x, y, z), 'end': (x, y, z)}
+    {'id': 123, 'start': (x, y, z), 'end': (x, y, z), 'half_width': 0.15}
+
+half_width (feet, optional) is half the member's modeled width.
 
 The hanger text direction (the family's local X axis in plan) decides roles:
 
   * Supported member: runs along the top or base of the hanger text (within
     SUPPORTED_MAX_ANGLE_DEG of the text) and has an end inside the hanger box,
     ALONG_REACH_FT along the text and ACROSS_REACH_FT across it. The end
-    closest to the hanger wins.
+    closest to the hanger wins. When the hanger's hexagon is known, the KL&A
+    standard aligns its top or bottom flat side (the sides along the text) with
+    a side face of the supported member, outside the hexagon; members aligned
+    within ALIGN_TOL_FT win over closer members that are not aligned.
   * Supporting member: crosses the text at SUPPORTING_MIN_ANGLE_DEG or more
     (square, or skewed up to 90 - SUPPORTING_MIN_ANGLE_DEG) and passes within
     SUPPORT_REACH_FT of the supported member's end. Members that run through
@@ -38,6 +43,7 @@ SKEW_NOTE_DEG = 2.0
 FLAT_SLOPE_DEG = 0.5
 SLOPE_FLAT = 'Flat'
 AMBIGUOUS_FT = 1.0 / 12.0
+ALIGN_TOL_FT = 1.0 / 12.0
 
 STATUS_OK = 'OK'
 STATUS_NO_FRAMING = 'No framing at hanger'
@@ -116,11 +122,30 @@ def _end_point(member, index):
     return member['start'] if index == 0 else member['end']
 
 
-def classify_hanger(point, members, text_dir=None):
+def side_alignment(point, member, text_dir, flat_sides):
+    """(gap, overlaps) between the member's side faces and the hexagon's flat
+    sides. flat_sides is [bottom, top], across-text offsets from point in feet.
+    gap is the smaller distance from the bottom side to the member's top face
+    (member below) or from the top side to its bottom face (member above);
+    overlaps is True when the member runs under the hexagon."""
+    start, end = member['start'], member['end']
+    t = closest_on_segment(point, start, end)[0]
+    cx = start[0] + t * (end[0] - start[0]) - point[0]
+    cy = start[1] + t * (end[1] - start[1]) - point[1]
+    center = -cx * text_dir[1] + cy * text_dir[0]
+    half = member.get('half_width') or 0.0
+    bottom, top = flat_sides
+    gap = min(abs(center + half - bottom), abs(center - half - top))
+    overlaps = center + half > bottom + ALIGN_TOL_FT and center - half < top - ALIGN_TOL_FT
+    return gap, overlaps
+
+
+def classify_hanger(point, members, text_dir=None, flat_sides=None):
     """Pick the supported and supporting member for one hanger.
 
     point is the hanger insertion point and text_dir its plan text direction
-    (any sign); both in feet/model coordinates.
+    (any sign); both in feet/model coordinates. flat_sides is the hexagon's
+    [bottom, top] flat side offsets across the text (see side_alignment).
     """
     text_dir = unit_plan(text_dir)
     result = {'supported': None, 'supported_end': None, 'supporting': None,
@@ -129,6 +154,7 @@ def classify_hanger(point, members, text_dir=None):
         result['status'] = STATUS_NO_FRAMING
         return result
 
+    use_sides = flat_sides is not None and text_dir is not None
     ends, misaligned = [], []
     for member in members:
         end = nearest_end(point, member, text_dir)
@@ -136,23 +162,35 @@ def classify_hanger(point, members, text_dir=None):
             continue
         angle = axis_angle_deg(plan_direction(member), text_dir)
         if angle is None or angle <= SUPPORTED_MAX_ANGLE_DEG:
-            ends.append((end[1], end[0], member))
+            alignment = (side_alignment(point, member, text_dir, flat_sides) if use_sides
+                         else (0.0, False))
+            # (not aligned, end distance, end index, member, (gap, overlaps))
+            ends.append((alignment[0] > ALIGN_TOL_FT, end[1], end[0], member, alignment))
         else:
             misaligned.append((angle, member))
-    ends.sort(key=lambda item: item[0])
-    supported = ends[0][2] if ends else None
+    ends.sort(key=lambda item: (item[0], item[1]))
+    supported = ends[0][3] if ends else None
     if supported is not None:
-        result['supported'], result['supported_end'] = supported['id'], ends[0][1]
-        tied = [item[2]['id'] for item in ends[1:] if item[0] - ends[0][0] <= AMBIGUOUS_FT]
+        off_sides, best = ends[0][0], ends[0][1]
+        result['supported'], result['supported_end'] = supported['id'], ends[0][2]
+        tied = [item[3]['id'] for item in ends[1:]
+                if item[0] == off_sides and item[1] - best <= AMBIGUOUS_FT]
         if tied:
             result['notes'].append('Another member end is equally close (Id %s); '
                                    'confirm the supported member' % ', '.join(map(str, tied)))
+        gap, overlaps = ends[0][4]
+        if use_sides and overlaps:
+            result['notes'].append('Hexagon overlaps the supported member; align its top or '
+                                   'bottom side with the member edge')
+        elif use_sides and off_sides:
+            result['notes'].append('Supported member edge is %.1f in. off the hexagon top or '
+                                   'bottom side' % (gap * 12.0))
     elif misaligned:
         misaligned.sort(key=lambda item: item[0])
         result['notes'].append('Member Id %d ends at the hanger but runs %.0f deg off the '
                                'hanger text' % (misaligned[0][1]['id'], misaligned[0][0]))
 
-    anchor = _end_point(supported, ends[0][1]) if supported is not None else point
+    anchor = _end_point(supported, ends[0][2]) if supported is not None else point
     reference = text_dir or (plan_direction(supported) if supported is not None else None)
     through = []
     for member in members:

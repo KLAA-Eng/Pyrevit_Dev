@@ -7,9 +7,12 @@ first, so hangers that were fixed since the last run lose their highlight.
 
 In plan views framing is taken from what the view shows and compared in plan,
 ignoring the hanger's height (the Dynamo graph projected onto the level).
-Hangers are highlighted by tracing their hexagon with heavy colored detail
-lines, so the hanger text keeps its own color.
+The hanger's hexagon is found in its plan linework; its flat sides along the
+text locate the supported member, and highlights trace it with heavy colored
+detail lines, so the hanger text keeps its own color.
 """
+
+from System.Collections.Generic import List
 
 from pyrevit import DB
 
@@ -29,11 +32,12 @@ from .classify import (
     member_roles,
     slope_label,
 )
-from .outline import find_hexagons, loop_segments
+from .outline import find_hexagons, flat_side_offsets, loop_segments
 from .sizes import (
     DETAIL_KINDS,
     compare_size,
     compare_supporting,
+    member_width,
     mismatch_label,
     mounting_label,
     support_kind,
@@ -55,7 +59,6 @@ HEXAGON_LINE_WEIGHT = 10
 LINE_STYLE_PREFIX = 'KLA Hanger Check - '
 LINE_STYLES = {PROBLEM_KEY: 'Problem', DETAILS_KEY: 'Review details'}
 PLAN_Z_REACH_FT = 10000.0
-ZOOM_MARGIN_FT = 4.0
 HANGER_FIELDS = ('Designation', 'Header', 'Joist')
 TOP_FLANGE_FIELD = 'Fastener-TF'
 WIDTH_PARAMS = ('b', 'Width', 'B', 'Beam Width', 'Nominal Width')
@@ -171,9 +174,12 @@ def framing_near(doc, view, point, elements):
         if isinstance(framing.Location, DB.LocationCurve):
             curve = framing.Location.Curve
             elements[id_value(framing.Id)] = framing
+            width_in = member_width(member_label(doc, framing),
+                                    _length_in(doc, framing, WIDTH_PARAMS))
             members.append({'id': id_value(framing.Id),
                             'start': _xyz(curve.GetEndPoint(0)),
-                            'end': _xyz(curve.GetEndPoint(1))})
+                            'end': _xyz(curve.GetEndPoint(1)),
+                            'half_width': width_in / 24.0 if width_in else 0.0})
     return members
 
 
@@ -184,8 +190,13 @@ def check_hangers(doc, view, hangers, elements):
         point = hanger.Location.Point
         elements[id_value(hanger.Id)] = hanger
         xyz = (point.X, point.Y, None) if is_plan(view) else _xyz(point)
-        results[id_value(hanger.Id)] = classify_hanger(
-            xyz, framing_near(doc, view, point, elements), text_direction(hanger))
+        hexagon = _hexagon(hanger, view)
+        flat_sides = (flat_side_offsets(hexagon, text_direction(hanger), (point.X, point.Y))
+                      if hexagon else None)
+        result = classify_hanger(xyz, framing_near(doc, view, point, elements),
+                                 text_direction(hanger), flat_sides)
+        result['hexagon'] = hexagon
+        results[id_value(hanger.Id)] = result
     flag_shared_ends(results)
     for hanger_id, result in results.items():
         _add_size_check(doc, result, hanger_values(doc, elements[hanger_id]), elements)
@@ -337,14 +348,19 @@ def _plan_z(view):
     return level.Elevation if level is not None else view.Origin.Z
 
 
-def _trace_hexagon(doc, view, hanger, style):
-    """Draw detail lines over the hanger's hexagon. False when none is found."""
+def _hexagon(hanger, view):
+    """The hanger's hexagon (6 plan points) from its linework in the view, else None."""
     hexagons = find_hexagons(_plan_segments(hanger, view))
-    if not hexagons:
+    return hexagons[0] if hexagons else None
+
+
+def _trace_hexagon(doc, view, hexagon, style):
+    """Draw detail lines over the hanger's hexagon. False when there is none."""
+    if not hexagon:
         return False
     z = _plan_z(view)
     try:
-        for (x1, y1), (x2, y2) in loop_segments(hexagons[0]):
+        for (x1, y1), (x2, y2) in loop_segments(hexagon):
             curve = doc.Create.NewDetailCurve(
                 view, DB.Line.CreateBound(DB.XYZ(x1, y1, z), DB.XYZ(x2, y2, z)))
             curve.LineStyle = style
@@ -378,7 +394,7 @@ def refresh_highlights(doc, view, results, elements, transaction):
             if key not in styles:
                 styles[key] = _line_style(doc, key)
             hanger = elements[hanger_id]
-            if not _trace_hexagon(doc, view, hanger, styles[key]):
+            if not _trace_hexagon(doc, view, result.get('hexagon'), styles[key]):
                 view.SetElementOverrides(hanger.Id, _hanger_override(key))
 
 
@@ -390,27 +406,25 @@ def member_slope(element):
     return slope_label(_xyz(curve.GetEndPoint(0)), _xyz(curve.GetEndPoint(1)))
 
 
-def _zoom_points(element):
-    location = element.Location
-    if isinstance(location, DB.LocationPoint):
-        return [location.Point]
-    if isinstance(location, DB.LocationCurve):
-        return [location.Curve.GetEndPoint(0), location.Curve.GetEndPoint(1)]
-    box = element.get_BoundingBox(None)
-    return [box.Min, box.Max] if box is not None else []
-
-
 def zoom_to(uidoc, view, elements):
-    """Zoom the active view to the elements: hanger insertion points, member
-    location lines, else bounding boxes, plus a margin. Returns False when the
-    view is not open or nothing has a location."""
-    points = [p for e in elements for p in _zoom_points(e)]
-    ui_views = [v for v in uidoc.GetOpenUIViews() if v.ViewId == view.Id]
-    if not points or not ui_views:
-        return False
-    low = DB.XYZ(min(p.X for p in points) - ZOOM_MARGIN_FT,
-                 min(p.Y for p in points) - ZOOM_MARGIN_FT, min(p.Z for p in points))
-    high = DB.XYZ(max(p.X for p in points) + ZOOM_MARGIN_FT,
-                  max(p.Y for p in points) + ZOOM_MARGIN_FT, max(p.Z for p in points))
-    ui_views[0].ZoomAndCenterRectangle(low, high)
-    return True
+    """Select the elements and zoom the active view to their bounding boxes in
+    that view (ZoomAndCenterRectangle, as in the pyRevit forum "Zoom / Go to
+    element" solution). Returns the elements not visible in the view; nothing
+    zooms when none are visible or the view is not open."""
+    ui_view = next((v for v in uidoc.GetOpenUIViews() if v.ViewId == view.Id), None)
+    boxes, hidden = [], []
+    for element in elements:
+        box = element.get_BoundingBox(view)
+        if box is None:
+            hidden.append(element)
+        else:
+            boxes.append(box)
+    if ui_view is None or not boxes:
+        return list(elements)
+    uidoc.Selection.SetElementIds(List[DB.ElementId]([e.Id for e in elements]))
+    low = DB.XYZ(min(b.Min.X for b in boxes), min(b.Min.Y for b in boxes),
+                 min(b.Min.Z for b in boxes))
+    high = DB.XYZ(max(b.Max.X for b in boxes), max(b.Max.Y for b in boxes),
+                  max(b.Max.Z for b in boxes))
+    ui_view.ZoomAndCenterRectangle(low, high)
+    return hidden

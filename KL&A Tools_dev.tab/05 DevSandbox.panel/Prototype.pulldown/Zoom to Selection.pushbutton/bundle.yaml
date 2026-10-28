@@ -7,7 +7,7 @@ tooltip:
     Status: Unreleased
     _____________________________________________________________________
     Description:
-    Prototype: zooms the active view to the selected elements. Hangers zoom to their insertion point and framing to its location line, with a 4'-0" margin. Used by the Zoom to selection button in the Check Hanger Locations report.
+    Prototype: zooms the active view to the selected elements' bounding boxes in that view and keeps them selected, as in the pyRevit forum "Zoom / Go to element" solution. Elements not visible in the view are reported. Used by the Zoom to selection button in the Check Hanger Locations report.
     _____________________________________________________________________
     How-to:
     - Click a hanger or member Id in the Check Hanger Locations report to select it.

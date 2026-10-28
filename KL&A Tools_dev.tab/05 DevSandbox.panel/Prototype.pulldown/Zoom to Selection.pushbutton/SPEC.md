@@ -24,19 +24,22 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 
 pyRevit's report magnifier calls Revit's `ShowElements`, which did not
 reliably zoom to hangers or members in plan. This command zooms the active
-view to the current selection itself, and the `Check Hanger Locations` report
-links to it with a `Zoom to selection` button.
+view to the current selection itself, following the solution in the pyRevit
+forum thread "Zoom / Go to element"
+(https://discourse.pyrevitlabs.io/t/zoom-go-to-element/3544/4), and the
+`Check Hanger Locations` report links to it with a `Zoom to selection` button.
 
 ## Behavior
 
-- Zooms the active view (`ZoomAndCenterRectangle`) to the selected elements:
-  point-located elements (hangers) by insertion point, line-located elements
-  (framing) by both ends, anything else by its model bounding box, plus a
-  4'-0" margin on every side.
+- Takes each selected element's bounding box in the active view
+  (`get_BoundingBox(view)`); an element without one is not visible there.
+- Re-selects the elements and calls `ZoomAndCenterRectangle` on the open UI
+  view of the active view with the combined box, with no added margin.
 - Nothing selected: an alert asks the user to select a hanger or member.
-- The active view is not open as a UI view, or nothing has a location: an alert
-  says the view could not be zoomed.
-- No model data changes and the selection is kept.
+- None of the selection visible in the view: an alert says so and nothing
+  zooms. Some not visible: the view zooms to the rest and an alert gives the
+  count left out.
+- No model data changes.
 
 ## Implementation inventory
 
@@ -51,5 +54,6 @@ links to it with a `Zoom to selection` button.
 ## Validation boundary
 
 Live Revit 2024+ acceptance must confirm the report button runs this command,
-that the zoom frames a hanger and a long member in plan, and behavior in
+that the zoom frames a hanger and a long member in plan, whether the tight
+fit (no margin) shows enough context, and behavior in
 sections and 3D views.

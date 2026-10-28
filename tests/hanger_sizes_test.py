@@ -32,6 +32,7 @@ from lib.hanger_check.sizes import (
     compare_size,
     compare_supporting,
     has_top_flange,
+    member_width,
     mismatch_label,
     mounting_label,
     parse_member,
@@ -198,6 +199,16 @@ class MountingTest(unittest.TestCase):
         self.assertEqual(mounting_label(KIND_COLUMN, ''), 'Face mounted - column, see detail')
         self.assertEqual(mounting_label(None, '--'), MOUNT_FACE)
         self.assertEqual(mounting_label(None, '(4)10d'), MOUNT_TOP_FLANGE)
+
+
+class MemberWidthTest(unittest.TestCase):
+    def test_full_modeled_width(self):
+        self.assertEqual(member_width('LVL_Framing_KLAA_15SE: (2)7 1/4" LVL'), 3.5)
+        self.assertEqual(member_width('LVL: 3 1/2" x 11 7/8"'), 3.5)
+        self.assertEqual(member_width('Dimension_Lumber_Framing_KLAA_14SE: 2x10'), 1.5)
+        self.assertEqual(member_width('Dimension Lumber: (2)2x10'), 3.0)
+        self.assertEqual(member_width('Glulam: GL-1', 5.125), 5.125)
+        self.assertIsNone(member_width('Glulam: GL-1'))
 
 
 class ReviewStatusTest(unittest.TestCase):

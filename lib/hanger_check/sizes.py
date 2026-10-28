@@ -185,6 +185,21 @@ def _member_width(member, member_width_in, ply_width):
     return width
 
 
+def member_width(member_label, member_width_in=None):
+    """Full modeled width in inches of a 'Family: Type' member, else None: the
+    type name's W x D (actual size for nominal lumber), the width parameter, or
+    type plies x ply width."""
+    member = parse_member(member_label)
+    sawn = _is_nominal(member) or bool(_SAWN_WORDS.search((member_label or '').upper()))
+    ply_width = _ply_width(member['material'], sawn)
+    width = _member_width(member, member_width_in, ply_width)
+    if width is not None and width == member['width'] and _is_nominal(member):
+        width = _actual(width) * (member['plies'] or 1)
+    if width is None and member['plies'] and ply_width:
+        width = member['plies'] * ply_width
+    return width
+
+
 def _close(a, b):
     return abs(a - b) <= SIZE_TOL_IN
 

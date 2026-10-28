@@ -19,9 +19,15 @@ def main():
         forms.alert('Select a hanger or member (click its Id in the Check Hanger Locations '
                     'report) and run again.', title=COMMAND_TITLE, warn_icon=True)
         script.exit()
-    if not zoom_to(uidoc, view, elements):
-        forms.alert('Could not zoom "{}" to the selection.'.format(view.Name),
+    hidden = zoom_to(uidoc, view, elements)
+    if len(hidden) == len(elements):
+        forms.alert('None of the selected elements is visible in "{}". Open a view that '
+                    'shows them and run again.'.format(view.Name),
                     title=COMMAND_TITLE, warn_icon=True)
+    elif hidden:
+        forms.alert('Zoomed to {} element(s); {} selected element(s) are not visible in "{}".'
+                    .format(len(elements) - len(hidden), len(hidden), view.Name),
+                    title=COMMAND_TITLE)
 
 
 if __name__ == '__main__':
