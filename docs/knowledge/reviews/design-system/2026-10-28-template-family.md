@@ -13,6 +13,9 @@ historical evidence.
 The subsequent [Message refinement](2026-10-28-message-template-refinement.md)
 also supersedes the initial fixed-size/expanded-error Message behavior and
 matches Form's heading to Selection's prompt style.
+The subsequent [Review refinement](2026-10-28-review-template-refinement.md)
+supersedes the initial Check All scope: it now affects only filtered rows,
+preserving hidden checks, and centers status chips in their cells.
 
 ## Delivered reference family
 

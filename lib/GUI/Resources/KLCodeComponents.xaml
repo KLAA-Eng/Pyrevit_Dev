@@ -248,6 +248,10 @@
             <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
         </Style.Triggers>
     </Style>
+    <Style x:Key="KlaDataGridStatusCell" TargetType="DataGridCell" BasedOn="{StaticResource KlaDataGridCell}">
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
     <Style x:Key="KlaDataGridRow" TargetType="DataGridRow">
         <Setter Property="Background" Value="{StaticResource header_background}"/>
         <Setter Property="Foreground" Value="{StaticResource text_white}"/>

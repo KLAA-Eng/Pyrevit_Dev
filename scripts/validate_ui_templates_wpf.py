@@ -4,7 +4,26 @@ from __future__ import print_function
 
 from ui_gallery.template_data import TEMPLATE_FILES
 from System.Windows import Thickness
-from System.Windows.Controls import CheckBox, Label
+from System.Windows.Controls import CheckBox, Label, Border, DataGridCell
+
+
+def validate_review_cells(window):
+    for index in range(min(4, window.review_grid.Items.Count)):
+        item = window.review_grid.Items[index]
+        row = window.review_grid.ItemContainerGenerator.ContainerFromIndex(index)
+        content = window.review_grid.Columns[2].GetCellContent(row)
+        chip = next(control for control in descendants(content)
+                    if isinstance(control, Border) and isinstance(control.Child, TextBlock)
+                    and control.Child.Text == item.Status)
+        cell = VisualTreeHelper.GetParent(chip)
+        while not isinstance(cell, DataGridCell):
+            cell = VisualTreeHelper.GetParent(cell)
+        center = chip.TranslatePoint(Point(chip.ActualWidth / 2, chip.ActualHeight / 2), cell)
+        assert abs(center.X - cell.ActualWidth / 2) < 1, (item.Status, center.X, cell.ActualWidth)
+        assert abs(center.Y - cell.ActualHeight / 2) < 1, (item.Status, center.Y, cell.ActualHeight)
+        check_content = window.review_grid.Columns[0].GetCellContent(row)
+        check = next(control for control in descendants(check_content) if isinstance(control, CheckBox))
+        assert check.IsEnabled == (window.preview_state != 'Disabled' and item.CanUse)
 
 
 def validate_template_family():
@@ -71,6 +90,8 @@ def validate_template_family():
                 for widget in (window.option_category, window.scope_selected, window.option_include_existing):
                     labels = [item for item in descendants(widget) if isinstance(item, TextBlock) and item.Text]
                     assert labels and all(str(label.Foreground) == '#FFA6B0AD' for label in labels), (widget.Name, [(label.Text, str(label.Foreground)) for label in labels])
+            if identity == 'template-review':
+                validate_review_cells(window)
             if hasattr(window, 'primary_action'):
                 button = window.primary_action
                 bottom = button.TranslatePoint(Point(0, button.ActualHeight), shell).Y
@@ -142,8 +163,20 @@ def validate_template_family():
                     check.IsChecked = False
                     assert not window._review_rows[0].IsChecked
                     assert '0 checked' in window.review_summary.Text
+                    window.review_grid.SelectedItem = window._review_rows[3]
+                    assert window._review_rows[3].Name in window.review_detail.Text
+                    assert not window._review_rows[3].IsChecked
+                    window.review_search.Text = window._review_rows[0].Name
+                    window.review_check_all(None, None)
+                    assert [row.IsChecked for row in window._review_rows] == [True, False, False, False]
                     window.review_search.Text = 'no_sample_match_593'
                     assert window.review_grid.Items.Count == 0
+                    window.review_check_all(None, None)
+                    assert [row.IsChecked for row in window._review_rows] == [True, False, False, False]
+                    if output_directory:
+                        window.review_search.Text = window._review_rows[0].Name
+                        render_content(window, os.path.join(output_directory, 'template-review-filtered.png'), width, height)
+                        assert window.review_grid.ItemContainerGenerator.ContainerFromIndex(0) is not None
                     window.review_search.Text = ''
                     window.review_check_all(None, None)
                     assert not any(row.IsChecked and not row.CanUse for row in window._review_rows)

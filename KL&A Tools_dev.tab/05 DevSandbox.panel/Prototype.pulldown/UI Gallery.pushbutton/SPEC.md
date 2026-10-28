@@ -105,6 +105,10 @@ Message fits its height to content up to a cap and scrolls overflow. Details
 starts collapsed, including for Error, and severity changes preserve user
 expansion. Heading/body text colors remain stable; heading wording and border
 color identify severity. Form's Edit Naming Rules prompt shares Selection's style.
+Review's Check All affects only eligible rows shown by the filter, preserving
+hidden checks. Apply Checked validates the full checked collection. Clicking a
+row updates details without checking it. Ready/Warning/Blocked chips center in
+their Status cells; blocked rows remain unavailable for checking.
 
 Other production forms and the Gallery catalog shell keep their existing
 layouts pending review of the references. See the

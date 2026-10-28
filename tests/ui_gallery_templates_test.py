@@ -62,6 +62,31 @@ class TemplateInteractionTests(unittest.TestCase):
             window.review_filter_changed(None, None)
             self.assertEqual(checked, sum(row.IsChecked for row in window._review_rows))
 
+    def test_review_check_all_affects_visible_rows_and_preserves_hidden_checks(self):
+        with patch.dict(sys.modules, host_modules([])):
+            window = self.preview('review')
+            rows = window._review_rows
+            for row in rows:
+                row.IsChecked = False
+            rows[1].IsChecked = True
+            window.review_grid.SelectedItem = rows[3]
+            window.review_selection_changed(None, None)
+            self.assertIn(rows[3].Name, window.review_detail.Text)
+            self.assertFalse(rows[3].IsChecked)
+            window.review_search.Text = rows[0].Name
+            window.review_filter_changed(None, None)
+            self.assertEqual([rows[0]], window.review_grid.ItemsSource)
+            window.review_check_all(None, None)
+            self.assertEqual([True, True, False, False], [row.IsChecked for row in rows])
+            window.review_search.Text = 'no_matching_sample'
+            window.review_filter_changed(None, None)
+            window.review_check_all(None, None)
+            self.assertEqual([True, True, False, False], [row.IsChecked for row in rows])
+            window.review_search.Text = 'Blocked'
+            window.review_filter_changed(None, None)
+            window.review_check_all(None, None)
+            self.assertFalse(any(row.IsChecked for row in rows if not row.CanUse))
+
     def test_message_kind_change_and_disabled_body_keep_common_close_available(self):
         with patch.dict(sys.modules, host_modules([])):
             window = self.preview('message')

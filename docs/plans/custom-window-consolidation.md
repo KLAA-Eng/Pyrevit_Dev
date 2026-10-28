@@ -37,7 +37,7 @@ be selected with the owner.
 | GUI-08 | Live pyRevit/Revit acceptance | Pending host availability | Real ownership, keyboard/focus, drag, footer navigation, DPI/work-area and accessibility checks |
 | GUI-09 | Review remaining custom-window components and explain implementation | Reviewed; five template additions selected | [2026-10-28 review](../knowledge/reviews/design-system/2026-10-28-custom-window-components-review.md): 19 remaining windows at its baseline, migration risks and candidate primitives; Close label corrected; no production migration |
 | GUI-10 | Create five shared reference templates | Implemented; locally verified | Owner approved all five on 2026-10-28; [family guide](../../lib/GUI/_templates/README.md), [verification](../knowledge/reviews/design-system/2026-10-28-template-family.md) |
-| GUI-11 | Refine template elements with owner using grilling | Interview in progress | Selection keeps settled baseline; review new Form, Message, Options and Review decisions before production migration |
+| GUI-11 | Refine template elements with owner using grilling | First refinement pass implemented; locally verified | Selection baseline retained; accepted Form, Message, Options and Review choices implemented; final visual acceptance, artwork and live-host checks remain separate from production migration |
 
 ## Template refinement interview — 2026-10-28
 
@@ -95,7 +95,23 @@ follow-up. All five states measure a 60-unit label column and use the actual
 Include Existing CheckBox. Checked/unchecked feedback and disabled text pass;
 Normal, Disabled and minimum-size renders were inspected.
 [Current render](../knowledge/reviews/design-system/2026-10-28-template-family-evidence/template-options-confirmed.png).
-Live input/DPI acceptance remains pending. Next interview frontier: Review.
+Live input/DPI acceptance remains pending.
+
+Review round 1: owner confirmed separate checked/selected rows, the right-hand
+detail pane and resizable divider, visible-only Check All, and labelled
+Ready/Warning/Blocked chips with blocked rows unavailable for checking. The
+owner additionally requested centering chips in the column. Implemented an
+opt-in Status-cell alignment style and filtered-only checking with hidden
+checks preserved. Selected rows are brought into view after filtering; Apply
+Checked still validates all checked rows. The summary makes visible/total
+counts and Check All scope explicit.
+
+[Review verification and renders](../knowledge/reviews/design-system/2026-10-28-review-template-refinement.md)
+cover actual chip centers, blocked/disabled checkboxes, selected-versus-checked
+behavior, hidden-check preservation, empty filters and filtered-row visibility.
+This completes the first refinement pass across the five reference templates.
+Production migration, owner icon-artwork selection and live-host acceptance
+remain separate tasks.
 
 ## Implementation boundaries and recovery
 

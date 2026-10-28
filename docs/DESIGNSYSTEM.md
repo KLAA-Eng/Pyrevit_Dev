@@ -59,6 +59,13 @@ with 424 minimum while its 128-high Details readout is open. The opt-in shared
 `fit_window_height` helper measures the chromeless shell without showing it.
 See the [Message refinement evidence](knowledge/reviews/design-system/2026-10-28-message-template-refinement.md).
 
+Review separates checked items from the selected row's right-hand detail pane.
+Check All affects only eligible rows in the current filtered view; hidden checks
+are retained and Apply Checked uses the full checked collection. Blocked rows
+cannot be checked. Ready/Warning/Blocked chips center in their Status cells
+through an opt-in cell style; other table columns retain their alignment.
+See the [Review refinement evidence](knowledge/reviews/design-system/2026-10-28-review-template-refinement.md).
+
 `GUI.window_chrome.load_window()` is a small Python adapter with no import-time
 pyRevit/document dependency. It binds shared close/drag/navigation events;
 the caller retains body data, showing/dismissal semantics and model operations.

@@ -41,9 +41,14 @@ Close stays available when the body is disabled. Form keeps input/sample names
 separate and supports validation/reset. Options validates a chosen category
 and finite offset. Review distinguishes the selected detail row from checked
 items, preserves checks across filtering, and Check All checks eligible items
-across the whole sample collection. Blocked samples are not user-checkable;
+only in the current filtered view. Hidden checks remain unchanged. Apply Checked
+uses the full checked collection, including hidden items. Blocked samples are not user-checkable;
 the Error fixture intentionally starts with an invalid blocked check so the
 validation/recovery path can be reviewed.
+Clear the filter before using Check All to recover an invalid hidden blocked
+check in the Error fixture. Row selection only updates the right-hand detail
+pane, with its resizable divider. Labelled Ready/Warning/Blocked chips center
+within their Status cells through the opt-in `KlaDataGridStatusCell` style.
 
 Form's owner-confirmed compact field role uses Segoe UI 12, 24-high inputs,
 60-wide label and 240-wide input columns, 8-unit row gaps and 12-unit group

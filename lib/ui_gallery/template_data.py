@@ -70,6 +70,6 @@ def review_outcome(rows):
     if not chosen:
         return 'Select at least one sample item.'
     if any(row.Status == 'Blocked' for row in chosen):
-        return 'Cannot apply: a checked sample item is blocked. Check All selects eligible items only.'
+        return 'Cannot apply: a checked sample item is blocked. Clear the filter and use Check All to select eligible items only.'
     return '{} checked sample item(s); {} warning(s). No import or model change was performed.'.format(
         len(chosen), sum(row.Status == 'Warning' for row in chosen))

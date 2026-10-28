@@ -23,6 +23,9 @@ class Control(object):
         self.IsChecked = False
         self.SelectedItem = None
 
+    def ScrollIntoView(self, item):
+        self.scrolled_item = item
+
 
 class Resources(dict):
     def __init__(self):

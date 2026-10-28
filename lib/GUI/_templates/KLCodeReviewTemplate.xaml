@@ -26,7 +26,7 @@
                             </DataTemplate></DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Name" Width="2*" MinWidth="140" Binding="{Binding Name}" ElementStyle="{StaticResource KlaDataGridText}" IsReadOnly="True"/>
-                        <DataGridTemplateColumn Header="Status" Width="100">
+                        <DataGridTemplateColumn Header="Status" Width="100" CellStyle="{StaticResource KlaDataGridStatusCell}">
                             <DataGridTemplateColumn.CellTemplate><DataTemplate>
                                 <Border>
                                     <Border.Style><Style TargetType="Border" BasedOn="{StaticResource KlaStatusReady}">
