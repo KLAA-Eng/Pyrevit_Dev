@@ -69,6 +69,18 @@ lets the user blend or blink the two for review.
    labels printed in the PDF (see Member check). Members to review are
    selected in Revit and listed in the pyRevit output window.
 
+5. **Reuse.** The overlay list names each import by PDF, page, DPI, import
+   time, and whether it is in the active view. Overlays in the active view
+   come first, newest first, and the first one is selected. **Place in View**
+   adds the selected overlay to the active view at its aligned position. This
+   works in any view facing the same way as the one it was aligned in, such as
+   another plan view. **Replace PDF...** loads a revised PDF into the selected
+   overlay at the same page and DPI, keeping its alignment, color, and opacity.
+   If the new page has a different pixel size, the palette says so, because
+   the alignment then only holds near the page center. **Remove** deletes the
+   overlay image and all its placements from the model after a confirmation;
+   Revit Undo restores it, and its local files are kept.
+
 The palette is modeless and stays open beside Revit. Actions run through an
 `ExternalEvent`, one at a time.
 
@@ -91,8 +103,10 @@ positions. Sizes compare numerically, so case, `X` vs `x`, leading marks
 
 Each label is placed in the view through the displayed page, the raster size,
 and the overlay pose. It goes to the nearest structural framing line in the
-active view that is within 15° of the label's direction and within 3 text
-heights. Framing comes from a view-filtered collector, using each member's
+active view that is within the overlay's **Match within** tolerance: a
+distance in feet from the member line (default 2.5 ft, up to 100) and an angle
+from the label's direction (default 15°, up to 45°). The palette edits both,
+and they are saved with the overlay and printed in the report. Framing comes from a view-filtered collector, using each member's
 location curve and the size parsed from its type name, or failing that, its
 family and type names. Labels outside an active crop region are ignored.
 Results:
@@ -128,12 +142,21 @@ alert. In pyRevit 6, `wpf` must be taken from `pyrevit.framework`, which loads
 the engine's IronPython.Wpf assembly; a bare `import wpf` before that fails with
 `No module named _wpf`.
 
+## Coordinates
+
+View 2D coordinates are measured from the model origin along the view's
+right and up directions, not from the view origin. Every view facing the same
+way therefore shares one set of overlay coordinates, which Place in View relies
+on. State files from before this change (version 1) used the view origin;
+every action re-reads the placed image's center before use, so they keep
+working.
+
 ## Storage and sharing
 
 For each overlay, three files with the same stem are kept in
 `%LOCALAPPDATA%\KLA Tools\PDF Overlay\`: `<stem>_source.png` (page raster),
 `<stem>.png` (current overlay), and `<stem>.json` (PDF path, page, DPI, page
-size, pose, tint, and opacity). The overlay image is embedded in the model, so
+size, pose, tint, opacity, import time, and match tolerances). The overlay image is embedded in the model, so
 other users see it as last rendered. Only the computer that imported it can
 re-style or re-align it. Elsewhere the palette lists it as "no local files" and
 asks for a re-import. Deleting the image in Revit (Manage Images) leaves the

@@ -192,13 +192,19 @@ class MatchMembersTests(unittest.TestCase):
 
     def test_label_goes_to_nearest_parallel_member_only(self):
         # Closer to the vertical girder, but horizontal like beam 1.
-        result = match_members([label('W12x26', (23.5, 1.0), height=1.5)], self.members)
+        result = match_members([label('W12x26', (23.5, 1.0))], self.members, tolerance_feet=4.5)
         self.assertEqual([1], [row['id'] for row in result['rows']])
-        # Too far from any member at this text height.
-        result = match_members([label('W12x26', (10.0, 3.0), height=0.5)], self.members)
+        # Too far from any member at this tolerance.
+        result = match_members([label('W12x26', (10.0, 3.0))], self.members, tolerance_feet=1.0)
         self.assertEqual([], result['rows'])
         self.assertEqual(1, len(result['unmatched_labels']))
         self.assertEqual(5, len(result['unlabelled']))
+
+    def test_angle_tolerance_admits_skewed_labels(self):
+        skewed = label('W12x26', (10.0, 1.0), (math.cos(math.radians(20)), math.sin(math.radians(20))))
+        self.assertEqual([], match_members([skewed], self.members)['rows'])
+        result = match_members([skewed], self.members, max_angle=25.0)
+        self.assertEqual([1], [row['id'] for row in result['rows']])
 
 
 if __name__ == '__main__':

@@ -12,7 +12,8 @@ tooltip:
     How-to:
     - Open the plan view, run the command, set the page and DPI, and click Import PDF.
     - Click Align (2 Points) and follow the 4 numbered steps in the palette: a point on the PDF, the same point in the model, then a second far-apart pair. Blue and green circles mark each click until Align finishes.
-    - Click Check Members: members to review are selected and listed in the report window with clickable ids.
+    - Set Match within (feet and degrees), then click Check Members: members to review are selected and listed in the report window with clickable ids.
+    - Reuse an overlay instead of importing again: pick it in the list, then Place in View (any plan view) or Replace PDF (a revised file, alignment kept). Remove deletes duplicates.
     - DPI up to 600 for small sheets; large sheets are limited to the DPI that fits in memory (about 400 for 36x24).
     - Drag the Opacity slider, change Color, or untick Show overlay to compare.
     _____________________________________________________________________

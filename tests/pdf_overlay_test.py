@@ -28,6 +28,7 @@ from lib.pdf_overlay.geometry import (
 )
 from lib.pdf_overlay.state import (
     default_cache_root,
+    describe_overlay,
     load_state,
     make_state,
     overlay_paths,
@@ -187,7 +188,8 @@ class PdfOverlayStateTests(unittest.TestCase):
 
     def test_state_save_and_load_round_trip(self):
         state = make_state('C:\\plans.pdf', 2, 150, (3600, 2400),
-                           make_pose((1.0, 2.0), 0.05, 0.1), 'Blue', 45)
+                           make_pose((1.0, 2.0), 0.05, 0.1), 'Blue', 45,
+                           '2026-10-28T14:17:05', 3.5, 20)
         path = overlay_paths(self.folder, 'pdfoverlay_x_p2_1')['state']
         save_state(path, state)
         save_state(path, state)
@@ -202,6 +204,28 @@ class PdfOverlayStateTests(unittest.TestCase):
             validate_state(state)
         with self.assertRaises(ValueError):
             validate_state({'pdf_path': 'x'})
+
+    def test_older_state_gets_default_tolerances(self):
+        state = make_state('C:\\plans.pdf', 1, 150, (10, 10), make_pose((0, 0), 0.05))
+        for key in ('created', 'tolerance_feet', 'tolerance_degrees'):
+            del state[key]
+        state['version'] = 1
+        loaded = validate_state(state)
+        self.assertEqual((2.5, 15.0, ''),
+                         (loaded['tolerance_feet'], loaded['tolerance_degrees'], loaded['created']))
+        loaded['tolerance_feet'] = 'wide'
+        loaded['tolerance_degrees'] = 90
+        repaired = validate_state(loaded)
+        self.assertEqual((2.5, 45.0), (repaired['tolerance_feet'], repaired['tolerance_degrees']))
+
+    def test_describe_overlay_tells_imports_apart(self):
+        state = make_state('C:\\x\\Roof Ram PDF map.pdf', 1, 150, (10, 10), make_pose((0, 0), 0.05),
+                           created='2026-10-28T14:17:05')
+        self.assertEqual(u'Roof Ram PDF map.pdf  p1 \u00b7 150 DPI \u00b7 10/28 14:17 \u00b7 in this view',
+                         describe_overlay(state, True))
+        state['created'] = ''
+        self.assertEqual(u'Roof Ram PDF map.pdf  p1 \u00b7 150 DPI \u00b7 10/28 09:05 \u00b7 not in this view',
+                         describe_overlay(state, False, '2026-10-28 09:05:44'))
 
 
 if __name__ == '__main__':

@@ -52,7 +52,9 @@ try:
         view_to_pixel,
     )
     from pdf_overlay.state import (
+        clamp_tolerance,
         default_cache_root,
+        describe_overlay,
         load_state,
         make_state,
         overlay_paths,
@@ -63,6 +65,8 @@ try:
     from pdf_overlay.style import DEFAULT_OPACITY, DEFAULT_TINT, TINTS, clamp_opacity, tint_rgb
     from pdf_overlay.members import (
         CONFLICT,
+        DEFAULT_TOLERANCE_DEGREES,
+        DEFAULT_TOLERANCE_FEET,
         MATCH,
         MISMATCH,
         UNREADABLE,
@@ -100,6 +104,7 @@ class Overlay(object):
         self.paths = overlay_paths(CACHE_ROOT, stem)
         self.state = None
         self.error = None
+        self.in_view = False
         try:
             self.state = load_state(self.paths['state'])
         except (IOError, OSError, ValueError) as error:
@@ -107,27 +112,44 @@ class Overlay(object):
             logger.debug('PDF Overlay state %s: %s', self.paths['state'], error)
 
     @property
+    def created(self):
+        """Import time as text; older overlays fall back to their state file time."""
+        if self.state is None:
+            return ''
+        if self.state.get('created'):
+            return self.state['created']
+        try:
+            stamp = os.path.getmtime(self.paths['state'])
+        except OSError:
+            return ''
+        return datetime.datetime.fromtimestamp(stamp).strftime('%Y-%m-%dT%H:%M:%S')
+
+    @property
     def label(self):
         if self.state is None:
             return '{} (no local files)'.format(self.stem)
-        return '{}  p{}'.format(os.path.basename(self.state['pdf_path']), self.state['page'])
+        return describe_overlay(self.state, self.in_view, self.created)
 
 
 # -- Revit helpers -----------------------------------------------------------
 
-def _view_basis(view):
-    return view.Origin, view.RightDirection, view.UpDirection
-
+# View 2D coordinates are measured from the model origin along the view's
+# right/up axes, so every view facing the same way (all plan views of a
+# level stack, for example) shares one set of overlay coordinates.
 
 def _to_view_2d(view, point):
-    origin, right, up = _view_basis(view)
-    offset = point - origin
-    return (offset.DotProduct(right), offset.DotProduct(up))
+    return (point.DotProduct(view.RightDirection), point.DotProduct(view.UpDirection))
 
 
 def _to_model(view, xy):
-    origin, right, up = _view_basis(view)
-    return origin + right.Multiply(xy[0]) + up.Multiply(xy[1])
+    depth = view.Origin.DotProduct(view.ViewDirection)
+    return (view.RightDirection.Multiply(xy[0]) + view.UpDirection.Multiply(xy[1])
+            + view.ViewDirection.Multiply(depth))
+
+
+def _same_orientation(view_a, view_b):
+    return (view_a.RightDirection.DotProduct(view_b.RightDirection) > 0.9999 and
+            view_a.UpDirection.DotProduct(view_b.UpDirection) > 0.9999)
 
 
 def _visible_center(uidoc, view):
@@ -155,7 +177,17 @@ def find_overlays(doc):
         stem = _image_type_name(image_type)
         if stem:
             overlays.append(Overlay(image_type, stem))
-    return sorted(overlays, key=lambda overlay: overlay.label.lower())
+    return overlays
+
+
+def order_overlays(overlays, doc, view):
+    """Mark overlays placed in view; list those first, newest import first."""
+    valid_view = view is not None and DB.ImageInstance.IsValidView(view)
+    for overlay in overlays:
+        overlay.in_view = valid_view and bool(overlay_instances(doc, overlay.image_type, view))
+    overlays.sort(key=lambda overlay: overlay.created, reverse=True)
+    overlays.sort(key=lambda overlay: not overlay.in_view)
+    return overlays
 
 
 def overlay_instances(doc, image_type, view=None):
@@ -225,13 +257,10 @@ class UserError(Exception):
 
 # -- Actions (run inside the Revit API context) ------------------------------
 
-def import_pdf(uiapp, pdf_path, page, dpi):
-    uidoc = uiapp.ActiveUIDocument
-    doc = uidoc.Document
-    view = _active_overlay_view(uidoc)
+def _rasterize_page(doc, pdf_path, page, dpi, source_path):
+    """Save a PDF page as the overlay source PNG; return its pixel size."""
     if not DB.OptionalFunctionalityUtils.IsPDFImportAvailable():
         raise UserError('PDF import is not available in this Revit installation.')
-
     # Let Revit rasterize the page, copy the pixels, then roll the type back out.
     transaction = DB.Transaction(doc, 'PDF Overlay - Read Page')
     transaction.Start()
@@ -253,15 +282,22 @@ def import_pdf(uiapp, pdf_path, page, dpi):
             page_image.Dispose()
     finally:
         transaction.RollBack()
-
-    paths = overlay_paths(CACHE_ROOT, overlay_stem(pdf_path, page, uuid.uuid4().hex[:8]))
     try:
-        raster.save_png(source, paths['source'])
-        page_size = (source.Width, source.Height)
+        raster.save_png(source, source_path)
+        return (source.Width, source.Height)
     finally:
         source.Dispose()
+
+
+def import_pdf(uiapp, pdf_path, page, dpi):
+    uidoc = uiapp.ActiveUIDocument
+    doc = uidoc.Document
+    view = _active_overlay_view(uidoc)
+    paths = overlay_paths(CACHE_ROOT, overlay_stem(pdf_path, page, uuid.uuid4().hex[:8]))
+    page_size = _rasterize_page(doc, pdf_path, page, dpi, paths['source'])
     pose = make_pose(_visible_center(uidoc, view), initial_feet_per_pixel(view.Scale, dpi))
-    state = make_state(pdf_path, page, dpi, page_size, pose, DEFAULT_TINT, DEFAULT_OPACITY)
+    state = make_state(pdf_path, page, dpi, page_size, pose, DEFAULT_TINT, DEFAULT_OPACITY,
+                       datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'))
     _render(paths, state)
     save_state(paths['state'], state)
 
@@ -285,6 +321,11 @@ def refresh_overlay(uiapp, overlay, pose=None):
     state = overlay.state
     if pose is not None:
         state['pose'] = pose
+    else:
+        # Re-read the placed image, which may have moved in Revit.
+        instances = overlay_instances(doc, overlay.image_type)
+        if instances:
+            _sync_pose_from_instance(instances[0], doc.GetElement(instances[0].OwnerViewId), state)
     _render(overlay.paths, state)
     transaction = DB.Transaction(doc, 'PDF Overlay - Update')
     transaction.Start()
@@ -297,6 +338,71 @@ def refresh_overlay(uiapp, overlay, pose=None):
         transaction.RollBack()
         raise
     save_state(overlay.paths['state'], state)
+
+
+def place_in_view(uiapp, overlay):
+    """Place an existing overlay in the active view at its aligned position."""
+    uidoc = uiapp.ActiveUIDocument
+    doc = _overlay_document(uiapp, overlay)
+    view = _active_overlay_view(uidoc)
+    if overlay_instances(doc, overlay.image_type, view):
+        raise UserError('This overlay is already in the active view.')
+    state = overlay.state
+    placed = overlay_instances(doc, overlay.image_type)
+    if placed:
+        source_view = doc.GetElement(placed[0].OwnerViewId)
+        if not _same_orientation(source_view, view):
+            raise UserError('The overlay was aligned in a view facing another way; '
+                            'place it in a plan view, or import the PDF again here.')
+        _sync_pose_from_instance(placed[0], source_view, state)
+    transaction = DB.Transaction(doc, 'PDF Overlay - Place in View')
+    transaction.Start()
+    try:
+        placement = DB.ImagePlacementOptions(_to_model(view, state['pose']['center']),
+                                             DB.BoxPlacement.Center)
+        instance = DB.ImageInstance.Create(doc, view, overlay.image_type.Id, placement)
+        _apply_pose(instance, view, state)
+        transaction.Commit()
+    except Exception:
+        transaction.RollBack()
+        raise
+    save_state(overlay.paths['state'], state)
+
+
+def replace_pdf(uiapp, overlay, pdf_path):
+    """Load a revised PDF into an overlay, keeping its alignment, page, and DPI.
+
+    Returns a warning when the new page has a different size, since the
+    alignment then only holds near the page center.
+    """
+    doc = _overlay_document(uiapp, overlay)
+    state = overlay.state
+    placed = overlay_instances(doc, overlay.image_type)
+    if placed:
+        _sync_pose_from_instance(placed[0], doc.GetElement(placed[0].OwnerViewId), state)
+    old_size = tuple(state['page_size'])
+    new_size = _rasterize_page(doc, pdf_path, state['page'], state['dpi'], overlay.paths['source'])
+    state['pdf_path'] = pdf_path
+    state['page_size'] = [new_size[0], new_size[1]]
+    refresh_overlay(uiapp, overlay, state['pose'])
+    if abs(new_size[0] - old_size[0]) > 2 or abs(new_size[1] - old_size[1]) > 2:
+        return ('The new page is a different size ({} x {} px, was {} x {}); '
+                'check the alignment and run Align if needed.').format(
+                    new_size[0], new_size[1], old_size[0], old_size[1])
+    return None
+
+
+def remove_overlay(uiapp, overlay):
+    """Delete the overlay's image and every placement from the model."""
+    doc = _overlay_document(uiapp, overlay)
+    transaction = DB.Transaction(doc, 'PDF Overlay - Remove')
+    transaction.Start()
+    try:
+        doc.Delete(overlay.image_type.Id)
+        transaction.Commit()
+    except Exception:
+        transaction.RollBack()
+        raise
 
 
 def _add_marker(doc, view, point, rgb):
@@ -490,8 +596,10 @@ def check_members(uiapp, overlay):
         outside = len(labels) - len(inside)
         labels = inside
     members = collect_members(doc, view)
-    result = match_members(labels, members)
+    result = match_members(labels, members, state['tolerance_feet'], state['tolerance_degrees'])
+    save_state(overlay.paths['state'], state)
     result.update({'labels': len(labels), 'members': len(members), 'outside': outside,
+                   'tolerance': (state['tolerance_feet'], state['tolerance_degrees']),
                    'aspect_warning': _aspect_warning(page_text, state['page_size'])})
     return result
 
@@ -517,6 +625,8 @@ def report_member_check(output, overlay, result):
         '{} labels found no member, {} members in the view had no label.'.format(
             result['labels'], matched, len(review), len(result['unmatched_labels']),
             len(result['unlabelled'])))
+    output.print_md('Labels matched to members within {:g} ft and {:g} degrees.'.format(
+        *result['tolerance']))
     if result['outside']:
         output.print_md('{} labels outside the crop region were ignored.'.format(result['outside']))
     if result['aspect_warning']:
@@ -635,7 +745,7 @@ class PdfOverlayPalette(my_WPF):
         uidoc = uiapp.ActiveUIDocument
         previous = self.selected_overlay()
         select_stem = select_stem or (previous.stem if previous else None)
-        self.overlays = find_overlays(uidoc.Document)
+        self.overlays = order_overlays(find_overlays(uidoc.Document), uidoc.Document, uidoc.ActiveView)
         self._loading = True
         try:
             self.overlay_list.Items.Clear()
@@ -663,12 +773,21 @@ class PdfOverlayPalette(my_WPF):
                 instances = overlay_instances(uidoc.Document, overlay.image_type, view)
                 visible = not any(instance.IsHidden(view) for instance in instances)
             self.visible_check.IsChecked = visible
+            self.tolerance_feet_box.Text = '{:g}'.format(
+                state['tolerance_feet'] if state else DEFAULT_TOLERANCE_FEET)
+            self.tolerance_angle_box.Text = '{:g}'.format(
+                state['tolerance_degrees'] if state else DEFAULT_TOLERANCE_DEGREES)
         finally:
             self._loading = False
         if overlay is None:
             self.set_status('No overlays in this model yet. Pick a page and DPI, then Import PDF.')
         elif overlay.error:
             self.set_status(overlay.error)
+        elif not overlay.in_view:
+            self.set_status('This overlay is not in the active view. Click Place in View '
+                            'to reuse it here without importing again.')
+        else:
+            self.set_status('Ready. Reuse this overlay; Replace PDF loads a revised file into it.')
 
     def button_refresh(self, sender, e):
         self.run(self.load_overlays, 'Refreshing...')
@@ -708,9 +827,69 @@ class PdfOverlayPalette(my_WPF):
                 math.degrees(pose['rotation'])))
         self.run(action, ALIGN_STEPS[0])
 
+    def button_place(self, sender, e):
+        overlay = self._usable_overlay()
+        if overlay is None:
+            return
+
+        def action(uiapp):
+            place_in_view(uiapp, overlay)
+            self.load_overlays(uiapp, overlay.stem)
+            self.set_status('Placed in this view at its aligned position.')
+        self.run(action, 'Placing overlay in this view...')
+
+    def button_replace(self, sender, e):
+        overlay = self._usable_overlay()
+        if overlay is None:
+            return
+        pdf_path = forms.pick_file(file_ext='pdf', title='Select the revised PDF',
+                                   init_dir=os.path.dirname(overlay.state['pdf_path']))
+        if not pdf_path:
+            return
+
+        def action(uiapp):
+            warning = replace_pdf(uiapp, overlay, pdf_path)
+            self.load_overlays(uiapp, overlay.stem)
+            self.set_status(warning or 'Loaded {} into the overlay; alignment kept.'.format(
+                os.path.basename(pdf_path)))
+        self.run(action, 'Loading the revised PDF (page {}, {} DPI)...'.format(
+            overlay.state['page'], overlay.state['dpi']))
+
+    def button_remove(self, sender, e):
+        overlay = self.selected_overlay()
+        if overlay is None:
+            self.set_status('Pick an overlay to remove.')
+            return
+        if not forms.alert('Remove "{}" and all its placements from the model?'.format(overlay.label),
+                           title=COMMAND_TITLE, ok=False, yes=True, no=True):
+            return
+
+        def action(uiapp):
+            remove_overlay(uiapp, overlay)
+            self.load_overlays(uiapp)
+            self.set_status('Overlay removed. Undo in Revit brings it back.')
+        self.run(action, 'Removing overlay...')
+
+    def _read_tolerances(self, overlay):
+        """Store the palette's tolerance fields on the overlay; return an error or None."""
+        try:
+            feet = float(self.tolerance_feet_box.Text.strip())
+            degrees = float(self.tolerance_angle_box.Text.strip())
+        except ValueError:
+            return 'Tolerance must be numbers: feet and degrees.'
+        if feet <= 0 or degrees <= 0:
+            return 'Tolerance must be greater than zero.'
+        overlay.state['tolerance_feet'] = clamp_tolerance(feet, DEFAULT_TOLERANCE_FEET, 100.0)
+        overlay.state['tolerance_degrees'] = clamp_tolerance(degrees, DEFAULT_TOLERANCE_DEGREES, 45.0)
+        return None
+
     def button_check(self, sender, e):
         overlay = self._usable_overlay()
         if overlay is None:
+            return
+        error = self._read_tolerances(overlay)
+        if error:
+            self.set_status(error)
             return
 
         def action(uiapp):

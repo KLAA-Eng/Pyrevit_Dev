@@ -21,8 +21,10 @@ SIZE_PATTERN = re.compile(
     re.IGNORECASE)
 _DIMENSION = re.compile(r'(\d*\.?\d+)(?:-(\d+)/(\d+)|/(\d+))?')
 
-DISTANCE_FACTOR = 3.0
-MAX_ANGLE_DEGREES = 15.0
+# A label within this distance of a member line and this angle of its
+# direction can belong to it. Users can change both per overlay.
+DEFAULT_TOLERANCE_FEET = 2.5
+DEFAULT_TOLERANCE_DEGREES = 15.0
 
 MATCH = 'match'
 MISMATCH = 'mismatch'
@@ -140,14 +142,14 @@ def _direction(start, end):
     return (dx / length, dy / length)
 
 
-def match_members(labels, members, distance_factor=DISTANCE_FACTOR,
-                  max_angle=MAX_ANGLE_DEGREES):
+def match_members(labels, members, tolerance_feet=DEFAULT_TOLERANCE_FEET,
+                  max_angle=DEFAULT_TOLERANCE_DEGREES):
     """Assign labels to members and classify each labelled member.
 
     labels: dicts from size_labels. members: dicts with id, size (Revit text),
     key (parse_size key or None), start, end (view feet). A label goes to the
-    nearest member within distance_factor text heights whose line is within
-    max_angle degrees of the label. Returns a dict with:
+    nearest member within tolerance_feet whose line is within max_angle
+    degrees of the label. Returns a dict with:
 
     - rows: one per labelled member with status match, mismatch, conflict
       (its labels disagree), or unreadable (Revit size not recognized)
@@ -158,13 +160,12 @@ def match_members(labels, members, distance_factor=DISTANCE_FACTOR,
     assigned = {}
     unmatched = []
     for label in labels:
-        tolerance = distance_factor * label['height']
         best, best_distance = None, None
         for index, member in enumerate(members):
             if _line_angle(label['direction'], directions[index]) > max_angle:
                 continue
             distance = _segment_distance(label['center'], member['start'], member['end'])
-            if distance <= tolerance and (best_distance is None or distance < best_distance):
+            if distance <= tolerance_feet and (best_distance is None or distance < best_distance):
                 best, best_distance = index, distance
         if best is None:
             unmatched.append(label)

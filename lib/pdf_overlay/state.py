@@ -13,10 +13,14 @@ import re
 import tempfile
 
 from .geometry import make_pose
+from .members import DEFAULT_TOLERANCE_DEGREES, DEFAULT_TOLERANCE_FEET
 from .style import DEFAULT_OPACITY, DEFAULT_TINT, TINTS, clamp_opacity
 
 
-STATE_VERSION = 1
+# Version 2 measures pose centers from the model origin on the view's
+# right/up axes (version 1 used the view origin). Hosts re-read the center
+# from a placed image before use, so version 1 files still load.
+STATE_VERSION = 2
 OVERLAY_PREFIX = 'pdfoverlay_'
 SOURCE_SUFFIX = '_source.png'
 OVERLAY_SUFFIX = '.png'
@@ -58,7 +62,9 @@ def stem_from_image_name(name):
 
 
 def make_state(pdf_path, page, dpi, page_size, pose,
-               tint=DEFAULT_TINT, opacity=DEFAULT_OPACITY):
+               tint=DEFAULT_TINT, opacity=DEFAULT_OPACITY, created='',
+               tolerance_feet=DEFAULT_TOLERANCE_FEET,
+               tolerance_degrees=DEFAULT_TOLERANCE_DEGREES):
     return {
         'version': STATE_VERSION,
         'pdf_path': pdf_path,
@@ -68,7 +74,21 @@ def make_state(pdf_path, page, dpi, page_size, pose,
         'pose': pose,
         'tint': tint,
         'opacity': clamp_opacity(opacity),
+        'created': created or '',
+        'tolerance_feet': clamp_tolerance(tolerance_feet, DEFAULT_TOLERANCE_FEET, 100.0),
+        'tolerance_degrees': clamp_tolerance(tolerance_degrees, DEFAULT_TOLERANCE_DEGREES, 45.0),
     }
+
+
+def clamp_tolerance(value, default, maximum):
+    """Return a positive tolerance no larger than maximum, or default if unreadable."""
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return default
+    if value != value or value <= 0:
+        return default
+    return min(value, maximum)
 
 
 def validate_state(state):
@@ -79,7 +99,10 @@ def validate_state(state):
         normalized = make_state(
             state['pdf_path'], state['page'], state['dpi'], size,
             make_pose(pose['center'], pose['feet_per_pixel'], pose.get('rotation', 0.0)),
-            state.get('tint', DEFAULT_TINT), state.get('opacity', DEFAULT_OPACITY))
+            state.get('tint', DEFAULT_TINT), state.get('opacity', DEFAULT_OPACITY),
+            state.get('created', ''),
+            state.get('tolerance_feet', DEFAULT_TOLERANCE_FEET),
+            state.get('tolerance_degrees', DEFAULT_TOLERANCE_DEGREES))
     except (KeyError, TypeError, ValueError, AttributeError):
         raise ValueError('Overlay state is incomplete.')
     if size[0] <= 0 or size[1] <= 0 or normalized['pose']['feet_per_pixel'] <= 0:
@@ -87,6 +110,21 @@ def validate_state(state):
     if normalized['tint'] not in TINTS:
         normalized['tint'] = DEFAULT_TINT
     return normalized
+
+
+def describe_overlay(state, in_view, fallback_created=''):
+    """Return a list label that tells repeated imports of one PDF apart."""
+    created = state.get('created') or fallback_created
+    when = ''
+    match = re.match(r'\d{4}-(\d{2})-(\d{2})[T ](\d{2}:\d{2})', created or '')
+    if match:
+        when = '{}/{} {}'.format(match.group(1), match.group(2), match.group(3))
+    parts = ['{}  p{}'.format(os.path.basename(state['pdf_path']), state['page']),
+             '{} DPI'.format(state['dpi'])]
+    if when:
+        parts.append(when)
+    parts.append('in this view' if in_view else 'not in this view')
+    return u' · '.join(parts)
 
 
 def load_state(path):
