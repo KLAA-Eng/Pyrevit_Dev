@@ -19,9 +19,11 @@ Gallery previews remain deferred under the separate Gallery plan.
 The first delivery introduced opt-in foundations and the Selection reference.
 On 2026-10-28 the owner approved all five reference templates followed by
 grilling to refine their elements. Current scope is reference construction and
-review; propagation to production windows still waits for reference acceptance.
-Icon names/sizes belong to the foundation; specific replacement artwork will
-be selected with the owner.
+review. After the first refinement pass, the owner requested icon selection
+followed by production migration. The settled reference choices are the baseline
+for that next phase; do not request the migration authorization again.
+Icon names/sizes belong to the foundation; specific replacement artwork is now
+being selected with the owner before migration begins.
 
 ## Task ledger
 
@@ -31,9 +33,9 @@ be selected with the owner.
 | GUI-02 | Create shared shell, tokens, controls, and caller metadata | Implemented; locally verified | Host-free imports; no show/model side effects; existing resources/DataContext preserved; real WPF part bindings/events |
 | GUI-03 | Apply foundation to main template and Gallery preview | Implemented; locally verified | Actual 432 x 576 renders; five fictional states; measured header/footer, padding, button dimensions/gaps; simulated navigation |
 | GUI-04 | Review template appearance with owner | Follow-up refinements implemented; ready for visual review | 8-unit top/bottom gaps, 14-unit Title Case prompt, native row hover; [current renders](../knowledge/reviews/design-system/2026-10-27-main-template-refinement.md); [initial delivery](../knowledge/reviews/design-system/2026-10-27-custom-window-foundation.md) |
-| GUI-05 | Migrate other Python custom windows | Waiting for GUI-04 | Review each window's body/lifecycle/callers before adopting the shell; preserve command operations |
-| GUI-06 | Adopt foundation in compiled WPF adapters/windows | Waiting for GUI-04 | Share source design resources; preserve CLR/host boundaries; build and matching-host evidence required |
-| GUI-07 | Select additional in-window artwork | Pending owner selection | Reuse existing Search asset initially; keep semantic keys and 16-unit default |
+| GUI-05 | Migrate other Python custom windows | Authorized; queued after GUI-07 | Review each window's body/lifecycle/callers before adopting the shell; preserve command operations |
+| GUI-06 | Adopt foundation in compiled WPF adapters/windows | Authorized; queued after shared-resource compatibility | Share source design resources; preserve CLR/host boundaries; build and matching-host evidence required; compiled Gallery previews stay deferred |
+| GUI-07 | Select additional in-window artwork | Lucide family selected; specific choices pending | [Candidate sheet and inventory](../knowledge/reviews/design-system/2026-10-28-icon-selection/README.md); semantic keys and 16-unit default; retain source/license attribution |
 | GUI-08 | Live pyRevit/Revit acceptance | Pending host availability | Real ownership, keyboard/focus, drag, footer navigation, DPI/work-area and accessibility checks |
 | GUI-09 | Review remaining custom-window components and explain implementation | Reviewed; five template additions selected | [2026-10-28 review](../knowledge/reviews/design-system/2026-10-28-custom-window-components-review.md): 19 remaining windows at its baseline, migration risks and candidate primitives; Close label corrected; no production migration |
 | GUI-10 | Create five shared reference templates | Implemented; locally verified | Owner approved all five on 2026-10-28; [family guide](../../lib/GUI/_templates/README.md), [verification](../knowledge/reviews/design-system/2026-10-28-template-family.md) |
@@ -112,6 +114,46 @@ behavior, hidden-check preservation, empty filters and filtered-row visibility.
 This completes the first refinement pass across the five reference templates.
 Production migration, owner icon-artwork selection and live-host acceptance
 remain separate tasks.
+
+## Icon selection and authorized migration sequence
+
+On 2026-10-28 the owner requested icon selection, then production migration,
+and supplied `https://lucide.dev/icons/`. Lucide is the selected family. The
+[review package](../knowledge/reviews/design-system/2026-10-28-icon-selection/README.md)
+contains actual inventory, 17 attributed source candidates and a WPF-rendered
+sheet. Specific mappings, proposed 1.5 stroke, optional message symbols and
+icon/text placement remain the current interview frontier. No production XAML
+or resource was changed for the candidate package.
+
+After icon choices settle, implement resources/previews and migrate in verified
+batches on `dev.GUI-Clean` under the existing authorization:
+
+1. Shared modal Python windows: CustomAlert, SelectFromDict, CreateFromRooms and
+   DuplicateSheets. Preserve nested checkbox content/handler contracts and each
+   tool's filtering, confirmation and close policy.
+2. Core Find/Replace Views and Sheets, then Steel PSF. Preserve named controls,
+   one/two naming groups, outcomes, case actions and CSV action placement.
+3. Modeless View Range and standalone Recall. Preserve Revit event cleanup,
+   persistence and ownership; Recall's shared docked consumer needs isolation
+   or compatible resources, not an accidental docked redesign.
+4. Compiled shared alert, Family Studio, Startup source picker/review/blocking
+   issues. First make resource packaging compatible with CLR/localization
+   adapters; build supported targets and retain honest matching-host limits.
+
+Current inventory is 21 Window sources: five references, nine Python tool
+windows, five compiled windows, and Gallery/PreviewFixture tooling exceptions.
+The nine Python and five compiled windows are the production/tool migration
+scope. Gallery remains the review harness; its previews and source/caller
+inventory must follow migrated sources. Its own shell/fixture are tooling
+exceptions. The absent Model Checker source and five deferred compiled Gallery
+previews are not silently replaced with invented implementations.
+
+Read adjacent command SPECs and trace actual callers before each batch; use the
+existing component review as a risk map, not as permission to alter workflows.
+Verify shared resources, focused command contracts and actual WPF bounds/states;
+keep live ownership, input, Revit operations and DPI acceptance explicit.
+Make local verified milestone commits. No release/version change or remote
+publication is part of this request.
 
 ## Implementation boundaries and recovery
 
