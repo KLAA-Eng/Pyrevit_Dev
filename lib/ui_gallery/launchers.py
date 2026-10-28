@@ -133,6 +133,17 @@ _LAUNCHERS = (
         'can_launch': True,
     },
     {
+        'id': 'kla-pdf-overlay',
+        'category': 'KL&A custom',
+        'title': 'PDF Overlay palette',
+        'relative_path': 'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton/PdfOverlayPalette.xaml',
+        'called_by': 'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton/script.py',
+        'description': 'DevSandbox modeless palette for PDF overlay import, alignment, and opacity.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Host/model data required',
+        'can_launch': False,
+    },
+    {
         'id': 'kla-select-from-dict',
         'category': 'KL&A custom',
         'title': 'KL&A list selection',

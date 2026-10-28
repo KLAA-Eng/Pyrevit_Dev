@@ -1,0 +1,24 @@
+title:
+  en_us: "PDF Overlay"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 10.28.2026
+    Status: Unreleased
+    _____________________________________________________________________
+    Description:
+    Prototype: overlays one page of a PDF (for example a RAM member-size map or a printed roof plan) on the active view for member size review. White paper becomes transparent and the linework is tinted so the model shows through. A two-point pick scales, rotates, and moves the page onto the framing, including partial or differently scaled prints. A palette sets opacity and color and shows or hides the overlay. Adds an image to the model.
+    _____________________________________________________________________
+    How-to:
+    - Open the plan view, run the command, set the page and DPI, and click Import PDF.
+    - Click Align (2 Points): pick a grid intersection on the PDF, then the same intersection in the model; repeat for a second, far-apart point.
+    - Drag the Opacity slider, change Color, or untick Show overlay to compare.
+    _____________________________________________________________________
+    Last update:
+    - [10.28.2026] - v0.0 (Unreleased): First DevSandbox PDF overlay with two-point alignment and an opacity palette.
+author: KL&A
+min_revit_version: 2023
+engine:
+  clean: true
+  full_frame: false
+  persistent: true
