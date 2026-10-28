@@ -27,15 +27,18 @@ report, so users can review the plan clean and bring the check back quickly.
 
 ## Behavior
 
-- Off: if any element in the active view has an override whose projection line
-  color is one of the hanger check colors, every such override is reset in one
-  transaction.
+- Off: if any hanger or framing element in the active view has an override
+  whose projection line color is a hanger check color, or the view has check
+  hexagon outlines, they are reset and deleted in one transaction. Only the
+  active view changes (clearing every view was too slow); closing the
+  `Check Hanger Locations` report clears every view the check colored.
 - On: otherwise every hanger visible in the active view is checked with the
   same rules as `Check Hanger Locations` and the framing and problem hangers
   are colored (see that command's SPEC for rules and colors).
 - An alert reports the count cleared, or hangers checked and problems found.
 - Views that do not allow graphic overrides and family documents stop with a
-  message and no changes.
+  message and no changes. Turning on also marks
+  a new run so an older open report closing does not clear the new colors.
 
 ## Implementation inventory
 

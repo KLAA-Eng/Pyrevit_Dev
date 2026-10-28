@@ -13,6 +13,7 @@ from hanger_check.classify import (
 )
 from hanger_check.revit_check import (
     check_hangers,
+    clear_when_closed,
     hanger_info,
     hangers_in_view,
     id_value,
@@ -21,6 +22,7 @@ from hanger_check.revit_check import (
     refresh_highlights,
     ribbon_control_id,
     selected_hangers,
+    start_run,
     zoom_to,
 )
 
@@ -73,11 +75,14 @@ def _print_report(output, doc, view, source, results, elements, colored):
     if colored:
         output.print_md('Colors: supported member = blue, supporting member = orange, '
                         'both = purple. Hanger hexagon outline: red = problem, teal = '
-                        'review details. Use Hanger Highlights to turn them off.')
+                        'review details. **Closing this window removes the hanger check '
+                        'colors from every view and sheet**; run Hanger Highlights to '
+                        'turn them back on.')
     else:
         output.print_md('Graphics overrides are not allowed in this view; nothing was colored.')
     zoom = _zoom_button(output)
-    output.print_md('Click an Id to select it in Revit, then {} to zoom the view to it '
+    output.print_md('**Zoom from the printing plan view, not from a sheet.** '
+                    'Click an Id to select it in Revit, then {} to zoom the view to it '
                     '(hangers zoom to the supported/supporting member joint). If the button '
                     'does nothing, run Prototypes > Zoom to Selection. Press Esc in Revit to '
                     'clear the selection.'.format(zoom or 'run Prototypes > Zoom to Selection'))
@@ -120,14 +125,22 @@ def main():
     elements = {}
     results = check_hangers(doc, view, hangers, elements)
     colored = view.AreGraphicsOverridesAllowed()
+    run = start_run()
     if colored:
         refresh_highlights(doc, view, results, elements, revit.Transaction)
 
     if picked:
         zoom_to(uidoc, view, picked, joint_targets(results))
         results = dict((i, r) for i, r in results.items() if i in picked_ids)
-    _print_report(script.get_output(), doc, view, 'selection' if picked else 'active view',
+    output = script.get_output()
+    _print_report(output, doc, view, 'selection' if picked else 'active view',
                   results, elements, colored)
+    if colored:
+        try:
+            clear_when_closed(output.window, doc, run, revit.Transaction)
+        except Exception:
+            output.print_md('Could not watch this window; run Hanger Highlights to remove '
+                            'the colors when you are done.')
 
 
 if __name__ == '__main__':

@@ -10,6 +10,7 @@ tooltip:
     Prototype: zooms the active view to the selected elements and keeps them selected, as in the pyRevit forum "Zoom / Go to element" solution. Hangers zoom to their insertion point and the joint of their supported and supporting members, framing to its location line, with a 3'-0" margin. On a sheet it zooms to the element in the viewport that shows it. Elements not visible in the view are reported. Used by the Zoom to selection button in the Check Hanger Locations report.
     _____________________________________________________________________
     How-to:
+    - Use it in the printing plan view, not on a sheet.
     - Click a hanger or member Id in the Check Hanger Locations report to select it.
     - Click Zoom to selection in the report, or run this command.
     _____________________________________________________________________

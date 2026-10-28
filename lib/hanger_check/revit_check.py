@@ -266,7 +266,8 @@ def _is_check_color(settings):
 
 
 def _highlighted_ids(doc, view):
-    return [e.Id for e in DB.FilteredElementCollector(doc, view.Id).WhereElementIsNotElementType()
+    # Only framing and hangers (family instances) are colored by the check.
+    return [e.Id for e in DB.FilteredElementCollector(doc, view.Id).OfClass(DB.FamilyInstance)
             if _is_check_color(view.GetElementOverrides(e.Id))]
 
 
@@ -280,10 +281,6 @@ def _outline_ids(doc, view):
     return ids
 
 
-def has_highlights(doc, view):
-    return bool(_highlighted_ids(doc, view) or _outline_ids(doc, view))
-
-
 def _reset(doc, view, element_ids, outline_ids):
     for element_id in element_ids:
         view.SetElementOverrides(element_id, DB.OverrideGraphicSettings())
@@ -291,12 +288,92 @@ def _reset(doc, view, element_ids, outline_ids):
         doc.Delete(outline_id)
 
 
+def has_highlights(doc, view):
+    return bool(_highlighted_ids(doc, view) or _outline_ids(doc, view))
+
+
 def clear_highlights(doc, view, transaction):
-    """Reset check colors and delete hexagon outlines. Returns the count cleared."""
+    """Reset check colors and delete hexagon outlines in one view. Returns the count cleared."""
     highlighted, outlines = _highlighted_ids(doc, view), _outline_ids(doc, view)
-    with transaction('Clear hanger check highlights', doc=doc):
-        _reset(doc, view, highlighted, outlines)
+    if highlighted or outlines:
+        with transaction('Clear hanger check highlights', doc=doc):
+            _reset(doc, view, highlighted, outlines)
+        forget_view(doc, view)
     return len(highlighted) + len(outlines)
+
+
+def _views_slot(doc):
+    return 'KLA.HangerCheck.Views|' + doc.PathName + '|' + doc.Title
+
+
+def _colored_view_ids(doc):
+    from System import AppDomain
+    text = AppDomain.CurrentDomain.GetData(_views_slot(doc)) or ''
+    return [int(v) for v in str(text).split(',') if v]
+
+
+def _set_colored_view_ids(doc, view_ids):
+    from System import AppDomain
+    AppDomain.CurrentDomain.SetData(_views_slot(doc), ','.join(str(v) for v in sorted(view_ids)))
+
+
+def remember_view(doc, view):
+    """Record a view the check colored (kept in the AppDomain across runs), so
+    closing the report clears just those views instead of scanning the model."""
+    _set_colored_view_ids(doc, set(_colored_view_ids(doc)) | {id_value(view.Id)})
+
+
+def forget_view(doc, view):
+    _set_colored_view_ids(doc, set(_colored_view_ids(doc)) - {id_value(view.Id)})
+
+
+def clear_checked_views(doc, transaction):
+    """Clear the highlights in every view the check has colored this session
+    (views on sheets show those same views). Returns (elements cleared, views)."""
+    if doc is None or not doc.IsValidObject:
+        return 0, 0
+    found = []
+    for view_id in _colored_view_ids(doc):
+        view = doc.GetElement(DB.ElementId(view_id))
+        if isinstance(view, DB.View):
+            ids, outlines = _highlighted_ids(doc, view), _outline_ids(doc, view)
+            if ids or outlines:
+                found.append((view, ids, outlines))
+    if found:
+        with transaction('Clear hanger check highlights', doc=doc):
+            for view, ids, outlines in found:
+                _reset(doc, view, ids, outlines)
+    _set_colored_view_ids(doc, [])
+    return sum(len(ids) + len(outlines) for _view, ids, outlines in found), len(found)
+
+
+RUN_SLOT = 'KLA.HangerCheck.Run'
+
+
+def start_run():
+    """Mark a new Check Hanger Locations run; returns its token. Kept in the
+    AppDomain so it survives pyRevit's per-run engines."""
+    from System import AppDomain, Guid
+    token = str(Guid.NewGuid())
+    AppDomain.CurrentDomain.SetData(RUN_SLOT, token)
+    return token
+
+
+def is_current_run(token):
+    from System import AppDomain
+    return AppDomain.CurrentDomain.GetData(RUN_SLOT) == token
+
+
+def clear_when_closed(window, doc, token, transaction):
+    """When the report window closes, clear the views the check colored unless
+    a newer run has started. The clear runs later in Revit's API context."""
+    from pyrevit.revit.events import execute_in_revit_context
+
+    def on_closed(sender, args):
+        if is_current_run(token):
+            execute_in_revit_context(clear_checked_views, doc, transaction)
+
+    window.Closed += on_closed
 
 
 def _line_style(doc, key):
@@ -382,6 +459,7 @@ def refresh_highlights(doc, view, results, elements, transaction):
     """Clear old check colors, then color members by role and outline hangers to review."""
     solid_fill_id = _solid_fill_id(doc)
     highlighted, outlines = _highlighted_ids(doc, view), _outline_ids(doc, view)
+    remember_view(doc, view)
     with transaction('Refresh hanger check highlights', doc=doc):
         _reset(doc, view, highlighted, outlines)
         for member_id, role in member_roles(results).items():

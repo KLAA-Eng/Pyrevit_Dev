@@ -31,6 +31,10 @@ forum thread "Zoom / Go to element"
 
 ## Behavior
 
+Intended use is in the printing plan view; the report and tooltip say to zoom
+there, not from a sheet. Sheets are handled as a fallback.
+
+
 - An element with no bounding box in the active view (`get_BoundingBox(view)`)
   is not visible there and is skipped.
 - Frames: hangers by insertion point plus their framing joint (the supported

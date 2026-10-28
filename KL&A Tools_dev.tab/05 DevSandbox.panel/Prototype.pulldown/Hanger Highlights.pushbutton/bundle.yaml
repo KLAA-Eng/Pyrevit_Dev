@@ -7,7 +7,7 @@ tooltip:
     Status: Unreleased
     _____________________________________________________________________
     Description:
-    Prototype: turns the Check Hanger Locations highlights on or off in the active view. When highlights are on it clears them; when they are off it re-checks every visible hanger and colors the framing and problem hangers.
+    Prototype: turns the Check Hanger Locations highlights on or off in the active view. When the active view has them it clears them in that view only; when they are off it re-checks every visible hanger and colors the framing and problem hangers.
     _____________________________________________________________________
     How-to:
     - Click to toggle hanger check colors in the active view.

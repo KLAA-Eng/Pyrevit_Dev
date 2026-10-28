@@ -135,6 +135,19 @@ lose their highlight:
   itself is not overridden, so its text keeps its own color. A hanger without
   a recognizable hexagon falls back to halftone with colored projection lines.
 
+Closing the report window clears the highlights so no view or sheet keeps
+them. The check only colors the view it runs in, and sheets show those same
+views, so each colored view id is recorded in the AppDomain (per document,
+for the Revit session) and closing the report clears just the recorded views
+instead of scanning every view in the model, which was slow on large models.
+The window's `Closed` event schedules that clear through pyRevit's
+`execute_in_revit_context`, because the window closes outside Revit's API
+context. Each run (and `Hanger Highlights` turning colors on) stores a run
+token in the AppDomain; a window only clears when its run is still the latest,
+so closing an older report does not remove newer colors. The bundle uses a
+persistent pyRevit engine so the close handler survives after the script
+returns. The report says so in bold.
+
 Existing overrides on colored elements are replaced. The two line styles are
 created in the project on first use; outline detail lines exist only in the
 checked view and are removed by re-running or by `Hanger Highlights`. No
@@ -164,7 +177,8 @@ The check records each hanger's framing joint: the supported member's end
 projected onto the supporting member's location line (the supported end when
 there is no supporting member). Zooms frame a hanger's insertion point and its
 joint. The joint is an output only; the members are still found from the
-hanger insertion point, text direction, and hexagon. The selection stays until the user presses Esc.
+hanger insertion point, text direction, and hexagon. The selection stays until the user presses Esc. The report tells users, in
+bold, to zoom from the printing plan view rather than from a sheet.
 
 ## Implementation inventory
 
@@ -186,7 +200,8 @@ Live Revit 2024+ acceptance must confirm that the hanger text runs along the
 family's local X axis, the hanger box size on representative joist-to-header,
 skewed, and header-to-girder framing, plan-only matching on projects with
 level offsets, that the hexagon is found and traced in plan, the fallback
-override, the Zoom to selection button, the non-breaking space fix on
+override, the Zoom to selection button, the close-window clear (including views on sheets, a second report
+open at once, and its speed on a large model), the non-breaking space fix on
 real schedule text, hexagon flat-side alignment on real hanger linework, slope on sloped joists, and that re-running clears highlights for fixed hangers.
 
 ## Future development

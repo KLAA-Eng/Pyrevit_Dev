@@ -13,6 +13,7 @@ from hanger_check.revit_check import (
     has_highlights,
     hangers_in_view,
     refresh_highlights,
+    start_run,
 )
 
 
@@ -38,6 +39,7 @@ def main():
         return
     elements = {}
     results = check_hangers(doc, view, hangers, elements)
+    start_run()  # an older report closing must not clear these colors
     refresh_highlights(doc, view, results, elements, revit.Transaction)
     problems = sum(1 for r in results.values() if is_problem(r))
     forms.alert('Hanger highlights on: {} hanger(s) checked, {} with a problem. Run Check '

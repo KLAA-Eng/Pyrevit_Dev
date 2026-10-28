@@ -13,10 +13,12 @@ tooltip:
     - Select nothing to report every hanger in the active view, or select hangers to zoom to them and report only those.
     - Click an Id in the report to select it, then Zoom to selection to zoom the view to it.
     - Review colors: supported blue, supporting orange, both purple; hexagon outlined red for problems, teal for review details.
+    - Zoom from the printing plan view, not from a sheet.
+    - Closing the report removes the colors from every view and sheet.
     - Re-run after fixing framing to clear resolved highlights. Hanger Highlights turns the colors on or off.
     _____________________________________________________________________
     Last update:
     - [10.27.2026] - v0.0 (Unreleased): First DevSandbox port of the Check Hanger Locations Dynamo graph.
 author: KL&A
 engine:
-  clean: true
+  persistent: true
