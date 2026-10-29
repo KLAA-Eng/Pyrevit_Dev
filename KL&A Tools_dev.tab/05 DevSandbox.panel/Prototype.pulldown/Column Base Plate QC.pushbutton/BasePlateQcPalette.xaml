@@ -1,0 +1,107 @@
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Column Base Plate QC"
+    Height="420" Width="340"
+    ResizeMode="NoResize"
+    WindowStartupLocation="CenterScreen"
+    ShowInTaskbar="True"
+    WindowStyle="None"
+    AllowsTransparency="True"
+    Background="#1A252B">
+
+    <Grid Background="#1A252B">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="24"/>
+            <RowDefinition/>
+            <RowDefinition Height="24"/>
+        </Grid.RowDefinitions>
+
+        <Grid MouseDown="header_drag" Background="#1A252B">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="86"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="86"/>
+            </Grid.ColumnDefinitions>
+
+            <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
+                            VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"
+                            ContentTemplate="{StaticResource KLCodeWordmark}"/>
+
+            <TextBlock Text="Column Base Plate QC"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="3"
+                       Style="{StaticResource KLCodeHeaderTitle}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Foreground="{StaticResource text_white}" />
+
+            <Button Content="Close"
+                    Grid.Column="2"
+                    Click="button_close"
+                    Style="{StaticResource KLCodeCloseButton}" />
+        </Grid>
+
+        <StackPanel Grid.Row="1" Margin="12,6,12,0">
+
+            <Label Content="Base plate schedule (text in this view):" Foreground="{StaticResource text_white}"
+                   FontSize="12" Padding="0,0,0,2"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="72"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox x:Name="schedule_list" Height="24" SelectionChanged="schedule_selected"
+                          ToolTip="Views whose text notes include BASE PLATE SCHEDULE."/>
+                <Button Grid.Column="1" Content="Refresh" Click="button_refresh" Height="24" Margin="6,0,0,0"
+                        FontSize="12" Style="{StaticResource KLCodeActionButton}"/>
+            </Grid>
+            <TextBlock x:Name="schedule_text" Text="" Foreground="{StaticResource text_gray}" FontSize="11"
+                       TextWrapping="Wrap" Margin="0,4,0,0"/>
+
+            <Separator Background="{StaticResource border_green_dark}" Margin="0,10,0,6"/>
+
+            <Button Content="Draw Base Plates in Active View" Click="button_draw" Height="28"
+                    FontSize="12" Style="{StaticResource KLCodeActionButton}"
+                    ToolTip="Draws a grouped plate, anchor rods, and mark at each column with a Column Base Plate Type, replacing this view's earlier drawing."/>
+            <UniformGrid Columns="2" Margin="0,6,0,0">
+                <Button Content="Clear Active View" Click="button_clear_view" Height="28" Margin="0,0,3,0"
+                        FontSize="12" Style="{StaticResource KLCodeActionButton}"/>
+                <Button Content="Clear All Views" Click="button_clear_all" Height="28" Margin="3,0,0,0"
+                        FontSize="12" Style="{StaticResource KLCodeActionButton}"/>
+            </UniformGrid>
+            <CheckBox x:Name="delete_on_close_check" Content="Delete base plates drawn here when this closes"
+                      IsChecked="True" Margin="0,10,0,0" Foreground="{StaticResource text_white}" FontSize="12"
+                      ToolTip="Removes the groups drawn while this window was open. Earlier drawings stay until cleared."/>
+
+            <TextBlock x:Name="status_text" Text="" Foreground="{StaticResource text_gray}" FontSize="11"
+                       TextWrapping="Wrap" Margin="0,10,0,0" Height="96"/>
+        </StackPanel>
+
+        <Grid Grid.Row="2" Style="{StaticResource KLCodeFooterGrid}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0">
+                <Hyperlink NavigateUri="https://forms.cloud.microsoft/r/HjuggSZqyU"
+                           RequestNavigate="Hyperlink_RequestNavigate"
+                           Style="{StaticResource KLCodeFooterLink}">Prototype</Hyperlink>
+            </TextBlock>
+
+            <TextBlock Style="{StaticResource KLCodeFooterVersion}"
+                       Text="DevSandbox Prototype"
+                       Grid.Column="1"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0">
+                <Hyperlink NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
+                           RequestNavigate="Hyperlink_RequestNavigate"
+                           Style="{StaticResource KLCodeFooterLink}">Outreach</Hyperlink>
+            </TextBlock>
+        </Grid>
+    </Grid>
+</Window>

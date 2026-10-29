@@ -1,0 +1,25 @@
+title:
+  en_us: "Column Base Plate QC"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 10.29.2026
+    Status: Unreleased
+    _____________________________________________________________________
+    Description:
+    Prototype: draws each column's base plate in the active plan view for QC. The plate comes from the column's Column Base Plate Type (BP7) and the BASE PLATE SCHEDULE text in the drawing set; rod edge distances come from the ANCHOR ROD REQUIREMENTS table. Plate L runs along the wall under the column, or the column axis when there is none. Each plate is a detail group with its mark. Plates that hang past a wall face, are smaller than the column, or put a rod on the column are drawn red and listed. Adds detail groups to the model.
+    _____________________________________________________________________
+    How-to:
+    - Run the command; the palette finds the view holding the BASE PLATE SCHEDULE text and lists the marks it read.
+    - Open a plan view and click Draw Base Plates in Active View. Columns to review are selected and listed in the report window.
+    - Drawing again replaces that view's plates. Clear Active View or Clear All Views deletes drawn plates.
+    - With Delete base plates drawn here when this closes ticked, closing the palette removes what it drew.
+    _____________________________________________________________________
+    Last update:
+    - [10.29.2026] - v0.0 (Unreleased): First DevSandbox base plate drawing from the base plate schedule text.
+author: KL&A
+min_revit_version: 2023
+engine:
+  clean: true
+  full_frame: false
+  persistent: true

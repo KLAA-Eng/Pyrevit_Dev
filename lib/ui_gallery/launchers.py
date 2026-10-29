@@ -9,6 +9,17 @@ from __future__ import unicode_literals
 
 _LAUNCHERS = (
     {
+        'id': 'kla-column-base-plate-qc',
+        'category': 'KL&A custom',
+        'title': 'Column Base Plate QC palette',
+        'relative_path': 'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Column Base Plate QC.pushbutton/BasePlateQcPalette.xaml',
+        'called_by': 'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Column Base Plate QC.pushbutton/script.py',
+        'description': 'DevSandbox modeless palette that draws and clears base plate QC groups.',
+        'uses_seed_data': False,
+        'sample_data_label': 'Host/model data required',
+        'can_launch': False,
+    },
+    {
         'id': 'kla-compiled-alert',
         'category': 'Compiled add-in',
         'title': 'KL&A compiled alert',

@@ -15,6 +15,7 @@ WINDOW_XAML_PATHS = (
     'lib/GUI/Tools/CreateFromRooms.xaml',
     'lib/match/clipboard_window.xaml',
     TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
+    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Column Base Plate QC.pushbutton/BasePlateQcPalette.xaml',
 )
 
 ALL_WINDOW_XAML_PATHS = WINDOW_XAML_PATHS + (
@@ -45,6 +46,7 @@ KL_A_TEMPLATE_WINDOW_XAML_PATHS = (
     TAB_NAME + '/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml',
     TAB_NAME + '/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml',
     TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
+    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Column Base Plate QC.pushbutton/BasePlateQcPalette.xaml',
 )
 
 
