@@ -1,7 +1,7 @@
 # KLCode Design System
 
-The shared presentation of every KLCode window: the nine Python tool windows, the five reference templates and the five
-compiled add-in windows all run on `KlaWindowShell` with one chain of XAML dictionaries. This file owns the rules and the
+The shared presentation of every KLCode window: the nine Python tool windows, five reference templates, Gallery and five
+compiled add-in windows all run on `KlaWindowShell` with one chain of XAML dictionaries. The static PreviewFixture retains its test chrome. This file owns the rules and the
 layering; the [consolidation plan](plans/custom-window-consolidation.md) owns task status; the
 [template guide](../lib/GUI/_templates/README.md) owns the reference implementations; dated evidence lives in
 [knowledge/reviews/design-system](knowledge/reviews/design-system/README.md). The long-form history is archived as
@@ -20,7 +20,7 @@ Each dictionary merges only the ones above it. Nothing is referenced upward, and
 | Chrome data | `KLCodeChrome.xaml` | Footer URIs (`KlaPrototypeUri`, `KlaOutreachUri`) and default labels (`CloseLabel`, `PrototypeLabel`, `OutreachLabel`) | Strings and URIs |
 | Icons | `lib/_icons/gui/KLCodeIcons.xaml` (generated) | One `Kla<Role>Geometry` per approved Lucide role | Geometry only |
 | Foundation | `KLCodeFoundation.xaml` | `KlaFoundationWindow`, `KlaWindowShell`, buttons, labels, input, filter, checkbox, list, link; the `KlaGuiIcon` presenter, `KlaGuiIconPen` and the generated `KlaIcon<Role>` images | Tokens and brushes by name; one template per control |
-| Components | `KLCodeComponents.xaml` | Section, prompt, compact fields, readout, dropdown, radio, segment, toggle, link and ghost buttons, chips, banner, table, splitter; implicit TextBox / ComboBox / CheckBox; the compiled brush names; role-named aliases | Tokens and brushes by name |
+| Components | `KLCodeComponents.xaml` | Section, prompt, compact fields, `KlaFieldRows` and `KlaFilteredCheckList` compositions, readout, dropdown, radio, segment, toggle, link and ghost buttons, chips, banner, table, splitter; implicit TextBox / ComboBox / CheckBox; the compiled brush names; role-named aliases | Tokens and brushes by name |
 | Compiled aliases | `src/KLCode.Wpf/Resources/KLCodeControls.xaml` | `Kla*Style` keys that are `BasedOn` the shared styles | No templates, no literals |
 
 Tokens are every number or colour the rules below name; styles set properties and `BasedOn`; templates draw one control type
@@ -33,7 +33,7 @@ foundation and components free of numeric literals and reports consumer margins 
 | --- | --- |
 | Identity | KLCharcoal `#1A252B` ground, KLGreen family, the outlined wordmark at 70×12 (`KlaWordmarkWidth` / `Height`) in every header |
 | Chrome | Header and footer `KlaChromeRow` 24 high; side columns `KlaHeaderSideColumn` 86 / `KlaFooterSideColumn` 100; shared composition, never copied markup |
-| Header | Wordmark left, centred 14-unit title with ellipsis and no tooltip, `Close` 60×18 at 10 (`KlaClose*`), text lifted one unit in layout |
+| Header | Wordmark left, centred 14-unit title with ellipsis and no tooltip, `Close` 60×18 at 10 (`KlaClose*`), glyph placement measured through `KlaCloseGlyphLift` |
 | Footer | Prototype and Outreach links and the caller's pure `vX.X` version, all `KlaTextMutedBrush` (8.5:1); links underline, hover KLWhite; a missing version leaves the centre empty |
 | Keyboard | Body first in Tab order, then Close, then the links; Escape closes through the adapter; Enter runs the one `IsDefault` main action; focus marks never move layout |
 | Typography | Segoe UI; `KlaBodyFontSize` 12 for body and controls, `KlaTitleFontSize` 14 for title, prompts, headings and the main action; constant labels in Title Case |
@@ -65,6 +65,12 @@ foundation and components free of numeric literals and reports consumer margins 
 3. Give every input `AutomationProperties.Name`, mark the one main action `IsDefault`, and let the adapter own Close and Escape.
 4. Add a Gallery adapter and a production-probe case, an adjacent `SPEC.md`, and run `python scripts/check_ui_scale.py`.
 
+Use `KlaFieldRows` for the four compact naming rows: label/input columns 0/1,
+row pairs 0/2/4/6. Use `KlaFilteredCheckList` for the filter/prompt/list/secondary
+actions/main action in rows 0/2/4/6/8. Both are `ItemsControl` compositions with
+shared Grid panels. Declare named controls and handlers as direct items so their
+window namescope survives. A secondary-actions item can hold multiple rows.
+
 ## Validation
 
 | Tier | What it proves | Where |
@@ -72,4 +78,4 @@ foundation and components free of numeric literals and reports consumer margins 
 | CPython tests | Adapter contracts, caller identity (`gui_caller_identity_test`), template contracts (`gui_foundation_contract_test`), token discipline (`gui_token_scale_test`), artwork generation (`gui_icons_test`) | `tests/` |
 | IronPython + WPF probes | Real layout: chrome heights, gaps, scroll ranges, glyph centring, de / ko captions, icon stroke; values read from the tokens | `scripts/validate_ui_*_wpf.py` (Windows) |
 | C# contract and smoke | Dictionary layering and literal-free rules; every compiled window constructs against forbidding fakes | `src/KLCode.Wpf/Tests` |
-| Live Revit (GUI-08) | Ownership, DPI, drag, real tool operations | Pending host availability |
+| Live Revit (GUI-08) | Ownership, DPI, drag, real tool operations | Owner will review; [Windows evidence and checklist](knowledge/reviews/design-system/2026-10-29-gui-architecture-windows.md) |

@@ -102,6 +102,7 @@ gallery.PreviewFilter.SelectedItem = 'Interactive preview'
 assert all(row.CanLaunch for row in gallery.EntriesGrid.Items)
 gallery.PreviewFilter.SelectedItem = 'All previews'
 assert gallery.EntriesGrid.Items.Count == len(entries)
+assert gallery._kla_chrome.version.Text == namespace['__version__']
 
 deferred = next(row for row in gallery.EntriesGrid.Items if row.Entry['id'] == 'kla-family-studio')
 gallery.EntriesGrid.SelectedItem = deferred

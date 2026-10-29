@@ -3,15 +3,7 @@
         Title="Steel PSF" Width="432" Height="576" MinWidth="432" MinHeight="576" MaxHeight="576"
         WindowStartupLocation="CenterScreen" ShowInTaskbar="True" Style="{StaticResource KlaFoundationWindow}">
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
-        <Grid x:Name="window_body">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="{StaticResource KlaFilterRow}"/><RowDefinition Height="8"/>
-                <RowDefinition Height="Auto"/><RowDefinition Height="4"/>
-                <RowDefinition Height="*"/><RowDefinition Height="8"/>
-                <RowDefinition Height="{StaticResource KlaCompactRow}"/><RowDefinition Height="8"/>
-                <RowDefinition Height="{StaticResource KlaCompactRow}"/><RowDefinition Height="8"/>
-                <RowDefinition Height="{StaticResource KlaControlRow}"/>
-            </Grid.RowDefinitions>
+        <ItemsControl x:Name="window_body" Style="{StaticResource KlaFilteredCheckList}">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="16"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <Image x:Name="filter_icon" Source="{StaticResource KlaIconSearch}" AutomationProperties.Name="Search" Width="16" Height="16" VerticalAlignment="Center" IsHitTestVisible="False"/>
@@ -23,15 +15,17 @@
                     <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}" Checked="UIe_ItemChecked" Style="{StaticResource KlaFoundationCheckBox}"/>
                 </DataTemplate></ListBox.ItemTemplate>
             </ListBox>
-            <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Select All" Click="button_select_all" Style="{StaticResource KlaFoundationButton}" Margin="{StaticResource KlaPairGap}"/>
-                <Button Content="Select None" Click="button_select_none" Style="{StaticResource KlaFoundationButton}"/>
+            <StackPanel Grid.Row="6">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Select All" Click="button_select_all" Style="{StaticResource KlaFoundationButton}" Margin="{StaticResource KlaPairGap}"/>
+                    <Button Content="Select None" Click="button_select_none" Style="{StaticResource KlaFoundationButton}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                    <Button Content="Initialize CSV" Click="button_initialize_csv" Style="{StaticResource KlaSecondaryButton}" Margin="{StaticResource KlaPairGap}"/>
+                    <Button Content="Append CSV" Click="button_append_csv" Style="{StaticResource KlaSecondaryButton}"/>
+                </StackPanel>
             </StackPanel>
-            <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Initialize CSV" Click="button_initialize_csv" Style="{StaticResource KlaSecondaryButton}" Margin="{StaticResource KlaPairGap}"/>
-                <Button Content="Append CSV" Click="button_append_csv" Style="{StaticResource KlaSecondaryButton}"/>
-            </StackPanel>
-            <Button x:Name="button_main" Grid.Row="10" Content="Review Selected Stories" Click="button_select" Style="{StaticResource KlaFoundationMainButton}"/>
-        </Grid>
+            <Button x:Name="button_main" Grid.Row="8" Content="Review Selected Stories" Click="button_select" Style="{StaticResource KlaFoundationMainButton}"/>
+        </ItemsControl>
     </ContentControl>
 </Window>

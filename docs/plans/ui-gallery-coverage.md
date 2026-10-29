@@ -26,7 +26,7 @@ windows remain visible and disabled by explicit owner decision.
 | GAL-03 | Add interactive states with isolated actions | Implemented; locally verified | Scenario/adapter tests and 66 real-WPF custom/state constructions |
 | GAL-04 | Preserve Recall composition and register Model Checker conditionally | Implemented; locally verified | Real Recall shell/UserControl render; exact-path adapter only when source exists |
 | GAL-05 | Update SPEC/version and review evidence | Implemented; locally verified | Planned v0.5; dated verification record; targeted metadata and diff checks |
-| GAL-06 | Live Revit acceptance | Pending host availability | Every supported family/state, input/dismissal, native pickers, DPI, and no production side effects |
+| GAL-06 | Live Revit acceptance | Pending owner review | Owner took actual Revit review on 2026-10-29; every supported family/state, input/dismissal, native pickers, DPI, and no production side effects |
 | GAL-07 | Remove retired rename forms and add Preview filter | Implemented; locally verified | 2026-10-28 owner request; source/caller regression checks and real WPF filter intersections; [verification](../knowledge/reviews/design-system/2026-10-28-gallery-retirement-and-preview-filter.md) |
 | GAL-08 | Register five template references | Implemented; locally verified | Selection/Form replace old main/generic FindReplace; Message/Options/Review add shared specimens; [family verification](../knowledge/reviews/design-system/2026-10-28-template-family.md) |
 | GAL-F01 | Enable five compiled previews | Deferred by owner | Future actual-view providers/actions, runtime builds, and matching-host validation |
@@ -51,6 +51,9 @@ migrates production sources; Gallery follows those actual sources and keeps
 all five compiled previews disabled. The subsequent
 [migration verification](../knowledge/reviews/design-system/2026-10-29-production-migration.md)
 records the current 36-entry catalog and 71 custom/state constructions.
+Gallery's own shell now shares the foundation; the architecture follow-up and
+current Windows evidence are owned by
+[GUI-12](custom-window-consolidation.md) and its linked review record.
 Host-independent tests and isolated IronPython/WPF tests complement each other.
 Neither substitutes for GAL-06. The full metadata checker has a pre-existing
 missing-bundle error for a cache-only Model Checker directory left by the other

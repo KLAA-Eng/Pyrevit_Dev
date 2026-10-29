@@ -79,6 +79,7 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
         shell.Arrange(Rect(0, 0, 432, 576))
         shell.UpdateLayout()
         chrome = window._kla_chrome
+        token = window.FindResource
         if state == 'Normal':
             row = window.main_ListBox.ItemContainerGenerator.ContainerFromIndex(0)
             check = next(item for item in descendants(row) if isinstance(item, CheckBox))
@@ -94,8 +95,8 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
             origin = label.TranslatePoint(Point(0, 0), chrome.close_button)
             center_x = origin.X + glyphs.X + glyphs.Width / 2
             center_y = origin.Y + glyphs.Y + glyphs.Height / 2
-            assert abs(center_x - chrome.close_button.ActualWidth / 2) < 0.25
-            assert abs(center_y - chrome.close_button.ActualHeight / 2) < 0.25
+            assert abs(center_x - chrome.close_button.ActualWidth / 2) < 0.25, 'Close horizontal center: {}'.format(center_x)
+            assert abs(center_y - chrome.close_button.ActualHeight / 2) < 0.25, 'Close vertical center: {}'.format(center_y)
             print('Close visible-text center: {:.2f}, {:.2f}; button center: 30, 9.'.format(center_x, center_y))
             if output_directory:
                 render_close_detail(chrome.close_button, os.path.join(output_directory, 'close-control-4x.png'))
@@ -105,15 +106,14 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
                 row.ActualHeight, row.Padding, text.TranslatePoint(Point(0, 0), check).X - 16,
                 window.main_ListBox.ActualWidth, window.main_ListBox.ActualHeight, text.ActualWidth,
                 [(str(bar.Orientation), bar.ActualWidth) for bar in bars]))
-        token = window.FindResource
         chrome_row, inset, pair_gap = token('KlaChromeRow').Value, token('KlaBodyInset'), token('KlaPairGap').Right
         assert chrome.header.ActualHeight == chrome.footer.ActualHeight == chrome_row
         assert chrome.title.Text == shell.Tag.Title
         assert chrome.title.ToolTip is None and window.ToolTip is None
         assert chrome.version.Text == tool_version
         assert str(chrome.version.Foreground) == str(token('KlaTextMutedBrush'))
-        assert str(chrome.prototype.Foreground) == str(token('KlaAccentHoverBrush'))
-        assert str(chrome.outreach.Foreground) == str(token('KlaAccentHoverBrush'))
+        assert str(chrome.prototype.Foreground) == str(token('KlaTextMutedBrush'))
+        assert str(chrome.outreach.Foreground) == str(token('KlaTextMutedBrush'))
         assert window.textbox_filter.ActualHeight == room_filter_height
         assert window.textbox_filter.FontSize == token('KlaTitleFontSize')
         assert window.textbox_filter.TranslatePoint(Point(0, 0), shell).Y == chrome_row + inset.Top

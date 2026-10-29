@@ -7,7 +7,7 @@ __version__ = 'v0.5'
 import os
 import sys
 from pyrevit import forms
-from System.Windows.Input import MouseButtonState
+from System.Windows import Window
 
 
 def _extension_root(path):
@@ -29,6 +29,7 @@ if LIB_DIR not in sys.path:
 from ui_gallery.registry import ORIGINS, gallery_entries, matching_entries
 from ui_gallery.builtin import launch_builtin
 from ui_gallery.windows import launch_custom
+from GUI.window_chrome import load_window
 
 XAML_PATH = os.path.join(os.path.dirname(__file__), 'Gallery.xaml')
 
@@ -57,7 +58,8 @@ class GalleryRow(object):
 class Gallery(forms.WPFWindow):
     def __init__(self):
         self._ready = False
-        forms.WPFWindow.__init__(self, XAML_PATH)
+        Window.__init__(self)
+        load_window(self, XAML_PATH, __title__, __version__)
         self._entries = gallery_entries(EXTENSION_ROOT)
         self.OriginFilter.ItemsSource = ['All origins'] + list(ORIGINS)
         self.OriginFilter.SelectedIndex = 0
@@ -66,13 +68,6 @@ class Gallery(forms.WPFWindow):
         self.PreviewFilter.SelectedIndex = 0
         self._ready = True
         self._filter()
-
-    def button_close(self, sender, args):
-        self.Close()
-
-    def header_drag(self, sender, args):
-        if args.LeftButton == MouseButtonState.Pressed:
-            self.DragMove()
 
     def filter_changed(self, sender, args):
         if self._ready:

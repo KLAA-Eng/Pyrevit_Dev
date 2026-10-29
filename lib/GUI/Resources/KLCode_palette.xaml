@@ -11,13 +11,13 @@
     <SolidColorBrush x:Key="KlaBorderStrongBrush" Color="#286048" />    <!-- KLGreen-dark: sections, lists, grid lines -->
 
     <!-- Legacy aliases (2019 names). Consumers that still name these resolve to the role brushes above; new XAML uses the role names. -->
-    <StaticResource x:Key="header_background" ResourceKey="KlaWindowBrush" />
-    <StaticResource x:Key="text_white" ResourceKey="KlaTextBrush" />
-    <StaticResource x:Key="text_gray" ResourceKey="KlaTextMutedBrush" />
-    <StaticResource x:Key="text_green" ResourceKey="KlaBorderBrush" />
-    <StaticResource x:Key="button_fg_normal" ResourceKey="KlaTextOnAccentBrush" />
-    <StaticResource x:Key="button_bg_normal" ResourceKey="KlaAccentBrush" />
-    <StaticResource x:Key="button_bg_hover" ResourceKey="KlaAccentHoverBrush" />
-    <StaticResource x:Key="border_green_dark" ResourceKey="KlaBorderStrongBrush" />
-    <StaticResource x:Key="border_green" ResourceKey="KlaBorderBrush" />
+    <SolidColorBrush x:Key="header_background" Color="{Binding Color, Source={StaticResource KlaWindowBrush}}" />
+    <SolidColorBrush x:Key="text_white" Color="{Binding Color, Source={StaticResource KlaTextBrush}}" />
+    <SolidColorBrush x:Key="text_gray" Color="{Binding Color, Source={StaticResource KlaTextMutedBrush}}" />
+    <SolidColorBrush x:Key="text_green" Color="{Binding Color, Source={StaticResource KlaBorderBrush}}" />
+    <SolidColorBrush x:Key="button_fg_normal" Color="{Binding Color, Source={StaticResource KlaTextOnAccentBrush}}" />
+    <SolidColorBrush x:Key="button_bg_normal" Color="{Binding Color, Source={StaticResource KlaAccentBrush}}" />
+    <SolidColorBrush x:Key="button_bg_hover" Color="{Binding Color, Source={StaticResource KlaAccentHoverBrush}}" />
+    <SolidColorBrush x:Key="border_green_dark" Color="{Binding Color, Source={StaticResource KlaBorderStrongBrush}}" />
+    <SolidColorBrush x:Key="border_green" Color="{Binding Color, Source={StaticResource KlaBorderBrush}}" />
 </ResourceDictionary>

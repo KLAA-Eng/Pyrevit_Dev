@@ -16,7 +16,7 @@
                                         <ColumnDefinition Width="112" />
                                     </Grid.ColumnDefinitions>
                                     <TextBox Text="{Binding ChecklistPath}" IsReadOnly="True" Margin="0,0,6,0" ToolTip="{Binding ChecklistPath}" />
-                                    <Button Grid.Column="1" Content="{StaticResource BrowseLabel}" Style="{StaticResource KlaSmallButtonStyle}" Click="OnBrowseChecklistClick" />
+                                    <Button Grid.Column="1" Content="{StaticResource BrowseLabel}" Style="{StaticResource KlaButtonStyle}" Click="OnBrowseChecklistClick" />
                                 </Grid>
                                 <TextBlock x:Name="ChecklistStatus" Text="{Binding ChecklistStatus}" FontSize="11" Margin="0,7,0,0" TextWrapping="Wrap" />
                             </StackPanel>
@@ -32,7 +32,7 @@
                                         <ColumnDefinition Width="112" />
                                     </Grid.ColumnDefinitions>
                                     <TextBox Text="{Binding SettingsPath}" IsReadOnly="True" Margin="0,0,6,0" ToolTip="{Binding SettingsPath}" />
-                                    <Button Grid.Column="1" Content="{StaticResource BrowseLabel}" Style="{StaticResource KlaSmallButtonStyle}" Click="OnBrowseSettingsClick" />
+                                    <Button Grid.Column="1" Content="{StaticResource BrowseLabel}" Style="{StaticResource KlaButtonStyle}" Click="OnBrowseSettingsClick" />
                                 </Grid>
                                 <TextBlock x:Name="SettingsStatus" Text="{Binding SettingsStatus}" FontSize="11" Margin="0,7,0,0" TextWrapping="Wrap" />
                                 <TextBlock Text="{Binding SeedModelStatus}" Style="{StaticResource KlaMutedTextStyle}" Margin="0,6,0,0" TextWrapping="Wrap" />

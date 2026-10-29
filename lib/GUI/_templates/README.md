@@ -26,6 +26,10 @@ before the body and wires only common chrome. `../window_metadata.py` supplies
 the caller's title and version; `../Resources/KLCodeChrome.xaml` holds the footer links and labels. The body owns layout and declared event names;
 each production controller owns its data, validation and operations. The
 production migration uses these same resources through Python/CLR host adapters.
+`KlaFieldRows` shares Form's four-row naming grid; `KlaFilteredCheckList` shares
+Selection's filter, prompt, expanding list and action rows. Both are
+`ItemsControl` compositions: declare named controls as direct items with their
+`Grid.Row`/`Grid.Column` assignments so controllers retain their namescope.
 Approved vector icons and their attributed sources live in
 [lib/_icons/gui](../../_icons/gui/README.md).
 

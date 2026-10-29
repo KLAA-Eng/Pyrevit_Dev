@@ -5,18 +5,7 @@
         Style="{StaticResource KlaFoundationWindow}">
     <!-- Load with GUI.window_chrome.load_window; only the workflow body belongs here. -->
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
-        <Grid x:Name="window_body">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="{StaticResource KlaFilterRow}"/>
-                <RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="{StaticResource KlaGridSpace4}"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="{StaticResource KlaCompactRow}"/>
-                <RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="{StaticResource KlaControlRow}"/>
-            </Grid.RowDefinitions>
+        <ItemsControl x:Name="window_body" Style="{StaticResource KlaFilteredCheckList}">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaGridSpace16}"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <Image Source="{StaticResource KlaIconSearch}" AutomationProperties.Name="Search" Width="{StaticResource KlaIconSize}" Height="{StaticResource KlaIconSize}" VerticalAlignment="Center" IsHitTestVisible="False"/>
@@ -33,6 +22,6 @@
                 <Button Content="Select None" Click="button_select_none" Style="{StaticResource KlaFoundationButton}"/>
             </StackPanel>
             <Button x:Name="button_main" Grid.Row="8" Content="Select" Click="button_select" Style="{StaticResource KlaFoundationMainButton}" IsDefault="True"/>
-        </Grid>
+        </ItemsControl>
     </ContentControl>
 </Window>

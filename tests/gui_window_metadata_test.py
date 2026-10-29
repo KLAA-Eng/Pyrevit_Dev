@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.join(ROOT, 'lib'))
 from GUI.window_metadata import WindowMetadata
 
 X = '{http://schemas.microsoft.com/winfx/2006/xaml}'
-SYS = '{clr-namespace:System;assembly=mscorlib}'
+SYS = '{clr-namespace:System;assembly=System}'
 
 
 def vectors(family):

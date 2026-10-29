@@ -89,7 +89,7 @@ public sealed class DesignSystemResourceContractTests
     public void ChromeData_HoldsBothFooterDestinationsAndTheDefaultLabels()
     {
         XDocument chrome = LoadXaml("lib/GUI/Resources/KLCodeChrome.xaml");
-        XNamespace sys = "clr-namespace:System;assembly=mscorlib";
+        XNamespace sys = "clr-namespace:System;assembly=System";
         Dictionary<string, string> entries = chrome.Root!.Elements()
             .ToDictionary(e => (string)e.Attribute(Xaml + "Key")!, e => e.Value.Trim());
         Assert.AreEqual("https", new Uri(entries["KlaPrototypeUri"]).Scheme);

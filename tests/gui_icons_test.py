@@ -40,17 +40,19 @@ class GuiIconTests(unittest.TestCase):
         tokens = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeFoundationTokens.xaml').read_text(encoding='utf-8')
         self.assertNotIn('KLCodeIcons.xaml', tokens, 'icons are merged by the foundation, not by the tokens')
 
-    def test_wordmark_geometry_is_generated_from_the_svg_at_the_origin(self):
+    def test_wordmark_keeps_svg_geometry_separate_from_the_drawing_offset(self):
         self.assertEqual(icons.generate_wordmark(), icons.WORDMARK_XAML.read_text(encoding='utf-8'))
         dictionary = ET.fromstring(icons.generate_wordmark())
         keys = [node.attrib.get(X + 'Key') for node in dictionary]
-        self.assertEqual(['KlaWordmarkSlashGeometry', 'KlaWordmarkLettersGeometry', 'KlaWordmarkCanvasWidth', 'KlaWordmarkCanvasHeight'], keys)
+        self.assertEqual(['KlaWordmarkSlashGeometry', 'KlaWordmarkLettersGeometry', 'KlaWordmarkOrigin', 'KlaWordmarkCanvasWidth', 'KlaWordmarkCanvasHeight'], keys)
         for geo in dictionary.findall(P + 'PathGeometry'):
-            shift = geo.find('.//' + P + 'TranslateTransform')
-            self.assertEqual(('-32', '-64'), (shift.attrib['X'], shift.attrib['Y']))
+            self.assertIsNone(geo.find(P + 'PathGeometry.Transform'))
+        shift = dictionary.find(P + 'TranslateTransform')
+        self.assertEqual(('-32', '-64'), (shift.attrib['X'], shift.attrib['Y']))
         primitives = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeSharedPrimitives.xaml').read_text(encoding='utf-8')
         self.assertIn('Data="{StaticResource KlaWordmarkSlashGeometry}"', primitives)
         self.assertIn('Fill="{StaticResource KlaBorderBrush}"', primitives)
+        self.assertEqual(2, primitives.count('RenderTransform="{StaticResource KlaWordmarkOrigin}"'))
         self.assertNotIn('#33714F', primitives)
 
     def test_path_points_tracks_relative_commands(self):

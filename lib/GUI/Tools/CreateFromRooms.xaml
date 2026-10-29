@@ -4,14 +4,7 @@
         WindowStartupLocation="CenterScreen" ShowInTaskbar="True"
         Style="{StaticResource KlaFoundationWindow}">
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
-        <Grid x:Name="window_body">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="{StaticResource KlaFilterRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace4}"/>
-                <RowDefinition Height="*"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="{StaticResource KlaControlRow}"/>
-            </Grid.RowDefinitions>
+        <ItemsControl x:Name="window_body" Style="{StaticResource KlaFilteredCheckList}">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaGridSpace16}"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <Image x:Name="filter_icon" Source="{StaticResource KlaIconSearch}" AutomationProperties.Name="Search" Width="{StaticResource KlaIconSize}" Height="{StaticResource KlaIconSize}" VerticalAlignment="Center" IsHitTestVisible="False"/>
@@ -35,6 +28,6 @@
                 </Border>
             </StackPanel>
             <Button x:Name="button_main" Grid.Row="8" Content="Create" Click="button_run" Style="{StaticResource KlaFoundationMainButton}" IsDefault="True"/>
-        </Grid>
+        </ItemsControl>
     </ContentControl>
 </Window>

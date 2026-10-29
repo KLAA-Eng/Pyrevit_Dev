@@ -1,5 +1,10 @@
 # GUI architecture review — Windows handoff
 
+This is the original handoff snapshot. The Windows follow-up is recorded in
+[2026-10-29 Windows verification](reviews/design-system/2026-10-29-gui-architecture-windows.md);
+the [consolidation plan](../plans/custom-window-consolidation.md) owns current
+status. The owner will perform the actual Revit review.
+
 Snapshot taken 2026-10-29 on branch `dev.GUI-Clean` at `7e01901` (eight commits after the migration verification
 `0f8c599`). Everything below was written and tested on macOS: the CPython suite (351 tests, one macOS-only failure
 in `carbon_gwp_command_test`) and the C# source-contract project (17 tests) pass. **Nothing has been rendered in

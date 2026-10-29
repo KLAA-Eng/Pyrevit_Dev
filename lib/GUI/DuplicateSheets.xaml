@@ -19,14 +19,7 @@
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
                         <Label Content="View Name" Style="{StaticResource KlaFieldLabel}" Margin="0,0,0,8"/>
-                        <Grid HorizontalAlignment="Left">
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}"/><ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}"/></Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/>
-                            </Grid.RowDefinitions>
+                        <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label Grid.Row="0" Content="Find:" Target="{Binding ElementName=UI_view_find}" Style="{StaticResource KlaCompactFieldLabel}"/>
                             <TextBox x:Name="UI_view_find" Grid.Row="0" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="View name find"/>
                             <Label Grid.Row="2" Content="Replace:" Target="{Binding ElementName=UI_view_replace}" Style="{StaticResource KlaCompactFieldLabel}"/>
@@ -35,18 +28,11 @@
                             <TextBox x:Name="UI_view_prefix" Grid.Row="4" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="View name prefix"/>
                             <Label Grid.Row="6" Content="Suffix:" Target="{Binding ElementName=UI_view_suffix}" Style="{StaticResource KlaCompactFieldLabel}"/>
                             <TextBox x:Name="UI_view_suffix" Grid.Row="6" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="View name suffix"/>
-                        </Grid>
+                        </ItemsControl>
                     </StackPanel>
                     <StackPanel Grid.Column="2">
                         <Label Content="Sheet Number" Style="{StaticResource KlaFieldLabel}" Margin="0,0,0,8"/>
-                        <Grid HorizontalAlignment="Left">
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}"/><ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}"/></Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/>
-                            </Grid.RowDefinitions>
+                        <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label Grid.Row="0" Content="Find:" Target="{Binding ElementName=UI_sheet_number_find}" Style="{StaticResource KlaCompactFieldLabel}"/>
                             <TextBox x:Name="UI_sheet_number_find" Grid.Row="0" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet number find"/>
                             <Label Grid.Row="2" Content="Replace:" Target="{Binding ElementName=UI_sheet_number_replace}" Style="{StaticResource KlaCompactFieldLabel}"/>
@@ -55,18 +41,11 @@
                             <TextBox x:Name="UI_sheet_number_prefix" Grid.Row="4" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet number prefix"/>
                             <Label Grid.Row="6" Content="Suffix:" Target="{Binding ElementName=UI_sheet_number_suffix}" Style="{StaticResource KlaCompactFieldLabel}"/>
                             <TextBox x:Name="UI_sheet_number_suffix" Grid.Row="6" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet number suffix"/>
-                        </Grid>
+                        </ItemsControl>
                     </StackPanel>
                     <StackPanel Grid.Column="4">
                         <Label Content="Sheet Name" Style="{StaticResource KlaFieldLabel}" Margin="0,0,0,8"/>
-                        <Grid HorizontalAlignment="Left">
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}"/><ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}"/></Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/>
-                            </Grid.RowDefinitions>
+                        <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label Grid.Row="0" Content="Find:" Target="{Binding ElementName=UI_sheet_name_find}" Style="{StaticResource KlaCompactFieldLabel}"/>
                             <TextBox x:Name="UI_sheet_name_find" Grid.Row="0" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet name find"/>
                             <Label Grid.Row="2" Content="Replace:" Target="{Binding ElementName=UI_sheet_name_replace}" Style="{StaticResource KlaCompactFieldLabel}"/>
@@ -75,7 +54,7 @@
                             <TextBox x:Name="UI_sheet_name_prefix" Grid.Row="4" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet name prefix"/>
                             <Label Grid.Row="6" Content="Suffix:" Target="{Binding ElementName=UI_sheet_name_suffix}" Style="{StaticResource KlaCompactFieldLabel}"/>
                             <TextBox x:Name="UI_sheet_name_suffix" Grid.Row="6" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet name suffix"/>
-                        </Grid>
+                        </ItemsControl>
                     </StackPanel>
                 </Grid>
             </Border>

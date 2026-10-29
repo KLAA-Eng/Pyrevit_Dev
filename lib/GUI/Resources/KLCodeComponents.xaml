@@ -29,6 +29,38 @@
     <Style x:Key="KlaCompactFieldInput" TargetType="TextBox" BasedOn="{StaticResource KlaFoundationInput}">
         <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}"/>
     </Style>
+    <!-- UIElement items remain their own containers. Names and event handlers
+         stay in the window's namescope; only the repeated layout is shared. -->
+    <Style x:Key="KlaFieldRows" TargetType="ItemsControl">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="ItemsPanel"><Setter.Value><ItemsPanelTemplate>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}"/>
+                    <ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                    <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                    <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                    <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/>
+                </Grid.RowDefinitions>
+            </Grid>
+        </ItemsPanelTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="KlaFilteredCheckList" TargetType="ItemsControl">
+        <Setter Property="ItemsPanel"><Setter.Value><ItemsPanelTemplate>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="{StaticResource KlaFilterRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                    <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace4}"/>
+                    <RowDefinition Height="*"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                    <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                    <RowDefinition Height="{StaticResource KlaControlRow}"/>
+                </Grid.RowDefinitions>
+            </Grid>
+        </ItemsPanelTemplate></Setter.Value></Setter>
+    </Style>
     <Style x:Key="KlaInfoText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
@@ -338,10 +370,10 @@
     <Style TargetType="CheckBox" BasedOn="{StaticResource KlaFoundationCheckBox}"/>
 
     <!-- Compiled-host brush names (formerly KLCodeCompiledTokens.xaml): aliases of the shared brushes, so one token chain serves both hosts. -->
-    <StaticResource x:Key="KlaPanelBrush" ResourceKey="KlaComponentSurfaceBrush"/>
-    <StaticResource x:Key="KlaMutedTextBrush" ResourceKey="KlaMutedBrush"/>
-    <StaticResource x:Key="KlaSubtleTextBrush" ResourceKey="KlaMutedBrush"/>
-    <StaticResource x:Key="KlaBlockingBrush" ResourceKey="KlaErrorBrush"/>
+    <SolidColorBrush x:Key="KlaPanelBrush" Color="{Binding Color, Source={StaticResource KlaComponentSurfaceBrush}}"/>
+    <SolidColorBrush x:Key="KlaMutedTextBrush" Color="{Binding Color, Source={StaticResource KlaMutedBrush}}"/>
+    <SolidColorBrush x:Key="KlaSubtleTextBrush" Color="{Binding Color, Source={StaticResource KlaMutedBrush}}"/>
+    <SolidColorBrush x:Key="KlaBlockingBrush" Color="{Binding Color, Source={StaticResource KlaErrorBrush}}"/>
 
     <!-- Role-named aliases (the names new XAML should use); the KlaFoundation* keys stay for existing consumers. -->
     <Style x:Key="KlaWindow" TargetType="Window" BasedOn="{StaticResource KlaFoundationWindow}"/>

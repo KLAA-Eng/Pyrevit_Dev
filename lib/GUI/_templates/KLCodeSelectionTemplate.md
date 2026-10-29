@@ -5,9 +5,9 @@ See the [template family](README.md) for the other reference windows.
 This is the selection reference for the approved custom-window foundation.
 Open **Template - Selection** in UI Gallery to review it with fictional data.
 The [consolidation plan](../../../docs/plans/custom-window-consolidation.md)
-owns delivery status; [DESIGNSYSTEM.md](../../../docs/DESIGNSYSTEM.md#custom-window-foundation)
-owns the shared design rules. Other production windows still use their existing
-resources and layouts until the owner reviews this reference.
+owns delivery status; [DESIGNSYSTEM.md](../../../docs/DESIGNSYSTEM.md)
+owns the shared design rules. Production windows now use the same shared
+resources; live Revit acceptance remains the owner's review.
 
 ## Responsibilities
 
@@ -15,13 +15,15 @@ resources and layouts until the owner reviews this reference.
 | --- | --- |
 | `KLCodeSelectionTemplate.xaml` | Workflow body: search, sample list, selection controls and centered action arrangement |
 | `../Resources/KLCodeFoundation.xaml` | Reusable `KlaWindowShell`, header/footer composition, and explicitly named control styles |
-| `../Resources/KLCodeComponents.xaml` | Shared extended components; loader entry dictionary that merges Foundation |
-| `../Resources/KLCodeFoundationTokens.xaml` | Typed WPF spacing, typography, sizes, readable semantic brushes, and `KlaIconSearch` |
-| `../window_metadata.py` | Caller title/pure version and the two shared footer destinations; host-independent |
+| `../Resources/KLCodeComponents.xaml` | Shared extended components, including `KlaFilteredCheckList`; loader entry dictionary that merges Foundation |
+| `../Resources/KLCodeFoundationTokens.xaml` | Typed WPF spacing, typography, sizes and readable semantic brushes |
+| `../Resources/KLCodeFoundation.xaml` icon block | Generated `KlaIconSearch` image from the approved geometry |
+| `../window_metadata.py` | Caller title/pure version; host-independent |
+| `../Resources/KLCodeChrome.xaml` | Shared footer destinations and default labels |
 | `../window_chrome.py` | Opt-in Python loading and shared close/drag/navigation events; does not show the window |
 
-The foundation reuses the legacy dictionary's palette, vector wordmark and
-scrollbars. It does not edit that dictionary or change existing consumers.
+The foundation merges the shared palette, generated vector wordmark and
+scrollbars.
 `Tag` on `window_shell` is reserved for `WindowMetadata`; the body retains its
 own `DataContext`. Do not copy header/footer markup into a new form.
 
@@ -35,7 +37,7 @@ Values are WPF device-independent units, not physical screen pixels.
 | Header and footer | 24 high each |
 | Header | 86 / flexible / 86 columns; existing 70 x 12 outlined wordmark, centered title, Close button |
 | Title | Segoe UI 14; uses the available center lane, with ellipsis and no tooltip |
-| Close | 60 x 18, Segoe UI 10; one-unit upward optical text adjustment in the shared style |
+| Close | 60 x 18, Segoe UI 10; measured glyph placement through `KlaCloseGlyphLift` |
 | Body | 16 horizontal padding; 8 below header and last action; list uses remaining height rather than a fixed height |
 | Search | 24-high visible field, matching Create from rooms; 14-unit text and existing 16-unit icon |
 | Typography | Segoe UI 12 body/controls; 14 main action |
@@ -45,7 +47,7 @@ Values are WPF device-independent units, not physical screen pixels.
 | Row interaction | Native WPF row template, matching KL&A list selection's blue hover/selection |
 | Select All / Select None | 104 x 28 each, 8 apart, centered |
 | Main action | 216 x 32, centered, 8 below the pair, 8 before footer |
-| Footer | Prototype left, pure caller version such as v0.5 center, Outreach right; same green/gray as Create from rooms |
+| Footer | Prototype left, pure caller version such as v0.5 center, Outreach right; muted text with white hover/focus |
 
 The pair still matches the main action width: 104 + 8 + 104 = 216. Main and
 secondary actions retain their arrangement. Long item names wrap and scroll;
@@ -64,6 +66,11 @@ few rows leave unused vertical space because the reference remains 432 x 576.
 Use a normal WPF `Window` or a compatible host window. Supply a body XAML
 following this template, keeping `window_shell` as its named ContentControl.
 The loader merges the foundation before resolving XAML static resources.
+
+The named `window_body` is an `ItemsControl` using `KlaFilteredCheckList`.
+Its direct items occupy shared Grid rows 0/2/4/6/8 (filter, prompt, list,
+secondary actions, main action); their names and handlers remain in the
+window's namescope. Keep the ListBox item template and workflow events local.
 
 ```python
 from System.Windows import Window

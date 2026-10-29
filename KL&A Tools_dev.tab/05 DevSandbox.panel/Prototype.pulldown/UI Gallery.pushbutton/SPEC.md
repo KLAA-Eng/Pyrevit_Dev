@@ -113,8 +113,10 @@ their Status cells; blocked rows remain unavailable for checking.
 The nine Python tool previews now load their migrated source bodies through the
 shared loader. Their canonical controls, operations and lifecycle remain
 caller-owned. Caller discovery recognizes aliased `GUI.window_chrome.load_window`
-calls, preserving tool lists after migration. Gallery's own catalog shell and
-static fixture remain tooling exceptions. See the
+calls, preserving tool lists after migration. Gallery also uses `load_window`,
+the shared shell, `KlaDataGrid` and compact dropdown styles. Its header/footer
+receive this command's title and version, and Escape follows the shared Close
+policy. The static fixture retains its standalone test chrome. See the
 [template guide](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.md) and
 [consolidation plan](../../../../docs/plans/custom-window-consolidation.md).
 

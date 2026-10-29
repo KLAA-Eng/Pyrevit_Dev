@@ -12,8 +12,8 @@ import math
 from System import Uri
 from System.Windows import Window, Size, Rect, Point, ResourceDictionary, ResizeMode, TextWrapping
 from System.Windows.Automation import AutomationProperties
-from System.Windows.Controls import (Button, ContentControl, Image, Label,
-                                     ScrollViewer, StackPanel, TextBlock,
+from System.Windows.Controls import (Border, Button, ContentControl, Image, Label,
+                                     ScrollBarVisibility, ScrollViewer, StackPanel, TextBlock,
                                      TextBox, WrapPanel)
 from System.Windows.Media import Brushes, DrawingImage, Geometry
 from System.Windows.Media.Imaging import BitmapSource
@@ -242,5 +242,87 @@ def validate_gui_icons():
         owner.Close()
 
 
+def validate_scrollbars():
+    from System.Windows.Controls.Primitives import ScrollBar
+    from GUI.window_chrome import shared_resources
+
+    owner = Window()
+    owner.Resources.MergedDictionaries.Add(shared_resources())
+    viewer = ScrollViewer()
+    viewer.HorizontalScrollBarVisibility = viewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible
+    content = Border()
+    content.Width, content.Height = 1200, 600
+    content.Background = owner.FindResource('KlaWindowBrush')
+    viewer.Content, owner.Content = content, viewer
+    try:
+        viewer.Measure(Size(320, 160))
+        viewer.Arrange(Rect(0, 0, 320, 160))
+        settle_layout(viewer)
+        for bar in (part for part in descendants(viewer) if isinstance(part, ScrollBar)):
+            track = bar.Template.FindName('PART_Track', bar)
+            horizontal = str(bar.Orientation) == 'Horizontal'
+            assert track.Orientation == bar.Orientation
+            assert track.IsDirectionReversed == (not horizontal)
+            if horizontal:
+                assert track.Thumb.ActualWidth > track.Thumb.ActualHeight, (track.Thumb.ActualWidth, track.Thumb.ActualHeight)
+            else:
+                assert track.Thumb.ActualHeight > track.Thumb.ActualWidth
+        viewer.ScrollToRightEnd()
+        viewer.ScrollToBottom()
+        settle_layout(viewer)
+        assert viewer.HorizontalOffset == viewer.ScrollableWidth > 0
+        assert viewer.VerticalOffset == viewer.ScrollableHeight > 0
+        if output_directory:
+            render_content(owner, os.path.join(output_directory, 'scrollbars-overflow.png'), 320, 160)
+        print('Scrollbars: horizontal/vertical track orientation, thumb geometry and both overflow ranges passed.')
+    finally:
+        owner.Close()
+
+
+def validate_wordmark():
+    """Compare generated resources with the former inline SVG-path renderer."""
+    from xml.etree import ElementTree
+    from System import Array, Byte
+    from System.Windows.Controls import Canvas, Viewbox
+    from System.Windows.Media import TranslateTransform
+    from GUI.window_chrome import shared_resources
+
+    owner = Window()
+    owner.Resources.MergedDictionaries.Add(shared_resources())
+    actual = ContentControl()
+    actual.Content = 'wordmark'
+    actual.ContentTemplate = owner.FindResource('KLCodeWordmark')
+    expected = Viewbox()
+    expected.Width, expected.Height, expected.SnapsToDevicePixels = 70, 12, True
+    canvas = Canvas()
+    canvas.Width, canvas.Height, canvas.ClipToBounds = 961, 138, True
+    expected.Child = canvas
+    svg = ElementTree.parse(os.path.join(repo_root, 'lib', '_logos', 'KLCode_text_1024x256px.svg'))
+    for source, role in zip(svg.iter('{http://www.w3.org/2000/svg}path'), ('KlaBorderBrush', 'KlaTextBrush')):
+        path = Path()
+        path.Data = Geometry.Parse(source.attrib['d'])
+        path.Fill = owner.FindResource(role)
+        path.RenderTransform = TranslateTransform(-32, -64)
+        canvas.Children.Add(path)
+    buffers = []
+    try:
+        for control in (expected, actual):
+            owner.Content = control
+            control.Measure(Size(70, 12))
+            control.Arrange(Rect(0, 0, 70, 12))
+            settle_layout(control)
+            bitmap = RenderTargetBitmap(70, 12, 96, 96, PixelFormats.Pbgra32)
+            bitmap.Render(control)
+            pixels = Array.CreateInstance(Byte, 70 * 12 * 4)
+            bitmap.CopyPixels(pixels, 70 * 4, 0)
+            buffers.append(list(pixels))
+        assert buffers[0] == buffers[1], 'Generated wordmark differs from the former inline renderer.'
+        print('Wordmark: all 840 pixels match the former inline SVG-path renderer.')
+    finally:
+        owner.Close()
+
+
 validate_production_windows()
 validate_gui_icons()
+validate_scrollbars()
+validate_wordmark()

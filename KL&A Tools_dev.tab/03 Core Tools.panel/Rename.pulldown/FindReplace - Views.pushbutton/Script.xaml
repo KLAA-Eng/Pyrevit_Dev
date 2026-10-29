@@ -8,14 +8,7 @@
                 <StackPanel>
                     <Label Content="Renaming Parameters" Style="{StaticResource KlaFoundationPromptLabel}" Margin="0,0,0,8"/>
                     <Border Style="{StaticResource KlaSection}">
-                        <Grid HorizontalAlignment="Left">
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}"/><ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}"/></Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="8"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="8"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="8"/>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/>
-                            </Grid.RowDefinitions>
+                        <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label Content="Find:" Target="{Binding ElementName=input_find}" Style="{StaticResource KlaCompactFieldLabel}"/>
                             <TextBox x:Name="input_find" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Find view name text"/>
                             <Label Grid.Row="2" Content="Replace:" Target="{Binding ElementName=input_replace}" Style="{StaticResource KlaCompactFieldLabel}"/>
@@ -24,7 +17,7 @@
                             <TextBox x:Name="input_prefix" Grid.Row="4" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="View name prefix"/>
                             <Label Grid.Row="6" Content="Suffix:" Target="{Binding ElementName=input_suffix}" Style="{StaticResource KlaCompactFieldLabel}"/>
                             <TextBox x:Name="input_suffix" Grid.Row="6" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="View name suffix"/>
-                        </Grid>
+                        </ItemsControl>
                     </Border>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
                         <Button Click="button_uppercase" Content="Uppercase" Style="{StaticResource KlaSecondaryButton}" Margin="{StaticResource KlaPairGap}"/>

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -71,6 +72,28 @@ internal static class Program
         double chromeRow = ((GridLength)window.FindResource("KlaChromeRow")).Value;
         Require(header.ActualHeight == chromeRow && footerGrid.ActualHeight == chromeRow, identity + " chrome heights");
         Require(window.FindResource("KlaIconSearch") is DrawingImage, identity + " canonical vector search");
+        foreach (string[] pair in new[]
+        {
+            new[] { "header_background", "KlaWindowBrush" },
+            new[] { "border_green", "KlaBorderBrush" },
+            new[] { "KlaPanelBrush", "KlaComponentSurfaceBrush" },
+            new[] { "KlaSubtleTextBrush", "KlaMutedBrush" },
+            new[] { "KlaBlockingBrush", "KlaErrorBrush" },
+        })
+        {
+            Require(((SolidColorBrush)window.FindResource(pair[0])).Color ==
+                ((SolidColorBrush)window.FindResource(pair[1])).Color,
+                identity + " brush alias " + pair[0]);
+        }
+        Button close = (Button)shell.Template.FindName("PART_Close", shell);
+        Require((string)close.Content == (string)window.FindResource("CloseLabel"), identity + " localized Close");
+        foreach (string role in new[] { "Prototype", "Outreach" })
+        {
+            Hyperlink link = (Hyperlink)shell.Template.FindName("PART_" + role, shell);
+            Require(link.NavigateUri == (Uri)window.FindResource("Kla" + role + "Uri"), identity + " footer URI " + role);
+            Require(new TextRange(link.ContentStart, link.ContentEnd).Text ==
+                (string)window.FindResource(role + "Label"), identity + " localized footer " + role);
+        }
         Border infoChip = new Border { Style = (Style)window.FindResource("KlaInfoChipStyle") };
         Require(((SolidColorBrush)infoChip.BorderBrush).Color ==
             ((SolidColorBrush)window.FindResource("KlaInfoBrush")).Color,

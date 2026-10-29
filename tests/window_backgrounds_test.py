@@ -26,10 +26,9 @@ ALL_WINDOW_XAML_PATHS = WINDOW_XAML_PATHS + (
     TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml',
 )
 
-# The UI Gallery and its static preview fixture are DevSandbox tooling, not
-# user-facing KL&A custom windows. The main template itself is the source
-# visual authority rather than an additional production window.
+# The static preview fixture deliberately retains its standalone test chrome.
 KL_A_TEMPLATE_WINDOW_XAML_PATHS = (
+    TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml',
     'lib/GUI/SelectFromDict.xaml',
     'lib/GUI/CustomAlert.xaml',
     'lib/GUI/DuplicateSheets.xaml',
@@ -75,14 +74,8 @@ class WindowBackgroundTests(unittest.TestCase):
             with open(xaml_path, 'r', encoding='utf-8') as xaml_file:
                 xaml = xaml_file.read()
 
-            if relative_path in KL_A_TEMPLATE_WINDOW_XAML_PATHS:
-                self.assertEqual('{StaticResource KlaFoundationWindow}', root.attrib.get('Style'), relative_path)
-                self.assertIn('Style="{StaticResource KlaWindowShell}"', xaml)
-            else:
-                self.assertEqual('None', root.attrib.get('WindowStyle'), relative_path)
-                self.assertEqual('True', root.attrib.get('AllowsTransparency'), relative_path)
-                self.assertIn('MouseDown="header_drag"', xaml, relative_path)
-                self.assertIn('x:Name="main_title"', xaml, relative_path)
+            self.assertEqual('{StaticResource KlaFoundationWindow}', root.attrib.get('Style'), relative_path)
+            self.assertIn('Style="{StaticResource KlaWindowShell}"', xaml)
             self.assertNotIn('#F5F5F5', xaml, relative_path)
             self.assertNotIn('#E8E8E8', xaml, relative_path)
             self.assertNotIn('Foreground="Red"', xaml, relative_path)

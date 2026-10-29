@@ -31,8 +31,8 @@
     <DataTemplate x:Key="KLCodeWordmark">
         <Viewbox Width="70" Height="12" Stretch="Uniform" SnapsToDevicePixels="True">
             <Canvas Width="{StaticResource KlaWordmarkCanvasWidth}" Height="{StaticResource KlaWordmarkCanvasHeight}" ClipToBounds="True">
-                <Path Fill="{StaticResource KlaBorderBrush}" Data="{StaticResource KlaWordmarkSlashGeometry}" />
-                <Path Fill="{StaticResource KlaTextBrush}" Data="{StaticResource KlaWordmarkLettersGeometry}" />
+                <Path Fill="{StaticResource KlaBorderBrush}" Data="{StaticResource KlaWordmarkSlashGeometry}" RenderTransform="{StaticResource KlaWordmarkOrigin}" />
+                <Path Fill="{StaticResource KlaTextBrush}" Data="{StaticResource KlaWordmarkLettersGeometry}" RenderTransform="{StaticResource KlaWordmarkOrigin}" />
             </Canvas>
         </Viewbox>
     </DataTemplate>

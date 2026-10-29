@@ -16,14 +16,7 @@
             </Grid.RowDefinitions>
             <Label x:Name="form_prompt" Content="Edit Naming Rules" Target="{Binding ElementName=input_find}" Style="{StaticResource KlaFoundationPromptLabel}"/>
             <Border x:Name="naming_group" Grid.Row="2" Style="{StaticResource KlaSection}">
-                <Grid HorizontalAlignment="Left">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}"/><ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}"/></Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/>
-                    </Grid.RowDefinitions>
+                <ItemsControl Style="{StaticResource KlaFieldRows}">
                     <Label Content="Find:" Target="{Binding ElementName=input_find}" Style="{StaticResource KlaCompactFieldLabel}"/>
                     <TextBox x:Name="input_find" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Find text"/>
                     <Label Grid.Row="2" Content="Replace:" Target="{Binding ElementName=input_replace}" Style="{StaticResource KlaCompactFieldLabel}"/>
@@ -32,7 +25,7 @@
                     <TextBox x:Name="input_prefix" Grid.Row="4" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Name prefix"/>
                     <Label Grid.Row="6" Content="Suffix:" Target="{Binding ElementName=input_suffix}" Style="{StaticResource KlaCompactFieldLabel}"/>
                     <TextBox x:Name="input_suffix" Grid.Row="6" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Name suffix"/>
-                </Grid>
+                </ItemsControl>
             </Border>
             <Border Grid.Row="4" Style="{StaticResource KlaBanner}">
                 <TextBlock x:Name="form_feedback" Style="{StaticResource KlaInfoText}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite"/>

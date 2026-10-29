@@ -11,14 +11,7 @@
                         <StackPanel>
                             <Label Content="Sheet Number" Style="{StaticResource KlaFoundationPromptLabel}" Margin="0,0,0,8"/>
                             <Border Style="{StaticResource KlaSection}">
-                                <Grid HorizontalAlignment="Left">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}"/><ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}"/></Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="8"/>
-                                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="8"/>
-                                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="8"/>
-                                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/>
-                                    </Grid.RowDefinitions>
+                                <ItemsControl Style="{StaticResource KlaFieldRows}">
                                     <Label Content="Find:" Target="{Binding ElementName=input_sheet_number_find}" Style="{StaticResource KlaCompactFieldLabel}"/>
                                     <TextBox x:Name="input_sheet_number_find" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Find sheet number text"/>
                                     <Label Grid.Row="2" Content="Replace:" Target="{Binding ElementName=input_sheet_number_replace}" Style="{StaticResource KlaCompactFieldLabel}"/>
@@ -27,20 +20,13 @@
                                     <TextBox x:Name="input_sheet_number_prefix" Grid.Row="4" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet number prefix"/>
                                     <Label Grid.Row="6" Content="Suffix:" Target="{Binding ElementName=input_sheet_number_suffix}" Style="{StaticResource KlaCompactFieldLabel}"/>
                                     <TextBox x:Name="input_sheet_number_suffix" Grid.Row="6" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet number suffix"/>
-                                </Grid>
+                                </ItemsControl>
                             </Border>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
                             <Label Content="Sheet Name" Style="{StaticResource KlaFoundationPromptLabel}" Margin="0,0,0,8"/>
                             <Border Style="{StaticResource KlaSection}">
-                                <Grid HorizontalAlignment="Left">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}"/><ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}"/></Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="8"/>
-                                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="8"/>
-                                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/><RowDefinition Height="8"/>
-                                        <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/>
-                                    </Grid.RowDefinitions>
+                                <ItemsControl Style="{StaticResource KlaFieldRows}">
                                     <Label Content="Find:" Target="{Binding ElementName=input_sheet_name_find}" Style="{StaticResource KlaCompactFieldLabel}"/>
                                     <TextBox x:Name="input_sheet_name_find" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Find sheet name text"/>
                                     <Label Grid.Row="2" Content="Replace:" Target="{Binding ElementName=input_sheet_name_replace}" Style="{StaticResource KlaCompactFieldLabel}"/>
@@ -49,7 +35,7 @@
                                     <TextBox x:Name="input_sheet_name_prefix" Grid.Row="4" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet name prefix"/>
                                     <Label Grid.Row="6" Content="Suffix:" Target="{Binding ElementName=input_sheet_name_suffix}" Style="{StaticResource KlaCompactFieldLabel}"/>
                                     <TextBox x:Name="input_sheet_name_suffix" Grid.Row="6" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet name suffix"/>
-                                </Grid>
+                                </ItemsControl>
                             </Border>
                         </StackPanel>
                     </Grid>

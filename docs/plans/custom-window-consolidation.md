@@ -38,10 +38,10 @@ host/build limits are recorded in the
 | GUI-05 | Migrate other Python custom windows | Implemented; locally verified | All nine tool windows use shared shell/components; 45 actual WPF state layouts and focused workflow contracts pass; [migration evidence](../knowledge/reviews/design-system/2026-10-29-production-migration.md) |
 | GUI-06 | Adopt foundation in compiled WPF adapters/windows | Source implemented; runtime layout verified; host build limitation recorded | All five classes construct on net48/net8.0-windows using canonical linked resources; full Family Studio 2025 build blocked by installed API/System.Runtime mismatch; packaged DLLs unchanged; compiled Gallery previews remain deferred |
 | GUI-07 | Select additional in-window artwork | Owner approved; implemented | 17 pinned Lucide roles under lib/_icons/gui; 16-unit default, 1.5 stroke, semantic geometry/ImageSource keys, source/license attribution and generation check |
-| GUI-08 | Live pyRevit/Revit acceptance | Pending host availability | Real ownership, keyboard/focus, drag, footer navigation, DPI/work-area and accessibility checks |
+| GUI-08 | Live pyRevit/Revit acceptance | Pending owner review | Owner took the actual Revit review on 2026-10-29; [checklist and Windows evidence](../knowledge/reviews/design-system/2026-10-29-gui-architecture-windows.md) |
 | GUI-09 | Review remaining custom-window components and explain implementation | Reviewed; five template additions selected | [2026-10-28 review](../knowledge/reviews/design-system/2026-10-28-custom-window-components-review.md): 19 remaining windows at its baseline, migration risks and candidate primitives; Close label corrected; no production migration |
 | GUI-10 | Create five shared reference templates | Implemented; locally verified | Owner approved all five on 2026-10-28; [family guide](../../lib/GUI/_templates/README.md), [verification](../knowledge/reviews/design-system/2026-10-28-template-family.md) |
-| GUI-12 | Architecture-review follow-ups | Implemented on dev.GUI-Clean; WPF render pending | Shell correctness (db919d4), dead weight (53dd182), template pass (d9830dc), tokens and scale lint (c7f1160), icons and wordmark (4283862), chrome data (28c96f7), contrast / aliases / caching / docs (this commit); `check_ui_scale.py` reports consumer margins; the review page lists what remains |
+| GUI-12 | Architecture-review follow-ups | Source cleanup complete; Windows checks pass | Fixed URI assembly, compiled brush aliases, stale Browse style and Close placement; extracted seven naming groups/four filtered lists; Gallery uses shared shell; generated wordmark matches former renderer pixel for pixel. [Evidence and remaining owner decisions](../knowledge/reviews/design-system/2026-10-29-gui-architecture-windows.md). GUI-08 remains separate. |
 | GUI-11 | Refine template elements with owner using grilling | Settled choices implemented; locally verified | Selection baseline retained; accepted Form, Message, Options, Review and icon choices implemented; final owner/live-host acceptance remains pending |
 
 ## Template refinement interview — 2026-10-28
@@ -146,11 +146,11 @@ existing authorization:
    adapters; build supported targets and retain honest matching-host limits.
 
 Current inventory is 21 Window sources: five references, nine Python tool
-windows, five compiled windows, and Gallery/PreviewFixture tooling exceptions.
+windows, five compiled windows, the shared-shell Gallery and the PreviewFixture tooling exception.
 The nine Python and five compiled windows are the production/tool migration
 scope. Gallery remains the review harness; its previews and source/caller
-inventory must follow migrated sources. Its own shell/fixture are tooling
-exceptions. The absent Model Checker source and five deferred compiled Gallery
+inventory must follow migrated sources. Only its static fixture retains test
+chrome. The absent Model Checker source and five deferred compiled Gallery
 previews are not silently replaced with invented implementations.
 
 Read adjacent command SPECs and trace actual callers before each batch; use the
@@ -165,8 +165,9 @@ publication is part of this request.
 `KLCodeFoundation.xaml` merges event-free `KLCodeSharedPrimitives.xaml` for the
 canonical palette, vector wordmark, footer links and scrollbars. Explicit
 control styles are shared by Python windows and compiled resource aliases.
-Legacy `WPF_styles.xaml` and Recall's docked body/resources remain unchanged for
-excluded consumers. Gallery's own shell/fixture remain tooling exceptions.
+Recall's docked body/resources remain unchanged for excluded consumers. The
+unused legacy `WPF_styles.xaml` was retired in the architecture pass. Gallery
+uses the shared shell; its static fixture retains standalone test chrome.
 
 The Python adapter loads the shell and binds common events without importing
 `GUI.forms`, pyRevit, or an active document. The shell's `Tag` holds

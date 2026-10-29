@@ -50,7 +50,7 @@ def validate_template_family():
                 assert window.naming_group.Padding == token('KlaSectionPadding')
                 for field in fields:
                     assert field.ActualWidth == token('KlaCompactFieldInputColumn').Value and field.ActualHeight == token('KlaCompactFieldHeight'), (state, field.Name, field.ActualWidth, field.ActualHeight)
-                    label = next(control for control in window.naming_group.Child.Children
+                    label = next(control for control in descendants(window.naming_group)
                                  if isinstance(control, Label) and control.Target == field)
                     assert label.ActualWidth == token('KlaCompactFieldLabelColumn').Value and str(label.VerticalContentAlignment) == 'Center'
                     assert label.Content.endswith(':')
