@@ -7,7 +7,7 @@ from System.Windows import Point, RoutedEventArgs, Size, Rect, FlowDirection
 from System.Windows.Controls.Primitives import ButtonBase
 from System.Windows.Controls import TextBlock, CheckBox
 from System.Windows.Controls.Primitives import ScrollBar
-from System.Windows.Media import (VisualTreeHelper, FormattedText, Typeface,
+from System.Windows.Media import (Color, VisualTreeHelper, FormattedText, Typeface,
                                   DrawingVisual, VisualBrush, PixelFormats)
 from System.Windows.Media.Imaging import RenderTargetBitmap, PngBitmapEncoder, BitmapFrame
 from System.IO import FileStream, FileMode
@@ -111,9 +111,9 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
         assert chrome.title.Text == shell.Tag.Title
         assert chrome.title.ToolTip is None and window.ToolTip is None
         assert chrome.version.Text == tool_version
-        assert str(chrome.version.Foreground) == str(token('KlaTextMutedBrush'))
-        assert str(chrome.prototype.Foreground) == str(token('KlaTextMutedBrush'))
-        assert str(chrome.outreach.Foreground) == str(token('KlaTextMutedBrush'))
+        assert chrome.version.Foreground.Color == Color.FromRgb(128, 128, 128)
+        assert chrome.prototype.Foreground.Color == Color.FromRgb(64, 112, 88)
+        assert chrome.outreach.Foreground.Color == Color.FromRgb(64, 112, 88)
         assert window.textbox_filter.ActualHeight == room_filter_height
         assert window.textbox_filter.FontSize == token('KlaTitleFontSize')
         assert window.textbox_filter.TranslatePoint(Point(0, 0), shell).Y == chrome_row + inset.Top

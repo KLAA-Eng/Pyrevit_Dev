@@ -47,7 +47,7 @@ Values are WPF device-independent units, not physical screen pixels.
 | Row interaction | Native WPF row template, matching KL&A list selection's blue hover/selection |
 | Select All / Select None | 104 x 28 each, 8 apart, centered |
 | Main action | 216 x 32, centered, 8 below the pair, 8 before footer |
-| Footer | Prototype left, pure caller version such as v0.5 center, Outreach right; muted text with white hover/focus |
+| Footer | Prototype/Outreach green (`KlaFooterLinkBrush`), pure caller version such as v0.5 gray (`KlaFooterVersionBrush`); links turn white on hover/focus |
 
 The pair still matches the main action width: 104 + 8 + 104 = 216. Main and
 secondary actions retain their arrangement. Long item names wrap and scroll;

@@ -69,6 +69,8 @@ internal static class Program
         FrameworkElement header = (FrameworkElement)shell.Template.FindName("PART_Header", shell);
         FrameworkElement footerGrid = (FrameworkElement)shell.Template.FindName("PART_Footer", shell);
         Require(footer.Text == version, identity + " caller version");
+        Require(((SolidColorBrush)footer.Foreground).Color == Color.FromRgb(128, 128, 128),
+            identity + " original gray footer version");
         double chromeRow = ((GridLength)window.FindResource("KlaChromeRow")).Value;
         Require(header.ActualHeight == chromeRow && footerGrid.ActualHeight == chromeRow, identity + " chrome heights");
         Require(window.FindResource("KlaIconSearch") is DrawingImage, identity + " canonical vector search");
@@ -90,6 +92,8 @@ internal static class Program
         foreach (string role in new[] { "Prototype", "Outreach" })
         {
             Hyperlink link = (Hyperlink)shell.Template.FindName("PART_" + role, shell);
+            Require(((SolidColorBrush)link.Foreground).Color == Color.FromRgb(64, 112, 88),
+                identity + " original green footer " + role);
             Require(link.NavigateUri == (Uri)window.FindResource("Kla" + role + "Uri"), identity + " footer URI " + role);
             Require(new TextRange(link.ContentStart, link.ContentEnd).Text ==
                 (string)window.FindResource(role + "Label"), identity + " localized footer " + role);

@@ -22,10 +22,10 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <!-- Footer links read as muted text (8.5:1) with the underline; the green accent was 2.7:1 as text. Hover turns them KLWhite. -->
+    <!-- Footer links retain the original green and underline; hover/focus is supplied by the foundation link style. -->
     <Style x:Key="KLCodeFooterLink" TargetType="Hyperlink">
         <Setter Property="FontWeight" Value="Medium" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextMutedBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource KlaFooterLinkBrush}" />
     </Style>
     <!-- The wordmark geometry is generated from lib/_logos/KLCode_text_1024x256px.svg (KLCodeWordmark.xaml); the fills are palette roles. -->
     <DataTemplate x:Key="KLCodeWordmark">

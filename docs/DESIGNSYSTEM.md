@@ -40,15 +40,16 @@ palette does not define an orange brush.
 | KLCharcoal | `#1A252B` | Window, chrome, input and list backgrounds; dark ribbon artwork variant |
 | KLGreen | `#33714F` | Input borders, wordmark slash, scrollbar thumbs; green ribbon artwork |
 | KLGreen-dark | `#286048` | Standard action fills, checked fills, section/list/grid borders |
-| KLGreen-secondary | `#407058` | Standard action and dropdown hover fills |
+| KLGreen-secondary | `#407058` | Standard action/dropdown hover fills and footer links |
 | KLWhite | `#E5E4E2` | Body text, ordinary icons, wordmark letters; light ribbon artwork variant |
 | White | `#FFFFFF` | Text on accent-filled buttons and selected segments |
-| Muted text | `#B5C2BD` | Footer links/version, captions and secondary information |
+| Muted text | `#B5C2BD` | Captions and secondary information |
+| Gray | `#808080` | Footer version text |
 | KLOrange | `#FF8000` | Orange ribbon artwork and default DevSandbox prototype icon |
 
-The former `#808080` text is historical. Current muted GUI text uses
-`#B5C2BD`; the compatibility key `text_gray` also resolves to that color.
-Do not restore archived gray/green text values when updating a current window.
+The footer restores its original green links and gray version text through
+dedicated roles. Other muted GUI text uses `#B5C2BD`; the compatibility key
+`text_gray` also resolves to that color. Use the footer roles for footer text.
 
 ## GUI colors and resource keys
 
@@ -61,7 +62,9 @@ brushes. The same dictionary is used by Python and compiled WPF.
 | --- | --- | --- |
 | `KlaWindowBrush` | `#1A252B` | Window/chrome surface, fields and lists |
 | `KlaTextBrush` | `#E5E4E2` | Body text, labels, ordinary icon stroke; footer hover |
-| `KlaTextMutedBrush` | `#B5C2BD` | Footer links and version, secondary captions |
+| `KlaTextMutedBrush` | `#B5C2BD` | Secondary captions |
+| `KlaFooterLinkBrush` | `#407058` | Prototype and Outreach footer links at rest |
+| `KlaFooterVersionBrush` | `#808080` | Centered caller-version footer text |
 | `KlaTextOnAccentBrush` | `#FFFFFF` | Text on accent-filled actions and selected segments |
 | `KlaAccentBrush` | `#286048` | Standard buttons, checked boxes and selected segments |
 | `KlaAccentHoverBrush` | `#407058` | Standard action/dropdown hover background |
@@ -332,7 +335,7 @@ repeated control dimensions belong to shared roles/tokens.
 | Header artwork/title | 70 x 12 wordmark; centered 14-unit title, ellipsis without tooltip |
 | Header Close | 60 x 18, font size 10; glyph placement through `KlaCloseGlyphLift` |
 | Footer columns | 100 / flexible / 100, `KlaFooterSideColumn` |
-| Footer content | Prototype left, caller's pure version center, Outreach right; muted text, white hover/focus |
+| Footer content | Prototype/Outreach links green (`KlaFooterLinkBrush`), caller's pure version gray (`KlaFooterVersionBrush`); links turn white on hover/focus |
 | Body inset | 16 horizontally and 8 below header/above footer, `KlaBodyInset` |
 | Typography | Body 12, title/prompts/main action 14; constant labels use Title Case |
 | Corners/borders | Card 8, input 6, chip 4, checkbox 2; hairline 1 |
@@ -340,6 +343,10 @@ repeated control dimensions belong to shared roles/tokens.
 | List selection | Native WPF ListBoxItem template retains its blue hover/selection; it is an intentional current exception to the green table styling |
 | Scrollbars | Shared vertical/horizontal templates; `KlaList` keeps its vertical bar visible, while `KlaDataGrid` and standalone Recall use Auto where specified |
 | Grid spacing | Header padding 8,6 (`KlaHeaderCellInset`); cell padding 8,4 (`KlaCompactInset`) |
+
+The [current Python footer render](knowledge/reviews/design-system/2026-10-29-footer-color-evidence/selection.png)
+and [compiled footer render](knowledge/reviews/design-system/2026-10-29-footer-color-evidence/compiled-source-picker.png)
+show the owner-requested original green links and gray version text.
 
 Use `KlaFoundationWindow` or its `KlaWindow` alias for the window and
 `KlaWindowShell` for the named `window_shell` ContentControl. The shell supplies

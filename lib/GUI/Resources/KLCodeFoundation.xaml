@@ -620,7 +620,7 @@
                 <Grid x:Name="PART_Footer" Grid.Row="2" Margin="{StaticResource KlaFooterInset}">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaFooterSideColumn}"/><ColumnDefinition Width="*"/><ColumnDefinition Width="{StaticResource KlaFooterSideColumn}"/></Grid.ColumnDefinitions>
                     <TextBlock VerticalAlignment="Center"><Hyperlink x:Name="PART_Prototype" NavigateUri="{StaticResource KlaPrototypeUri}" Style="{StaticResource KlaFoundationLink}"><Run Text="{DynamicResource PrototypeLabel}"/></Hyperlink></TextBlock>
-                    <TextBlock x:Name="PART_Version" Grid.Column="1" Text="{Binding Tag.VersionText, RelativeSource={RelativeSource TemplatedParent}}" AutomationProperties.Name="Tool version" Foreground="{StaticResource KlaTextMutedBrush}" TextAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock x:Name="PART_Version" Grid.Column="1" Text="{Binding Tag.VersionText, RelativeSource={RelativeSource TemplatedParent}}" AutomationProperties.Name="Tool version" Foreground="{StaticResource KlaFooterVersionBrush}" TextAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                     <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"><Hyperlink x:Name="PART_Outreach" NavigateUri="{StaticResource KlaOutreachUri}" Style="{StaticResource KlaFoundationLink}"><Run Text="{DynamicResource OutreachLabel}"/></Hyperlink></TextBlock>
                 </Grid>
             </Grid>
