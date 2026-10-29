@@ -123,12 +123,21 @@ Results:
 - **PDF labels disagree**: two or more different sizes were assigned to one
   member.
 - **Revit size not recognized**: the type name has no steel size to compare.
-- PDF labels with no member nearby (a missing member or loose alignment),
-  counted by size.
+- PDF labels with no member nearby (a missing member or loose alignment).
+  With **Mark labels with no member nearby** ticked (the default), each one
+  gets a review mark in the active view: a circle whose radius is the match
+  distance, plus a line through it along the label's direction. The report
+  lists them by size and position, each linked to select its mark. Unticked,
+  the report counts them by size.
 - Members with no PDF label (not checked), listed up to 200.
 
 The review members are selected in Revit and listed with clickable ids in the
-pyRevit output window. Nothing in the model changes. The check reads the PDF
+pyRevit output window. The only model change is the review marks: detail
+lines in the active view, drawn in the `PDF Overlay Marks` line style
+(orange, weight 6), which the tool creates once. Every check replaces the
+view's marks, and **Clear Marks** removes them. Marks are found by that line
+style, so Visibility/Graphics can hide them, and lines drawn by hand in that
+style are cleared too. Marking and clearing are one undoable transaction. The check reads the PDF
 from its original path at check time. A warning is printed if the PDF page
 shape and the imported image differ by more than 2%.
 

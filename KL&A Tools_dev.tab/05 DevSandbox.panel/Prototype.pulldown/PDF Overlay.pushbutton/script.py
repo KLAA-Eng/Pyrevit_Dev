@@ -70,9 +70,11 @@ try:
         MATCH,
         MISMATCH,
         UNREADABLE,
+        label_mark,
         match_members,
         parse_size,
         size_labels,
+        sort_labels,
     )
     from pdf_overlay.pdftext import PdfError, read_pdf_page_text
 except Exception:
@@ -525,6 +527,11 @@ STATUS_LABELS = {
     UNREADABLE: 'Revit size not recognized',
 }
 MAX_UNLABELLED_ROWS = 200
+# Review marks are detail lines in their own line style, so the tool can find
+# and clear them, and Visibility/Graphics can hide them.
+MARK_STYLE_NAME = 'PDF Overlay Marks'
+MARK_STYLE_RGB = (255, 120, 0)
+MARK_STYLE_WEIGHT = 6
 
 
 def _member_size(doc, element):
@@ -604,6 +611,64 @@ def check_members(uiapp, overlay):
     return result
 
 
+def _mark_style(doc):
+    """Return the review-mark line style, creating it if needed (in a transaction)."""
+    categories = doc.Settings.Categories
+    lines = categories.get_Item(DB.BuiltInCategory.OST_Lines)
+    style = next((sub for sub in lines.SubCategories if sub.Name == MARK_STYLE_NAME), None)
+    if style is None:
+        style = categories.NewSubcategory(lines, MARK_STYLE_NAME)
+        style.LineColor = DB.Color(*MARK_STYLE_RGB)
+        style.SetLineWeight(MARK_STYLE_WEIGHT, DB.GraphicsStyleType.Projection)
+    return style.GetGraphicsStyle(DB.GraphicsStyleType.Projection)
+
+
+def _mark_ids(doc, view):
+    ids = []
+    for curve in DB.FilteredElementCollector(doc, view.Id).OfClass(DB.CurveElement):
+        style = curve.LineStyle
+        if style is not None and style.Name == MARK_STYLE_NAME:
+            ids.append(curve.Id)
+    return ids
+
+
+def update_marks(doc, view, labels, radius):
+    """Replace this view's review marks with one mark per label.
+
+    Returns (cleared count, [(label, [mark element ids])]). An empty labels
+    list only clears.
+    """
+    marks = []
+    transaction = DB.Transaction(doc, 'PDF Overlay - Review Marks')
+    transaction.Start()
+    try:
+        old = _mark_ids(doc, view)
+        if old:
+            doc.Delete(List[DB.ElementId](old))
+        if labels:
+            style = _mark_style(doc)
+            for label in labels:
+                mark = label_mark(label, radius)
+                ids = []
+                try:
+                    circle = DB.Arc.Create(_to_model(view, mark['center']), mark['radius'], 0.0,
+                                           2.0 * math.pi, view.RightDirection, view.UpDirection)
+                    line = DB.Line.CreateBound(_to_model(view, mark['line'][0]),
+                                               _to_model(view, mark['line'][1]))
+                    for curve in (circle, line):
+                        detail = doc.Create.NewDetailCurve(view, curve)
+                        detail.LineStyle = style
+                        ids.append(detail.Id)
+                except Exception:
+                    log('review mark skipped:\n' + traceback.format_exc())
+                marks.append((label, ids))
+        transaction.Commit()
+    except Exception:
+        transaction.RollBack()
+        raise
+    return len(old), marks
+
+
 def _aspect_warning(page_text, page_size):
     width, height = page_text.display_size()
     pdf_aspect = width / height
@@ -614,8 +679,12 @@ def _aspect_warning(page_text, page_size):
     return None
 
 
-def report_member_check(output, overlay, result):
-    """Print the review list to the pyRevit output window; return ids to select."""
+def report_member_check(output, overlay, result, marks=None):
+    """Print the review list to the pyRevit output window; return ids to select.
+
+    marks: [(label, [mark ids])] for the labels with no member nearby, or
+    None when they were not marked.
+    """
     rows = result['rows']
     review = [row for row in rows if row['status'] != MATCH]
     matched = len(rows) - len(review)
@@ -637,7 +706,14 @@ def report_member_check(output, overlay, result):
                          STATUS_LABELS.get(row['status'], row['status'])] for row in review],
             columns=['Member', 'Revit size', 'PDF size', 'Review'],
             title='Members to review')
-    if result['unmatched_labels']:
+    if marks:
+        output.print_table(
+            table_data=[[output.linkify(ids, title=label['text']) if ids else label['text'],
+                         'Orange circle = {:g} ft match window'.format(result['tolerance'][0])]
+                        for label, ids in marks],
+            columns=['PDF size (click to select its mark)', 'Mark'],
+            title='PDF labels with no member nearby (missing members or loose alignment)')
+    elif result['unmatched_labels']:
         counts = {}
         for label in result['unmatched_labels']:
             counts[label['text']] = counts.get(label['text'], 0) + 1
@@ -932,13 +1008,31 @@ class PdfOverlayPalette(my_WPF):
             self.set_status(error)
             return
 
+        draw_marks = bool(self.mark_check.IsChecked)
+
         def action(uiapp):
             result = check_members(uiapp, overlay)
-            review_ids = report_member_check(self.output, overlay, result)
-            uiapp.ActiveUIDocument.Selection.SetElementIds(List[DB.ElementId](review_ids))
-            self.set_status('{} member(s) to review are selected; see the report window.'.format(len(review_ids))
-                            if review_ids else 'No size differences found; see the report window.')
+            uidoc = uiapp.ActiveUIDocument
+            unmatched = sort_labels(result['unmatched_labels']) if draw_marks else []
+            _, marks = update_marks(uidoc.Document, uidoc.ActiveView, unmatched,
+                                    result['tolerance'][0])
+            review_ids = report_member_check(self.output, overlay, result, marks or None)
+            uidoc.Selection.SetElementIds(List[DB.ElementId](review_ids))
+            status = ('{} member(s) to review are selected'.format(len(review_ids))
+                      if review_ids else 'No size differences found')
+            if marks:
+                status += '; {} label(s) with no member are marked in orange'.format(len(marks))
+            self.set_status(status + '. See the report window.')
         self.run(action, 'Reading PDF labels and checking members...')
+
+    def button_clear_marks(self, sender, e):
+        def action(uiapp):
+            uidoc = uiapp.ActiveUIDocument
+            view = _active_overlay_view(uidoc)
+            cleared, _ = update_marks(uidoc.Document, view, [], 0.0)
+            self.set_status('Cleared {} review mark line(s) from this view.'.format(cleared)
+                            if cleared else 'No review marks in this view.')
+        self.run(action, 'Clearing review marks...')
 
     def opacity_changed(self, sender, e):
         self.opacity_text.Text = '{}%'.format(int(self.opacity_slider.Value))

@@ -20,9 +20,11 @@ from lib.pdf_overlay.members import (
     UNREADABLE,
     find_size_spans,
     label_in_view,
+    label_mark,
     match_members,
     parse_size,
     size_labels,
+    sort_labels,
 )
 from lib.pdf_overlay.pdftext import PageText, PdfError, parse_cmap, read_page_text
 
@@ -205,6 +207,21 @@ class MatchMembersTests(unittest.TestCase):
         self.assertEqual([], match_members([skewed], self.members)['rows'])
         result = match_members([skewed], self.members, max_angle=25.0)
         self.assertEqual([1], [row['id'] for row in result['rows']])
+
+
+class LabelMarkTests(unittest.TestCase):
+    def test_mark_circle_is_the_match_window_and_line_follows_label(self):
+        mark = label_mark(label('W12x26', (10.0, 5.0), (0.0, 1.0)), 2.5)
+        self.assertEqual((10.0, 5.0), mark['center'])
+        self.assertEqual(2.5, mark['radius'])
+        self.assertEqual(((10.0, 2.5), (10.0, 7.5)), mark['line'])
+
+    def test_sort_labels_groups_by_size_then_position(self):
+        labels = [label('W16x26', (0.0, 0.0)), label('W12x19', (5.0, 0.0)),
+                  label('W12x19', (1.0, 0.0)), label('W12x19', (1.0, 9.0))]
+        ordered = [(item['text'], item['center']) for item in sort_labels(labels)]
+        self.assertEqual([('W12X19', (1.0, 9.0)), ('W12X19', (1.0, 0.0)),
+                          ('W12X19', (5.0, 0.0)), ('W16X26', (0.0, 0.0))], ordered)
 
 
 if __name__ == '__main__':

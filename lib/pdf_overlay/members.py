@@ -120,6 +120,24 @@ def size_labels(page_text, pose, page_size):
 
 # -- Matching labels to members ----------------------------------------------------
 
+def label_mark(label, radius):
+    """Return the review mark for a label: a circle of radius (the match
+    window) at the label and a diameter along the label's direction."""
+    cx, cy = label['center']
+    dx, dy = label['direction']
+    return {
+        'center': (cx, cy),
+        'radius': radius,
+        'line': ((cx - dx * radius, cy - dy * radius), (cx + dx * radius, cy + dy * radius)),
+    }
+
+
+def sort_labels(labels):
+    """Order labels by size text, then left to right and top to bottom."""
+    return sorted(labels, key=lambda label: (label['text'], round(label['center'][0], 1),
+                                             -round(label['center'][1], 1)))
+
+
 def _segment_distance(point, start, end):
     sx, sy = start
     dx, dy = end[0] - sx, end[1] - sy
