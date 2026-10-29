@@ -7,12 +7,13 @@ tooltip:
     Status: Unreleased
     _____________________________________________________________________
     Description:
-    Prototype: overlays one page of a PDF (for example a RAM member-size map or a printed roof plan) on the active view for member size review. White paper becomes transparent and the linework is tinted so the model shows through. A two-point pick scales, rotates, and moves the page onto the framing, including partial or differently scaled prints. A palette sets opacity and color and shows or hides the overlay. Check Members reads the PDF's size labels (W12x26, HSS5x5x3/8) and lists framing in the view whose Revit size differs. Adds an image to the model.
+    Prototype: overlays one page of a PDF (for example a RAM member-size map or a printed roof plan) on the active view for member size review. White paper becomes transparent and the linework is tinted so the model shows through. A two-point pick scales, rotates, and moves the page onto the framing, including partial or differently scaled prints. A palette sets opacity and color and shows or hides the overlay. Check Members reads the PDF's size labels (W12x26, HSS5x5x3/8) with any studs and camber (W16x26 (14) c=3/4") and lists framing in the view that differs; Revise Selected to PDF changes the selected members' type, studs, and camber to match. Adds an image to the model.
     _____________________________________________________________________
     How-to:
     - Open the plan view, run the command, set the page and DPI, and click Import PDF.
     - Click Align (2 Points) and follow the 4 numbered steps in the palette: a point on the PDF, the same point in the model, then a second far-apart pair. Blue and green circles mark each click until Align finishes.
     - Set Match within (feet and degrees), then click Check Members: members to review are selected and listed in the report window with clickable ids.
+    - Click Revise Selected to PDF to change the selected members (one or many; Check Members selects all to review) to their PDF size, studs, and camber. It asks first; Undo reverses it.
     - With Mark labels ticked, each PDF label with no member nearby gets an orange circle (the match window) in the view; Clear Marks removes them.
     - Reuse an overlay instead of importing again: click its PDF image in the view and the palette works on it. Place in View adds one from another view; Replace PDF loads a revised file, alignment kept; Remove deletes duplicates.
     - DPI up to 600 for small sheets; large sheets are limited to the DPI that fits in memory (about 400 for 36x24).

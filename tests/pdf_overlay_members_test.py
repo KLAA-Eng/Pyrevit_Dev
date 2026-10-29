@@ -14,15 +14,23 @@ if PROJECT_ROOT not in sys.path:
 
 from lib.pdf_overlay.geometry import make_pose
 from lib.pdf_overlay.members import (
+    CAMBER_DIFFER,
     CONFLICT,
     MATCH,
     MISMATCH,
+    STUDS_DIFFER,
     UNREADABLE,
+    choose_type,
+    describe_member,
     find_size_spans,
+    format_inches,
     label_in_view,
     label_mark,
     match_members,
+    parse_extras,
+    parse_inches,
     parse_size,
+    revision_plan,
     size_labels,
     sort_labels,
 )
@@ -207,6 +215,99 @@ class MatchMembersTests(unittest.TestCase):
         self.assertEqual([], match_members([skewed], self.members)['rows'])
         result = match_members([skewed], self.members, max_angle=25.0)
         self.assertEqual([1], [row['id'] for row in result['rows']])
+
+
+class StudsAndCamberTests(unittest.TestCase):
+    def test_parse_extras_reads_common_plan_forms(self):
+        cases = {
+            ' (14) c=3/4"': (14, 0.75),
+            ' [24] c=1"': (24, 1.0),
+            ' (6,8)': (14, None),
+            ' c=1 1/4"': (None, 1.25),
+            ' c=1-1/2': (None, 1.5),
+            ' C=.75': (None, 0.75),
+            ' (HIGH)': (None, None),
+            ' 51K': (None, None),
+            '': (None, None),
+        }
+        for text, expected in cases.items():
+            extras = parse_extras(text)
+            self.assertEqual(expected, (extras['studs'], extras['camber']), text)
+
+    def test_inches_round_trip(self):
+        self.assertEqual(0.75, parse_inches('3/4"'))
+        self.assertEqual(1.25, parse_inches('1 1/4'))
+        self.assertIsNone(parse_inches('none'))
+        self.assertEqual(['3/4"', '1"', '1 1/4"', '1/16"'],
+                         [format_inches(value) for value in (0.75, 1.0, 1.25, 0.06)])
+        self.assertEqual('W16X26 (14) c=3/4"', describe_member('W16X26', 14, 0.75))
+        self.assertEqual('W16X26', describe_member('W16X26', None, 0.0))
+
+    def test_labels_pick_up_studs_and_camber_from_following_words(self):
+        content = (b'BT /F1 10 Tf 100 200 Td (W16x26) Tj ET\n'
+                   b'BT /F1 10 Tf 140 200 Td (\\(14\\)) Tj ET\n'
+                   b'BT /F1 10 Tf 170 200 Td (c=3/4") Tj ET\n'
+                   b'BT /F1 10 Tf 100 100 Td (W12x19\\(8\\)W12x26) Tj ET\n'
+                   b'BT /F1 10 Tf 100 50 Td (W8x10) Tj ET\n'
+                   b'BT /F1 10 Tf 400 50 Td (\\(20\\)) Tj ET\n')
+        page = read_page_text(build_pdf(content))
+        labels = dict((label['display'], label) for label in
+                      size_labels(page, make_pose((0.0, 0.0), 0.1), (1000, 500)))
+        self.assertIn('W16X26 (14) c=3/4"', labels)
+        self.assertEqual((14, 0.75), (labels['W16X26 (14) c=3/4"']['studs'],
+                                      labels['W16X26 (14) c=3/4"']['camber']))
+        # Studs between two sizes belong to the first; distant text is not a tail.
+        self.assertIn('W12X19 (8)', labels)
+        self.assertIn('W12X26', labels)
+        self.assertIn('W8X10', labels)
+
+    def setUp(self):
+        self.beam = member(1, 'W16X26', (0.0, 0.0), (20.0, 0.0))
+        self.beam.update({'studs': 10, 'camber': 0.5})
+
+    def test_studs_and_camber_differences_are_flagged_after_size(self):
+        def status_for(text, studs=None, camber=None):
+            item = label(text, (10.0, 1.0))
+            item.update({'studs': studs, 'camber': camber})
+            return match_members([item], [self.beam])['rows'][0]['status']
+
+        self.assertEqual(MATCH, status_for('W16x26'))
+        self.assertEqual(MATCH, status_for('W16x26', 10, 0.5))
+        self.assertEqual(STUDS_DIFFER, status_for('W16x26', 14))
+        self.assertEqual(CAMBER_DIFFER, status_for('W16x26', 10, 0.75))
+        self.assertEqual(MISMATCH, status_for('W18x35', 14, 0.75))
+
+    def test_revision_plan_sets_only_what_the_pdf_shows(self):
+        item = label('W18x35', (10.0, 1.0))
+        item.update({'studs': 14, 'camber': 0.75})
+        row = match_members([item], [self.beam])['rows'][0]
+        plan = revision_plan(row, self.beam)
+        self.assertEqual((parse_size('W18x35')[0], 'W18X35'), plan['size'])
+        self.assertEqual((14, 0.75, None), (plan['studs'], plan['camber'], plan['skip']))
+
+        size_only = label('W18x35', (10.0, 1.0))
+        plan = revision_plan(match_members([size_only], [self.beam])['rows'][0], self.beam)
+        self.assertEqual((None, None), (plan['studs'], plan['camber']))
+
+        same = label('W16x26', (10.0, 1.0))
+        plan = revision_plan(match_members([same], [self.beam])['rows'][0], self.beam)
+        self.assertEqual('Already matches the PDF.', plan['skip'])
+        self.assertEqual('No PDF label is matched to this member.', revision_plan(None, self.beam)['skip'])
+
+    def test_conflicting_labels_are_not_revised(self):
+        first, second = label('W16x26', (5.0, 1.0)), label('W16x26', (15.0, 1.0))
+        first['studs'], second['studs'] = 10, 14
+        row = match_members([first, second], [self.beam])['rows'][0]
+        self.assertEqual(CONFLICT, row['status'])
+        self.assertIn('disagree', revision_plan(row, self.beam)['skip'])
+
+    def test_choose_type_prefers_the_members_family(self):
+        key = parse_size('W18x35')[0]
+        candidates = [('W Shapes', key, 'other family'), ('W-Wide Flange', key, 'same family'),
+                      ('W-Wide Flange', parse_size('W18x40')[0], 'wrong size')]
+        self.assertEqual('same family', choose_type(candidates, key, 'W-Wide Flange'))
+        self.assertEqual('other family', choose_type(candidates, key, 'Custom'))
+        self.assertIsNone(choose_type(candidates, parse_size('W21x44')[0], 'W-Wide Flange'))
 
 
 class LabelMarkTests(unittest.TestCase):

@@ -4,7 +4,9 @@
 PDF labels (for example ``W12x26`` beside a beam on a RAM member map) are
 placed in the view through the overlay pose, then each label is assigned to
 the nearest roughly parallel member line. A member whose Revit size differs
-from its label is a mismatch for review.
+from its label is a mismatch for review. Stud counts and camber printed after
+a size (``W16x26 (14) c=3/4"``) are read and compared too, and
+``revision_plan`` lists what to change to make a member match its label.
 """
 
 import math
@@ -28,8 +30,23 @@ DEFAULT_TOLERANCE_DEGREES = 15.0
 
 MATCH = 'match'
 MISMATCH = 'mismatch'
+STUDS_DIFFER = 'studs'
+CAMBER_DIFFER = 'camber'
 CONFLICT = 'conflict'
 UNREADABLE = 'unreadable'
+# Statuses a revision can resolve.
+REVISABLE = (MISMATCH, STUDS_DIFFER, CAMBER_DIFFER)
+
+# Studs follow a size as (14), [14], or split runs (6,8) that add up; camber
+# as c=3/4", c=1", c=1 1/4", c=1-1/4", or c=.75. (HIGH) and 51K are ignored.
+STUDS_PATTERN = re.compile(r'[\(\[]\s*(\d{1,3}(?:\s*[,+]\s*\d{1,3})*)\s*[\)\]]')
+CAMBER_PATTERN = re.compile(
+    r'(?<![A-Za-z])c\s*=\s*(\d+[\s-]+\d+/\d+|\d+/\d+|\d*\.\d+|\d+)\s*(?:"|\'\'|in\b)?',
+    re.IGNORECASE)
+CAMBER_TOLERANCE_INCHES = 1.0 / 32.0
+# Following words on the label's baseline that can carry studs or camber.
+TAIL_WORDS = 3
+TAIL_GAP_RATIO = 1.5
 
 
 def _dimension_value(text):
@@ -78,6 +95,60 @@ def find_size_spans(text):
             yield match.start(), match.end(), size[0], size[1]
 
 
+def parse_inches(text):
+    """Return inches from 3/4, 1, 1 1/4, 1-1/4, or .75 (quote marks ignored), else None."""
+    if text is None:
+        return None
+    text = text.strip().strip('"').strip("'").strip()
+    match = re.match(r'^(\d+)[\s-]+(\d+)/(\d+)$', text)
+    if match:
+        return int(match.group(1)) + float(match.group(2)) / float(match.group(3))
+    match = re.match(r'^(\d+)/(\d+)$', text)
+    if match:
+        return float(match.group(1)) / float(match.group(2))
+    try:
+        return float(text)
+    except ValueError:
+        return None
+
+
+def format_inches(inches):
+    """Format inches to the nearest 1/16 as 3/4", 1", or 1 1/4"."""
+    sixteenths = int(round(inches * 16))
+    whole, remainder = divmod(sixteenths, 16)
+    if remainder == 0:
+        return '{}"'.format(whole)
+    numerator, denominator = remainder, 16
+    while numerator % 2 == 0:
+        numerator //= 2
+        denominator //= 2
+    fraction = '{}/{}'.format(numerator, denominator)
+    return '{} {}"'.format(whole, fraction) if whole else fraction + '"'
+
+
+def parse_extras(text):
+    """Return {'studs': int or None, 'camber': inches or None} from label tail text."""
+    studs = None
+    match = STUDS_PATTERN.search(text or '')
+    if match:
+        studs = sum(int(part) for part in re.split(r'\s*[,+]\s*', match.group(1)))
+    camber = None
+    match = CAMBER_PATTERN.search(text or '')
+    if match:
+        camber = parse_inches(match.group(1))
+    return {'studs': studs, 'camber': camber}
+
+
+def describe_member(size, studs=None, camber=None):
+    """Return size text with studs and camber, as a plan would print it."""
+    text = size
+    if studs:
+        text += ' ({})'.format(studs)
+    if camber:
+        text += ' c=' + format_inches(camber)
+    return text
+
+
 # -- Placing PDF labels in the view ------------------------------------------------
 
 def label_in_view(word, page_text, pose, page_size):
@@ -101,16 +172,59 @@ def label_in_view(word, page_text, pose, page_size):
     return center, (dx / length, dy / length), height
 
 
+def _following_text(word, words):
+    """Return the text of up to TAIL_WORDS words that continue word's baseline."""
+    ux, uy, size = word.ux, word.uy, word.size
+
+    def along(other):
+        return other.x * ux + other.y * uy
+
+    def across(other):
+        return -other.x * uy + other.y * ux
+
+    base = across(word)
+    nearby = sorted((other for other in words
+                     if other is not word and other.ux * ux + other.uy * uy > 0.999
+                     and abs(across(other) - base) < 0.5 * size),
+                    key=along)
+    cursor = along(word) + word.length
+    parts = []
+    for other in nearby:
+        start = along(other)
+        if start < cursor - 0.5 * size:
+            continue
+        if start - cursor > TAIL_GAP_RATIO * size or SIZE_PATTERN.search(other.text):
+            break
+        parts.append(other.text)
+        cursor = start + other.length
+        if len(parts) >= TAIL_WORDS:
+            break
+    return ' '.join(parts)
+
+
 def size_labels(page_text, pose, page_size):
-    """Return every steel size label on the page, placed in view feet."""
+    """Return every steel size label on the page, placed in view feet.
+
+    Each label carries the studs and camber printed after it, up to the next
+    size, within its own word or the next few words on its baseline.
+    """
     labels = []
     for word in page_text.words:
-        for start, end, key, display in find_size_spans(word.text):
+        spans = list(find_size_spans(word.text))
+        for index, (start, end, key, display) in enumerate(spans):
+            if index + 1 < len(spans):
+                tail = word.text[end:spans[index + 1][0]]
+            else:
+                tail = word.text[end:] + ' ' + _following_text(word, page_text.words)
+            extras = parse_extras(tail)
             piece = word.span(start, end)
             center, direction, height = label_in_view(piece, page_text, pose, page_size)
             labels.append({
                 'text': display,
                 'key': key,
+                'studs': extras['studs'],
+                'camber': extras['camber'],
+                'display': describe_member(display, extras['studs'], extras['camber']),
                 'center': center,
                 'direction': direction,
                 'height': height,
@@ -165,11 +279,13 @@ def match_members(labels, members, tolerance_feet=DEFAULT_TOLERANCE_FEET,
     """Assign labels to members and classify each labelled member.
 
     labels: dicts from size_labels. members: dicts with id, size (Revit text),
-    key (parse_size key or None), start, end (view feet). A label goes to the
-    nearest member within tolerance_feet whose line is within max_angle
-    degrees of the label. Returns a dict with:
+    key (parse_size key or None), start, end (view feet), and optional studs
+    and camber (inches). A label goes to the nearest member within
+    tolerance_feet whose line is within max_angle degrees of the label.
+    Returns a dict with:
 
-    - rows: one per labelled member with status match, mismatch, conflict
+    - rows: one per labelled member with status match, mismatch, studs or
+      camber (size matches but the PDF's studs or camber differ), conflict
       (its labels disagree), or unreadable (Revit size not recognized)
     - unmatched_labels: labels with no member nearby
     - unlabelled: members with no label
@@ -193,23 +309,73 @@ def match_members(labels, members, tolerance_feet=DEFAULT_TOLERANCE_FEET,
     rows = []
     for index in sorted(assigned, key=lambda item: str(members[item]['id'])):
         member = members[index]
-        found = assigned[index]
-        keys = sorted(set(label['key'] for label, _ in found))
-        pdf_text = ', '.join(sorted(set(label['text'] for label, _ in found)))
-        if len(keys) > 1:
+        found = [label for label, _ in assigned[index]]
+        variants = set((label['key'], label.get('studs'), label.get('camber')) for label in found)
+        label = found[0]
+        if len(variants) > 1:
             status = CONFLICT
         elif member['key'] is None:
             status = UNREADABLE
-        elif member['key'] == keys[0]:
-            status = MATCH
-        else:
+        elif member['key'] != label['key']:
             status = MISMATCH
+        elif label.get('studs') is not None and member.get('studs') != label['studs']:
+            status = STUDS_DIFFER
+        elif label.get('camber') is not None and not same_camber(member.get('camber'), label['camber']):
+            status = CAMBER_DIFFER
+        else:
+            status = MATCH
         rows.append({
             'id': member['id'],
-            'revit': member['size'],
-            'pdf': pdf_text,
+            'revit': describe_member(member['size'], member.get('studs'), member.get('camber')),
+            'pdf': ', '.join(sorted(set(item.get('display', item['text']) for item in found))),
+            'label': label if status != CONFLICT else None,
             'status': status,
-            'distance': min(distance for _, distance in found),
+            'distance': min(distance for _, distance in assigned[index]),
         })
     unlabelled = [member for index, member in enumerate(members) if index not in assigned]
     return {'rows': rows, 'unmatched_labels': unmatched, 'unlabelled': unlabelled}
+
+
+def same_camber(revit_inches, pdf_inches):
+    """Compare cambers to 1/32 inch; no camber in Revit counts as zero."""
+    return abs((revit_inches or 0.0) - (pdf_inches or 0.0)) <= CAMBER_TOLERANCE_INCHES
+
+
+# -- Revising members to the PDF ------------------------------------------------------
+
+def revision_plan(row, member):
+    """Return the changes that make member match its PDF label.
+
+    Returns {'size': (key, display) or None, 'studs': int or None,
+    'camber': inches or None, 'skip': reason or None}. Studs and camber are
+    set only where the PDF prints them; a size alone leaves them unchanged.
+    """
+    plan = {'size': None, 'studs': None, 'camber': None, 'skip': None}
+    if row is None:
+        plan['skip'] = 'No PDF label is matched to this member.'
+        return plan
+    label = row.get('label')
+    if row['status'] == CONFLICT or label is None:
+        plan['skip'] = 'Its PDF labels disagree ({}).'.format(row['pdf'])
+        return plan
+    if member.get('key') != label['key']:
+        plan['size'] = (label['key'], label['text'])
+    if label.get('studs') is not None and member.get('studs') != label['studs']:
+        plan['studs'] = label['studs']
+    if label.get('camber') is not None and not same_camber(member.get('camber'), label['camber']):
+        plan['camber'] = label['camber']
+    if plan['size'] is None and plan['studs'] is None and plan['camber'] is None:
+        plan['skip'] = 'Already matches the PDF.'
+    return plan
+
+
+def choose_type(candidates, key, family_name):
+    """Pick the loaded type for a size: same family first, then any family.
+
+    candidates: (family name, size key, type) tuples. Returns the type or None.
+    """
+    matching = [candidate for candidate in candidates if candidate[1] == key]
+    for candidate in matching:
+        if candidate[0] == family_name:
+            return candidate[2]
+    return matching[0][2] if matching else None

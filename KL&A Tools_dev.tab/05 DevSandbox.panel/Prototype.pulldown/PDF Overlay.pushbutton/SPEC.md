@@ -65,9 +65,11 @@ lets the user blend or blink the two for review.
    the same ImageType. Its instances are re-placed, so alignment is kept. Show
    overlay hides or unhides the overlay in the active view only.
 
-4. **Check Members.** Compares framing sizes in the active view with the size
-   labels printed in the PDF (see Member check). Members to review are
-   selected in Revit and listed in the pyRevit output window.
+4. **Check Members.** Compares framing sizes, studs, and camber in the active
+   view with the labels printed in the PDF (see Member check). Members to
+   review are selected in Revit and listed in the pyRevit output window.
+   **Revise Selected to PDF** changes the selected members to match their
+   labels (see Revise to PDF).
 
 5. **Reuse.** The palette has no overlay list; it works on the overlay
    whose PDF image is selected in Revit. It follows
@@ -120,8 +122,12 @@ family and type names. Labels outside an active crop region are ignored.
 Results:
 
 - **Size differs**: the member's Revit size differs from its PDF label.
-- **PDF labels disagree**: two or more different sizes were assigned to one
-  member.
+- **Studs differ** / **Camber differs**: the size matches, but the PDF prints a
+  stud count or camber that differs from the member's Number of studs or
+  Camber Size (to 1/32 in; an empty camber counts as zero). These are
+  compared only when the PDF prints them.
+- **PDF labels disagree**: two or more labels with different sizes, studs, or
+  camber were assigned to one member.
 - **Revit size not recognized**: the type name has no steel size to compare.
 - PDF labels with no member nearby (a missing member or loose alignment).
   With **Mark labels with no member nearby** ticked (the default), each one
@@ -140,6 +146,40 @@ style, so Visibility/Graphics can hide them, and lines drawn by hand in that
 style are cleared too. Marking and clearing are one undoable transaction. The check reads the PDF
 from its original path at check time. A warning is printed if the PDF page
 shape and the imported image differ by more than 2%.
+
+### Studs and camber in labels
+
+Text after a size, in the same word or in up to three following words on its
+baseline (each within 1.5 text heights, stopping at the next size), is read
+for studs and camber. Studs are a count in parentheses or brackets, `(14)` or
+`[14]`; split runs such as `(6,8)` are added together. Camber is `c=` with
+inches: `3/4"`, `1"`, `1 1/4"`, `1-1/4"`, or `.75`. Other notes such as
+`(HIGH)` or `51K` are ignored. Neither sample PDF (a roof RAM map and a roof
+framing plan) prints studs or camber, so the formats follow RAM and plan
+conventions. Confirm them with a floor PDF before relying on them.
+
+## Revise to PDF
+
+**Revise Selected to PDF** works on the Revit selection, from one member to
+many. Check Members selects every member to review, so it can follow a check
+directly; deselect any members to keep. It re-runs the check with the current
+tolerances so nothing is stale, then plans a change for each selected member:
+
+- **Size**: the loaded framing type whose name gives the label's size,
+  preferring the member's own family. A size that is not loaded is reported,
+  not created; load the type, then revise again.
+- **Studs**: the built-in Number of studs is set to the PDF count.
+- **Camber**: the built-in Camber Size is set to the PDF value: inch text
+  such as `3/4"` for a text parameter, or a length for a length parameter.
+
+Studs and camber change only where the PDF prints them; a size-only label
+leaves them as they are. Members with no label, disagreeing labels, a size
+not recognized, or nothing to change are skipped with a reason, as are
+selected elements that are not framing in the view. The palette shows the
+counts and asks before changing anything. All changes are one undoable
+transaction, with each member in its own sub-transaction, so one failure
+leaves that member unchanged and the rest still apply. The report lists each
+member as it was and as it is now, and the revised members are selected.
 
 ## Rendering
 

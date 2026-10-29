@@ -7,6 +7,7 @@ __version__ = "v0.0"
 import datetime
 import math
 import os
+import re
 import traceback
 import uuid
 
@@ -64,18 +65,27 @@ try:
     )
     from pdf_overlay.style import DEFAULT_OPACITY, DEFAULT_TINT, TINTS, clamp_opacity, tint_rgb
     from pdf_overlay.members import (
+        CAMBER_DIFFER,
         CONFLICT,
         DEFAULT_TOLERANCE_DEGREES,
         DEFAULT_TOLERANCE_FEET,
         MATCH,
         MISMATCH,
+        REVISABLE,
+        STUDS_DIFFER,
         UNREADABLE,
+        choose_type,
+        describe_member,
+        format_inches,
         label_mark,
         match_members,
+        parse_inches,
         parse_size,
+        revision_plan,
         size_labels,
         sort_labels,
     )
+    from pyrevit.compat import get_elementid_value_func
     from pdf_overlay.pdftext import PdfError, read_pdf_page_text
 except Exception:
     log('import failed:\n' + traceback.format_exc())
@@ -523,6 +533,8 @@ def set_overlay_visibility(uiapp, overlay, visible):
 
 STATUS_LABELS = {
     MISMATCH: 'Size differs',
+    STUDS_DIFFER: 'Studs differ',
+    CAMBER_DIFFER: 'Camber differs',
     CONFLICT: 'PDF labels disagree',
     UNREADABLE: 'Revit size not recognized',
 }
@@ -546,6 +558,35 @@ def _member_size(doc, element):
     return (type_name or family_name or '?'), None
 
 
+def _number_from_text(text):
+    digits = [int(part) for part in re.findall(r'\d+', text or '')]
+    return sum(digits) if digits else None
+
+
+def _member_studs(element):
+    """Return the member's Number of studs, or None when it is not set."""
+    param = element.get_Parameter(DB.BuiltInParameter.STRUCTURAL_NUMBER_OF_STUDS)
+    if param is None or not param.HasValue:
+        return None
+    if param.StorageType == DB.StorageType.Integer:
+        return param.AsInteger()
+    if param.StorageType == DB.StorageType.Double:
+        return int(round(param.AsDouble()))
+    return _number_from_text(param.AsString())
+
+
+def _member_camber(element):
+    """Return the member's Camber Size in inches, or None when it is not set."""
+    param = element.get_Parameter(DB.BuiltInParameter.STRUCTURAL_CAMBER)
+    if param is None or not param.HasValue:
+        return None
+    if param.StorageType == DB.StorageType.Double:
+        return param.AsDouble() * 12.0  # Internal length unit is feet.
+    if param.StorageType == DB.StorageType.Integer:
+        return float(param.AsInteger())
+    return parse_inches(param.AsString())
+
+
 def collect_members(doc, view):
     """Return framing visible in view as 2D member lines for matching."""
     members = []
@@ -561,7 +602,10 @@ def collect_members(doc, view):
         if math.hypot(end[0] - start[0], end[1] - start[1]) < 0.01:
             continue  # Seen end-on in this view.
         size, key = _member_size(doc, element)
-        members.append({'id': element.Id, 'size': size, 'key': key, 'start': start, 'end': end})
+        symbol = doc.GetElement(element.GetTypeId())
+        members.append({'id': element.Id, 'size': size, 'key': key, 'start': start, 'end': end,
+                        'family': getattr(symbol, 'FamilyName', '') or '',
+                        'studs': _member_studs(element), 'camber': _member_camber(element)})
     return members
 
 
@@ -605,10 +649,132 @@ def check_members(uiapp, overlay):
     members = collect_members(doc, view)
     result = match_members(labels, members, state['tolerance_feet'], state['tolerance_degrees'])
     save_state(overlay.paths['state'], state)
-    result.update({'labels': len(labels), 'members': len(members), 'outside': outside,
+    result.update({'labels': len(labels), 'members': len(members), 'member_list': members,
+                   'outside': outside,
                    'tolerance': (state['tolerance_feet'], state['tolerance_degrees']),
                    'aspect_warning': _aspect_warning(page_text, state['page_size'])})
     return result
+
+
+# -- Revise to PDF ------------------------------------------------------------
+
+element_id_value = get_elementid_value_func()
+
+
+def _framing_types(doc):
+    """Return (family name, size key, type) for every loaded framing type with a size."""
+    types = []
+    collector = (DB.FilteredElementCollector(doc).OfClass(DB.FamilySymbol)
+                 .OfCategory(DB.BuiltInCategory.OST_StructuralFraming))
+    for symbol in collector:
+        name = DB.Element.Name.GetValue(symbol)
+        parsed = parse_size(name) or parse_size((symbol.FamilyName or '') + ' ' + name)
+        if parsed:
+            types.append((symbol.FamilyName or '', parsed[0], symbol))
+    return types
+
+
+def _set_param(element, built_in, value, label, as_text, as_length_feet=None):
+    """Set an instance parameter by its storage type; return an error or None."""
+    param = element.get_Parameter(built_in)
+    if param is None or param.IsReadOnly:
+        return '{} is not editable on this member.'.format(label)
+    storage = param.StorageType
+    if storage == DB.StorageType.String:
+        ok = param.Set(as_text)
+    elif storage == DB.StorageType.Integer:
+        ok = param.Set(int(round(value)))
+    else:
+        ok = param.Set(float(as_length_feet if as_length_feet is not None else value))
+    return None if ok else 'Revit did not accept {} = {}.'.format(label, as_text)
+
+
+def plan_revisions(uiapp, overlay, element_ids):
+    """Re-run the check and plan PDF revisions for the given element ids.
+
+    Returns (planned, skipped): planned is [(member, row, plan)]; skipped is
+    [(element id, reason)] for members that cannot or need not change.
+    """
+    result = check_members(uiapp, overlay)
+    rows = dict((element_id_value(row['id']), row) for row in result['rows'])
+    members = dict((element_id_value(member['id']), member) for member in result['member_list'])
+    planned, skipped = [], []
+    for element_id in element_ids:
+        value = element_id_value(element_id)
+        member = members.get(value)
+        if member is None:
+            skipped.append((element_id, 'Not structural framing shown in this view.'))
+            continue
+        plan = revision_plan(rows.get(value), member)
+        if plan['skip']:
+            skipped.append((element_id, plan['skip']))
+        else:
+            planned.append((member, rows[value], plan))
+    return planned, skipped
+
+
+def apply_revisions(doc, planned):
+    """Change type, studs, and camber per plan; one undo step, each member on its own.
+
+    Returns [(member, before, after or None, error or None)].
+    """
+    types = _framing_types(doc)
+    results = []
+    transaction = DB.Transaction(doc, 'PDF Overlay - Revise to PDF')
+    transaction.Start()
+    try:
+        for member, row, plan in planned:
+            element = doc.GetElement(member['id'])
+            sub = DB.SubTransaction(doc)
+            sub.Start()
+            error = None
+            try:
+                if plan['size']:
+                    symbol = choose_type(types, plan['size'][0], member['family'])
+                    if symbol is None:
+                        error = '{} is not loaded in this project; load it, then revise again.'.format(
+                            plan['size'][1])
+                    else:
+                        if not symbol.IsActive:
+                            symbol.Activate()
+                        element.ChangeTypeId(symbol.Id)
+                if error is None and plan['studs'] is not None:
+                    error = _set_param(element, DB.BuiltInParameter.STRUCTURAL_NUMBER_OF_STUDS,
+                                       plan['studs'], 'Number of studs', str(plan['studs']))
+                if error is None and plan['camber'] is not None:
+                    error = _set_param(element, DB.BuiltInParameter.STRUCTURAL_CAMBER,
+                                       plan['camber'], 'Camber Size', format_inches(plan['camber']),
+                                       plan['camber'] / 12.0)
+            except Exception as failure:
+                error = 'Revit refused the change: {}'.format(failure)
+                log('revise failed:\n' + traceback.format_exc())
+            if error:
+                sub.RollBack()
+                results.append((member, row['revit'], None, error))
+                continue
+            sub.Commit()
+            size, _ = _member_size(doc, element)
+            after = describe_member(size, _member_studs(element), _member_camber(element))
+            results.append((member, row['revit'], after, None))
+        transaction.Commit()
+    except Exception:
+        transaction.RollBack()
+        raise
+    return results
+
+
+def report_revisions(output, results, skipped):
+    """Print revision results; return the ids that changed."""
+    changed = [item for item in results if item[3] is None]
+    output.print_md('## Revise to PDF: {} member(s) changed, {} not changed'.format(
+        len(changed), len(results) - len(changed) + len(skipped)))
+    rows = [[output.linkify(member['id']), before, after or before, error or 'Revised']
+            for member, before, after, error in results]
+    rows += [[output.linkify(element_id), '', '', reason] for element_id, reason in skipped]
+    if rows:
+        output.print_table(table_data=rows, columns=['Member', 'Was', 'Now', 'Result'],
+                           title='Revisions')
+    return [member['id'] for member, _, _, error in changed]
 
 
 def _mark_style(doc):
@@ -1024,6 +1190,44 @@ class PdfOverlayPalette(my_WPF):
                 status += '; {} label(s) with no member are marked in orange'.format(len(marks))
             self.set_status(status + '. See the report window.')
         self.run(action, 'Reading PDF labels and checking members...')
+
+    def button_revise(self, sender, e):
+        overlay = self._usable_overlay()
+        if overlay is None:
+            return
+        error = self._read_tolerances(overlay)
+        if error:
+            self.set_status(error)
+            return
+
+        def action(uiapp):
+            uidoc = uiapp.ActiveUIDocument
+            selected = list(uidoc.Selection.GetElementIds())
+            if not selected:
+                self.set_status('Select the members to revise first. Check Members selects '
+                                'every member to review; deselect any to keep.')
+                return
+            planned, skipped = plan_revisions(uiapp, overlay, selected)
+            if not planned:
+                report_revisions(self.output, [], skipped)
+                self.set_status('Nothing to revise in the selection; see the report window.')
+                return
+            sizes = sum(1 for _, _, plan in planned if plan['size'])
+            studs = sum(1 for _, _, plan in planned if plan['studs'] is not None)
+            cambers = sum(1 for _, _, plan in planned if plan['camber'] is not None)
+            message = ('Revise {} member(s) to the PDF?\n\n{} size change(s), {} stud change(s), '
+                       '{} camber change(s). {} selected item(s) will be left as they are.').format(
+                           len(planned), sizes, studs, cambers, len(skipped))
+            if not forms.alert(message, title=COMMAND_TITLE, ok=False, yes=True, no=True):
+                self.set_status('Nothing revised.')
+                return
+            results = apply_revisions(uidoc.Document, planned)
+            changed = report_revisions(self.output, results, skipped)
+            uidoc.Selection.SetElementIds(List[DB.ElementId](changed))
+            failed = len(results) - len(changed)
+            self.set_status('Revised {} member(s){}. Undo in Revit reverses it; see the report window.'.format(
+                len(changed), ', {} could not be changed'.format(failed) if failed else ''))
+        self.run(action, 'Checking the selected members against the PDF...')
 
     def button_clear_marks(self, sender, e):
         def action(uiapp):
