@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | Unreleased |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton/PdfOverlayPalette.xaml`; `lib/pdf_overlay/` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton/PdfOverlayPalette.xaml`; `lib/pdf_overlay/`; shared `lib/error_reports.py` and `lib/error_reports_revit.py` |
 
 ## Tool version history
 
@@ -198,6 +198,15 @@ output window can render blank. A startup failure also shows the error in an
 alert. In pyRevit 6, `wpf` must be taken from `pyrevit.framework`, which loads
 the engine's IronPython.Wpf assembly; a bare `import wpf` before that fails with
 `No module named _wpf`.
+
+Unexpected failures (loading code, startup, any palette action, or following
+the selection, the last once per session) also save an error report with
+tool code `PDFO` and the action's name, such as `Check Members` or
+`Revise to PDF`. The report id is shown in the palette status or startup
+alert and copied to the clipboard for the user to paste into Suggestions/Bugs
+Feedback. Reports include the last 40 lines of the log above. See
+[Error reports](../../../../docs/knowledge/error-reports.md) for contents,
+collection, and `scripts/summarize_error_reports.py`.
 
 ## Coordinates
 

@@ -27,6 +27,7 @@ the [active plan or tracker](../plans/README.md); update task status only there.
 | [Python and pyRevit guide](python-pyrevit.md) | Living command structure and IronPython-compatible Python conventions. |
 | [Comment guide](python-comments.md) | Living comments, docstrings, and command-documentation conventions. |
 | [Design-system guide](../DESIGNSYSTEM.md) | Living UI tokens, resources, and component inventory. |
+| [Error reports](error-reports.md) | How tools record unexpected failures, what a report holds, and how to collect and summarize reports. |
 | [Review archive](reviews/README.md) | Dated audits, release reviews, promotion reviews, and their evidence. |
 | [Compiled-WPF decision](compiled-wpf-decision.md) | Recorded compiled adapter rationale, alternatives, and source-checkpoint validation. |
 | [Compiled-tools handoff](family-studio-startup-importer-handoff.md) | The 2026-09-01 implementation snapshot; follow its linked plan for task status. |

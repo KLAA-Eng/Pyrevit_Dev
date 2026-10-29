@@ -28,6 +28,24 @@ def log(message):
         pass
 
 
+# Unexpected errors also leave an error report (lib/error_reports.py) whose id
+# the user can quote in Suggestions/Bugs Feedback.
+TOOL = {'id': 'devsandbox.pdf-overlay', 'name': 'PDF Overlay', 'version': __version__}
+TOOL_CODE = 'PDFO'
+
+
+def report_error(action):
+    """Save an error report for the exception being handled; return the user message."""
+    try:
+        from error_reports_revit import report_exception
+    except Exception:
+        log('error reports unavailable:\n' + traceback.format_exc())
+        return 'Details are in {}.'.format(LOG_PATH)
+    report_id, message = report_exception(TOOL, TOOL_CODE, action, LOG_PATH)
+    log('error report: {}'.format(report_id))
+    return message
+
+
 log('--- start')
 try:
     from Autodesk.Revit.Exceptions import InvalidOperationException, OperationCanceledException
@@ -89,6 +107,7 @@ try:
     from pdf_overlay.pdftext import PdfError, read_pdf_page_text
 except Exception:
     log('import failed:\n' + traceback.format_exc())
+    report_error('Start (loading code)')
     raise
 log('imports ok')
 
@@ -905,6 +924,7 @@ class OverlayActionHandler(UI.IExternalEventHandler):
 
     def __init__(self):
         self.action = None
+        self.action_name = ''
         self.palette = None
 
     def Execute(self, uiapp):
@@ -922,7 +942,7 @@ class OverlayActionHandler(UI.IExternalEventHandler):
             self.palette.set_status(str(error))
         except Exception as error:
             log('action failed:\n' + traceback.format_exc())
-            self.palette.set_status('Failed: {}'.format(error))
+            self.palette.set_status(u'Failed: {}\n{}'.format(error, report_error(self.action_name)))
 
     def GetName(self):
         return COMMAND_TITLE
@@ -936,6 +956,7 @@ class PdfOverlayPalette(my_WPF):
         self.output = output
         self.current = None
         self._loading = False
+        self._selection_error_reported = False
         self.add_wpf_resource()
         wpf.LoadComponent(self, os.path.join(os.path.dirname(__file__), 'PdfOverlayPalette.xaml'))
         WindowInteropHelper(self).Owner = HOST_APP.proc_window
@@ -955,11 +976,13 @@ class PdfOverlayPalette(my_WPF):
 
     # Queueing ---------------------------------------------------------------
 
-    def run(self, action, status):
+    def run(self, action, status, name):
+        """Queue action (named for error reports) to run in Revit's API context."""
         if self.handler.action is not None:
             self.set_status('Busy with the previous action; try again in a moment.')
             return
         self.set_status(status)
+        self.handler.action_name = name
         self.handler.action = action
         self.action_event.Raise()
 
@@ -1029,6 +1052,9 @@ class PdfOverlayPalette(my_WPF):
             self.pick_current(self.uiapp, stem)
         except Exception:
             log('selection follow failed:\n' + traceback.format_exc())
+            if not self._selection_error_reported:
+                self._selection_error_reported = True
+                self.set_status(report_error('Follow selection'))
 
     def palette_closed(self, sender, e):
         try:
@@ -1085,7 +1111,7 @@ class PdfOverlayPalette(my_WPF):
             self.pick_current(uiapp, os.path.splitext(os.path.basename(paths['overlay']))[0])
             self.set_status('Placed at the view scale in the middle of the view. '
                             'Click Align (2 Points) to fit it to the framing.')
-        self.run(action, 'Importing page {} at {} DPI...'.format(page, dpi))
+        self.run(action, 'Importing page {} at {} DPI...'.format(page, dpi), 'Import PDF')
 
     def button_align(self, sender, e):
         overlay = self._usable_overlay()
@@ -1096,7 +1122,7 @@ class PdfOverlayPalette(my_WPF):
             pose = align_overlay(uiapp, overlay, self.show_progress)
             self.set_status('Aligned. Rotation {:.2f} deg. Run Align again to refine.'.format(
                 math.degrees(pose['rotation'])))
-        self.run(action, ALIGN_STEPS[0])
+        self.run(action, ALIGN_STEPS[0], 'Align')
 
     def button_place(self, sender, e):
         def action(uiapp):
@@ -1117,7 +1143,7 @@ class PdfOverlayPalette(my_WPF):
             place_in_view(uiapp, overlay)
             self.pick_current(uiapp, overlay.stem)
             self.set_status('Placed in this view at its aligned position.')
-        self.run(action, 'Finding overlays in other views...')
+        self.run(action, 'Finding overlays in other views...', 'Place in View')
 
     def button_replace(self, sender, e):
         overlay = self._usable_overlay()
@@ -1134,7 +1160,7 @@ class PdfOverlayPalette(my_WPF):
             self.set_status(warning or 'Loaded {} into the overlay; alignment kept.'.format(
                 os.path.basename(pdf_path)))
         self.run(action, 'Loading the revised PDF (page {}, {} DPI)...'.format(
-            overlay.state['page'], overlay.state['dpi']))
+            overlay.state['page'], overlay.state['dpi']), 'Replace PDF')
 
     def button_remove(self, sender, e):
         overlay = self.selected_overlay()
@@ -1150,7 +1176,7 @@ class PdfOverlayPalette(my_WPF):
             self.current = None
             self.pick_current(uiapp)
             self.set_status('Overlay removed. Undo in Revit brings it back.')
-        self.run(action, 'Removing overlay...')
+        self.run(action, 'Removing overlay...', 'Remove')
 
     def _read_tolerances(self, overlay):
         """Store the palette's tolerance fields on the overlay; return an error or None."""
@@ -1189,7 +1215,7 @@ class PdfOverlayPalette(my_WPF):
             if marks:
                 status += '; {} label(s) with no member are marked in orange'.format(len(marks))
             self.set_status(status + '. See the report window.')
-        self.run(action, 'Reading PDF labels and checking members...')
+        self.run(action, 'Reading PDF labels and checking members...', 'Check Members')
 
     def button_revise(self, sender, e):
         overlay = self._usable_overlay()
@@ -1227,7 +1253,7 @@ class PdfOverlayPalette(my_WPF):
             failed = len(results) - len(changed)
             self.set_status('Revised {} member(s){}. Undo in Revit reverses it; see the report window.'.format(
                 len(changed), ', {} could not be changed'.format(failed) if failed else ''))
-        self.run(action, 'Checking the selected members against the PDF...')
+        self.run(action, 'Checking the selected members against the PDF...', 'Revise to PDF')
 
     def button_clear_marks(self, sender, e):
         def action(uiapp):
@@ -1236,7 +1262,7 @@ class PdfOverlayPalette(my_WPF):
             cleared, _ = update_marks(uidoc.Document, view, [], 0.0)
             self.set_status('Cleared {} review mark line(s) from this view.'.format(cleared)
                             if cleared else 'No review marks in this view.')
-        self.run(action, 'Clearing review marks...')
+        self.run(action, 'Clearing review marks...', 'Clear Marks')
 
     def opacity_changed(self, sender, e):
         self.opacity_text.Text = '{}%'.format(int(self.opacity_slider.Value))
@@ -1267,7 +1293,7 @@ class PdfOverlayPalette(my_WPF):
             refresh_overlay(uiapp, overlay)
             self.set_status('Updated: {} at {}% opacity.'.format(
                 overlay.state['tint'], overlay.state['opacity']))
-        self.run(action, 'Updating overlay...')
+        self.run(action, 'Updating overlay...', 'Opacity or Color')
 
     def visibility_changed(self, sender, e):
         if self._loading:
@@ -1280,7 +1306,7 @@ class PdfOverlayPalette(my_WPF):
         def action(uiapp):
             set_overlay_visibility(uiapp, overlay, visible)
             self.set_status('Overlay shown.' if visible else 'Overlay hidden in the active view.')
-        self.run(action, '')
+        self.run(action, '', 'Show or Hide')
 
 
 def main():
@@ -1298,5 +1324,5 @@ try:
     main()
 except Exception as error:
     log('startup failed:\n' + traceback.format_exc())
-    forms.alert('PDF Overlay could not start:\n{}\n\nDetails: {}'.format(error, LOG_PATH),
+    forms.alert(u'PDF Overlay could not start:\n{}\n\n{}'.format(error, report_error('Start')),
                 title=COMMAND_TITLE, warn_icon=True)
