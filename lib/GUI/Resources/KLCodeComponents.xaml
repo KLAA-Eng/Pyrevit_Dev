@@ -282,6 +282,13 @@
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
     </Style>
+    <!-- Implicit-style policy (both hosts): a bare TextBox, ComboBox or CheckBox inside a shared-shell window takes the compact
+         input, the compact dropdown and the foundation checkbox, so no control falls back to the native look. Every other control
+         is opt-in by key. -->
+    <Style TargetType="TextBox" BasedOn="{StaticResource KlaCompactFieldInput}"/>
+    <Style TargetType="ComboBox" BasedOn="{StaticResource KlaCompactComboBox}"/>
+    <Style TargetType="CheckBox" BasedOn="{StaticResource KlaFoundationCheckBox}"/>
+
     <Style x:Key="KlaSplitter" TargetType="GridSplitter">
         <Setter Property="Background" Value="{StaticResource KlaComponentBorderBrush}"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>

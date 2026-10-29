@@ -1,0 +1,25 @@
+{
+  "_comment": "Shared by tests/gui_window_metadata_test.py and WindowChromeMetadataTests.cs: the version text the footer shows for each caller input.",
+  "version": [
+    {"input": "v1.3", "expected": "v1.3"},
+    {"input": "V1.3", "expected": "v1.3"},
+    {"input": "1.2", "expected": "v1.2"},
+    {"input": "Version: 1.2", "expected": "v1.2"},
+    {"input": "version= V1.2.Source", "expected": "v1.2.Source"},
+    {"input": "Version 0.1", "expected": "v0.1"},
+    {"input": " v0.5 ", "expected": "v0.5"},
+    {"input": "v1.0.pyRevit", "expected": "v1.0.pyRevit"},
+    {"input": "Version: _", "expected": ""},
+    {"input": "__version__", "expected": ""},
+    {"input": "Core Tools", "expected": ""},
+    {"input": "DevSandbox Prototype", "expected": ""},
+    {"input": "not available", "expected": ""},
+    {"input": "v", "expected": ""},
+    {"input": "", "expected": ""},
+    {"input": null, "expected": ""}
+  ],
+  "title": [
+    {"input": "  Sample Tool v2.0  ", "expected": "Sample Tool v2.0"},
+    {"input": null, "expected": ""}
+  ]
+}

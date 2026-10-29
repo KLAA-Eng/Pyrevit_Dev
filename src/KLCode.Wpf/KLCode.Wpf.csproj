@@ -32,6 +32,7 @@
     <Page Include="../../lib/GUI/Resources/KLCode_palette.xaml" Link="GUI/Resources/KLCode_palette.xaml" />
     <Page Include="../../lib/GUI/Resources/KLCodeSharedPrimitives.xaml" Link="GUI/Resources/KLCodeSharedPrimitives.xaml" />
     <Page Include="../../lib/GUI/Resources/KLCodeFoundationTokens.xaml" Link="GUI/Resources/KLCodeFoundationTokens.xaml" />
+    <Page Include="../../lib/GUI/Resources/KLCodeChrome.xaml" Link="GUI/Resources/KLCodeChrome.xaml" />
     <Page Include="../../lib/GUI/Resources/KLCodeFoundation.xaml" Link="GUI/Resources/KLCodeFoundation.xaml" />
     <Page Include="../../lib/GUI/Resources/KLCodeComponents.xaml" Link="GUI/Resources/KLCodeComponents.xaml" />
     <Page Include="../../lib/_icons/gui/KLCodeIcons.xaml" Link="_icons/gui/KLCodeIcons.xaml" />

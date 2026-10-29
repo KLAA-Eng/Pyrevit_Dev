@@ -178,7 +178,7 @@ class WindowChromeTests(unittest.TestCase):
 
     def test_ordinary_footer_click_opens_the_shared_destination_once(self):
         chrome = self.load()
-        uri = chrome.shell.Tag.OutreachUri
+        uri = 'https://forms.microsoft.com/Pages/ResponsePage.aspx?id=sample'
         args = types.SimpleNamespace(Uri=types.SimpleNamespace(AbsoluteUri=uri), Handled=False)
         with patch.dict(sys.modules, self.host):
             chrome.outreach.RequestNavigate.emit(None, args)

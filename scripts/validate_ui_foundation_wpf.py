@@ -163,7 +163,7 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
             assert all(item.IsChecked for item in window._items)
             window.button_main.RaiseEvent(RoutedEventArgs(ButtonBase.ClickEvent))
             assert 'fictional item(s) selected' in window.preview_result
-        navigation = RequestNavigateEventArgs(Uri(shell.Tag.PrototypeUri), '')
+        navigation = RequestNavigateEventArgs(chrome.prototype.NavigateUri, '')
         navigation.RoutedEvent = Hyperlink.RequestNavigateEvent
         chrome.prototype.RaiseEvent(navigation)
         assert navigation.Handled and 'navigation simulated' in window.preview_result

@@ -1,9 +1,10 @@
-using System;
 using System.Text.RegularExpressions;
 
 namespace KLCode.Wpf;
 
-/// <summary>Caller-owned identity for the shared shell; no WPF or Revit dependency.</summary>
+/// <summary>Caller-owned identity for the shared shell; no WPF or Revit dependency. Footer destinations and labels are
+/// data in lib/GUI/Resources/KLCodeChrome.xaml, read by the shell template; the normalisation vectors in
+/// lib/GUI/window_metadata_vectors.json are shared with the Python adapter's tests.</summary>
 public sealed class WindowChromeMetadata
 {
     public WindowChromeMetadata(string? title, string? version = null)
@@ -17,6 +18,4 @@ public sealed class WindowChromeMetadata
 
     public string Title { get; }
     public string VersionText { get; }
-    public Uri PrototypeUri { get; } = new Uri("https://forms.cloud.microsoft/r/HjuggSZqyU");
-    public Uri OutreachUri { get; } = new Uri("https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u");
 }

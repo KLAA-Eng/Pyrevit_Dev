@@ -29,7 +29,5 @@
         <Setter Property="Background" Value="{StaticResource KlaSurfaceBrush}" />
         <Setter Property="Padding" Value="0" />
     </Style>
-    <Style TargetType="TextBox" BasedOn="{StaticResource KlaTextBoxStyle}" />
-    <Style TargetType="ComboBox" BasedOn="{StaticResource KlaComboBoxStyle}" />
-    <Style TargetType="CheckBox" BasedOn="{StaticResource KlaCheckBoxStyle}" />
+    <!-- The implicit TextBox / ComboBox / CheckBox styles live in KLCodeComponents.xaml, shared with the Python host. -->
 </ResourceDictionary>

@@ -87,6 +87,25 @@ public sealed class DesignSystemResourceContractTests
     }
 
     [TestMethod]
+    public void ChromeData_HoldsBothFooterDestinationsAndTheDefaultLabels()
+    {
+        XDocument chrome = LoadXaml("lib/GUI/Resources/KLCodeChrome.xaml");
+        XNamespace sys = "clr-namespace:System;assembly=mscorlib";
+        Dictionary<string, string> entries = chrome.Root!.Elements()
+            .ToDictionary(e => (string)e.Attribute(Xaml + "Key")!, e => e.Value.Trim());
+        Assert.AreEqual("https", new Uri(entries["KlaPrototypeUri"]).Scheme);
+        Assert.AreEqual("https", new Uri(entries["KlaOutreachUri"]).Scheme);
+        Assert.AreNotEqual(entries["KlaPrototypeUri"], entries["KlaOutreachUri"]);
+        CollectionAssert.IsSubsetOf(new[] { "CloseLabel", "PrototypeLabel", "OutreachLabel" }, entries.Keys.ToArray());
+        Assert.AreEqual(2, chrome.Root.Elements(sys + "Uri").Count());
+        XDocument foundation = LoadXaml("lib/GUI/Resources/KLCodeFoundation.xaml");
+        string shell = foundation.ToString();
+        StringAssert.Contains(shell, "{DynamicResource CloseLabel}");
+        StringAssert.Contains(shell, "{StaticResource KlaPrototypeUri}");
+        StringAssert.Contains(shell, "{StaticResource KlaOutreachUri}");
+    }
+
+    [TestMethod]
     public void CompiledAdapter_UsesCanonicalResources()
     {
         XDocument controls = LoadXaml("src/KLCode.Wpf/Resources/KLCodeControls.xaml");
@@ -118,7 +137,7 @@ public sealed class DesignSystemResourceContractTests
 
         XDocument project = XDocument.Load(Path.Combine(FindRepositoryRoot(), "src/KLCode.Wpf/KLCode.Wpf.csproj"));
         foreach (string file in new[] { "KLCode_palette.xaml", "KLCodeSharedPrimitives.xaml",
-                     "KLCodeFoundationTokens.xaml", "KLCodeFoundation.xaml", "KLCodeComponents.xaml" })
+                     "KLCodeFoundationTokens.xaml", "KLCodeChrome.xaml", "KLCodeFoundation.xaml", "KLCodeComponents.xaml" })
         {
             XElement? page = project.Descendants("Page")
                 .FirstOrDefault(element => (string?)element.Attribute("Include") == "../../lib/GUI/Resources/" + file);
@@ -214,6 +233,8 @@ public sealed class DesignSystemResourceContractTests
         Assert.IsTrue(File.Exists(path), "Required design-system file is missing: " + relativePath);
         return XDocument.Load(path, LoadOptions.SetLineInfo);
     }
+
+    internal static string RepositoryRoot() => FindRepositoryRoot();
 
     private static string FindRepositoryRoot()
     {

@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!-- Chrome data shared by the Python and C# adapters: the two footer destinations and the default (en_us) labels.
+         The shell reads the labels with DynamicResource, so a dictionary merged after this one (the compiled
+         Strings/ResourceDictionary.<locale>.xaml, or a Python window's own locale dictionary) overrides them. -->
+    <sys:Uri x:Key="KlaPrototypeUri">https://forms.cloud.microsoft/r/HjuggSZqyU</sys:Uri>
+    <sys:Uri x:Key="KlaOutreachUri">https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u</sys:Uri>
+    <sys:String x:Key="CloseLabel">Close</sys:String>
+    <sys:String x:Key="PrototypeLabel">Prototype</sys:String>
+    <sys:String x:Key="OutreachLabel">Outreach</sys:String>
+</ResourceDictionary>

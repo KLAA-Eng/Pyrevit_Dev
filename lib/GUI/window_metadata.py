@@ -1,12 +1,13 @@
-"""Host-independent caller identity and shared footer destinations."""
+"""Host-independent caller identity for the shared shell.
+
+The footer destinations and chrome labels are data in
+``lib/GUI/Resources/KLCodeChrome.xaml`` (read by the shell template in both
+hosts); this class carries only what the caller supplies. The normalisation
+vectors in ``window_metadata_vectors.json`` are shared with the C# adapter's tests.
+"""
 from __future__ import unicode_literals
 
 import re
-
-
-PROTOTYPE_URI = 'https://forms.cloud.microsoft/r/HjuggSZqyU'
-OUTREACH_URI = ('https://forms.microsoft.com/Pages/ResponsePage.aspx?'
-                'id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u')
 
 
 class WindowMetadata(object):
@@ -16,5 +17,3 @@ class WindowMetadata(object):
         version = (version or '').strip()
         version = re.sub(r'^version\s*[:=]?\s*', '', version, flags=re.IGNORECASE)
         self.VersionText = ('v' + version.lstrip('vV') if re.match(r'^[vV]?\d+\.\d+', version) else '')
-        self.PrototypeUri = PROTOTYPE_URI
-        self.OutreachUri = OUTREACH_URI

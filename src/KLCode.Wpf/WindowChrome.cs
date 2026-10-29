@@ -28,9 +28,8 @@ public sealed class WindowChrome
         Hyperlink outreach = Part<Hyperlink>(shell, "PART_Outreach");
         prototype.RequestNavigate += OnNavigate;
         outreach.RequestNavigate += OnNavigate;
-        Part<Button>(shell, "PART_Close").Content = window.TryFindResource("CloseLabel") ?? "Close";
-        SetLinkLabel(prototype, window.TryFindResource("PrototypeLabel") as string ?? "Prototype");
-        SetLinkLabel(outreach, window.TryFindResource("OutreachLabel") as string ?? "Outreach");
+        // Labels and destinations come from KLCodeChrome.xaml through the template (DynamicResource), so the
+        // locale dictionary ThemeBootstrapper merges after the controls overrides them without adapter code.
     }
 
     public static WindowChrome Attach(Window window, ContentControl shell, string? title,
@@ -44,12 +43,6 @@ public sealed class WindowChrome
     private static T Part<T>(ContentControl shell, string name) where T : class =>
         shell.Template.FindName(name, shell) as T
         ?? throw new InvalidOperationException("The shared window shell is missing " + name + ".");
-
-    private static void SetLinkLabel(Hyperlink link, string label)
-    {
-        link.Inlines.Clear();
-        link.Inlines.Add(new Run(label));
-    }
 
     private void OnClose(object sender, RoutedEventArgs args) => _close();
 

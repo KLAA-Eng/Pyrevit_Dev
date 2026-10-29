@@ -4,6 +4,8 @@
         <!-- Shared data-only primitives load in loose Python XAML and compiled WPF. -->
         <ResourceDictionary Source="KLCodeSharedPrimitives.xaml"/>
         <ResourceDictionary Source="KLCodeFoundationTokens.xaml"/>
+        <!-- Footer destinations and default chrome labels, read by both adapters; labels are DynamicResource so locale dictionaries override. -->
+        <ResourceDictionary Source="KLCodeChrome.xaml"/>
         <!-- Geometry-only leaf (generated); the presenter, pen and ImageSources below bind it to the tokens. -->
         <ResourceDictionary Source="../../_icons/gui/KLCodeIcons.xaml"/>
     </ResourceDictionary.MergedDictionaries>
@@ -612,13 +614,13 @@
                     <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaHeaderSideColumn}"/><ColumnDefinition Width="*"/><ColumnDefinition Width="{StaticResource KlaHeaderSideColumn}"/></Grid.ColumnDefinitions>
                     <ContentControl ContentTemplate="{StaticResource KLCodeWordmark}" Width="{StaticResource KlaWordmarkWidth}" Height="{StaticResource KlaWordmarkHeight}" Margin="{StaticResource KlaBrandInset}" HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="False" Focusable="False"/>
                     <TextBlock x:Name="PART_Title" Grid.Column="1" Text="{Binding Tag.Title, RelativeSource={RelativeSource TemplatedParent}}" TextAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="{StaticResource KlaTitleFontSize}"/>
-                    <Button x:Name="PART_Close" Grid.Column="2" Content="Close" Style="{StaticResource KlaFoundationCloseButton}" AutomationProperties.Name="Close window"/>
+                    <Button x:Name="PART_Close" Grid.Column="2" Content="{DynamicResource CloseLabel}" Style="{StaticResource KlaFoundationCloseButton}" AutomationProperties.Name="Close window"/>
                 </Grid>
                 <Grid x:Name="PART_Footer" Grid.Row="2" Margin="{StaticResource KlaFooterInset}">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaFooterSideColumn}"/><ColumnDefinition Width="*"/><ColumnDefinition Width="{StaticResource KlaFooterSideColumn}"/></Grid.ColumnDefinitions>
-                    <TextBlock VerticalAlignment="Center"><Hyperlink x:Name="PART_Prototype" NavigateUri="{Binding Tag.PrototypeUri, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource KlaFoundationLink}">Prototype</Hyperlink></TextBlock>
+                    <TextBlock VerticalAlignment="Center"><Hyperlink x:Name="PART_Prototype" NavigateUri="{StaticResource KlaPrototypeUri}" Style="{StaticResource KlaFoundationLink}"><Run Text="{DynamicResource PrototypeLabel}"/></Hyperlink></TextBlock>
                     <TextBlock x:Name="PART_Version" Grid.Column="1" Text="{Binding Tag.VersionText, RelativeSource={RelativeSource TemplatedParent}}" AutomationProperties.Name="Tool version" Foreground="{StaticResource KlaTextMutedBrush}" TextAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"><Hyperlink x:Name="PART_Outreach" NavigateUri="{Binding Tag.OutreachUri, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource KlaFoundationLink}">Outreach</Hyperlink></TextBlock>
+                    <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"><Hyperlink x:Name="PART_Outreach" NavigateUri="{StaticResource KlaOutreachUri}" Style="{StaticResource KlaFoundationLink}"><Run Text="{DynamicResource OutreachLabel}"/></Hyperlink></TextBlock>
                 </Grid>
             </Grid>
         </ControlTemplate></Setter.Value></Setter>
