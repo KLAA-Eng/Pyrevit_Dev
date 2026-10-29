@@ -45,18 +45,15 @@
 
         <StackPanel Grid.Row="1" Margin="12,6,12,0">
 
-            <Label Content="Overlay in this model:" Foreground="{StaticResource text_white}" FontSize="12" Padding="0,0,0,2"/>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="72"/>
-                </Grid.ColumnDefinitions>
-                <ComboBox x:Name="overlay_list" Height="24" SelectionChanged="overlay_selected"/>
-                <Button Grid.Column="1" Content="Refresh" Click="button_refresh" Height="24" Margin="6,0,0,0"
-                        FontSize="12" Style="{StaticResource KLCodeActionButton}"/>
-            </Grid>
+            <Label Content="Overlay (click a PDF image in the view):" Foreground="{StaticResource text_white}"
+                   FontSize="12" Padding="0,0,0,2"/>
+            <Border BorderBrush="{StaticResource border_green_dark}" BorderThickness="1" CornerRadius="4"
+                    Padding="6,3" MinHeight="24">
+                <TextBlock x:Name="overlay_name" Text="None: click a PDF overlay in the view."
+                           Foreground="{StaticResource text_white}" FontSize="12" TextWrapping="Wrap"/>
+            </Border>
             <UniformGrid Columns="3" Margin="0,6,0,0">
-                <Button Content="Place in View" Click="button_place" Height="24" Margin="0,0,3,0"
+                <Button Content="Place in View..." Click="button_place" Height="24" Margin="0,0,3,0"
                         FontSize="11" Style="{StaticResource KLCodeActionButton}"/>
                 <Button Content="Replace PDF..." Click="button_replace" Height="24" Margin="3,0,3,0"
                         FontSize="11" Style="{StaticResource KLCodeActionButton}"/>

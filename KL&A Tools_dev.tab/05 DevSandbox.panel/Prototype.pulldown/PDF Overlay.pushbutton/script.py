@@ -692,7 +692,7 @@ class PdfOverlayPalette(my_WPF):
         self.action_event = action_event
         # Captured at launch; pyRevit binds output to the running command.
         self.output = output
-        self.overlays = []
+        self.current = None
         self._loading = False
         self.add_wpf_resource()
         wpf.LoadComponent(self, os.path.join(os.path.dirname(__file__), 'PdfOverlayPalette.xaml'))
@@ -705,6 +705,11 @@ class PdfOverlayPalette(my_WPF):
         self.opacity_timer = DispatcherTimer()
         self.opacity_timer.Interval = TimeSpan.FromMilliseconds(OPACITY_DELAY_MS)
         self.opacity_timer.Tick += self.opacity_settled
+        # Clicking a PDF overlay image in Revit makes it the palette's overlay.
+        self.uiapp = HOST_APP.uiapp
+        self._selection_handler = self.selection_changed
+        self.uiapp.SelectionChanged += self._selection_handler
+        self.Closed += self.palette_closed
 
     # Queueing ---------------------------------------------------------------
 
@@ -725,39 +730,69 @@ class PdfOverlayPalette(my_WPF):
         self.Dispatcher.Invoke(Action(lambda: None), DispatcherPriority.Render)
 
     def selected_overlay(self):
-        index = self.overlay_list.SelectedIndex
-        if 0 <= index < len(self.overlays):
-            return self.overlays[index]
-        return None
+        return self.current
 
     def _usable_overlay(self):
         overlay = self.selected_overlay()
         if overlay is None:
-            self.set_status('Import a PDF or pick an overlay first.')
+            self.set_status('Click a PDF overlay in the view first, or Import PDF.')
         elif overlay.state is None:
             self.set_status(overlay.error)
             overlay = None
         return overlay
 
-    # List and controls --------------------------------------------------------
+    # Current overlay and controls -----------------------------------------------
 
-    def load_overlays(self, uiapp, select_stem=None):
+    def pick_current(self, uiapp, select_stem=None):
+        """Choose the overlay to work on: a given one, the selected image, the
+        previous one, or else the newest overlay in the active view."""
         uidoc = uiapp.ActiveUIDocument
-        previous = self.selected_overlay()
-        select_stem = select_stem or (previous.stem if previous else None)
-        self.overlays = order_overlays(find_overlays(uidoc.Document), uidoc.Document, uidoc.ActiveView)
-        self._loading = True
-        try:
-            self.overlay_list.Items.Clear()
-            selected = 0 if self.overlays else -1
-            for index, overlay in enumerate(self.overlays):
-                self.overlay_list.Items.Add(overlay.label)
-                if overlay.stem == select_stem:
-                    selected = index
-            self.overlay_list.SelectedIndex = selected
-        finally:
-            self._loading = False
+        doc = uidoc.Document
+        overlays = order_overlays(find_overlays(doc), doc, uidoc.ActiveView)
+        stems = [select_stem, self._selected_stem(doc, uidoc.Selection.GetElementIds()),
+                 self.current.stem if self.current else None]
+        chosen = None
+        for stem in stems:
+            chosen = next((overlay for overlay in overlays if stem and overlay.stem == stem), None)
+            if chosen:
+                break
+        if chosen is None:
+            chosen = next((overlay for overlay in overlays if overlay.in_view), None)
+        self.set_current(chosen, uidoc)
+
+    @staticmethod
+    def _selected_stem(doc, element_ids):
+        """Return the overlay stem of the first selected image, '' for a non-overlay image."""
+        for element_id in element_ids:
+            element = doc.GetElement(element_id)
+            if isinstance(element, DB.ImageInstance):
+                return _image_type_name(doc.GetElement(element.GetTypeId())) or ''
+        return None
+
+    def set_current(self, overlay, uidoc):
+        self.current = overlay
+        self.overlay_name.Text = overlay.label if overlay else 'None: click a PDF overlay in the view.'
         self.show_controls(uidoc)
+
+    def selection_changed(self, sender, args):
+        """Follow Revit's selection when it includes a PDF overlay image."""
+        try:
+            doc = args.GetDocument()
+            stem = self._selected_stem(doc, args.GetSelectedElements())
+            if stem is None:
+                return  # Nothing image-like selected; keep the current overlay.
+            if stem == '':
+                self.set_status('That image is not a PDF overlay from this tool.')
+                return
+            self.pick_current(self.uiapp, stem)
+        except Exception:
+            log('selection follow failed:\n' + traceback.format_exc())
+
+    def palette_closed(self, sender, e):
+        try:
+            self.uiapp.SelectionChanged -= self._selection_handler
+        except Exception:
+            log('selection unsubscribe failed:\n' + traceback.format_exc())
 
     def show_controls(self, uidoc):
         overlay = self.selected_overlay()
@@ -780,21 +815,15 @@ class PdfOverlayPalette(my_WPF):
         finally:
             self._loading = False
         if overlay is None:
-            self.set_status('No overlays in this model yet. Pick a page and DPI, then Import PDF.')
+            self.set_status('Click a PDF overlay in the view to work on it, or pick a page and DPI '
+                            'and Import PDF. Place in View reuses one from another view.')
         elif overlay.error:
             self.set_status(overlay.error)
         elif not overlay.in_view:
-            self.set_status('This overlay is not in the active view. Click Place in View '
-                            'to reuse it here without importing again.')
+            self.set_status('This overlay is not in the active view. Click it in a view that shows it, '
+                            'or use Place in View.')
         else:
-            self.set_status('Ready. Reuse this overlay; Replace PDF loads a revised file into it.')
-
-    def button_refresh(self, sender, e):
-        self.run(self.load_overlays, 'Refreshing...')
-
-    def overlay_selected(self, sender, e):
-        if not self._loading:
-            self.run(lambda uiapp: self.show_controls(uiapp.ActiveUIDocument), '')
+            self.set_status('Ready. Replace PDF loads a revised file into this overlay.')
 
     def button_import(self, sender, e):
         try:
@@ -811,7 +840,7 @@ class PdfOverlayPalette(my_WPF):
 
         def action(uiapp):
             paths = import_pdf(uiapp, pdf_path, page, dpi)
-            self.load_overlays(uiapp, os.path.splitext(os.path.basename(paths['overlay']))[0])
+            self.pick_current(uiapp, os.path.splitext(os.path.basename(paths['overlay']))[0])
             self.set_status('Placed at the view scale in the middle of the view. '
                             'Click Align (2 Points) to fit it to the framing.')
         self.run(action, 'Importing page {} at {} DPI...'.format(page, dpi))
@@ -828,15 +857,25 @@ class PdfOverlayPalette(my_WPF):
         self.run(action, ALIGN_STEPS[0])
 
     def button_place(self, sender, e):
-        overlay = self._usable_overlay()
-        if overlay is None:
-            return
-
         def action(uiapp):
+            uidoc = uiapp.ActiveUIDocument
+            doc = uidoc.Document
+            elsewhere = [overlay for overlay in order_overlays(find_overlays(doc), doc, uidoc.ActiveView)
+                         if not overlay.in_view and overlay.state is not None]
+            if not elsewhere:
+                self.set_status('Every overlay in this model is already in this view.')
+                return
+            labels = [overlay.label for overlay in elsewhere]
+            choice = forms.SelectFromList.show(labels, title='Place overlay in this view',
+                                               button_name='Place', multiselect=False)
+            if not choice:
+                self.set_status('Nothing placed.')
+                return
+            overlay = elsewhere[labels.index(choice)]
             place_in_view(uiapp, overlay)
-            self.load_overlays(uiapp, overlay.stem)
+            self.pick_current(uiapp, overlay.stem)
             self.set_status('Placed in this view at its aligned position.')
-        self.run(action, 'Placing overlay in this view...')
+        self.run(action, 'Finding overlays in other views...')
 
     def button_replace(self, sender, e):
         overlay = self._usable_overlay()
@@ -849,7 +888,7 @@ class PdfOverlayPalette(my_WPF):
 
         def action(uiapp):
             warning = replace_pdf(uiapp, overlay, pdf_path)
-            self.load_overlays(uiapp, overlay.stem)
+            self.pick_current(uiapp, overlay.stem)
             self.set_status(warning or 'Loaded {} into the overlay; alignment kept.'.format(
                 os.path.basename(pdf_path)))
         self.run(action, 'Loading the revised PDF (page {}, {} DPI)...'.format(
@@ -858,7 +897,7 @@ class PdfOverlayPalette(my_WPF):
     def button_remove(self, sender, e):
         overlay = self.selected_overlay()
         if overlay is None:
-            self.set_status('Pick an overlay to remove.')
+            self.set_status('Click the PDF overlay to remove in the view first.')
             return
         if not forms.alert('Remove "{}" and all its placements from the model?'.format(overlay.label),
                            title=COMMAND_TITLE, ok=False, yes=True, no=True):
@@ -866,7 +905,8 @@ class PdfOverlayPalette(my_WPF):
 
         def action(uiapp):
             remove_overlay(uiapp, overlay)
-            self.load_overlays(uiapp)
+            self.current = None
+            self.pick_current(uiapp)
             self.set_status('Overlay removed. Undo in Revit brings it back.')
         self.run(action, 'Removing overlay...')
 
@@ -950,8 +990,8 @@ def main():
     palette = PdfOverlayPalette(handler, UI.ExternalEvent.Create(handler), script.get_output())
     log('palette loaded')
     handler.palette = palette
-    palette.load_overlays(HOST_APP.uiapp)
-    log('overlays listed: {}'.format(len(palette.overlays)))
+    palette.pick_current(HOST_APP.uiapp)
+    log('current overlay: {}'.format(palette.current.stem if palette.current else None))
     palette.Show()
     log('palette shown')
 

@@ -69,15 +69,23 @@ lets the user blend or blink the two for review.
    labels printed in the PDF (see Member check). Members to review are
    selected in Revit and listed in the pyRevit output window.
 
-5. **Reuse.** The overlay list names each import by PDF, page, DPI, import
-   time, and whether it is in the active view. Overlays in the active view
-   come first, newest first, and the first one is selected. **Place in View**
-   adds the selected overlay to the active view at its aligned position. This
-   works in any view facing the same way as the one it was aligned in, such as
-   another plan view. **Replace PDF...** loads a revised PDF into the selected
+5. **Reuse.** The palette has no overlay list; it works on the overlay
+   whose PDF image is selected in Revit. It follows
+   `UIApplication.SelectionChanged` (Revit 2023+): selecting an overlay image
+   makes it current, a selection without images keeps the current overlay (so
+   Check Members selecting framing does not change it), and selecting an image
+   that is not an overlay says so. The handler only reads the model and is
+   removed when the palette closes. At launch the palette uses a selected
+   overlay image, else the newest overlay in the active view. The current
+   overlay is named by PDF, page, DPI, import time, and whether it is in the
+   active view. **Place in View...** lists the overlays that are not in the
+   active view and adds the chosen one at its aligned position. This works in
+   any view facing the same way as the one it was aligned in, such as another
+   plan view; Revit's Copy and Paste Aligned also works, and the pasted image
+   is picked up when selected. **Replace PDF...** loads a revised PDF into the selected
    overlay at the same page and DPI, keeping its alignment, color, and opacity.
    If the new page has a different pixel size, the palette says so, because
-   the alignment then only holds near the page center. **Remove** deletes the
+   the alignment then only holds near the page center. **Remove** deletes the current
    overlay image and all its placements from the model after a confirmation;
    Revit Undo restores it, and its local files are kept.
 
