@@ -130,27 +130,3 @@ def alert_message(state='Normal'):
         return '\n\n'.join('Sample issue {}: {}'.format(i, LONG_NAME)
                             for i in range(1, 9))
     return 'Fictional preview data. Actions affect this preview only.'
-
-
-def review_items(state='Normal'):
-    """Bind the optional Model Checker view without running any checks."""
-    validate_state(state)
-    if state == 'Empty':
-        return []
-    rows = []
-    for index, severity in enumerate(('Critical', 'Error', 'Warning', 'Information')):
-        item = PreviewItem('Sample member {}'.format(index + 1))
-        item.Severity = severity
-        item.Check = 'Column grid alignment' if index % 2 else 'Beam support'
-        item.Category = 'Sample relationship'
-        item.Member = item.Name
-        item.End = 'A'
-        item.Level = 'Level 01'
-        item.Offset = '0.50 in'
-        item.Measurement = 'Sample perpendicular distance'
-        item.Value = 0.5
-        item.Related = 'Sample support {}'.format(index + 1)
-        item.Status = 'Open'
-        item.Reason = LONG_NAME if state == 'Long content' else 'Fictional finding for visual review.'
-        rows.append(item)
-    return rows

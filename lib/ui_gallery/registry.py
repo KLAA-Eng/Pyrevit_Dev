@@ -118,10 +118,6 @@ def gallery_entries(extension_root, caller_index=None):
         row = dict(id='source:' + path, category='Discovered window', relative_path=path,
                    title=source['title'] or os.path.basename(path), called_by=path,
                    description='Standalone source found in this checkout.', can_launch=False)
-        if path == ('KL&A Tools.tab/05 DevSandbox.panel/Model Review.pulldown/'
-                    'Model Checker.pushbutton/review.xaml'):
-            row.update(id='kla-model-checker', category='KL&A custom', can_launch=True,
-                       description='Model Checker review window with fictional findings and simulated actions.')
         row = _prepare(row, extension_root)
         if not row['can_launch'] and row['source_path']:
             row['preview_status'] = 'Needs preview adapter'

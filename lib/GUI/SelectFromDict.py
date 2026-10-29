@@ -10,7 +10,7 @@ import os
 from pyrevit import forms # Needed for wpf import to work.
 
 # Custom Imports
-from GUI.forms import my_WPF
+from GUI.forms import my_WPF, ListItem
 from GUI.window_chrome import load_window
 
 #>>>>>>>>>> .NET IMPORTS
@@ -32,13 +32,6 @@ doc     = __revit__.ActiveUIDocument.Document
 active_view_id      = doc.ActiveView.Id
 active_view         = doc.GetElement(active_view_id)
 active_view_level   = active_view.GenLevel
-
-class ListItem:
-    """Helper Class for displaying selected sheets in my custom GUI."""
-    def __init__(self,  Name='Unnamed', element = None, checked = False):
-        self.Name       = Name
-        self.IsChecked  = checked
-        self.element    = element
 
 # ╔═╗╦  ╔═╗╔═╗╔═╗╔═╗╔═╗
 # ║  ║  ╠═╣╚═╗╚═╗║╣ ╚═╗

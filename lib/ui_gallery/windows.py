@@ -13,7 +13,7 @@ from .template_data import TEMPLATE_FILES
 
 from ui_gallery.scenarios import (PreviewItem, alert_message, filtered_items, naming_values,
                                   parse_offset, recall_items, rename_samples,
-                                  review_items, selection_items, set_checked, validate_state)
+                                  selection_items, set_checked, validate_state)
 
 
 DEFERRED_IDS = frozenset((
@@ -31,7 +31,6 @@ SOURCES = {
     'kla-select-from-dict': 'lib/GUI/SelectFromDict.xaml',
     'kla-steel-psf': 'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
     'kla-view-range': 'KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
-    'kla-model-checker': 'KL&A Tools.tab/05 DevSandbox.panel/Model Review.pulldown/Model Checker.pushbutton/review.xaml',
     'ui-gallery-preview-fixture': 'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml',
 }
 
@@ -236,9 +235,7 @@ def _window_type():
                                     for i in range(len(self._sample_names))]
             self._duplicate_option = 'Duplicate'
             title = '{} [Gallery: {}]'.format(launcher.get('title', 'Preview'), state)
-            if self.preview_id in ('kla-model-checker', 'ui-gallery-preview-fixture'):
-                if self.preview_id == 'ui-gallery-preview-fixture':
-                    merge(self, os.path.join(root, 'lib', 'GUI', 'Resources', 'WPF_styles.xaml'))
+            if self.preview_id == 'ui-gallery-preview-fixture':
                 wpf.LoadComponent(self, path)
                 self.Title = title
             else:
@@ -277,8 +274,6 @@ def _window_type():
                 self.content_host.Content = PreviewRecallContent(self)
             elif self.preview_id == 'kla-view-range':
                 self.DataContext = ViewRangeData(self.preview_state)
-            elif self.preview_id == 'kla-model-checker':
-                self._initialize_review()
             if hasattr(self, 'result_panel'):
                 if self.preview_state == 'Error':
                     self._show_result('Sample: 1 skipped; 1 failed.',
@@ -302,67 +297,6 @@ def _window_type():
 
         def _preview_navigation(self, uri):
             self.preview_result = 'Footer navigation simulated; no external page opened.'
-
-        def _initialize_review(self):
-            self._review_rows = review_items(self.preview_state)
-            self.summary.Text = '{} fictional findings. No checks were run.'.format(len(self._review_rows))
-            self.coverage_text.Text = 'Preview coverage: sample checks and members only.'
-            self.stale_text.Text = ('Sample report is stale; rerun the simulation.'
-                                    if self.preview_state == 'Error' else '')
-            self.view_status.Text = 'No Revit review view is created by this preview.'
-            self.selection_status.Text = 'Select a fictional finding to inspect its details.'
-            self._review_events = []
-            for name, values in (('severity_filter', ['All', 'Critical', 'Error', 'Warning', 'Information']),
-                                  ('check_filter', ['All', 'Column grid alignment', 'Beam support']),
-                                  ('level_filter', ['All', 'Level 01']),
-                                  ('status_filter', ['All', 'Open', 'Accepted'])):
-                widget = getattr(self, name)
-                widget.ItemsSource = values
-                widget.SelectedIndex = 0
-                widget.SelectionChanged += self._review_filter
-            self.search_box.TextChanged += self._review_filter
-            self.findings.SelectionChanged += self._review_selected
-            for name, action in (('coverage_button', 'Coverage details'), ('grids_button', 'Assign grid pair'),
-                                  ('select_button', 'Select / Zoom'), ('view_button', 'Open review 3D'),
-                                  ('accept_button', 'Accept exception'), ('reopen_button', 'Reopen finding'),
-                                  ('rerun_button', 'Rerun')):
-                def handler(sender, args, label=action):
-                    self._review_action(label)
-                self._review_events.append(handler)
-                getattr(self, name).Click += handler
-            self.close_button.Click += self.button_close
-            self._review_filter(None, None)
-
-        def _review_filter(self, sender, args):
-            rows, unused = filtered_items(self._review_rows, self.search_box.Text or '')
-            for name, field in (('severity_filter', 'Severity'), ('check_filter', 'Check'),
-                                 ('level_filter', 'Level'), ('status_filter', 'Status')):
-                selected = getattr(self, name).SelectedItem
-                if selected and str(selected) != 'All':
-                    rows = [row for row in rows if getattr(row, field) == str(selected)]
-            refresh(self.findings, rows)
-            self.result_count.Text = '{} visible sample findings'.format(len(rows))
-
-        def _review_selected(self, sender, args):
-            item = self.findings.SelectedItem
-            self.detail.Text = ('{}\n{}\n{}\n{}'.format(item.Member, item.Check, item.Status, item.Reason)
-                                if item else 'No fictional finding selected.')
-
-        def _review_action(self, action):
-            item = self.findings.SelectedItem
-            if action == 'Rerun':
-                self._review_rows = review_items('Normal')
-                self.stale_text.Text = ''
-                self._review_filter(None, None)
-            elif action in ('Accept exception', 'Reopen finding'):
-                if not item:
-                    self._feedback('Select a fictional finding first.', True)
-                    return
-                item.Status = 'Accepted' if action == 'Accept exception' else 'Open'
-                self._review_filter(None, None)
-                self.detail.Text = '{}: {}'.format(item.Member, item.Status)
-            else:
-                self._feedback('{} simulated; no model selection, view, or saved data changed.'.format(action))
 
         def _feedback(self, message, error=False):
             self.preview_result = message

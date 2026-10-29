@@ -21,12 +21,6 @@ from find_replace.revit_batch import apply_batch
 from find_replace.window import present
 from find_replace.workflow import case_value, new_result, rename_value
 
-# .NET IMPORTS
-from clr import AddReference
-AddReference("System")
-from System.Diagnostics.Process import Start
-from System.Windows.Window      import DragMove
-from System.Windows.Input       import MouseButtonState
 
 # ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
 # ╚╗╔╝╠═╣╠╦╝║╠═╣╠╩╗║  ║╣ ╚═╗
@@ -190,19 +184,6 @@ class MyWindow(my_WPF):
         return self.input_sheet_name_suffix.Text
 
     # GUI EVENT HANDLERS:
-    def button_close(self,sender,e):
-        """Stop application by clicking on a <Close> button in the top right corner."""
-        self.Close()
-
-    def Hyperlink_RequestNavigate(self, sender, e):
-        """Forwarding for a Hyperlink"""
-        Start(e.Uri.AbsoluteUri)
-
-    def header_drag(self,sender,e):
-        """Drag window by holding LeftButton on the header."""
-        if e.LeftButton == MouseButtonState.Pressed:
-            DragMove(self)
-
     def button_run(self, sender, e):
         """Button action: Rename view with given """
         self.rename()

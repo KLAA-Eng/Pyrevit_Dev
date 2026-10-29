@@ -18,9 +18,6 @@ public sealed class DesignSystemResourceContractTests
         "button_bg_hover",
         "border_green_dark",
         "border_green",
-        "uncheckbox_checked_colour",
-        "checkbox_checked_colour",
-        "footer_donate",
     };
 
     private static readonly string[] RequiredCompiledStyleKeys =

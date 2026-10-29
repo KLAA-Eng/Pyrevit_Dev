@@ -149,18 +149,6 @@ class WindowBackgroundTests(unittest.TestCase):
             adapter = stream.read()
         self.assertIn('host_loader(xaml_path)', adapter)
 
-    def test_shared_dictionary_exposes_template_control_styles(self):
-        styles_path = os.path.join(PROJECT_ROOT, 'lib/GUI/Resources/WPF_styles.xaml')
-        with open(styles_path, 'r', encoding='utf-8') as styles_file:
-            styles = styles_file.read()
-
-        self.assertIn('x:Key="KLCodeWordmark"', styles)
-        self.assertIn('x:Key="KLCodeCloseButton"', styles)
-        self.assertIn('x:Key="KLCodeActionButton"', styles)
-        self.assertIn('x:Key="KLCodeFilterTextBox"', styles)
-        self.assertIn('Background="{StaticResource text_green}"', styles)
-        self.assertIn('<Viewbox Width="70" Height="12"', styles)
-
     def test_search_windows_use_the_template_icon_and_filter_shell(self):
         search_windows = (
             'lib/GUI/SelectFromDict.xaml',

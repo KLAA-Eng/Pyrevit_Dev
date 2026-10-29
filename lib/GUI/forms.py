@@ -1,5 +1,4 @@
 from WPF_Base import my_WPF
-from SelectFromDict import select_from_dict
 
 
 class ListItem:
@@ -8,3 +7,6 @@ class ListItem:
         self.Name       = Name
         self.IsChecked  = checked
         self.element    = element
+
+
+from SelectFromDict import select_from_dict  # noqa: E402 — needs my_WPF and ListItem above

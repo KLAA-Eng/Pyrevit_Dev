@@ -4,12 +4,8 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../../_icons/gui/KLCodeIcons.xaml"/>
     </ResourceDictionary.MergedDictionaries>
-    <!-- Shared WPF values; no Python, Revit, or compiled-add-in dependency. -->
-    <sys:Double x:Key="KlaSpace4">4</sys:Double>
-    <sys:Double x:Key="KlaSpace8">8</sys:Double>
-    <sys:Double x:Key="KlaSpace12">12</sys:Double>
-    <sys:Double x:Key="KlaSpace16">16</sys:Double>
-    <sys:Double x:Key="KlaSpace24">24</sys:Double>
+    <!-- Shared WPF values; no Python, Revit, or compiled-add-in dependency. The spacing scale is 4 / 8 / 12 / 16 / 24; XAML
+         consumes it through the typed GridLength / Thickness keys below, so no Double spacing tokens exist. -->
     <!-- GridLength is required for row/column definitions; WPF does not coerce Double resources. -->
     <GridLength x:Key="KlaChromeRow">24</GridLength>
     <GridLength x:Key="KlaControlRow">32</GridLength>
@@ -26,7 +22,6 @@
     <Thickness x:Key="KlaItemPadding">4,1</Thickness>
     <Thickness x:Key="KlaBrandInset">8,0,0,0</Thickness>
     <Thickness x:Key="KlaFooterInset">12,0</Thickness>
-    <sys:Double x:Key="KlaChromeHeight">24</sys:Double>
     <sys:Double x:Key="KlaControlHeight">32</sys:Double>
     <sys:Double x:Key="KlaCompactHeight">28</sys:Double>
     <sys:Double x:Key="KlaFilterHeight">24</sys:Double>

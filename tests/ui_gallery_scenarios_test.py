@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'lib'))
 
 from ui_gallery.scenarios import (STATES, alert_message, filtered_items,
                                   parse_offset, recall_items, rename_samples,
-                                  review_items, selection_items, set_checked)
+                                  selection_items, set_checked)
 
 
 class GalleryScenarioTests(unittest.TestCase):
@@ -66,19 +66,6 @@ class GalleryScenarioTests(unittest.TestCase):
             selection_items('Unknown')
         with self.assertRaises(ValueError):
             rename_samples(['A'], action='Delete')
-
-    def test_optional_model_checker_rows_have_real_grid_fields_and_local_status(self):
-        self.assertEqual([], review_items('Empty'))
-        rows = review_items('Normal')
-        self.assertEqual(['Critical', 'Error', 'Warning', 'Information'],
-                         [row.Severity for row in rows])
-        self.assertEqual('Open', rows[0].Status)
-        rows[0].Status = 'Accepted'
-        self.assertEqual('Open', review_items('Normal')[0].Status)
-        for field in ('Check', 'Category', 'Member', 'End', 'Level', 'Offset',
-                      'Measurement', 'Value', 'Related', 'Status', 'Reason'):
-            self.assertTrue(hasattr(rows[0], field), field)
-
 
 if __name__ == '__main__':
     unittest.main()

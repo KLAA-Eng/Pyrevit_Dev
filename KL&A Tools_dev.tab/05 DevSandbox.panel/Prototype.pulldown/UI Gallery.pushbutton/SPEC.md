@@ -139,10 +139,10 @@ actual Revit TaskDialog with fictional actions.
 
 The catalog inventories every contained Window XAML source. New unregistered
 windows are listed as **Needs preview adapter**, with opening disabled: discovery
-never grants execution permission. The exact Model Checker `review.xaml` path
-has a reviewed sample adapter when that source is present. The Model Checker
+never grants execution permission. The Model Checker
 command remains on its own development branch until separately integrated; the
-Gallery does not copy it onto this branch. Pages, UserControls, and resource
+Gallery does not copy it onto this branch, and its former sample adapter was
+removed on 2026-10-29 (discovery lists the source without a preview if it appears). Pages, UserControls, and resource
 dictionaries do not become standalone entries.
 
 ## Deferred compiled previews

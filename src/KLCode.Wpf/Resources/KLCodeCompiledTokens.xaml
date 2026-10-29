@@ -4,15 +4,8 @@
         <ResourceDictionary Source="../GUI/Resources/KLCodeFoundationTokens.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <SolidColorBrush x:Key="KlaSurfaceBrush" Color="#10171B" />
-    <SolidColorBrush x:Key="KlaSurfaceDeepBrush" Color="#0D1418" />
     <SolidColorBrush x:Key="KlaPanelBrush" Color="{Binding Color, Source={StaticResource KlaComponentSurfaceBrush}}" />
     <SolidColorBrush x:Key="KlaMutedTextBrush" Color="{Binding Color, Source={StaticResource KlaMutedBrush}}" />
     <SolidColorBrush x:Key="KlaSubtleTextBrush" Color="{Binding Color, Source={StaticResource KlaMutedBrush}}" />
-    <SolidColorBrush x:Key="KlaNeutralBorderBrush" Color="{Binding Color, Source={StaticResource KlaComponentBorderBrush}}" />
-    <SolidColorBrush x:Key="KlaRowHoverBrush" Color="#4F4F4F" />
-    <SolidColorBrush x:Key="KlaRowSelectedBrush" Color="#4933714F" />
-    <SolidColorBrush x:Key="KlaNearBlackBrush" Color="#131313" />
-    <SolidColorBrush x:Key="KlaBlackBrush" Color="#000000" />
     <SolidColorBrush x:Key="KlaBlockingBrush" Color="{Binding Color, Source={StaticResource KlaErrorBrush}}" />
-    <SolidColorBrush x:Key="KlaTransparentBrush" Color="Transparent" />
 </ResourceDictionary>

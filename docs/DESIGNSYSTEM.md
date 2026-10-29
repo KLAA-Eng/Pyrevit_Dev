@@ -34,10 +34,10 @@ continues to preview the Python sources; compiled previews remain deferred. The
 `KLCodeFoundation.xaml` owns the shell and explicit control styles. It merges
 event-free `KLCodeSharedPrimitives.xaml` for the canonical palette, outlined
 wordmark, footer links and scrollbars. Both loose Python XAML and compiled WPF
-package the same resources. Legacy `WPF_styles.xaml` remains unchanged for
-docked/tooling consumers outside this migration. Focus, pressed and
-disabled brushes supplement brand colors. Footer links and version
-use the existing `footer_donate` and `text_gray` colors, per owner review.
+package the same resources. The legacy `WPF_styles.xaml` dictionary was deleted on
+2026-10-29; no window loaded it. Focus, pressed and disabled brushes supplement
+brand colors. Footer links and version use `button_bg_hover` and `text_gray`, per
+owner review.
 Workflow data and host adapters remain separate from shared presentation.
 
 `KLCodeComponents.xaml` merges the foundation and adds opt-in field/group,
@@ -126,8 +126,7 @@ The nine Python tool windows and five references consume the same foundation
 and components. Compiled windows use `KLCode.Wpf` aliases and `ThemeBootstrapper`
 with links to those canonical XAML sources; C# retains its event/localization
 adapter. A shared style change therefore reaches both source implementations.
-Legacy `WPF_styles.xaml` remains for docked/tooling consumers, including the
-Gallery catalog's own shell. Standalone Recall uses a separate body so its
+The Gallery catalog keeps its own local shell resources. Standalone Recall uses a separate body so its
 docked consumer retains its existing appearance. The
 [production migration review](knowledge/reviews/design-system/2026-10-29-production-migration.md)
 records construction/layout evidence and remaining build/host limits.
@@ -236,7 +235,7 @@ New prototype scripts should start with `lib/_icons/drill_32px_orange.png` as th
 
 ## GUI Colors
 
-`lib/GUI/Resources/WPF_styles.xaml` defines the legacy pyRevit brush keys and
+(Historical — `WPF_styles.xaml` was deleted on 2026-10-29.) `lib/GUI/Resources/WPF_styles.xaml` defined the legacy pyRevit brush keys and
 control templates. `lib/GUI/Resources/KLCode_palette.xaml` carries matching
 palette keys for compiled WPF, and
 `src/KLCode.Wpf/Resources/KLCodeControls.xaml` merges that compiled palette.

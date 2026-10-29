@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import os
 
-from WPF_Base import my_WPF
+from WPF_Base import my_WPF  # not GUI.forms: that module imports the Revit-bound SelectFromDict at load time
 from GUI.window_chrome import load_window, fit_window_height
 
 

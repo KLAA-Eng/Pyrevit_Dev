@@ -7,12 +7,6 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from GUI.forms import my_WPF
 
-# .NET IMPORTS
-from clr import AddReference
-AddReference("System")
-from System.Diagnostics.Process import Start
-from System.Windows.Window import DragMove
-from System.Windows.Input import MouseButtonState
 
 
 # ╔╗ ╔═╗╔═╗╔═╗  ╔═╗╦  ╔═╗╔═╗╔═╗
@@ -79,19 +73,6 @@ class BaseRenaming(my_WPF):
     # ║ ╦║ ║║  ║╣ ╚╗╔╝║╣ ║║║ ║ ╚═╗
     # ╚═╝╚═╝╩  ╚═╝ ╚╝ ╚═╝╝╚╝ ╩ ╚═╝ GUI EVENTS (BUTTONS)
     # ====================================================================================================
-    def button_close(self,sender,e):
-        """Stop application by clicking on a <Close> button in the top right corner."""
-        self.Close()
-
-    def Hyperlink_RequestNavigate(self, sender, e):
-        """Forwarding for a Hyperlink"""
-        Start(e.Uri.AbsoluteUri)
-
-    def header_drag(self,sender,e):
-        """Drag window by holding LeftButton on the header."""
-        if e.LeftButton == MouseButtonState.Pressed:
-            DragMove(self)
-
     def button_run(self, sender, e):
         """Button action: Rename view with given """
         self.rename_elements()

@@ -14,9 +14,6 @@ class DuplicateSheets(my_WPF):
         load_window(self, os.path.join(os.path.dirname(__file__), 'DuplicateSheets.xaml'),
                     title, version)
 
-    def button_close(self, sender, e):
-        self.Close()
-
     def radiobutton_duplicate_option(self, sender, e):
         self._duplicate_option_handler(sender)
 
