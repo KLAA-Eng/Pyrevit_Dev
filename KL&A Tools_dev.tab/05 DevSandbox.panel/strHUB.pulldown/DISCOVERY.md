@@ -1,9 +1,10 @@
 # strHUB discovery and compatibility evidence
 
-Recorded: 2026-10-29. Status: discovery; scope and technical choices await discussion.
+Recorded: 2026-10-29. Status: both interview rounds answered;
+the draft [SPEC.md](SPEC.md) awaits approval.
 
-This file owns the current discovery findings and open decision tree. It is not an
-approved specification, implementation plan, or evidence of a working exporter.
+This file owns discovery evidence and the interview history. [SPEC.md](SPEC.md)
+owns the proposed requirements. Neither is evidence of a working exporter.
 All strHUB outputs remain under this pulldown at the user's request, overriding
 the repository's usual central documentation locations for this effort.
 
@@ -33,7 +34,7 @@ The extension checkout was clean before this discovery file was added.
 | Extension | Branch `dev.ram-push`, HEAD `5bb67c34b2c952ac60a938899e46627fca7a5c49` | Existing development branch retained. |
 | Revit 2024 | Installed executable `24.3.60.12` | Available alternate host; not qualified here. |
 | Revit 2025 | Installed executable `25.5.0.57`; `RevitNET.runtimeconfig.json` requests `net10.0` | Exact update/runtime matters, not just the Revit year. |
-| Revit 2026 | Installed executable `26.5.0.55`; runtime config requests `net10.0` | Proposed first host, pending user choice. |
+| Revit 2026 | Installed executable `26.5.0.55`; runtime config requests `net10.0` | User-selected first host; runtime integration remains unqualified. |
 | Revit 2027 | Installed; runtime config requests `net10.0` | Outside the inspected BHoM Revit build configurations. |
 | pyRevit | Version file `6.5.3.26176+2017` | Installed clone's version, not a live runtime assertion. |
 | pyRevit attachment | User manifests for 2024/2025/2026 point to `IPY2712PR`; netfx for 2024, netcore for 2025/2026 | Preserve IronPython 2.7 command compatibility. Live assembly loading remains untested. |
@@ -88,6 +89,8 @@ must be selected before qualification.
    `FamilyInstance`. For 2023 onward it uses an associated `AnalyticalMember`
    curve when available, otherwise the physical location curve. This can produce
    mixed geometry provenance unless strHUB defines and reports the policy.
+   The user has now required physical location lines exclusively; associated
+   analytical curves must not supply export geometry.
 4. **Useful identity data exists.** Conversion calls `SetIdentifiers`, attaching
    Revit identifiers including `UniqueId`. Preserve source document identity as
    well as element identity before claiming suitability for future round trips;
@@ -181,34 +184,94 @@ modified binaries, review the exact licenses, notices, and corresponding source
 requirements. No code has been vendored and no distribution conclusion is made.
 [RAM license](https://github.com/BHoM/RAM_Toolkit/blob/8dee79ffc8f149f4630fc72a4b2272447473d02d/LICENSE).
 
-## Decision tree and first interview round
+## Decision tree and interview record
 
 Settled by the user's request: DevSandbox destination; BHoM reuse preference;
 Revit-to-RAM SS as the initial transfer direction; future multi-software and
-round-trip intent. Everything below is proposed, not approved.
+round-trip intent.
 
-The independent frontier sent to the user is:
+### Round 1: settled choices
 
-1. **Milestone:** qualify a tiny agreed steel frame exported to a new RAM file,
-   with transferred/skipped reporting and no Revit model changes? Recommended:
-   yes, as the first end-to-end proof. Alternatives: diagnosis only, or start
-   with requirements for a production exporter.
-2. **Source model:** start from physical beams/columns and make the associated
-   analytical-curve policy explicit? Recommended: yes. Alternatives: require a
-   prepared analytical model, or support separate physical/analytical modes.
-3. **Version target:** qualify installed Revit 2026 `26.5.0.55` and RAM SS
-   `25.00.02.42` first? Recommended: yes. Alternatives offered: Revit 2025 or
-   2024 with the same RAM version.
+1. **Milestone accepted:** qualify a tiny agreed steel frame exported to a new
+   RAM file, with transferred/skipped reporting and no Revit model changes.
+2. **Source policy specified by the user:** use physical columns and beams,
+   using their location lines. This is more specific than accepting BHoM's
+   physical-to-analytical fallback behavior. Associated analytical geometry is
+   excluded as an export geometry source.
+3. **Version target accepted:** installed Revit 2026 `26.5.0.55` and RAM SS
+   `25.00.02.42` first.
 
-Pending dependent branches include exact fixture/content, geometry policy,
-base datum, section/material mappings, acceptance tolerances, target-file
-ownership, and what counts as a complete transfer. Runtime placement depends
-on compatibility evidence. Fork scope depends on a demonstrated blocker.
+### Follow-up source inspection: physical location lines
 
-After the frontier is answered, recompute the next questions. Confirm shared
-understanding before acting on interview decisions. Then write the spec and
-request its approval in a separate gate, followed by separately approved plan
-and tasks. No implementation is authorized by this discovery document.
+At the pinned local Revit toolkit revision, `BarsFromRevit` unconditionally
+tries the analytical association before the physical fallback. No physical-only
+switch was found in the inspected settings. Its fallback
+`Query/LocationCurve.cs` also does more than read a raw Revit location curve:
+framing conversion can transform the axis and apply start/end extensions;
+column conversion can apply column extensions; missing location data can fall
+back to solid geometry. Those behaviors cannot silently define the user's
+requested geometry policy.
+
+Vertical columns can be point-located. The inspected BHoM column query derives
+an axis from insertion X/Y and base/top level elevations plus offsets before
+applying extensions. A proposed strHUB definition is to use that insertion and
+constraint information to define the vertical line, without the later solid or
+extension adjustments. Beam geometry uses the stored physical
+`LocationCurve.Curve` directly. The user accepted this definition in round 2.
+
+This is an identified behavior gap, not yet a reason to fork: an explicit
+geometry extraction/composition layer may preserve BHoM's objects, other
+conversion helpers, and RAM adapter while satisfying the requirement. The
+implementation mechanism belongs in the later approved plan.
+
+Evidence:
+[BHoM location query](https://github.com/BHoM/Revit_Toolkit/blob/5cd34ccc523e18fddcad51105a1fa7b0ea81893c/Revit_Core_Engine/Query/LocationCurve.cs),
+[BHoM bar conversion](https://github.com/BHoM/Revit_Toolkit/blob/5cd34ccc523e18fddcad51105a1fa7b0ea81893c/Revit_Core_Engine/Convert/Structure/FromRevit/Bars.cs),
+and [Autodesk's Revit 2026 LocationPoint reference](https://help.autodesk.com/cloudhelp/2026/ENU/Revit-API-MainReference/files/html/8d81892a-7863-cbec-9148-a0311f3bf2b6.htm).
+
+### Round 2: settled choices
+
+4. **Location-line definition:** use beam `LocationCurve` endpoints directly;
+   derive vertical column axes from insertion X/Y and base/top levels plus
+   offsets. Ignore analytical geometry, solid extents, and end-extension
+   adjustments. Accepted by the user.
+5. **Proof contents:** manually select a one-story rectangular steel bay in the
+   active document: four vertical columns and four straight horizontal beams,
+   using standard AISC sections and the required Revit levels. Linked elements,
+   braces, slabs, walls, loads, and analysis/design execution are excluded from
+   this first proof. Accepted by the user.
+6. **Fidelity policy:** block export before target writes if an included member
+   cannot be represented faithfully or its RAM section mapping is unverified;
+   report the reason instead of silently flattening, moving, or substituting it.
+   Accepted by the user, with emphasis on reporting. This makes skipped or
+   unsupported input explicit and prevents
+   a partial or approximated model from being reported as a successful proof.
+7. **Datum:** choose a Revit base level for RAM Z=0; preserve Revit internal X/Y
+   and axes, translate export Z by the chosen base elevation, and record that
+   transform. Apply the translation to export data only. Accepted by the user.
+
+The seven answers establish the scope captured in [SPEC.md](SPEC.md). Its review
+confirms shared understanding and exclusions before planning. The actual fixture
+and section mapping values will be recorded with test evidence rather than
+guessed here.
+
+### Spec feedback: development file policy and unresolved comparisons
+
+- The user accepted a new RAM file per run for initial development and explicitly
+  requires reconsidering model reuse/update behavior in future scope.
+- The user requested further discussion of the suggested 1 mm tolerance. It
+  is not an accepted threshold and is not based on measured RAM precision.
+  Distinguish numeric readback comparison from permission to move geometry or
+  merge nearby nodes; the agreed physical-axis rule remains in force.
+- The user requested an explanation of retaining failed output. The draft
+  explains retaining only owned files that actually exist after writing starts,
+  with failure diagnostics and no success/recovery guarantee. Retention versus
+  cleanup remains a choice under discussion. Preflight-blocked runs still
+  create no RAM model.
+
+Runtime placement, dependency pins, isolated build commands, and any fork
+decision remain technical questions for the approved planning/qualification
+workflow. No implementation is authorized by this discovery document.
 
 ## What has and has not been verified
 
