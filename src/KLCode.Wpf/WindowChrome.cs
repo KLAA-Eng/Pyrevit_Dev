@@ -22,6 +22,7 @@ public sealed class WindowChrome
         window.Title = ((WindowChromeMetadata)shell.Tag).Title;
         shell.ApplyTemplate();
         Part<Button>(shell, "PART_Close").Click += OnClose;
+        window.PreviewKeyDown += OnKey;
         Part<Grid>(shell, "PART_Header").MouseLeftButtonDown += OnDrag;
         Hyperlink prototype = Part<Hyperlink>(shell, "PART_Prototype");
         Hyperlink outreach = Part<Hyperlink>(shell, "PART_Outreach");
@@ -51,6 +52,16 @@ public sealed class WindowChrome
     }
 
     private void OnClose(object sender, RoutedEventArgs args) => _close();
+
+    /// <summary>Escape follows the same close policy as the header Close button.</summary>
+    private void OnKey(object sender, KeyEventArgs args)
+    {
+        if (args.Key == Key.Escape)
+        {
+            args.Handled = true;
+            _close();
+        }
+    }
 
     private void OnDrag(object sender, MouseButtonEventArgs args)
     {

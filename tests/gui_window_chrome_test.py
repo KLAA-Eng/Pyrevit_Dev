@@ -27,6 +27,7 @@ class Parts:
         self.Click = Event()
         self.MouseLeftButtonDown = Event()
         self.RequestNavigate = Event()
+        self.PreviewKeyDown = Event()
 
 
 class Merged(list):
@@ -54,6 +55,7 @@ class Window:
         self.Resources = Resources()
         self.DataContext = object()
         self.window_shell = Shell()
+        self.PreviewKeyDown = Event()
         self.closed = False
         self.drags = 0
 
@@ -79,7 +81,8 @@ class WindowChromeTests(unittest.TestCase):
             'wpf': module(LoadComponent=lambda owner, path: self.loads.append((owner, path))),
             'System': module(Uri=lambda path: path),
             'System.Windows': module(ResourceDictionary=Resources),
-            'System.Windows.Input': module(MouseButtonState=module(Pressed='pressed')),
+            'System.Windows.Input': module(MouseButtonState=module(Pressed='pressed'),
+                                           Key=module(Escape='escape')),
             'System.Diagnostics.Process': module(Start=self.destinations.append),
         }
 
@@ -119,6 +122,27 @@ class WindowChromeTests(unittest.TestCase):
         args = object()
         chrome.close_button.Click.emit(None, args)
         self.assertEqual([args], closes)
+        self.assertFalse(self.window.closed)
+
+    def test_escape_follows_the_same_close_policy_as_the_close_button(self):
+        chrome = self.load()
+        with patch.dict(sys.modules, self.host):
+            other = types.SimpleNamespace(Key='enter', Handled=False)
+            self.window.PreviewKeyDown.emit(None, other)
+            self.assertFalse(self.window.closed)
+            self.assertFalse(other.Handled)
+            escape = types.SimpleNamespace(Key='escape', Handled=False)
+            self.window.PreviewKeyDown.emit(None, escape)
+        self.assertTrue(self.window.closed)
+        self.assertTrue(escape.Handled)
+
+    def test_escape_honours_a_caller_close_policy(self):
+        closes = []
+        with patch.dict(sys.modules, self.host):
+            load_window(self.window, 'body.xaml', 'Caller', close_handler=lambda sender, args: closes.append(args))
+            escape = types.SimpleNamespace(Key='escape', Handled=False)
+            self.window.PreviewKeyDown.emit(None, escape)
+        self.assertEqual([escape], closes)
         self.assertFalse(self.window.closed)
 
     def test_content_height_uses_current_width_and_clamps_to_caller_limits(self):

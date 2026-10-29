@@ -23,7 +23,7 @@ from System.Windows.Input import MouseButtonState
 class BaseRenaming(my_WPF):
     """Shared view-renaming behavior; concrete commands own their window source."""
     @abstractmethod
-    def start(self, title, version="Version: _"):
+    def start(self, title, version=None):
         raise NotImplementedError('Concrete rename commands must load their own XAML.')
 
     # ╔═╗╔╗ ╔═╗╔╦╗╦═╗╔═╗╔═╗╔╦╗

@@ -106,7 +106,7 @@ def _select_view_types(document):
         title=COMMAND_TITLE,
         label='Select Detail and Drafting view types:',
         button_name='Create View Folders',
-        version='DevSandbox Prototype',
+        version=__version__,
         SelectMultiple=True,
     )
 

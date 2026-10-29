@@ -20,7 +20,10 @@ public sealed class WindowChromeMetadataTests
         Assert.AreEqual("v0.0", new WindowChromeMetadata("Tool", "v0.0").VersionText);
         Assert.AreEqual("v1.2", new WindowChromeMetadata("Tool", "Version: 1.2").VersionText);
         Assert.AreEqual("v1.2.Source", new WindowChromeMetadata("Tool", "version= V1.2.Source").VersionText);
+        Assert.AreEqual("v0.1", new WindowChromeMetadata("Tool", "Version 0.1").VersionText);
         Assert.AreEqual(string.Empty, new WindowChromeMetadata("Tool", "Version: _").VersionText);
+        Assert.AreEqual(string.Empty, new WindowChromeMetadata("Tool", "Core Tools").VersionText);
+        Assert.AreEqual(string.Empty, new WindowChromeMetadata("Tool", "DevSandbox Prototype").VersionText);
     }
 
     [TestMethod]

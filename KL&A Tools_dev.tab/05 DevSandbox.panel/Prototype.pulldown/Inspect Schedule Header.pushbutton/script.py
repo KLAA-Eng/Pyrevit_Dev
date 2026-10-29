@@ -135,7 +135,7 @@ def _select_schedule(document):
             title=COMMAND_TITLE,
             label='Select schedule to inspect:',
             button_name='Inspect Schedule',
-            version='DevSandbox Prototype',
+            version=__version__,
             SelectMultiple=False,
         )
     except Exception:

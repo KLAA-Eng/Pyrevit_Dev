@@ -69,6 +69,7 @@ class WindowChrome(object):
         self.prototype = template.FindName('PART_Prototype', self.shell)
         self.outreach = template.FindName('PART_Outreach', self.shell)
         self.close_button.Click += self._close
+        window.PreviewKeyDown += self._key
         self.header.MouseLeftButtonDown += self._drag
         self.prototype.RequestNavigate += self._navigate
         self.outreach.RequestNavigate += self._navigate
@@ -78,6 +79,13 @@ class WindowChrome(object):
             self.close_handler(sender, args)
         else:
             self.window.Close()
+
+    def _key(self, sender, args):
+        """Escape follows the same close policy as the header Close button."""
+        from System.Windows.Input import Key
+        if args.Key == Key.Escape:
+            args.Handled = True
+            self._close(sender, args)
 
     def _drag(self, sender, args):
         from System.Windows.Input import MouseButtonState

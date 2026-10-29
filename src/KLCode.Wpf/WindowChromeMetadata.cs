@@ -10,7 +10,7 @@ public sealed class WindowChromeMetadata
     {
         Title = (title ?? string.Empty).Trim();
         string candidate = Regex.Replace((version ?? string.Empty).Trim(),
-            @"^version\s*[:=]\s*", string.Empty, RegexOptions.IgnoreCase);
+            @"^version\s*[:=]?\s*", string.Empty, RegexOptions.IgnoreCase);
         VersionText = Regex.IsMatch(candidate, @"^[vV]?\d+\.\d+")
             ? "v" + candidate.TrimStart('v', 'V') : string.Empty;
     }

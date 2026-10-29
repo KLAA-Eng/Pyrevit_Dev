@@ -19,7 +19,7 @@
                     </ScrollViewer>
                 </Grid>
             </Grid>
-            <Button Grid.Row="2" Content="{StaticResource OkLabel}" Style="{StaticResource KlaFoundationMainButton}" IsDefault="True" Click="OnCloseClick"/>
+            <Button Grid.Row="2" Content="{StaticResource OkLabel}" Style="{StaticResource KlaFoundationMainButton}" IsDefault="True" IsCancel="True" Click="OnCloseClick"/>
         </Grid>
     </ContentControl>
 </Window>

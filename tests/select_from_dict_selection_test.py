@@ -113,16 +113,15 @@ class SelectFromDictSelectionTests(unittest.TestCase):
         methods['UIe_ItemChecked'](dialog, sender, None)
         self.assertTrue(items[1].IsChecked)
 
-    def test_room_cancel_still_closes_before_exiting_the_command(self):
+    def test_room_cancel_closes_and_records_cancellation_without_exiting_the_host(self):
         path = os.path.join(PROJECT_ROOT, 'lib', 'GUI', 'Tools', 'CreateFromRooms.py')
         methods = _dialog_methods(path, 'CreateFromRooms')
-        def exit_command():
-            raise SystemExit()
-        methods['button_close'].__globals__['sys'] = type('Sys', (), {'exit': staticmethod(exit_command)})()
+        self.assertNotIn('sys', methods['button_close'].__code__.co_names)
         dialog = _Dialog([])
-        with self.assertRaises(SystemExit):
-            methods['button_close'](dialog, None, None)
+        dialog.cancelled = False
+        methods['button_close'](dialog, None, None)
         self.assertTrue(dialog.closed)
+        self.assertTrue(dialog.cancelled)
 
     def test_duplicate_action_closes_before_invoking_the_model_callback(self):
         path = os.path.join(PROJECT_ROOT, 'lib', 'GUI', 'DuplicateSheets.py')

@@ -83,7 +83,7 @@ def _select_sheets(doc):
         title=COMMAND_TITLE,
         label='Select sheets to highlight:',
         button_name='Highlight Selected Sheets',
-        version='DevSandbox Prototype',
+        version=__version__,
         SelectMultiple=True,
     )
     if not selected_sheets:

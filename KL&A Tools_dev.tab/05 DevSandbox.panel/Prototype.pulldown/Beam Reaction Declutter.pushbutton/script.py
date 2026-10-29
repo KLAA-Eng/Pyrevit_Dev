@@ -104,7 +104,7 @@ def _select_plan_views(document):
         title=COMMAND_TITLE,
         label='Select plan views to process:',
         button_name='Process Selected Views',
-        version='DevSandbox Prototype',
+        version=__version__,
         SelectMultiple=True,
     )
     return selected or []
@@ -152,7 +152,7 @@ def _select_sheet_plan_views(document):
         title=COMMAND_TITLE,
         label='Select sheets containing plan views:',
         button_name='Move Tags on Selected Sheets',
-        version='DevSandbox Prototype',
+        version=__version__,
         SelectMultiple=True,
     )
     if not selected:

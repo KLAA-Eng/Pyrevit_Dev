@@ -106,7 +106,7 @@ def _select_revisions(doc, action_label):
         title=COMMAND_TITLE,
         label='Select revisions to {}:'.format(action_label.lower()),
         button_name='Select Revisions',
-        version='Core Tools',
+        version=__version__,
         SelectMultiple=True,
         initial_checked_names=[],
     )
@@ -134,7 +134,7 @@ def _select_sheets(doc, action_label):
         label='Select sheets to {} revision clouds on:'.format(
             action_label.lower()),
         button_name='{} Clouds'.format(action_label),
-        version='Core Tools',
+        version=__version__,
         SelectMultiple=True,
         initial_checked_names=[],
     )

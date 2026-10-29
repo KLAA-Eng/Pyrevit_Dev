@@ -3,7 +3,7 @@
 # ║║║║╠═╝║ ║╠╦╝ ║ ╚═╗
 # ╩╩ ╩╩  ╚═╝╩╚═ ╩ ╚═╝ IMPORTS
 #====================================================================================================
-import os, clr, traceback, sys
+import os, clr, traceback
 
 #>>>>>>>>>> pyRevit
 from pyrevit import forms # Needed for wpf import to work.
@@ -45,16 +45,19 @@ class CreateFromRooms(my_WPF):
     selected_type = []
     offset         = 0
 
-    def __init__(self, items, title       = '__title',
+    def __init__(self, items, title,
                               label       = "Select Type:" ,
                               button_name = 'Create',
-                              version     = 'version= 1.0'):
+                              version     = None):
         """Function to show GUI to a user to Select Type and offset for creating elements from Rooms
             :param items:           Dictionary of items {e.Name:e}
             :param title:           Title of the window.
             :param label:           Label that is displayed above ListBox
             :param button_name:     Text in Button
-            :param version:         Version of the script for footer."""
+            :param version:         The tool's pure __version__ for the footer, or None.
+            Read ``cancelled`` after the dialog returns: the header Close sets it and
+            leaves exiting the command to the caller."""
+        self.cancelled   = False
         self.items       = items        #type: dict
         self.title       = title        #type: str
         self.label       = label        #type: str
@@ -137,9 +140,9 @@ class CreateFromRooms(my_WPF):
     # ╚═╝╚═╝ ╩  ╩ ╚═╝╝╚╝╚═╝ BUTTONS
     #==================================================
     def button_close(self, sender, e):
-        """Stop application by clicking on a <Close> button in the top right corner."""
+        """Header Close cancels: record it and close; the caller decides whether to exit."""
+        self.cancelled = True
         self.Close()
-        sys.exit()
 
     def button_run(self, sender, e):
         """Button to finilize selection"""

@@ -18,7 +18,7 @@ default_app     = __revit__.Application
 
 
 
-def select_group_types(given_groups = None, uidoc = default_uidoc ,title='__title__', version = 'Version 0.1' ,exit_if_none = False):
+def select_group_types(given_groups = None, uidoc = default_uidoc ,title='Select Group Types', version = None ,exit_if_none = False):
     """Function to select group names from a list.
     :param given_groups: List of groups. If none then all groups in project will be used.
     :param uidoc:
@@ -51,7 +51,7 @@ def select_group_types(given_groups = None, uidoc = default_uidoc ,title='__titl
 
 
 
-def select_attached_groups(list_of_groups, uidoc = default_uidoc, title="__title__", label = "Select Groups:", version = 'Version 0.1', exit_if_none = False):
+def select_attached_groups(list_of_groups, uidoc = default_uidoc, title="Select Attached Groups", label = "Select Groups:", version = None, exit_if_none = False):
     """Function to select attached groups from given list of groups.
     :param list_of_groups: List containing groups from which to take attached groups.
     :return: List of selected attached groups

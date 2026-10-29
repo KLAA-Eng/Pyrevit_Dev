@@ -92,7 +92,7 @@ def get_selected_rooms(uidoc=uidoc, exitscript = True):
 
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GET VIEWS
-def get_selected_views(given_uidoc = uidoc, exit_if_none = False, title = '__title__', version = 'Version: _'):
+def get_selected_views(given_uidoc = uidoc, exit_if_none = False, title = 'Select Views', version = None):
     """Function to get selected views. If none selected give a menu for a user to select views.
     ALL_VIEW_TYPES = [ViewPlan, ViewSection, View3D , ViewSchedule, View, ViewDrafting]
     LastUpdates:
@@ -119,8 +119,8 @@ def get_selected_views(given_uidoc = uidoc, exit_if_none = False, title = '__tit
     return selected_views
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GET SHEETS
-def get_selected_sheets(given_uidoc = uidoc, exit_if_none = False, title='__title__', label='Select Sheets',
-                        btn_name = 'Select Sheets',  version = 'Version: _',
+def get_selected_sheets(given_uidoc = uidoc, exit_if_none = False, title='Select Sheets', label='Select Sheets',
+                        btn_name = 'Select Sheets',  version = None,
                         initial_checked_names = None):
     """Function to get selected views. return list of selected views.
     LastUpdates:
@@ -184,7 +184,7 @@ def get_selected_walls(uidoc, exitscript = True):
 # ╚═╝╚═╝╩═╝╚═╝╚═╝ ╩
 #==================================================
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SELECT TITLEBLOCK
-def select_title_block(given_uidoc = uidoc, exitscript = True):
+def select_title_block(given_uidoc = uidoc, exitscript = True, title = 'Select Title Block', version = None):
     """Function to let user select a title block.
     LastUpdates:
     [15.02.2022] - SelectFromList -> select_from_dict()"""
@@ -198,7 +198,7 @@ def select_title_block(given_uidoc = uidoc, exitscript = True):
         unique_title_blocks["{} - {}".format(family_name, type_name)] = tb.Id
 
     #>>>>>>>>>> MAKE SURE IT'S SELECTED
-    selected_title_block = select_from_dict(unique_title_blocks, SelectMultiple=False)
+    selected_title_block = select_from_dict(unique_title_blocks, title=title, version=version, SelectMultiple=False)
 
     # VERIFY SOMETHING IS SELECTED
     if not selected_title_block and exitscript:

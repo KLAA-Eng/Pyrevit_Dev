@@ -46,10 +46,10 @@ class ListItem:
 #====================================================================================================
 class SelectFromDict(my_WPF):
     def __init__(self, items,
-                 title = '__title',
+                 title,
                  label = "Select Elements:" ,
                  button_name = 'Select',
-                 version = 'version= 1.0',
+                 version = None,
                  SelectMultiple = True,
                  initial_checked_names = None):
         self.SelectMultiple = SelectMultiple
@@ -178,20 +178,20 @@ class SelectFromDict(my_WPF):
 # ╩ ╩╩ ╩╩╝╚╝MAIN
 #====================================================================================================
 def select_from_dict(elements_dict,
-                     title          = '__title__',
+                     title,
                      label          = "Select Elements:" ,
                      button_name    = 'Select',
-                     version        = 'Version: 1.0',
+                     version        = None,
                      SelectMultiple = True,
                      initial_checked_names = None):
     #type:(any, str,str,str,str,bool) -> list
     """Function to present a DialogBox to a user to select elements from the list based on the dict keys.
     :param elements_dict:   Dictonary or list of elements {name : element}.
                                 if list is provided it will be converted to dict {i:i}.
-    :param title:           Title of the window.
+    :param title:           Title of the window (required; pass the tool's __title__).
     :param label:           Label that is displayed above ListBox
     :param button_name:     Text in Button
-    :param version:         Version of the script for footer.
+    :param version:         The tool's pure __version__ for the footer, or None to show nothing.
     :param SelectMultiple:  By default it allows multiple selection. Set False if you need only single item selection.
     :return:                Selected elements. (dict values)"""
 

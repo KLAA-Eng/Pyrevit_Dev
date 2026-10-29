@@ -52,18 +52,6 @@
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="Padding" Value="8"/>
         <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}"/>
-        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TextBox">
-            <Border x:Name="ReadoutBorder" Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="6">
-                <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"
-                              VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}"
-                              HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}"/>
-            </Border>
-            <ControlTemplate.Triggers>
-                <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="ReadoutBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}"/></Trigger>
-                <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate></Setter.Value></Setter>
     </Style>
 
     <Style x:Key="KlaCompactReadOnlyField" TargetType="TextBox" BasedOn="{StaticResource KlaReadOnlyField}">

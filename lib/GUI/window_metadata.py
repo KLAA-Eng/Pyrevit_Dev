@@ -14,7 +14,7 @@ class WindowMetadata(object):
     def __init__(self, title, version=None):
         self.Title = (title or '').strip()
         version = (version or '').strip()
-        version = re.sub(r'^version\s*[:=]\s*', '', version, flags=re.IGNORECASE)
+        version = re.sub(r'^version\s*[:=]?\s*', '', version, flags=re.IGNORECASE)
         self.VersionText = ('v' + version.lstrip('vV') if re.match(r'^[vV]?\d+\.\d+', version) else '')
         self.PrototypeUri = PROTOTYPE_URI
         self.OutreachUri = OUTREACH_URI

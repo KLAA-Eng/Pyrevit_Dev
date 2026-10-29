@@ -40,7 +40,7 @@ class RenameViews(BaseRenaming):
     def __init__(self):
         self.start(title=__title__, version=__version__)
 
-    def start(self, title, version="Version: _"):
+    def start(self, title, version=None):
         xaml_file_name = os.path.join(os.path.dirname(__file__), "Script.xaml")
 
         load_window(self, xaml_file_name, title, version)

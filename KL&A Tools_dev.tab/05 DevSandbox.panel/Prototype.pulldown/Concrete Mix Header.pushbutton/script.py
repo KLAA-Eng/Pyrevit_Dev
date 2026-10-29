@@ -255,7 +255,7 @@ def _target_schedule(document):
         title=COMMAND_TITLE,
         label='Select target schedule:',
         button_name='Use Schedule',
-        version='DevSandbox Prototype',
+        version=__version__,
         SelectMultiple=False,
     )
     if isinstance(selected, list):

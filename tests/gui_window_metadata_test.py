@@ -19,9 +19,13 @@ class WindowMetadataTests(unittest.TestCase):
             self.assertEqual('', WindowMetadata('Shared alert', version).VersionText)
 
     def test_legacy_display_prefixes_are_normalized_without_changing_tool_versions(self):
-        for source in ('Version: 1.2', 'version= 1.2', '1.2', 'v1.2'):
+        for source in ('Version: 1.2', 'version= 1.2', 'Version 1.2', '1.2', 'v1.2'):
             self.assertEqual('v1.2', WindowMetadata('Caller', source).VersionText)
         self.assertEqual('v1.0.Source', WindowMetadata('Imported', 'v1.0.Source').VersionText)
+
+    def test_tool_names_and_placeholders_never_become_a_version(self):
+        for source in ('Core Tools', 'DevSandbox Prototype', 'Version: _', '__version__', 'v'):
+            self.assertEqual('', WindowMetadata('Caller', source).VersionText, source)
 
     def test_metadata_strips_outer_whitespace_and_preserves_full_title(self):
         title = 'A long window title that should remain available to automation'
