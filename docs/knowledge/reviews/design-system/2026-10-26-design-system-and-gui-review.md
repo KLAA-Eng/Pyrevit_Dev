@@ -19,6 +19,9 @@ use one named [active plan or tracker](../../../plans/README.md) if the effort
 needs ongoing task tracking. Link the finding IDs below from that authority.
 
 The living implementation guide remains [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
+Link maintenance on 2026-10-29: `WPF_styles.xaml` was retired after this review's
+baseline. Its cited path/line numbers below remain historical code references;
+the living guide identifies the current shared resources.
 Command behavior remains owned by each adjacent `SPEC.md`. Earlier evidence is
 preserved in the [October 5 review](../2026-10-05/design-system-and-gui.md) and
 [October 8 review](2026-10-08-current-state-review.md).
@@ -131,7 +134,7 @@ the final character and dismissal action by keyboard and mouse at multiple DPIs.
 **Evidence:** [KLCodeControls.xaml:43](../../../../src/KLCode.Wpf/Resources/KLCodeControls.xaml)
 and lines 92, 216, and 276 set null focus styles for compiled buttons, segmented
 radio options, checkboxes, and list rows without replacement keyboard-focus
-triggers. [WPF_styles.xaml:208](../../../../lib/GUI/Resources/WPF_styles.xaml)
+triggers. Historical `lib/GUI/Resources/WPF_styles.xaml:208`
 does the same for legacy checkboxes.
 
 **Trigger/impact:** a control can receive keyboard focus without identifying the
@@ -146,7 +149,7 @@ See [Microsoft's WPF focus-styling guidance](https://learn.microsoft.com/en-us/d
 
 ### GUI26-05 — P2: text accent and muted colors have weak contrast
 
-**Evidence:** [WPF_styles.xaml:11](../../../../lib/GUI/Resources/WPF_styles.xaml)
+**Evidence:** historical `lib/GUI/Resources/WPF_styles.xaml:11`
 defines the text accent and footer colors. Compiled group captions and footers
 consume the same colors at [KLCodeControls.xaml:331](../../../../src/KLCode.Wpf/Resources/KLCodeControls.xaml).
 The source color pairs give these approximate opaque-sRGB ratios:
@@ -307,7 +310,7 @@ state; verify no preview invokes document-changing production handlers.
 
 ### GUI26-14 — P3: palette ownership conflicts with the source-test contract
 
-**Evidence:** [WPF_styles.xaml:6](../../../../lib/GUI/Resources/WPF_styles.xaml)
+**Evidence:** historical `lib/GUI/Resources/WPF_styles.xaml:6`
 defines legacy brushes locally. The compiled adapter uses
 [KLCode_palette.xaml](../../../../lib/GUI/Resources/KLCode_palette.xaml).
 Common color values match, but the legacy dictionary also has `window_background`,

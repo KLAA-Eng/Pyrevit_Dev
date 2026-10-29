@@ -18,8 +18,11 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
 
 `KLCodeFoundation.xaml` merges the geometry and owns the presenter, pen and
 ImageSources, bound to tokens (`KlaIconSize`, `KlaIconCanvas`, `KlaIconStroke`,
-`KlaTextBrush`, `KlaDisabledTextBrush`). Use `KlaIconSearch` as an Image.Source,
-or a foreground-aware presenter:
+`KlaTextBrush`, `KlaDisabledTextBrush`). Choose the rendering method deliberately:
+`KlaIconSearch` as an Image.Source uses a fixed `KlaTextBrush` pen and does not
+inherit foreground or automatically recolor when disabled. For an interactive
+icon that follows its parent control's foreground and disabled state, use the
+foreground-aware presenter:
 
 ```xml
 <ContentControl Style="{StaticResource KlaGuiIcon}"
@@ -30,6 +33,8 @@ The presenter uses 16-unit dimensions and a 24-unit source canvas, with a 1.5
 stroke. Foreground inherits from its parent control; disabled icons use the
 shared `KlaDisabledTextBrush`. Decorative icons do not intercept clicks or focus.
 Do not create per-window copies or replace source SVGs with screenshots.
+See the [design-system usage examples](../../../docs/DESIGNSYSTEM.md#in-window-gui-icons)
+for icon-only and icon/text actions, fixed-color images and accessible naming.
 
 | Semantic role | Geometry | ImageSource |
 | --- | --- | --- |

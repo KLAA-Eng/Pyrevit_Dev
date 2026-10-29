@@ -1,15 +1,15 @@
 # KLCode Design System — archived long form (2026-10-29)
 
 > Historical. The normative guide is now [docs/DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md); this file keeps the
-> 2026-10-08 legacy property tables, window inventories and loader history for reference. Paths below are relative
-> to the old location and may not resolve.
+> 2026-10-08 legacy property tables, window inventories and loader history for reference. Links below are
+> updated for this archive location; source descriptions retain their historical baseline.
 
 This file records the current visual system used by the KLCode repository. It
 covers the legacy IronPython/pyRevit dialogs, their DevSandbox gallery, and
 the compiled WPF add-ins. It does not replace host-specific runtime validation.
 The legacy source descriptions below were rechecked on 2026-10-08 at
 `089da1b7d88e0df9dec2cc127659a24e051b9163`; see the
-[design-system reviews](knowledge/reviews/design-system/README.md) for dated findings
+[design-system reviews](README.md) for dated findings
 and live-acceptance boundaries.
 
 ## Custom window foundation
@@ -18,7 +18,7 @@ The owner approved a shared custom-window standard on 2026-10-27 and refined
 its five references on 2026-10-28. The production migration adopts that source
 foundation in nine Python tool windows and five compiled windows. Gallery
 continues to preview the Python sources; compiled previews remain deferred. The
-[consolidation plan](plans/custom-window-consolidation.md) owns migration status.
+[consolidation plan](../../../plans/custom-window-consolidation.md) owns migration status.
 
 | Role | Approved rule |
 | --- | --- |
@@ -46,7 +46,7 @@ Workflow data and host adapters remain separate from shared presentation.
 
 `KLCodeComponents.xaml` merges the foundation and adds opt-in field/group,
 readout, dropdown, radio/toggle, status/banner, table and splitter styles.
-The [five reference templates](../lib/GUI/_templates/README.md) compose these
+The [five reference templates](../../../../lib/GUI/_templates/README.md) compose these
 parts with safe Gallery presenters. The generic FindReplace example was adapted
 into Form and its unused wrapper retired. Core tools retain their bundled body
 XAML and behavior while adopting the common shell and components.
@@ -55,7 +55,7 @@ The owner refined Form's compact field role on 2026-10-28: 24-high inputs,
 60-wide label and 240-wide input columns, 8-unit row gaps and 12-unit group
 padding. Labels include colons and center vertically. Explicit compact styles
 preserve standard-field sizing elsewhere. Form has inline validation and Reset/
-Apply actions, with no Sample Preview. See the [Form refinement evidence](knowledge/reviews/design-system/2026-10-28-form-template-refinement.md).
+Apply actions, with no Sample Preview. See the [Form refinement evidence](2026-10-28-form-template-refinement.md).
 Form's Edit Naming Rules heading uses the same `KlaFoundationPromptLabel` as
 Selection's Select Elements prompt, including normal weight and zero padding.
 
@@ -65,14 +65,14 @@ changes. Heading/body text colors stay consistent; severity uses heading wording
 and border color. Current reference defaults are 288 minimum/640 maximum height,
 with 424 minimum while its 128-high Details readout is open. The opt-in shared
 `fit_window_height` helper measures the chromeless shell without showing it.
-See the [Message refinement evidence](knowledge/reviews/design-system/2026-10-28-message-template-refinement.md).
+See the [Message refinement evidence](2026-10-28-message-template-refinement.md).
 
 Review separates checked items from the selected row's right-hand detail pane.
 Check All affects only eligible rows in the current filtered view; hidden checks
 are retained and Apply Checked uses the full checked collection. Blocked rows
 cannot be checked. Ready/Warning/Blocked chips center in their Status cells
 through an opt-in cell style; other table columns retain their alignment.
-See the [Review refinement evidence](knowledge/reviews/design-system/2026-10-28-review-template-refinement.md).
+See the [Review refinement evidence](2026-10-28-review-template-refinement.md).
 
 `GUI.window_chrome.load_window()` is a small Python adapter with no import-time
 pyRevit/document dependency. It binds shared close/drag/navigation events;
@@ -83,12 +83,12 @@ optional close callback retains caller-specific cancellation. The compiled
 `KLCode.Wpf.WindowChrome` adapter binds the same shell parts while preserving
 CLR/localization, tool DataContext and lifecycle responsibilities.
 
-The [main template guide](../lib/GUI/_templates/KLCodeSelectionTemplate.md) explains
+The [main template guide](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.md) explains
 the 432 x 576 reference and creating a new body. The
-[first-delivery verification](knowledge/reviews/design-system/2026-10-27-custom-window-foundation.md)
+[first-delivery verification](2026-10-27-custom-window-foundation.md)
 contains actual WPF renders and proof limits. Native/pyRevit dialogs, ribbon
 icon redesign and the five deferred compiled previews are outside this delivery.
-The [owner-requested refinement](knowledge/reviews/design-system/2026-10-27-main-template-refinement.md)
+The [owner-requested refinement](2026-10-27-main-template-refinement.md)
 records the current compact search/list spacing, footer appearance, prefix-free
 version, and removal of the default-button outline.
 
@@ -100,11 +100,11 @@ assemble shared visual parts instead of copying their formatting.
 
 | Layer | Plain-English job | Code owner |
 | --- | --- | --- |
-| Shared values | Names for sizes, gaps, fonts and state colors | [KLCodeFoundationTokens.xaml](../lib/GUI/Resources/KLCodeFoundationTokens.xaml) |
-| Shared parts/frame | Styles format controls; templates draw their inner pieces/states; `KlaWindowShell` supplies header/footer around a body | [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) and [Components](../lib/GUI/Resources/KLCodeComponents.xaml) |
-| Window body | The tool's arrangement of search, fields, lists and actions | [Main template example](../lib/GUI/_templates/KLCodeSelectionTemplate.xaml) and each tool's own XAML |
-| Assembly/events | Load the resources/body and connect Close, dragging and footer navigation | [window_chrome.py](../lib/GUI/window_chrome.py) |
-| Caller identity | Supply title, pure tool version and shared link destinations | [window_metadata.py](../lib/GUI/window_metadata.py) |
+| Shared values | Names for sizes, gaps, fonts and state colors | [KLCodeFoundationTokens.xaml](../../../../lib/GUI/Resources/KLCodeFoundationTokens.xaml) |
+| Shared parts/frame | Styles format controls; templates draw their inner pieces/states; `KlaWindowShell` supplies header/footer around a body | [Foundation](../../../../lib/GUI/Resources/KLCodeFoundation.xaml) and [Components](../../../../lib/GUI/Resources/KLCodeComponents.xaml) |
+| Window body | The tool's arrangement of search, fields, lists and actions | [Main template example](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.xaml) and each tool's own XAML |
+| Assembly/events | Load the resources/body and connect Close, dragging and footer navigation | [window_chrome.py](../../../../lib/GUI/window_chrome.py) |
+| Caller identity | Supply title, pure tool version and shared link destinations | [window_metadata.py](../../../../lib/GUI/window_metadata.py) |
 | Tool logic | Supply data, filtering/validation, showing/lifetime and Revit operations | Each tool's Python/C# code |
 | Review harness | Use the real visual source with fictional data and simulated actions | `lib/ui_gallery/` and UI Gallery |
 
@@ -132,10 +132,10 @@ with links to those canonical XAML sources; C# retains its event/localization
 adapter. A shared style change therefore reaches both source implementations.
 The Gallery catalog keeps its own local shell resources. Standalone Recall uses a separate body so its
 docked consumer retains its existing appearance. The
-[production migration review](knowledge/reviews/design-system/2026-10-29-production-migration.md)
+[production migration review](2026-10-29-production-migration.md)
 records construction/layout evidence and remaining build/host limits.
 
-The [2026-10-28 component review](knowledge/reviews/design-system/2026-10-28-custom-window-components-review.md)
+The [2026-10-28 component review](2026-10-28-custom-window-components-review.md)
 maps the missing parts. The shared Close style now moves its text upward by one
 unit for optical centering in the fixed 18-unit control; the WPF probe measures
 the visible glyph bounds rather than only the surrounding text box.
@@ -175,7 +175,7 @@ the compiled-WPF adapter: `src/KLCode.Wpf/KLCode.Wpf.csproj` links it as
 repeats the same legacy brush values rather than merging that file. The
 repository wordmark asset is `lib/_logos/KLCode_text_1024x256px.svg`, generated into `lib/_logos/KLCodeWordmark.xaml` by `scripts/generate_gui_icons.py` (with a
 PNG export). The palette consolidation decision and test-contract mismatch are
-recorded in the [current-state review](knowledge/reviews/design-system/2026-10-08-current-state-review.md).
+recorded in the [current-state review](2026-10-08-current-state-review.md).
 
 | Property | Value |
 | --- | --- |
@@ -188,7 +188,7 @@ recorded in the [current-state review](knowledge/reviews/design-system/2026-10-0
 
 ### In-window GUI icons
 
-Approved GUI artwork lives in [lib/_icons/gui](../lib/_icons/gui/README.md).
+Approved GUI artwork lives in [lib/_icons/gui](../../../../lib/_icons/gui/README.md).
 Original SVGs, a pinned source manifest and Lucide/Feather license notices stay
 together. `scripts/generate_gui_icons.py` produces `KLCodeIcons.xaml`; do not
 edit that generated dictionary manually. Python and compiled adapters consume
@@ -478,8 +478,8 @@ calling tools, and offers interactive fictional states for supported windows.
 It also catalogs newly discovered Window sources without enabling arbitrary XAML.
 Search combines with Origin and Preview availability filters; the latter uses
 the current catalog statuses independently of the fictional state selector.
-See the [current Gallery SPEC](<../KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
-and [verification record](knowledge/reviews/design-system/2026-10-27-ui-gallery-verification.md)
+See the [current Gallery SPEC](<../../../../KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/SPEC.md>)
+and [verification record](2026-10-27-ui-gallery-verification.md)
 for current behavior and evidence.
 
 The table below is a historical pre-migration snapshot. Current implementation
@@ -487,25 +487,25 @@ is described above and in the consolidation plan. The linked audit describes
 2026-10-08; the rename rows below were
 updated for the 2026-10-09 Core promotion. This table does not
 establish rendered appearance, keyboard behavior, DPI behavior, or live Revit
-acceptance. See the [dated design-system review](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit)
+acceptance. See the [dated design-system review](2026-10-08-current-state-review.md#ui-gallery-theme-audit)
 for the full audit, drift notes, and recommended actions.
 
 | Window | Historical source status | Detail |
 | --- | --- | --- |
-| Create from rooms | Shared styles with a local list override | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| KL&A alert | Shared KLCode styles | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Duplicate sheets | Shared styles with a local checkbox override | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Find and replace | Shared KLCode styles | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Find and replace sheets | Promoted Core dialog with shared KLCode styles and a local result panel | [Promotion record](knowledge/reviews/releases/2026-10-08/find-replace-promotion.md) |
-| Legacy sheet rename form | Prior shared presentation retained for historical preview | [Source audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Find and replace views | Promoted Core dialog with shared KLCode styles and a local result panel | [Promotion record](knowledge/reviews/releases/2026-10-08/find-replace-promotion.md) |
-| Legacy view rename form | Prior shared presentation retained for historical preview | [Source audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Match properties recall | Shared styles; Gallery now preserves the shell and actual clipboard content with simulated handlers | [Current verification](knowledge/reviews/design-system/2026-10-27-ui-gallery-verification.md) |
-| KL&A list selection | Production reference for shared list-selection styling | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| Steel PSF story selection | Shared styles in a DevSandbox selector | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| View range editor | Command-local dark resources and ComboBox templates | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| UI Gallery | Command-local palette and DataGrid styles | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
-| UI Gallery preview fixture | Minimal test fixture without shared KLCode chrome | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Create from rooms | Shared styles with a local list override | [Audit](2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| KL&A alert | Shared KLCode styles | [Audit](2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Duplicate sheets | Shared styles with a local checkbox override | [Audit](2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Find and replace | Shared KLCode styles | [Audit](2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Find and replace sheets | Promoted Core dialog with shared KLCode styles and a local result panel | [Promotion record](../releases/2026-10-08/find-replace-promotion.md) |
+| Legacy sheet rename form | Prior shared presentation retained for historical preview | [Source audit](2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Find and replace views | Promoted Core dialog with shared KLCode styles and a local result panel | [Promotion record](../releases/2026-10-08/find-replace-promotion.md) |
+| Legacy view rename form | Prior shared presentation retained for historical preview | [Source audit](2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Match properties recall | Shared styles; Gallery now preserves the shell and actual clipboard content with simulated handlers | [Current verification](2026-10-27-ui-gallery-verification.md) |
+| KL&A list selection | Production reference for shared list-selection styling | [Audit](2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| Steel PSF story selection | Shared styles in a DevSandbox selector | [Audit](2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| View range editor | Command-local dark resources and ComboBox templates | [Audit](2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| UI Gallery | Command-local palette and DataGrid styles | [Audit](2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
+| UI Gallery preview fixture | Minimal test fixture without shared KLCode chrome | [Audit](2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
 
 ## Legacy Style Loading And Local GUI Overrides (historical)
 
@@ -540,6 +540,6 @@ These entries are not pure shared-style consumers. Some define local resources a
 | UI Gallery preview fixture | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | No shared dictionary or KLCode header treatment. | A deliberately minimal preview/test fixture. |
 
 Future custom-window work should follow the approved foundation and
-[main template guide](../lib/GUI/_templates/KLCodeSelectionTemplate.md), with adoption
+[main template guide](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.md), with adoption
 scheduled through the consolidation plan after owner review. Keep workflow
 content local; promote reusable visual rules into the shared foundation.
