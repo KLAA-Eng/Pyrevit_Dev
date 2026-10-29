@@ -1,5 +1,7 @@
 from __future__ import print_function
 
+import ast
+import io
 import math
 import os
 import sys
@@ -149,6 +151,27 @@ class ScheduleTests(unittest.TestCase):
         self.assertEqual([], problems)
         self.assertEqual(1.25, entries['BP4']['thickness'])
         self.assertEqual(0.75, entries['BP9']['rod_diameter'])
+
+    def test_reads_drafted_schedule_from_a_project(self):
+        # Text notes dumped from a project's drafted schedule view: note boxes
+        # are taller than the row pitch and the diameter glyph reads as a letter.
+        path = os.path.join(PROJECT_ROOT, 'tests', 'fixtures', 'baseplate_schedule_text.txt')
+        cells = []
+        with io.open(path, encoding='utf-8') as dump:
+            for line in dump.read().splitlines()[2:]:
+                xmin, xmax, ymin, ymax, text = line.split(', ', 4)
+                cells.append({'text': ast.literal_eval(text), 'xmin': float(xmin), 'xmax': float(xmax),
+                              'ymin': float(ymin), 'ymax': float(ymax)})
+        entries, problems = read_base_plate_schedule(cells)
+        self.assertEqual([], problems)
+        self.assertEqual(['BP{}'.format(n) for n in range(1, 12)],
+                         sorted(entries, key=lambda mark: int(mark[2:])))
+        self.assertEqual(('B', 10.0, 6.0, 0.75, 4, 0.75, 9.0), tuple(
+            entries['BP9'][key] for key in ('type', 'length', 'width', 'thickness',
+                                            'rod_count', 'rod_diameter', 'embed')))
+        self.assertEqual(24.0, entries['BP11']['embed'])
+        self.assertEqual({0.75: 1.5, 0.875: 2.0, 1.0: 2.5, 1.25: 2.5, 1.5: 2.5},
+                         read_edge_distances(cells))
 
     def test_missing_header_reports_problem(self):
         entries, problems = read_base_plate_schedule([cell('MARK', 0, 0)])

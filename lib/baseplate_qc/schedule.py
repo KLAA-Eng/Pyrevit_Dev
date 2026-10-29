@@ -67,6 +67,9 @@ def parse_inches(text):
     for token in ('%%C', u'Ø', u'ø', u'Φ', u'φ', u'ϕ', u'⌀', '(IN)', 'IN.', 'DIA'):
         value = value.replace(token, ' ')
     value = value.replace(u'″', '"').replace(u'′', "'").replace("''", '"')
+    # Symbol fonts map the diameter glyph to letters such as à, so any other
+    # non-ASCII character is dropped too.
+    value = re.sub(u'[^\x00-\x7f]', ' ', value)
     value = value.replace('"', ' ').strip()
     feet = 0.0
     match = _FEET_INCHES_RE.match(value)
@@ -151,8 +154,14 @@ def _center(cell):
 
 
 def _overlaps_rows(cell, other):
-    """True when two cells share part of their height (the same table row)."""
-    return cell['ymin'] < other['ymax'] and other['ymin'] < cell['ymax']
+    """True when two cells sit in the same table row.
+
+    Text note boxes are often taller than the row pitch, so boxes of
+    neighboring rows overlap; cells share a row only when their centers are
+    within half the shorter cell's height.
+    """
+    height = min(cell['ymax'] - cell['ymin'], other['ymax'] - other['ymin'])
+    return abs(_center(cell)[1] - _center(other)[1]) < height / 2.0
 
 
 def _row_cells(cells, header):
