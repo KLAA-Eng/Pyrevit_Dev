@@ -1,0 +1,18 @@
+title:
+  en_us: "Revision\nCloud Sheets"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 10.29.2026
+    Status: Unreleased
+    _____________________________________________________________________
+    Description:
+    Prototype: lists every sheet each revision cloud appears on, including clouds drawn in views placed on sheets and in dependent views. Read-only.
+    _____________________________________________________________________
+    How-to:
+    - Select one or more revision clouds, or select nothing to report every cloud in the model.
+    - Run the tool and review the pyRevit output table.
+    _____________________________________________________________________
+    Last update:
+    - [10.29.2026] - v0.0 (Unreleased): First prototype of the cloud-to-sheet report.
+author: KL&A
