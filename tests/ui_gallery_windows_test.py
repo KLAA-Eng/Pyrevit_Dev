@@ -134,7 +134,9 @@ class GalleryWindowTests(unittest.TestCase):
                    if isinstance(node, ast.FunctionDef)}
         events = {'Click', 'Checked', 'Unchecked', 'MouseDown', 'TextChanged',
                   'PreviewTextInput', 'RequestNavigate', 'Expanded', 'Collapsed', 'SizeChanged'}
-        for relative in list(windows.SOURCES.values()) + ['lib/match/clipboard_content.xaml']:
+        for relative in list(windows.SOURCES.values()) + [
+                'lib/match/clipboard_content.xaml',
+                'lib/match/clipboard_recall_content.xaml']:
             path = windows.source_path(ROOT, relative)
             if not os.path.isfile(path):
                 continue

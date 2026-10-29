@@ -122,14 +122,15 @@ flowchart LR
     Tool[Tool data and actions] --> Window
 ```
 
-There are currently three shared-style paths: most older Python forms use
-`WPF_styles.xaml`, the reference templates opt into the new foundation, and compiled
-windows use `KLCode.Wpf` styles plus `ThemeBootstrapper`. There are also local
-exceptions: View Range owns its control resources and borrows only the shared
-wordmark; the Gallery catalog owns its local resources. Editing a foundation
-style affects opted-in consumers; the other windows still need migration.
-The foundation reuses legacy resources. Compiled adoption must package compatible
-resources/assets and keep its C# event/localization adapter.
+The nine Python tool windows and five references consume the same foundation
+and components. Compiled windows use `KLCode.Wpf` aliases and `ThemeBootstrapper`
+with links to those canonical XAML sources; C# retains its event/localization
+adapter. A shared style change therefore reaches both source implementations.
+Legacy `WPF_styles.xaml` remains for docked/tooling consumers, including the
+Gallery catalog's own shell. Standalone Recall uses a separate body so its
+docked consumer retains its existing appearance. The
+[production migration review](knowledge/reviews/design-system/2026-10-29-production-migration.md)
+records construction/layout evidence and remaining build/host limits.
 
 The [2026-10-28 component review](knowledge/reviews/design-system/2026-10-28-custom-window-components-review.md)
 maps the missing parts. The shared Close style now moves its text upward by one

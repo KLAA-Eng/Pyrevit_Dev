@@ -207,11 +207,6 @@
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="Padding" Value="8,4"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Child.Text, RelativeSource={RelativeSource Self}}" Value="">
-                <Setter Property="Visibility" Value="Collapsed"/>
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
     <Style x:Key="KlaTableStatusChip" TargetType="Border" BasedOn="{StaticResource KlaStatusChip}">
         <Setter Property="HorizontalAlignment" Value="Center"/>

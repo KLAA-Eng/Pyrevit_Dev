@@ -179,6 +179,9 @@ build the correct runtime assemblies, and validate in the matching Revit hosts.
   simulated actions/navigation, routed Close, and state-render checks.
 - `scripts/validate_ui_templates_wpf.py`: 25 template-state layouts, sample
   interactions, generated checkbox bindings and minimum-size evidence.
+- `scripts/validate_ui_production_wpf.py`: 45 production-window state layouts,
+  compact naming fields, caller identity, localized Recall captions, overflow
+  scrolling and the 17 approved vector icon roles.
 
 ## Model and external effects
 

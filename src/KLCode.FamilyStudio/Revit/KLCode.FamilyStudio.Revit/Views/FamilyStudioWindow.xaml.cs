@@ -298,6 +298,7 @@ public sealed partial class FamilyStudioWindow : Window
         }
 
         _selectedDetail = detail;
+        DetailChips.Visibility = Visibility.Visible;
         FamilyNameText.Text = detail.Summary.FamilyName;
         string unavailable = FamilyStudioText.Get("UnavailableValue");
         StatusText.Text = detail.Summary.Status ?? unavailable;
@@ -325,6 +326,7 @@ public sealed partial class FamilyStudioWindow : Window
     private void ClearDetail(string message)
     {
         _selectedDetail = null;
+        DetailChips.Visibility = Visibility.Collapsed;
         FamilyNameText.Text = message;
         StatusText.Text = string.Empty;
         CategoryText.Text = string.Empty;

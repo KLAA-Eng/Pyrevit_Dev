@@ -70,9 +70,13 @@ internal static class Program
         Require(footer.Text == version, identity + " caller version");
         Require(header.ActualHeight == 24 && footerGrid.ActualHeight == 24, identity + " chrome heights");
         Require(window.FindResource("KlaIconSearch") is DrawingImage, identity + " canonical vector search");
+        Border infoChip = new Border { Style = (Style)window.FindResource("KlaInfoChipStyle") };
+        Require(((SolidColorBrush)infoChip.BorderBrush).Color ==
+            ((SolidColorBrush)window.FindResource("KlaInfoBrush")).Color,
+            identity + " information-chip accent");
         if (identity == "family-studio")
         {
-            Require(((Border)window.FindName("StatusChip")).Visibility == Visibility.Collapsed,
+            Require(HasCollapsedAncestor((Border)window.FindName("StatusChip")),
                 "Empty detail status must not leave an empty chip border.");
             foreach (string group in new[] { "ContentMode", "SearchScope", "ViewMode" })
             {

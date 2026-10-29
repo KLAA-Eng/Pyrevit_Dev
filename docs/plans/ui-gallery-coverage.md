@@ -46,6 +46,11 @@ adapter does not merge or copy that command from `dev.model-checker`.
 
 No production XAML/helpers are changed by the Gallery adapters. Pure scenario
 logic lives under `lib/ui_gallery`; `script.py` coordinates the pyRevit window.
+The separate [custom-window consolidation](custom-window-consolidation.md)
+migrates production sources; Gallery follows those actual sources and keeps
+all five compiled previews disabled. The subsequent
+[migration verification](../knowledge/reviews/design-system/2026-10-29-production-migration.md)
+records the current 36-entry catalog and 71 custom/state constructions.
 Host-independent tests and isolated IronPython/WPF tests complement each other.
 Neither substitutes for GAL-06. The full metadata checker has a pre-existing
 missing-bundle error for a cache-only Model Checker directory left by the other

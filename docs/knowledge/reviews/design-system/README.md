@@ -5,7 +5,8 @@ implementation guide is [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
 
 | Review | Scope |
 | --- | --- |
-| [2026-10-28 icon candidates](2026-10-28-icon-selection/README.md) | Pinned, attributed Lucide candidate sheet, actual in-window icon inventory and pending owner choices before migration. |
+| [2026-10-29 production migration](2026-10-29-production-migration.md) | Approved GUI icons, nine Python and five compiled source migrations, actual WPF renders/checks, and explicit build/live-host limits. |
+| [2026-10-28 icon candidates](2026-10-28-icon-selection/README.md) | Pinned, attributed Lucide candidate sheet and inventory; owner choices subsequently approved and implemented in the canonical icon folder. |
 | [2026-10-28 Review template refinement](2026-10-28-review-template-refinement.md) | Visible-only Check All, preserved hidden checks, separate row details, centered status chips and actual WPF evidence. |
 | [2026-10-28 Message and Form prompt refinement](2026-10-28-message-template-refinement.md) | Content-fitting Message height, capped scrolling, user-controlled Details, stable severity text colors, and exact shared Form prompt styling. |
 | [2026-10-28 Form refinement](2026-10-28-form-template-refinement.md) | Owner-confirmed compact fields, no Sample Preview, opt-in component styles and actual WPF geometry/state evidence. |

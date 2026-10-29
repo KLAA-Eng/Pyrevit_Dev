@@ -22,8 +22,10 @@ grilling to refine their elements. Current scope is reference construction and
 review. After the first refinement pass, the owner requested icon selection
 followed by production migration. The settled reference choices are the baseline
 for that next phase; do not request the migration authorization again.
-Icon names/sizes belong to the foundation; specific replacement artwork is now
-being selected with the owner before migration begins.
+The owner subsequently approved all icon choices and their location under
+`lib/_icons/gui/`. Source migration is implemented; local evidence and remaining
+host/build limits are recorded in the
+[production migration review](../knowledge/reviews/design-system/2026-10-29-production-migration.md).
 
 ## Task ledger
 
@@ -33,13 +35,13 @@ being selected with the owner before migration begins.
 | GUI-02 | Create shared shell, tokens, controls, and caller metadata | Implemented; locally verified | Host-free imports; no show/model side effects; existing resources/DataContext preserved; real WPF part bindings/events |
 | GUI-03 | Apply foundation to main template and Gallery preview | Implemented; locally verified | Actual 432 x 576 renders; five fictional states; measured header/footer, padding, button dimensions/gaps; simulated navigation |
 | GUI-04 | Review template appearance with owner | Follow-up refinements implemented; ready for visual review | 8-unit top/bottom gaps, 14-unit Title Case prompt, native row hover; [current renders](../knowledge/reviews/design-system/2026-10-27-main-template-refinement.md); [initial delivery](../knowledge/reviews/design-system/2026-10-27-custom-window-foundation.md) |
-| GUI-05 | Migrate other Python custom windows | Authorized; queued after GUI-07 | Review each window's body/lifecycle/callers before adopting the shell; preserve command operations |
-| GUI-06 | Adopt foundation in compiled WPF adapters/windows | Authorized; queued after shared-resource compatibility | Share source design resources; preserve CLR/host boundaries; build and matching-host evidence required; compiled Gallery previews stay deferred |
-| GUI-07 | Select additional in-window artwork | Lucide family selected; specific choices pending | [Candidate sheet and inventory](../knowledge/reviews/design-system/2026-10-28-icon-selection/README.md); semantic keys and 16-unit default; retain source/license attribution |
+| GUI-05 | Migrate other Python custom windows | Implemented; locally verified | All nine tool windows use shared shell/components; 45 actual WPF state layouts and focused workflow contracts pass; [migration evidence](../knowledge/reviews/design-system/2026-10-29-production-migration.md) |
+| GUI-06 | Adopt foundation in compiled WPF adapters/windows | Source implemented; runtime layout verified; host build limitation recorded | All five classes construct on net48/net8.0-windows using canonical linked resources; full Family Studio 2025 build blocked by installed API/System.Runtime mismatch; packaged DLLs unchanged; compiled Gallery previews remain deferred |
+| GUI-07 | Select additional in-window artwork | Owner approved; implemented | 17 pinned Lucide roles under lib/_icons/gui; 16-unit default, 1.5 stroke, semantic geometry/ImageSource keys, source/license attribution and generation check |
 | GUI-08 | Live pyRevit/Revit acceptance | Pending host availability | Real ownership, keyboard/focus, drag, footer navigation, DPI/work-area and accessibility checks |
 | GUI-09 | Review remaining custom-window components and explain implementation | Reviewed; five template additions selected | [2026-10-28 review](../knowledge/reviews/design-system/2026-10-28-custom-window-components-review.md): 19 remaining windows at its baseline, migration risks and candidate primitives; Close label corrected; no production migration |
 | GUI-10 | Create five shared reference templates | Implemented; locally verified | Owner approved all five on 2026-10-28; [family guide](../../lib/GUI/_templates/README.md), [verification](../knowledge/reviews/design-system/2026-10-28-template-family.md) |
-| GUI-11 | Refine template elements with owner using grilling | First refinement pass implemented; locally verified | Selection baseline retained; accepted Form, Message, Options and Review choices implemented; final visual acceptance, artwork and live-host checks remain separate from production migration |
+| GUI-11 | Refine template elements with owner using grilling | Settled choices implemented; locally verified | Selection baseline retained; accepted Form, Message, Options, Review and icon choices implemented; final owner/live-host acceptance remains pending |
 
 ## Template refinement interview — 2026-10-28
 
@@ -112,8 +114,8 @@ counts and Check All scope explicit.
 cover actual chip centers, blocked/disabled checkboxes, selected-versus-checked
 behavior, hidden-check preservation, empty filters and filtered-row visibility.
 This completes the first refinement pass across the five reference templates.
-Production migration, owner icon-artwork selection and live-host acceptance
-remain separate tasks.
+The following phase implemented owner-approved artwork and production source
+migration. Live-host acceptance remains a separate task.
 
 ## Icon selection and authorized migration sequence
 
@@ -121,12 +123,14 @@ On 2026-10-28 the owner requested icon selection, then production migration,
 and supplied `https://lucide.dev/icons/`. Lucide is the selected family. The
 [review package](../knowledge/reviews/design-system/2026-10-28-icon-selection/README.md)
 contains actual inventory, 17 attributed source candidates and a WPF-rendered
-sheet. Specific mappings, proposed 1.5 stroke, optional message symbols and
-icon/text placement remain the current interview frontier. No production XAML
-or resource was changed for the candidate package.
+sheet. The owner approved every proposed mapping, 1.5 stroke, applicable message
+symbols, retained word/border status chips and text-only larger actions. The
+canonical implementation is `lib/_icons/gui/`; the candidate package remains
+historical evidence. Fixed 128 x 28 icon/text buttons accommodate Recall's
+English, German and Korean captions without fitting buttons to text.
 
-After icon choices settle, implement resources/previews and migrate in verified
-batches on `dev.GUI-Clean` under the existing authorization:
+The following source batches are implemented on `dev.GUI-Clean` under the
+existing authorization:
 
 1. Shared modal Python windows: CustomAlert, SelectFromDict, CreateFromRooms and
    DuplicateSheets. Preserve nested checkbox content/handler contracts and each
@@ -157,18 +161,20 @@ publication is part of this request.
 
 ## Implementation boundaries and recovery
 
-`KLCodeFoundation.xaml` is opt-in and merges the existing legacy dictionary
-for its palette, vector wordmark, and scrollbars. Its new control styles have
-explicit names. The legacy dictionary and production XAML/loaders are unchanged.
-Removing remaining legacy resource dependencies is part of later migration,
-not evidence that this delivery converted every control or host.
+`KLCodeFoundation.xaml` merges event-free `KLCodeSharedPrimitives.xaml` for the
+canonical palette, vector wordmark, footer links and scrollbars. Explicit
+control styles are shared by Python windows and compiled resource aliases.
+Legacy `WPF_styles.xaml` and Recall's docked body/resources remain unchanged for
+excluded consumers. Gallery's own shell/fixture remain tooling exceptions.
 
 The Python adapter loads the shell and binds common events without importing
 `GUI.forms`, pyRevit, or an active document. The shell's `Tag` holds
 caller metadata; body `Content` and workflow `DataContext` remain caller-owned.
 The caller explicitly shows the window and owns accept/cancel/persistence.
 
-Rollback this delivery's opt-in resources, helpers, template, Gallery adapter,
-probe/tests and linked documentation together. No data/model migration or
-compiled asset replacement is involved. Extension/tool versions remain at
-their existing unreleased values; this is not a release delivery.
+Rollback shared resources, both adapters, migrated window bodies, Gallery
+previews, probes/tests and linked documentation together; the consumers depend
+on the new shared keys. No data/model migration or packaged compiled asset
+replacement is involved. Extension/tool versions remain unchanged; this is not
+a release delivery. The local source/build checks do not close GUI-08 or the
+separate compiled-tools host acceptance plan.

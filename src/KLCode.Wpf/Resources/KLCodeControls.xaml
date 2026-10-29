@@ -18,7 +18,9 @@
     <Style x:Key="KlaGroupBorderStyle" TargetType="Border" BasedOn="{StaticResource KlaSection}" />
     <Style x:Key="KlaGroupCaptionStyle" TargetType="TextBlock" BasedOn="{StaticResource KlaPromptText}" />
     <Style x:Key="KlaChipBorderStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusChip}" />
-    <Style x:Key="KlaInfoChipStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusReady}" />
+    <Style x:Key="KlaInfoChipStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusChip}">
+        <Setter Property="BorderBrush" Value="{StaticResource KlaInfoBrush}" />
+    </Style>
     <Style x:Key="KlaWarningChipStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusWarning}" />
     <Style x:Key="KlaBlockingChipStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusError}" />
     <Style x:Key="KlaNeutralChipStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusChip}" />
