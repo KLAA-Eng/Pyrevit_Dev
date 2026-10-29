@@ -115,6 +115,41 @@ class ScheduleTests(unittest.TestCase):
         self.assertEqual(1.25, entries['BP4']['thickness'])
         self.assertEqual(24.0, entries['BP11']['embed'])
 
+    def column_notes(self, rows, xs, top, first, last):
+        """Cells for rows first..last drawn as one multi-line note per column."""
+        ymax = top - first * ROW + ROW / 2.0
+        ymin = top - last * ROW - ROW / 2.0
+        cells = []
+        for column, x in enumerate(xs):
+            lines = [row[column] if column < len(row) else '' for row in rows[first:last + 1]]
+            cells.append({'text': '\r'.join(lines) + '\r', 'xmin': x - 0.2, 'xmax': x + 0.2,
+                          'ymin': ymin, 'ymax': ymax})
+        return cells
+
+    def test_reads_drafted_column_notes(self):
+        cells = table(BASE_PLATE_ROWS[:3] + BASE_PLATE_ROWS[8:], BASE_PLATE_XS, 10.0)
+        cells = [c for c in cells if 'NOTE' not in c['text']]
+        cells += self.column_notes(BASE_PLATE_ROWS, BASE_PLATE_XS, 10.0, 3, 7)
+        cells += table(ANCHOR_ROWS[:2], ANCHOR_XS, 7.0, heights={1: 0.2})
+        cells += self.column_notes(ANCHOR_ROWS, ANCHOR_XS, 7.0, 2, 6)
+        entries, problems = read_base_plate_schedule(cells)
+        self.assertEqual([], problems)
+        self.assertEqual(['BP1', 'BP11', 'BP4', 'BP7', 'BP9'], sorted(entries))
+        self.assertEqual(('C', 15.0, 12.0, 24.0), tuple(
+            entries['BP11'][key] for key in ('type', 'length', 'width', 'embed')))
+        self.assertEqual(2.0, read_edge_distances(cells)[0.875])
+
+    def test_reads_one_note_per_row(self):
+        cells = table(BASE_PLATE_ROWS[:3], BASE_PLATE_XS, 10.0)
+        for index, row in enumerate(BASE_PLATE_ROWS[3:8]):
+            cells.append({'text': '\t'.join(row), 'xmin': -0.2, 'xmax': 7.2,
+                          'ymin': 10.0 - (3 + index) * ROW - 0.05,
+                          'ymax': 10.0 - (3 + index) * ROW + 0.05})
+        entries, problems = read_base_plate_schedule(cells)
+        self.assertEqual([], problems)
+        self.assertEqual(1.25, entries['BP4']['thickness'])
+        self.assertEqual(0.75, entries['BP9']['rod_diameter'])
+
     def test_missing_header_reports_problem(self):
         entries, problems = read_base_plate_schedule([cell('MARK', 0, 0)])
         self.assertEqual({}, entries)

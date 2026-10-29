@@ -39,7 +39,11 @@ past a wall face or clash with the column are visible at a glance.
   cell reading exactly `MARK` with `TYPE`, `DIM L`, and `DIM W`; `THICKNESS`,
   `NUMBER`, `SIZE`, and `EMBED` are read when present. Rows are rebuilt from
   the notes' heights and columns from the nearest header, and reading stops
-  at the first row below the table whose MARK cell is not a mark.
+  at the first row below the table whose MARK cell is not a mark. Drafted
+  ("dumb") schedules may hold one note per cell, one multi-line note per
+  column (each line is placed in its row by sharing the note's height
+  evenly), or one note per row with values separated by tabs or two or more
+  spaces.
 - **Anchor rod requirements.** In the same view, the table whose header has
   an `ANCHOR ROD` column and an `EDGE DISTANCE` column gives the edge
   distance "C" for each rod diameter. Without it, the built-in KL&A values
@@ -52,7 +56,10 @@ past a wall face or clash with the column are visible at a glance.
   `h`/`b`. The size only draws the column outline and its checks.
 
 A schedule drawn as an imported or linked CAD file cannot be read; its text
-is not available to the API. Walls in linked models are not used.
+is not available to the API. When no rows or no anchor rod table are read,
+every text note in the schedule view is written, with its box, to
+`%LOCALAPPDATA%\KLA Tools\Column Base Plate QC\schedule_text.txt` and the
+palette names the file. Walls in linked models are not used.
 
 ## Layout rules
 

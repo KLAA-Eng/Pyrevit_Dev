@@ -120,6 +120,32 @@ def format_inches(value):
 
 # -- Cell geometry -------------------------------------------------------------
 
+def split_lines(cells):
+    """Return one cell per text line.
+
+    Drafted ("dumb") schedules often hold a whole column in one note, one
+    value per line. A note's lines share its height evenly, so each line gets
+    the middle half of its slot: lines of different notes in the same table
+    row overlap, and neighboring rows do not.
+    """
+    result = []
+    for cell in cells:
+        lines = re.split(r'\r\n|\r|\n', cell['text'] or '')
+        while lines and not lines[-1].strip():
+            lines.pop()  # Revit ends note text with a line break.
+        if len(lines) <= 1:
+            result.append(dict(cell, text=lines[0] if lines else ''))
+            continue
+        slot = (cell['ymax'] - cell['ymin']) / float(len(lines))
+        for index, line in enumerate(lines):
+            if not line.strip():
+                continue
+            middle = cell['ymax'] - slot * (index + 0.5)
+            result.append({'text': line, 'xmin': cell['xmin'], 'xmax': cell['xmax'],
+                           'ymin': middle - slot / 4.0, 'ymax': middle + slot / 4.0})
+    return result
+
+
 def _center(cell):
     return ((cell['xmin'] + cell['xmax']) / 2.0, (cell['ymin'] + cell['ymax']) / 2.0)
 
@@ -163,11 +189,23 @@ def _column_bounds(headers):
 def _assign(row, columns):
     """Map each cell in row to the nearest column (by center x); join shared cells."""
     values = {}
-    for cell in sorted(row, key=lambda item: _center(item)[0]):
-        x = _center(cell)[0]
-        key = min(columns, key=lambda item: abs(item[1] - x))[0]
-        text = normalize_text(cell['text'])
+
+    def put(key, text):
+        text = normalize_text(text)
         values[key] = (values[key] + ' ' + text) if key in values else text
+
+    for cell in sorted(row, key=lambda item: _center(item)[0]):
+        # A note spanning several columns holds the row's values separated by
+        # tabs or runs of spaces; give them out left to right.
+        spanned = sorted((item for item in columns if cell['xmin'] < item[1] < cell['xmax']),
+                         key=lambda item: item[1])
+        parts = [part for part in re.split(r'\t+|\s{2,}', (cell['text'] or '').strip()) if part]
+        if len(spanned) > 1 and len(parts) == len(spanned):
+            for (key, _), part in zip(spanned, parts):
+                put(key, part)
+            continue
+        x = _center(cell)[0]
+        put(min(columns, key=lambda item: abs(item[1] - x))[0], cell['text'])
     return values
 
 
@@ -188,6 +226,7 @@ def read_base_plate_schedule(cells):
     fields. The header row is the row holding a cell reading exactly MARK
     alongside TYPE and a plate dimension.
     """
+    cells = split_lines(cells)
     for mark_cell in (cell for cell in cells if normalize_text(cell['text']) == 'MARK'):
         mark_x = _center(mark_cell)[0]
         # Nearest first, so other text at the same height cannot claim a field.
@@ -252,6 +291,7 @@ def read_edge_distances(cells):
     The header row holds a cell starting ANCHOR ROD (the diameter column) and a
     cell containing EDGE DISTANCE. Returns {} when the table is not found.
     """
+    cells = split_lines(cells)
     for edge_cell in (cell for cell in cells if 'EDGE' in normalize_text(cell['text'])):
         row = _row_cells(cells, edge_cell)
         rod_cell = next((cell for cell in row

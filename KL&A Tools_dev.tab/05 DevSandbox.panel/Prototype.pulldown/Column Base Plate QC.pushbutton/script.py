@@ -125,7 +125,31 @@ def read_schedule(doc, view_id):
     edges = read_edge_distances(cells)
     if not edges:
         problems.append('No anchor rod requirements table found; built-in edge distances are used.')
+    if not entries or not edges:
+        path = dump_cells(view, cells)
+        if path:
+            problems.append('The view\'s text notes were written to {} for troubleshooting.'.format(path))
     return entries, edges, problems
+
+
+def dump_cells(view, cells):
+    """Write each note's text and box (top first) so an unreadable schedule can be diagnosed."""
+    path = os.path.join(os.path.dirname(LOG_PATH), 'schedule_text.txt')
+    try:
+        if not os.path.isdir(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+        # repr keeps line breaks and symbols visible and the file ASCII.
+        with open(path, 'w') as dump:
+            dump.write('View: {}\n'.format(repr(_element_name(view))))
+            dump.write('xmin, xmax, ymin, ymax (feet), text\n')
+            for cell in sorted(cells, key=lambda item: (-item['ymax'], item['xmin'])):
+                dump.write('{:.3f}, {:.3f}, {:.3f}, {:.3f}, {}\n'.format(
+                    cell['xmin'], cell['xmax'], cell['ymin'], cell['ymax'],
+                    repr(cell['text'])))
+        return path
+    except Exception:
+        log('schedule dump failed:\n' + traceback.format_exc())
+        return None
 
 
 # -- Model -------------------------------------------------------------------------
