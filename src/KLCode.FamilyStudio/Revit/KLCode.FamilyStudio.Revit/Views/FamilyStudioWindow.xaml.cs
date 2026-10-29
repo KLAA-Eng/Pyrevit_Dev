@@ -44,18 +44,12 @@ public sealed partial class FamilyStudioWindow : Window
         ThemeBootstrapper.Apply(Resources, CultureInfo.CurrentUICulture.Name);
         FamilyStudioText.ApplyToolStrings(Resources);
         InitializeComponent();
+        WindowChrome.Attach(this, window_shell, Title, FamilyStudioText.Get("ToolVersion"));
         LoadFilterOptions();
         Search();
         UpdateViewMode();
     }
 
-    private void OnHeaderMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        if (e.LeftButton == MouseButtonState.Pressed)
-        {
-            DragMove();
-        }
-    }
 
     private void OnCloseClick(object sender, RoutedEventArgs e) => Close();
     private void OnSearchClick(object sender, RoutedEventArgs e) => Search();

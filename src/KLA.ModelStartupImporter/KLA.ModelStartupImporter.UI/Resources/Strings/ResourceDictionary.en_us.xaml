@@ -77,10 +77,11 @@
     <system:String x:Key="DuplicateHeadingFormat">{0} duplicate ids</system:String>
     <system:String x:Key="ImportableHeadingFormat">{0} clean matches remain classified</system:String>
     <system:String x:Key="CleanMatchesBlockedLabel">Import remains blocked until every selected unknown or duplicate id is removed from the checklist.</system:String>
-    <system:String x:Key="CopyIssueReportLabel">Copy Issue Report</system:String>
+    <system:String x:Key="CopyIssueReportLabel">Copy Report</system:String>
     <system:String x:Key="ImportBlockedLabel">Import Blocked</system:String>
     <system:String x:Key="ImportCompleteHeading">Import complete</system:String>
     <system:String x:Key="ChecklistReadFailedHeading">Checklist could not be read</system:String>
     <system:String x:Key="NothingImportedLabel">Nothing was imported. Correct the source and try again.</system:String>
     <system:String x:Key="OpenProjectFirstLabel">Open a Revit project before running Startup Importer.</system:String>
+    <system:String x:Key="ToolVersion">v0.0</system:String>
 </ResourceDictionary>

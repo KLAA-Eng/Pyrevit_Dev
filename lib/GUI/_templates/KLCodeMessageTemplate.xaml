@@ -23,7 +23,11 @@
             <Border x:Name="message_banner" Grid.Row="2" Style="{StaticResource KlaBanner}">
                 <Grid>
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                    <TextBlock x:Name="message_heading" Text="Information" Style="{StaticResource KlaSectionHeading}" TextWrapping="Wrap"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="16"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <ContentControl x:Name="message_icon" Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaInformationGeometry}" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="message_heading" Grid.Column="2" Text="Information" Style="{StaticResource KlaSectionHeading}" TextWrapping="Wrap"/>
+                    </Grid>
                     <ScrollViewer x:Name="message_scroll" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="True" AutomationProperties.Name="Message content">
                         <TextBlock x:Name="message_body" Style="{StaticResource KlaInfoText}" TextWrapping="Wrap"/>
                     </ScrollViewer>

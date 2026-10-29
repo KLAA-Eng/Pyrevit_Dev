@@ -129,10 +129,11 @@ for entry in entries:
             assert not any(item.IsChecked for item in window._items)
         if output_directory and state == 'Normal' and entry['id'] in ('kla-match-properties-recall', 'kla-find-replace-views'):
             render_content(window, os.path.join(output_directory, entry['id'] + '.png'),
-                           420 if 'recall' in entry['id'] else 350, 500)
+                           window.Width, window.Height)
         window.Close()
 gallery.Close()
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_foundation_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_templates_wpf.py'))
+execfile(os.path.join(repo_root, 'scripts', 'validate_ui_production_wpf.py'))
 print('IronPython {}: {} catalog entries; {} real-WPF custom/state constructions; Gallery filters/deferred selection passed.'.format(sys.version.split()[0], len(entries), count))
 print('No window was shown. Native dialogs and pyRevit/Revit integration remain host checks.')

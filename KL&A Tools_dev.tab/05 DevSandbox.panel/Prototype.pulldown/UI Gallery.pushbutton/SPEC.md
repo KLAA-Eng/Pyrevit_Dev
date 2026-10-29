@@ -110,13 +110,17 @@ hidden checks. Apply Checked validates the full checked collection. Clicking a
 row updates details without checking it. Ready/Warning/Blocked chips center in
 their Status cells; blocked rows remain unavailable for checking.
 
-Other production forms and the Gallery catalog shell keep their existing
-layouts pending review of the references. See the
+The nine Python tool previews now load their migrated source bodies through the
+shared loader. Their canonical controls, operations and lifecycle remain
+caller-owned. Caller discovery recognizes aliased `GUI.window_chrome.load_window`
+calls, preserving tool lists after migration. Gallery's own catalog shell and
+static fixture remain tooling exceptions. See the
 [template guide](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.md) and
 [consolidation plan](../../../../docs/plans/custom-window-consolidation.md).
 
-Recall preserves the actual recall shell and hosts the actual clipboard
-UserControl inside `content_host`; its search, selection, sample load, and
+Recall preserves the actual recall shell and hosts the standalone-specific
+`clipboard_recall_content.xaml` UserControl inside `content_host`; its search,
+selection, sample load, and
 paste actions are local simulations. The production light/dark issue remains
 visible. The Gallery does not fix or certify production GUI appearance.
 

@@ -10,7 +10,7 @@ __version__ = "v1.0"
 from Autodesk.Revit.DB import *
 from pyrevit import forms
 import os
-import wpf
+from GUI.window_chrome import load_window
 
 # Custom
 from Renaming.BaseClass_FindReplace import BaseRenaming
@@ -43,10 +43,7 @@ class RenameViews(BaseRenaming):
     def start(self, title, version="Version: _"):
         xaml_file_name = os.path.join(os.path.dirname(__file__), "Script.xaml")
 
-        self.add_wpf_resource()
-        wpf.LoadComponent(self, xaml_file_name)
-        self.main_title.Text = title
-        self.footer_version.Text = version
+        load_window(self, xaml_file_name, title, version)
         self.selected_elements = self.get_selected_elements()
 
         if self.selected_elements:

@@ -98,6 +98,30 @@ there is no filename/name fallback that could select unrelated project content.
 The native command also rejects Family Editor documents. Load/Place source is
 not accepted as live behavior until it passes the Windows/Revit gates below.
 
+## Shared custom-window presentation
+
+The compiled browser uses the same `KlaWindowShell`, Foundation, Components,
+tokens and vector wordmark as the Python custom windows. The compiled adapter
+links these canonical XAML sources; compatibility style names derive from
+shared roles instead of carrying separate control templates. Both chrome rows
+are 24 units high, body typography is Segoe UI 12, and group prompts use the
+shared 14-unit normal-weight role. Supporting actions use 104 x 28 dimensions.
+Search, List, Grid and Favorite use approved shared Lucide geometry; localized
+captions remain text-only so state changes retain their icon templates.
+
+`WindowChrome.Attach` supplies shared close/drag/footer navigation behavior
+after localized resources load, without changing workflow ownership. The caller
+passes its existing `v0.0` tool version; no extension or invented version is
+displayed. Shared alerts inherit a known owner version or omit it. Browser,
+selection, refresh, loading, placement and repository operations are unchanged.
+The compiled Gallery entry remains disabled under its separate deferred scope.
+
+The actual UI class can be built and constructed offscreen through
+`src/KLCode.Wpf/Tests/KLCode.Wpf.Desktop.Smoke` with its real core/service ports
+and an in-memory empty repository. This does not exercise Autodesk adapters,
+database files, actual input or Revit model operations. Matching-host acceptance
+remains required; installed API assemblies must match the declared framework.
+
 ## Local data
 
 The Revit command reads:

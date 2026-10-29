@@ -2,7 +2,6 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using KLA.ModelStartupImporter.Core;
 using KLA.ModelStartupImporter.UI.ViewModels;
@@ -25,6 +24,8 @@ public partial class StartupSourcePickerWindow : Window
         ThemeBootstrapper.Apply(Resources, CultureInfo.CurrentUICulture.Name);
         StartupImporterText.ApplyToolStrings(Resources);
         InitializeComponent();
+        WindowChrome.Attach(this, window_shell, Title, StartupImporterText.Get("ToolVersion"),
+            close: () => DialogResult = false);
         _viewModel.DestinationProject = string.IsNullOrWhiteSpace(destinationProject)
             ? StartupImporterText.Get("UnknownDestinationLabel")
             : destinationProject;
@@ -139,9 +140,5 @@ public partial class StartupSourcePickerWindow : Window
     }
 
     private void OnCancelClick(object sender, RoutedEventArgs e) => DialogResult = false;
-
-    private void OnHeaderMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        if (e.LeftButton == MouseButtonState.Pressed) DragMove();
-    }
 }
+

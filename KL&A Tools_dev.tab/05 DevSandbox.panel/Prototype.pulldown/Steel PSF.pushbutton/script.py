@@ -12,24 +12,9 @@ import traceback
 from Autodesk.Revit import Exceptions as RevitExceptions
 from pyrevit import DB, forms, revit, script
 from System.Collections.Generic import List
-from System import Uri, UriKind
-from System.Windows.Media.Imaging import BitmapImage, BitmapCacheOption, BitmapCreateOptions
-import wpf
 
 
 COMMAND_TITLE = 'Steel PSF'
-
-
-def _load_search_icon(image_path):
-    """Load the shared 16 px search icon from its absolute extension path."""
-    bitmap = BitmapImage()
-    bitmap.BeginInit()
-    bitmap.CacheOption = BitmapCacheOption.OnLoad
-    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache
-    bitmap.UriSource = Uri(image_path, UriKind.Absolute)
-    bitmap.EndInit()
-    bitmap.Freeze()
-    return bitmap
 
 
 def _element_name(element, default='Unspecified'):
@@ -129,6 +114,7 @@ if LIB_DIR not in sys.path:
     sys.path.insert(0, LIB_DIR)
 
 from GUI.forms import my_WPF
+from GUI.window_chrome import load_window
 from excel_com import (
     add_chart_object, add_workbook, add_worksheet, call_method,
     close_excel_application, create_excel_application, create_pivot_cache,
@@ -170,11 +156,8 @@ class SteelPsfDialog(my_WPF):
         self.items = self._generate_list_items()
         self.selected_items = []
         self.export_mode = RUN_ONLY
-        self.add_wpf_resource()
-        wpf.LoadComponent(self, os.path.join(os.path.dirname(__file__), 'SteelPsfDialog.xaml'))
-        search_icon_path = os.path.join(EXTENSION_ROOT, 'lib', '_icons', 'search_16px_light.png')
-        self.filter_icon.Source = _load_search_icon(search_icon_path)
-        self.main_title.Text = title
+        load_window(self, os.path.join(os.path.dirname(__file__), 'SteelPsfDialog.xaml'),
+                    title, __version__)
         self.main_ListBox.ItemsSource = self.items
         self.ShowDialog()
 

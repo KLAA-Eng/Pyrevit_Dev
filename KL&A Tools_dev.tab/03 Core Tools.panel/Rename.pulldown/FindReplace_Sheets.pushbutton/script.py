@@ -12,7 +12,7 @@ from Autodesk.Revit.DB import *
 #pyRevit
 from pyrevit import forms
 import os
-import wpf
+from GUI.window_chrome import load_window
 
 # CUSTOM
 from Snippets._selection        import get_selected_sheets
@@ -60,10 +60,8 @@ def update_project_browser():
 class MyWindow(my_WPF):
     """GUI for ViewSheet renaming tool."""
     def __init__(self, xaml_file_name):
-        self.add_wpf_resource()
-        wpf.LoadComponent(self, os.path.join(os.path.dirname(__file__), xaml_file_name))
-        self.main_title.Text = __title__
-        self.footer_version.Text = __version__
+        load_window(self, os.path.join(os.path.dirname(__file__), xaml_file_name),
+                    __title__, __version__)
 
 
     def rename(self):

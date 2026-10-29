@@ -4,8 +4,8 @@ Date: 2026-10-28. Baseline: `bb78f0d` on `dev.GUI-Clean`.
 The owner requested icon selection followed by production migration and supplied
 the [Lucide catalog](https://lucide.dev/icons/) as the source family.
 The [consolidation plan](../../../../plans/custom-window-consolidation.md) owns
-decisions and migration status. This directory is a review package, not a
-production icon dictionary.
+decisions and migration status. This directory preserves the reviewed candidates. The owner approved all four
+choices; the production source owner is now [lib/_icons/gui](../../../../../lib/_icons/gui/README.md).
 
 ![Candidate sheet](contact-sheet.png)
 
@@ -71,5 +71,6 @@ Lucide's ISC notice and the Feather-derived MIT notices. See the official
 Run `render.ps1` with Windows PowerShell/WPF to recreate `contact-sheet.png`.
 It reads only the local candidates and the repository's two existing PNGs.
 This is a static asset review, not live-host or interactive icon-state evidence.
-Glyph mappings, stroke weight, optional message symbols and placement policy
-remain proposals until answered by the owner.
+The owner subsequently approved the mappings, 1.5 stroke, optional message
+symbols and text-only larger actions. This sheet remains the dated review
+snapshot; edit approved artwork in the canonical GUI icon folder.

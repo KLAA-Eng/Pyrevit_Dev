@@ -29,15 +29,30 @@ workflow, make the required selection and review the result before confirming.
 The View Range window shows the four planes in a table headed **Plane**,
 **Elevation - ft**, **Level Offset**, and **Level**. These headings are static;
 the displayed elevation and offset values follow the model's length units.
-The heading text is bold 16, table values and controls are 14, and status
-messages are 12. The plane names are left-aligned under their centered header;
-other table content is centered by column, while numeric offsets remain
-right-aligned inside their fields. The instruction area reserves 40 layout
-units for its one- or two-line message. Apply and Reset use the main template's
-Arial 14 action-button text. Nearby vertical gaps use 8 layout
-units, with 16 between sections. Empty status messages take no space; longer
-messages can expand the window or scroll within the content area. The footer,
-KLCode palette, and four plane colors retain their existing treatment.
+The window opts into `KlaWindowShell`: its header and footer are both 24 units
+high, body padding is 16 horizontally and 8 vertically, and the centered footer
+receives the calling command's pure version. Typography is Segoe UI: shared
+14-unit section/table headings and 12-unit values/status text. The plane names
+remain left-aligned under their centered heading; other table content is
+centered by column, while numeric offsets remain right-aligned inside their
+24-high shared compact fields. Level selectors use the shared dark ComboBox
+and item styles, including full-surface opening and disabled/focus states.
+
+The instruction area reserves at least 40 and at most 96 units, scrolling longer
+messages so instruction text remains reachable.
+Apply Changes and Reset remain a centered horizontal group with an 8-unit gap;
+Apply uses the shared 216 x 32 main role and Reset the 104 x 28 secondary role.
+Empty warnings take no space. Table/warning content can scroll independently
+of the action group when the resizable, height-sized window reaches its limit.
+The four plane colors, length formatting, table headings and Revit operations
+are preserved by this presentation migration. In particular, the static
+`Elevation - ft` heading remains the separately recorded unit-label issue.
+
+`GUI.window_chrome.load_window()` delegates XAML loading to the installed
+pyRevit `load_xaml` method for this `forms.WPFWindow`, retaining its host owner,
+icon and Escape handling. The command still assigns its ViewModel, calls
+`show()` modelessly, and removes the drawing server/events on Closed. The
+shared loader does not show the window or own Revit event/transaction logic.
 
 ## Current execution logic
 
@@ -61,7 +76,7 @@ environment before promotion or behavior changes.
 | --- | --- |
 | Tool ID | `core.viewrange` |
 | Path aliases | `KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/ViewRange.pushbutton` |
-| Version inputs | `bundle.yaml`; `script.py`; `MainWindow.xaml`; `lib/GUI/Resources/WPF_styles.xaml` |
+| Version inputs | `bundle.yaml`; `script.py`; `MainWindow.xaml`; `lib/GUI/window_chrome.py`; `lib/GUI/Resources/KLCodeComponents.xaml`; `lib/GUI/Resources/KLCodeFoundation.xaml`; `lib/GUI/Resources/KLCodeFoundationTokens.xaml` |
 | Tool version | `v1.1` |
 | Status/origin | Maintained — KL&A adaptation of pyRevit; View Range UI refinement released in the 0.0.11 beta. |
 

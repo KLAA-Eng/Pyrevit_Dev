@@ -51,7 +51,7 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
     room_text = next(item for item in descendants(room_check) if isinstance(item, TextBlock))
     room_row_height = room_row.ActualHeight
     room_text_gap = room_text.TranslatePoint(Point(0, 0), room_check).X - 16
-    room_filter_height = rooms.textbox_filter.ActualHeight + 2  # Its separate 1-unit shell border.
+    room_filter_height = rooms.textbox_filter.ActualHeight
     print('Create from rooms: search {} high at y={}; row {} high, padding {}; checkbox text gap {}.'.format(
         rooms.textbox_filter.ActualHeight, rooms.textbox_filter.TranslatePoint(Point(0, 0), rooms.Content).Y,
         room_row.ActualHeight, room_row.Padding,

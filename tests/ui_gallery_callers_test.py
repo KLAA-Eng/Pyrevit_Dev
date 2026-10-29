@@ -93,6 +93,15 @@ class CallerDiscoveryTests(unittest.TestCase):
         self.assertEqual('Sheets', result['lib/GUI/Select.xaml'][0]['title'])
         self.assertIn('lib/helpers.py', result['lib/GUI/Select.xaml'][0]['via'])
 
+    def test_discovers_shared_loader_with_an_import_alias(self):
+        self.write('lib/GUI/Select.xaml', '<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"/>')
+        self.write('lib/GUI/window_chrome.py', 'def load_window(window, path, title):\n    pass\n')
+        self.write('lib/GUI/select.py', 'import os\nfrom GUI.window_chrome import load_window as load\n'
+                   'def select():\n    load(None, os.path.join(os.path.dirname(__file__), "Select.xaml"), "Select")\n')
+        self.tool('Picker', '__title__ = "Picker"\nfrom GUI.select import select\nselect()\n')
+        result = discover_callers(self.root)
+        self.assertEqual(['Picker'], [row['title'] for row in result['lib/GUI/Select.xaml']])
+
     def test_ignores_hidden_template_tools_and_comments(self):
         self.write('KL&A Tools_dev.tab/_Templates/Hidden.pushbutton/script.py',
                    'from pyrevit import forms\nforms.alert("hidden")\n')

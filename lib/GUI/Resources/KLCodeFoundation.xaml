@@ -1,8 +1,8 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
-        <!-- Reuse the existing wordmark, palette, and scrollbars. Legacy consumers are unchanged. -->
-        <ResourceDictionary Source="WPF_styles.xaml"/>
+        <!-- Shared data-only primitives load in loose Python XAML and compiled WPF. -->
+        <ResourceDictionary Source="KLCodeSharedPrimitives.xaml"/>
         <ResourceDictionary Source="KLCodeFoundationTokens.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 

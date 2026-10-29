@@ -105,6 +105,22 @@ class WindowChromeTests(unittest.TestCase):
         chrome.close_button.Click.emit(None, None)
         self.assertTrue(self.window.closed)
 
+    def test_pyrevit_loader_preserves_its_host_setup(self):
+        host_loads = []
+        self.window.load_xaml = host_loads.append
+        self.load()
+        self.assertEqual(['body.xaml'], host_loads)
+        self.assertEqual([], self.loads)
+
+    def test_caller_can_preserve_a_special_close_policy(self):
+        closes = []
+        with patch.dict(sys.modules, self.host):
+            chrome = load_window(self.window, 'body.xaml', 'Caller', close_handler=lambda sender, args: closes.append(args))
+        args = object()
+        chrome.close_button.Click.emit(None, args)
+        self.assertEqual([args], closes)
+        self.assertFalse(self.window.closed)
+
     def test_content_height_uses_current_width_and_clamps_to_caller_limits(self):
         measurements = []
         content = types.SimpleNamespace(Measure=measurements.append,

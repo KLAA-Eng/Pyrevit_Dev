@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 
 namespace KLCode.Wpf.Views;
@@ -19,12 +18,11 @@ public partial class KlaAlertWindow : Window
     {
     }
 
-    public KlaAlertWindow(string title, string heading, string message, KlaAlertKind kind)
+    public KlaAlertWindow(string title, string heading, string message, KlaAlertKind kind, string? version = null)
     {
         ThemeBootstrapper.Apply(Resources, CultureInfo.CurrentUICulture.Name);
         InitializeComponent();
-        Title = title ?? string.Empty;
-        AlertTitle.Text = Title;
+        WindowChrome.Attach(this, window_shell, title, version);
         AlertHeading.Text = heading ?? string.Empty;
         AlertMessage.Text = message ?? string.Empty;
 
@@ -33,17 +31,15 @@ public partial class KlaAlertWindow : Window
         {
             case KlaAlertKind.Warning:
                 resourceKey = "KlaWarningBrush";
-                AlertIcon.Text = "!";
+                AlertIcon.Content = FindResource("KlaWarningGeometry");
                 break;
             case KlaAlertKind.Blocking:
                 resourceKey = "KlaBlockingBrush";
-                AlertIcon.Text = "!";
+                AlertIcon.Content = FindResource("KlaErrorGeometry");
                 break;
             default:
                 resourceKey = "KlaInfoBrush";
-                AlertIcon.Text = "i";
-                AlertIcon.FontFamily = new FontFamily("Georgia");
-                AlertIcon.FontStyle = FontStyles.Italic;
+                AlertIcon.Content = FindResource("KlaInformationGeometry");
                 break;
         }
 
@@ -74,21 +70,15 @@ public partial class KlaAlertWindow : Window
 
     private static void Show(Window? owner, string title, string heading, string message, KlaAlertKind kind)
     {
-        KlaAlertWindow window = new KlaAlertWindow(title, heading, message, kind);
+        string? version = (owner?.Content as System.Windows.Controls.ContentControl)?.Tag
+            is WindowChromeMetadata caller ? caller.VersionText : null;
+        KlaAlertWindow window = new KlaAlertWindow(title, heading, message, kind, version);
         if (owner is not null)
         {
             window.Owner = owner;
         }
 
         window.ShowDialog();
-    }
-
-    private void OnHeaderMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        if (e.LeftButton == MouseButtonState.Pressed)
-        {
-            DragMove();
-        }
     }
 
     private void OnCloseClick(object sender, RoutedEventArgs e)

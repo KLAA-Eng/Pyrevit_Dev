@@ -100,6 +100,26 @@ already named by the catalog target are skipped and reported. This wave never
 overwrites, refreshes, rebuilds, or stores link metadata. Any failure after the
 transaction group starts rolls the full import back.
 
+## Shared custom-window presentation
+
+Source Picker, Review, Blocking Issues and their shared alert use the canonical
+`KlaWindowShell`, Foundation, Components, tokens and vector icons also loaded by
+Python custom windows. The compiled adapter links those sources and derives
+compatibility names from shared styles. Header and footer are both 24 units;
+normal actions are 104 x 28 and primary actions 216 x 32. Read-only inline
+bindings are explicitly one-way. Table status chips use the centered shared
+table role; descriptive chips outside tables retain their own layout role.
+
+`WindowChrome.Attach` receives the caller title and existing `v0.0` tool version
+after localization loads. Header cancellation preserves the source/review
+dialog policy. Shared alerts inherit a known owner version or omit it; message
+content is bounded and scrollable. File selection, validation, import planning,
+selection, transactions, rollback and model behavior remain command-owned and
+unchanged. All compiled Gallery entries remain disabled under their separate
+deferred scope. Offscreen desktop construction/layout validates the actual UI
+classes with fictional in-memory data; it does not establish live Revit input,
+ownership, DPI, pickers, imports or host acceptance.
+
 ## Deferred contracts and live gates
 
 No seed RVT or content catalog file is invented or committed by this slice. The

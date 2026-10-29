@@ -89,9 +89,8 @@ def _window_type():
     from System.Windows import ResourceDictionary, Visibility, Window
     from System.Windows.Controls import Grid, UserControl
     from System.Windows.Input import MouseButtonState
-    from System.Windows.Media import Brushes
-    from System.Windows.Media.Imaging import (BitmapImage, BitmapCacheOption,
-                                              BitmapCreateOptions)
+    from System.Windows.Media import Brushes, Color, SolidColorBrush
+    from GUI.window_chrome import load_window, fit_window_height
 
     def merge(control, path):
         resources = ResourceDictionary()
@@ -110,11 +109,11 @@ def _window_type():
             self._ready = False
             self._items = recall_items(owner.preview_state)
             self._visible = list(self._items)
-            merge(self, os.path.join(owner.preview_root, 'lib', 'match', 'clipboard.Icons.xaml'))
+            merge(self, os.path.join(owner.preview_root, 'lib', 'GUI', 'Resources', 'KLCodeComponents.xaml'))
             merge(self, os.path.join(owner.preview_root, 'lib', 'match',
                                     'clipboard_ui.ResourceDictionary.en_us.xaml'))
             wpf.LoadComponent(self, os.path.join(owner.preview_root, 'lib', 'match',
-                                               'clipboard_content.xaml'))
+                                               'clipboard_recall_content.xaml'))
             self.loadViewFiltersBtn.Visibility = Visibility.Collapsed
             self.loadFilterElemBtn.Visibility = Visibility.Collapsed
             self.categoryFilterCheck.Visibility = Visibility.Collapsed
@@ -209,10 +208,11 @@ def _window_type():
                 self.message = alert_message('Long content')
                 self.available_levels[0].Name = selection_items('Long content')[0].Name
             self.cutplane_level_name = self.available_levels[0].Name
-            for prefix, value, brush in (('topplane', '12', Brushes.DodgerBlue),
-                                         ('cutplane', '4', Brushes.Orange),
-                                         ('bottomplane', '0', Brushes.SeaGreen),
-                                         ('viewdepth', '-4', Brushes.MediumPurple)):
+            for prefix, value, rgb in (('topplane', '12', (0, 255, 0)),
+                                       ('cutplane', '4', (255, 0, 0)),
+                                       ('bottomplane', '0', (0, 0, 255)),
+                                       ('viewdepth', '-4', (255, 127, 0))):
+                brush = SolidColorBrush(Color.FromRgb(*rgb))
                 setattr(self, prefix + '_brush', brush)
                 setattr(self, prefix + '_elevation', '-' if state == 'Empty' else value)
                 setattr(self, prefix + '_new_value', '' if state == 'Empty' else value)
@@ -235,16 +235,21 @@ def _window_type():
             self._sample_numbers = ['A{:03d}'.format(i + 101)
                                     for i in range(len(self._sample_names))]
             self._duplicate_option = 'Duplicate'
-            if self.preview_id not in ('kla-view-range', 'kla-model-checker'):
-                merge(self, os.path.join(root, 'lib', 'GUI', 'Resources', 'WPF_styles.xaml'))
-            wpf.LoadComponent(self, path)
-            self.Title = '{} [Gallery: {}]'.format(launcher.get('title', 'Preview'), state)
-            self.ToolTip = 'Fictional data preview. Model, file, and navigation actions are simulated.'
+            title = '{} [Gallery: {}]'.format(launcher.get('title', 'Preview'), state)
+            if self.preview_id in ('kla-model-checker', 'ui-gallery-preview-fixture'):
+                if self.preview_id == 'ui-gallery-preview-fixture':
+                    merge(self, os.path.join(root, 'lib', 'GUI', 'Resources', 'WPF_styles.xaml'))
+                wpf.LoadComponent(self, path)
+                self.Title = title
+            else:
+                load_window(self, path, title, launcher.get('tool_version'), self._preview_navigation)
             if hasattr(self, 'main_title'):
                 self.main_title.Text = launcher.get('title', 'Preview')
             if hasattr(self, 'footer_version'):
                 self.footer_version.Text = 'Gallery - {}'.format(state)
             self._initialize()
+            if self.preview_id in ('kla-custom-alert', 'kla-view-range'):
+                fit_window_height(self)
             self._ready = True
             if hasattr(self, 'main_ListBox'):
                 self._refresh_selection()
@@ -252,16 +257,6 @@ def _window_type():
                 self._disable_body()
 
         def _initialize(self):
-            if hasattr(self, 'filter_icon'):
-                bitmap = BitmapImage()
-                bitmap.BeginInit()
-                bitmap.CacheOption = BitmapCacheOption.OnLoad
-                bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache
-                bitmap.UriSource = Uri(os.path.join(self.preview_root, 'lib', '_icons',
-                                                    'search_16px_light.png'), UriKind.Absolute)
-                bitmap.EndInit()
-                bitmap.Freeze()
-                self.filter_icon.Source = bitmap
             if hasattr(self, 'UI_offset'):
                 self.UI_offset.Text = {'Error': 'not a number', 'Empty': '',
                                        'Long content': '12345678901234567890.125'}.get(self.preview_state, '15')
@@ -274,17 +269,13 @@ def _window_type():
                         getattr(self, name).Text = values[suffix]
             if self.preview_id == 'kla-custom-alert':
                 self.alert_heading.Text = 'Warning' if self.preview_state == 'Error' else 'Information'
-                self.alert_icon.Text = '!' if self.preview_state == 'Error' else 'i'
-                self.alert_icon.Foreground = (Brushes.Goldenrod if self.preview_state == 'Error'
-                                               else Brushes.MediumSeaGreen)
+                severity = 'Warning' if self.preview_state == 'Error' else 'Information'
+                self.alert_icon.Content = self.Resources['Kla' + severity + 'Geometry']
+                self.alert_banner.BorderBrush = self.Resources['KlaWarningBrush' if severity == 'Warning' else 'KlaInfoBrush']
                 self.message_text.Text = alert_message(self.preview_state)
             elif self.preview_id == 'kla-match-properties-recall':
                 self.content_host.Content = PreviewRecallContent(self)
             elif self.preview_id == 'kla-view-range':
-                resources = ResourceDictionary()
-                resources.Source = Uri(os.path.join(self.preview_root, 'lib', 'GUI',
-                                                   'Resources', 'WPF_styles.xaml'))
-                self.wordmark_host.ContentTemplate = resources['KLCodeWordmark']
                 self.DataContext = ViewRangeData(self.preview_state)
             elif self.preview_id == 'kla-model-checker':
                 self._initialize_review()
@@ -298,6 +289,9 @@ def _window_type():
                     self._show_result('Sample: multiple items need attention.', alert_message('Long content'))
 
         def _disable_body(self):
+            if hasattr(self, 'window_body'):
+                self.window_body.IsEnabled = False
+                return
             content = self.Content
             if hasattr(content, 'Child'):
                 content = content.Child

@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Windows;
-using System.Windows.Input;
 using KLA.ModelStartupImporter.Core;
 using KLA.ModelStartupImporter.UI.ViewModels;
 using KLCode.Wpf;
@@ -17,6 +16,8 @@ public partial class StartupImportReviewWindow : Window
         ThemeBootstrapper.Apply(Resources, CultureInfo.CurrentUICulture.Name);
         StartupImporterText.ApplyToolStrings(Resources);
         InitializeComponent();
+        WindowChrome.Attach(this, window_shell, Title, StartupImporterText.Get("ToolVersion"),
+            close: () => DialogResult = false);
         _viewModel = new StartupImportReviewViewModel(document, settings, review);
         DataContext = _viewModel;
     }
@@ -26,5 +27,4 @@ public partial class StartupImportReviewWindow : Window
     private void OnSelectNoneClick(object sender, RoutedEventArgs e) => _viewModel.SelectNone();
     private void OnImportClick(object sender, RoutedEventArgs e) => DialogResult = true;
     private void OnCancelClick(object sender, RoutedEventArgs e) => DialogResult = false;
-    private void OnHeaderMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { if (e.LeftButton == MouseButtonState.Pressed) DragMove(); }
 }

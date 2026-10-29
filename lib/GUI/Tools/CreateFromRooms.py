@@ -10,35 +10,18 @@ from pyrevit import forms # Needed for wpf import to work.
 
 # Custom Imports
 from GUI.forms         import my_WPF
+from GUI.window_chrome import load_window
 from Snippets._convert import convert_internal_units
 
 #>>>>>>>>>> .NET IMPORTS
 clr.AddReference("System")
 from System.Collections.Generic import List
-from System import Uri, UriKind
-from System.Windows.Media.Imaging import BitmapImage, BitmapCacheOption, BitmapCreateOptions
-import wpf
 
 # ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
 # ╚╗╔╝╠═╣╠╦╝║╠═╣╠╩╗║  ║╣ ╚═╗
 #  ╚╝ ╩ ╩╩╚═╩╩ ╩╚═╝╩═╝╚═╝╚═╝ VARIABLES
 #====================================================================================================
 PATH_SCRIPT = os.path.dirname(__file__)
-SEARCH_ICON_PATH = os.path.abspath(os.path.join(
-    PATH_SCRIPT, '..', '..', '_icons', 'search_16px_light.png'))
-
-
-def _load_search_icon():
-    """Load the template search icon from its absolute extension path."""
-    bitmap = BitmapImage()
-    bitmap.BeginInit()
-    bitmap.CacheOption = BitmapCacheOption.OnLoad
-    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache
-    bitmap.UriSource = Uri(SEARCH_ICON_PATH, UriKind.Absolute)
-    bitmap.EndInit()
-    bitmap.Freeze()
-    return bitmap
-
 uidoc   = __revit__.ActiveUIDocument
 app     = __revit__.Application
 doc     = __revit__.ActiveUIDocument.Document
@@ -79,10 +62,9 @@ class CreateFromRooms(my_WPF):
         self.version     = version      #type: str
 
         #>>>>>>>>>> SET RESOURCES AND LOAD WPF
-        super(CreateFromRooms, self).add_wpf_resource()
         path_xaml_file = os.path.join(PATH_SCRIPT, 'CreateFromRooms.xaml')
-        wpf.LoadComponent(self, path_xaml_file )
-        self.filter_icon.Source = _load_search_icon()
+        load_window(self, path_xaml_file, title, version,
+                    close_handler=self.button_close)
 
         self.update_UI()
         self.ShowDialog()
@@ -90,10 +72,8 @@ class CreateFromRooms(my_WPF):
     def update_UI(self):
         """Function to make updates to UI based on provided arguments."""
         # UPDATE GUI ELEMENTS
-        self.main_title.Text          = self.title
         self.text_label.Content       = self.label
         self.button_main.Content      = self.button_name
-        self.footer_version.Text      = self.version
 
         self.items                    = self.generate_list_items()
         self.main_ListBox.ItemsSource = self.items
@@ -141,7 +121,7 @@ class CreateFromRooms(my_WPF):
         """Single Selection in ListBox"""
         filtered_list_of_items = List[type(ListItem())]()
         for item in self.main_ListBox.Items:
-            item.IsChecked = True if item.Name == sender.Content.Text else False
+            item.IsChecked = item.Name == sender.DataContext.Name
             filtered_list_of_items.Add(item)
         self.main_ListBox.ItemsSource = filtered_list_of_items
 

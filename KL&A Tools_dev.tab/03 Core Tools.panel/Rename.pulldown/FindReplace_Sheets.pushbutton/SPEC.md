@@ -73,11 +73,20 @@ quiet success, and Project Browser display.
 
 ## GUI and interaction
 
-The local XAML uses shared KLCode brushes, wordmark, header, action buttons, and
-footer styles. The original labels and direct case buttons remain. A result
-panel is collapsed initially and appears only for no-change Rename or
-unresolved items. No preview or success popup is used. The footer version is
-set from `__version__` when the dialog loads.
+The local body uses the shared `KlaWindowShell`, loaded through
+`GUI.window_chrome.load_window` with the caller title and `__version__`. Header,
+footer, close/drag/navigation behavior, and control styles are shared rather
+than copied into the command. Sheet Number and Sheet Name retain their two
+columns. Each compact naming row has a 60-unit label, 240-unit input,
+24-unit height and 8-unit gaps. Uppercase/Lowercase retain their position above
+Rename, using 104 x 28 supporting actions and a 216 x 32 main action. The
+712 x 313 initial window accommodates both shared naming groups.
+
+The result panel remains collapsed initially and appears only for no-change
+Rename or unresolved items. Its details are read-only and scrollable; the body
+can scroll when expanded results exceed the available height. Existing outcome
+height changes, rerun policy, and quiet-success closure are unchanged. No
+preview or success popup is used. Live host acceptance remains pending.
 
 ## Current execution logic
 

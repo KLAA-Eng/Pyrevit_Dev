@@ -318,7 +318,10 @@ class _Inventory(object):
                     api = _api_key(resolved)
                     if api:
                         result.setdefault(api, set()).add(source.relative_path)
-                if constructor or name.endswith(('LoadComponent', 'WPFWindow.__init__', 'WPFWindow')):
+                shared_loader = (isinstance(resolved, tuple)
+                                 and self.sources[resolved[0]].relative_path == 'lib/GUI/window_chrome.py'
+                                 and resolved[1] == 'load_window')
+                if constructor or shared_loader or name.endswith(('LoadComponent', 'WPFWindow.__init__', 'WPFWindow')):
                     for arg in node.args:
                         key = self.window_key(source, self.value(source, scope, arg))
                         if key:

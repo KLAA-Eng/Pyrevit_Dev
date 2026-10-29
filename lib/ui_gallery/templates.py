@@ -114,6 +114,7 @@ def create_template(launcher, state, path):
             self.message_heading.Text = data['heading']
             self.message_body.Text = data['body']
             self.message_details.Text = data['details']
+            self.message_icon.Content = self.Resources['Kla' + data['kind'] + 'Geometry']
             brush = {'Information': 'KlaInfoBrush', 'Warning': 'KlaWarningBrush', 'Error': 'KlaErrorBrush'}[data['kind']]
             self.message_banner.BorderBrush = self.Resources[brush]
             self._fit_message()

@@ -74,6 +74,18 @@ append to the Steel PSF raw CSV set in a selected folder after the report runs.
 Folder selection is prompted only after the report has been generated and only
 for initialize/append modes.
 
+The story-selection body uses `KlaWindowShell` through
+`GUI.window_chrome.load_window`, passing the command title and `__version__`.
+Shared resources own chrome, search artwork, list/checkbox states, spacing and
+button dimensions. The 432 x 576 window retains the search/list, Select All /
+Select None pair, Initialize CSV / Append CSV supporting pair, and main review
+action in that order. The list takes the remaining body height and long names
+wrap. Supporting actions are 104 x 28 and the main review action is 216 x 32,
+with 8-unit gaps between action rows. Showing and closing remain owned by the
+command; selected stories and export mode are collected before closing, with
+the existing filtered-selection policy preserved. This presentation migration
+does not change report, CSV, Excel, or model behavior.
+
 ## Current execution logic
 
 pyRevit loads the bundle and executes its entry point. The implementation uses

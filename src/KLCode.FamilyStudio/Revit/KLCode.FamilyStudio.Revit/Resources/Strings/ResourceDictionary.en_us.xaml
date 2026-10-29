@@ -9,8 +9,8 @@
     <system:String x:Key="ThisProjectLabel">This Project</system:String>
     <system:String x:Key="LibraryLabel">Library</system:String>
     <system:String x:Key="ProjectScopeUnavailableLabel">Project-scoped catalog search is not enabled in this DevSandbox wave.</system:String>
-    <system:String x:Key="ListModeLabel">≣ List</system:String>
-    <system:String x:Key="GridModeLabel">▦ Grid</system:String>
+    <system:String x:Key="ListModeLabel">List</system:String>
+    <system:String x:Key="GridModeLabel">Grid</system:String>
     <system:String x:Key="SearchPlaceholderLabel">Search name, category, type, parameter, or tag.</system:String>
     <system:String x:Key="FamiliesCaptionLabel">Families</system:String>
     <system:String x:Key="SearchLabel">Search</system:String>
@@ -31,8 +31,8 @@
     <system:String x:Key="LoadAndPlaceLabel">Load &amp; Place</system:String>
     <system:String x:Key="BatchLoadLabel">Batch Load</system:String>
     <system:String x:Key="BatchLoadCountFormat">Batch Load ({0})</system:String>
-    <system:String x:Key="FavoriteLabel">★ Favorite</system:String>
-    <system:String x:Key="UnfavoriteLabel">★ Unfavorite</system:String>
+    <system:String x:Key="FavoriteLabel">Favorite</system:String>
+    <system:String x:Key="UnfavoriteLabel">Unfavorite</system:String>
     <system:String x:Key="CopyPathLabel">Copy Path</system:String>
     <system:String x:Key="OpenFolderLabel">Open Folder</system:String>
     <system:String x:Key="PreviewUnavailableLabel">preview unavailable</system:String>
@@ -85,4 +85,5 @@
     <system:String x:Key="DetailInstanceParametersLabel">Instance parameter definitions:</system:String>
     <system:String x:Key="DetailParameterValueFormat">- {0}: {1}</system:String>
     <system:String x:Key="DetailParameterDefinitionFormat">- {0} ({1})</system:String>
+    <system:String x:Key="ToolVersion">v0.0</system:String>
 </ResourceDictionary>

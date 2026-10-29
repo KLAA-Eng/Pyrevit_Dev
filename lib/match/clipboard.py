@@ -7,9 +7,8 @@ from pyrevit import DB
 from pyrevit.revit.events import execute_in_revit_context
 from pyrevit.framework import ComponentModel, wpf, Controls, Uri, UriKind, ResourceDictionary
 from pyrevit.compat import get_elementid_value_func
-from System.Windows.Input import MouseButtonState
-from System.Windows.Window import DragMove
 from GUI.forms import my_WPF
+from GUI.window_chrome import load_window
 
 from match.match_utils import (
     PropKeyValue,
@@ -31,6 +30,8 @@ MAX_HISTORY_ITEMS = 50
 _DIR = op.dirname(op.abspath(__file__))
 _ICONS_XAML = op.join(_DIR, "clipboard.Icons.xaml")
 _CONTENT_XAML = op.join(_DIR, "clipboard_content.xaml")
+_RECALL_CONTENT_XAML = op.join(_DIR, "clipboard_recall_content.xaml")
+_COMPONENTS_XAML = op.join(_DIR, '..', 'GUI', 'Resources', 'KLCodeComponents.xaml')
 _WINDOW_XAML = op.join(_DIR, "clipboard_window.xaml")
 _PAGE_XAML = op.join(_DIR, "clipboard_page.xaml")
 
@@ -157,9 +158,12 @@ class ClipboardContent(Controls.UserControl):
         self._memfile = memfile
         self._items = []
 
-        _merge_resource_dict(self, _ICONS_XAML)
+        if is_recall:
+            _merge_resource_dict(self, _COMPONENTS_XAML)
+        else:
+            _merge_resource_dict(self, _ICONS_XAML)
         _merge_locale(self)
-        wpf.LoadComponent(self, _CONTENT_XAML)
+        wpf.LoadComponent(self, _RECALL_CONTENT_XAML if is_recall else _CONTENT_XAML)
 
         if is_recall:
             self.loadViewFiltersBtn.Visibility = forms.WPF_COLLAPSED
@@ -455,9 +459,9 @@ class MatchHistoryClipboard(forms.WPFPanel):
 
 
 class RecallWindow(my_WPF):
-    def __init__(self, target_type, initial_props, memfile):
-        self.add_wpf_resource()
-        wpf.LoadComponent(self, _WINDOW_XAML)
+    def __init__(self, target_type, initial_props, memfile,
+                 title='Match Properties Recall', version=None):
+        load_window(self, _WINDOW_XAML, title, version)
         self._content = ClipboardContent(
             is_recall=True,
             target_type=target_type,
@@ -467,13 +471,6 @@ class RecallWindow(my_WPF):
         self._content.populate(initial_props, all_selected=True)
         script.restore_window_position(self, "MatchPropertiesRecall")
         self.Closing += self._on_closing
-
-    def button_close(self, sender, e):
-        self.Close()
-
-    def header_drag(self, sender, e):
-        if e.LeftButton == MouseButtonState.Pressed:
-            DragMove(self)
 
     def _on_closing(self, sender, args):
         script.save_window_position(self, "MatchPropertiesRecall")

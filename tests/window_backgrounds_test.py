@@ -48,7 +48,10 @@ class WindowBackgroundTests(unittest.TestCase):
             xaml_path = os.path.join(PROJECT_ROOT, relative_path)
             root = ElementTree.parse(xaml_path).getroot()
 
-            self.assertEqual('#1A252B', root.attrib.get('Background'), relative_path)
+            if relative_path in KL_A_TEMPLATE_WINDOW_XAML_PATHS:
+                self.assertEqual('{StaticResource KlaFoundationWindow}', root.attrib.get('Style'), relative_path)
+            else:
+                self.assertEqual('#1A252B', root.attrib.get('Background'), relative_path)
 
     def test_branded_window_bodies_use_solid_kl_charcoal(self):
         for relative_path in WINDOW_XAML_PATHS:
@@ -56,7 +59,8 @@ class WindowBackgroundTests(unittest.TestCase):
             with open(xaml_path, 'r', encoding='utf-8') as xaml_file:
                 xaml = xaml_file.read()
 
-            self.assertIn('<Grid Background="#1A252B">', xaml, relative_path)
+            self.assertIn('x:Name="window_body"', xaml, relative_path)
+            self.assertIn('Style="{StaticResource KlaWindowShell}"', xaml, relative_path)
             self.assertNotIn('<LinearGradientBrush', xaml, relative_path)
 
     def test_editor_and_gallery_use_branded_chrome(self):
@@ -71,10 +75,14 @@ class WindowBackgroundTests(unittest.TestCase):
             with open(xaml_path, 'r', encoding='utf-8') as xaml_file:
                 xaml = xaml_file.read()
 
-            self.assertEqual('None', root.attrib.get('WindowStyle'), relative_path)
-            self.assertEqual('True', root.attrib.get('AllowsTransparency'), relative_path)
-            self.assertIn('MouseDown="header_drag"', xaml, relative_path)
-            self.assertIn('x:Name="main_title"', xaml, relative_path)
+            if relative_path in KL_A_TEMPLATE_WINDOW_XAML_PATHS:
+                self.assertEqual('{StaticResource KlaFoundationWindow}', root.attrib.get('Style'), relative_path)
+                self.assertIn('Style="{StaticResource KlaWindowShell}"', xaml)
+            else:
+                self.assertEqual('None', root.attrib.get('WindowStyle'), relative_path)
+                self.assertEqual('True', root.attrib.get('AllowsTransparency'), relative_path)
+                self.assertIn('MouseDown="header_drag"', xaml, relative_path)
+                self.assertIn('x:Name="main_title"', xaml, relative_path)
             self.assertNotIn('#F5F5F5', xaml, relative_path)
             self.assertNotIn('#E8E8E8', xaml, relative_path)
             self.assertNotIn('Foreground="Red"', xaml, relative_path)
@@ -99,13 +107,15 @@ class WindowBackgroundTests(unittest.TestCase):
         with open(xaml_path, 'r', encoding='utf-8') as xaml_file:
             xaml = xaml_file.read()
 
-        self.assertIn('x:Key="ComboBoxToggleButton"', xaml)
-        self.assertIn('x:Key="ViewRangeComboBox"', xaml)
-        self.assertIn('x:Key="ViewRangeComboBoxItem"', xaml)
-        self.assertIn('Style="{StaticResource ViewRangeComboBox}"', xaml)
-        self.assertIn('ItemContainerStyle="{StaticResource ViewRangeComboBoxItem}"', xaml)
-        self.assertIn('DropDownBorder', xaml)
-        self.assertIn('SelectionBoxItem', xaml)
+        self.assertIn('Style="{StaticResource KlaCompactComboBox}"', xaml)
+        with open(os.path.join(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeComponents.xaml'), encoding='utf-8') as stream:
+            shared = stream.read()
+        self.assertIn('x:Key="KlaCompactComboBox"', shared)
+        self.assertIn('BasedOn="{StaticResource KlaComboBox}"', shared)
+        self.assertIn('ItemContainerStyle', shared)
+        self.assertIn('DropDownBorder', shared)
+        self.assertIn('SelectionBoxItem', shared)
+        self.assertIn('x:Name="PART_Popup"', shared)
 
     def test_kl_a_custom_windows_use_the_template_header_treatment(self):
         for relative_path in KL_A_TEMPLATE_WINDOW_XAML_PATHS:
@@ -114,20 +124,16 @@ class WindowBackgroundTests(unittest.TestCase):
                 xaml = xaml_file.read()
 
             root = ElementTree.parse(xaml_path).getroot()
-            self.assertEqual('None', root.attrib.get('WindowStyle'), relative_path)
-            self.assertEqual('#1A252B', root.attrib.get('Background'), relative_path)
-            self.assertIn('MouseDown="header_drag"', xaml, relative_path)
-            self.assertIn('RowDefinition Height="24"', xaml, relative_path)
-            if relative_path.endswith('ViewRange.pushbutton/MainWindow.xaml'):
-                self.assertIn('x:Name="wordmark_host"', xaml, relative_path)
-            else:
-                self.assertIn('ContentTemplate="{StaticResource KLCodeWordmark}"', xaml,
-                              relative_path)
-            self.assertIn('Width="70" Height="12" Margin="8,0,0,0"', xaml,
-                          relative_path)
-            self.assertIn('Grid.ColumnSpan="3"', xaml, relative_path)
-            self.assertIn('Style="{StaticResource KLCodeCloseButton}"', xaml,
-                          relative_path)
+            self.assertEqual('{StaticResource KlaFoundationWindow}', root.attrib.get('Style'), relative_path)
+            self.assertIn('x:Name="window_shell"', xaml, relative_path)
+            self.assertIn('Style="{StaticResource KlaWindowShell}"', xaml, relative_path)
+            self.assertNotIn('x:Name="main_title"', xaml, relative_path)
+        with open(os.path.join(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeFoundation.xaml'), encoding='utf-8') as stream:
+            shell = stream.read()
+        self.assertIn('Width="70" Height="12"', shell)
+        self.assertIn('ContentTemplate="{StaticResource KLCodeWordmark}"', shell)
+        self.assertIn('Height="{StaticResource KlaChromeRow}"', shell)
+        self.assertIn('Style="{StaticResource KlaFoundationCloseButton}"', shell)
 
     def test_view_range_loads_the_shared_wordmark_at_runtime(self):
         script_path = os.path.join(
@@ -137,8 +143,11 @@ class WindowBackgroundTests(unittest.TestCase):
         with open(script_path, 'r', encoding='utf-8') as script_file:
             script = script_file.read()
 
-        self.assertIn('wordmark_host.ContentTemplate = self._shared_wordmark_template()', script)
-        self.assertIn("return styles['KLCodeWordmark']", script)
+        self.assertIn('from GUI.window_chrome import load_window', script)
+        self.assertIn('load_window(self,', script)
+        with open(os.path.join(PROJECT_ROOT, 'lib/GUI/window_chrome.py'), encoding='utf-8') as stream:
+            adapter = stream.read()
+        self.assertIn('host_loader(xaml_path)', adapter)
 
     def test_shared_dictionary_exposes_template_control_styles(self):
         styles_path = os.path.join(PROJECT_ROOT, 'lib/GUI/Resources/WPF_styles.xaml')
@@ -163,10 +172,10 @@ class WindowBackgroundTests(unittest.TestCase):
             with open(xaml_path, 'r', encoding='utf-8') as xaml_file:
                 xaml = xaml_file.read()
 
-            self.assertIn('search_16px_light.png', xaml, relative_path)
-            self.assertIn('Style="{StaticResource KLCodeFilterTextBox}"', xaml,
+            self.assertIn('Source="{StaticResource KlaIconSearch}"', xaml, relative_path)
+            self.assertIn('Style="{StaticResource KlaFoundationFilter}"', xaml,
                           relative_path)
-            self.assertIn('CornerRadius="6"', xaml, relative_path)
+            self.assertNotIn('search_16px_light.png', xaml, relative_path)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,9 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="../../_icons/gui/KLCodeIcons.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
     <!-- Shared WPF values; no Python, Revit, or compiled-add-in dependency. -->
     <sys:Double x:Key="KlaSpace4">4</sys:Double>
     <sys:Double x:Key="KlaSpace8">8</sys:Double>
@@ -37,7 +40,6 @@
     <SolidColorBrush x:Key="KlaPressedBrush" Color="#204D3A"/>
     <SolidColorBrush x:Key="KlaDisabledFillBrush" Color="#303C40"/>
     <SolidColorBrush x:Key="KlaDisabledTextBrush" Color="#A6B0AD"/>
-    <BitmapImage x:Key="KlaIconSearch" UriSource="../../_icons/search_16px_light.png"/>
     <!-- Component roles supplement the shared brand palette; all styles are opt-in. -->
     <GridLength x:Key="KlaFieldLabelColumn">112</GridLength>
     <GridLength x:Key="KlaCompactFieldLabelColumn">60</GridLength>

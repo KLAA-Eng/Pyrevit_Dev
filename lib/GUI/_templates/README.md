@@ -24,7 +24,10 @@ dropdown, option, result, status, table and splitter styles. Foundation owns
 the shell/basic controls and tokens. `../window_chrome.py` loads Components
 before the body and wires only common chrome. `../window_metadata.py` supplies
 the caller's title/version/links. The body owns layout and declared event names;
-each production controller will own its data, validation and operations.
+each production controller owns its data, validation and operations. The
+production migration uses these same resources through Python/CLR host adapters.
+Approved vector icons and their attributed sources live in
+[lib/_icons/gui](../../_icons/gui/README.md).
 
 `lib/ui_gallery/template_data.py` owns the five source identities and pure
 fictional fixtures; `templates.py` implements the safe example interactions.
@@ -86,7 +89,8 @@ an owner choice.
 Dimensions and component appearance are an initial review build, not final
 acceptance. See the [active plan](../../../docs/plans/custom-window-consolidation.md)
 and [template-family verification](../../../docs/knowledge/reviews/design-system/2026-10-28-template-family.md).
-The owner-requested grilling will settle refinements before production migration.
+The first owner-requested refinement pass is settled; the active plan owns
+production migration and live-host acceptance status.
 
 ## Validation
 

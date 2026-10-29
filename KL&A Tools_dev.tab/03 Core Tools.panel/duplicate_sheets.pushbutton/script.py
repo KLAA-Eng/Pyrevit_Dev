@@ -59,7 +59,7 @@ class MyWindow(DuplicateSheets):
                                                    exit_if_none= False)
         if self.selected_sheets:
             DuplicateSheets.__init__(self, __title__, self.duplicate_selected_sheets,
-                                     self.set_duplicate_option)
+                                     self.set_duplicate_option, version=__version__)
             self.ShowDialog()
     # ╔═╗╦ ╦╔╗╔╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
     # ╠╣ ║ ║║║║║   ║ ║║ ║║║║╚═╗

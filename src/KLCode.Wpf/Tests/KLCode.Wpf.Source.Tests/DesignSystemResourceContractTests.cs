@@ -26,8 +26,6 @@ public sealed class DesignSystemResourceContractTests
     private static readonly string[] RequiredCompiledStyleKeys =
     {
         "KlaWindowStyle",
-        "KlaHeaderBrandStyle",
-        "KlaHeaderTitleStyle",
         "KlaButtonStyle",
         "KlaSmallButtonStyle",
         "KlaCloseButtonStyle",
@@ -47,7 +45,6 @@ public sealed class DesignSystemResourceContractTests
         "KlaWarningChipStyle",
         "KlaBlockingChipStyle",
         "KlaNeutralChipStyle",
-        "KlaFooterTextStyle",
     };
 
     private static readonly XNamespace Presentation =
@@ -74,20 +71,22 @@ public sealed class DesignSystemResourceContractTests
     }
 
     [TestMethod]
-    public void LegacyStyles_MergeTheCanonicalPaletteInsteadOfForkingBrushes()
+    public void SharedFoundation_UsesEventFreePrimitivesInsteadOfTheLegacyWindowDictionary()
     {
-        XDocument legacyStyles = LoadXaml("lib/GUI/Resources/WPF_styles.xaml");
-        string[] mergedSources = legacyStyles
+        XDocument foundation = LoadXaml("lib/GUI/Resources/KLCodeFoundation.xaml");
+        string[] mergedSources = foundation
             .Descendants(Presentation + "ResourceDictionary")
             .Attributes("Source")
             .Select(attribute => attribute.Value)
             .ToArray();
 
-        CollectionAssert.Contains(mergedSources, "KLCode_palette.xaml");
-        Assert.AreEqual(
-            0,
-            legacyStyles.Root!.Elements(Presentation + "SolidColorBrush").Count(),
-            "Palette brushes must have one canonical definition.");
+        CollectionAssert.Contains(mergedSources, "KLCodeSharedPrimitives.xaml");
+        CollectionAssert.DoesNotContain(mergedSources, "WPF_styles.xaml");
+        XDocument primitives = LoadXaml("lib/GUI/Resources/KLCodeSharedPrimitives.xaml");
+        Assert.IsTrue(primitives.Descendants(Presentation + "ResourceDictionary")
+            .Any(element => (string?)element.Attribute("Source") == "KLCode_palette.xaml"));
+        Assert.IsFalse(primitives.Descendants().Attributes().Any(IsEventAttribute));
+        Assert.AreEqual(0, primitives.Descendants(Presentation + "EventSetter").Count());
     }
 
     [TestMethod]
@@ -99,7 +98,7 @@ public sealed class DesignSystemResourceContractTests
     }
 
     [TestMethod]
-    public void CompiledAdapter_DefinesTheCompleteIsolatedControlSurfaceAndEmbedsAudiowide()
+    public void CompiledAdapter_AliasesSharedControlsAndLinksTheCanonicalSourceFiles()
     {
         XDocument controls = LoadXaml("src/KLCode.Wpf/Resources/KLCodeControls.xaml");
         HashSet<string> styleKeys = controls
@@ -115,15 +114,22 @@ public sealed class DesignSystemResourceContractTests
             .Attributes("Source")
             .Select(attribute => attribute.Value)
             .ToArray();
-        CollectionAssert.Contains(mergedSources, "KLCodePalette.xaml");
+        CollectionAssert.Contains(mergedSources, "../GUI/Resources/KLCodeComponents.xaml");
         CollectionAssert.Contains(mergedSources, "KLCodeCompiledTokens.xaml");
+        Assert.AreEqual(0, controls.Descendants(Presentation + "ControlTemplate").Count(),
+            "Compiled aliases must not fork shared control templates.");
 
         XDocument project = XDocument.Load(Path.Combine(FindRepositoryRoot(), "src/KLCode.Wpf/KLCode.Wpf.csproj"));
-        XElement? font = project.Descendants("Resource")
-            .FirstOrDefault(element => ((string?)element.Attribute("Include"))?.EndsWith(
-                "Audiowide-Regular.ttf", StringComparison.OrdinalIgnoreCase) == true);
-        Assert.IsNotNull(font, "The handoff Audiowide font must be embedded in the compiled adapter.");
-        Assert.AreEqual("Assets/Fonts/Audiowide-Regular.ttf", ((string?)font.Attribute("Link"))?.Replace('\\', '/'));
+        foreach (string file in new[] { "KLCode_palette.xaml", "KLCodeSharedPrimitives.xaml",
+                     "KLCodeFoundationTokens.xaml", "KLCodeFoundation.xaml", "KLCodeComponents.xaml" })
+        {
+            XElement? page = project.Descendants("Page")
+                .FirstOrDefault(element => (string?)element.Attribute("Include") == "../../lib/GUI/Resources/" + file);
+            Assert.IsNotNull(page, "The compiled adapter must link the canonical " + file);
+            Assert.AreEqual("GUI/Resources/" + file, (string?)page.Attribute("Link"));
+        }
+        Assert.IsTrue(project.Descendants("Page").Any(element =>
+            (string?)element.Attribute("Link") == "_icons/gui/KLCodeIcons.xaml"));
     }
 
     [TestMethod]
@@ -182,7 +188,7 @@ public sealed class DesignSystemResourceContractTests
             .Attributes("Source")
             .Select(attribute => attribute.Value)
             .ToArray();
-        CollectionAssert.Contains(mergedSources, "KLCodePalette.xaml");
+        CollectionAssert.Contains(mergedSources, "../GUI/Resources/KLCodeComponents.xaml");
 
         string bootstrapper = File.ReadAllText(Path.Combine(
             FindRepositoryRoot(),
@@ -267,7 +273,8 @@ public sealed class DesignSystemResourceContractTests
         XDocument window = LoadXaml(relativePath);
         Assert.AreEqual(expectedWidth, (string?)window.Root?.Attribute("Width"), relativePath + " width");
         Assert.AreEqual(expectedHeight, (string?)window.Root?.Attribute("Height"), relativePath + " height");
-        Assert.AreEqual("{StaticResource KlaWindowStyle}", (string?)window.Root?.Attribute("Style"));
+        CollectionAssert.Contains(new[] { "{StaticResource KlaWindowStyle}", "{StaticResource KlaFoundationWindow}" },
+            (string?)window.Root?.Attribute("Style"));
 
         HashSet<string> names = window.Descendants()
             .Select(element => (string?)element.Attribute(Xaml + "Name"))
@@ -277,13 +284,9 @@ public sealed class DesignSystemResourceContractTests
         CollectionAssert.IsSubsetOf(requiredNames, names.ToArray(), relativePath);
 
         string source = window.ToString(SaveOptions.DisableFormatting);
-        StringAssert.Contains(source, "KlaHeaderBrandStyle", relativePath);
-        StringAssert.Contains(source, "BrandSlash", relativePath);
-        StringAssert.Contains(source, "BrandName", relativePath);
-        if (!relativePath.EndsWith("KlaAlertWindow.xaml", StringComparison.Ordinal))
-        {
-            StringAssert.Contains(source, "KlaFooterTextStyle", relativePath);
-            StringAssert.Contains(source, "VersionLabel", relativePath);
-        }
+        CollectionAssert.IsSubsetOf(new[] { "window_shell", "window_body" }, names.ToArray(), relativePath);
+        StringAssert.Contains(source, "KlaWindowShell", relativePath);
+        Assert.IsFalse(source.Contains("OnHeaderMouseLeftButtonDown", StringComparison.Ordinal));
+        Assert.IsFalse(source.Contains("VersionLabel", StringComparison.Ordinal));
     }
 }

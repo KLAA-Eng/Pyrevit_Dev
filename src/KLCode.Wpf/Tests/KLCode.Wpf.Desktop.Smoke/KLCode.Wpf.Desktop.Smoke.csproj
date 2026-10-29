@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../KLA.ModelStartupImporter/KLA.ModelStartupImporter.UI/KLA.ModelStartupImporter.UI.csproj" />
+    <ProjectReference Include="../../../KLCode.FamilyStudio/Library/KLCode.FamilyStudio.Core/KLCode.FamilyStudio.Core.csproj" AdditionalProperties="FamilyStudioRevitHost=true" />
+    <!-- Exercise the actual UI class with its real ports; no Autodesk implementation or assembly is linked. -->
+    <Page Include="../../../KLCode.FamilyStudio/Revit/KLCode.FamilyStudio.Revit/Views/FamilyStudioWindow.xaml" Link="FamilyStudioWindow.xaml" />
+    <Page Include="../../../KLCode.FamilyStudio/Revit/KLCode.FamilyStudio.Revit/Resources/Strings/ResourceDictionary.en_us.xaml" Link="Resources/Strings/ResourceDictionary.en_us.xaml" />
+    <Compile Include="../../../KLCode.FamilyStudio/Revit/KLCode.FamilyStudio.Revit/Views/FamilyStudioWindow.xaml.cs" Link="FamilyStudioWindow.xaml.cs" />
+    <Compile Include="../../../KLCode.FamilyStudio/Revit/KLCode.FamilyStudio.Revit/Views/FamilyStudioText.cs" Link="FamilyStudioText.cs" />
+    <Compile Include="../../../KLCode.FamilyStudio/Revit/KLCode.FamilyStudio.Revit/Services/IFamilyLoadService.cs" Link="IFamilyLoadService.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

@@ -19,6 +19,9 @@
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
     </Style>
+    <Style x:Key="KlaPromptText" TargetType="TextBlock" BasedOn="{StaticResource KlaSectionHeading}">
+        <Setter Property="FontWeight" Value="Normal"/>
+    </Style>
     <Style x:Key="KlaFieldLabel" TargetType="Label" BasedOn="{StaticResource KlaFoundationLabel}"/>
     <Style x:Key="KlaCompactFieldLabel" TargetType="Label" BasedOn="{StaticResource KlaFieldLabel}">
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -114,7 +117,8 @@
                 </ToggleButton>
                 <!-- Selection text must not intercept clicks intended for the full-surface toggle. -->
                 <ContentPresenter IsHitTestVisible="False" Margin="8,0,28,0" VerticalAlignment="Center"
-                                  Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+                                  Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                  ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
                 <Border x:Name="ComboFocus" IsHitTestVisible="False" BorderThickness="1" BorderBrush="Transparent" CornerRadius="6"/>
                 <Popup x:Name="PART_Popup" Placement="Bottom" Focusable="False" AllowsTransparency="True"
                        IsOpen="{TemplateBinding IsDropDownOpen}">
@@ -188,6 +192,9 @@
     <Style x:Key="KlaSecondaryButton" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}">
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}"/>
     </Style>
+    <Style x:Key="KlaIconTextButton" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}">
+        <Setter Property="Width" Value="128"/>
+    </Style>
     <Style x:Key="KlaIconButton" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}">
         <Setter Property="Width" Value="28"/><Setter Property="Height" Value="28"/>
         <Setter Property="Padding" Value="0"/>
@@ -200,6 +207,15 @@
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="Padding" Value="8,4"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Child.Text, RelativeSource={RelativeSource Self}}" Value="">
+                <Setter Property="Visibility" Value="Collapsed"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="KlaTableStatusChip" TargetType="Border" BasedOn="{StaticResource KlaStatusChip}">
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
     <Style x:Key="KlaStatusReady" TargetType="Border" BasedOn="{StaticResource KlaStatusChip}"><Setter Property="BorderBrush" Value="{StaticResource KlaReadyBrush}"/></Style>
     <Style x:Key="KlaStatusWarning" TargetType="Border" BasedOn="{StaticResource KlaStatusChip}"><Setter Property="BorderBrush" Value="{StaticResource KlaWarningBrush}"/></Style>

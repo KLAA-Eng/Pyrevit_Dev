@@ -10,10 +10,7 @@ import traceback
 import os
 from Autodesk.Revit.Exceptions import InvalidOperationException
 from collections import OrderedDict
-from System import Uri
-from System.Windows import ResourceDictionary
-from System.Windows.Input import MouseButtonState
-from System.Diagnostics.Process import Start
+from GUI.window_chrome import load_window
 
 
 doc = HOST_APP.doc
@@ -743,32 +740,11 @@ class MainViewModel(forms.Reactive):
 
 class MainWindow(forms.WPFWindow):
     def __init__(self):
-        forms.WPFWindow.__init__(self, "MainWindow.xaml")
-        self.wordmark_host.ContentTemplate = self._shared_wordmark_template()
+        load_window(self, os.path.join(os.path.dirname(__file__), 'MainWindow.xaml'),
+                    __title__, __version__)
         self.Closed += self.window_closed
         # Events are now handled via @events.handle decorators
         server.add_server()
-
-    @staticmethod
-    def _shared_wordmark_template():
-        """Load the exact outlined wordmark used by the main window template."""
-        extension_root = os.path.abspath(os.path.join(
-            os.path.dirname(__file__), '..', '..', '..'))
-        styles_path = os.path.join(
-            extension_root, 'lib', 'GUI', 'Resources', 'WPF_styles.xaml')
-        styles = ResourceDictionary()
-        styles.Source = Uri(styles_path)
-        return styles['KLCodeWordmark']
-
-    def button_close(self, sender, e):
-        self.Close()
-
-    def header_drag(self, sender, e):
-        if e.LeftButton == MouseButtonState.Pressed:
-            self.DragMove()
-
-    def Hyperlink_RequestNavigate(self, sender, e):
-        Start(e.Uri.AbsoluteUri)
 
     def window_closed(self, sender, args):
         server.remove_server()

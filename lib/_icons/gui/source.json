@@ -1,0 +1,27 @@
+{
+  "source": "https://github.com/lucide-icons/lucide",
+  "commit": "be09619c1c1124ad09c19fc3e87ee3b939409bbd",
+  "icons": [
+    "search",
+    "list-filter",
+    "regex",
+    "x",
+    "tags",
+    "eye",
+    "funnel",
+    "mouse-pointer-2",
+    "scan",
+    "check-check",
+    "info",
+    "triangle-alert",
+    "circle-x",
+    "circle-check",
+    "star",
+    "list",
+    "layout-grid"
+  ],
+  "status": "Owner-approved GUI icon family, mappings, stroke and placement, 2026-10-28",
+  "stroke_width": 1.5,
+  "foreground": "#E5E4E2",
+  "disabled_foreground": "#A6B0AD"
+}

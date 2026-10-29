@@ -1,265 +1,40 @@
-<Window
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Title="Create From Rooms"
-    Height="406" Width="400"
-    MinWidth="400"
-    MinHeight="406" MaxHeight="406"
-    WindowStartupLocation="CenterScreen"
-    HorizontalAlignment="Center"
-    ShowInTaskbar="True"
-    WindowStyle="None"
-    AllowsTransparency="True"
-    Background="#1A252B">
-
-
-
-
-    <!--MAIN-->
-    <Grid Background="#1A252B">
-
-
-        <Grid.RowDefinitions>
-
-            <RowDefinition Height="24"/>
-            <RowDefinition Height="32"/>
-            <RowDefinition/>
-            <RowDefinition Height="25"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-
-        <!--HEADER START-->
-        <Grid   MouseDown="header_drag"
-                Background="{StaticResource header_background}"
-                Grid.ColumnSpan="2">
-            <!--HEADER GRID-->
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="86"/>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="86"/>
-            </Grid.ColumnDefinitions>
-
-            <!--LOGO-->
-            <ContentControl Grid.Column="0" Width="70" Height="12" Margin="8,0,0,0"
-                            VerticalAlignment="Center" HorizontalAlignment="Left" IsHitTestVisible="False"
-                            ContentTemplate="{StaticResource KLCodeWordmark}"/>
-            <DockPanel  Grid.Column="0"
-                        Grid.ColumnSpan="2"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Left"
-                        Visibility="Collapsed">
-
-
-                <TextBlock
-                    Margin="5,0,0,0"
-                    FontSize="14px"
-                    FontWeight="Heavy"
-                    Foreground="{StaticResource text_white}">
-                    KLCode
-                </TextBlock>
-            </DockPanel>
-
-            <!--__TITLE__-->
-            <TextBlock x:Name="main_title"
-                Text="__title__"
-                Grid.Column="0"
-                Grid.ColumnSpan="3"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                Foreground="{StaticResource text_white}"
-                MaxWidth="180"
-                TextTrimming="CharacterEllipsis"
-                />
-
-            <!--CLOSE-->
-            <Button
-                Content="Close"
-                Grid.Column="2"
-                Width="60" Height="18"
-                FontSize="10"
-                Click="button_close"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Center"
-                Style="{StaticResource KLCodeCloseButton}"
-                    />
-        </Grid>
-        <!--HEADER END-->
-
-
-
-        <!--FILTER START-->
-        <Grid Grid.Row="1" Margin="8,4,12,4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="24"/>
-                <ColumnDefinition Width="6"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Image x:Name="filter_icon" Grid.Column="0" Width="16" Height="16" Source="../../_icons/search_16px_light.png"
-                   VerticalAlignment="Center" HorizontalAlignment="Center" Stretch="None" SnapsToDevicePixels="True"/>
-            <Border Grid.Column="2" Background="{StaticResource window_background}" BorderBrush="{StaticResource text_green}"
-                    BorderThickness="1" CornerRadius="6" SnapsToDevicePixels="True">
-                <TextBox x:Name="textbox_filter" Text="" TextChanged="text_filter_updated"
-                         Style="{StaticResource KLCodeFilterTextBox}"/>
-            </Border>
-        </Grid>
-        <!--FILTER END-->
-
-        <!--LISTBOX START-->
-        <StackPanel Grid.Row="2"
-                    VerticalAlignment="Top"
-                    Margin="10,0,10,0">
-
-
-            <Label x:Name="text_label"  Content="Select Type:"
-                           Foreground="{StaticResource text_white}"/>
-
-            <ListBox x:Name="main_ListBox"
-                         Height="150" Grid.Row="0"
-                         Background="{StaticResource header_background}"
-                         SelectionMode="Single"
-                         ScrollViewer.VerticalScrollBarVisibility="Visible"
-                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                         BorderBrush="{StaticResource border_green_dark}"
-                         >
-
-                <ListBox.Resources>
-                    <Style TargetType="ScrollBar">
-                        <Setter Property="Background" Value="{StaticResource border_green_dark}"/>
-                        <Setter Property="Foreground" Value="{StaticResource border_green_dark}"/>
-                        <Setter Property="BorderBrush" Value="{StaticResource header_background}"/>
-                        <Setter Property="Opacity" Value="0.9"/>
-                        <Setter Property="Margin" Value="3"/>
-
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type ScrollBar}">
-                                    <Grid x:Name="Bg"
-                                              SnapsToDevicePixels="true">
-                                        <Border BorderBrush     = "{TemplateBinding BorderBrush}"
-                                                    BorderThickness = "{TemplateBinding BorderThickness}"
-                                                    Background      = "{TemplateBinding Background}"
-
-                                                    Grid.Row        = "1"
-                                                    CornerRadius="10"/>
-
-                                        <Track x:Name="PART_Track"
-                                                   IsDirectionReversed="true"
-                                                   IsEnabled="{TemplateBinding IsMouseOver}"
-                                                   Grid.Row="1">
-                                            <Track.Thumb>
-                                                <Thumb Style="{StaticResource ScrollBarThumbVertical}"
-                                                           Margin="2"/>
-                                            </Track.Thumb>
-                                        </Track>
-
-                                    </Grid>
-
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                    <Style TargetType="ListBox">
-                        <Style.Resources>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius" Value="10"/>
-                            </Style>
-                        </Style.Resources>
-                    </Style>
-                </ListBox.Resources>
-
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <CheckBox  Background="#286048" Foreground="{StaticResource text_white}" IsChecked="{Binding IsChecked}"  Checked="UIe_ItemChecked" >
-                            <TextBlock Text="{Binding Name}"/>
-                        </CheckBox>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-
-
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Create From Rooms" Width="400" Height="406" MinWidth="400" MinHeight="406" MaxHeight="406"
+        WindowStartupLocation="CenterScreen" ShowInTaskbar="True"
+        Style="{StaticResource KlaFoundationWindow}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+        <Grid x:Name="window_body">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{StaticResource KlaFilterRow}"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace4}"/>
+                <RowDefinition Height="*"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                <RowDefinition Height="{StaticResource KlaControlRow}"/>
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaGridSpace16}"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Image x:Name="filter_icon" Source="{StaticResource KlaIconSearch}" Width="{StaticResource KlaIconSize}" Height="{StaticResource KlaIconSize}" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                <TextBox x:Name="textbox_filter" Grid.Column="2" TextChanged="text_filter_updated" Style="{StaticResource KlaFoundationFilter}" AutomationProperties.Name="Filter available types"/>
+            </Grid>
+            <Label x:Name="text_label" Grid.Row="2" Content="Select Type:" Target="{Binding ElementName=main_ListBox}" Style="{StaticResource KlaFoundationPromptLabel}"/>
+            <ListBox x:Name="main_ListBox" Grid.Row="4" SelectionMode="Single" Style="{StaticResource KlaFoundationList}" AutomationProperties.Name="Available types">
+                <ListBox.ItemTemplate><DataTemplate>
+                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="UIe_ItemChecked" Style="{StaticResource KlaFoundationCheckBox}"/>
+                </DataTemplate></ListBox.ItemTemplate>
             </ListBox>
-
-
-
-
-
-            <Separator Margin="5,20,5,5" Background="{StaticResource border_green_dark}"/>
-
-            <!--REGION SETTINGS-->
-            <StackPanel Margin="5,20,5,5" x:Name="UI_stack_region_settings" >
-                <Label Content="Additional Settings:" Margin="0, -25,0,0 " Foreground="{StaticResource text_white}"/>
-                <Border  BorderBrush="{DynamicResource border_green_dark}" Padding="0,5,0,10">
-                    <StackPanel Margin="5,10,5,5" >
-
-                        <!--REGION WIDTH-->
-                        <DockPanel>
-                            <TextBlock  Text="Offset from level (cm):"    Width="130"/>
-                            <TextBox    Text="0" Width="200" x:Name="UI_offset" PreviewTextInput="NumberValidationTextBox"/>
-                        </DockPanel>
-
-
-                    </StackPanel>
+            <StackPanel x:Name="UI_stack_region_settings" Grid.Row="6">
+                <Label Content="Additional Settings:" Target="{Binding ElementName=UI_offset}" Style="{StaticResource KlaFoundationPromptLabel}" Margin="0,0,0,8"/>
+                <Border Style="{StaticResource KlaSection}">
+                    <Grid HorizontalAlignment="Left">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}"/><ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <Label Content="Offset:" Target="{Binding ElementName=UI_offset}" Style="{StaticResource KlaCompactFieldLabel}"/>
+                        <TextBox x:Name="UI_offset" Grid.Column="1" Text="0" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Offset from level in centimeters"/>
+                        <TextBlock Grid.Column="3" Text="cm" Style="{StaticResource KlaInfoText}" VerticalAlignment="Center"/>
+                    </Grid>
                 </Border>
             </StackPanel>
-
-            <!--BUTTON_2-->
-            <Button x:Name="button_main"
-                Content="Create"
-                        Click="button_run"
-                        Height="32"
-                        Width="210"
-                        Margin="0,8,0,16"
-                        Style="{StaticResource KLCodeActionButton}"
-                        />
-
-
-        </StackPanel>
-        <!--LISTBOX END-->
-
-        <!--FOOTER START-->
-        <Grid Grid.Row="3" Style="{StaticResource KLCodeFooterGrid}">
-            <!--FOOTER GRID-->
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0">
-                <Hyperlink NavigateUri="https://forms.cloud.microsoft/r/HjuggSZqyU" RequestNavigate="Hyperlink_RequestNavigate"
-                           Style="{StaticResource KLCodeFooterLink}">
-                    Prototype
-                </Hyperlink>
-            </TextBlock>
-
-
-
-            <!--VERSION-->
-            <TextBlock x:Name="footer_version" Style="{StaticResource KLCodeFooterVersion}"
-              Text="Version: 1.0"
-              Grid.Column="1"
-              VerticalAlignment="Center"
-              HorizontalAlignment="Center"
-              Foreground="{StaticResource text_gray}"
-    />
-
-            <!--Ko-Fi-->
-            <TextBlock  Grid.Column="2"
-              VerticalAlignment="Center"
-              HorizontalAlignment="Right"
-              Margin="0,0,10,0">
-              <Hyperlink
-                  RequestNavigate="Hyperlink_RequestNavigate"
-                  NavigateUri="https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u"
-                  Style="{StaticResource KLCodeFooterLink}">
-                  Outreach
-              </Hyperlink>
-            </TextBlock>
+            <Button x:Name="button_main" Grid.Row="8" Content="Create" Click="button_run" Style="{StaticResource KlaFoundationMainButton}" IsDefault="True"/>
         </Grid>
-        <!--FOOTER END-->
-    </Grid>
+    </ContentControl>
 </Window>

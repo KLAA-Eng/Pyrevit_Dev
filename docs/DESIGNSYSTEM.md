@@ -10,9 +10,10 @@ and live-acceptance boundaries.
 
 ## Custom window foundation
 
-The owner approved a shared custom-window standard on 2026-10-27. Its reference family is opt-in: five templates and their Gallery previews use the
-new foundation; existing production Python and compiled windows retain their
-current implementation until the reference is reviewed. The
+The owner approved a shared custom-window standard on 2026-10-27 and refined
+its five references on 2026-10-28. The production migration adopts that source
+foundation in nine Python tool windows and five compiled windows. Gallery
+continues to preview the Python sources; compiled previews remain deferred. The
 [consolidation plan](plans/custom-window-consolidation.md) owns migration status.
 
 | Role | Approved rule |
@@ -22,26 +23,29 @@ current implementation until the reference is reviewed. The
 | Header | Wordmark left, centered title, text Close right; ellipsis without a tooltip |
 | Footer | Functional shared Prototype/Outreach links; pure calling-tool version (vX.X) centered; omit missing versions; use Create from rooms green/gray |
 | Typography | Segoe UI 12 body/controls, 14 header/main action/selection prompt; constant labels use Title Case; compact Close remains 10 |
-| Buttons | Fixed 104 x 28 standard role and 216 x 32 wide main role; preserve action placement |
+| Buttons | Fixed 104 x 28 standard, 128 x 28 icon/text, and 216 x 32 wide main roles; preserve action placement |
 | Controls | 32-high standard fields; 28-high compact controls; 24-high compact form fields; search field 24 high, matching Create from rooms |
 | Spacing | 4/8/12/16/24 scale; body inset 16 horizontally, 8 below header/last action; sections 16, related controls 8, label-to-field 4 |
 | Checkbox list | Create from rooms spacing: rows 20 high, 4-unit box-to-label gap; native KL&A list-selection row template supplies blue hover/selection; long names wrap |
-| Icons | Semantic resource names; existing Search at 16 units initially; replacement artwork selected with owner |
+| Icons | Approved Lucide geometry in `lib/_icons/gui/`; 16-unit normal size, 1.5 source stroke on a 24-unit canvas; semantic keys and inherited state colors |
 | States | Shared hover/pressed/disabled/focus treatments, readable text and wrapped/scrollable long content |
 
 `lib/GUI/Resources/KLCodeFoundationTokens.xaml` owns typed WPF token data.
 `KLCodeFoundation.xaml` owns the shell and explicit control styles. It merges
-the existing `WPF_styles.xaml` for its wordmark, palette and scrollbars, without
-editing that dictionary or changing existing consumers. Focus, pressed and
+event-free `KLCodeSharedPrimitives.xaml` for the canonical palette, outlined
+wordmark, footer links and scrollbars. Both loose Python XAML and compiled WPF
+package the same resources. Legacy `WPF_styles.xaml` remains unchanged for
+docked/tooling consumers outside this migration. Focus, pressed and
 disabled brushes supplement brand colors. Footer links and version
 use the existing `footer_donate` and `text_gray` colors, per owner review.
-This is a transition seam, not a claim that every legacy control is consolidated.
+Workflow data and host adapters remain separate from shared presentation.
 
 `KLCodeComponents.xaml` merges the foundation and adds opt-in field/group,
 readout, dropdown, radio/toggle, status/banner, table and splitter styles.
 The [five reference templates](../lib/GUI/_templates/README.md) compose these
 parts with safe Gallery presenters. The generic FindReplace example was adapted
-into Form and its unused wrapper retired; current Core tools were not migrated.
+into Form and its unused wrapper retired. Core tools retain their bundled body
+XAML and behavior while adopting the common shell and components.
 
 The owner refined Form's compact field role on 2026-10-28: 24-high inputs,
 60-wide label and 240-wide input columns, 8-unit row gaps and 12-unit group
@@ -69,7 +73,11 @@ See the [Review refinement evidence](knowledge/reviews/design-system/2026-10-28-
 `GUI.window_chrome.load_window()` is a small Python adapter with no import-time
 pyRevit/document dependency. It binds shared close/drag/navigation events;
 the caller retains body data, showing/dismissal semantics and model operations.
-Compiled WPF adoption is later work and keeps its own host adapter.
+For existing pyRevit WPFWindow subclasses it delegates loading to the installed
+host's `load_xaml` API, preserving owner, icon, thread and Escape setup. An
+optional close callback retains caller-specific cancellation. The compiled
+`KLCode.Wpf.WindowChrome` adapter binds the same shell parts while preserving
+CLR/localization, tool DataContext and lifecycle responsibilities.
 
 The [main template guide](../lib/GUI/_templates/KLCodeSelectionTemplate.md) explains
 the 432 x 576 reference and creating a new body. The
@@ -173,6 +181,25 @@ recorded in the [current-state review](knowledge/reviews/design-system/2026-10-0
 | KLGreen-secondary sample | `#407058` |
 
 ## Icons
+
+### In-window GUI icons
+
+Approved GUI artwork lives in [lib/_icons/gui](../lib/_icons/gui/README.md).
+Original SVGs, a pinned source manifest and Lucide/Feather license notices stay
+together. `scripts/generate_gui_icons.py` produces `KLCodeIcons.xaml`; do not
+edit that generated dictionary manually. Python and compiled adapters consume
+the same geometry/ImageSource resources, without a runtime SVG dependency.
+
+Use semantic keys such as `KlaSearchGeometry` or `KlaIconSearch`, rather than
+per-window file paths. `KlaGuiIcon` inherits its control's foreground and has a
+disabled treatment. Both render paths retain the full 24-unit source bounds.
+Keep 16 units for ordinary icons; the review sheet's 32-unit versions are
+enlargements. Recall and Family Studio use the approved functional mappings;
+message headings may show information/warning/error/success symbols as
+applicable. Status chips retain words and borders. Larger Browse, Reset, Copy
+and Open Folder buttons remain text-only.
+
+### Ribbon assets
 
 KLCode ribbon icons are transparent-background PNGs. Use a single foreground color unless the command clearly needs additional visual detail.
 
@@ -362,23 +389,23 @@ Command-local windows that use `forms.WPFWindow`, including the View Range edito
 
 ## Compiled WPF Add-in System
 
-The compiled add-ins use a separate control adapter rather than loading the
-IronPython `my_WPF` base class. This is deliberate: the adapter merges its
-compiled palette file while keeping compiled-only tokens and WPF control
-templates in a CLR-loadable assembly. Its base palette values match the legacy
-dictionary, but the two files have not yet been consolidated.
+The compiled add-ins use a CLR host adapter rather than loading the IronPython
+base class. Their project links the canonical palette, shared primitives,
+foundation, tokens, components and GUI icon dictionary as WPF resources,
+preserving relative resource paths. Compiled-only names remain compatibility
+aliases or workflow-specific bindings, rather than copied control templates.
 
 | Layer | Source | Responsibility |
 | --- | --- | --- |
 | Compiled palette | `lib/GUI/Resources/KLCode_palette.xaml` | Named brush keys matching the legacy palette, such as `header_background`, `text_white`, and `button_bg_normal`. |
-| Compiled semantic tokens | `src/KLCode.Wpf/Resources/KLCodeCompiledTokens.xaml` | Compiled-only surface, neutral, informational, warning, blocking, and checkbox tokens. |
-| Compiled controls | `src/KLCode.Wpf/Resources/KLCodeControls.xaml` | `KlaWindowStyle`, header, button, input, selection, list, status-chip, and footer styles. |
+| Compiled semantic aliases | `src/KLCode.Wpf/Resources/KLCodeCompiledTokens.xaml` | Existing compiled names map to canonical shared role colors. |
+| Compiled control aliases | `src/KLCode.Wpf/Resources/KLCodeControls.xaml` | Existing style keys derive from shared Foundation/Components roles. |
+| Compiled chrome adapter | `src/KLCode.Wpf/WindowChrome.cs` | Wire common named shell parts while preserving caller-owned showing, closing, locale and workflow data. |
 | Shared compiled alert | `src/KLCode.Wpf/Views/KlaAlertWindow.xaml` | Reusable information and warning dialog used by compiled Revit commands. |
 
-The compiled control adapter embeds the repository-local Audiowide font for
-the header wordmark. Compiled windows use `KlaWindowStyle`, giving them the
-same borderless dark chrome and shared palette while preserving their own
-host-specific bindings and event handlers.
+Compiled windows use the same outlined vector wordmark and shell as Python
+windows. Actual tool versions are caller-owned and displayed without a Version
+prefix; shared alerts omit unknown versions or retain their owner's identity.
 
 ### Compiled WPF Windows
 
@@ -451,13 +478,15 @@ See the [current Gallery SPEC](<../KL&A Tools_dev.tab/05 DevSandbox.panel/Protot
 and [verification record](knowledge/reviews/design-system/2026-10-27-ui-gallery-verification.md)
 for current behavior and evidence.
 
-The linked source audit describes 2026-10-08; the rename rows below were
+The table below is a historical pre-migration snapshot. Current implementation
+is described above and in the consolidation plan. The linked audit describes
+2026-10-08; the rename rows below were
 updated for the 2026-10-09 Core promotion. This table does not
 establish rendered appearance, keyboard behavior, DPI behavior, or live Revit
 acceptance. See the [dated design-system review](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit)
 for the full audit, drift notes, and recommended actions.
 
-| Window | Current source status | Detail |
+| Window | Historical source status | Detail |
 | --- | --- | --- |
 | Create from rooms | Shared styles with a local list override | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
 | KL&A alert | Shared KLCode styles | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
@@ -474,7 +503,7 @@ for the full audit, drift notes, and recommended actions.
 | UI Gallery | Command-local palette and DataGrid styles | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
 | UI Gallery preview fixture | Minimal test fixture without shared KLCode chrome | [Audit](knowledge/reviews/design-system/2026-10-08-current-state-review.md#ui-gallery-theme-audit) |
 
-## Style Loading And Local GUI Overrides
+## Legacy Style Loading And Local GUI Overrides (historical)
 
 The opt-in reference is `lib/GUI/_templates/KLCodeSelectionTemplate.xaml`, 432 x 576
 with `KlaWindowShell` and new explicit foundation styles. Its title uses the

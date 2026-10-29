@@ -26,6 +26,16 @@ Static UI/API references: WPFWindow,forms.WPFWindow,forms.alert,
 Use the command from its pyRevit button. Where it exposes a dialog or selection
 workflow, make the required selection and review the result before confirming.
 
+The shared `lib/GUI/DuplicateSheets.xaml` body loads through
+`GUI.window_chrome.load_window`, using the common header/footer and the caller's
+title and `__version__`. The three naming columns use the compact field scheme;
+include-element checks, existing-element choices, duplicate radio choices and
+the centered main action retain their control contracts and defaults. The
+window is 1050 by 688 units to accommodate the shared 60/240-unit field columns.
+The adapter closes before invoking the existing duplicate callback; the caller
+still owns modal display and all Revit operations. Isolated rendering does not
+replace the live Revit validation described above.
+
 ## Current execution logic
 
 pyRevit loads the bundle and executes its entry point. The implementation uses
@@ -48,7 +58,7 @@ environment before promotion or behavior changes.
 | --- | --- |
 | Tool ID | `core.duplicate-sheets` |
 | Path aliases | `KL&A Tools.tab/03 Core Tools.panel/duplicate_sheets.pushbutton` (0.0.0.beta–0.0.9); current `KL&A Tools_dev.tab/03 Core Tools.panel/duplicate_sheets.pushbutton` |
-| Version inputs | `bundle.yaml`; `script.py`; `lib/GUI/DuplicateSheets.py`; `lib/Snippets/_selection.py` |
+| Version inputs | `bundle.yaml`; `script.py`; `lib/GUI/DuplicateSheets.py`; `lib/GUI/DuplicateSheets.xaml`; `lib/GUI/window_chrome.py`; `lib/GUI/window_metadata.py`; shared `lib/GUI/Resources/KLCodeComponents.xaml`, `KLCodeFoundation.xaml`, `KLCodeFoundationTokens.xaml`; `lib/Snippets/_selection.py` |
 | Tool version | `v1.0` |
 | Status/origin | Maintained — KL&A adaptation of EF Tools. |
 

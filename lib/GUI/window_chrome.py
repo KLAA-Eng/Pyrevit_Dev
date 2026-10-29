@@ -10,7 +10,7 @@ import os
 from GUI.window_metadata import WindowMetadata
 
 
-def load_window(window, xaml_path, title, version=None, navigate=None):
+def load_window(window, xaml_path, title, version=None, navigate=None, close_handler=None):
     """Load a body with shared chrome; do not show it or change DataContext.
 
     ``navigate`` receives an absolute URI; Gallery supplies a local simulation.
@@ -24,8 +24,12 @@ def load_window(window, xaml_path, title, version=None, navigate=None):
     resources.Source = Uri(os.path.join(os.path.dirname(__file__), 'Resources',
                                        'KLCodeComponents.xaml'))
     window.Resources.MergedDictionaries.Add(resources)
-    wpf.LoadComponent(window, xaml_path)
-    chrome = WindowChrome(window, WindowMetadata(title, version), navigate)
+    host_loader = getattr(window, 'load_xaml', None)
+    if callable(host_loader):
+        host_loader(xaml_path)
+    else:
+        wpf.LoadComponent(window, xaml_path)
+    chrome = WindowChrome(window, WindowMetadata(title, version), navigate, close_handler)
     window._kla_chrome = chrome
     return chrome
 
@@ -47,9 +51,10 @@ def fit_window_height(window):
 
 class WindowChrome(object):
     """Bind KlaWindowShell named parts without workflow inheritance."""
-    def __init__(self, window, metadata, navigate):
+    def __init__(self, window, metadata, navigate, close_handler=None):
         self.window = window
         self.navigate = navigate
+        self.close_handler = close_handler
         self.shell = window.window_shell
         self.shell.Tag = metadata
         window.Title = metadata.Title
@@ -69,7 +74,10 @@ class WindowChrome(object):
         self.outreach.RequestNavigate += self._navigate
 
     def _close(self, sender, args):
-        self.window.Close()
+        if self.close_handler is not None:
+            self.close_handler(sender, args)
+        else:
+            self.window.Close()
 
     def _drag(self, sender, args):
         from System.Windows.Input import MouseButtonState

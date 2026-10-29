@@ -11,37 +11,20 @@ from pyrevit import forms # Needed for wpf import to work.
 
 # Custom Imports
 from GUI.forms import my_WPF
+from GUI.window_chrome import load_window
 
 #>>>>>>>>>> .NET IMPORTS
 import clr
 clr.AddReference("System.Windows.Forms")
 clr.AddReference("System")
 from System.Collections.Generic import List
-from System                    import Uri, UriKind
 from System.Windows             import Visibility
-from System.Windows.Media.Imaging import BitmapImage, BitmapCacheOption, BitmapCreateOptions
-import wpf
 
 # ╦  ╦╔═╗╦═╗╦╔═╗╔╗ ╦  ╔═╗╔═╗
 # ╚╗╔╝╠═╣╠╦╝║╠═╣╠╩╗║  ║╣ ╚═╗
 #  ╚╝ ╩ ╩╩╚═╩╩ ╩╚═╝╩═╝╚═╝╚═╝ VARIABLES
 #====================================================================================================
 PATH_SCRIPT = os.path.dirname(__file__)
-SEARCH_ICON_PATH = os.path.abspath(os.path.join(
-    PATH_SCRIPT, '..', '_icons', 'search_16px_light.png'))
-
-
-def _load_search_icon():
-    """Load the template search icon from its absolute extension path."""
-    bitmap = BitmapImage()
-    bitmap.BeginInit()
-    bitmap.CacheOption = BitmapCacheOption.OnLoad
-    bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache
-    bitmap.UriSource = Uri(SEARCH_ICON_PATH, UriKind.Absolute)
-    bitmap.EndInit()
-    bitmap.Freeze()
-    return bitmap
-
 uidoc   = __revit__.ActiveUIDocument
 app     = __revit__.Application
 doc     = __revit__.ActiveUIDocument.Document
@@ -80,16 +63,12 @@ class SelectFromDict(my_WPF):
         self.items          = self.generate_list_items()
         self.selected_items = []
         #>>>>>>>>>> SET RESOURCES FOR WPF
-        self.add_wpf_resource()
         path_xaml_file = os.path.join(PATH_SCRIPT, 'SelectFromDict.xaml')
-        wpf.LoadComponent(self, path_xaml_file )
-        self.filter_icon.Source = _load_search_icon()
+        load_window(self, path_xaml_file, title, version)
 
         # UPDATE GUI ELEMENTS
-        self.main_title.Text        = title
         self.text_label.Content     = label
         self.button_main.Content    = button_name
-        self.footer_version.Text    = version
         if not SelectMultiple:
             self.UI_Buttons_all_none.Visibility = Visibility.Collapsed
 
@@ -115,12 +94,6 @@ class SelectFromDict(my_WPF):
             list_of_items.Add(ListItem(type_name, floor_type, checked))
         return list_of_items
 
-
-
-    #>>>>>>>>>> INHERIT WPF RESOURCES
-    def add_wpf_resource(self):
-        """Function to get resources from super()"""
-        super(SelectFromDict, self).add_wpf_resource()
 
 
     # ╔═╗╦ ╦╦  ╔═╗╦  ╦╔═╗╔╗╔╔╦╗╔═╗
@@ -154,7 +127,7 @@ class SelectFromDict(my_WPF):
             # subset. Otherwise checking one item after a search can leave a
             # previously checked hidden item selected at confirmation time.
             for item in self.items:
-                item.IsChecked = True if item.Name == sender.Content.Text else False
+                item.IsChecked = item.Name == sender.DataContext.Name
 
     # ╔╗ ╦ ╦╔╦╗╔╦╗╔═╗╔╗╔╔═╗
     # ╠╩╗║ ║ ║  ║ ║ ║║║║╚═╗
