@@ -71,7 +71,7 @@
                 <Trigger Property="IsSelected" Value="True"><Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
                 <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource button_bg_hover}"/></Trigger>
                 <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}"/></Trigger>
-                <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/><Setter Property="Opacity" Value="0.6"/></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate></Setter.Value></Setter>
     </Style>
@@ -121,7 +121,6 @@
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/>
                     <Setter Property="Background" Value="{StaticResource KlaDisabledFillBrush}"/>
-                    <Setter Property="Opacity" Value="0.6"/>
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate></Setter.Value></Setter>
@@ -149,7 +148,7 @@
                 <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource button_bg_hover}"/></Trigger>
                 <Trigger Property="IsPressed" Value="True"><Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
                 <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="RadioBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}"/></Trigger>
-                <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/><Setter Property="Opacity" Value="0.6"/></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate></Setter.Value></Setter>
     </Style>
@@ -257,7 +256,7 @@
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}"/></Trigger>
             <Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
-            <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/><Setter Property="Opacity" Value="0.6"/></Trigger>
+            <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="KlaDataGrid" TargetType="DataGrid">

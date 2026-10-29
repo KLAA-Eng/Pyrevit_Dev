@@ -58,10 +58,9 @@
         <Setter Property="Width" Value="60"/><Setter Property="Height" Value="18"/>
         <Setter Property="FontSize" Value="10"/><Setter Property="Padding" Value="0"/>
         <Setter Property="ContentTemplate"><Setter.Value><DataTemplate>
-            <!-- Segoe UI's line box is centered, but its visible glyphs sit lower in this 18-unit control. -->
-            <TextBlock Text="{Binding}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}">
-                <TextBlock.RenderTransform><TranslateTransform Y="-1"/></TextBlock.RenderTransform>
-            </TextBlock>
+            <!-- Segoe UI's line box is centered, but its visible glyphs sit lower in this 18-unit control: a 2-unit bottom margin lifts
+                 the centered block by one unit in layout (DPI-safe), where a RenderTransform would not. -->
+            <TextBlock Text="{Binding}" Margin="0,0,0,2" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
         </DataTemplate></Setter.Value></Setter>
     </Style>
     <Style x:Key="KlaFoundationLabel" TargetType="Label">
@@ -109,12 +108,16 @@
             <Grid Background="Transparent">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="16"/><ColumnDefinition Width="4"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <Border x:Name="CheckBorder" Width="16" Height="16" BorderThickness="1" BorderBrush="{StaticResource border_green}" Background="{StaticResource header_background}" CornerRadius="2" VerticalAlignment="Center">
-                    <Path x:Name="CheckMark" Visibility="Collapsed" Data="M 2,7 L 5,10 L 12,3" Stroke="{StaticResource text_white}" StrokeThickness="2"/>
+                    <Grid>
+                        <Path x:Name="CheckMark" Visibility="Collapsed" Data="M 2,7 L 5,10 L 12,3" Stroke="{StaticResource text_white}" StrokeThickness="2"/>
+                        <Path x:Name="IndeterminateMark" Visibility="Collapsed" Data="M 3,7 L 11,7" Stroke="{StaticResource text_white}" StrokeThickness="2"/>
+                    </Grid>
                 </Border>
                 <ContentPresenter Grid.Column="2" VerticalAlignment="Center" RecognizesAccessKey="True"/>
             </Grid>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsChecked" Value="True"><Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/><Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource button_bg_normal}"/></Trigger>
+                <Trigger Property="IsChecked" Value="{x:Null}"><Setter TargetName="IndeterminateMark" Property="Visibility" Value="Visible"/><Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource button_bg_normal}"/></Trigger>
                 <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource button_bg_hover}"/></Trigger>
                 <Trigger Property="IsPressed" Value="True"><Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
                 <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}"/></Trigger>
@@ -148,7 +151,8 @@
     <Style x:Key="KlaFoundationLink" TargetType="Hyperlink" BasedOn="{StaticResource KLCodeFooterLink}">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{StaticResource text_white}"/></Trigger>
-            <Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="Foreground" Value="{StaticResource text_white}"/><Setter Property="FontWeight" Value="Bold"/></Trigger>
+            <!-- Focus changes colour only (the default dotted focus visual marks it); a weight change would reflow the footer. -->
+            <Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="Foreground" Value="{StaticResource KlaFocusBrush}"/></Trigger>
         </Style.Triggers>
     </Style>
 
@@ -159,17 +163,19 @@
         <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ContentControl">
             <Grid Background="{StaticResource header_background}">
                 <Grid.RowDefinitions><RowDefinition Height="{StaticResource KlaChromeRow}"/><RowDefinition Height="*"/><RowDefinition Height="{StaticResource KlaChromeRow}"/></Grid.RowDefinitions>
+                <!-- The body is declared first so keyboard order and initial focus start in the body, then Close, then the footer links;
+                     Grid.Row places it visually between the two chrome bands. -->
+                <ContentPresenter x:Name="PART_Body" Grid.Row="1" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Margin="{StaticResource KlaBodyInset}"/>
                 <Grid x:Name="PART_Header" Background="{StaticResource header_background}">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="86"/><ColumnDefinition Width="*"/><ColumnDefinition Width="86"/></Grid.ColumnDefinitions>
                     <ContentControl ContentTemplate="{StaticResource KLCodeWordmark}" Width="70" Height="12" Margin="{StaticResource KlaBrandInset}" HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="False" Focusable="False"/>
                     <TextBlock x:Name="PART_Title" Grid.Column="1" Text="{Binding Tag.Title, RelativeSource={RelativeSource TemplatedParent}}" TextAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" FontSize="{StaticResource KlaTitleFontSize}"/>
                     <Button x:Name="PART_Close" Grid.Column="2" Content="Close" Style="{StaticResource KlaFoundationCloseButton}" AutomationProperties.Name="Close window"/>
                 </Grid>
-                <ContentPresenter x:Name="PART_Body" Grid.Row="1" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Margin="{StaticResource KlaBodyInset}"/>
                 <Grid x:Name="PART_Footer" Grid.Row="2" Margin="{StaticResource KlaFooterInset}">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="100"/><ColumnDefinition Width="*"/><ColumnDefinition Width="100"/></Grid.ColumnDefinitions>
                     <TextBlock VerticalAlignment="Center"><Hyperlink x:Name="PART_Prototype" NavigateUri="{Binding Tag.PrototypeUri, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource KlaFoundationLink}">Prototype</Hyperlink></TextBlock>
-                    <TextBlock x:Name="PART_Version" Grid.Column="1" Text="{Binding Tag.VersionText, RelativeSource={RelativeSource TemplatedParent}}" Foreground="{StaticResource text_gray}" TextAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock x:Name="PART_Version" Grid.Column="1" Text="{Binding Tag.VersionText, RelativeSource={RelativeSource TemplatedParent}}" AutomationProperties.Name="Tool version" Foreground="{StaticResource text_gray}" TextAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                     <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center"><Hyperlink x:Name="PART_Outreach" NavigateUri="{Binding Tag.OutreachUri, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource KlaFoundationLink}">Outreach</Hyperlink></TextBlock>
                 </Grid>
             </Grid>
