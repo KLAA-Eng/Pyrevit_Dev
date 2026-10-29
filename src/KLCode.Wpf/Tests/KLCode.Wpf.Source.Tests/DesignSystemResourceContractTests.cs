@@ -24,7 +24,6 @@ public sealed class DesignSystemResourceContractTests
     {
         "KlaWindowStyle",
         "KlaButtonStyle",
-        "KlaSmallButtonStyle",
         "KlaCloseButtonStyle",
         "KlaGhostButtonStyle",
         "KlaLinkButtonStyle",
@@ -114,6 +113,16 @@ public sealed class DesignSystemResourceContractTests
     }
 
     [TestMethod]
+    public void SharedDictionaries_ReferenceBrushesInsteadOfColorLiterals()
+    {
+        // Only the palette and the token dictionary may spell a colour; everything above them names a brush.
+        foreach (string file in new[] { "KLCodeSharedPrimitives.xaml", "KLCodeChrome.xaml", "KLCodeFoundation.xaml", "KLCodeComponents.xaml" })
+        {
+            AssertNoColorLiterals(LoadXaml("lib/GUI/Resources/" + file), file);
+        }
+    }
+
+    [TestMethod]
     public void CompiledAdapter_AliasesSharedControlsAndLinksTheCanonicalSourceFiles()
     {
         XDocument controls = LoadXaml("src/KLCode.Wpf/Resources/KLCodeControls.xaml");
@@ -131,7 +140,7 @@ public sealed class DesignSystemResourceContractTests
             .Select(attribute => attribute.Value)
             .ToArray();
         CollectionAssert.Contains(mergedSources, "../GUI/Resources/KLCodeComponents.xaml");
-        CollectionAssert.Contains(mergedSources, "KLCodeCompiledTokens.xaml");
+        CollectionAssert.DoesNotContain(mergedSources, "KLCodeCompiledTokens.xaml");
         Assert.AreEqual(0, controls.Descendants(Presentation + "ControlTemplate").Count(),
             "Compiled aliases must not fork shared control templates.");
 

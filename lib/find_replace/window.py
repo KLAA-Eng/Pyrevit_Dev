@@ -3,6 +3,7 @@
 
 from System.Windows import Visibility
 
+from find_replace.layout import results_height
 from find_replace.workflow import details, summary, unresolved
 
 
@@ -23,10 +24,10 @@ def present(window, result):
         shown = pending if result in pending else pending + [result]
         window.result_details.Visibility = Visibility.Visible
         window.result_details.Text = "\n".join(details(item) for item in shown)
-        window.Height = 485 + 20 * (len(shown) - 1)
+        window.Height = results_height(len(shown), True)
     else:
         shown = [result]
         window.result_details.Visibility = Visibility.Collapsed
         window.result_details.Text = ""
-        window.Height = 340
+        window.Height = results_height(1, False)
     window.result_summary.Text = "\n".join(summary(item) for item in shown)

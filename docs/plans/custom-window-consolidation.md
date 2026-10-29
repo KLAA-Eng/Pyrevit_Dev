@@ -41,6 +41,7 @@ host/build limits are recorded in the
 | GUI-08 | Live pyRevit/Revit acceptance | Pending host availability | Real ownership, keyboard/focus, drag, footer navigation, DPI/work-area and accessibility checks |
 | GUI-09 | Review remaining custom-window components and explain implementation | Reviewed; five template additions selected | [2026-10-28 review](../knowledge/reviews/design-system/2026-10-28-custom-window-components-review.md): 19 remaining windows at its baseline, migration risks and candidate primitives; Close label corrected; no production migration |
 | GUI-10 | Create five shared reference templates | Implemented; locally verified | Owner approved all five on 2026-10-28; [family guide](../../lib/GUI/_templates/README.md), [verification](../knowledge/reviews/design-system/2026-10-28-template-family.md) |
+| GUI-12 | Architecture-review follow-ups | Implemented on dev.GUI-Clean; WPF render pending | Shell correctness (db919d4), dead weight (53dd182), template pass (d9830dc), tokens and scale lint (c7f1160), icons and wordmark (4283862), chrome data (28c96f7), contrast / aliases / caching / docs (this commit); `check_ui_scale.py` reports consumer margins; the review page lists what remains |
 | GUI-11 | Refine template elements with owner using grilling | Settled choices implemented; locally verified | Selection baseline retained; accepted Form, Message, Options, Review and icon choices implemented; final owner/live-host acceptance remains pending |
 
 ## Template refinement interview — 2026-10-28

@@ -455,6 +455,7 @@
         <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
+        <!-- Borderless: no non-client frame, so a resizable window must set ResizeMode="CanResizeWithGrip" (CanResize alone has no edge to grab). -->
         <Setter Property="WindowStyle" Value="None"/>
         <Setter Property="AllowsTransparency" Value="True"/>
         <Setter Property="ResizeMode" Value="NoResize"/>

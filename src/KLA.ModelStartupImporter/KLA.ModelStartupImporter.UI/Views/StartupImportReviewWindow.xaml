@@ -42,10 +42,10 @@
                                 <ColumnDefinition Width="96" />
                                 <ColumnDefinition Width="104" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="1" Text="{StaticResource ItemIdLabel}" Foreground="{StaticResource text_green}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="2" Text="{StaticResource ItemTitleLabel}" Foreground="{StaticResource text_green}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="3" Text="{StaticResource ItemCategoryLabel}" Foreground="{StaticResource text_green}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="4" Text="{StaticResource ItemStatusLabel}" Foreground="{StaticResource text_green}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{StaticResource ItemIdLabel}" Foreground="{StaticResource KlaMutedTextBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="{StaticResource ItemTitleLabel}" Foreground="{StaticResource KlaMutedTextBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="3" Text="{StaticResource ItemCategoryLabel}" Foreground="{StaticResource KlaMutedTextBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="4" Text="{StaticResource ItemStatusLabel}" Foreground="{StaticResource KlaMutedTextBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
                         </Grid>
                         <ListBox Grid.Row="1" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow, Mode=TwoWay}" BorderThickness="0" Background="Transparent" Padding="2" ItemContainerStyle="{StaticResource KlaListBoxItemStyle}" ScrollViewer.VerticalScrollBarVisibility="Visible">
                             <ListBox.ItemTemplate>
@@ -79,7 +79,7 @@
                 </Border>
                 <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel>
-                        <TextBlock Foreground="{StaticResource text_green}" FontSize="12" Margin="0,0,0,8">
+                        <TextBlock Foreground="{StaticResource KlaMutedTextBrush}" FontSize="12" Margin="0,0,0,8">
                             <Run Text="{StaticResource SelectedItemPrefix}" />
                             <Run Text="{Binding SelectedRow.ItemId, Mode=OneWay}" />
                         </TextBlock>

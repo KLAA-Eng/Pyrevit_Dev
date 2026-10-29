@@ -23,7 +23,7 @@ their own bundled XAML and production behavior.
 dropdown, option, result, status, table and splitter styles. Foundation owns
 the shell/basic controls and tokens. `../window_chrome.py` loads Components
 before the body and wires only common chrome. `../window_metadata.py` supplies
-the caller's title/version/links. The body owns layout and declared event names;
+the caller's title and version; `../Resources/KLCodeChrome.xaml` holds the footer links and labels. The body owns layout and declared event names;
 each production controller owns its data, validation and operations. The
 production migration uses these same resources through Python/CLR host adapters.
 Approved vector icons and their attributed sources live in

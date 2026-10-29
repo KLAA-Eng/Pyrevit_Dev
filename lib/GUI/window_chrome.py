@@ -9,6 +9,26 @@ import os
 
 from GUI.window_metadata import WindowMetadata
 
+COMPONENTS_XAML = os.path.join(os.path.dirname(__file__), 'Resources', 'KLCodeComponents.xaml')
+_DICTIONARIES = {}
+
+
+def shared_resources(xaml_path=COMPONENTS_XAML):
+    """One parsed ResourceDictionary per process for the shared chain.
+
+    Every window merges the same instance (WPF allows a dictionary in several
+    MergedDictionaries), so the foundation, tokens and icons parse once instead
+    of once per window; Recall's content control shares it with its window.
+    """
+    from System import Uri
+    from System.Windows import ResourceDictionary
+
+    if xaml_path not in _DICTIONARIES:
+        resources = ResourceDictionary()
+        resources.Source = Uri(xaml_path)
+        _DICTIONARIES[xaml_path] = resources
+    return _DICTIONARIES[xaml_path]
+
 
 def load_window(window, xaml_path, title, version=None, navigate=None, close_handler=None):
     """Load a body with shared chrome; do not show it or change DataContext.
@@ -17,13 +37,8 @@ def load_window(window, xaml_path, title, version=None, navigate=None, close_han
     Ordinary callers omit it to use the same OS navigation as legacy windows.
     """
     import wpf
-    from System import Uri
-    from System.Windows import ResourceDictionary
 
-    resources = ResourceDictionary()
-    resources.Source = Uri(os.path.join(os.path.dirname(__file__), 'Resources',
-                                       'KLCodeComponents.xaml'))
-    window.Resources.MergedDictionaries.Add(resources)
+    window.Resources.MergedDictionaries.Add(shared_resources())
     host_loader = getattr(window, 'load_xaml', None)
     if callable(host_loader):
         host_loader(xaml_path)

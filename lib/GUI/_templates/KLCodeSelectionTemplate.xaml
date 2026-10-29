@@ -19,7 +19,7 @@
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaGridSpace16}"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <Image Source="{StaticResource KlaIconSearch}" Width="{StaticResource KlaIconSize}" Height="{StaticResource KlaIconSize}" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                <Image Source="{StaticResource KlaIconSearch}" AutomationProperties.Name="Search" Width="{StaticResource KlaIconSize}" Height="{StaticResource KlaIconSize}" VerticalAlignment="Center" IsHitTestVisible="False"/>
                 <TextBox x:Name="textbox_filter" Grid.Column="2" Style="{StaticResource KlaFoundationFilter}" TextChanged="text_filter_updated" AutomationProperties.Name="Search sample items"/>
             </Grid>
             <Label x:Name="text_label" Grid.Row="2" Content="Select Elements:" Target="{Binding ElementName=main_ListBox}" Style="{StaticResource KlaFoundationPromptLabel}"/>

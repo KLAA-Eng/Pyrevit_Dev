@@ -64,6 +64,7 @@ class CustomAlertPresentationTests(unittest.TestCase):
             'WPF_Base': module(my_WPF=Window),
             'GUI.window_chrome': module(load_window=load, fit_window_height=fit),
             'System.Windows.Media': module(Brushes=module(Goldenrod='warning', MediumSeaGreen='information')),
+            'System.Windows.Automation': module(AutomationProperties=module(SetName=lambda element, name: setattr(element, 'automation_name', name))),
             'wpf': module(LoadComponent=legacy_load),
         }
         path = os.path.join(GUI_DIR, 'CustomAlert.py')
@@ -76,6 +77,7 @@ class CustomAlertPresentationTests(unittest.TestCase):
     def test_warning_sets_shared_icon_and_border_before_fitting_and_showing(self):
         adapter, actions = self.load_adapter()
         window = adapter.CustomAlert('Review this warning.', title='Caller title', is_warning=True)
+        self.assertEqual('Warning', window.alert_icon.automation_name)
         self.assertEqual(['load', 'fit', 'show'], actions)
         self.assertEqual('Caller title', window.Title)
         self.assertIsNone(window.version)

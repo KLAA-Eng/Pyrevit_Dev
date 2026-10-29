@@ -7,6 +7,8 @@ import os
 from WPF_Base import my_WPF  # not GUI.forms: that module imports the Revit-bound SelectFromDict at load time
 from GUI.window_chrome import load_window, fit_window_height
 
+from System.Windows.Automation import AutomationProperties
+
 
 PATH_SCRIPT = os.path.dirname(__file__)
 class CustomAlert(my_WPF):
@@ -23,10 +25,12 @@ class CustomAlert(my_WPF):
         if is_warning:
             self.alert_heading.Text = 'Warning'
             self.alert_icon.Content = self.Resources['KlaWarningGeometry']
+            AutomationProperties.SetName(self.alert_icon, 'Warning')
             self.alert_banner.BorderBrush = self.Resources['KlaWarningBrush']
             return
         self.alert_heading.Text = 'Information'
         self.alert_icon.Content = self.Resources['KlaInformationGeometry']
+        AutomationProperties.SetName(self.alert_icon, 'Information')
         self.alert_banner.BorderBrush = self.Resources['KlaInfoBrush']
 
 def show_alert(message, title='KL&A Tools', is_warning=False):

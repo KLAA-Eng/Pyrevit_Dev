@@ -3,7 +3,7 @@
     <!-- Role brushes: the names the foundation and components use. Each value is a KL&A brand colour. -->
     <SolidColorBrush x:Key="KlaWindowBrush" Color="#1A252B" />          <!-- KLCharcoal: window, chrome, fields, lists -->
     <SolidColorBrush x:Key="KlaTextBrush" Color="#E5E4E2" />            <!-- KLWhite: body text, labels, icons -->
-    <SolidColorBrush x:Key="KlaTextMutedBrush" Color="Gray" />          <!-- footer version text -->
+    <SolidColorBrush x:Key="KlaTextMutedBrush" Color="#B5C2BD" />       <!-- muted text: footer version and links, captions (8.5:1 on KLCharcoal; Gray was 3.96:1) -->
     <SolidColorBrush x:Key="KlaTextOnAccentBrush" Color="White" />      <!-- labels on accent fills -->
     <SolidColorBrush x:Key="KlaAccentBrush" Color="#286048" />          <!-- KLGreen-dark: action and checked fills -->
     <SolidColorBrush x:Key="KlaAccentHoverBrush" Color="#407058" />     <!-- KLGreen-secondary: hover fills, footer links -->

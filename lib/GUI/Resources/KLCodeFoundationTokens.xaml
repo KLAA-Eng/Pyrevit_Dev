@@ -48,6 +48,7 @@
     <SolidColorBrush x:Key="KlaReadyBrush" Color="#91C8A6"/>
     <SolidColorBrush x:Key="KlaWarningBrush" Color="#E8C66A"/>
     <SolidColorBrush x:Key="KlaErrorBrush" Color="#E89E96"/>
+    <SolidColorBrush x:Key="KlaPreviewSurfaceBrush" Color="#10171B"/>
 
     <!-- Typed layout tokens for the values the design rules name. WPF resolves CornerRadius / Thickness / GridLength resources
          directly, so the foundation and components reference these instead of literals (scripts/check_ui_scale.py keeps it so). -->

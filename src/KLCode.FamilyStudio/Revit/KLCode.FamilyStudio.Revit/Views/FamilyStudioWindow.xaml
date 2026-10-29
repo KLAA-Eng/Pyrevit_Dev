@@ -31,7 +31,7 @@
                             <ColumnDefinition Width="24" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Image Source="{StaticResource KlaIconSearch}" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
+                        <Image Source="{StaticResource KlaIconSearch}" AutomationProperties.Name="Search" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
                         <TextBox x:Name="SearchBox" Grid.Column="1" BorderThickness="0" Background="Transparent" ToolTip="{StaticResource SearchPlaceholderLabel}" KeyDown="OnSearchBoxKeyDown" />
                     </Grid>
                 </Border>
@@ -65,7 +65,7 @@
                         </RadioButton>
                     </StackPanel>
                 </Border>
-                <Button Grid.Column="8" Content="{StaticResource RefreshLibraryLabel}" Style="{StaticResource KlaSmallButtonStyle}" Click="OnRefreshClick" />
+                <Button Grid.Column="8" Content="{StaticResource RefreshLibraryLabel}" Style="{StaticResource KlaButtonStyle}" Click="OnRefreshClick" />
             </Grid>
             <WrapPanel Grid.Row="1" Margin="0,2,0,8" VerticalAlignment="Center">
                 <TextBlock Text="{StaticResource CategoryFieldLabel}" VerticalAlignment="Center" Margin="0,0,5,0" />
@@ -90,7 +90,7 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
-                        <TextBlock Text="{StaticResource FamiliesCaptionLabel}" Foreground="{StaticResource text_green}" FontSize="12" />
+                        <TextBlock Text="{StaticResource FamiliesCaptionLabel}" Foreground="{StaticResource KlaMutedTextBrush}" FontSize="12" />
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Content="{StaticResource FavoritesLabel}" Style="{StaticResource KlaLinkButtonStyle}" Margin="0,0,8,0" Click="OnFavoritesClick" />
                             <Button Content="{StaticResource RecentLabel}" Style="{StaticResource KlaLinkButtonStyle}" Margin="0,0,12,0" Click="OnRecentClick" />
@@ -147,8 +147,8 @@
                             <TextBlock Text="{StaticResource EmptyStateTitle}" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center" />
                             <TextBlock Text="{StaticResource EmptyStateBody}" Foreground="{StaticResource KlaMutedTextBrush}" Margin="0,6,0,12" />
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <Button Content="{StaticResource ClearFiltersLabel}" Style="{StaticResource KlaSmallButtonStyle}" Margin="0,0,8,0" Click="OnClearFiltersClick" />
-                                <Button Content="{StaticResource RefreshLibraryLabel}" Style="{StaticResource KlaSmallButtonStyle}" Click="OnRefreshClick" />
+                                <Button Content="{StaticResource ClearFiltersLabel}" Style="{StaticResource KlaButtonStyle}" Margin="0,0,8,0" Click="OnClearFiltersClick" />
+                                <Button Content="{StaticResource RefreshLibraryLabel}" Style="{StaticResource KlaButtonStyle}" Click="OnRefreshClick" />
                             </StackPanel>
                         </StackPanel>
                     </Grid>
@@ -178,9 +178,9 @@
                                 <StackPanel Margin="0,2,0,0">
                                     <ComboBox x:Name="Types" DisplayMemberPath="Name" SelectionChanged="OnTypeSelectionChanged" />
                                     <UniformGrid Columns="3" Margin="0,8,0,6">
-                                        <Button Content="{StaticResource DuplicateTypeLabel}" Style="{StaticResource KlaSmallButtonStyle}" Margin="0,0,4,0" IsEnabled="False" ToolTip="{StaticResource TypeEditingUnavailableLabel}" />
-                                        <Button Content="{StaticResource RenameTypeLabel}" Style="{StaticResource KlaSmallButtonStyle}" Margin="2,0" IsEnabled="False" ToolTip="{StaticResource TypeEditingUnavailableLabel}" />
-                                        <Button Content="{StaticResource EditTypeLabel}" Style="{StaticResource KlaSmallButtonStyle}" Margin="4,0,0,0" IsEnabled="False" ToolTip="{StaticResource TypeEditingUnavailableLabel}" />
+                                        <Button Content="{StaticResource DuplicateTypeLabel}" Style="{StaticResource KlaButtonStyle}" Margin="0,0,4,0" IsEnabled="False" ToolTip="{StaticResource TypeEditingUnavailableLabel}" />
+                                        <Button Content="{StaticResource RenameTypeLabel}" Style="{StaticResource KlaButtonStyle}" Margin="2,0" IsEnabled="False" ToolTip="{StaticResource TypeEditingUnavailableLabel}" />
+                                        <Button Content="{StaticResource EditTypeLabel}" Style="{StaticResource KlaButtonStyle}" Margin="4,0,0,0" IsEnabled="False" ToolTip="{StaticResource TypeEditingUnavailableLabel}" />
                                     </UniformGrid>
                                     <ItemsControl x:Name="TypeParameters">
                                         <ItemsControl.ItemTemplate>

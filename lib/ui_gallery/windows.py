@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 import os
 
 from .template_data import TEMPLATE_FILES
+from find_replace.layout import results_height  # host-free constants shared with the production dialog
 
 from ui_gallery.scenarios import (PreviewItem, alert_message, filtered_items, naming_values,
                                   parse_offset, recall_items, rename_samples,
@@ -312,7 +313,7 @@ def _window_type():
             self.result_summary.Text = summary
             self.result_details.Text = details
             self.result_details.Visibility = Visibility.Visible if details else Visibility.Collapsed
-            self.Height = 485 if details else 340
+            self.Height = results_height(1, bool(details))
 
         def button_close(self, sender, args):
             self.Close()

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Media;
 
 namespace KLCode.Wpf.Views;
@@ -46,6 +47,7 @@ public partial class KlaAlertWindow : Window
         Brush accent = (Brush)FindResource(resourceKey);
         AlertIconBorder.BorderBrush = accent;
         AlertIcon.Foreground = accent;
+        AutomationProperties.SetName(AlertIcon, kind.ToString());
     }
 
     public static void Show(Window? owner, string title, string message)

@@ -1,15 +1,13 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../GUI/Resources/KLCodeComponents.xaml" />
-        <ResourceDictionary Source="KLCodeCompiledTokens.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <Style x:Key="KlaWindowStyle" TargetType="Window" BasedOn="{StaticResource KlaFoundationWindow}" />
     <Style x:Key="KlaButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}" />
-    <Style x:Key="KlaSmallButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}" />
     <Style x:Key="KlaCloseButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaFoundationCloseButton}" />
-    <Style x:Key="KlaGhostButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaSecondaryButton}" />
-    <Style x:Key="KlaLinkButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaSecondaryButton}" />
-    <Style x:Key="KlaSegmentButtonStyle" TargetType="RadioButton" BasedOn="{StaticResource KlaRadioButton}" />
+    <Style x:Key="KlaGhostButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaGhostButton}" />
+    <Style x:Key="KlaLinkButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaLinkButton}" />
+    <Style x:Key="KlaSegmentButtonStyle" TargetType="RadioButton" BasedOn="{StaticResource KlaSegmentButton}" />
     <Style x:Key="KlaTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource KlaCompactFieldInput}" />
     <Style x:Key="KlaComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource KlaCompactComboBox}" />
     <Style x:Key="KlaCheckBoxStyle" TargetType="CheckBox" BasedOn="{StaticResource KlaFoundationCheckBox}" />
@@ -26,7 +24,7 @@
     <Style x:Key="KlaNeutralChipStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusChip}" />
     <Style x:Key="KlaMutedTextStyle" TargetType="TextBlock" BasedOn="{StaticResource KlaInfoText}" />
     <Style x:Key="KlaPreviewBorderStyle" TargetType="Border" BasedOn="{StaticResource KlaSection}">
-        <Setter Property="Background" Value="{StaticResource KlaSurfaceBrush}" />
+        <Setter Property="Background" Value="{StaticResource KlaPreviewSurfaceBrush}" />
         <Setter Property="Padding" Value="0" />
     </Style>
     <!-- The implicit TextBox / ComboBox / CheckBox styles live in KLCodeComponents.xaml, shared with the Python host. -->

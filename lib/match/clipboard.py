@@ -8,7 +8,7 @@ from pyrevit.revit.events import execute_in_revit_context
 from pyrevit.framework import ComponentModel, wpf, Controls, Uri, UriKind, ResourceDictionary
 from pyrevit.compat import get_elementid_value_func
 from GUI.forms import my_WPF
-from GUI.window_chrome import load_window
+from GUI.window_chrome import load_window, shared_resources
 
 from match.match_utils import (
     PropKeyValue,
@@ -31,7 +31,6 @@ _DIR = op.dirname(op.abspath(__file__))
 _ICONS_XAML = op.join(_DIR, "clipboard.Icons.xaml")
 _CONTENT_XAML = op.join(_DIR, "clipboard_content.xaml")
 _RECALL_CONTENT_XAML = op.join(_DIR, "clipboard_recall_content.xaml")
-_COMPONENTS_XAML = op.join(_DIR, '..', 'GUI', 'Resources', 'KLCodeComponents.xaml')
 _WINDOW_XAML = op.join(_DIR, "clipboard_window.xaml")
 _PAGE_XAML = op.join(_DIR, "clipboard_page.xaml")
 
@@ -159,7 +158,7 @@ class ClipboardContent(Controls.UserControl):
         self._items = []
 
         if is_recall:
-            _merge_resource_dict(self, _COMPONENTS_XAML)
+            self.Resources.MergedDictionaries.Add(shared_resources())  # the same parsed chain as the owner window
         else:
             _merge_resource_dict(self, _ICONS_XAML)
         _merge_locale(self)

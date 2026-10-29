@@ -13,7 +13,7 @@
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="16"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <Image Source="{StaticResource KlaIconSearch}" Width="16" Height="16" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                <Image Source="{StaticResource KlaIconSearch}" AutomationProperties.Name="Search" Width="16" Height="16" VerticalAlignment="Center" IsHitTestVisible="False"/>
                 <TextBox x:Name="review_search" Grid.Column="2" Style="{StaticResource KlaFoundationFilter}" TextChanged="review_filter_changed" AutomationProperties.Name="Search sample review items"/>
             </Grid>
             <Grid Grid.Row="2">

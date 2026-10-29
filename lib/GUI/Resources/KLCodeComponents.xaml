@@ -179,6 +179,54 @@
     <Style x:Key="KlaSecondaryButton" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}">
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}"/>
     </Style>
+    <!-- Link: a text action on the surface (Clear filters, Favorites, Recent) — transparent at rest, surface on hover, the same
+         role width and focus mark as every button. Ghost: the same with a hairline border (Cancel beside a main action). -->
+    <Style x:Key="KlaLinkButton" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+            <Border x:Name="LinkBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{StaticResource KlaHairline}" CornerRadius="{StaticResource KlaRadiusCard}" Padding="{TemplateBinding Padding}">
+                <Grid>
+                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                    <Border x:Name="FocusMark" Height="{StaticResource KlaFocusMarkHeight}" Margin="{StaticResource KlaFocusMarkInset}" VerticalAlignment="Bottom" Background="{StaticResource KlaFocusBrush}" Visibility="Collapsed"/>
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="LinkBorder" Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}"/></Trigger>
+                <Trigger Property="IsPressed" Value="True"><Setter TargetName="LinkBorder" Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusMark" Property="Visibility" Value="Visible"/></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="KlaGhostButton" TargetType="Button" BasedOn="{StaticResource KlaLinkButton}">
+        <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}"/>
+    </Style>
+    <!-- Segment: an exclusive choice drawn as a filled pill segment, not a radio circle (Family Studio's Families / Views,
+         This Project / Library, List / Grid inside a KlaBorderStrongBrush pill). -->
+    <Style x:Key="KlaSegmentButton" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
+        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
+        <Setter Property="Height" Value="{StaticResource KlaCompactHeight}"/>
+        <Setter Property="Padding" Value="{StaticResource KlaInputPadding}"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="RadioButton">
+            <Border x:Name="SegmentBorder" Background="Transparent" Padding="{TemplateBinding Padding}">
+                <Grid>
+                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+                    <Border x:Name="FocusMark" Height="{StaticResource KlaFocusMarkHeight}" Margin="{StaticResource KlaFocusMarkInset}" VerticalAlignment="Bottom" Background="{StaticResource KlaFocusBrush}" Visibility="Collapsed"/>
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}"/></Trigger>
+                <Trigger Property="IsChecked" Value="True"><Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource KlaAccentBrush}"/><Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}"/></Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusMark" Property="Visibility" Value="Visible"/></Trigger>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
     <Style x:Key="KlaIconTextButton" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}">
         <Setter Property="Width" Value="{StaticResource KlaIconTextButtonWidth}"/>
     </Style>
@@ -288,6 +336,28 @@
     <Style TargetType="TextBox" BasedOn="{StaticResource KlaCompactFieldInput}"/>
     <Style TargetType="ComboBox" BasedOn="{StaticResource KlaCompactComboBox}"/>
     <Style TargetType="CheckBox" BasedOn="{StaticResource KlaFoundationCheckBox}"/>
+
+    <!-- Compiled-host brush names (formerly KLCodeCompiledTokens.xaml): aliases of the shared brushes, so one token chain serves both hosts. -->
+    <StaticResource x:Key="KlaPanelBrush" ResourceKey="KlaComponentSurfaceBrush"/>
+    <StaticResource x:Key="KlaMutedTextBrush" ResourceKey="KlaMutedBrush"/>
+    <StaticResource x:Key="KlaSubtleTextBrush" ResourceKey="KlaMutedBrush"/>
+    <StaticResource x:Key="KlaBlockingBrush" ResourceKey="KlaErrorBrush"/>
+
+    <!-- Role-named aliases (the names new XAML should use); the KlaFoundation* keys stay for existing consumers. -->
+    <Style x:Key="KlaWindow" TargetType="Window" BasedOn="{StaticResource KlaFoundationWindow}"/>
+    <Style x:Key="KlaButton" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}"/>
+    <Style x:Key="KlaButtonPrimary" TargetType="Button" BasedOn="{StaticResource KlaFoundationMainButton}"/>
+    <Style x:Key="KlaButtonSecondary" TargetType="Button" BasedOn="{StaticResource KlaSecondaryButton}"/>
+    <Style x:Key="KlaButtonClose" TargetType="Button" BasedOn="{StaticResource KlaFoundationCloseButton}"/>
+    <Style x:Key="KlaLabel" TargetType="Label" BasedOn="{StaticResource KlaFoundationLabel}"/>
+    <Style x:Key="KlaPromptLabel" TargetType="Label" BasedOn="{StaticResource KlaFoundationPromptLabel}"/>
+    <Style x:Key="KlaInput" TargetType="TextBox" BasedOn="{StaticResource KlaFoundationInput}"/>
+    <Style x:Key="KlaInputCompact" TargetType="TextBox" BasedOn="{StaticResource KlaCompactFieldInput}"/>
+    <Style x:Key="KlaFilter" TargetType="TextBox" BasedOn="{StaticResource KlaFoundationFilter}"/>
+    <Style x:Key="KlaCheck" TargetType="CheckBox" BasedOn="{StaticResource KlaFoundationCheckBox}"/>
+    <Style x:Key="KlaList" TargetType="ListBox" BasedOn="{StaticResource KlaFoundationList}"/>
+    <Style x:Key="KlaListItem" TargetType="ListBoxItem" BasedOn="{StaticResource KlaFoundationListItem}"/>
+    <Style x:Key="KlaLink" TargetType="Hyperlink" BasedOn="{StaticResource KlaFoundationLink}"/>
 
     <Style x:Key="KlaSplitter" TargetType="GridSplitter">
         <Setter Property="Background" Value="{StaticResource KlaComponentBorderBrush}"/>
