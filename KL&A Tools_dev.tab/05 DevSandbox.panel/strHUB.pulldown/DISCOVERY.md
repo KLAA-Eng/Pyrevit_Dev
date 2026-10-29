@@ -1,7 +1,7 @@
 # strHUB discovery and compatibility evidence
 
 Recorded: 2026-10-29. Status: both interview rounds answered;
-the draft [SPEC.md](SPEC.md) awaits approval.
+[SPEC.md](SPEC.md) and the technical plan approved; tasks await approval.
 
 This file owns discovery evidence and the interview history. [SPEC.md](SPEC.md)
 owns the proposed requirements. Neither is evidence of a working exporter.
@@ -255,7 +255,7 @@ confirms shared understanding and exclusions before planning. The actual fixture
 and section mapping values will be recorded with test evidence rather than
 guessed here.
 
-### Spec feedback: development file policy and unresolved comparisons
+### Spec feedback: development file policy and comparisons
 
 - The user accepted a new RAM file per run for initial development and explicitly
   requires reconsidering model reuse/update behavior in future scope.
@@ -266,8 +266,36 @@ guessed here.
 - The user requested an explanation of retaining failed output. The draft
   explains retaining only owned files that actually exist after writing starts,
   with failure diagnostics and no success/recovery guarantee. Retention versus
-  cleanup remains a choice under discussion. Preflight-blocked runs still
-  create no RAM model.
+  cleanup was initially left open. Preflight-blocked runs still create no
+  RAM model.
+
+### Follow-up answers: accepted tolerances and retention
+
+- The user accepted small numeric differences for unit conversion. No exact
+  numeric readback bound was supplied; the draft requires a bound justified
+  by compatibility measurements and reviewed before verified status. The
+  earlier proposed 1 mm value remains unapproved.
+- The user specified **1/8 inch (3.175 mm)** for connectivity checking. The
+  draft treats this as an inclusive endpoint-distance check, separately from
+  numeric readback differences. The established physical-line rule still
+  forbids automatic movement, snapping, and merging. Intended target
+  connectivity also needs query/UI confirmation; proximity alone does not
+  establish it.
+- The user accepted retaining existing owned failed output plus diagnostics,
+  clearly marked incomplete, for development. A fresh run remains the retry
+  policy; a failed run is not automatically resumed or reported as verified.
+- The revised [SPEC.md](SPEC.md) was presented for review with these choices.
+
+### Specification approval and planning
+
+The user stated, "I approve the spec. Create the plan documents."
+The specification is approved for planning. [tasks/plan.md](tasks/plan.md)
+owns the approved implementation design and approval record;
+[tasks/compatibility.md](tasks/compatibility.md) describes the qualification
+experiments and decision rules. The user subsequently stated, "i approve the
+plan create the tasks dpocument". [tasks/todo.md](tasks/todo.md) now owns the
+task breakdown and checkpoint completion; task approval is pending.
+No implementation or live compatibility experiment has started.
 
 Runtime placement, dependency pins, isolated build commands, and any fork
 decision remain technical questions for the approved planning/qualification

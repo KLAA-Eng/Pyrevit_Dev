@@ -1,9 +1,10 @@
 # strHUB: Revit to RAM SS qualification proof
 
-Status: **Draft for human approval**. Date: 10.29.2026.
-This specification captures the user's seven interview decisions. Approval
-confirms the shared scope and exclusions below; planning and implementation
-remain separately gated. [DISCOVERY.md](DISCOVERY.md) owns research evidence,
+Status: **Approved for planning**. Date: 10.29.2026.
+Approval: the user stated, "I approve the spec. Create the plan documents."
+This specification captures the user's interview decisions and approved scope.
+The technical plan and implementation tasks remain separately gated.
+[DISCOVERY.md](DISCOVERY.md) owns research evidence,
 source revisions, known adapter limitations, and interview history.
 
 ## Objective
@@ -56,23 +57,33 @@ and script titles must match; the bundle owns author and versioned tooltip.
   a member, or present a partial transfer as success.
 - Initial host pairing: Revit 2026 `26.5.0.55` (installed .NET 10 runtime) and
   RAM SS `25.00.02.42`, using the installed pyRevit IronPython attachment.
+- Connectivity checking uses an inclusive **1/8 inch (3.175 mm)** distance
+  tolerance. It checks intended connections and does not authorize moving axes,
+  snapping endpoints, or merging nodes.
 
-## Development policy and draft assumptions
+## Development policy and qualification conditions
 
-Item 1 is accepted for initial development. The remaining details are proposed
-for review; the numeric tolerance and failed-output policy remain under discussion.
+New-file behavior and failed-output retention are accepted for initial
+development. Small numeric differences for unit conversion are accepted;
+the precise numeric readback bound will be established through compatibility
+evidence and reviewed before a transfer earns verified status. It is separate
+from the accepted connectivity tolerance. Spec approval accepts the conditions
+below while preserving that numeric-bound review checkpoint.
 
 1. Each export uses a unique owned run directory and a new RAM file; existing
    models are never overwritten or updated. Cancellation before export writes
    no RAM model. The user accepted this for initial development only; future
    update/reuse behavior must be reconsidered when that capability is specified.
 2. A run that fails after writing begins retains its owned output and diagnostics
-   as incomplete. No cross-application atomic rollback is promised.
+   as incomplete. The user accepted this policy for development after the
+   explanation below. No cross-application atomic rollback is promised.
 3. Readback coordinates and story elevations need an agreed numeric comparison
-   threshold after unit normalization. **1 mm absolute was an initial proposal,
-   not an accepted limit or a measured RAM precision.** The threshold is under
-   discussion. It must accommodate only numeric/file precision and cannot
-   authorize deliberate snapping, node merging, or geometry changes.
+   bound after unit normalization. Allow small differences due to conversion
+   and numeric/file precision; record the measured differences from controlled
+   write/save/reopen/readback probes and propose a justified bound. Record its
+   review before the first verified transfer. **The earlier 1 mm proposal is
+   not an accepted bound. The 1/8 inch connectivity tolerance is not a numeric
+   readback allowance.** Neither can authorize deliberate geometry changes.
 4. The proof qualifies member axes, beam/column classification, story placement,
    catalogue section assignment, and the fixture's section orientation. Source
    steel material/grade and applicable RAM defaults are reported; material
@@ -83,7 +94,7 @@ for review; the numeric tolerance and failed-output policy remain under discussi
    output destinations. Any required deployment outside this area needs a new
    scope decision and applicable tool approval.
 
-The proposed failed-output policy applies only after an export has begun writing.
+The accepted failed-output policy applies only after an export has begun writing.
 A preflight-blocked attempt creates no RAM model. If an export fails after
 creating some objects or saving a partial file, retain whatever owned model
 files exist alongside diagnostics identifying the run as `FAILED`/incomplete.
@@ -91,6 +102,28 @@ An invalid or unreadable file is not promised to be recoverable. Retention is
 for diagnosis, not permission to use the file as a completed transfer or to
 resume writing into it. No partial model is created just to illustrate a failure.
 Existing user files/sessions remain unaffected.
+
+## Connectivity and numeric comparisons
+
+For the initial bay, explicitly identify the intended beam-end/column-top
+connections. Compare endpoint positions in the same coordinate system and units
+using three-dimensional Euclidean distance. A distance at or below 1/8 inch
+passes the proximity check; a larger gap is a reported blocker. Missing or
+ambiguous intended partners must be reported rather than matched silently.
+Nearby unrelated objects must not be treated as intended connections solely
+because they lie within tolerance.
+
+Proximity is one check, not proof of actual target connectivity. Confirm the
+intended beam-to-column connectivity in RAM through a supported query or UI
+inspection as part of the fixture's acceptance evidence. If maintaining that
+connectivity would require moving a physical axis, report the incompatibility;
+the tolerance does not override the physical-line policy.
+
+Readback comparison answers a different question: how closely RAM preserved
+each exported coordinate. Report those differences separately from connectivity
+gaps. The compatibility probes must distinguish unit/precision effects from
+systematic translation, scaling, story snapping, and other adapter alterations.
+Do not choose a larger numeric bound just to make a failed transfer pass.
 
 ## User workflow, inputs, and effects
 
@@ -150,7 +183,7 @@ supported configuration or a wrapper. Record the reproducer, minimal change,
 alternatives, pinned upstream base, and maintenance implications before adopting
 one. Preserve licenses and notices and review distribution requirements before
 shipping upstream or modified binaries. No fork or global installation is
-approved by this draft.
+approved by this specification.
 
 ## Success criteria
 
@@ -164,10 +197,11 @@ All criteria are required. Automated evidence and host evidence are distinct.
 | AC-004 | Use a nonzero Revit base-level elevation | X/Y and axes preserved; Z translated by exactly the chosen datum before unit conversion. Forward and inverse transformations and SI/RAM units are recorded and consistent. | Pure transform/unit tests and live readback. |
 | AC-005 | A selected member is curved/sloped, has unresolved constraints/mapping, or would require deliberate snapping to a RAM story | All detected blockers reported with element identity and reason; no RAM model is created or modified for that blocked attempt. No default section/material guess is presented as verified. | Negative preflight tests and host boundary evidence. |
 | AC-006 | Export a valid bay | New model contains four columns, four beams, and the intended story arrangement. Base Z=0 is handled as the datum, without duplicate/unintended stories. Each member has the intended catalogue section. | RAM queries, saved/reopened model and UI review. |
-| AC-007 | Read back the saved/reopened file | Endpoint and story-elevation differences meet the agreed numeric comparison threshold (under discussion; 1 mm was an initial proposal). Classifications and mapped section labels match exactly; fixture section orientations are manually checked. No extra, missing, or substituted members. No verified status until a threshold is agreed. | Source/target comparison report and RAM UI evidence. |
+| AC-007 | Read back the saved/reopened file | Endpoint and story-elevation differences meet the separately documented numeric bound justified by compatibility measurements and reviewed before verification. Classifications and mapped section labels match exactly; fixture section orientations are manually checked. No extra, missing, or substituted members. Neither the earlier 1 mm proposal nor the connectivity tolerance supplies this numeric bound. | Source/target comparison report, recorded numeric-bound review, and RAM UI evidence. |
 | AC-008 | Start another run or encounter an existing output path | Use a distinct owned output, or block the collision; preserve prior runs and user files. No model appears at the adapter's uncontrolled default path. | Filesystem checks plus live repeat-run evidence. |
 | AC-009 | Cancel, fail COM activation, or fail during creation/readback | Actionable status/error reported; owned resources released; any partial model retained and labeled incomplete. No verified status and no loss of user-owned sessions/files. | Failure scenarios and lifecycle diagnostics. |
 | AC-010 | Review the finished qualification | All required criteria have linked evidence; BHoM reuse and exceptions are documented; compatibility/fidelity limits are stated. Any required fork has an explicit evidence-backed decision. | Human review of the evidence package. |
+| AC-011 | Check intended connections before export and in the reopened RAM model | Intended endpoint pairs satisfy the inclusive 1/8 inch (3.175 mm) proximity check; missing, ambiguous, or out-of-tolerance connections are reported and block verified status. Target connectivity is also confirmed. No automatic snapping, movement, merging, or connection inference from unrelated nearby objects. | Pure boundary cases, connection report, and RAM query/UI evidence. |
 
 ## Testing strategy
 
@@ -176,6 +210,9 @@ All criteria are required. Automated evidence and host evidence are distinct.
   ownership, and reconciliation of expected/actual results. Use meaningful
   cases, including reversed endpoints and values that expose feet/metres/inches
   mistakes; do not duplicate implementation details in tests.
+- Connectivity tests include distances just below, exactly at, and just above
+  1/8 inch, plus missing/ambiguous partners and unrelated nearby objects. Keep
+  these distinct from numeric readback comparison tests.
 - Host tests prove assembly loading, actual Revit extraction, DataAccess
   activation, new-file ownership, save/reopen, and assigned catalogue sections.
   Include a source member with deliberately different analytical geometry.
@@ -289,12 +326,13 @@ The eight-member proof is not production-readiness or engineering design approva
 
 ## Open technical decisions and approval
 
-Interview rounds 1-2 established the transfer scope. The user subsequently
-accepted a new file per run for initial development, requested more discussion
-of numeric tolerance, and requested an explanation of retained failed output.
-The latter two policies must be resolved before this draft is approved, or be
-given an explicit approval checkpoint before verification. No numeric threshold
-has been accepted. The following are for the later plan/qualification evidence:
+Interview rounds 1-2 established the transfer scope. Subsequent feedback
+accepted a new file per development run, small numeric differences for unit
+conversion, an inclusive 1/8 inch connectivity-checking tolerance, and retention
+of incomplete output for diagnosis. Spec approval confirms the separate
+numeric-bound review checkpoint before the first verified transfer; no fixed
+numeric readback threshold has yet been accepted. The following are for the
+later plan/qualification evidence:
 
 - Coherent BHoM release/revisions and a complete local dependency closure.
 - Physical-axis extraction/composition mechanism, preserving maximum BHoM reuse.
@@ -303,8 +341,9 @@ has been accepted. The following are for the later plan/qualification evidence:
 - Fixture-specific section mappings and a reliable independent readback path.
 - Whether any demonstrated blocker requires a minimal upstream change/fork.
 
-Approve this spec before a technical plan is written. Approve that plan before
-tasks, and tasks before product/probe implementation. A failed compatibility
+This spec is approved. Review the technical plan in [tasks/plan.md](tasks/plan.md)
+before detailed tasks, and approve tasks before product/probe implementation.
+A failed compatibility
 prerequisite requires an evidence-backed revision, not an implicit scope change.
 
 ## Validation evidence and tool version history
