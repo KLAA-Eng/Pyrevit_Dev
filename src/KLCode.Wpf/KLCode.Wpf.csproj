@@ -35,6 +35,7 @@
     <Page Include="../../lib/GUI/Resources/KLCodeFoundation.xaml" Link="GUI/Resources/KLCodeFoundation.xaml" />
     <Page Include="../../lib/GUI/Resources/KLCodeComponents.xaml" Link="GUI/Resources/KLCodeComponents.xaml" />
     <Page Include="../../lib/_icons/gui/KLCodeIcons.xaml" Link="_icons/gui/KLCodeIcons.xaml" />
+    <Page Include="../../lib/_logos/KLCodeWordmark.xaml" Link="_logos/KLCodeWordmark.xaml" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">

@@ -169,7 +169,7 @@ the compiled-WPF adapter: `src/KLCode.Wpf/KLCode.Wpf.csproj` links it as
 `Resources/KLCodePalette.xaml`, which `KLCodeControls.xaml` merges. The legacy
 `WPF_styles.xaml` dictionary currently
 repeats the same legacy brush values rather than merging that file. The
-repository wordmark asset is `lib/_logos/KLCode_text_1024x256px.svg` (with a
+repository wordmark asset is `lib/_logos/KLCode_text_1024x256px.svg`, generated into `lib/_logos/KLCodeWordmark.xaml` by `scripts/generate_gui_icons.py` (with a
 PNG export). The palette consolidation decision and test-contract mismatch are
 recorded in the [current-state review](knowledge/reviews/design-system/2026-10-08-current-state-review.md).
 

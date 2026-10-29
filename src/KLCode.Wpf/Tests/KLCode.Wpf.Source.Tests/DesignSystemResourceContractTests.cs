@@ -127,6 +127,8 @@ public sealed class DesignSystemResourceContractTests
         }
         Assert.IsTrue(project.Descendants("Page").Any(element =>
             (string?)element.Attribute("Link") == "_icons/gui/KLCodeIcons.xaml"));
+        Assert.IsTrue(project.Descendants("Page").Any(element =>
+            (string?)element.Attribute("Link") == "_logos/KLCodeWordmark.xaml"));
     }
 
     [TestMethod]

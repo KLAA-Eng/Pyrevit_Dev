@@ -6,13 +6,20 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
 [LICENSE.lucide.txt](LICENSE.lucide.txt) retains the upstream attribution/notices.
 
 - `svg/` contains the original approved SVG sources.
-- `KLCodeIcons.xaml` is generated framework-native WPF geometry and ImageSource
-  resources. Windows need no SVG renderer or added runtime package.
-- `scripts/generate_gui_icons.py` owns semantic role mappings and generation.
-  Run it after changing sources; `--check` detects stale generated resources.
+- `KLCodeIcons.xaml` is generated framework-native WPF geometry only (one
+  `Kla<Role>Geometry` per role) — a leaf with no brushes. Windows need no SVG
+  renderer or added runtime package.
+- `scripts/generate_gui_icons.py` owns semantic role mappings and generation. It
+  also writes the `KlaIcon<Role>` ImageSources into the `generated-icons` block
+  of `lib/GUI/Resources/KLCodeFoundation.xaml` (drawn with the foundation's
+  `KlaGuiIconPen` and `KlaTextBrush`) and the wordmark geometry in
+  `lib/_logos/KLCodeWordmark.xaml`. Run it after changing sources; `--check`
+  detects stale generated resources.
 
-Foundation tokens merge the dictionary automatically. Use `KlaIconSearch` as an
-Image.Source, or a foreground-aware presenter:
+`KLCodeFoundation.xaml` merges the geometry and owns the presenter, pen and
+ImageSources, bound to tokens (`KlaIconSize`, `KlaIconCanvas`, `KlaIconStroke`,
+`KlaTextBrush`, `KlaDisabledTextBrush`). Use `KlaIconSearch` as an Image.Source,
+or a foreground-aware presenter:
 
 ```xml
 <ContentControl Style="{StaticResource KlaGuiIcon}"
@@ -21,7 +28,7 @@ Image.Source, or a foreground-aware presenter:
 
 The presenter uses 16-unit dimensions and a 24-unit source canvas, with a 1.5
 stroke. Foreground inherits from its parent control; disabled icons use the
-shared disabled icon color. Decorative icons do not intercept clicks or focus.
+shared `KlaDisabledTextBrush`. Decorative icons do not intercept clicks or focus.
 Do not create per-window copies or replace source SVGs with screenshots.
 
 | Semantic role | Geometry | ImageSource |

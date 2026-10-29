@@ -231,7 +231,7 @@ def validate_gui_icons():
             assert path.StrokeThickness == 1.5
             icon.IsEnabled = False
             settle_layout(panel)
-            assert str(path.Stroke) == str(resources['KlaGuiIconDisabledBrush'])
+            assert str(path.Stroke) == str(resources['KlaDisabledTextBrush'])
             icon.IsEnabled = True
         owner.Foreground = resources['text_white']
         settle_layout(panel)

@@ -1,9 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="../../_icons/gui/KLCodeIcons.xaml"/>
-    </ResourceDictionary.MergedDictionaries>
     <!-- Shared WPF values; no Python, Revit, or compiled-add-in dependency. The spacing scale is 4 / 8 / 12 / 16 / 24; XAML
          consumes it through the typed GridLength / Thickness keys below, so no Double spacing tokens exist. -->
     <!-- GridLength is required for row/column definitions; WPF does not coerce Double resources. -->
@@ -28,6 +25,8 @@
     <sys:Double x:Key="KlaButtonWidth">104</sys:Double>
     <sys:Double x:Key="KlaMainButtonWidth">216</sys:Double>
     <sys:Double x:Key="KlaIconSize">16</sys:Double>
+    <sys:Double x:Key="KlaIconCanvas">24</sys:Double>
+    <sys:Double x:Key="KlaIconStroke">1.5</sys:Double>
     <sys:Double x:Key="KlaBodyFontSize">12</sys:Double>
     <sys:Double x:Key="KlaTitleFontSize">14</sys:Double>
     <FontFamily x:Key="KlaBodyFont">Segoe UI</FontFamily>

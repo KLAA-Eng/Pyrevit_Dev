@@ -20,8 +20,6 @@
     "list",
     "layout-grid"
   ],
-  "status": "Owner-approved GUI icon family, mappings, stroke and placement, 2026-10-28",
-  "stroke_width": 1.5,
-  "foreground": "#E5E4E2",
-  "disabled_foreground": "#A6B0AD"
+  "status": "Owner-approved GUI icon family, mappings, stroke and placement, 2026-10-28; colours come from the foundation tokens (KlaTextBrush, KlaDisabledTextBrush), not this manifest",
+  "stroke_width": 1.5
 }
