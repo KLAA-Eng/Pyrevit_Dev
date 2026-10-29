@@ -29,6 +29,7 @@ the [active plan or tracker](../plans/README.md); update task status only there.
 | [Design-system guide](../DESIGNSYSTEM.md) | Living UI tokens, resources, and component inventory. |
 | [Review archive](reviews/README.md) | Dated audits, release reviews, promotion reviews, and their evidence. |
 | [Compiled-WPF decision](compiled-wpf-decision.md) | Recorded compiled adapter rationale, alternatives, and source-checkpoint validation. |
+| [GUI architecture review handoff](gui-architecture-review-handoff.md) | 2026-10-29 snapshot at `7e01901`: what the eight review commits changed, the Windows checks to run, and the five items that need a render or an owner decision. |
 | [Compiled-tools handoff](family-studio-startup-importer-handoff.md) | The 2026-09-01 implementation snapshot; follow its linked plan for task status. |
 | [Design reference package](handoffs/family-studio-startup-importer/README.md) | Original Family Studio and Startup Importer prototypes, design notes, and assets. |
 
