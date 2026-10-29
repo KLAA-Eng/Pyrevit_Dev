@@ -5,6 +5,7 @@ __title__ = "Column Base Plate QC"
 __version__ = "v0.0"
 
 import datetime
+import json
 import math
 import os
 import traceback
@@ -36,7 +37,8 @@ try:
     from System.Windows.Interop import WindowInteropHelper
 
     from GUI.WPF_Base import my_WPF
-    from baseplate_qc.layout import layout_plate, nearest_wall, parse_column_size
+    from baseplate_qc.details import describe, read_type_details
+    from baseplate_qc.layout import layout_plate, parse_column_size
     from baseplate_qc.schedule import (
         SCHEDULE_TITLE,
         edge_distance,
@@ -113,8 +115,75 @@ def note_cells(view, notes):
     return cells
 
 
+def view_geometry(view):
+    """Return (polylines, arcs, dimension segments) drawn in a view, in its right/up coordinates.
+
+    Detail lines, detail components, filled regions, and imported CAD all
+    give their curves; groups are skipped because their members are
+    collected on their own.
+    """
+    doc = view.Document
+    right, up = view.RightDirection, view.UpDirection
+    to_2d = lambda point: (point.DotProduct(right), point.DotProduct(up))
+    polylines, arcs, dims = [], [], []
+
+    def add_curve(curve):
+        try:
+            points = [to_2d(point) for point in curve.Tessellate()]
+        except Exception:
+            return
+        if len(points) > 1:
+            polylines.append(points)
+        if isinstance(curve, DB.Arc):
+            sweep = curve.GetEndParameter(1) - curve.GetEndParameter(0) if curve.IsBound else 2 * math.pi
+            arcs.append({'center': to_2d(curve.Center), 'radius': curve.Radius, 'sweep': abs(sweep)})
+
+    def walk(geometry):
+        for item in geometry or []:
+            if isinstance(item, DB.Curve):
+                add_curve(item)
+            elif isinstance(item, DB.PolyLine):
+                polylines.append([to_2d(point) for point in item.GetCoordinates()])
+            elif isinstance(item, DB.GeometryInstance):
+                walk(item.GetInstanceGeometry())
+
+    options = DB.Options()
+    options.View = view
+    for element in DB.FilteredElementCollector(doc, view.Id).WhereElementIsNotElementType():
+        if isinstance(element, (DB.TextNote, DB.Group)) or element.OwnerViewId != view.Id:
+            continue
+        try:
+            if isinstance(element, DB.Dimension):
+                dims.extend(_dimension_segments(element, to_2d))
+            elif isinstance(element, DB.FilledRegion):
+                for loop in element.GetBoundaries():
+                    for curve in loop:
+                        add_curve(curve)
+            else:
+                walk(element.get_Geometry(options))
+        except Exception:
+            log('geometry skipped for {}:\n{}'.format(get_elementid_value(element.Id), traceback.format_exc()))
+    return polylines, arcs, dims
+
+
+def _dimension_segments(dimension, to_2d):
+    line = dimension.Curve
+    if not isinstance(line, DB.Line):
+        return []
+    direction = to_2d(line.Direction)
+    equal = bool(getattr(dimension, 'AreSegmentsEqual', False))
+    segments = list(dimension.Segments) if dimension.NumberOfSegments > 1 else [dimension]
+    return [{'value': segment.Value, 'text': segment.ValueOverride or '', 'origin': to_2d(segment.Origin),
+             'direction': direction, 'equal': equal}
+            for segment in segments if segment.Value is not None]
+
+
 def read_schedule(doc, view_id):
-    """Return (entries, edge distance table, problems) from the schedule view's text."""
+    """Return the schedule, anchor rod edge distances, and detail types from the schedule view.
+
+    Returns {'entries', 'edges', 'types' {key: definition}, 'type_problems'
+    {key: reason}, 'problems' [str]}.
+    """
     view = doc.GetElement(view_id) if view_id is not None else None
     if view is None:
         raise UserError('No base plate schedule view. Click Refresh, or place the schedule text in the model.')
@@ -125,27 +194,28 @@ def read_schedule(doc, view_id):
     edges = read_edge_distances(cells)
     if not edges:
         problems.append('No anchor rod requirements table found; built-in edge distances are used.')
-    if not entries or not edges:
-        path = dump_cells(view, cells)
+    polylines, arcs, dims = view_geometry(view)
+    types, type_problems = read_type_details(cells, polylines, arcs, dims)
+    if not types and not type_problems:
+        problems.append('No TYPE A, TYPE B, ... detail labels found.')
+    if not entries or not edges or type_problems or not types:
+        path = dump_view(view, cells, polylines, arcs, dims)
         if path:
-            problems.append('The view\'s text notes were written to {} for troubleshooting.'.format(path))
-    return entries, edges, problems
+            problems.append('The view\'s text and linework were written to {} for '
+                            'troubleshooting.'.format(path))
+    return {'entries': entries, 'edges': edges, 'types': types, 'type_problems': type_problems,
+            'problems': problems}
 
 
-def dump_cells(view, cells):
-    """Write each note's text and box (top first) so an unreadable schedule can be diagnosed."""
-    path = os.path.join(os.path.dirname(LOG_PATH), 'schedule_text.txt')
+def dump_view(view, cells, polylines, arcs, dims):
+    """Write the view's text, linework, and dimensions so an unreadable schedule can be diagnosed."""
+    path = os.path.join(os.path.dirname(LOG_PATH), 'schedule_view.json')
     try:
         if not os.path.isdir(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
-        # repr keeps line breaks and symbols visible and the file ASCII.
         with open(path, 'w') as dump:
-            dump.write('View: {}\n'.format(repr(_element_name(view))))
-            dump.write('xmin, xmax, ymin, ymax (feet), text\n')
-            for cell in sorted(cells, key=lambda item: (-item['ymax'], item['xmin'])):
-                dump.write('{:.3f}, {:.3f}, {:.3f}, {:.3f}, {}\n'.format(
-                    cell['xmin'], cell['xmax'], cell['ymin'], cell['ymax'],
-                    repr(cell['text'])))
+            json.dump({'view': _element_name(view), 'cells': cells, 'polylines': polylines,
+                       'arcs': arcs, 'dims': dims}, dump)
         return path
     except Exception:
         log('schedule dump failed:\n' + traceback.format_exc())
@@ -301,7 +371,7 @@ def delete_group_types(doc, type_ids, name):
     return len(live)
 
 
-def draw_view(doc, view, entries, edges):
+def draw_view(doc, view, schedule):
     """Replace the view's base plate drawing; return (rows, group type ids, flagged column ids)."""
     walls = collect_walls(doc)
     text_type_id = doc.GetDefaultElementTypeId(DB.ElementTypeGroup.TextNoteType)
@@ -315,7 +385,7 @@ def draw_view(doc, view, entries, edges):
         if old:
             doc.Delete(List[DB.ElementId](old))
         for column in columns:
-            row, type_id = _draw_column(doc, view, column, entries, edges, walls, text_type_id)
+            row, type_id = _draw_column(doc, view, column, schedule, walls, text_type_id)
             rows.append(row)
             if type_id is not None:
                 type_ids.append(type_id)
@@ -328,19 +398,24 @@ def draw_view(doc, view, entries, edges):
     return rows, type_ids, flagged
 
 
-def _draw_column(doc, view, column, entries, edges, walls, text_type_id):
+def _draw_column(doc, view, column, schedule, walls, text_type_id):
     row = {'column': column.Id, 'mark': '', 'plate': '', 'orientation': '', 'issues': []}
     mark = column_mark(column)
     if not mark:
         row['issues'].append('No {} value.'.format(MARK_PARAMETER))
         return row, None
     row['mark'] = mark
-    entry = entries.get(normalize_mark(mark))
+    entry = schedule['entries'].get(normalize_mark(mark))
     if entry is None:
         row['issues'].append('{} is not in the base plate schedule.'.format(mark))
         return row, None
     if not entry['length'] or not entry['width']:
         row['issues'].append('{} has no readable plate size in the schedule.'.format(mark))
+        return row, None
+    definition = schedule['types'].get(entry['type'])
+    if definition is None:
+        row['issues'].append('Not drawn: {}'.format(schedule['type_problems'].get(
+            entry['type'], 'no TYPE {} detail was found.'.format(entry['type']))))
         return row, None
     point = column_point(column)
     if point is None:
@@ -349,19 +424,25 @@ def _draw_column(doc, view, column, entries, edges, walls, text_type_id):
     size, label = column_size(column)
     box = column.get_BoundingBox(None)
     base_z = box.Min.Z if box is not None else point.Z
-    wall = nearest_wall(_xy(point), supporting_walls(walls, base_z))
     hand = column.HandOrientation if isinstance(column, DB.FamilyInstance) else None
-    result = layout_plate(entry, edge_distance(entry['rod_diameter'], edges), _xy(point), size,
-                          _xy(hand) if hand is not None else None, wall)
+    result = layout_plate(entry, definition, edge_distance(entry['rod_diameter'], schedule['edges']),
+                          _xy(point), size, _xy(hand) if hand is not None else None,
+                          supporting_walls(walls, base_z))
     result['mark'] = normalize_mark(mark)
     if size is None:
         result['issues'].append('Column size not read from "{}"; column outline not drawn.'.format(label))
-    row['plate'] = '{} {} x {}, {} rods'.format(entry['type'] or '?', format_inches(entry['length']),
-                                                format_inches(entry['width']),
-                                                format_inches(entry['rod_diameter']))
+    row['plate'] = 'Type {} ({}) {} x {}, {} rods'.format(
+        entry['type'], describe(definition).split(' plate')[0], format_inches(entry['length']),
+        format_inches(entry['width']), format_inches(entry['rod_diameter']))
     row['orientation'] = 'Along wall' if result['axis_source'] == 'wall' else 'Column axis'
     row['issues'] = result['issues']
     return row, draw_plate(doc, view, column, result, text_type_id)
+
+
+def _mark_order(mark):
+    """Sort BP2 before BP10."""
+    digits = ''.join(char for char in mark if char.isdigit())
+    return (mark.rstrip('0123456789'), int(digits) if digits else 0, mark)
 
 
 def report(output, view, rows, problems):
@@ -446,10 +527,16 @@ class BasePlateQcPalette(my_WPF):
         return self.schedule_views[index][0] if 0 <= index < len(self.schedule_views) else None
 
     def show_schedule_summary(self, doc):
-        entries, edges, problems = read_schedule(doc, self.selected_schedule_view())
-        lines = ['{} marks read: {}.'.format(len(entries), ', '.join(sorted(entries)) or 'none')]
-        lines.append('Edge distances from the anchor rod table.' if edges else 'Built-in edge distances.')
-        lines.extend(problems)
+        schedule = read_schedule(doc, self.selected_schedule_view())
+        entries = schedule['entries']
+        lines = ['{} marks read: {}.'.format(len(entries), ', '.join(sorted(entries, key=_mark_order)) or 'none')]
+        lines.append('Edge distances from the anchor rod table.' if schedule['edges']
+                     else 'Built-in edge distances.')
+        for key in sorted(schedule['types']):
+            lines.append('TYPE {}: {}.'.format(key, describe(schedule['types'][key])))
+        for key in sorted(schedule['type_problems']):
+            lines.append('Left out: {}'.format(schedule['type_problems'][key]))
+        lines.extend(schedule['problems'])
         self.schedule_text.Text = '\n'.join(lines)
 
     # Buttons --------------------------------------------------------------------
@@ -478,14 +565,14 @@ class BasePlateQcPalette(my_WPF):
             doc, view = uidoc.Document, uidoc.ActiveView
             if not isinstance(view, DB.ViewPlan):
                 raise UserError('Open a plan view first.')
-            entries, edges, problems = read_schedule(doc, schedule_view_id)
-            if not entries:
-                raise UserError('No base plates read from the schedule. ' + ' '.join(problems))
-            rows, type_ids, flagged = draw_view(doc, view, entries, edges)
+            schedule = read_schedule(doc, schedule_view_id)
+            if not schedule['entries']:
+                raise UserError('No base plates read from the schedule. ' + ' '.join(schedule['problems']))
+            rows, type_ids, flagged = draw_view(doc, view, schedule)
             self.drawn.extend((doc, type_id) for type_id in type_ids)
             if flagged:
                 uidoc.Selection.SetElementIds(List[DB.ElementId](flagged))
-            report(self.output, view, rows, problems)
+            report(self.output, view, rows, schedule['problems'] + sorted(schedule['type_problems'].values()))
             self.set_status('Drew {} base plates; {} columns to review are selected and listed in the '
                             'report.'.format(len(type_ids), len(flagged)))
         self.run(action, 'Drawing base plates...')

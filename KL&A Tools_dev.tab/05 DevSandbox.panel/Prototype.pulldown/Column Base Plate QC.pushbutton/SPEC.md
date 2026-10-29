@@ -14,7 +14,7 @@
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| v0.0 | Unreleased | 10.29.2026 | First DevSandbox base plate drawing: reads the base plate schedule and anchor rod table text, draws each column's plate, rods, and mark as a detail group along the supporting wall, flags fit problems, and clears drawn plates. | Pending commit on `dev.column-baseplate-qc`; pending next main delivery. |
+| v0.0 | Unreleased | 10.29.2026 | First DevSandbox base plate drawing: reads the base plate schedule and anchor rod table text and each type's shape and rods from its detail drawing, draws each column's plate, rods, and mark as a detail group along the supporting wall, flags fit problems, and clears drawn plates. | Pending commit on `dev.column-baseplate-qc`; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -55,28 +55,62 @@ past a wall face or clash with the column are visible at a glance.
   `HSS6.625x.280`), else from type parameters `d`/`bf`, `Depth`/`Width`, or
   `h`/`b`. The size only draws the column outline and its checks.
 
+- **Base plate detail types.** In the same view, each detail above a text
+  note reading `TYPE <key>` (TYPE A, TYPE B, ...) defines that type; see
+  [Detail types](#detail-types).
+
 A schedule drawn as an imported or linked CAD file cannot be read; its text
-is not available to the API. When no rows or no anchor rod table are read,
-every text note in the schedule view is written, with its box, to
-`%LOCALAPPDATA%\KLA Tools\Column Base Plate QC\schedule_text.txt` and the
+is not available to the API. When the schedule rows, the anchor rod table,
+or any detail type cannot be read, the schedule view's text notes,
+linework, and dimensions are written to
+`%LOCALAPPDATA%\KLA Tools\Column Base Plate QC\schedule_view.json` and the
 palette names the file. Walls in linked models are not used.
+
+## Detail types
+
+Types are read from the drawing, not built in, so a changed or added detail
+changes the plates (`lib/baseplate_qc/details.py`):
+
+- **Area.** A detail's area is above its label, half the gap to the
+  neighboring labels each side, up to the first wide text above (a table
+  note).
+- **Plate outline.** The largest closed loop of lines in the area (detail
+  lines, detail components, filled regions, or imported CAD). Lines dangling
+  off an outline are ignored. Four corners is a **square** plate (drawn
+  sides within 15%) or a **rectangular** plate; six corners is an
+  **L-shaped** plate. Any other outline, an outline not square to the page,
+  or an L whose legs differ by more than 15% is too complex: the type is left
+  out, the palette says why, and its columns are listed but not drawn.
+- **L and W.** For square and rectangular plates, a dimension whose text is
+  overridden to `L` gives the L direction (else the longer drawn side); W is
+  across it. An L-shaped plate has two legs, each L long and W wide, meeting
+  at a W x W corner.
+- **Anchor rods.** Circles inside the plate (concentric circles are one
+  rod). Each rod coordinate takes the nearest rule: "C" from a plate edge;
+  "C" from the inside of an L leg; "C" from an L leg end; the middle of the
+  plate or leg; or the middle plus or minus half of a dimensioned spacing.
+  A dimension counts as a spacing when it is measured (its length is the
+  true spacing, such as 2 1/2") or typed over with a size; a rule from a
+  spacing wins a near tie. A rod matching no rule leaves the type out.
+- **"C".** The drawn edge distance is the dimension typed over to `C`, else
+  the smallest drawn rod-to-edge distance. The true "C" comes from the
+  anchor rod requirements table for the scheduled rod diameter.
+- **Column.** The largest other loop inside the plate (not around a rod);
+  it must be centered on a square or rectangular plate, or in the corner
+  square of an L, or the type is left out.
 
 ## Layout rules
 
-The geometry follows the base plate detail (Types A, B, and C):
-
-- The column is centered on the plate in both directions.
-- Plate **L** runs along the supporting wall's location line and **W**
-  across it. Without a wall, L runs along the column's hand orientation (its
-  width direction).
-- **Types A and B:** four rods, one in each plate corner, "C" in from both
-  edges.
-- **Type C:** two pairs of rods, "C" in from each L end; the rods of a pair
-  are 2 1/2" apart across W, centered on the column.
-- An unknown type is drawn as Type A and flagged.
-
-These rules are the prototype's reading of the detail and need engineer
-confirmation; the constants live in `lib/baseplate_qc/layout.py`.
+- The column point is the column's center on the plate as drawn in its
+  detail.
+- For square and rectangular plates, **L** runs along the supporting wall's
+  location line and **W** across it. Without a wall, L runs along the
+  column's hand orientation (its width direction).
+- For L-shaped plates, one leg runs along the supporting wall toward its
+  longer run from the column. The other leg follows a crossing wall at the
+  column (within 17 degrees of square) toward that wall's longer run; with
+  no crossing wall it takes one side and the column is flagged. A plate
+  corner past the faces of both walls is an overhang.
 
 ## Drawing
 
@@ -96,11 +130,14 @@ A column is listed for review, and selected in Revit, when:
 
 - it has no `Column Base Plate Type`, or its mark is not in the schedule, or
   the schedule row has no readable L or W;
+- its type has no detail or the detail was left out (not drawn);
 - its plate hangs past a face of the supporting wall (more than 1/16");
 - the column outline is larger than the plate;
 - a rod circle falls on the column outline;
-- the plate is too small for the rod edge distance, the rod diameter has no
-  edge distance (rods not drawn), or the schedule lists other than four rods;
+- a rod falls outside the plate (too small for the edge distance), the rod
+  diameter has no edge distance (rods not drawn), or the schedule's rod
+  count differs from the detail's;
+- an L-shaped plate has no crossing wall, or its W is not less than L;
 - its size could not be read (the plate is drawn without the column outline).
 
 The pyRevit output window lists flagged columns with clickable ids, the mark,

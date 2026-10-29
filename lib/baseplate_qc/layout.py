@@ -2,26 +2,23 @@
 """Lay out a base plate, its anchor rods, and its column in plan.
 
 Plan points are (x, y) tuples in feet; schedule and column sizes are inches.
-The plate's L dimension runs along the wall the column sits on (or along the
-column's own axis when no wall is found) and the column is centered on the
-plate, per the base plate detail types:
-
-- Type A and B: four rods, one at each plate corner, the edge distance "C"
-  in from both edges.
-- Type C: two pairs of rods, the edge distance "C" in from each L end, the
-  rods of a pair TYPE_C_ROD_SPACING apart across W.
+The plate's shape and rods come from its detail type (baseplate_qc.details).
+A square or rectangular plate's L runs along the wall the column sits on, or
+along the column's own axis when there is no wall. An L-shaped plate puts
+one leg along that wall and the other along a second, crossing wall; each
+leg points toward the longer run of its wall.
 """
 
 import math
 import re
 
+from .details import plate_geometry, point_in_polygon
 from .schedule import format_inches, parse_inches
 
 
-TYPE_C_ROD_SPACING = 2.5  # inches, from the Type C detail.
-KNOWN_TYPES = ('A', 'B', 'C')
 WALL_REACH = 0.5  # feet beyond the wall face a column may sit and still use it.
 TOLERANCE = 1.0 / 16  # inches.
+CROSSING_DOT = 0.3  # |cos| below which a second wall counts as crossing the first.
 
 _HSS_RE = re.compile(r'HSS\s*([0-9./\s-]+(?:X[0-9./\s-]+)+)')
 
@@ -85,15 +82,8 @@ def _rect(center, axis, length, width):
 
 # -- Walls -------------------------------------------------------------------------
 
-def nearest_wall(point, walls, reach=WALL_REACH):
-    """Return the wall segment a column point sits on, or None.
-
-    walls are dicts {'id', 'points': [(x, y), ...] along the wall's location
-    line, 'width' (feet)}. A wall qualifies when the point is within its
-    half-width plus reach of the location line; the closest one wins. Returns
-    {'id', 'axis' (unit), 'origin' (closest point), 'width', 'distance'}.
-    """
-    best = None
+def _wall_hits(point, walls, reach):
+    """Yield each wall segment the point sits on, with its distance and run lengths."""
     for wall in walls:
         points = wall['points']
         for start, end in zip(points, points[1:]):
@@ -107,60 +97,105 @@ def nearest_wall(point, walls, reach=WALL_REACH):
             distance = math.hypot(point[0] - closest[0], point[1] - closest[1])
             if distance > wall['width'] / 2.0 + reach:
                 continue
-            if best is None or distance < best['distance']:
-                best = {'id': wall['id'], 'axis': _canonical(axis), 'origin': closest,
-                        'width': wall['width'], 'distance': distance}
+            canonical = _canonical(axis)
+            ahead, behind = length - along, along
+            if canonical != axis:
+                ahead, behind = behind, ahead
+            yield {'id': wall['id'], 'axis': canonical, 'origin': closest, 'width': wall['width'],
+                   'distance': distance, 'ahead': ahead, 'behind': behind}
+
+
+def nearest_wall(point, walls, reach=WALL_REACH):
+    """Return the wall segment a column point sits on, or None.
+
+    walls are dicts {'id', 'points': [(x, y), ...] along the wall's location
+    line, 'width' (feet)}. A wall qualifies when the point is within its
+    half-width plus reach of the location line; the closest one wins. Returns
+    {'id', 'axis' (unit), 'origin' (closest point), 'width', 'distance',
+    'ahead', 'behind' (wall run, feet, along +axis and -axis)}.
+    """
+    best = None
+    for hit in _wall_hits(point, walls, reach):
+        if best is None or hit['distance'] < best['distance']:
+            best = hit
     return best
+
+
+def leg_directions(point, wall, walls, reach=WALL_REACH):
+    """Return ((u sign, v sign), crossing wall or None) for an L-shaped plate.
+
+    The u leg points along the column's wall toward its longer run. The v
+    leg follows a crossing wall at the column toward that wall's longer run;
+    without one it takes +v.
+    """
+    if wall is None:
+        return (1, 1), None
+    u_sign = 1 if wall['ahead'] >= wall['behind'] else -1
+    normal = _perp(wall['axis'])
+    crossing = [hit for hit in _wall_hits(point, walls, reach)
+                if hit['id'] != wall['id'] and
+                abs(hit['axis'][0] * wall['axis'][0] + hit['axis'][1] * wall['axis'][1]) < CROSSING_DOT]
+    if not crossing:
+        return (u_sign, 1), None
+    other = min(crossing, key=lambda hit: hit['distance'])
+    run = other['axis'] if other['ahead'] >= other['behind'] else (-other['axis'][0], -other['axis'][1])
+    v_sign = 1 if run[0] * normal[0] + run[1] * normal[1] >= 0 else -1
+    return (u_sign, v_sign), other
 
 
 # -- Plate layout ------------------------------------------------------------------
 
-def rod_offsets(plate_type, length, width, edge):
-    """Return rod (u, v) offsets in inches from the plate center for a detail type."""
-    half_u = length / 2.0 - edge
-    if plate_type == 'C':
-        half_v = TYPE_C_ROD_SPACING / 2.0
-    else:
-        half_v = width / 2.0 - edge
-    return [(su * half_u, sv * half_v) for su in (-1, 1) for sv in (-1, 1)]
-
-
-def layout_plate(entry, edge, center, column=None, column_axis=None, wall=None):
+def layout_plate(entry, definition, edge, center, column=None, column_axis=None, walls=()):
     """Return the drawing and review issues for one column's base plate.
 
-    entry is a schedule entry (inches); edge is the edge distance "C" (inches);
+    entry is a schedule entry (inches); definition is its detail type from
+    baseplate_qc.details; edge is the edge distance "C" (inches) or None;
     center is the column point (feet); column is a parse_column_size dict or
     None; column_axis is the column's width direction (its hand orientation);
-    wall is a nearest_wall result or None.
+    walls are the nearest_wall dicts that may support the column.
 
     Returns {'axis', 'axis_source', 'plate' (corners), 'rods' [(center,
     radius)], 'column' (corners, or (center, radius) when round, or None),
     'label' (point), 'text', 'issues' [str]}; points and radii in feet.
     """
     issues = []
-    plate_type = entry.get('type')
-    if plate_type not in KNOWN_TYPES:
-        issues.append('Type {} is not in the base plate detail; drawn as Type A.'.format(plate_type or '?'))
-        plate_type = 'A'
     length, width = entry['length'], entry['width']
+    wall = nearest_wall(center, walls)
     if wall is not None:
         axis, source = wall['axis'], 'wall'
     else:
         axis = _canonical(_unit(column_axis or (1.0, 0.0)) or (1.0, 0.0))
         source = 'column'
+    signs, crossing = (1, 1), None
+    if definition['shape'] == 'L':
+        if width >= length:
+            issues.append('L-shaped plate needs W less than L.')
+        signs, crossing = leg_directions(center, wall, walls)
+        if crossing is None:
+            issues.append('No crossing wall at the column; the L-shaped plate\'s second leg '
+                          'direction is assumed.')
 
+    geometry = plate_geometry(definition, length, width, edge or 0.0)
+    column_u, column_v = geometry['column']
+
+    def place(u, v):
+        """Plate frame inches to plan feet, with the column at center."""
+        return _point(center, axis, signs[0] * (u - column_u) / 12.0, signs[1] * (v - column_v) / 12.0)
+
+    plate = [place(u, v) for u, v in geometry['plate']]
     rods = []
     if edge is None:
         issues.append('No edge distance for a {} rod; rods not drawn.'.format(
             format_inches(entry.get('rod_diameter'))))
     else:
-        if length / 2.0 - edge <= 0 or (plate_type != 'C' and width / 2.0 - edge <= 0):
-            issues.append('Plate is too small for the {} rod edge distance.'.format(format_inches(edge)))
         radius = (entry.get('rod_diameter') or 0.75) / 24.0
-        for u, v in rod_offsets(plate_type, length, width, edge):
-            rods.append((_point(center, axis, u / 12.0, v / 12.0), radius))
-    if entry.get('rod_count') not in (None, 4):
-        issues.append('Schedule lists {} rods; the detail shows 4.'.format(entry['rod_count']))
+        rods = [(place(u, v), radius) for u, v in geometry['rods']]
+        if any(not point_in_polygon(rod, plate) for rod, _ in rods):
+            issues.append('Plate is too small for the {} rod edge distance.'.format(format_inches(edge)))
+    count = len(definition['rods'])
+    if entry.get('rod_count') not in (None, count):
+        issues.append('Schedule lists {} rods; the TYPE {} detail shows {}.'.format(
+            entry['rod_count'], definition['key'], count))
 
     column_shape = None
     if column is not None:
@@ -169,20 +204,19 @@ def layout_plate(entry, edge, center, column=None, column_axis=None, wall=None):
             column_shape = (center, column['width'] / 24.0)
         else:
             column_shape = _rect(center, col_axis, column['width'], column['depth'])
-        issues.extend(_column_issues(column, col_axis, center, axis, length, width, rods))
-
-    plate = _rect(center, axis, length, width)
+        issues.extend(_column_issues(column, col_axis, center, plate, rods))
     if wall is not None:
-        issues.extend(_wall_issues(plate, wall))
+        issues.extend(_wall_issues(plate, [hit for hit in (wall, crossing) if hit is not None]))
 
-    label = _point(center, axis, length / 24.0 + 0.25, width / 24.0 + 0.25)
+    corner = max(geometry['plate'], key=lambda p: signs[0] * (p[0] - column_u) + signs[1] * (p[1] - column_v))
+    label = place(corner[0] + signs[0] * 3.0, corner[1] + signs[1] * 3.0)
     text = '{} ({}) {}x{}'.format(entry['mark'], entry.get('type') or '?',
                                   format_inches(length).rstrip('"'), format_inches(width).rstrip('"'))
     return {'axis': axis, 'axis_source': source, 'plate': plate, 'rods': rods,
             'column': column_shape, 'label': label, 'text': text, 'issues': issues}
 
 
-def _column_issues(column, col_axis, center, axis, length, width, rods):
+def _column_issues(column, col_axis, center, plate, rods):
     issues = []
     half_w, half_d = column['width'] / 2.0, column['depth'] / 2.0
     corners = [(su * half_w, sv * half_d) for su in (-1, 1) for sv in (-1, 1)]
@@ -190,9 +224,9 @@ def _column_issues(column, col_axis, center, axis, length, width, rods):
         corners = [(half_w * math.cos(a), half_w * math.sin(a))
                    for a in (i * math.pi / 8 for i in range(16))]
     for cu, cv in corners:
-        world = _point(center, col_axis, cu / 12.0, cv / 12.0)
-        u, v = _local(world, center, axis)
-        if abs(u) * 12 > length / 2.0 + TOLERANCE or abs(v) * 12 > width / 2.0 + TOLERANCE:
+        # Pull each corner in by the tolerance so a flush column passes.
+        scale = max(0.0, 1.0 - TOLERANCE / max(math.hypot(cu, cv), 1e-9))
+        if not point_in_polygon(_point(center, col_axis, cu * scale / 12.0, cv * scale / 12.0), plate):
             issues.append('Column is larger than the plate.')
             break
     for rod_center, radius in rods:
@@ -210,12 +244,14 @@ def _column_issues(column, col_axis, center, axis, length, width, rods):
     return issues
 
 
-def _wall_issues(plate, wall):
-    """Flag a plate that hangs past either wall face."""
-    normal = _perp(wall['axis'])
-    origin = wall['origin']
-    half = wall['width'] / 2.0
-    worst = max(abs((x - origin[0]) * normal[0] + (y - origin[1]) * normal[1]) for x, y in plate) - half
+def _wall_issues(plate, walls):
+    """Flag a plate corner that hangs past the faces of every supporting wall."""
+    def overhang(point, wall):
+        normal = _perp(wall['axis'])
+        offset = (point[0] - wall['origin'][0]) * normal[0] + (point[1] - wall['origin'][1]) * normal[1]
+        return abs(offset) - wall['width'] / 2.0
+
+    worst = max(min(overhang(point, wall) for wall in walls) for point in plate)
     if worst * 12 > TOLERANCE:
         return ['Plate hangs {} past the wall face.'.format(format_inches(worst * 12))]
     return []

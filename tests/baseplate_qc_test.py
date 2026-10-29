@@ -13,13 +13,8 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 
-from lib.baseplate_qc.layout import (
-    TYPE_C_ROD_SPACING,
-    layout_plate,
-    nearest_wall,
-    parse_column_size,
-    rod_offsets,
-)
+from lib.baseplate_qc.details import describe, plate_geometry, read_type_details
+from lib.baseplate_qc.layout import layout_plate, nearest_wall, parse_column_size
 from lib.baseplate_qc.schedule import (
     edge_distance,
     format_inches,
@@ -192,10 +187,150 @@ class ScheduleTests(unittest.TestCase):
         self.assertIsNone(edge_distance(2.0, distances))
 
 
+def outline(points):
+    return list(points) + [points[0]]
+
+
+def square(cx, cy, half):
+    return outline([(cx - half, cy - half), (cx + half, cy - half), (cx + half, cy + half),
+                    (cx - half, cy + half)])
+
+
+def rod(cx, cy, radius=0.03):
+    """A rod drawn as a circle inside a square washer: (polylines, arcs)."""
+    circle = [(cx + radius * math.cos(a), cy + radius * math.sin(a))
+              for a in (i * math.pi / 8 for i in range(17))]
+    return [circle, square(cx, cy, 0.05)], [{'center': (cx, cy), 'radius': radius, 'sweep': 2 * math.pi}]
+
+
+def dim(value, text, origin, horizontal, equal=False):
+    return {'value': value, 'text': text, 'origin': origin,
+            'direction': (1.0, 0.0) if horizontal else (0.0, 1.0), 'equal': equal}
+
+
+def detail_sheet():
+    """Linework, dimensions, and labels laid out like the S-500.S base plate detail.
+
+    Details are not to scale: plates about 1 ft across, "C" drawn 0.15 ft.
+    TYPE A is square, TYPE B L-shaped, TYPE C rectangular with a true 2 1/2"
+    rod spacing, and TYPE D an octagon the reader must reject.
+    """
+    cells = [cell('NOTE: ALL ANCHOR RODS ARE F1554 GRADE 55', 3.4, -9.9, width=8.0)]
+    polylines, arcs, dims = [], [], []
+
+    def add_rods(points):
+        for x, y in points:
+            lines, circles = rod(x, y)
+            polylines.extend(lines)
+            arcs.extend(circles)
+
+    # TYPE A: square plate, rods C in from both edges, centerlines and a weld leader.
+    cells.append(cell('TYPE A', 1.8, -13.3, width=1.0, height=0.46))
+    polylines.append(outline([(1.3, -12.3), (2.3, -12.3), (2.3, -11.3), (1.3, -11.3)]))
+    polylines.append(square(1.8, -11.8, 0.12))
+    polylines += [[(1.8, -12.5), (1.8, -11.1)], [(1.1, -11.8), (2.5, -11.8)]]
+    polylines.append([(0.5, -12.6), (1.6, -12.6), (1.9, -12.3)])
+    add_rods([(1.45, -12.15), (2.15, -12.15), (1.45, -11.45), (2.15, -11.45)])
+    dims += [dim(1.0, 'L', (1.8, -11.1), True), dim(1.0, 'W', (2.5, -11.8), False),
+             dim(0.15, '"C"', (2.2, -12.5), True), dim(0.5, '', (1.55, -11.0), True, equal=True)]
+
+    # TYPE B: L-shaped plate, legs 1.0 long and 0.6 wide meeting at the bottom left.
+    cells.append(cell('TYPE B', 6.17, -13.3, width=1.0, height=0.46))
+    polylines.append(outline([(5.0, -12.4), (6.0, -12.4), (6.0, -11.8), (5.6, -11.8),
+                              (5.6, -11.4), (5.0, -11.4)]))
+    polylines.append(square(5.3, -12.1, 0.1))
+    add_rods([(5.85, -12.25), (5.85, -11.95), (5.15, -11.55), (5.45, -11.55)])
+    dims += [dim(1.0, 'L', (5.5, -11.2), True), dim(0.6, 'W', (5.3, -11.3), True),
+             dim(0.15, 'C', (5.9, -12.6), True)]
+
+    # TYPE C: rectangular plate, rod pairs C from each end, 2 1/2" apart across W.
+    cells.append(cell('TYPE C', 10.54, -13.3, width=1.0, height=0.46))
+    polylines.append(outline([(9.9, -12.3), (11.1, -12.3), (11.1, -11.7), (9.9, -11.7)]))
+    polylines.append(square(10.5, -12.0, 0.1))
+    add_rods([(10.05, -12.104), (10.05, -11.896), (10.95, -12.104), (10.95, -11.896)])
+    dims += [dim(1.2, 'L', (10.5, -11.5), True), dim(0.6, 'W', (11.3, -12.0), False),
+             dim(0.15, 'C', (11.0, -12.5), True), dim(2.5 / 12, '', (9.7, -12.0), False)]
+
+    # TYPE D: an octagonal plate is too complex.
+    cells.append(cell('TYPE D', 14.9, -13.3, width=1.0, height=0.46))
+    polylines.append(outline([(14.6, -12.4), (15.2, -12.4), (15.4, -12.2), (15.4, -11.6),
+                              (15.2, -11.4), (14.6, -11.4), (14.4, -11.6), (14.4, -12.2)]))
+    add_rods([(14.9, -12.2), (14.9, -11.6)])
+    return cells, polylines, arcs, dims
+
+
+def rule_names(definition):
+    return sorted((u[0], v[0]) for u, v in definition['rods'])
+
+
+class DetailTests(unittest.TestCase):
+    def setUp(self):
+        self.definitions, self.problems = read_type_details(*detail_sheet())
+
+    def test_shapes_are_read(self):
+        self.assertEqual(['A', 'B', 'C'], sorted(self.definitions))
+        self.assertEqual('square plate, 4 rods', describe(self.definitions['A']))
+        self.assertEqual('L-shaped plate, 4 rods', describe(self.definitions['B']))
+        self.assertEqual('rectangular plate, 4 rods', describe(self.definitions['C']))
+
+    def test_complex_type_is_left_out(self):
+        self.assertEqual(['D'], list(self.problems))
+        self.assertIn('8 corners', self.problems['D'])
+
+    def test_square_rods_sit_c_from_each_edge(self):
+        geometry = plate_geometry(self.definitions['A'], 14.0, 14.0, 1.5)
+        self.assertEqual([(1.5, 1.5), (1.5, 12.5), (12.5, 1.5), (12.5, 12.5)], sorted(geometry['rods']))
+        self.assertEqual((7.0, 7.0), geometry['column'])
+
+    def test_l_rods_sit_at_the_leg_ends(self):
+        geometry = plate_geometry(self.definitions['B'], 10.0, 6.0, 1.5)
+        self.assertEqual([(1.5, 8.5), (4.5, 8.5), (8.5, 1.5), (8.5, 4.5)], sorted(geometry['rods']))
+        self.assertEqual(6, len(geometry['plate']))
+        self.assertEqual((3.0, 3.0), geometry['column'])
+
+    def test_rectangular_rods_use_the_dimensioned_spacing(self):
+        geometry = plate_geometry(self.definitions['C'], 15.0, 12.0, 1.5)
+        rods = sorted((round(u, 4), round(v, 4)) for u, v in geometry['rods'])
+        self.assertEqual([(1.5, 4.75), (1.5, 7.25), (13.5, 4.75), (13.5, 7.25)], rods)
+
+    def test_typed_over_spacing_is_the_true_size(self):
+        # The spacing is drawn 0.3 ft apart but its dimension text reads 2 1/2".
+        cells, polylines, arcs, dims = detail_sheet()
+        for arc in arcs:
+            x, y = arc['center']
+            if 9.9 < x < 11.1:
+                arc['center'] = (x, -12.15 if y < -12.0 else -11.85)
+        dims[-1] = dim(0.3, '2 1/2"', (9.7, -12.0), False)
+        definitions, _ = read_type_details(cells, polylines, arcs, dims)
+        geometry = plate_geometry(definitions['C'], 15.0, 12.0, 1.5)
+        self.assertEqual([4.75, 7.25], sorted(set(round(v, 4) for _, v in geometry['rods'])))
+
+    def test_changed_detail_changes_the_rods(self):
+        # Move TYPE C's rods to C from the long edges: the rule follows the drawing.
+        cells, polylines, arcs, dims = detail_sheet()
+        for arc in arcs:
+            x, y = arc['center']
+            if 9.9 < x < 11.1:
+                arc['center'] = (x, -12.15 if y < -12.0 else -11.85)
+        definitions, _ = read_type_details(cells, polylines, arcs, dims)
+        self.assertEqual([('C from the end', 'C from the end'), ('C from the end', 'C from the start'),
+                          ('C from the start', 'C from the end'), ('C from the start', 'C from the start')],
+                         rule_names(definitions['C']))
+
+
 class LayoutTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.definitions, _ = read_type_details(*detail_sheet())
+
     def entry(self, plate_type='A', length=9.0, width=8.0):
         return {'mark': 'BP7', 'type': plate_type, 'length': length, 'width': width,
                 'rod_count': 4, 'rod_diameter': 0.75}
+
+    def layout(self, plate_type, length, width, center, column=None, column_axis=(1.0, 0.0), walls=(),
+               edge=1.5):
+        return layout_plate(self.entry(plate_type, length, width), self.definitions[plate_type], edge,
+                            center, column, column_axis, walls)
 
     def test_column_sizes(self):
         self.assertEqual({'shape': 'rect', 'depth': 3.0, 'width': 3.0}, parse_column_size('HSS3x3x3/8'))
@@ -207,19 +342,11 @@ class LayoutTests(unittest.TestCase):
         self.assertEqual(3.0, parse_column_size('HSS-Square Column HSS3x3x3/8')['width'])
         self.assertIsNone(parse_column_size('W10x68'))
 
-    def test_rod_patterns(self):
-        self.assertEqual(sorted([(-3.0, -2.5), (-3.0, 2.5), (3.0, -2.5), (3.0, 2.5)]),
-                         sorted(rod_offsets('A', 9.0, 8.0, 1.5)))
-        offsets = rod_offsets('C', 12.0, 8.0, 1.5)
-        self.assertEqual(sorted(set(abs(v) for _, v in offsets)), [TYPE_C_ROD_SPACING / 2.0])
-        self.assertEqual(sorted(set(abs(u) for u, _ in offsets)), [4.5])
-
     def test_plate_runs_along_the_wall(self):
         wall = {'id': 1, 'points': [(0.0, 0.0), (0.0, 20.0)], 'width': 1.0}
         found = nearest_wall((0.1, 5.0), [wall])
         self.assertEqual((0.0, 1.0), found['axis'])
-        result = layout_plate(self.entry(), 1.5, (0.1, 5.0), parse_column_size('HSS3x3x3/8'),
-                              (1.0, 0.0), found)
+        result = self.layout('A', 9.0, 8.0, (0.1, 5.0), parse_column_size('HSS3x3x3/8'), walls=[wall])
         self.assertEqual('wall', result['axis_source'])
         xs = [x for x, _ in result['plate']]
         ys = [y for _, y in result['plate']]
@@ -233,27 +360,45 @@ class LayoutTests(unittest.TestCase):
         wall = {'id': 1, 'points': [(0.0, 0.0), (10.0, 0.0)], 'width': 1.0}
         self.assertIsNone(nearest_wall((5.0, 3.0), [wall]))
         angle = math.radians(30)
-        result = layout_plate(self.entry(), 1.5, (5.0, 3.0), None, (math.cos(angle), math.sin(angle)))
+        result = self.layout('A', 9.0, 8.0, (5.0, 3.0), column_axis=(math.cos(angle), math.sin(angle)),
+                             walls=[wall])
         self.assertEqual('column', result['axis_source'])
         self.assertAlmostEqual(angle, math.atan2(result['axis'][1], result['axis'][0]))
         self.assertEqual([], result['issues'])
 
     def test_overhang_and_clashes_are_flagged(self):
         wall = {'id': 1, 'points': [(0.0, 0.0), (10.0, 0.0)], 'width': 0.5}
-        found = nearest_wall((5.0, 0.0), [wall])
-        result = layout_plate(self.entry('C', 12.0, 8.0), 1.5, (5.0, 0.0),
-                              parse_column_size('HSS10x10x1/2'), (1.0, 0.0), found)
+        result = self.layout('A', 12.0, 8.0, (5.0, 0.0), parse_column_size('HSS10x10x1/2'), walls=[wall])
         issues = ' '.join(result['issues'])
         self.assertIn('hangs 1"', issues)  # 8" plate on a 6" wall
         self.assertIn('larger than the plate', issues)
         self.assertIn('rod falls on the column', issues)
 
-    def test_unknown_type_and_missing_edge(self):
-        result = layout_plate(self.entry('D'), None, (0.0, 0.0))
+    def test_missing_edge_and_rod_count(self):
+        entry = dict(self.entry('C', 15.0, 12.0), rod_count=6)
+        result = layout_plate(entry, self.definitions['C'], None, (0.0, 0.0))
         self.assertEqual([], result['rods'])
         issues = ' '.join(result['issues'])
-        self.assertIn('Type D', issues)
         self.assertIn('rods not drawn', issues)
+        self.assertIn('Schedule lists 6 rods; the TYPE C detail shows 4', issues)
+
+    def test_l_plate_follows_both_walls(self):
+        # Wall 1 runs mostly toward -x from the column; wall 2 runs toward +y.
+        walls = [{'id': 1, 'points': [(-10.0, 0.0), (3.0, 0.0)], 'width': 1.0},
+                 {'id': 2, 'points': [(0.0, 0.0), (0.0, 8.0)], 'width': 1.0}]
+        result = self.layout('B', 10.0, 6.0, (0.0, 0.0), parse_column_size('HSS3x3x3/8'), walls=walls)
+        xs = [x for x, _ in result['plate']]
+        ys = [y for _, y in result['plate']]
+        self.assertAlmostEqual(-7.0 / 12, min(xs))
+        self.assertAlmostEqual(3.0 / 12, max(xs))
+        self.assertAlmostEqual(-3.0 / 12, min(ys))
+        self.assertAlmostEqual(7.0 / 12, max(ys))
+        self.assertEqual([], result['issues'])
+
+    def test_l_plate_without_crossing_wall_is_flagged(self):
+        walls = [{'id': 1, 'points': [(-10.0, 0.0), (3.0, 0.0)], 'width': 1.0}]
+        result = self.layout('B', 10.0, 6.0, (0.0, 0.0), walls=walls)
+        self.assertTrue(any('crossing wall' in issue for issue in result['issues']))
 
 
 if __name__ == '__main__':
