@@ -69,7 +69,7 @@ def assert_recall_captions(window, locale):
         assert button.Content.DesiredSize.Width <= available + 0.1, (locale, button.Name, 'icon/text clipped', button.Content.DesiredSize.Width, available)
         position = button.TranslatePoint(Point(0, 0), window.window_body)
         assert position.X >= -0.1 and position.X + button.ActualWidth <= window.window_body.ActualWidth + 0.1, (locale, button.Name, 'button exceeds body')
-        assert button.ActualWidth == 128 and button.ActualHeight == 28, (locale, button.Name, 'icon/text role')
+        assert button.ActualWidth == window.FindResource('KlaIconTextButtonWidth') and button.ActualHeight == window.FindResource('KlaCompactHeight'), (locale, button.Name, 'icon/text role')
         count += 1
     assert count == 4, (locale, count)
     last = recall.pasteSelBtn.TranslatePoint(Point(0, recall.pasteSelBtn.ActualHeight), window.window_shell).Y
@@ -87,10 +87,12 @@ def validate_production_windows():
             try:
                 width, height = production_layout(window)
                 shell, chrome = window.window_shell, window._kla_chrome
-                assert chrome.header.ActualHeight == chrome.footer.ActualHeight == 24, (identity, state)
+                token = window.FindResource
+                chrome_row, inset = token('KlaChromeRow').Value, token('KlaBodyInset')
+                assert chrome.header.ActualHeight == chrome.footer.ActualHeight == chrome_row, (identity, state)
                 origin = window.window_body.TranslatePoint(Point(0, 0), shell)
-                assert abs(origin.X - 16) < 0.1 and abs(origin.Y - 32) < 0.1, (identity, state, origin)
-                assert abs(window.window_body.ActualWidth - (width - 32)) < 1, (identity, state)
+                assert abs(origin.X - inset.Left) < 0.1 and abs(origin.Y - (chrome_row + inset.Top)) < 0.1, (identity, state, origin)
+                assert abs(window.window_body.ActualWidth - (width - inset.Left - inset.Right)) < 1, (identity, state)
                 assert window.window_body.ActualHeight > 0, (identity, state)
                 assert window.window_body.IsEnabled == (state != 'Disabled'), (identity, state)
                 assert chrome.close_button.IsEnabled, (identity, state)
@@ -103,13 +105,13 @@ def validate_production_windows():
                     if isinstance(control, TextBox) and (control.Name.startswith(('input_', 'UI_view_', 'UI_sheet_'))
                             or control.Name in ('textbox_filter', 'UI_offset', 'search_tb',
                                                 'topplane_input', 'cutplane_input', 'bottomplane_input', 'viewdepth_input')):
-                        assert abs(control.ActualHeight - 24) < 0.1, (identity, state, control.Name, control.ActualHeight)
+                        assert abs(control.ActualHeight - token('KlaCompactFieldHeight')) < 0.1, (identity, state, control.Name, control.ActualHeight)
                         assert control.ActualWidth > 20, (identity, state, control.Name)
                         if control.Name.startswith(('input_', 'UI_view_', 'UI_sheet_')):
-                            assert abs(control.ActualWidth - 240) < 0.1, (identity, state, control.Name, 'naming field width', control.ActualWidth)
+                            assert abs(control.ActualWidth - token('KlaCompactFieldInputColumn').Value) < 0.1, (identity, state, control.Name, 'naming field width', control.ActualWidth)
                         assert AutomationProperties.GetName(control), (identity, control.Name, 'unnamed field')
                     if isinstance(control, Label) and control.Style == window.Resources['KlaFoundationPromptLabel']:
-                        assert control.FontSize == 14, (identity, state, 'prompt')
+                        assert control.FontSize == token('KlaTitleFontSize'), (identity, state, 'prompt')
 
                 if identity in FOOTER_ACTIONS:
                     action = getattr(window, FOOTER_ACTIONS[identity])

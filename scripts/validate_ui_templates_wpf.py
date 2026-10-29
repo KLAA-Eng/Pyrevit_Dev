@@ -38,24 +38,25 @@ def validate_template_family():
             shell.Arrange(Rect(0, 0, width, height))
             shell.UpdateLayout()
             settle_layout(shell)
-            assert window._kla_chrome.header.ActualHeight == window._kla_chrome.footer.ActualHeight == 24
+            token = window.FindResource
+            assert window._kla_chrome.header.ActualHeight == window._kla_chrome.footer.ActualHeight == token('KlaChromeRow').Value
             assert window._kla_chrome.title.ToolTip is None
             assert window.window_body.IsEnabled == (state != 'Disabled')
             if identity == 'template-form':
                 assert window.form_prompt.Style == window.Resources['KlaFoundationPromptLabel']
-                assert window.form_prompt.FontSize == 14 and str(window.form_prompt.FontWeight) == 'Normal'
+                assert window.form_prompt.FontSize == token('KlaTitleFontSize') and str(window.form_prompt.FontWeight) == 'Normal'
                 fields = [getattr(window, 'input_' + name) for name in ('find', 'replace', 'prefix', 'suffix')]
                 assert not hasattr(window, 'preview_lines')
-                assert window.naming_group.Padding == Thickness(12)
+                assert window.naming_group.Padding == token('KlaSectionPadding')
                 for field in fields:
-                    assert field.ActualWidth == 240 and field.ActualHeight == 24, (state, field.Name, field.ActualWidth, field.ActualHeight)
+                    assert field.ActualWidth == token('KlaCompactFieldInputColumn').Value and field.ActualHeight == token('KlaCompactFieldHeight'), (state, field.Name, field.ActualWidth, field.ActualHeight)
                     label = next(control for control in window.naming_group.Child.Children
                                  if isinstance(control, Label) and control.Target == field)
-                    assert label.ActualWidth == 60 and str(label.VerticalContentAlignment) == 'Center'
+                    assert label.ActualWidth == token('KlaCompactFieldLabelColumn').Value and str(label.VerticalContentAlignment) == 'Center'
                     assert label.Content.endswith(':')
                 for previous, following in zip(fields, fields[1:]):
                     gap = following.TranslatePoint(Point(0, 0), shell).Y - previous.TranslatePoint(Point(0, previous.ActualHeight), shell).Y
-                    assert gap == 8, gap
+                    assert gap == token('KlaGridSpace8').Value, gap
             if identity == 'template-message':
                 assert not window.message_expander.IsExpanded
                 assert window.MinHeight <= window.Height <= window.MaxHeight == 640
@@ -77,15 +78,15 @@ def validate_template_family():
                     window.message_scroll.ScrollToTop()
                     settle_layout(shell)
             if identity == 'template-options':
-                assert window.options_fields.ColumnDefinitions[0].ActualWidth == 60
+                assert window.options_fields.ColumnDefinitions[0].ActualWidth == token('KlaCompactFieldLabelColumn').Value
                 assert isinstance(window.option_include_existing, CheckBox)
                 assert window.option_include_existing.Content == 'Include Existing'
                 assert not hasattr(window, 'option_toggle')
                 for field in (window.option_category, window.option_offset, window.option_path):
-                    assert field.ActualHeight == 24, (state, field.Name, field.ActualHeight)
+                    assert field.ActualHeight == token('KlaCompactFieldHeight'), (state, field.Name, field.ActualHeight)
                 for prompt in (window.options_prompt, window.output_prompt):
                     assert prompt.Style == window.Resources['KlaFoundationPromptLabel']
-                    assert prompt.FontSize == 14 and str(prompt.FontWeight) == 'Normal'
+                    assert prompt.FontSize == token('KlaTitleFontSize') and str(prompt.FontWeight) == 'Normal'
             if identity == 'template-options' and state == 'Disabled':
                 for widget in (window.option_category, window.scope_selected, window.option_include_existing):
                     labels = [item for item in descendants(widget) if isinstance(item, TextBlock) and item.Text]

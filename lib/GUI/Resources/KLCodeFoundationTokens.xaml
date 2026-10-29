@@ -50,4 +50,37 @@
     <SolidColorBrush x:Key="KlaWarningBrush" Color="#E8C66A"/>
     <SolidColorBrush x:Key="KlaErrorBrush" Color="#E89E96"/>
 
+    <!-- Typed layout tokens for the values the design rules name. WPF resolves CornerRadius / Thickness / GridLength resources
+         directly, so the foundation and components reference these instead of literals (scripts/check_ui_scale.py keeps it so). -->
+    <Thickness x:Key="KlaHairline">1</Thickness>
+    <CornerRadius x:Key="KlaRadiusCard">8</CornerRadius>
+    <CornerRadius x:Key="KlaRadiusControl">6</CornerRadius>
+    <CornerRadius x:Key="KlaRadiusChip">4</CornerRadius>
+    <CornerRadius x:Key="KlaRadiusCheck">2</CornerRadius>
+    <CornerRadius x:Key="KlaRadiusRadio">8</CornerRadius>
+    <GridLength x:Key="KlaHeaderSideColumn">86</GridLength>
+    <GridLength x:Key="KlaFooterSideColumn">100</GridLength>
+    <sys:Double x:Key="KlaWordmarkWidth">70</sys:Double>
+    <sys:Double x:Key="KlaWordmarkHeight">12</sys:Double>
+    <sys:Double x:Key="KlaCloseWidth">60</sys:Double>
+    <sys:Double x:Key="KlaCloseHeight">18</sys:Double>
+    <sys:Double x:Key="KlaCloseFontSize">10</sys:Double>
+    <Thickness x:Key="KlaCloseGlyphLift">0,0,0,2</Thickness>
+    <sys:Double x:Key="KlaFocusMarkHeight">2</sys:Double>
+    <Thickness x:Key="KlaFocusMarkInset">8,0,8,0</Thickness>
+    <sys:Double x:Key="KlaCheckSize">16</sys:Double>
+    <sys:Double x:Key="KlaCheckStroke">2</sys:Double>
+    <sys:Double x:Key="KlaRadioDotSize">6</sys:Double>
+    <sys:Double x:Key="KlaIconTextButtonWidth">128</sys:Double>
+    <sys:Double x:Key="KlaIconButtonWidth">28</sys:Double>
+    <sys:Double x:Key="KlaDropDownMaxHeight">260</sys:Double>
+    <Thickness x:Key="KlaComboTextInset">8,0,28,0</Thickness>
+    <Thickness x:Key="KlaComboArrowInset">0,0,8,0</Thickness>
+    <Thickness x:Key="KlaSectionPadding">12</Thickness>
+    <Thickness x:Key="KlaCompactInset">8,4</Thickness>
+    <Thickness x:Key="KlaHeaderCellInset">8,6</Thickness>
+    <Thickness x:Key="KlaReadoutPadding">8</Thickness>
+    <sys:Double x:Key="KlaReadoutMinHeight">64</sys:Double>
+    <sys:Double x:Key="KlaSplitterSize">4</sys:Double>
+
 </ResourceDictionary>

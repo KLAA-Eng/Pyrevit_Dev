@@ -47,7 +47,7 @@ class FoundationTemplateContracts(unittest.TestCase):
         self.assertNotIn('TranslateTransform', foundation)
         close = _style(_root('KLCodeFoundation.xaml'), 'KlaFoundationCloseButton')
         text = next(close.iter(P + 'TextBlock'))
-        self.assertEqual('0,0,0,2', text.attrib.get('Margin'))
+        self.assertEqual('{StaticResource KlaCloseGlyphLift}', text.attrib.get('Margin'))
 
     def test_checkbox_has_an_indeterminate_state(self):
         box = _style(_root('KLCodeFoundation.xaml'), 'KlaFoundationCheckBox')

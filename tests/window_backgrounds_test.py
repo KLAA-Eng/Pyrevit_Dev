@@ -130,7 +130,7 @@ class WindowBackgroundTests(unittest.TestCase):
             self.assertNotIn('x:Name="main_title"', xaml, relative_path)
         with open(os.path.join(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeFoundation.xaml'), encoding='utf-8') as stream:
             shell = stream.read()
-        self.assertIn('Width="70" Height="12"', shell)
+        self.assertIn('Width="{StaticResource KlaWordmarkWidth}" Height="{StaticResource KlaWordmarkHeight}"', shell)
         self.assertIn('ContentTemplate="{StaticResource KLCodeWordmark}"', shell)
         self.assertIn('Height="{StaticResource KlaChromeRow}"', shell)
         self.assertIn('Style="{StaticResource KlaFoundationCloseButton}"', shell)

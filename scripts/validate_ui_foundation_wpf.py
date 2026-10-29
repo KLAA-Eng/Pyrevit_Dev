@@ -99,38 +99,40 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
             print('Close visible-text center: {:.2f}, {:.2f}; button center: 30, 9.'.format(center_x, center_y))
             if output_directory:
                 render_close_detail(chrome.close_button, os.path.join(output_directory, 'close-control-4x.png'))
-            assert text.TranslatePoint(Point(0, 0), check).X - 16 == room_text_gap
+            assert text.TranslatePoint(Point(0, 0), check).X - token('KlaGridSpace16').Value == room_text_gap
             print('Main template: search {} high at y={}; row {} high, padding {}; checkbox text gap {}; list {} x {}; text width {}; scrollbars {}.'.format(
                 window.textbox_filter.ActualHeight, window.textbox_filter.TranslatePoint(Point(0, 0), shell).Y,
                 row.ActualHeight, row.Padding, text.TranslatePoint(Point(0, 0), check).X - 16,
                 window.main_ListBox.ActualWidth, window.main_ListBox.ActualHeight, text.ActualWidth,
                 [(str(bar.Orientation), bar.ActualWidth) for bar in bars]))
-        assert chrome.header.ActualHeight == chrome.footer.ActualHeight == 24
+        token = window.FindResource
+        chrome_row, inset, pair_gap = token('KlaChromeRow').Value, token('KlaBodyInset'), token('KlaPairGap').Right
+        assert chrome.header.ActualHeight == chrome.footer.ActualHeight == chrome_row
         assert chrome.title.Text == shell.Tag.Title
         assert chrome.title.ToolTip is None and window.ToolTip is None
         assert chrome.version.Text == tool_version
-        assert str(chrome.version.Foreground) == '#FF808080'
-        assert str(chrome.prototype.Foreground) == '#FF407058'
-        assert str(chrome.outreach.Foreground) == '#FF407058'
+        assert str(chrome.version.Foreground) == str(token('KlaTextMutedBrush'))
+        assert str(chrome.prototype.Foreground) == str(token('KlaAccentHoverBrush'))
+        assert str(chrome.outreach.Foreground) == str(token('KlaAccentHoverBrush'))
         assert window.textbox_filter.ActualHeight == room_filter_height
-        assert window.textbox_filter.FontSize == 14
-        assert window.textbox_filter.TranslatePoint(Point(0, 0), shell).Y == 32
+        assert window.textbox_filter.FontSize == token('KlaTitleFontSize')
+        assert window.textbox_filter.TranslatePoint(Point(0, 0), shell).Y == chrome_row + inset.Top
         assert window.text_label.FontSize == prompt_font_size
         window.button_main.ApplyTemplate()
         assert window.button_main.Template.FindName('ButtonBorder', window.button_main).BorderBrush.Color.A == 0
         assert str(window.FontFamily) == 'Segoe UI'
-        assert window.FontSize == 12 and chrome.title.FontSize == 14
-        assert window.button_main.ActualWidth == 216 and window.button_main.ActualHeight == 32
+        assert window.FontSize == token('KlaBodyFontSize') and chrome.title.FontSize == token('KlaTitleFontSize')
+        assert window.button_main.ActualWidth == token('KlaMainButtonWidth') and window.button_main.ActualHeight == token('KlaControlHeight')
         buttons = list(window.UI_Buttons_all_none.Children)
-        assert all(button.ActualWidth == 104 and button.ActualHeight == 28 for button in buttons)
+        assert all(button.ActualWidth == token('KlaButtonWidth') and button.ActualHeight == token('KlaCompactHeight') for button in buttons)
         body_origin = window.window_body.TranslatePoint(Point(0, 0), shell)
-        assert body_origin.X == 16 and body_origin.Y == 32
+        assert body_origin.X == inset.Left and body_origin.Y == chrome_row + inset.Top
         first = buttons[0].TranslatePoint(Point(0, 0), shell)
         second = buttons[1].TranslatePoint(Point(0, 0), shell)
         main = window.button_main.TranslatePoint(Point(0, 0), shell)
-        assert second.X - first.X - 104 == 8
-        assert main.X == first.X and main.Y - first.Y - 28 == 8
-        assert chrome.footer.TranslatePoint(Point(0, 0), shell).Y - main.Y - 32 == 8
+        assert second.X - first.X - token('KlaButtonWidth') == pair_gap
+        assert main.X == first.X and main.Y - first.Y - token('KlaCompactHeight') == token('KlaGridSpace8').Value
+        assert chrome.footer.TranslatePoint(Point(0, 0), shell).Y - main.Y - token('KlaControlHeight') == inset.Bottom
         assert window.window_body.IsEnabled == (state != 'Disabled')
         assert chrome.close_button.IsEnabled
         if state == 'Long content':
@@ -145,7 +147,7 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
         if state == 'Disabled':
             labels = [element for element in descendants(window.main_ListBox)
                       if isinstance(element, TextBlock) and element.Text]
-            assert labels and all(str(label.Foreground) == '#FFA6B0AD' for label in labels)
+            assert labels and all(str(label.Foreground) == str(token('KlaDisabledTextBrush')) for label in labels)
         if output_directory:
             render(window, os.path.join(output_directory, 'main-template-' + state.lower().replace(' ', '-') + '.png'), 432, 576)
         if state != 'Disabled':

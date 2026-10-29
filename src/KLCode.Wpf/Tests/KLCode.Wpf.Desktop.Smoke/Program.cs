@@ -68,7 +68,8 @@ internal static class Program
         FrameworkElement header = (FrameworkElement)shell.Template.FindName("PART_Header", shell);
         FrameworkElement footerGrid = (FrameworkElement)shell.Template.FindName("PART_Footer", shell);
         Require(footer.Text == version, identity + " caller version");
-        Require(header.ActualHeight == 24 && footerGrid.ActualHeight == 24, identity + " chrome heights");
+        double chromeRow = ((GridLength)window.FindResource("KlaChromeRow")).Value;
+        Require(header.ActualHeight == chromeRow && footerGrid.ActualHeight == chromeRow, identity + " chrome heights");
         Require(window.FindResource("KlaIconSearch") is DrawingImage, identity + " canonical vector search");
         Border infoChip = new Border { Style = (Style)window.FindResource("KlaInfoChipStyle") };
         Require(((SolidColorBrush)infoChip.BorderBrush).Color ==
@@ -85,7 +86,7 @@ internal static class Program
                 FrameworkElement parent = (FrameworkElement)choices[0].Parent;
                 double first = choices[0].TranslatePoint(new Point(0, 0), parent).X;
                 double second = choices[1].TranslatePoint(new Point(0, 0), parent).X;
-                Require(Math.Abs(second - first - choices[0].ActualWidth - 8) < 0.1,
+                Require(Math.Abs(second - first - choices[0].ActualWidth - ((Thickness)window.FindResource("KlaPairGap")).Right) < 0.1,
                     group + " related-choice gap");
             }
             Button favorite = (Button)window.FindName("FavoriteButton");
@@ -100,9 +101,11 @@ internal static class Program
         {
             if (HasCollapsedAncestor(button)) continue;
             if ((string)button.Content == "Close") continue;
-            Require(button.ActualWidth == 104 || button.ActualWidth == 216,
+            double buttonWidth = (double)window.FindResource("KlaButtonWidth"), mainWidth = (double)window.FindResource("KlaMainButtonWidth");
+            double compactHeight = (double)window.FindResource("KlaCompactHeight"), controlHeight = (double)window.FindResource("KlaControlHeight");
+            Require(button.ActualWidth == buttonWidth || button.ActualWidth == mainWidth,
                 identity + " button width: " + button.Content + " = " + button.ActualWidth);
-            Require(button.ActualHeight == 28 || button.ActualHeight == 32,
+            Require(button.ActualHeight == compactHeight || button.ActualHeight == controlHeight,
                 identity + " button height: " + button.Content + " = " + button.ActualHeight);
         }
         if (output is not null)

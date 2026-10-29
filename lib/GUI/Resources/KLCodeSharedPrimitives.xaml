@@ -8,13 +8,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Border x:Name="rectangle" Background="{StaticResource text_green}" Height="{TemplateBinding Height}" SnapsToDevicePixels="True" Width="{TemplateBinding Width}" CornerRadius="8" />
+                    <Border x:Name="rectangle" Background="{StaticResource KlaBorderBrush}" Height="{TemplateBinding Height}" SnapsToDevicePixels="True" Width="{TemplateBinding Width}" CornerRadius="8" />
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="true">
-                            <Setter Property="Background" TargetName="rectangle" Value="{StaticResource text_green}" />
+                            <Setter Property="Background" TargetName="rectangle" Value="{StaticResource KlaBorderBrush}" />
                         </Trigger>
                         <Trigger Property="IsDragging" Value="true">
-                            <Setter Property="Background" TargetName="rectangle" Value="{StaticResource text_green}" />
+                            <Setter Property="Background" TargetName="rectangle" Value="{StaticResource KlaBorderBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -23,7 +23,7 @@
     </Style>
     <Style x:Key="KLCodeFooterLink" TargetType="Hyperlink">
         <Setter Property="FontWeight" Value="Medium" />
-        <Setter Property="Foreground" Value="{StaticResource button_bg_hover}" />
+        <Setter Property="Foreground" Value="{StaticResource KlaAccentHoverBrush}" />
     </Style>
     <DataTemplate x:Key="KLCodeWordmark">
         <Viewbox Width="70" Height="12" Stretch="Uniform" SnapsToDevicePixels="True">
@@ -42,9 +42,9 @@
         </Viewbox>
     </DataTemplate>
     <Style TargetType="ScrollBar">
-        <Setter Property="Background" Value="{StaticResource header_background}" />
-        <Setter Property="Foreground" Value="{StaticResource header_background}" />
-        <Setter Property="BorderBrush" Value="{StaticResource header_background}" />
+        <Setter Property="Background" Value="{StaticResource KlaWindowBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource KlaWindowBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource KlaWindowBrush}" />
         <Setter Property="Opacity" Value="0.9" />
         <Setter Property="Margin" Value="3" />
         <Setter Property="Template">
