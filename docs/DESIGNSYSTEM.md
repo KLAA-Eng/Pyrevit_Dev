@@ -82,7 +82,8 @@ component, even when two roles currently have the same color.
 
 | Resource key | Hex | Intended use |
 | --- | --- | --- |
-| `KlaFocusBrush` | `#E5E4E2` | Keyboard focus underline or field border |
+| `KlaFocusBrush` | `#E5E4E2` | Input/dropdown focus border and link focus text; no button underline |
+| `KlaKeyboardFocusBrush` | `#91C8A6` | Keyboard-only green button/check/radio/toggle adorner |
 | `KlaPressedBrush` | `#204D3A` | Pressed buttons/options and selected table cells |
 | `KlaDisabledFillBrush` | `#303C40` | Disabled action/dropdown fill |
 | `KlaDisabledTextBrush` | `#A6B0AD` | Disabled control text and foreground-aware icons |
@@ -134,7 +135,7 @@ a second palette or set of control templates.
 ### In-window GUI icons
 
 Use the approved semantic roles in the **[GUI icon catalog](../lib/_icons/gui/README.md)**.
-That catalog owns the complete 17-role key table, from Search and Favorite to
+That catalog owns the complete 18-role key table, from Search and Group to
 Information, Warning, Error and Success. Original SVGs, the pinned revision in
 [source.json](../lib/_icons/gui/source.json), and
 [license notices](../lib/_icons/gui/LICENSE.lucide.txt) stay together.
@@ -477,7 +478,7 @@ the deployed DLLs.
 | Enter | Explicit `IsDefault="True"` identifies a default action. The visual primary style does not set it. Find/Replace Views, Find/Replace Sheets and Steel PSF currently omit it on their main actions. |
 | Escape | Shared adapters request the Close policy. Python WPFWindow subclasses also retain the host handler described above. |
 | Cancel | Use an explicit caller cancellation policy; `IsCancel="True"` is a WPF dialog setting, not a substitute for validating modeless/custom-close behavior. |
-| Focus | Visible marks/borders must not move layout; footer focus changes color without changing text weight. |
+| Focus | Buttons/checks/radios/toggles use the green keyboard-only `KlaKeyboardFocusVisual` adorner. Mouse focus does not leave a white underline or square-border override. Inputs/dropdowns retain field-focus outlines; footer focus changes color without reflow. |
 | Disabled body | Disable the body so header Close remains usable. Use semantic disabled brushes; verify both text and interactive icons. |
 | Names and labels | Give inputs/actions meaningful AutomationProperties.Name values; connect Label.Target to its field. Name the containing action when its icon is decorative. |
 | Long content | Bound and scroll long text/lists, retain readable labels and check minimum sizes, DPI/work-area placement and keyboard reachability in Revit. |
@@ -541,10 +542,18 @@ Message/details overflow is bounded and scrollable. Initial Message height fits
 content; manual width changes no longer force a new height. Deferred Details
 measurement grows the bottom and protects the message viewport until capped.
 Text removes only its footer row and uses the larger Segoe UI Bold field,
-content-fitting prompt/error height and single-line entry. Command Switch is a
+content-fitting prompt/error height and single-line entry. Its only visible
+action is OK; prompt/input and input-or-error/OK gaps are 8 units. Close/Escape
+still cancels. Shared selectors open at 432 x 576 like the Selection template.
+Search sits above optional Group; both fields are 24 high and align after their
+16-unit Search/Layers-2 icons plus an 8-unit gap. Template section gaps and a
+centered gray Select All/None pair above green Select replace the former action
+row; Close/Escape cancels. Command Switch is a
 compact, fixed-width, content-height floating panel without header/footer. Its
-buttons choose immediately, toggles remain visible during filtering, corner x
-cancels, and blank panel clicks leave it open.
+buttons choose immediately and toggles remain visible during filtering. It has
+no corner x and starts with neutral panel focus rather than selected search;
+typing or Tab can enter search. Escape clears search then cancels; blank panel
+clicks leave it open.
 
 Search **Shared dialog** in Gallery for Sheets, Revisions, Open Documents, List
 Single, List Multiple, Message, Text, Command Switch and existing Action choice.
@@ -647,6 +656,11 @@ dotnet test src/KLCode.Wpf/Tests/KLCode.Wpf.Source.Tests --no-restore
 dotnet run --project src/KLCode.Wpf/Tests/KLCode.Wpf.Desktop.Smoke --framework net48 --no-restore -- <tmp>
 dotnet run --project src/KLCode.Wpf/Tests/KLCode.Wpf.Desktop.Smoke --framework net8.0-windows --no-restore -- <tmp>
 ```
+
+Add `-ShowFocusProbe` to the WPF command to briefly show and close two owned
+fictional windows. It checks neutral Command Switch initial focus through UIA
+and verifies retained programmatic button/checkbox focus without white marks.
+No Revit session or user document is used. Default probe execution stays offscreen.
 
 Replace `<tmp>` with a writable evidence directory. The probes default to the
 installed IronPython engine location and the .NET commands require restored

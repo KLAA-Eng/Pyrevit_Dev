@@ -21,7 +21,12 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   accepted. Required selection validates before closing. Both modes use the
   same checkbox style. Single checking unchecks any previous row, including
   hidden rows. Select explicitly accepts; Enter/double-click never accept.
-  Batch controls are absent in single mode.
+  Batch controls are absent in single mode. Initial size is 432 x 576, matching
+  the Selection template. Search precedes the optional group dropdown; both are
+  24 high and align after 16-unit Search/Group icons plus an 8-unit gap. The
+  Group role uses Lucide Layers-2. Template 8/4-unit vertical gaps separate the
+  sections. Gray Select All/None buttons center above the single green Select
+  action, with an 8-unit row gap. No visible Cancel button; Close/Escape cancels.
 - AC-004: Action choices return a stable key after explicit selection and
   confirmation. Disabled choices cannot be accepted; no initial choice exists.
   Its existing layout/keyboard behavior stays unchanged; redesign is deferred.
@@ -29,7 +34,9 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   cancellation. Required and optional caller validation show inline feedback.
   Compact height fits prompt/validation. Input is 36 high, FontSize 24, centered
   Segoe UI Bold with KLCode colors. Retain title/Close; remove footer and its
-  reserved row. Enter accepts valid text; Escape cancels.
+  reserved row. Prompt/input and input-or-validation/OK gaps are 8. The only
+  visible action is OK; no Cancel button. Content-driven minimum height avoids
+  extra blank space. Enter accepts valid text; title Close/Escape cancels.
 - AC-006: Existing shared palette, typography, controls and icons remain the
   presentation authority. Standard bodies use the shell/green-gray footer;
   Text opts out of the footer only; floating Command Switch has its own compact
@@ -52,12 +59,18 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   All collectors preserve payload identity and perform no transaction/mutation.
 - AC-009: Separate Command Switch matches the compact floating pyRevit layout
   with KLCode colors: prompt/search, wrapping immediate command buttons,
-  optional toggles, corner x; no shared header/footer or Continue button.
+  optional toggles; no corner x, shared header/footer or Continue button.
+  Initial focus is the neutral panel, not the search field. Typing or Tab can
+  enter search; it is not selected automatically on open.
   Typing filters commands only; toggles retain state/visibility. Tab traverses,
   Space toggles; Enter chooses a focused command or sole enabled match while
   search is focused, never a toggle. Escape clears search then cancels when
   empty. Blank panel clicks do not dismiss. Confirm returns action `accept`,
   value `{'command': key, 'switches': {key: bool}}`; cancel returns None.
+- AC-010: Shared buttons/checks/radios/toggles have no persistent white mouse-
+  focus underline or square-border override. Keyboard navigation uses the
+  shared green FocusVisualStyle adorner without reflow. Inputs/dropdowns keep
+  their existing field-focus styling. Controls remain focusable/keyboard usable.
 
 Prepared-row factories are host-independent; optional modal convenience helpers
 invoke collectors in a valid Revit API context before showing UI. Callers own

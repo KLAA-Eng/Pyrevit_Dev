@@ -51,13 +51,21 @@ records actual WPF results and live-host limits.
 The confirmed refinement uses explicit Select-button acceptance for both
 checkbox modes, content-stable Message Details, a compact footerless Text
 prompt with 36/24 Segoe UI Bold input, and a separate floating pyRevit-shaped
-KLCode Command Switch with search, persistent toggles and corner x. The latter
+KLCode Command Switch with search, persistent toggles and neutral initial focus.
+It has no corner x; Escape clears search and then cancels. The latter
 returns fictional outcomes immediately; it never invokes a chosen command.
 Action choice redesign is deferred and its window is unchanged. Read-only
 Revit collectors exist for future caller adoption but are not run by Gallery.
 [Refinement evidence](../../../../docs/knowledge/reviews/design-system/2026-10-29-dialog-refinement.md)
 owns the new regression/render checks. The shared Command Switch dictionary
 `lib/GUI/Resources/KLCodeCommandSwitch.xaml` is also a v0.5 version input.
+
+The owner's subsequent polish uses template-sized 432 x 576 shared selectors,
+Search above the aligned 24-high Group dropdown with Lucide Layers-2, centered
+gray Select All/None above Select, and template section spacing. Text has one
+OK action with 8-unit prompt/field/action gaps. Shared focus styles omit white
+mouse-focus marks and retain a keyboard-only green adorner. These previews
+still use fictional data and do not adopt the dialogs in production tools.
 
 ## Purpose
 

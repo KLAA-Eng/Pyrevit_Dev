@@ -1,8 +1,10 @@
 param(
     [string]$EngineDirectory = "$env:APPDATA/pyRevit-Master/bin/netfx/engines/IPY2712PR",
-    [string]$OutputDirectory = ''
+    [string]$OutputDirectory = '',
+    [switch]$ShowFocusProbe
 )
 # Isolated .NET Framework WPF validation, without a Revit process or model.
+# Default is offscreen; ShowFocusProbe briefly opens/closes two owned fixtures.
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase,System.IO.Compression
 $galleryEngineAssembly = [Reflection.Assembly]::LoadFrom((Join-Path $EngineDirectory 'pyRevitLabs.IronPython.dll'))
@@ -18,6 +20,7 @@ $galleryScope = $galleryEngine.CreateScope()
 $galleryScope.SetVariable('stdlib_stream', $galleryRunnerAssembly.GetManifestResourceStream('pyRevitRunner.python_2712pr_lib.zip'))
 $galleryScope.SetVariable('repo_root', (Split-Path -Parent $PSScriptRoot))
 $galleryScope.SetVariable('output_directory', $OutputDirectory)
+$galleryScope.SetVariable('show_focus_probe', [bool]$ShowFocusProbe)
 $galleryBootstrap = @'
 import sys
 import clr

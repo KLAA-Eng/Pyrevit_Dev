@@ -162,6 +162,27 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
+    <DrawingImage x:Key="KlaIconGroup">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,24,24" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M13 13.74a2 2 0 0 1-2 0L2.5 8.87a1 1 0 0 1 0-1.74L11 2.26a2 2 0 0 1 2 0l8.5 4.87a1 1 0 0 1 0 1.74z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="m20 14.285 1.5.845a1 1 0 0 1 0 1.74L13 21.74a2 2 0 0 1-2 0l-8.5-4.87a1 1 0 0 1 0-1.74l1.5-.845" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
     <DrawingImage x:Key="KlaIconInformation">
         <DrawingImage.Drawing>
             <DrawingGroup>
@@ -450,6 +471,18 @@
     </DrawingImage>
     <!-- generated-icons:end -->
 
+    <!-- WPF shows FocusVisualStyle for keyboard navigation, rather than for
+         the keyboard focus that a mouse click also gives a control. The
+         adorner does not replace a checkbox border or add a button underline. -->
+    <Style x:Key="KlaKeyboardFocusVisual" TargetType="Control">
+        <Setter Property="IsHitTestVisible" Value="False"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Control">
+            <Border BorderBrush="{StaticResource KlaKeyboardFocusBrush}" BorderThickness="{StaticResource KlaHairline}"
+                    CornerRadius="{StaticResource KlaRadiusControl}" Margin="{StaticResource KlaKeyboardFocusInset}"/>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+
     <Style x:Key="KlaFoundationWindow" TargetType="Window">
         <Setter Property="Background" Value="{StaticResource KlaWindowBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
@@ -464,6 +497,7 @@
     </Style>
 
     <Style x:Key="KlaFoundationButton" TargetType="Button">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource KlaKeyboardFocusVisual}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
         <Setter Property="Width" Value="{StaticResource KlaButtonWidth}"/>
@@ -479,13 +513,11 @@
                     Padding="{TemplateBinding Padding}">
                 <Grid>
                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-                    <Border x:Name="FocusMark" Height="{StaticResource KlaFocusMarkHeight}" Margin="{StaticResource KlaFocusMarkInset}" VerticalAlignment="Bottom" Background="{StaticResource KlaFocusBrush}" Visibility="Collapsed"/>
                 </Grid>
             </Border>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource KlaAccentHoverBrush}"/></Trigger>
                 <Trigger Property="IsPressed" Value="True"><Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusMark" Property="Visibility" Value="Visible"/></Trigger>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource KlaDisabledFillBrush}"/>
                     <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/>
@@ -543,6 +575,7 @@
         <Setter Property="FontSize" Value="{StaticResource KlaTitleFontSize}"/>
     </Style>
     <Style x:Key="KlaFoundationCheckBox" TargetType="CheckBox">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource KlaKeyboardFocusVisual}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
@@ -565,7 +598,6 @@
                 <Trigger Property="IsChecked" Value="{x:Null}"><Setter TargetName="IndeterminateMark" Property="Visibility" Value="Visible"/><Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource KlaAccentBrush}"/></Trigger>
                 <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource KlaAccentHoverBrush}"/></Trigger>
                 <Trigger Property="IsPressed" Value="True"><Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="CheckBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}"/></Trigger>
                 <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/><Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource KlaDisabledFillBrush}"/></Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate></Setter.Value></Setter>

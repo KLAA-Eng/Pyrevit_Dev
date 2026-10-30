@@ -39,7 +39,7 @@ ROLES = {
     'RectangleSelection': 'scan', 'CurrentSelection': 'check-check',
     'ListView': 'list', 'GridView': 'layout-grid', 'Favorite': 'star',
     'Information': 'info', 'Warning': 'triangle-alert', 'Error': 'circle-x',
-    'Success': 'circle-check',
+    'Success': 'circle-check', 'Group': 'layers-2',
 }
 
 

@@ -39,6 +39,7 @@ for icon-only and icon/text actions, fixed-color images and accessible naming.
 | Semantic role | Geometry | ImageSource |
 | --- | --- | --- |
 | Search | KlaSearchGeometry | KlaIconSearch |
+| Group / sheet set | KlaGroupGeometry | KlaIconGroup |
 | Text/filter mode | KlaTextFilterGeometry | KlaIconTextFilter |
 | Regex | KlaRegexGeometry | KlaIconRegex |
 | Clear search | KlaClearSearchGeometry | KlaIconClearSearch |
@@ -60,3 +61,12 @@ Message headings may use feedback symbols where applicable. Existing status
 chips retain words and borders. Larger Browse/Reset/Copy/Open Folder actions
 remain text-only. Icon artwork does not change a tool's classification or
 operation. Compiled hosts package this same dictionary through their adapter.
+
+The Group role uses [Lucide Layers-2](https://lucide.dev/icons/layers-2), chosen
+for the owner-requested shared-selector group dropdown on 2026-10-29. Its stack
+of sheets distinguishes grouping from Search while using the same presenter
+size, canvas and stroke. The [source SVG](https://github.com/lucide-icons/lucide/blob/be09619c1c1124ad09c19fc3e87ee3b939409bbd/icons/layers-2.svg)
+comes from the existing pinned revision. It contains two paths, requires no
+transform or renderer changes, and is covered by the retained Lucide ISC notice.
+The original SVG keeps its upstream stroke attribute; generated WPF uses the
+existing 1.5-unit token pen rather than that attribute.

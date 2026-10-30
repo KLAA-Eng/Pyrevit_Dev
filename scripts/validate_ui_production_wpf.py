@@ -27,7 +27,7 @@ PRODUCTION_IDS = (
 ICON_ROLES = ('Search', 'TextFilter', 'Regex', 'ClearSearch', 'ReadElement',
               'ReadViewFilters', 'FilterElement', 'PickElement',
               'RectangleSelection', 'CurrentSelection', 'ListView', 'GridView',
-              'Favorite', 'Information', 'Warning', 'Error', 'Success')
+              'Favorite', 'Information', 'Warning', 'Error', 'Success', 'Group')
 FOOTER_ACTIONS = {
     'kla-select-from-dict': 'button_main',
     'kla-create-from-rooms': 'button_main',
@@ -236,8 +236,8 @@ def validate_gui_icons():
         owner.Foreground = resources['text_white']
         settle_layout(panel)
         if output_directory:
-            render_content(owner, os.path.join(output_directory, 'gui-icons-17-native.png'), 700, 224)
-        print('GUI icons: all17 geometry/DrawingImage resources load at24-unit bounds;16-unit presenters inherit foreground and show disabled stroke at1.5 thickness.')
+            render_content(owner, os.path.join(output_directory, 'gui-icons-18-native.png'), 700, 224)
+        print('GUI icons: all18 geometry/DrawingImage resources load at24-unit bounds;16-unit presenters inherit foreground and show disabled stroke at1.5 thickness.')
     finally:
         owner.Close()
 

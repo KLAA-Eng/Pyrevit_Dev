@@ -8,8 +8,8 @@
     <CornerRadius x:Key="KlaCommandPillRadius">12</CornerRadius>
     <Thickness x:Key="KlaCommandPillGap">0,0,8,8</Thickness>
     <Thickness x:Key="KlaCommandPillInset">12,4</Thickness>
-    <Thickness x:Key="KlaCommandCloseInset">0,0,32,8</Thickness>
     <Style x:Key="KlaCommandButton" TargetType="Button">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource KlaKeyboardFocusVisual}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}"/>
@@ -35,7 +35,6 @@
             <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{StaticResource KlaAccentHoverBrush}"/></Trigger>
                 <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="BorderBrush" Value="{StaticResource KlaFocusBrush}"/></Trigger>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/>
                     <Setter Property="Background" Value="{StaticResource KlaDisabledFillBrush}"/>
@@ -45,6 +44,7 @@
         </ControlTemplate></Setter.Value></Setter>
     </Style>
     <Style x:Key="KlaCommandToggle" TargetType="ToggleButton">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource KlaKeyboardFocusVisual}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
@@ -74,7 +74,6 @@
                     <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Right"/>
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{StaticResource KlaAccentHoverBrush}"/></Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="BorderBrush" Value="{StaticResource KlaFocusBrush}"/></Trigger>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/>
                     <Setter Property="Background" Value="{StaticResource KlaDisabledFillBrush}"/>

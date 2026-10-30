@@ -10,10 +10,9 @@
             Background="{StaticResource KlaWindowBrush}" BorderBrush="{StaticResource KlaBorderStrongBrush}"
             BorderThickness="{StaticResource KlaHairline}">
         <Border.Effect><DropShadowEffect Color="{Binding Color, Source={StaticResource KlaWindowBrush}}" BlurRadius="12" ShadowDepth="0" Opacity="0.4"/></Border.Effect>
-        <Grid>
-            <Grid x:Name="window_body">
+            <Grid x:Name="window_body" Focusable="True" KeyboardNavigation.IsTabStop="False" FocusVisualStyle="{x:Null}">
                 <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                <Grid x:Name="drag_region" MouseLeftButtonDown="drag_window" Margin="{StaticResource KlaCommandCloseInset}">
+                <Grid x:Name="drag_region" MouseLeftButtonDown="drag_window" Margin="0,0,0,8">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                     <Label x:Name="prompt_label" Target="{Binding ElementName=search_text}" MaxWidth="180"
                            Style="{StaticResource KlaPromptLabel}" VerticalAlignment="Center" Margin="0,0,8,0">
@@ -37,9 +36,5 @@
                 <TextBlock x:Name="status_text" Grid.Row="2" TextWrapping="Wrap" Foreground="{StaticResource KlaErrorBrush}"
                            Visibility="Collapsed" AutomationProperties.LiveSetting="Polite"/>
             </Grid>
-            <Button x:Name="close_button" Content="&#xD7;" Style="{StaticResource KlaIconButton}"
-                    HorizontalAlignment="Right" VerticalAlignment="Top" Click="cancel"
-                    AutomationProperties.Name="Close command switch" ToolTip="Close"/>
-        </Grid>
     </Border>
 </Window>

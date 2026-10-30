@@ -248,7 +248,8 @@ def _window_types():
             self.prompt_actions.Measure(bounds)
             desired = (self.FindResource('KlaChromeRow').Value + inset.Top + inset.Bottom
                        + self.prompt_fields.DesiredSize.Height + self.prompt_actions.DesiredSize.Height)
-            self.Height = max(self.MinHeight, min(self.MaxHeight, ceil(desired)))
+            self.MinHeight = min(self.MaxHeight, ceil(desired))
+            self.Height = self.MinHeight
 
         def feedback(self, text):
             DialogWindow.feedback(self, text)

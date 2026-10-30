@@ -163,6 +163,7 @@
     </Style>
 
     <Style x:Key="KlaRadioButton" TargetType="RadioButton">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource KlaKeyboardFocusVisual}"/>
         <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
@@ -179,12 +180,12 @@
                 <Trigger Property="IsChecked" Value="True"><Setter TargetName="RadioMark" Property="Visibility" Value="Visible"/><Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaAccentBrush}"/></Trigger>
                 <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaAccentHoverBrush}"/></Trigger>
                 <Trigger Property="IsPressed" Value="True"><Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="RadioBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}"/></Trigger>
                 <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate></Setter.Value></Setter>
     </Style>
     <Style x:Key="KlaToggle" TargetType="ToggleButton">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource KlaKeyboardFocusVisual}"/>
         <Setter Property="Width" Value="{StaticResource KlaButtonWidth}"/>
         <Setter Property="Height" Value="{StaticResource KlaCompactHeight}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
@@ -196,14 +197,12 @@
             <Border x:Name="ToggleBorder" Background="{TemplateBinding Background}" CornerRadius="{StaticResource KlaRadiusCard}" Padding="{TemplateBinding Padding}">
                 <Grid>
                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-                    <Border x:Name="ToggleFocus" Height="{StaticResource KlaFocusMarkHeight}" Margin="{StaticResource KlaFocusMarkInset}" VerticalAlignment="Bottom" Background="{StaticResource KlaFocusBrush}" Visibility="Collapsed"/>
                 </Grid>
             </Border>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsChecked" Value="True"><Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaAccentBrush}"/></Trigger>
                 <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaAccentHoverBrush}"/></Trigger>
                 <Trigger Property="IsPressed" Value="True"><Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="ToggleFocus" Property="Visibility" Value="Visible"/></Trigger>
                 <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaDisabledFillBrush}"/><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate></Setter.Value></Setter>
@@ -212,7 +211,7 @@
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}"/>
     </Style>
     <!-- Link: a text action on the surface (Clear filters, Favorites, Recent) — transparent at rest, surface on hover, the same
-         role width and focus mark as every button. Ghost: the same with a hairline border (Cancel beside a main action). -->
+         role width and keyboard-only focus adorner as every button. Ghost: the same with a hairline border (Cancel beside a main action). -->
     <Style x:Key="KlaLinkButton" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
@@ -222,13 +221,11 @@
                     BorderThickness="{StaticResource KlaHairline}" CornerRadius="{StaticResource KlaRadiusCard}" Padding="{TemplateBinding Padding}">
                 <Grid>
                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-                    <Border x:Name="FocusMark" Height="{StaticResource KlaFocusMarkHeight}" Margin="{StaticResource KlaFocusMarkInset}" VerticalAlignment="Bottom" Background="{StaticResource KlaFocusBrush}" Visibility="Collapsed"/>
                 </Grid>
             </Border>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="LinkBorder" Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}"/></Trigger>
                 <Trigger Property="IsPressed" Value="True"><Setter TargetName="LinkBorder" Property="Background" Value="{StaticResource KlaPressedBrush}"/></Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusMark" Property="Visibility" Value="Visible"/></Trigger>
                 <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate></Setter.Value></Setter>
@@ -239,6 +236,7 @@
     <!-- Segment: an exclusive choice drawn as a filled pill segment, not a radio circle (Family Studio's Families / Views,
          This Project / Library, List / Grid inside a KlaBorderStrongBrush pill). -->
     <Style x:Key="KlaSegmentButton" TargetType="RadioButton">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource KlaKeyboardFocusVisual}"/>
         <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
@@ -248,13 +246,11 @@
             <Border x:Name="SegmentBorder" Background="Transparent" Padding="{TemplateBinding Padding}">
                 <Grid>
                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
-                    <Border x:Name="FocusMark" Height="{StaticResource KlaFocusMarkHeight}" Margin="{StaticResource KlaFocusMarkInset}" VerticalAlignment="Bottom" Background="{StaticResource KlaFocusBrush}" Visibility="Collapsed"/>
                 </Grid>
             </Border>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}"/></Trigger>
                 <Trigger Property="IsChecked" Value="True"><Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource KlaAccentBrush}"/><Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}"/></Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusMark" Property="Visibility" Value="Visible"/></Trigger>
                 <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate></Setter.Value></Setter>

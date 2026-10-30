@@ -362,3 +362,22 @@ the active document, without explicitly excluding family documents. Generic
 pyRevit search supports fuzzy ranking/regex; these are optional behavior choices.
 The floating command switch supports optional toggles, keyboard filtering and
 immediate command choices; it has no separate Continue button.
+
+## Owner dialog polish — 2026-10-29
+
+The owner's latest direct feedback supersedes the earlier visible Cancel/
+corner-x/initial-focus decisions for Text, Selection and Command Switch.
+It also authorizes removing persistent white button/check focus decorations
+through the shared GUI system. No new interview gate applies to these explicit
+requests; Action choice redesign remains deferred under GUI-22.
+
+| ID | Scope | Status | Acceptance / evidence |
+| --- | --- | --- | --- |
+| GUI-27 | Text, Selection and Command Switch polish | Implemented; locally verified | Text has 8-unit prompt/input/action gaps and OK only. Selector starts at 432 x 576, follows template spacing/button layout, uses gray batch buttons, Search above a 24-high aligned Group field and licensed Lucide Layers-2. Switch has no x/autofocus and keeps typing/Tab/Escape. Exact WPF bounds and two shown focus fixtures pass. |
+| GUI-28 | Shared focus decoration | Implemented; locally verified | No persistent white button underline/check-border override; green keyboard-only FocusVisualStyle. Three new contracts and 15 actual style roles pass; input/dropdown focus, footer colors and checked/hover/disabled behavior retained. Both compiled runtimes load updated resources. |
+
+[Polish verification and renders](../knowledge/reviews/design-system/2026-10-29-dialog-polish.md)
+own the dated evidence. The main Gallery/WPF probe remains offscreen by default;
+`-ShowFocusProbe` separately shows and closes two owned fictional windows.
+Physical keyboard/pointer/DPI and Revit owner/model acceptance remain bounded
+host checks. Compiled source/smoke verification does not replace deployed DLLs.

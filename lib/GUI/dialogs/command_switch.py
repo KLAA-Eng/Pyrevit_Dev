@@ -85,7 +85,10 @@ def _window_type():
             self.Closed += self.closed
 
         def loaded(self, sender, args):
-            self.search_text.Focus()
+            # Start on the neutral panel. Typing routes into search explicitly,
+            # while Tab can still reach it without an initial selected field.
+            if not self.window_body.Focus():
+                self.Focus()
             self.fit_height()
 
         def closed(self, sender, args):

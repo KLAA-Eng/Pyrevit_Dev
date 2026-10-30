@@ -14,7 +14,7 @@ X = '{' + icons.XAML + '}'
 
 class GuiIconTests(unittest.TestCase):
     def test_generated_geometry_dictionary_is_a_leaf_that_matches_the_sources(self):
-        self.assertEqual(17, len(icons.ROLES))
+        self.assertEqual(18, len(icons.ROLES))
         self.assertEqual(icons.generate_icons(), (icons.ASSETS / 'KLCodeIcons.xaml').read_text(encoding='utf-8'))
         dictionary = ET.fromstring(icons.generate_icons())
         self.assertEqual({P + 'GeometryGroup'}, {node.tag for node in dictionary})

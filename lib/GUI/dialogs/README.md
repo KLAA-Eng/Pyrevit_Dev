@@ -71,6 +71,9 @@ Text options are `default=''`, `required=False`, `validator=None`. The field is
 36 high, FontSize 24, centered Segoe UI Bold. Compact height fits prompt/error;
 long prompts scroll at the cap. Title/Close remain; `WindowChrome.hide_footer()`
 collapses only this template instance's footer row. Other windows keep theirs.
+Prompt/input and input-or-validation/OK gaps are 8 units. OK is the only visible
+action; title Close or Escape cancels. Natural minimum height keeps these gaps
+instead of stretching blank space above the action.
 Required checks whitespace without changing the returned string. A pure, quick
 validator returns an error string or None; unexpected exceptions propagate as
 programming errors. Editing clears feedback. Initial focus selects default text.
@@ -100,10 +103,17 @@ Options: `groups=None`, `prompt='Select Items'`, `required=True`,
 `all_label='All Items'`. Group names derive in input order unless supplied as
 `SelectionGroup(key, label)` rows. None is reserved for the implicit All group.
 Search matches label/description case-insensitively without regex or reordering.
-Group/search filters intersect. Hidden checks remain in the result. All Visible
-/ None Visible affects visible eligible rows only and is absent in single mode.
+Group/search filters intersect. Hidden checks remain in the result. Select All
+/ Select None affects visible eligible rows only and is absent in single mode.
 Disabled rows cannot be accepted. Optional multiple selection may accept an
 empty list; optional single selection may accept None. Inspect action.
+
+Initial size is the Selection template's 432 x 576 (minimum 432 x 420). Search
+comes first; the optional group dropdown below it is also 24 high. Both fields
+align after 16-unit icons and an 8-unit gap. Group uses Lucide Layers-2 through
+`KlaGroupGeometry`. Section spacing follows the template's 8/4-unit gaps; gray
+Select All/None buttons center above green Select with an 8-unit gap. No visible
+Cancel action; header Close/Escape cancels. Counts/validation remain visible.
 
 The separate [collectors module](collectors.py) exposes:
 
@@ -146,16 +156,17 @@ if result.action == 'accept':
 `ActionChoice(key, label, description='', enabled=True)` and
 `CommandSwitch(key, label, checked=False, enabled=True)` require unique hashable
 non-None keys within each collection. The floating panel has prompt/search,
-wrapping immediate command buttons, optional toggle pills and a corner x. No
+wrapping immediate command buttons and optional toggle pills. No corner x,
 standard header/footer or Continue action. KLCode colors/roles come from
 [KLCodeCommandSwitch.xaml](../Resources/KLCodeCommandSwitch.xaml), which merges
 Components and defines opt-in styles. No upstream XAML/assets are copied.
 
-Typing moves to search and filters command labels/descriptions; optional toggles
+Initial focus rests on the neutral panel; search is neither focused nor selected
+on open. Typing moves to search and filters command labels/descriptions; optional toggles
 stay visible and keep cloned state. Tab traverses, Space toggles. Enter chooses
 the focused enabled command or sole enabled match while search is focused;
 Enter on a toggle never chooses a command. Escape clears search first, then
-cancels when empty. Corner x cancels. Blank panel clicks do not dismiss. Height
+cancels when empty. Blank panel clicks do not dismiss. Height
 fits content up to 500, then scrolls. Button descriptions are tooltips/help text.
 The result is `{'command': key, 'switches': {key: bool}}`; caller commands never run.
 
@@ -172,3 +183,10 @@ controls, bounded layout, regression cases and results without showing windows.
 Direct keyboard-handler dispatch does not prove live input/focus. Revit data,
 owner/modal lifetime, pointer-driven resize flicker, keyboard traversal and DPI
 remain explicitly identified host acceptance checks.
+
+The opt-in `-ShowFocusProbe` Windows run briefly opens two owned fictional
+windows: UIA identifies the search field, initial Command Switch focus stays on
+the neutral panel, and programmatically focused buttons/checks retain their
+normal borders. This does not establish physical keyboard/pointer routing or
+Revit ownership. Shared focus resources use a green keyboard-only adorner;
+there is no persistent white mouse-focus underline/square-border override.

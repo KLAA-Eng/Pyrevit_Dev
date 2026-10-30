@@ -28,10 +28,8 @@ def dialog_layout(window, width=None, height=None):
     if not hasattr(window, '_kla_chrome'):
         assert str(window.Background) == '#00FFFFFF' or window.Background.Color.A == 0
         assert window.MaxHeight == 500 and not hasattr(window, 'window_shell')
-        assert window.close_button.IsEnabled
-        position = window.close_button.TranslatePoint(Point(0, 0), window.Content)
-        assert position.X >= 0 and position.Y >= 0
-        assert position.X + window.close_button.ActualWidth <= width
+        assert not hasattr(window, 'close_button')
+        assert window.window_body.Focusable and not window.search_text.IsKeyboardFocusWithin
         return window
     chrome = window._kla_chrome
     assert chrome.header.ActualHeight == 24
@@ -93,6 +91,27 @@ def validate_shared_dialogs():
                 assert window.accept_button.IsDefault == (not hasattr(window, 'items_list'))
             if hasattr(window, 'items_list'):
                 assert window.state.multiple == (identity != 'dialog-list-single')
+                assert window.Width == 432 and window.Height == 576
+                assert window.filter_text.ActualHeight == window.group_filter.Height == 24
+                assert window.accept_button.ActualWidth == 216 and window.accept_button.ActualHeight == 32
+                bottom = window.accept_button.TranslatePoint(Point(0, 32), window.Content).Y
+                assert abs(window._kla_chrome.footer.TranslatePoint(Point(0, 0), window.Content).Y - bottom - 8) < 1
+                if window.group_row.Visibility == Visibility.Visible:
+                    search = window.filter_text.TranslatePoint(Point(0, 0), window.Content)
+                    group = window.group_filter.TranslatePoint(Point(0, 0), window.Content)
+                    assert abs(search.X - group.X) < 1 and group.Y - search.Y == 32
+                    assert window.group_filter.ActualHeight == 24
+                    assert window.group_icon.Content == window.FindResource('KlaGroupGeometry')
+                if window.state.multiple:
+                    batch = list(window.batch_actions.Children)
+                    assert [button.Content for button in batch] == ['Select All', 'Select None']
+                    first = batch[0].TranslatePoint(Point(0, 0), window.Content)
+                    second = batch[1].TranslatePoint(Point(0, 0), window.Content)
+                    main = window.accept_button.TranslatePoint(Point(0, 0), window.Content)
+                    assert first.X == main.X and second.X - first.X == 112
+                    assert main.Y - first.Y - batch[0].ActualHeight == 8
+                    if state != 'Disabled':
+                        assert batch[0].Background == window.FindResource('KlaComponentSurfaceBrush')
                 if identity == 'dialog-sheets':
                     assert window.group_filter.Items[0].Label == 'All Sheets'
             if hasattr(window, 'message_expander'):
@@ -101,6 +120,16 @@ def validate_shared_dialogs():
                 assert window.input_text.ActualHeight == 36 and window.input_text.FontSize == 24
                 assert str(window.input_text.FontWeight) == 'Bold' and str(window.input_text.FontFamily) == 'Segoe UI'
                 assert window._kla_chrome.footer.Visibility == Visibility.Collapsed
+                buttons = [control for control in descendants(window.window_body) if isinstance(control, Button)]
+                assert len(buttons) == 1 and buttons[0] == window.accept_button
+                if state in ('Normal', 'Empty', 'Error'):
+                    label_bottom = window.prompt_label.TranslatePoint(Point(0, window.prompt_label.ActualHeight), window.Content).Y
+                    field_top = window.input_text.TranslatePoint(Point(0, 0), window.Content).Y
+                    assert abs(field_top - label_bottom - 8) < 1
+                    last = window.validation_text if state == 'Error' else window.input_text
+                    field_bottom = last.TranslatePoint(Point(0, last.ActualHeight), window.Content).Y
+                    button_top = window.accept_button.TranslatePoint(Point(0, 0), window.Content).Y
+                    assert abs(button_top - field_bottom - 8) < 1, (state, button_top - field_bottom)
                 if state == 'Error':
                     assert window.prompt_scroll.ScrollableHeight == 0, 'Validation must fit without clipping'
             if output_directory and state in ('Normal', 'Error', 'Long content'):
@@ -233,7 +262,7 @@ def validate_shared_dialogs():
     window.on_key_down(window, EscapeArgs())
     assert window.result.is_cancelled
     window = create_command_switch('Close', choices)
-    click(window.close_button)
+    window.Close()
     assert window.result.is_cancelled
 
     window = create_choice('Actions', [ActionChoice('a', 'A'), ActionChoice('b', 'B', enabled=False)])
