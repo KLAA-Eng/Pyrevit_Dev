@@ -72,6 +72,9 @@ namespace = {'__file__': command_path, '__name__': 'gallery_probe'}
 execfile(command_path, namespace)
 gallery = namespace['Gallery']()
 assert len(gallery._entries) == len(entries)
+gallery.EntriesGrid.SelectedItem = next(row for row in gallery.EntriesGrid.Items
+                                       if row.Entry['id'] == 'dialog-message')
+assert list(gallery.StateSelector.Items) == ['Normal', 'Empty', 'Warning', 'Error', 'Success', 'Disabled', 'Long content']
 source_column = next(column for column in gallery.EntriesGrid.Columns if column.Header == 'Window source')
 assert source_column.CanUserSort, 'Window source must support header sorting'
 gallery.Content.Measure(Size(gallery.Width, gallery.Height))

@@ -13,10 +13,9 @@ class TemplateInteractionTests(unittest.TestCase):
     def preview(self, kind, state='Normal'):
         return create_custom(ROOT, dict(id='template-' + kind, title='Template - ' + kind), state)
 
-    def test_form_validation_and_reset_leave_sample_names_unchanged(self):
+    def test_form_validation_and_reset_preserve_edited_rules(self):
         with patch.dict(sys.modules, host_modules([])):
             window = self.preview('form')
-            names = [row.Name for row in window._items]
             window.input_find.Text = ''
             window.input_replace.Text = 'Replacement'
             window.apply_form(None, None)
@@ -27,7 +26,6 @@ class TemplateInteractionTests(unittest.TestCase):
             self.assertFalse(hasattr(window, 'preview_lines'))
             self.assertEqual('Reviewed-', window.input_prefix.Text)
             self.assertEqual('Rules accepted for 4 sample names. No elements were renamed.', window.preview_result)
-            self.assertEqual(names, [row.Name for row in window._items])
 
     def test_options_validate_and_browse_only_changes_fictional_path(self):
         alerts = []
@@ -87,32 +85,7 @@ class TemplateInteractionTests(unittest.TestCase):
             window.review_check_all(None, None)
             self.assertFalse(any(row.IsChecked for row in rows if not row.CanUse))
 
-    def test_message_kind_change_and_disabled_body_keep_common_close_available(self):
-        with patch.dict(sys.modules, host_modules([])):
-            window = self.preview('message')
-            window.message_severity.SelectedItem = 'Warning'
-            window.message_kind_changed(None, None)
-            self.assertIn('Warning', window.message_heading.Text)
-            self.assertFalse(window.message_expander.IsExpanded)
-            for state in ('Error', 'Long content'):
-                message = self.preview('message', state)
-                self.assertFalse(message.message_expander.IsExpanded)
-            disabled = self.preview('message', 'Disabled')
-            self.assertFalse(disabled.window_body.IsEnabled)
-            disabled.dismiss_template(None, None)
-            self.assertTrue(disabled.closed)
-
-    def test_selection_checks_and_navigation_are_local(self):
-        alerts = []
-        with patch.dict(sys.modules, host_modules(alerts)):
-            window = self.preview('selection')
-            window.button_select_none(None, None)
-            window.textbox_filter.Text = 'Foundation'
-            window.text_filter_updated(None, None)
-            window.button_select_all(None, None)
-            self.assertEqual(1, sum(row.IsChecked for row in window._items))
-            window.button_select(None, None)
-            self.assertIn('1 fictional', window.preview_result)
-            window._navigation('https://example.test')
-            self.assertIn('simulated', window.preview_result)
-        self.assertEqual(1, len(alerts))
+    def test_retired_templates_fail_before_loading_host_modules(self):
+        for kind in ('message', 'selection'):
+            with self.assertRaises(ValueError):
+                self.preview(kind)

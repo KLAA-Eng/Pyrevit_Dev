@@ -46,8 +46,11 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   current document. All factories construct without showing; modal helpers
   show and return explicit results without running model operations.
 - AC-007: Gallery offers Message, Sheets, Revisions, Open Documents, List Single,
-  List Multiple, existing Action choice, Text and Command Switch, in five
-  fictional states each. Separate Confirmation/Parameter entries stay removed.
+  List Multiple, existing Action choice, Text and Command Switch. Shared Message
+  offers Normal, Empty, Warning, Error, Success, Disabled and Long content; other
+  shared dialogs retain five states. Separate Confirmation/Parameter entries
+  and duplicate Selection/Message templates stay removed. Form, Options and
+  Review remain reference templates.
   Neither model collectors nor production commands run from these previews.
 - AC-008: Read-only collectors are separate from windows and lazy-load Revit.
   Sheets sort by number, group by saved sheet sets plus implicit All Sheets,

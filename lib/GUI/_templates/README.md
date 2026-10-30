@@ -1,21 +1,27 @@
 # KLCode reference templates
 
-Open UI Gallery and search `Template -` to review these five windows. They are
+Open UI Gallery and search `Template -` to review these three windows. They are
 reference compositions for future windows, with fictional sample controllers.
 They all use the same shell and opt-in shared component resources.
 
 | Reference | Source | Purpose |
 | --- | --- | --- |
-| Template - Selection | [KLCodeSelectionTemplate.xaml](KLCodeSelectionTemplate.xaml) | Compact filter, checked list, All/None and main action; [detailed guide](KLCodeSelectionTemplate.md) |
 | Template - Form | [KLCodeFormTemplate.xaml](KLCodeFormTemplate.xaml) | Compact labeled Find/Replace/Prefix/Suffix group and inline validation; no Sample Preview |
-| Template - Message | [KLCodeMessageTemplate.xaml](KLCodeMessageTemplate.xaml) | Information/Warning/Error severity, bounded long message, expandable details and dismissal |
 | Template - Options | [KLCodeOptionsTemplate.xaml](KLCodeOptionsTemplate.xaml) | Dropdown, exclusive scope, Include Existing checkbox, numeric unit field and read-only path/Browse row |
 | Template - Review | [KLCodeReviewTemplate.xaml](KLCodeReviewTemplate.xaml) | Filtered checkable table, severity chips, splitter, selected-item detail and action group |
 
-The former main template was renamed Selection. The generic FindReplace visual
-was adapted into Form; its unused Revit-dependent Python wrapper/export was
-retired after caller inspection. Actual Core view/sheet rename commands retain
-their own bundled XAML and production behavior.
+The separate Selection and Message example windows were removed at the owner's
+request on 2026-10-30. Their canonical references are now the actual shared
+[Selection dialog](../dialogs/SelectionDialog.xaml) and
+[Message dialog](../dialogs/MessageDialog.xaml), with the
+[shared dialog API guide](../dialogs/README.md). Search `Shared dialog` in
+Gallery to review those implementations. The old
+[Selection guide](KLCodeSelectionTemplate.md) remains a retired navigation
+pointer for historical links, without duplicate example/window code.
+
+The generic FindReplace visual was adapted into Form; its unused Revit-dependent
+Python wrapper/export was retired after caller inspection. Actual Core view/sheet
+rename commands retain their own bundled XAML and production behavior.
 
 ## Shared code versus example code
 
@@ -27,19 +33,18 @@ the caller's title and version; `../Resources/KLCodeChrome.xaml` holds the foote
 each production controller owns its data, validation and operations. The
 production migration uses these same resources through Python/CLR host adapters.
 `KlaFieldRows` shares Form's four-row naming grid; `KlaFilteredCheckList` shares
-Selection's filter, prompt, expanding list and action rows. Both are
+the legacy tool filter, prompt, expanding list and action rows. Both are
 `ItemsControl` compositions: declare named controls as direct items with their
 `Grid.Row`/`Grid.Column` assignments so controllers retain their namescope.
 Approved vector icons and their attributed sources live in
 [lib/_icons/gui](../../_icons/gui/README.md).
 
-`lib/ui_gallery/template_data.py` owns the five source identities and pure
+`lib/ui_gallery/template_data.py` owns the three source identities and pure
 fictional fixtures; `templates.py` implements the safe example interactions.
 Gallery uses both through the explicitly allowlisted custom-preview factory.
 No template action modifies a Revit model, reads/writes sample paths, opens
 external footer links, or invokes a production command. Browse assigns a new
-fictional path. Selection's action opens an informational sample alert; the
-other examples report inline or dismiss the window.
+fictional path; the examples report inline or dismiss the window.
 
 ## State and interaction contract
 
@@ -64,17 +69,7 @@ starts at 360 x 352 after removing Sample Preview; Reset/Apply and inline feedba
 remain. `KlaCompactFieldLabel` and `KlaCompactFieldInput` are explicit shared
 styles, so other templates keep their current standard sizing until reviewed.
 Its Edit Naming Rules prompt uses `KlaFoundationPromptLabel`, exactly matching
-Selection's Select Elements prompt (Segoe UI 14, normal weight, zero padding).
-
-Message starts with Details collapsed in every state, including Error. It fits
-content at its current width between 288 and 640 units high, then scrolls the
-message body when the cap is reached. Opening Details reserves its 128-high
-readout plus margin, raising the minimum to 424; closing it restores the compact
-minimum. It retains user expansion when severity changes. Heading/body colors
-stay consistent; heading wording and the banner border distinguish severity.
-These size limits are reference defaults for review. `window_chrome.fit_window_height`
-is an opt-in helper for chromeless shared-shell windows; the caller invokes it
-when content, expansion or width changes. It never shows the window.
+the shared Selection prompt (Segoe UI 14, normal weight, zero padding).
 
 Options also uses the compact 24-high field role for category, numeric offset
 and read-only path, through opt-in `KlaCompactComboBox`, `KlaCompactFieldInput`
@@ -84,10 +79,9 @@ Include Existing uses the standard self-labelled checkbox. Offset keeps its
 `mm` unit beside the input so its label fits the compact column. Options inputs
 still fill the available width; Form's naming inputs remain fixed at 240.
 
-Message severity changes its tone without changing banner geometry. Message
-and details have bounded scrolling. Review columns have useful minimum widths;
-the table can scroll horizontally at narrow sizes. Existing Search artwork and
-native expander/dropdown affordances are reused; replacement artwork remains
+Review columns have useful minimum widths; the table can scroll horizontally
+at narrow sizes. Existing Search artwork and native dropdown affordances are
+reused; replacement artwork remains
 an owner choice.
 
 Dimensions and component appearance are an initial review build, not final
@@ -99,7 +93,7 @@ production migration and live-host acceptance status.
 ## Validation
 
 Run `scripts/validate_ui_gallery_wpf.ps1` from the repository root. Its optional
-OutputDirectory saves actual WPF renders of all 25 states and minimum-size
+OutputDirectory saves actual WPF renders of all 15 reference states and minimum-size
 specimens. The isolated probe checks data binding, sample actions, chrome,
 disabled text, column sizing and bounds; no Window is shown. It cannot establish
 live pyRevit ownership, pointer/keyboard input, Narrator, DPI or Revit operations.

@@ -1,6 +1,8 @@
 """Allowlisted shared-dialog previews; no production callers or model data."""
 from __future__ import unicode_literals
 
+MESSAGE_STATES = ('Normal', 'Empty', 'Warning', 'Error', 'Success', 'Disabled', 'Long content')
+
 DIALOG_FILES = {
     'dialog-message': 'MessageDialog.xaml',
     'dialog-sheets': 'SelectionDialog.xaml',

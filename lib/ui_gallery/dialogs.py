@@ -39,7 +39,8 @@ def create_dialog(launcher, state):
         message = 'This is a fictional preview. No model or file is changed.' if state != 'Empty' else ''
         if is_long:
             message = '\n\n'.join([message + ' Review the supplied context before continuing.'] * 32)
-        window = create_message(title, message, severity='error' if state == 'Error' else 'information',
+        severity = {'Warning': 'warning', 'Error': 'error', 'Success': 'success'}.get(state, 'information')
+        window = create_message(title, message, severity=severity,
             details='Fictional diagnostic detail.\nNo production command is invoked.' if state != 'Empty' else '', **options)
     elif identity in ('dialog-sheets', 'dialog-revisions', 'dialog-documents', 'dialog-list-single', 'dialog-list-multiple'):
         rows = _selection_rows(identity)

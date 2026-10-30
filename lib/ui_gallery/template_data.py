@@ -1,23 +1,10 @@
 """Host-independent fictional states and validation for reference windows."""
 from __future__ import unicode_literals
 
-from .scenarios import alert_message, parse_offset, selection_items, validate_state
+from .scenarios import parse_offset, selection_items, validate_state
 
 TEMPLATE_FILES = dict((('template-' + name.lower()), 'KLCode' + name + 'Template.xaml')
-                      for name in ('Selection', 'Form', 'Message', 'Options', 'Review'))
-
-
-def message_data(state, kind=None):
-    validate_state(state)
-    kind = kind or ('Error' if state == 'Error' else 'Information')
-    return dict(kind=kind, heading='No Messages' if state == 'Empty' else kind + ' Message',
-                body=('There are no sample messages to display.' if state == 'Empty' else
-                      alert_message('Long content') if state == 'Long content' else
-                      'This fictional {} message demonstrates shared feedback. No model was changed.'.format(kind.lower())),
-                details=('\n'.join('Sample item {:02d}: review this fictional detail.'.format(i)
-                                   for i in range(1, 41)) if state == 'Long content' else
-                         'Sample item A101: validation failed. Correct the input and try again.'
-                         if kind == 'Error' else 'Sample item A101: no additional action is required.'))
+                      for name in ('Form', 'Options', 'Review'))
 
 
 def form_names(state):

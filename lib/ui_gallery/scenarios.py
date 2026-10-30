@@ -11,8 +11,8 @@ LONG_NAME = ('S101 - Coordination plan for the north and south structural '
              'framing areas, transfer levels, and equipment supports')
 
 
-def validate_state(state):
-    if state not in STATES:
+def validate_state(state, supported=STATES):
+    if state not in supported:
         raise ValueError('Unsupported preview state: {}'.format(state))
     return state
 

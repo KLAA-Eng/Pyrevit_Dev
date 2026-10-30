@@ -13,7 +13,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class GalleryRegistryTests(unittest.TestCase):
-    def test_shared_dialog_family_is_explicitly_allowlisted_with_five_states(self):
+    def test_shared_dialog_family_has_explicit_sources_and_supported_states(self):
         rows = [row for row in gallery_entries(ROOT, {}) if row['category'] == 'Shared dialog']
         self.assertEqual(9, len(rows))
         self.assertNotIn('dialog-confirmation', [row['id'] for row in rows])
@@ -21,7 +21,7 @@ class GalleryRegistryTests(unittest.TestCase):
         self.assertEqual(5, len(set(row['source_path'] for row in rows)))
         for row in rows:
             self.assertTrue(row['can_launch'])
-            self.assertEqual(5, len(row['states']))
+            self.assertEqual(7 if row['id'] == 'dialog-message' else 5, len(row['states']))
             self.assertTrue(os.path.isfile(row['source_path']))
             self.assertIn('Existing tools retain', row['description'])
 
@@ -86,19 +86,30 @@ class GalleryRegistryTests(unittest.TestCase):
         self.assertEqual([], matching_entries(rows, 'shared', preview='Deferred'))
         self.assertEqual(rows, matching_entries(rows, preview='All previews'))
 
-    def test_five_templates_replace_generic_find_replace_and_main_reference(self):
+    def test_only_form_options_review_remain_as_templates(self):
         rows = gallery_entries(ROOT, {})
         templates = [row for row in rows if row['category'] == 'Template']
-        self.assertEqual(5, len(templates))
-        self.assertEqual({'Template - ' + name for name in ('Selection', 'Form', 'Message', 'Options', 'Review')},
+        self.assertEqual(3, len(templates))
+        self.assertEqual({'Template - ' + name for name in ('Form', 'Options', 'Review')},
                          {row['title'] for row in templates})
         for row in templates:
             self.assertTrue(row['can_launch'])
             self.assertTrue(os.path.isfile(row['source_path']))
             self.assertEqual(5, len(row['states']))
         for old in ('lib/GUI/FindReplace.xaml', 'lib/GUI/FindReplace.py',
-                    'lib/GUI/_templates/KLCodeMainTemplate.xaml'):
+                    'lib/GUI/_templates/KLCodeMainTemplate.xaml',
+                    'lib/GUI/_templates/KLCodeSelectionTemplate.xaml',
+                    'lib/GUI/_templates/KLCodeMessageTemplate.xaml'):
             self.assertFalse(os.path.exists(os.path.join(ROOT, old)))
+
+    def test_only_shared_message_adds_warning_and_success_states(self):
+        rows = dict((row['id'], row) for row in gallery_entries(ROOT, {}))
+        self.assertEqual(['Normal', 'Empty', 'Warning', 'Error', 'Success', 'Disabled', 'Long content'],
+                         rows['dialog-message']['states'])
+        for row in rows.values():
+            if row['id'] != 'dialog-message':
+                self.assertNotIn('Warning', row['states'])
+                self.assertNotIn('Success', row['states'])
 
     def test_retired_rename_forms_are_absent_from_source_and_catalog(self):
         rows = gallery_entries(ROOT, {})

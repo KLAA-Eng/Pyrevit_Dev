@@ -5,6 +5,7 @@ import os
 
 from .catalog import catalog_xaml_sources
 from .launchers import gallery_launchers
+from .dialog_data import MESSAGE_STATES
 
 
 ORIGINS = ('Repository custom', 'pyRevit built-in', 'Revit/Windows native')
@@ -74,6 +75,8 @@ def _prepare(row, extension_root):
                      ORIGINS[1] if identity.startswith('pyrevit-') else ORIGINS[0])
     row['caller_key'] = _API_KEYS.get(identity, canonical_path(row.get('relative_path', '')))
     row['states'] = list(STATES)
+    if identity == 'dialog-message':
+        row['states'] = list(MESSAGE_STATES)
     row['preview_status'] = 'Interactive preview'
     row['unavailable_reason'] = ''
     row['callers'] = []

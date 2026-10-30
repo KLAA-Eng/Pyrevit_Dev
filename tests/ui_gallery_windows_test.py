@@ -111,6 +111,12 @@ def host_modules(alerts):
 
 
 class GalleryWindowTests(unittest.TestCase):
+    def test_message_severity_states_do_not_open_other_window_families(self):
+        for identity in ('template-form', 'dialog-list-single'):
+            for state in ('Warning', 'Success'):
+                with self.assertRaises(ValueError):
+                    windows.create_custom(ROOT, {'id': identity}, state)
+
     def test_compiled_windows_fail_before_loading_any_host_modules(self):
         for identifier in windows.DEFERRED_IDS:
             with self.assertRaises(ValueError) as caught:

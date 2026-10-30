@@ -174,8 +174,10 @@ The result is `{'command': key, 'switches': {key: bool}}`; caller commands never
 ## Gallery and verification
 
 Search **Shared dialog** for the five selector presets, Message, Text, Command
-Switch and existing Action choice. Nine entries have five fictional states.
-Confirmation/Parameter previews remain removed. Action choice retains its
+Switch and existing Action choice. Message offers Normal, Empty, Warning, Error,
+Success, Disabled and Long content; the other eight entries retain five states.
+The duplicate Message/Selection templates are retired; Form, Options and Review
+remain. Confirmation/Parameter previews remain removed. Action choice retains its
 current highlighted-row/Continue and default-key behavior pending future work.
 
 Run the Python suite and Windows probe in

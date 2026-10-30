@@ -4,8 +4,9 @@ Owner-approved design: 2026-10-27. Current work branch: `dev.GUI-Clean`.
 The owner requested moving all local GUI commits off `master-dev` on 2026-10-27;
 initial work was performed directly there under the earlier authorization.
 This file owns task status. [DESIGNSYSTEM.md](../DESIGNSYSTEM.md) owns the
-shared design rules; the [Selection template guide](../../lib/GUI/_templates/KLCodeSelectionTemplate.md)
-owns the reference-window implementation and usage.
+shared design rules; the [shared dialog guide](../../lib/GUI/dialogs/README.md)
+owns reusable Message/Selection usage, while the [remaining templates](../../lib/GUI/_templates/README.md)
+own Form/Options/Review reference compositions.
 
 ## Delivery boundaries
 
@@ -148,7 +149,7 @@ existing authorization:
    issues. First make resource packaging compatible with CLR/localization
    adapters; build supported targets and retain honest matching-host limits.
 
-Current inventory is 26 Window sources: five references, nine Python tool
+Current inventory is 24 Window sources: three references, nine Python tool
 windows, five opt-in dialog bodies, five compiled windows, the shared-shell
 Gallery and the PreviewFixture tooling exception.
 The nine Python and five compiled windows are the production/tool migration
@@ -376,6 +377,7 @@ requests; Action choice redesign remains deferred under GUI-22.
 | GUI-27 | Text, Selection and Command Switch polish | Implemented; locally verified | Text has 8-unit prompt/input/action gaps and OK only. Selector starts at 432 x 576, follows template spacing/button layout, uses gray batch buttons, Search above a 24-high aligned Group field and licensed Lucide Layers-2. Switch has no x/autofocus and keeps typing/Tab/Escape. Exact WPF bounds and two shown focus fixtures pass. |
 | GUI-28 | Shared focus decoration | Initial implementation superseded by GUI-29 | Initial green keyboard-only adorner passed local checks, then owner requested its removal. See GUI-29 for current behavior. |
 | GUI-29 | Remove focus frames and selector summary | Implemented; locally verified | Owner rejected the green frame and selected/visible text. Shared button/check/radio/toggle FocusVisualStyle is null; controls stay keyboard operable. Summary/control-update code removed; validation and 8-unit action spacing retained. 383 Python tests (one existing skip), 15 WPF focus roles, 116 constructions, two shown focus fixtures and both compiled runtimes pass. [Evidence](../knowledge/reviews/design-system/2026-10-30-focus-summary-cleanup.md). |
+| GUI-30 | Retire duplicate Message/Selection templates | Implemented; locally verified | Shared dialogs are canonical; both duplicate XAML sources and Gallery controllers removed. Form/Options/Review remain. Shared Message adds Warning/Success previews. Gallery integration and evidence are owned by GAL-10 in the [Gallery ledger](ui-gallery-coverage.md). |
 
 [Polish verification and renders](../knowledge/reviews/design-system/2026-10-29-dialog-polish.md)
 own the dated evidence. The main Gallery/WPF probe remains offscreen by default;

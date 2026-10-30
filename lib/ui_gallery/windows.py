@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 import os
 
 from .template_data import TEMPLATE_FILES
-from .dialog_data import DIALOG_FILES
+from .dialog_data import DIALOG_FILES, MESSAGE_STATES
 from find_replace.layout import results_height  # host-free constants shared with the production dialog
 
 from ui_gallery.scenarios import (PreviewItem, alert_message, filtered_items, naming_values,
@@ -65,7 +65,10 @@ def create_custom(extension_root, launcher, state='Normal'):
         raise ValueError('Compiled window previews are deferred; this entry stays disabled.')
     if identifier not in SOURCES:
         raise ValueError('No reviewed custom preview adapter: {}'.format(identifier))
-    validate_state(state)
+    if identifier == 'dialog-message':
+        validate_state(state, MESSAGE_STATES)
+    else:
+        validate_state(state)
     path = source_path(extension_root, SOURCES[identifier])
     if not os.path.isfile(path):
         raise ValueError('This window source is not present in this checkout.')

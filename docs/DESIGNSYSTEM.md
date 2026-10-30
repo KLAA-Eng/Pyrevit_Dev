@@ -5,12 +5,15 @@ window construction. Use it to choose a resource, understand its appearance and
 assemble a window. The linked XAML files own executable values and templates;
 this guide explains their intended use and the shared design rules.
 
-The nine Python tool windows, four standard opt-in dialog bodies, five reference templates, Gallery and five
+The nine Python tool windows, four standard opt-in dialog bodies, three reference templates, Gallery and five
 compiled window classes use `KlaWindowShell`. PreviewFixture retains its
 standalone test chrome. Native/pyRevit dialogs and Recall's docked panel have
 separate host presentation; the standalone Recall body uses the shared system.
 The fifth opt-in body is a floating Command Switch using shared colors/styles
 with its own compact layout. Text omits the standard footer by design.
+The current inventory has 24 standalone Window sources: nine Python tool
+windows, five opt-in bodies, three reference templates, five compiled windows,
+Gallery and PreviewFixture.
 
 - [Master design colors](#master-design-colors)
 - [GUI colors and resource keys](#gui-colors-and-resource-keys)
@@ -25,7 +28,8 @@ with its own compact layout. Text omits the standard footer by design.
 
 The [consolidation plan](plans/custom-window-consolidation.md) owns tasks and
 acceptance status. The [template guide](../lib/GUI/_templates/README.md) owns
-the five reference implementations. Dated checks and renders live in
+the three reference implementations: Form, Options and Review. The actual shared
+Message and Selection dialogs are their own canonical references. Dated checks and renders live in
 [design-system reviews](knowledge/reviews/design-system/README.md), including
 the [Windows verification and Revit checklist](knowledge/reviews/design-system/2026-10-29-gui-architecture-windows.md).
 The [archived long form](knowledge/reviews/design-system/2026-10-29-designsystem-archive.md)
@@ -314,16 +318,20 @@ namescope and controller access.
 | Composition | Direct-item placement | Existing uses |
 | --- | --- | --- |
 | `KlaFieldRows` | Labels in column 0, inputs in column 1; four rows at 0/2/4/6, separated by 8-unit gaps | Form, Find/Replace Views and Sheets, Duplicate Sheets |
-| `KlaFilteredCheckList` | Filter 0, prompt 2, expanding list 4, secondary content 6, main action 8 | Selection reference, SelectFromDict, Create From Rooms, Steel PSF |
+| `KlaFilteredCheckList` | Filter 0, prompt 2, expanding list 4, secondary content 6, main action 8 | SelectFromDict, Create From Rooms, Steel PSF |
 
 Naming columns are 60/240; each field row is 24 high. Wrap the naming group in
 `KlaSection` for its 12-unit inset. Secondary checklist content may contain
 several action/settings rows, as Steel PSF does. These recipes share layout,
 not selection, filtering, validation or confirmation behavior.
 
-The [five references](../lib/GUI/_templates/README.md) provide complete examples:
-Selection, Form, Message, Options and Review. Use Gallery's fictional states to
-inspect them without invoking production operations.
+The [three reference templates](../lib/GUI/_templates/README.md) provide Form,
+Options and Review examples. For selection and message composition, use the
+actual shared [Selection](../lib/GUI/dialogs/SelectionDialog.xaml) and
+[Message](../lib/GUI/dialogs/MessageDialog.xaml) bodies with their
+[API guide](../lib/GUI/dialogs/README.md). The separate Selection/Message
+templates were retired; use Gallery's fictional shared-dialog states to inspect
+their current implementations without invoking production operations.
 
 ## Window geometry and spacing
 
@@ -543,7 +551,8 @@ measurement grows the bottom and protects the message viewport until capped.
 Text removes only its footer row and uses the larger Segoe UI Bold field,
 content-fitting prompt/error height and single-line entry. Its only visible
 action is OK; prompt/input and input-or-error/OK gaps are 8 units. Close/Escape
-still cancels. Shared selectors open at 432 x 576 like the Selection template.
+still cancels. Shared selectors open at 432 x 576, retaining the established
+Selection geometry after retirement of the duplicate template.
 Search sits above optional Group; both fields are 24 high and align after their
 16-unit Search/Layers-2 icons plus an 8-unit gap. Template section gaps and a
 centered gray Select All/None pair above green Select replace the former action
@@ -557,7 +566,9 @@ clicks leave it open.
 
 Search **Shared dialog** in Gallery for Sheets, Revisions, Open Documents, List
 Single, List Multiple, Message, Text, Command Switch and existing Action choice.
-All nine entries have five fictional states. The collectors are never called
+The Message preview offers Normal, Empty, Warning, Error, Success, Disabled and
+Long content; other shared dialogs and the three reference templates offer five
+states. Gallery has 43 entries. The collectors are never called
 by Gallery. See [API examples](../lib/GUI/dialogs/README.md) and
 [refinement verification](knowledge/reviews/design-system/2026-10-29-dialog-refinement.md).
 

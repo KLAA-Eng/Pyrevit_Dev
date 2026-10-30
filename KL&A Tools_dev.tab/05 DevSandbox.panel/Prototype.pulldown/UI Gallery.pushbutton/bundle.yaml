@@ -13,10 +13,12 @@ tooltip:
     - Search by window or tool name, or filter Origin and Preview availability.
     - Select a row to see the calling tools and preview availability.
     - Choose a supported preview state and Open preview. All tool actions are simulated.
-    - Search Template - to review Selection, Form, Message, Options, and Review references.
+    - Search Template - to review Form, Options, and Review references.
+    - Select Shared dialog - Message and choose Warning or Success to preview those message severities.
     - Search Shared dialog to review Message, Text, five selector presets, Command Switch, and existing Action choice.
     _____________________________________________________________________
     Last update:
+    - [10.30.2026] - v0.5 (Unreleased): Remove duplicate Message/Selection templates; add Warning and Success states to the shared Message preview.
     - [10.30.2026] - v0.5 (Unreleased): Remove green button/checkbox focus frames and selector selected/visible summaries.
     - [10.30.2026] - v0.5 (Unreleased): Polish Text/selector spacing and actions, add Group icon, and remove switch x/autofocus plus persistent white click-focus marks.
     - [10.29.2026] - v0.5 (Unreleased): Restore Window source header sorting in both directions.

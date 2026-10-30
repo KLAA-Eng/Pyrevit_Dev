@@ -102,7 +102,7 @@ assemble shared visual parts instead of copying their formatting.
 | --- | --- | --- |
 | Shared values | Names for sizes, gaps, fonts and state colors | [KLCodeFoundationTokens.xaml](../../../../lib/GUI/Resources/KLCodeFoundationTokens.xaml) |
 | Shared parts/frame | Styles format controls; templates draw their inner pieces/states; `KlaWindowShell` supplies header/footer around a body | [Foundation](../../../../lib/GUI/Resources/KLCodeFoundation.xaml) and [Components](../../../../lib/GUI/Resources/KLCodeComponents.xaml) |
-| Window body | The tool's arrangement of search, fields, lists and actions | [Main template example](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.xaml) and each tool's own XAML |
+| Window body | The tool's arrangement of search, fields, lists and actions | [Retired main-template guide](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.md) and each tool's own XAML |
 | Assembly/events | Load the resources/body and connect Close, dragging and footer navigation | [window_chrome.py](../../../../lib/GUI/window_chrome.py) |
 | Caller identity | Supply title, pure tool version and shared link destinations | [window_metadata.py](../../../../lib/GUI/window_metadata.py) |
 | Tool logic | Supply data, filtering/validation, showing/lifetime and Revit operations | Each tool's Python/C# code |

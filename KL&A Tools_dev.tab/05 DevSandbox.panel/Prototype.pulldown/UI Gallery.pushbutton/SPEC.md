@@ -19,7 +19,7 @@
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
 | v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
-| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, five shared reference templates and nine refined opt-in dialog previews. | Gallery source/tests and the 2026-10-27/29 verification records; pending next main delivery. |
+| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, three reference templates and nine shared-dialog previews, including Warning/Success for Message. | Gallery source/tests and the 2026-10-27/30 verification records; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -32,14 +32,15 @@ migrating actual tools. Nine **Shared dialog** entries exercise five actual
 `lib/GUI/dialogs/` XAML bodies: Message, Sheets, Revisions, Open Documents,
 List Single, List Multiple, existing Action choice, Text and Command Switch.
 Separate confirmation and parameter-selection previews were removed
-at the owner's request. Each remaining entry supports Normal,
+at the owner's request. Shared Message supports Normal, Empty, Warning, Error,
+Success, Disabled and Long content; the other shared entries retain Normal,
 Empty, Error, Disabled and Long content using fictional data. These source
 files are version inputs for this same unreleased v0.5 delivery.
 
 These adapters use the real opt-in dialog factories and explicit result
 contracts, with simulated footer navigation. No production tool class, query,
 transaction or workflow is invoked. The existing pyRevit previews remain
-available for comparison. The catalog now contains 45 entries and 26 Window
+available for comparison. The catalog now contains 43 entries and 24 Window
 sources, with five compiled previews still deferred.
 
 The [dialog contract](../../../../lib/GUI/dialogs/SPEC.md) and
@@ -121,38 +122,27 @@ retired forms, and orphaned library windows may have no current tool caller.
 
 Choose a supported state and **Open preview**. Custom previews load actual
 repository XAML and resources with Gallery-owned handlers and fictional data.
-Supported custom states are Normal, Empty, Error, Disabled, and Long content.
+Standard custom states are Normal, Empty, Error, Disabled, and Long content;
+the shared Message dialog additionally offers Warning and Success.
 The static fixture and Gallery shell offer Normal only. Controls support
 filtering/checking, sample rename validation/results, duplicate options, numeric
 validation, and local outcomes as applicable. No production command is invoked.
 
-The **Template - Selection** preview uses the opt-in custom-window foundation:
-equal 24-unit header/footer, Segoe UI, fixed buttons, shared spacing and the
-existing semantic Search icon. It receives the Gallery's actual tool version
-as caller metadata; footer navigation remains simulated. Long content shows
-title ellipsis without a tooltip. Empty, Error and Disabled states are fictional.
-Owner refinement matches Create from rooms' 24-high search field and compact
-checkbox rows, uses its footer green/gray, omits the version prefix, and removes
-the default main-button outline. Gaps below the header and last action are
-8 units. The selection prompt uses the KL&A list-selection font size (14) and
-Title Case. Checkbox rows reuse its native WPF hover/selection template.
-The shared Close label has an optical alignment correction; isolated WPF checks
-measure its visible glyph center without changing button dimensions.
-The full reference family consists of **Template - Selection**, **Template -
-Form**, **Template - Message**, **Template - Options**, and **Template - Review**.
-All five offer the same five fictional states and share the shell, token data,
-and component styles. The old main reference is renamed Selection; the generic
-FindReplace form is adapted into Form. Its unused Python wrapper/export is
-retired, while the actual Core rename commands keep their own windows.
+The separate Message and Selection templates and their XAML/controller/sample
+branches are removed. The actual shared Message and Selection dialogs are the
+canonical references and Gallery previews. Shared layout/component resources
+used by production windows remain; no tool caller migrates in this cleanup.
+
+The retained reference family is **Template - Form**, **Template - Options**
+and **Template - Review**, each with five fictional states. They share the
+shell, tokens and component styles. The generic FindReplace visual was adapted
+into Form; actual Core rename commands retain their own windows.
 See the [template family guide](../../../../lib/GUI/_templates/README.md) for
-composition, interactions and source ownership. Browse uses fictional paths,
-Message supports severity/details, Form validates compact naming-rule fields
-without a Sample Preview, and Review separates
-checked items from selected detail. Sample operations remain local.
-Message fits its height to content up to a cap and scrolls overflow. Details
-starts collapsed, including for Error, and severity changes preserve user
-expansion. Heading/body text colors remain stable; heading wording and border
-color identify severity. Form's Edit Naming Rules prompt shares Selection's style.
+composition, interactions and source ownership. Browse uses fictional paths;
+Form validates compact naming-rule fields without a Sample Preview, and Review
+separates checked items from selected detail. Sample operations remain local.
+The shared Message preview uses caller-selected severity and its corrected
+Details/manual-size behavior; Warning/Success do not create duplicate windows.
 Review's Check All affects only eligible rows shown by the filter, preserving
 hidden checks. Apply Checked validates the full checked collection. Clicking a
 row updates details without checking it. Ready/Warning/Blocked chips center in
@@ -165,7 +155,7 @@ calls, preserving tool lists after migration. Gallery also uses `load_window`,
 the shared shell, `KlaDataGrid` and compact dropdown styles. Its header/footer
 receive this command's title and version, and Escape follows the shared Close
 policy. The static fixture retains its standalone test chrome. See the
-[template guide](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.md) and
+[shared dialog guide](../../../../lib/GUI/dialogs/README.md) and
 [consolidation plan](../../../../docs/plans/custom-window-consolidation.md).
 
 Recall preserves the actual recall shell and hosts the standalone-specific
@@ -227,11 +217,11 @@ build the correct runtime assemblies, and validate in the matching Revit hosts.
 - `scripts/validate_ui_gallery_wpf.ps1` and `.py`: isolated IronPython/WPF validation.
 - `scripts/validate_ui_foundation_wpf.py`: reference-shell geometry, bindings,
   simulated actions/navigation, routed Close, and state-render checks.
-- `scripts/validate_ui_templates_wpf.py`: 25 template-state layouts, sample
+- `scripts/validate_ui_templates_wpf.py`: 15 retained-template state layouts, sample
   interactions, generated checkbox bindings and minimum-size evidence.
 - `scripts/validate_ui_production_wpf.py`: 45 production-window state layouts,
   compact naming fields, caller identity, localized Recall captions, overflow
-  scrolling and the 17 approved vector icon roles.
+  scrolling and the 18 vector icon roles.
 
 ## Model and external effects
 
