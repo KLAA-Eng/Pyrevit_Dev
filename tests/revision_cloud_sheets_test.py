@@ -10,7 +10,11 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 
-from lib.revision_cloud_sheets.mapping import sheet_number_sort_key, sheets_by_cloud
+from lib.revision_cloud_sheets.mapping import (
+    sheet_number_sort_key,
+    sheets_by_cloud,
+    sheets_by_revision,
+)
 
 
 class SheetsByCloudTests(unittest.TestCase):
@@ -28,6 +32,17 @@ class SheetsByCloudTests(unittest.TestCase):
 
     def test_repeated_cloud_on_one_sheet_is_listed_once(self):
         self.assertEqual({1: ['S-101']}, sheets_by_cloud([('S-101', [1, 1])]))
+
+
+class SheetsByRevisionTests(unittest.TestCase):
+    def test_lists_each_sheet_once_per_revision_with_its_cloud_count(self):
+        result = sheets_by_revision(
+            {1: ['S-101'], 2: ['S-101', 'S-102'], 3: ['S-102'], 4: []},
+            {1: 'Rev A', 2: 'Rev A', 3: 'Rev B', 4: 'Rev C'})
+        self.assertEqual({
+            'Rev A': {'S-101': 2, 'S-102': 1},
+            'Rev B': {'S-102': 1},
+        }, result)
 
 
 class SheetNumberSortKeyTests(unittest.TestCase):

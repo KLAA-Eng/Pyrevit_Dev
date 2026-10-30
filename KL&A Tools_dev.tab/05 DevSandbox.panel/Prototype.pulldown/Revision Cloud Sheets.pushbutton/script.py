@@ -6,12 +6,18 @@ __version__ = "v0.0"
 
 import traceback
 
-from pyrevit import DB, revit, script
+from pyrevit import DB, forms, revit, script
 
-from revision_cloud_sheets.mapping import sheet_number_sort_key, sheets_by_cloud
+from revision_cloud_sheets.mapping import (
+    sheet_number_sort_key,
+    sheets_by_cloud,
+    sheets_by_revision,
+)
 
 
 COMMAND_TITLE = 'Revision Cloud Sheets'
+BY_REVISION = 'Sheets by revision'
+BY_CLOUD = 'Sheets by cloud'
 
 
 def _element_id_value(element_id):
@@ -85,10 +91,72 @@ def _owner_view_name(doc, cloud):
     return _view_name(owner_view)
 
 
+def _sorted_sheets(sheets_by_id, sheet_ids):
+    return sorted(
+        (sheets_by_id[sheet_id] for sheet_id in sheet_ids),
+        key=lambda sheet: sheet_number_sort_key(sheet.SheetNumber))
+
+
+def _print_by_revision(output, doc, clouds_by_id, cloud_sheets, sheets_by_id):
+    labels = {}
+    cloud_revisions = {}
+    for cloud_id, cloud in clouds_by_id.items():
+        revision_key = _element_id_value(cloud.RevisionId)
+        cloud_revisions[cloud_id] = revision_key
+        labels[revision_key] = _revision_label(doc, cloud)
+
+    revision_sheets = sheets_by_revision(cloud_sheets, cloud_revisions)
+    rows = []
+    for revision_key in sorted(revision_sheets, key=lambda key: labels[key]):
+        sheet_counts = revision_sheets[revision_key]
+        for sheet in _sorted_sheets(sheets_by_id, sheet_counts.keys()):
+            rows.append([
+                labels[revision_key][1],
+                sheet.SheetNumber,
+                sheet.Name,
+                sheet_counts[_element_id_value(sheet.Id)],
+            ])
+    output.print_table(rows, columns=['Revision', 'Sheet number', 'Sheet name', 'Clouds'])
+    output.print_md('**Revisions on sheets:** {}'.format(len(revision_sheets)))
+
+
+def _print_by_cloud(output, doc, clouds_by_id, cloud_sheets, sheets_by_id):
+    rows = []
+    unplaced = []
+    for cloud_id, cloud in clouds_by_id.items():
+        sequence, revision = _revision_label(doc, cloud)
+        cloud_sheet_list = _sorted_sheets(sheets_by_id, cloud_sheets[cloud_id])
+        row = [
+            revision,
+            output.linkify(cloud.Id),
+            _owner_view_name(doc, cloud),
+            len(cloud_sheet_list),
+            '<br>'.join(_sheet_label(sheet) for sheet in cloud_sheet_list) or '-',
+        ]
+        rows.append(((sequence, cloud_id), row))
+        if not cloud_sheet_list:
+            unplaced.append(cloud_id)
+
+    rows.sort(key=lambda item: item[0])
+    output.print_table(
+        [row for _, row in rows],
+        columns=['Revision', 'Cloud', 'Owner view', 'Sheet count', 'Sheets'])
+
+    if unplaced:
+        output.print_md(
+            '**{} cloud(s) are not shown on any sheet** (their view is not '
+            'placed on a sheet).'.format(len(unplaced)))
+
+
 def main():
     output = script.get_output()
     output.close_others()
     doc = revit.doc
+
+    report = forms.CommandSwitchWindow.show(
+        [BY_REVISION, BY_CLOUD], message='How should the report be sorted?')
+    if not report:
+        return
 
     clouds = _selected_clouds(doc, revit.uidoc)
     scope = 'Selected revision clouds'
@@ -97,6 +165,7 @@ def main():
         scope = 'All revision clouds in the model'
 
     output.print_md('# {}'.format(COMMAND_TITLE))
+    output.print_md('**Report:** {}'.format(report))
     output.print_md('**Scope:** {} ({})'.format(scope, len(clouds)))
     if not clouds:
         output.print_md('No revision clouds were found.')
@@ -114,37 +183,15 @@ def main():
     clouds_by_id = dict((_element_id_value(cloud.Id), cloud) for cloud in clouds)
     cloud_sheets = sheets_by_cloud(sheet_clouds, list(clouds_by_id.keys()))
 
-    rows = []
-    unplaced = []
-    for cloud_id, cloud in clouds_by_id.items():
-        sequence, revision = _revision_label(doc, cloud)
-        cloud_sheet_list = sorted(
-            (sheets_by_id[sheet_id] for sheet_id in cloud_sheets[cloud_id]),
-            key=lambda sheet: sheet_number_sort_key(sheet.SheetNumber))
-        row = [
-            revision,
-            output.linkify(cloud.Id),
-            _owner_view_name(doc, cloud),
-            len(cloud_sheet_list),
-            '<br>'.join(_sheet_label(sheet) for sheet in cloud_sheet_list) or '-',
-        ]
-        rows.append(((sequence, cloud_id), row))
-        if not cloud_sheet_list:
-            unplaced.append(cloud_id)
-
-    rows.sort(key=lambda item: item[0])
-    output.print_table(
-        [row for _, row in rows],
-        columns=['Revision', 'Cloud', 'Owner view', 'Sheet count', 'Sheets'])
+    if report == BY_REVISION:
+        _print_by_revision(output, doc, clouds_by_id, cloud_sheets, sheets_by_id)
+    else:
+        _print_by_cloud(output, doc, clouds_by_id, cloud_sheets, sheets_by_id)
 
     all_sheet_ids = set()
     for sheet_ids in cloud_sheets.values():
         all_sheet_ids.update(sheet_ids)
     output.print_md('**Distinct sheets:** {}'.format(len(all_sheet_ids)))
-    if unplaced:
-        output.print_md(
-            '**{} cloud(s) are not shown on any sheet** (their view is not '
-            'placed on a sheet).'.format(len(unplaced)))
 
 
 if __name__ == '__main__':

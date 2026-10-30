@@ -14,19 +14,22 @@
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| v0.0 | Unreleased | 10.29.2026 | First prototype of the cloud-to-sheet report. | Pending development commit on `dev.revision-cloud-sheets`. |
+| v0.0 | Unreleased | 10.29.2026 | First prototype of the revision and cloud sheet reports. | Pending development commit on `dev.revision-cloud-sheets`. |
 
 Versions reconstruct meaningful main-release deliveries. Dates use MM.DD.YYYY.
 
 ## Purpose
 
-`Revision Cloud Sheets` answers "which sheets is this revision cloud on?".
+`Revision Cloud Sheets` answers "which sheets is this revision cloud on?"
+and "which sheets carry this revision?".
 It is the inverse of `Find All Revision Clouds`, which groups clouds by sheet.
 A cloud drawn in a primary view can appear on several sheets through that
 view's dependent views, so one cloud may list more than one sheet.
 
 ## Inputs
 
+- Report choice: `Sheets by revision` or `Sheets by cloud`. Closing the
+  choice cancels without output.
 - Selected revision clouds in the active document. When no revision cloud is
   selected, every revision cloud in the model is reported.
 
@@ -40,10 +43,18 @@ number.
 
 ## Output
 
-A pyRevit output table with one row per cloud, ordered by revision sequence:
-revision (sequence, number, description), a clickable cloud ID, the owner
-view, the sheet count, and the sheet list. A summary gives the number of
-distinct sheets and the number of clouds that are not shown on any sheet.
+`Sheets by revision`: one row per revision and sheet, ordered by revision
+sequence and then by sheet number. A sheet is listed under a revision when at
+least one in-scope cloud of that revision is on it; the row shows the revision
+(sequence, number, description), sheet number, sheet name, and how many of
+that revision's clouds the sheet shows. Grouping lives in
+`sheets_by_revision`.
+
+`Sheets by cloud`: one row per cloud, ordered by revision sequence: revision,
+a clickable cloud ID, the owner view, the sheet count, and the sheet list,
+plus the number of clouds that are not shown on any sheet.
+
+Both reports end with the number of distinct sheets.
 
 ## Model and external effects
 

@@ -24,6 +24,23 @@ def sheets_by_cloud(clouds_by_sheet, cloud_ids=None):
     return result
 
 
+def sheets_by_revision(cloud_sheets, cloud_revisions):
+    """Group ``{cloud_id: [sheet_key]}`` by each cloud's revision key.
+
+    Returns ``{revision_key: {sheet_key: cloud_count}}``. A sheet is listed
+    under a revision when at least one of that revision's clouds is on it.
+    Clouds that are on no sheet add nothing.
+    """
+    result = {}
+    for cloud_id, sheet_keys in cloud_sheets.items():
+        if not sheet_keys:
+            continue
+        sheets = result.setdefault(cloud_revisions[cloud_id], {})
+        for sheet_key in sheet_keys:
+            sheets[sheet_key] = sheets.get(sheet_key, 0) + 1
+    return result
+
+
 def sheet_number_sort_key(sheet_number):
     """Sort sheet numbers naturally, so S-2 comes before S-10."""
     parts = re.split(r'(\d+)', (sheet_number or '').upper())
