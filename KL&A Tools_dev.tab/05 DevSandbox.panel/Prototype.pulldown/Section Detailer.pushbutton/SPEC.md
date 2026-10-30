@@ -36,7 +36,7 @@ KL&A `Section` detail component on each one.
 
 ## Inputs and prerequisites
 
-- Active view: a section (`ViewSection`), not a template. Revit 2024 or later.
+- Active view: a section (`ViewSection`), not a template. Revit 2023 or later.
 - Members: structural framing and columns visible in the view whose type name
   is an AISC designation (`W12X26`, `HSS6X6X1/4`, `HSS6.000X0.250`, `L4X4X1/2`,
   `C10X15.3`, `MC12X10.6`, `WT9X17.5`, `HP12X53`, `PIPE4STD`).
@@ -78,6 +78,9 @@ loaded families match, KLAA families are listed first.
   places at the profile center), rotation for rotated members, and mirroring of
   asymmetric shapes (L, C, WT).
 - The library path is the mapped `J:` drive.
+- Allowed from Revit 2023, below the repository's usual 2024+ target, so
+  it can be tested where it is used today. It relies on no 2024-only API;
+  live acceptance should cover 2023 and 2024.
 
 ## Validation evidence
 

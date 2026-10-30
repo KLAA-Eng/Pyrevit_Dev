@@ -36,7 +36,7 @@ from section_detailer.view_geometry import (
 
 COMMAND_TITLE = 'Section Detailer'
 OVERLAY_MARKER = 'Section Detailer'
-MINIMUM_REVIT_VERSION = 2024
+MINIMUM_REVIT_VERSION = 2023
 MEMBER_CATEGORIES = ('OST_StructuralFraming', 'OST_StructuralColumns')
 FACE_TOLERANCE = 1e-4
 

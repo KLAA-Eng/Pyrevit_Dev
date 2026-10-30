@@ -7,7 +7,7 @@ tooltip:
     Status: Unreleased
     _____________________________________________________________________
     Description:
-    Prototype: places KL&A steel section detail components over members cut by the active section view. Missing types load from the KLAA detail component library. Revit 2024+; adds detail components to the active view.
+    Prototype: places KL&A steel section detail components over members cut by the active section view. Missing types load from the KLAA detail component library. Revit 2023+; adds detail components to the active view.
     _____________________________________________________________________
     How-to:
     - Open a section view and click the button.
@@ -18,6 +18,6 @@ tooltip:
     Last update:
     - [10.30.2026] - v0.0: Phase 1 prototype for steel members cut by the section.
 author: KL&A
-min_revit_version: 2024
+min_revit_version: 2023
 engine:
   clean: true
