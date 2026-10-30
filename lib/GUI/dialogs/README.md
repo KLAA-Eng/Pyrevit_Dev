@@ -113,7 +113,8 @@ comes first; the optional group dropdown below it is also 24 high. Both fields
 align after 16-unit icons and an 8-unit gap. Group uses Lucide Layers-2 through
 `KlaGroupGeometry`. Section spacing follows the template's 8/4-unit gaps; gray
 Select All/None buttons center above green Select with an 8-unit gap. No visible
-Cancel action; header Close/Escape cancels. Counts/validation remain visible.
+Cancel action; header Close/Escape cancels. No selected/visible summary is shown
+below the list. Validation remains inline; list/action gaps remain 8 units.
 
 The separate [collectors module](collectors.py) exposes:
 
@@ -188,5 +189,6 @@ The opt-in `-ShowFocusProbe` Windows run briefly opens two owned fictional
 windows: UIA identifies the search field, initial Command Switch focus stays on
 the neutral panel, and programmatically focused buttons/checks retain their
 normal borders. This does not establish physical keyboard/pointer routing or
-Revit ownership. Shared focus resources use a green keyboard-only adorner;
-there is no persistent white mouse-focus underline/square-border override.
+Revit ownership. Shared button/check/radio/toggle styles use no focus adorner;
+there is no light-green frame around the focused control/checkbox text and no
+white underline/square-border override. Keyboard operation is retained.

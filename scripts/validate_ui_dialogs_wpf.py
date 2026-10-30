@@ -90,6 +90,7 @@ def validate_shared_dialogs():
             if hasattr(window, 'accept_button'):
                 assert window.accept_button.IsDefault == (not hasattr(window, 'items_list'))
             if hasattr(window, 'items_list'):
+                assert not hasattr(window, 'summary_text'), 'Selector count/visibility summary must be absent'
                 assert window.state.multiple == (identity != 'dialog-list-single')
                 assert window.Width == 432 and window.Height == 576
                 assert window.filter_text.ActualHeight == window.group_filter.Height == 24
@@ -110,8 +111,14 @@ def validate_shared_dialogs():
                     main = window.accept_button.TranslatePoint(Point(0, 0), window.Content)
                     assert first.X == main.X and second.X - first.X == 112
                     assert main.Y - first.Y - batch[0].ActualHeight == 8
+                    if state != 'Error':
+                        list_bottom = window.items_list.TranslatePoint(Point(0, window.items_list.ActualHeight), window.Content).Y
+                        assert first.Y - list_bottom == 8
                     if state != 'Disabled':
                         assert batch[0].Background == window.FindResource('KlaComponentSurfaceBrush')
+                elif state != 'Error':
+                    list_bottom = window.items_list.TranslatePoint(Point(0, window.items_list.ActualHeight), window.Content).Y
+                    assert window.accept_button.TranslatePoint(Point(0, 0), window.Content).Y - list_bottom == 8
                 if identity == 'dialog-sheets':
                     assert window.group_filter.Items[0].Label == 'All Sheets'
             if hasattr(window, 'message_expander'):

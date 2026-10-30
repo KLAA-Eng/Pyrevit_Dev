@@ -33,8 +33,6 @@
     <sys:Double x:Key="KlaTitleFontSize">14</sys:Double>
     <FontFamily x:Key="KlaBodyFont">Segoe UI</FontFamily>
     <SolidColorBrush x:Key="KlaFocusBrush" Color="#E5E4E2"/>
-    <SolidColorBrush x:Key="KlaKeyboardFocusBrush" Color="#91C8A6"/>
-    <Thickness x:Key="KlaKeyboardFocusInset">-2</Thickness>
     <SolidColorBrush x:Key="KlaPressedBrush" Color="#204D3A"/>
     <SolidColorBrush x:Key="KlaDisabledFillBrush" Color="#303C40"/>
     <SolidColorBrush x:Key="KlaDisabledTextBrush" Color="#A6B0AD"/>

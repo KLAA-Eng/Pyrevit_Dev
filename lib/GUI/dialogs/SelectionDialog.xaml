@@ -8,7 +8,7 @@
                 <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
                 <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace4}"/>
                 <RowDefinition Height="*"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                <RowDefinition Height="Auto"/><RowDefinition x:Name="secondary_gap" Height="{StaticResource KlaGridSpace8}"/>
                 <RowDefinition Height="{StaticResource KlaControlRow}"/>
             </Grid.RowDefinitions>
             <StackPanel>
@@ -31,9 +31,8 @@
                 </DataTemplate></ListBox.ItemTemplate>
             </ListBox>
             <StackPanel Grid.Row="6">
-                <TextBlock x:Name="summary_text" Style="{StaticResource KlaInfoText}"/>
-                <TextBlock x:Name="validation_text" TextWrapping="Wrap" Foreground="{StaticResource KlaErrorBrush}" Visibility="Collapsed" Margin="0,8,0,0" AutomationProperties.LiveSetting="Polite"/>
-                <StackPanel x:Name="batch_actions" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                <TextBlock x:Name="validation_text" TextWrapping="Wrap" Foreground="{StaticResource KlaErrorBrush}" Visibility="Collapsed" AutomationProperties.LiveSetting="Polite"/>
+                <StackPanel x:Name="batch_actions" Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Content="Select All" Click="check_all" Style="{StaticResource KlaButtonSecondary}" Margin="{StaticResource KlaPairGap}"/>
                     <Button Content="Select None" Click="check_none" Style="{StaticResource KlaButtonSecondary}"/>
                 </StackPanel>

@@ -128,6 +128,7 @@ def _window_types():
             self.batch_actions.Visibility = Visibility.Visible if multiple else Visibility.Collapsed
             self._ready = True
             self.refresh()
+            self.feedback(None)
             self.Loaded += self.focus_filter
             self.PreviewKeyDown += self.block_enter
 
@@ -142,14 +143,14 @@ def _window_types():
             self._ready = False
             self.items_list.ItemsSource = None
             self.items_list.ItemsSource = self.state.visible_items
-            self.update_summary()
             self._ready = True
 
-        def update_summary(self):
-            count = len(self.state.selected_values)
-            self.summary_text.Text = '{} selected; {} of {} visible. All / None affects visible items.'.format(
-                count, len(self.state.visible_items), len(self.state.items)) if self.state.multiple else '{} selected; {} of {} visible.'.format(
-                    count, len(self.state.visible_items), len(self.state.items))
+        def feedback(self, text):
+            from System.Windows import GridLength, Thickness
+
+            DialogWindow.feedback(self, text)
+            self.batch_actions.Margin = Thickness(0, 8, 0, 0) if text else Thickness(0)
+            self.secondary_gap.Height = GridLength(8 if text or self.state.multiple else 0)
 
         def update_checks(self, parent=None):
             # Pull changed checks into realized controls without rebuilding the list:
@@ -175,19 +176,16 @@ def _window_types():
             if self._ready:
                 self.state.set_checked(sender.DataContext.Key, sender.IsChecked == True)
                 self.update_checks()
-                self.update_summary()
                 self.feedback(None)
 
         def check_all(self, sender, args):
             self.state.set_visible_checked(True)
             self.update_checks()
-            self.update_summary()
             self.feedback(None)
 
         def check_none(self, sender, args):
             self.state.set_visible_checked(False)
             self.update_checks()
-            self.update_summary()
 
         def accept_selection(self, sender=None, args=None):
             values = self.state.selected_values

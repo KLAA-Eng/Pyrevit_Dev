@@ -83,7 +83,6 @@ component, even when two roles currently have the same color.
 | Resource key | Hex | Intended use |
 | --- | --- | --- |
 | `KlaFocusBrush` | `#E5E4E2` | Input/dropdown focus border and link focus text; no button underline |
-| `KlaKeyboardFocusBrush` | `#91C8A6` | Keyboard-only green button/check/radio/toggle adorner |
 | `KlaPressedBrush` | `#204D3A` | Pressed buttons/options and selected table cells |
 | `KlaDisabledFillBrush` | `#303C40` | Disabled action/dropdown fill |
 | `KlaDisabledTextBrush` | `#A6B0AD` | Disabled control text and foreground-aware icons |
@@ -478,7 +477,7 @@ the deployed DLLs.
 | Enter | Explicit `IsDefault="True"` identifies a default action. The visual primary style does not set it. Find/Replace Views, Find/Replace Sheets and Steel PSF currently omit it on their main actions. |
 | Escape | Shared adapters request the Close policy. Python WPFWindow subclasses also retain the host handler described above. |
 | Cancel | Use an explicit caller cancellation policy; `IsCancel="True"` is a WPF dialog setting, not a substitute for validating modeless/custom-close behavior. |
-| Focus | Buttons/checks/radios/toggles use the green keyboard-only `KlaKeyboardFocusVisual` adorner. Mouse focus does not leave a white underline or square-border override. Inputs/dropdowns retain field-focus outlines; footer focus changes color without reflow. |
+| Focus | Buttons/checks/radios/toggles explicitly set FocusVisualStyle to null: no green frame, white underline or focus-square override around the control/checkbox label. They remain keyboard operable. Inputs/dropdowns retain field-focus outlines; footer focus changes color without reflow. |
 | Disabled body | Disable the body so header Close remains usable. Use semantic disabled brushes; verify both text and interactive icons. |
 | Names and labels | Give inputs/actions meaningful AutomationProperties.Name values; connect Label.Target to its field. Name the containing action when its icon is decorative. |
 | Long content | Bound and scroll long text/lists, retain readable labels and check minimum sizes, DPI/work-area placement and keyboard reachability in Revit. |
@@ -548,7 +547,8 @@ still cancels. Shared selectors open at 432 x 576 like the Selection template.
 Search sits above optional Group; both fields are 24 high and align after their
 16-unit Search/Layers-2 icons plus an 8-unit gap. Template section gaps and a
 centered gray Select All/None pair above green Select replace the former action
-row; Close/Escape cancels. Command Switch is a
+row; Close/Escape cancels. The selected/visible summary below selector lists is
+removed; inline validation stays, with no empty summary gap. Command Switch is a
 compact, fixed-width, content-height floating panel without header/footer. Its
 buttons choose immediately and toggles remain visible during filtering. It has
 no corner x and starts with neutral panel focus rather than selected search;
@@ -659,7 +659,7 @@ dotnet run --project src/KLCode.Wpf/Tests/KLCode.Wpf.Desktop.Smoke --framework n
 
 Add `-ShowFocusProbe` to the WPF command to briefly show and close two owned
 fictional windows. It checks neutral Command Switch initial focus through UIA
-and verifies retained programmatic button/checkbox focus without white marks.
+and verifies retained programmatic button/checkbox focus without an adorner.
 No Revit session or user document is used. Default probe execution stays offscreen.
 
 Replace `<tmp>` with a writable evidence directory. The probes default to the

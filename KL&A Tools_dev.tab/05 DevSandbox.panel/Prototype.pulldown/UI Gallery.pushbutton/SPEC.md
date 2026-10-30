@@ -64,7 +64,9 @@ The owner's subsequent polish uses template-sized 432 x 576 shared selectors,
 Search above the aligned 24-high Group dropdown with Lucide Layers-2, centered
 gray Select All/None above Select, and template section spacing. Text has one
 OK action with 8-unit prompt/field/action gaps. Shared focus styles omit white
-mouse-focus marks and retain a keyboard-only green adorner. These previews
+mouse-focus marks and disable the green focus adorner while retaining keyboard
+operation. The selected/visible summary below shared selector lists is removed.
+These previews
 still use fictional data and do not adopt the dialogs in production tools.
 
 ## Purpose

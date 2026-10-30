@@ -31,16 +31,13 @@ class FocusVisualTests(unittest.TestCase):
     def test_every_button_family_keeps_keyboard_focus_without_pointer_focus_marks(self):
         self.assertGreater(len(self.button_styles), 15)
         for name, style in self.button_styles:
-            self.assertEqual('{StaticResource KlaKeyboardFocusVisual}', self.value(style, 'FocusVisualStyle'), name)
+            self.assertEqual('{x:Null}', self.value(style, 'FocusVisualStyle'), name)
             self.assertNotEqual('False', self.value(style, 'Focusable'), name)
             self.assertFalse(any(trigger.get('Property') in ('IsKeyboardFocused', 'IsKeyboardFocusWithin')
                                  for trigger in style.iter(NS + 'Trigger')), name)
 
-    def test_focus_decoration_cannot_capture_input_or_reflow_control_content(self):
-        visual = self.styles['KlaKeyboardFocusVisual']
-        self.assertEqual('False', self.value(visual, 'IsHitTestVisible'))
-        self.assertEqual('False', self.value(visual, 'Focusable'))
-        self.assertIsNotNone(visual.find('.//' + NS + 'ControlTemplate'))
+    def test_button_and_checkbox_focus_has_no_drawn_adorner_or_embedded_marks(self):
+        self.assertNotIn('KlaKeyboardFocusVisual', self.styles)
         for name, style in self.button_styles:
             names = [element.get('{http://schemas.microsoft.com/winfx/2006/xaml}Name') for element in style.iter()]
             self.assertNotIn('FocusMark', names, name)

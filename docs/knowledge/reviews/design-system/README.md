@@ -5,6 +5,7 @@ implementation guide is [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
 
 | Review | Scope |
 | --- | --- |
+| [2026-10-30 focus/summary removal](2026-10-30-focus-summary-cleanup.md) | Remove the green focus adorner and selector counts; preserve keyboard/state/validation and exact action spacing. |
 | [2026-10-29 shared dialog polish](2026-10-29-dialog-polish.md) | Template-sized selectors, aligned Group icon/fields, Text spacing/actions, neutral Command Switch focus, shared click-focus cleanup and bounded shown-window evidence. |
 | [2026-10-29 confirmed dialog refinement](2026-10-29-dialog-refinement.md) | Message sizing regression, larger footerless Text, five selector presets/read-only collectors, separate floating Command Switch, independent review and bounded WPF/host evidence. |
 | [2026-10-29 shared dialogs](2026-10-29-shared-dialogs.md) | Four reusable dialog families, six fictional Gallery variants, explicit results/selection contracts, actual WPF and compiled-resource regressions; production calls unchanged. |

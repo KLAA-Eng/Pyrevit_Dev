@@ -17,6 +17,7 @@ tooltip:
     - Search Shared dialog to review Message, Text, five selector presets, Command Switch, and existing Action choice.
     _____________________________________________________________________
     Last update:
+    - [10.30.2026] - v0.5 (Unreleased): Remove green button/checkbox focus frames and selector selected/visible summaries.
     - [10.30.2026] - v0.5 (Unreleased): Polish Text/selector spacing and actions, add Group icon, and remove switch x/autofocus plus persistent white click-focus marks.
     - [10.29.2026] - v0.5 (Unreleased): Restore Window source header sorting in both directions.
     - [10.29.2026] - v0.5 (Unreleased): Refine Message/Text, add selector presets and floating Command Switch; Action choice redesign remains deferred.

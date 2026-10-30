@@ -9,7 +9,7 @@
     <Thickness x:Key="KlaCommandPillGap">0,0,8,8</Thickness>
     <Thickness x:Key="KlaCommandPillInset">12,4</Thickness>
     <Style x:Key="KlaCommandButton" TargetType="Button">
-        <Setter Property="FocusVisualStyle" Value="{StaticResource KlaKeyboardFocusVisual}"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}"/>
@@ -44,7 +44,7 @@
         </ControlTemplate></Setter.Value></Setter>
     </Style>
     <Style x:Key="KlaCommandToggle" TargetType="ToggleButton">
-        <Setter Property="FocusVisualStyle" Value="{StaticResource KlaKeyboardFocusVisual}"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>

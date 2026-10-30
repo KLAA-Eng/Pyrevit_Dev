@@ -471,18 +471,6 @@
     </DrawingImage>
     <!-- generated-icons:end -->
 
-    <!-- WPF shows FocusVisualStyle for keyboard navigation, rather than for
-         the keyboard focus that a mouse click also gives a control. The
-         adorner does not replace a checkbox border or add a button underline. -->
-    <Style x:Key="KlaKeyboardFocusVisual" TargetType="Control">
-        <Setter Property="IsHitTestVisible" Value="False"/>
-        <Setter Property="Focusable" Value="False"/>
-        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Control">
-            <Border BorderBrush="{StaticResource KlaKeyboardFocusBrush}" BorderThickness="{StaticResource KlaHairline}"
-                    CornerRadius="{StaticResource KlaRadiusControl}" Margin="{StaticResource KlaKeyboardFocusInset}"/>
-        </ControlTemplate></Setter.Value></Setter>
-    </Style>
-
     <Style x:Key="KlaFoundationWindow" TargetType="Window">
         <Setter Property="Background" Value="{StaticResource KlaWindowBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
@@ -497,7 +485,7 @@
     </Style>
 
     <Style x:Key="KlaFoundationButton" TargetType="Button">
-        <Setter Property="FocusVisualStyle" Value="{StaticResource KlaKeyboardFocusVisual}"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
         <Setter Property="Width" Value="{StaticResource KlaButtonWidth}"/>
@@ -575,7 +563,7 @@
         <Setter Property="FontSize" Value="{StaticResource KlaTitleFontSize}"/>
     </Style>
     <Style x:Key="KlaFoundationCheckBox" TargetType="CheckBox">
-        <Setter Property="FocusVisualStyle" Value="{StaticResource KlaKeyboardFocusVisual}"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
         <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>

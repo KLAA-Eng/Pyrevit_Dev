@@ -27,6 +27,8 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   Group role uses Lucide Layers-2. Template 8/4-unit vertical gaps separate the
   sections. Gray Select All/None buttons center above the single green Select
   action, with an 8-unit row gap. No visible Cancel button; Close/Escape cancels.
+  No selected/visible count summary is shown below the list. Validation remains
+  inline, and removing the summary does not leave an empty spacing row.
 - AC-004: Action choices return a stable key after explicit selection and
   confirmation. Disabled choices cannot be accepted; no initial choice exists.
   Its existing layout/keyboard behavior stays unchanged; redesign is deferred.
@@ -67,10 +69,10 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   search is focused, never a toggle. Escape clears search then cancels when
   empty. Blank panel clicks do not dismiss. Confirm returns action `accept`,
   value `{'command': key, 'switches': {key: bool}}`; cancel returns None.
-- AC-010: Shared buttons/checks/radios/toggles have no persistent white mouse-
-  focus underline or square-border override. Keyboard navigation uses the
-  shared green FocusVisualStyle adorner without reflow. Inputs/dropdowns keep
-  their existing field-focus styling. Controls remain focusable/keyboard usable.
+- AC-010: Shared buttons/checks/radios/toggles have no FocusVisualStyle adorner,
+  white underline or focus-square override. No light-green frame surrounds a
+  focused button or checkbox/label. Controls remain focusable/keyboard usable;
+  input/dropdown field-focus styling and ordinary control borders stay unchanged.
 
 Prepared-row factories are host-independent; optional modal convenience helpers
 invoke collectors in a valid Revit API context before showing UI. Callers own

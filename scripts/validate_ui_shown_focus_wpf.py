@@ -19,9 +19,10 @@ def validate_shown_focus():
         button.Focus()
         settle_layout(window.Content)
         assert button.IsKeyboardFocused
+        assert button.FocusVisualStyle is None
         assert button.BorderBrush == window.FindResource('KlaAccentBrush')
         assert button.Template.FindName('FocusMark', button) is None
-        print('Shown Command Switch: UIA Edit/Filter commands, neutral initial focus, unselected search and no white button focus marks passed.')
+        print('Shown Command Switch: neutral initial focus and focused command without any focus adorner passed.')
     finally:
         window.Close()
 
@@ -34,8 +35,9 @@ def validate_shown_focus():
         check.Focus()
         settle_layout(window.Content)
         assert check.IsKeyboardFocused
+        assert check.FocusVisualStyle is None
         assert check.Template.FindName('CheckBorder', check).BorderBrush == window.FindResource('KlaBorderBrush')
-        print('Shown selector: focused checkbox retains the green square border without a white override.')
+        print('Shown selector: focused checkbox/label has no focus adorner; ordinary square border preserved.')
     finally:
         window.Close()
     print('Two owned fictional windows closed. No Revit, user documents or system-wide input injection used.')
