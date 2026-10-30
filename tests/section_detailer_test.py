@@ -12,25 +12,42 @@ if PROJECT_ROOT not in sys.path:
 
 
 from lib.section_detailer.matching import (
+    METALS_FOLDER,
+    STEEL,
+    VIEW_SIDE,
+    WOOD,
+    WOOD_FOLDER,
+    best_per_family,
     family_base,
     family_matches_base,
     find_catalog_type,
+    member_spec,
     normalize_designation,
     parse_library_filename,
+    parse_number,
     parse_type_catalog,
+    parse_wood,
     pick_library_file,
     rank_candidates,
     shape_key,
+    side_designation,
+    wood_family_bases,
+    wood_size_key,
 )
 from lib.section_detailer.view_geometry import (
-    CUT,
+    END_ON,
     IN_PLANE,
     OBLIQUE,
     bounds_center,
     classify_member,
+    clip_segment,
     crosses_plane,
+    extent_along,
+    ply_offsets,
     rotation_in_view,
+    side_segment,
     to_view,
+    width_direction,
 )
 
 
@@ -82,6 +99,74 @@ class DesignationTests(unittest.TestCase):
         self.assertIsNone(family_base(None))
 
 
+class SideAndSpecTests(unittest.TestCase):
+    def test_rect_hss_side_uses_seen_face_and_wall(self):
+        self.assertEqual(side_designation('HSS8X4X1/4'), 'HSS8X1/4')
+        self.assertEqual(side_designation('HSS8X4X1/4', show_width=True), 'HSS4X1/4')
+        self.assertEqual(normalize_designation('HSS5-1/2x1/4'),
+                         side_designation('HSS5-1/2X3X1/4'))
+        self.assertEqual(side_designation('W12X26'), 'W12X26')
+
+    def test_steel_spec(self):
+        spec = member_spec('W12X26', 'W-Wide Flange')
+        self.assertEqual(spec['kind'], STEEL)
+        self.assertEqual(spec['bases'], ['5_WideFlange_Section'])
+        self.assertEqual(spec['folder'], METALS_FOLDER)
+        side = member_spec('HSS6X4X3/8', view_kind=VIEW_SIDE)
+        self.assertEqual(side['target'], 'HSS6X3/8')
+        self.assertEqual(side['bases'], ['5_HSS_Side'])
+
+    def test_wood_spec(self):
+        spec = member_spec('3-2x10', 'Dimension Lumber')
+        self.assertEqual(spec['kind'], WOOD)
+        self.assertEqual(spec['plies'], 3)
+        self.assertEqual(spec['target'], '2x10')
+        self.assertEqual(spec['folder'], WOOD_FOLDER)
+        self.assertEqual(spec['bases'], ['6_Lumber_Dimension_Section',
+                                         '6_HeavyTimber_Section'])
+        self.assertIsNone(member_spec('Rectangular Beam', 'Concrete'))
+
+
+class WoodTests(unittest.TestCase):
+    def test_numbers(self):
+        self.assertEqual(parse_number('1 3/4'), 1.75)
+        self.assertEqual(parse_number('1-3/4'), 1.75)
+        self.assertEqual(parse_number('3/4'), 0.75)
+        self.assertEqual(parse_number('11.875'), 11.875)
+        self.assertIsNone(parse_number('abc'))
+
+    def test_size_keys(self):
+        self.assertEqual(wood_size_key('2x10'), (2.0, 10.0))
+        self.assertEqual(wood_size_key('PT Sill 2x10'), (2.0, 10.0))
+        self.assertEqual(wood_size_key('2x10 WBx'), (2.0, 10.0))
+        self.assertEqual(wood_size_key('1 3/4x11 7/8'), (1.75, 11.875))
+        self.assertEqual(wood_size_key('1-3/4x11-7/8'), (1.75, 11.875))
+        self.assertEqual(wood_size_key('1 1/8x9 1/4RB'), (1.125, 9.25))
+        self.assertIsNone(wood_size_key('W12x26'))
+        self.assertIsNone(wood_size_key('HSS6x1/4'))
+
+    def test_built_up_plies(self):
+        cases = {
+            '2x10': (1, '2x10'),
+            '3-2x10': (3, '2x10'),
+            '(2) 2x12': (2, '2x12'),
+            '2x12 (2)': (2, '2x12'),
+            '3 PLY 1 3/4x11 7/8 LVL': (3, '1 3/4x11 7/8'),
+            '2-1 3/4x11 7/8': (2, '1 3/4x11 7/8'),
+            '1-3/4x11-7/8': (1, '1-3/4x11-7/8'),
+        }
+        for name, (plies, size) in cases.items():
+            parsed = parse_wood(name)
+            self.assertEqual((parsed['plies'], parsed['size']), (plies, size), name)
+
+    def test_material_from_type_or_family(self):
+        self.assertEqual(parse_wood('2x10')['material'], 'Sawn')
+        self.assertEqual(parse_wood('1 3/4x11 7/8', 'LVL Beam')['material'], 'LVL')
+        self.assertEqual(parse_wood('5 1/8x12', 'Glulam-Rectangular')['material'], 'Glulam')
+        self.assertEqual(parse_wood('3 1/2x11 7/8 PSL')['material'], 'PSL')
+        self.assertIsNone(parse_wood('Rectangular Beam'))
+
+
 class LibraryTests(unittest.TestCase):
     def test_library_filenames_parse_revision(self):
         self.assertEqual(parse_library_filename('5_WideFlange_Section_KLAA_12DC.rfa'),
@@ -110,6 +195,12 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual(find_catalog_type(names, 'W12X26'), 'W12x26')
         self.assertIsNone(find_catalog_type(names, 'W14X22'))
 
+    def test_wood_catalog_lookup_prefers_plain_name(self):
+        names = ['PT 2x10', 'Rafter 2x10', '2x10', '2x12']
+        self.assertEqual(find_catalog_type(names, '2x10', key=wood_size_key), '2x10')
+        self.assertEqual(find_catalog_type(['PT 2x10'], '2x10', key=wood_size_key),
+                         'PT 2x10')
+
 
 class RankingTests(unittest.TestCase):
     CANDIDATES = [
@@ -126,18 +217,43 @@ class RankingTests(unittest.TestCase):
 
     def test_klaa_family_ranks_before_others(self):
         ranked = rank_candidates('W12X26', self.CANDIDATES,
-                                 base='5_WideFlange_Section')
+                                 bases='5_WideFlange_Section')
         self.assertEqual(ranked[0], ('5_WideFlange_Section_KLAA_12DC', 'W12x26'))
         self.assertEqual(ranked[1][0], 'Office_WF')
 
     def test_reference_detail_families_rank_first(self):
         ranked = rank_candidates('W12X26', self.CANDIDATES,
-                                 base='5_WideFlange_Section',
+                                 bases=['5_WideFlange_Section'],
                                  preferred_families=['other_steel_dc'])
         self.assertEqual(ranked[0][0], 'Other_Steel_DC')
 
     def test_no_match_returns_empty(self):
         self.assertEqual(rank_candidates('W8X10', self.CANDIDATES), [])
+
+    def test_wood_prefers_plain_names_and_earlier_bases(self):
+        candidates = [
+            ('6_Lumber_Dimension_Section_KLAA_12DC', 'PT 2x10'),
+            ('6_Lumber_Dimension_Section_KLAA_12DC', '2x10'),
+            ('6_HeavyTimber_Section_KLAA_DC', '2x10 WBx'),
+            ('6_Lumber_LVL_Section_KLAA_20DC', '1 3/4x11 7/8'),
+        ]
+        bases = wood_family_bases('Sawn')
+        ranked = rank_candidates('2x10', candidates, bases=bases,
+                                 key=wood_size_key, family_only=True)
+        self.assertEqual(ranked[0], ('6_Lumber_Dimension_Section_KLAA_12DC', '2x10'))
+        self.assertEqual(best_per_family(ranked), [
+            ('6_Lumber_Dimension_Section_KLAA_12DC', '2x10'),
+            ('6_HeavyTimber_Section_KLAA_DC', '2x10 WBx'),
+        ])
+
+    def test_wood_sizes_do_not_cross_materials(self):
+        candidates = [('6_Lumber_PSL_Section_KLAA_12DC', '1 3/4x11 7/8'),
+                      ('Office_Wood', '1 3/4x11 7/8'),
+                      ('Office_Wood', '1-3/4x11-7/8')]
+        ranked = rank_candidates('1 3/4x11 7/8', candidates,
+                                 bases=wood_family_bases('LVL'),
+                                 key=wood_size_key, family_only=True)
+        self.assertEqual(ranked, [('Office_Wood', '1 3/4x11 7/8')])
 
 
 class ViewGeometryTests(unittest.TestCase):
@@ -146,8 +262,8 @@ class ViewGeometryTests(unittest.TestCase):
     VIEW = (0.0, -1.0, 0.0)
 
     def test_members_are_classified_against_the_view_direction(self):
-        self.assertEqual(classify_member((0, 10, 0), self.VIEW), CUT)
-        self.assertEqual(classify_member((0, -3, 0.1), self.VIEW), CUT)
+        self.assertEqual(classify_member((0, 10, 0), self.VIEW), END_ON)
+        self.assertEqual(classify_member((0, -3, 0.1), self.VIEW), END_ON)
         self.assertEqual(classify_member((5, 0, 0), self.VIEW), IN_PLANE)
         self.assertEqual(classify_member((0, 0, 12), self.VIEW), IN_PLANE)
         self.assertEqual(classify_member((1, 1, 0), self.VIEW), OBLIQUE)
@@ -173,6 +289,28 @@ class ViewGeometryTests(unittest.TestCase):
         self.assertAlmostEqual(
             rotation_in_view((1.0, 0.0, 0.0), self.RIGHT, self.UP), -math.pi / 2)
         self.assertEqual(rotation_in_view(self.VIEW, self.RIGHT, self.UP), 0.0)
+
+    def test_plies_sit_side_by_side_across_the_width(self):
+        self.assertEqual(width_direction((0.0, 1.0)), (1.0, 0.0))
+        self.assertEqual(ply_offsets(1, 0.125), [0.0])
+        self.assertEqual(ply_offsets(3, 0.125), [-0.125, 0.0, 0.125])
+        self.assertEqual(ply_offsets(2, 1.0), [-0.5, 0.5])
+        self.assertEqual(extent_along([(0, 0), (4.5, 1)], (1.0, 0.0)), (0, 4.5))
+
+    def test_side_segment_runs_full_length_at_mid_depth(self):
+        outline = [(2, 9), (10, 9), (10, 10), (2, 10)]
+        self.assertEqual(side_segment(outline, (1, 0), (0, 1)), ((2, 9.5), (10, 9.5)))
+        # A depth below the axis flips the line so depth stays counterclockwise.
+        start, end = side_segment(outline, (1, 0), (0, -1))
+        self.assertEqual((start, end), ((10, 9.5), (2, 9.5)))
+        self.assertIsNone(side_segment([], (1, 0), (0, 1)))
+
+    def test_clip_segment_to_crop(self):
+        rect = (0.0, 0.0, 10.0, 10.0)
+        self.assertEqual(clip_segment((-5, 5), (15, 5), rect), ((0, 5), (10, 5)))
+        self.assertEqual(clip_segment((2, 2), (3, 3), rect), ((2, 2), (3, 3)))
+        self.assertIsNone(clip_segment((-5, 20), (15, 20), rect))
+        self.assertEqual(clip_segment((-5, 5), (15, 5), None), ((-5, 5), (15, 5)))
 
 
 if __name__ == '__main__':

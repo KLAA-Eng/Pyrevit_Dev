@@ -1,8 +1,8 @@
 # Section Detailer
 
-Status: proposed. Branch: `dev.section-detailer` (from `master-dev`).
-Owning command: `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Section Detailer.pushbutton`
-(not yet created; its `SPEC.md` will own behavior once scaffolded).
+Status: in progress. Branch: `dev.section-detailer` (from `master-dev`).
+Owning command: `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Section Detailer.pushbutton`;
+its `SPEC.md` owns current behavior.
 
 ## Goal
 
@@ -54,9 +54,9 @@ places, orients, and finishes the 2D content.
 
 | Phase | Scope | Exit |
 | --- | --- | --- |
-| P1 | C1, C2, C4 for steel cut perpendicular to the section; prompt on ambiguity; report unmatched | Live test in a representative steel section |
-| P2 | C3 loading, C5 break lines, C6 grids | Live test with cropped views and visible grids |
-| P3 | Members in the view plane, concrete/CMU/wood, C8 reference detail | Live test on a mixed-material detail |
+| P1 | C1, C2, C4 for steel and wood members cut, beyond, and along the section; built-up wood as single plies; library loading; prompt on ambiguity; report unmatched | Live test in representative steel and wood sections |
+| P2 | Browse for families outside the library, C5 break lines, C6 grids | Live test with cropped views and visible grids |
+| P3 | Concrete/CMU, C8 reference detail | Live test on a mixed-material detail |
 | P4 | C7 architectural outline, re-run update/clear | Live test with linked architectural model |
 
 ## KL&A detail component library
@@ -78,6 +78,12 @@ Decided 2026-10-30 from the library on the office share.
   `5_HSS_Section`, HSS round → `5_HSS_Round_Section`, L → `5_Angle_Section`,
   C/MC → `5_Channel_Section`, WT → `5_WT_Section`, HP → `5_HP_Section`,
   Pipe → `5_Pipe_Section`. In-plane members use the matching `_Side` family.
+- Wood families (`Div 06 - Wood and Plastic`) use single-ply catalog sizes
+  (`2x10`, `1 3/4x11 7/8`, `5 1/8x12`, heavy timber `6x10 WBx`); prefixed
+  variants such as `PT 2x10` and `Rafter 2x10` share a size. Built-up members
+  are drawn as one single-ply component per ply (decided 2026-10-30).
+- Side catalogs for rectangular HSS are named by seen face and wall
+  (`HSS6x1/4`), not the full designation.
 - Break line: `00_Break_Line_Pick_KLAA_15DC` (also `00_Dbl_Break_Line_Pick`,
   `00_Break_Pipe_Pick` for round members). Grid: `00_Grid_KLAA_20DC`.
   Parameter names for break width and grid label still need confirming in
@@ -97,7 +103,7 @@ Decided 2026-10-30 from the library on the office share.
 | --- | --- | --- | --- |
 | SD-1 | Resolve open decisions | Library conventions decided; others open | This plan, KL&A detail component library section |
 | SD-2 | Scaffold DevSandbox command, `SPEC.md`, `lib/` module with tests | Implementation complete | `lib/section_detailer/`, `tests/section_detailer_test.py` |
-| SD-3 | Deliver P1 | Implementation complete; live Revit acceptance pending | Command `SPEC.md` validation evidence |
+| SD-3 | Deliver P1 (steel and wood; cut, beyond, and along) | Implementation complete; live Revit acceptance pending | Command `SPEC.md` validation evidence |
 | SD-4 | Deliver P2 | Not started | |
 | SD-5 | Deliver P3 | Not started | |
 | SD-6 | Deliver P4 | Not started | |
