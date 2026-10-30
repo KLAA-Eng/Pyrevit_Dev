@@ -1,5 +1,6 @@
 """Opt-in shared dialogs. Importing this package does not load WPF or Revit."""
 from .models import ActionChoice, DialogResult, SelectionGroup, SelectionItem
+from .switch_models import CommandSwitch
 
 
 def create_message(title, message, **options):
@@ -22,6 +23,11 @@ def create_text_prompt(title, prompt, **options):
     return factory(title, prompt, **options)
 
 
+def create_command_switch(title, choices, **options):
+    from .command_switch import create_command_switch as factory
+    return factory(title, choices, **options)
+
+
 def _show(window):
     window.ShowDialog()
     return window.result
@@ -41,3 +47,56 @@ def choose_action(title, choices, **options):
 
 def ask_text(title, prompt, **options):
     return _show(create_text_prompt(title, prompt, **options))
+
+
+def command_switch(title, choices, **options):
+    return _show(create_command_switch(title, choices, **options))
+
+
+def create_list_single(title, items, **options):
+    return create_selection(title, items, multiple=False, **options)
+
+
+def create_list_multiple(title, items, **options):
+    return create_selection(title, items, multiple=True, **options)
+
+
+def create_sheet_selector(title, items, groups=None, **options):
+    options.setdefault('prompt', 'Select Sheets')
+    return create_selection(title, items, groups=groups, all_label='All Sheets', **options)
+
+
+def create_revision_selector(title, items, **options):
+    options.setdefault('prompt', 'Select Revisions')
+    return create_selection(title, items, **options)
+
+
+def create_document_selector(title, items, **options):
+    options.setdefault('prompt', 'Select Documents')
+    return create_selection(title, items, **options)
+
+
+def select_one(title, items, **options):
+    return _show(create_list_single(title, items, **options))
+
+
+def select_many(title, items, **options):
+    return _show(create_list_multiple(title, items, **options))
+
+
+def select_sheets(title, document, include_placeholders=False, filterfunc=None, **options):
+    from .collectors import sheet_items
+    items, groups = sheet_items(document, include_placeholders, filterfunc)
+    return _show(create_sheet_selector(title, items, groups, **options))
+
+
+def select_revisions(title, document, filterfunc=None, **options):
+    from .collectors import revision_items
+    return _show(create_revision_selector(title, revision_items(document, filterfunc), **options))
+
+
+def select_open_documents(title, application, active_document, include_active=False,
+                          include_families=True, filterfunc=None, **options):
+    from .collectors import document_items
+    items = document_items(application, active_document, include_active, include_families, filterfunc)
+    return _show(create_document_selector(title, items, **options))

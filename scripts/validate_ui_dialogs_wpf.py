@@ -12,14 +12,30 @@ from System.Windows.Input import Key
 
 
 def dialog_layout(window, width=None, height=None):
+    fixed_height = height is not None
     width = width or window.Width
     height = height or window.Height
     window.Content.Measure(Size(width, height))
     window.Content.Arrange(Rect(0, 0, width, height))
     window.Content.UpdateLayout()
     settle_layout(window.Content)
+    if not fixed_height and height != window.Height:
+        height = window.Height
+        window.Content.Measure(Size(width, height))
+        window.Content.Arrange(Rect(0, 0, width, height))
+        window.Content.UpdateLayout()
+        settle_layout(window.Content)
+    if not hasattr(window, '_kla_chrome'):
+        assert str(window.Background) == '#00FFFFFF' or window.Background.Color.A == 0
+        assert window.MaxHeight == 500 and not hasattr(window, 'window_shell')
+        assert window.close_button.IsEnabled
+        position = window.close_button.TranslatePoint(Point(0, 0), window.Content)
+        assert position.X >= 0 and position.Y >= 0
+        assert position.X + window.close_button.ActualWidth <= width
+        return window
     chrome = window._kla_chrome
-    assert chrome.header.ActualHeight == chrome.footer.ActualHeight == 24
+    assert chrome.header.ActualHeight == 24
+    assert chrome.footer.ActualHeight == (0 if hasattr(window, 'input_text') else 24)
     assert str(chrome.version.Foreground) == '#FF808080'
     assert str(chrome.prototype.Foreground) == '#FF407058'
     actions = [control for control in descendants(window.window_body)
@@ -28,7 +44,8 @@ def dialog_layout(window, width=None, height=None):
     for button in actions:
         position = button.TranslatePoint(Point(0, 0), window.Content)
         assert position.X >= 0 and position.X + button.ActualWidth <= width, (window.Title, button.Content, position.X, width)
-        assert position.Y + button.ActualHeight <= chrome.footer.TranslatePoint(Point(0, 0), window.Content).Y, (window.Title, button.Content)
+        bottom = height if hasattr(window, 'input_text') else chrome.footer.TranslatePoint(Point(0, 0), window.Content).Y
+        assert position.Y + button.ActualHeight <= bottom, (window.Title, button.Content)
     return window
 
 
@@ -37,6 +54,32 @@ def click(button):
 
 
 def validate_shared_dialogs():
+    window = create_message('Sizing regression', 'Keep this message visible.', details='Diagnostic detail.\n' * 8)
+    dialog_layout(window)
+    original_height = window.Height
+    original_message_height = window.message_banner.ActualHeight
+    window.message_expander.IsExpanded = True
+    dialog_layout(window)
+    dialog_layout(window)  # Expansion is applied after WPF updates the Expander template.
+    assert window.Height > original_height, 'Opening Details must grow the window'
+    assert window.message_banner.ActualHeight >= original_message_height - 1, 'Details must preserve the message viewport'
+    if output_directory:
+        render_content(window, os.path.join(output_directory, 'dialog-message-details-expanded.png'), window.Width, window.Height)
+    for unused in range(3):
+        window.message_expander.IsExpanded = False
+        dialog_layout(window)
+        assert window.Height == original_height
+        window.message_expander.IsExpanded = True
+        dialog_layout(window)
+        assert window.message_banner.ActualHeight >= original_message_height - 1
+    window.Height = 500
+    window.Width = 480
+    dialog_layout(window)
+    assert window.Height == 500, 'Width changes must preserve manual height'
+    window.Width = 640
+    dialog_layout(window)
+    assert window.Height == 500
+    window.Close()
     count = 0
     for identity in sorted(DIALOG_FILES):
         entry = next(row for row in entries if row['id'] == identity)
@@ -47,32 +90,43 @@ def validate_shared_dialogs():
             assert window.window_body.IsEnabled == (state != 'Disabled')
             assert window.result.is_cancelled
             if hasattr(window, 'accept_button'):
-                assert window.accept_button.IsDefault
+                assert window.accept_button.IsDefault == (not hasattr(window, 'items_list'))
+            if hasattr(window, 'items_list'):
+                assert window.state.multiple == (identity != 'dialog-list-single')
+                if identity == 'dialog-sheets':
+                    assert window.group_filter.Items[0].Label == 'All Sheets'
             if hasattr(window, 'message_expander'):
                 assert not window.message_expander.IsExpanded
+            if hasattr(window, 'input_text'):
+                assert window.input_text.ActualHeight == 36 and window.input_text.FontSize == 24
+                assert str(window.input_text.FontWeight) == 'Bold' and str(window.input_text.FontFamily) == 'Segoe UI'
+                assert window._kla_chrome.footer.Visibility == Visibility.Collapsed
+                if state == 'Error':
+                    assert window.prompt_scroll.ScrollableHeight == 0, 'Validation must fit without clipping'
             if output_directory and state in ('Normal', 'Error', 'Long content'):
                 render_content(window, os.path.join(output_directory, identity + '-' + state.replace(' ', '-').lower() + '.png'), window.Width, window.Height)
             # Validate the smallest supported layout too, including long content.
-            dialog_layout(window, window.MinWidth, window.MinHeight)
+            if hasattr(window, '_kla_chrome'):
+                dialog_layout(window, window.MinWidth, window.MinHeight)
+            else:
+                # The non-resizable floating switch fits height to its content.
+                window.Width = window.MinWidth
+                window.fit_height()
+                dialog_layout(window)
             if output_directory and state == 'Normal':
-                render_content(window, os.path.join(output_directory, identity + '-minimum.png'), window.MinWidth, window.MinHeight)
+                render_content(window, os.path.join(output_directory, identity + '-minimum.png'), window.MinWidth,
+                               window.MinHeight if hasattr(window, '_kla_chrome') else window.Height)
             window.Close()
             count += 1
 
-    for action in ('ok', 'yes', 'no', 'retry', 'cancel'):
-        window = create_message('Result contract', 'Fictional content', buttons=(action,))
-        click(window.action_one)
-        assert window.result.action == action
+    window = create_message('Result contract', 'Fictional content')
+    click(window.action_one)
+    assert window.result.action == 'ok'
     for severity in ('information', 'warning', 'error', 'success'):
         window = create_message('Severity', 'Fictional content', severity=severity)
         dialog_layout(window)
         assert window.message_heading.Text.lower() == severity
         window.Close()
-    window = create_message('Confirmation', 'Continue?', buttons=('yes', 'no', 'cancel'))
-    assert window.action_three.IsDefault and not window.action_one.IsDefault
-    click(window.action_two)
-    assert window.result.action == 'no' and not window.result.is_cancelled
-
     window = create_message('Overflow', '\n\n'.join(['Long fictional message. ' * 6] * 70), details='Diagnostic text\n' * 50)
     window.message_expander.IsExpanded = True
     dialog_layout(window)
@@ -140,6 +194,48 @@ def validate_shared_dialogs():
         click(window._kla_chrome.close_button)
         assert window.result.is_cancelled
 
+    for multiple in (False, True):
+        window = create_selection('Explicit Select', rows, multiple=multiple)
+        window.state.set_checked('a', True)
+        class EnterArgs(object):
+            Key = Key.Enter
+            Handled = False
+        event = EnterArgs()
+        window.block_enter(window, event)
+        assert event.Handled and window.result.is_cancelled and not window.accept_button.IsDefault
+        click(window.accept_button)
+        assert window.result.action == 'accept'
+
+    from GUI.dialogs import create_command_switch, CommandSwitch
+    toggles = [CommandSwitch('details', 'Include Details'), CommandSwitch('preview', 'Preview Only', checked=True)]
+    choices = [ActionChoice('first', 'First Command'), ActionChoice('second', 'Second Command'),
+               ActionChoice('blocked', 'Unavailable', enabled=False)]
+    window = create_command_switch('Switch contract', choices, switches=toggles)
+    dialog_layout(window)
+    window.search_text.Text = 'First'
+    dialog_layout(window)
+    assert window._command_buttons['second'].Visibility == Visibility.Collapsed
+    assert all(control.Visibility == Visibility.Visible for control in window._toggle_buttons.values())
+    toggle = window._toggle_buttons['details']
+    toggle.IsChecked = True
+    click(toggle)
+    assert not toggles[0].IsChecked and window.state.switches[0].IsChecked
+    click(window._command_buttons['blocked'])
+    assert window.result.is_cancelled
+    class EscapeArgs(object):
+        Key = Key.Escape
+        Handled = False
+    window.on_key_down(window, EscapeArgs())
+    assert window.search_text.Text == '' and window.result.is_cancelled
+    click(window._command_buttons['first'])
+    assert window.result.value == {'command': 'first', 'switches': {'details': True, 'preview': True}}
+    window = create_command_switch('Cancel', choices, switches=toggles)
+    window.on_key_down(window, EscapeArgs())
+    assert window.result.is_cancelled
+    window = create_command_switch('Close', choices)
+    click(window.close_button)
+    assert window.result.is_cancelled
+
     window = create_choice('Actions', [ActionChoice('a', 'A'), ActionChoice('b', 'B', enabled=False)])
     dialog_layout(window)
     assert window.choices_list.SelectedItem is None and not window.accept_button.IsEnabled
@@ -165,7 +261,7 @@ def validate_shared_dialogs():
     window.input_text.Text = ' raw '
     click(window.accept_button)
     assert window.result.value == ' raw '
-    print('Shared dialogs: {} normal/minimum state layouts; explicit actions, severities, cancellation handlers, selection identity/groups/filtering/disabled rows, single selection, action eligibility and text validation passed.'.format(count))
+    print('Shared dialogs: {} normal/minimum state layouts; Message expansion/manual-size regression, large footerless Text, explicit Select, five presets, command/toggle/filter/result contracts and deferred Action choice regression passed.'.format(count))
 
 
 validate_shared_dialogs()

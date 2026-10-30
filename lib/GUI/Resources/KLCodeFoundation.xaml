@@ -607,7 +607,7 @@
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ContentControl">
             <Grid Background="{StaticResource KlaWindowBrush}">
-                <Grid.RowDefinitions><RowDefinition Height="{StaticResource KlaChromeRow}"/><RowDefinition Height="*"/><RowDefinition Height="{StaticResource KlaChromeRow}"/></Grid.RowDefinitions>
+                <Grid.RowDefinitions><RowDefinition Height="{StaticResource KlaChromeRow}"/><RowDefinition Height="*"/><RowDefinition x:Name="PART_FooterRow" Height="{StaticResource KlaChromeRow}"/></Grid.RowDefinitions>
                 <!-- The body is declared first so keyboard order and initial focus start in the body, then Close, then the footer links;
                      Grid.Row places it visually between the two chrome bands. -->
                 <ContentPresenter x:Name="PART_Body" Grid.Row="1" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Margin="{StaticResource KlaBodyInset}"/>

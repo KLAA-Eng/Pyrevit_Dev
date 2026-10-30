@@ -392,6 +392,12 @@
     <Style x:Key="KlaLink" TargetType="Hyperlink" BasedOn="{StaticResource KlaFoundationLink}"/>
 
     <!-- Opt-in rows for the reusable dialogs; existing tool lists are unaffected. -->
+    <Style x:Key="KlaTextPromptInput" TargetType="TextBox" BasedOn="{StaticResource KlaInput}">
+        <Setter Property="Height" Value="{StaticResource KlaTextPromptInputHeight}"/>
+        <Setter Property="FontSize" Value="{StaticResource KlaTextPromptInputFontSize}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
     <Style x:Key="KlaDialogDescription" TargetType="TextBlock" BasedOn="{StaticResource KlaInfoText}">
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>

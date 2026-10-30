@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | Unreleased |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/UI Gallery.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/`; `lib/GUI/_templates/`; `lib/GUI/dialogs/`; `lib/GUI/Resources/KLCodeFoundation.xaml`; `lib/GUI/Resources/KLCodeFoundationTokens.xaml`; `lib/GUI/Resources/KLCodeComponents.xaml`; `lib/GUI/window_chrome.py`; `lib/GUI/window_metadata.py` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/`; `lib/GUI/_templates/`; `lib/GUI/dialogs/`; `lib/GUI/Resources/KLCodeFoundation.xaml`; `lib/GUI/Resources/KLCodeFoundationTokens.xaml`; `lib/GUI/Resources/KLCodeComponents.xaml`; `lib/GUI/Resources/KLCodeCommandSwitch.xaml`; `lib/GUI/window_chrome.py`; `lib/GUI/window_metadata.py` |
 
 ## Tool version history
 
@@ -19,7 +19,7 @@
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
 | v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
-| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, five shared reference templates and four opt-in dialog previews. | Gallery source/tests and the 2026-10-27/29 verification records; pending next main delivery. |
+| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, five shared reference templates and nine refined opt-in dialog previews. | Gallery source/tests and the 2026-10-27/29 verification records; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -28,9 +28,10 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 ## Shared dialog previews — 2026-10-29
 
 The owner authorized reusable GUI windows and Gallery integration without
-migrating actual tools. Four **Shared dialog** entries exercise four actual
-`lib/GUI/dialogs/` XAML bodies: message, grouped selection, action choice and
-text entry. Separate confirmation and parameter-selection previews were removed
+migrating actual tools. Nine **Shared dialog** entries exercise five actual
+`lib/GUI/dialogs/` XAML bodies: Message, Sheets, Revisions, Open Documents,
+List Single, List Multiple, existing Action choice, Text and Command Switch.
+Separate confirmation and parameter-selection previews were removed
 at the owner's request. Each remaining entry supports Normal,
 Empty, Error, Disabled and Long content using fictional data. These source
 files are version inputs for this same unreleased v0.5 delivery.
@@ -38,7 +39,7 @@ files are version inputs for this same unreleased v0.5 delivery.
 These adapters use the real opt-in dialog factories and explicit result
 contracts, with simulated footer navigation. No production tool class, query,
 transaction or workflow is invoked. The existing pyRevit previews remain
-available for comparison. The catalog now contains 40 entries and 25 Window
+available for comparison. The catalog now contains 45 entries and 26 Window
 sources, with five compiled previews still deferred.
 
 The [dialog contract](../../../../lib/GUI/dialogs/SPEC.md) and
@@ -46,6 +47,17 @@ The [dialog contract](../../../../lib/GUI/dialogs/SPEC.md) and
 the [consolidation plan](../../../../docs/plans/custom-window-consolidation.md)
 owns this slice's tasks. [Verification](../../../../docs/knowledge/reviews/design-system/2026-10-29-shared-dialogs.md)
 records actual WPF results and live-host limits.
+
+The confirmed refinement uses explicit Select-button acceptance for both
+checkbox modes, content-stable Message Details, a compact footerless Text
+prompt with 36/24 Segoe UI Bold input, and a separate floating pyRevit-shaped
+KLCode Command Switch with search, persistent toggles and corner x. The latter
+returns fictional outcomes immediately; it never invokes a chosen command.
+Action choice redesign is deferred and its window is unchanged. Read-only
+Revit collectors exist for future caller adoption but are not run by Gallery.
+[Refinement evidence](../../../../docs/knowledge/reviews/design-system/2026-10-29-dialog-refinement.md)
+owns the new regression/render checks. The shared Command Switch dictionary
+`lib/GUI/Resources/KLCodeCommandSwitch.xaml` is also a v0.5 version input.
 
 ## Purpose
 

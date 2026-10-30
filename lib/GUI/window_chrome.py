@@ -95,6 +95,13 @@ class WindowChrome(object):
         else:
             self.window.Close()
 
+    def hide_footer(self):
+        """Opt out for a compact prompt, without changing the shared template."""
+        from System.Windows import GridLength, Visibility
+
+        self.footer.Visibility = Visibility.Collapsed
+        self.shell.Template.FindName('PART_FooterRow', self.shell).Height = GridLength(0)
+
     def _key(self, sender, args):
         """Escape follows the same close policy as the header Close button."""
         from System.Windows.Input import Key

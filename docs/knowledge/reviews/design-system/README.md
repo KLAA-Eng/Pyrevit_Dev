@@ -5,6 +5,7 @@ implementation guide is [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
 
 | Review | Scope |
 | --- | --- |
+| [2026-10-29 confirmed dialog refinement](2026-10-29-dialog-refinement.md) | Message sizing regression, larger footerless Text, five selector presets/read-only collectors, separate floating Command Switch, independent review and bounded WPF/host evidence. |
 | [2026-10-29 shared dialogs](2026-10-29-shared-dialogs.md) | Four reusable dialog families, six fictional Gallery variants, explicit results/selection contracts, actual WPF and compiled-resource regressions; production calls unchanged. |
 | [2026-10-29 GUI architecture Windows verification](2026-10-29-gui-architecture-windows.md) | Windows load fixes, shared naming/list compositions, Gallery shell, exact wordmark rendering, both compiled runtimes and the owner's Revit checklist. |
 | [2026-10-29 design-system archive](2026-10-29-designsystem-archive.md) | The long-form DESIGNSYSTEM.md as it stood before the normative rewrite: legacy property tables, window inventories, loader history. |

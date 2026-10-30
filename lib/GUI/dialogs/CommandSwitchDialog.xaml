@@ -1,0 +1,45 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Command Switch" Width="600" MinWidth="360" MinHeight="120" MaxHeight="500"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        FontFamily="{StaticResource KlaBodyFont}" FontSize="{StaticResource KlaBodyFontSize}"
+        Foreground="{StaticResource KlaTextBrush}"
+        PreviewKeyDown="on_key_down" PreviewTextInput="on_text_input">
+    <Border x:Name="switch_panel" Margin="16" Padding="12" CornerRadius="12"
+            Background="{StaticResource KlaWindowBrush}" BorderBrush="{StaticResource KlaBorderStrongBrush}"
+            BorderThickness="{StaticResource KlaHairline}">
+        <Border.Effect><DropShadowEffect Color="{Binding Color, Source={StaticResource KlaWindowBrush}}" BlurRadius="12" ShadowDepth="0" Opacity="0.4"/></Border.Effect>
+        <Grid>
+            <Grid x:Name="window_body">
+                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                <Grid x:Name="drag_region" MouseLeftButtonDown="drag_window" Margin="{StaticResource KlaCommandCloseInset}">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Label x:Name="prompt_label" Target="{Binding ElementName=search_text}" MaxWidth="180"
+                           Style="{StaticResource KlaPromptLabel}" VerticalAlignment="Center" Margin="0,0,8,0">
+                        <Label.ContentTemplate><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap"/></DataTemplate></Label.ContentTemplate>
+                    </Label>
+                    <Grid Grid.Column="1" VerticalAlignment="Center">
+                        <TextBox x:Name="search_text" Style="{StaticResource KlaInputCompact}" TextChanged="filter_changed"
+                                 AutomationProperties.Name="Filter commands"
+                                 AutomationProperties.HelpText="Type to filter commands. Tab moves between controls. Escape clears the search, then closes."/>
+                        <TextBlock x:Name="search_hint" Text="Type to filter" Margin="8,0" VerticalAlignment="Center"
+                                   Foreground="{StaticResource KlaMutedBrush}" IsHitTestVisible="False"/>
+                    </Grid>
+                </Grid>
+                <ScrollViewer x:Name="commands_scroll" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <StackPanel>
+                        <WrapPanel x:Name="toggles_panel" SizeChanged="command_panel_size_changed" KeyboardNavigation.TabNavigation="Continue"/>
+                        <WrapPanel x:Name="commands_panel" SizeChanged="command_panel_size_changed" KeyboardNavigation.TabNavigation="Continue"/>
+                        <TextBlock x:Name="empty_text" Text="No commands available." Style="{StaticResource KlaInfoText}" Visibility="Collapsed" Margin="0,0,0,8"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <TextBlock x:Name="status_text" Grid.Row="2" TextWrapping="Wrap" Foreground="{StaticResource KlaErrorBrush}"
+                           Visibility="Collapsed" AutomationProperties.LiveSetting="Polite"/>
+            </Grid>
+            <Button x:Name="close_button" Content="&#xD7;" Style="{StaticResource KlaIconButton}"
+                    HorizontalAlignment="Right" VerticalAlignment="Top" Click="cancel"
+                    AutomationProperties.Name="Close command switch" ToolTip="Close"/>
+        </Grid>
+    </Border>
+</Window>

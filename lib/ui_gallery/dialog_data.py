@@ -3,14 +3,24 @@ from __future__ import unicode_literals
 
 DIALOG_FILES = {
     'dialog-message': 'MessageDialog.xaml',
-    'dialog-selection': 'SelectionDialog.xaml',
+    'dialog-sheets': 'SelectionDialog.xaml',
+    'dialog-revisions': 'SelectionDialog.xaml',
+    'dialog-documents': 'SelectionDialog.xaml',
+    'dialog-list-single': 'SelectionDialog.xaml',
+    'dialog-list-multiple': 'SelectionDialog.xaml',
     'dialog-actions': 'ActionChoiceDialog.xaml',
     'dialog-text': 'TextPromptDialog.xaml',
+    'dialog-command-switch': 'CommandSwitchDialog.xaml',
 }
 
 DIALOG_TITLES = {
     'dialog-message': 'Shared dialog - Message',
-    'dialog-selection': 'Shared dialog - Grouped selection',
+    'dialog-sheets': 'Shared dialog - Sheets',
+    'dialog-revisions': 'Shared dialog - Revisions',
+    'dialog-documents': 'Shared dialog - Open documents',
+    'dialog-list-single': 'Shared dialog - List single',
+    'dialog-list-multiple': 'Shared dialog - List multiple',
     'dialog-actions': 'Shared dialog - Action choice',
     'dialog-text': 'Shared dialog - Text entry',
+    'dialog-command-switch': 'Shared dialog - Command Switch',
 }

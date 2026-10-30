@@ -28,6 +28,8 @@
     <sys:Double x:Key="KlaIconCanvas">24</sys:Double>
     <sys:Double x:Key="KlaIconStroke">1.5</sys:Double>
     <sys:Double x:Key="KlaBodyFontSize">12</sys:Double>
+    <sys:Double x:Key="KlaTextPromptInputHeight">36</sys:Double>
+    <sys:Double x:Key="KlaTextPromptInputFontSize">24</sys:Double>
     <sys:Double x:Key="KlaTitleFontSize">14</sys:Double>
     <FontFamily x:Key="KlaBodyFont">Segoe UI</FontFamily>
     <SolidColorBrush x:Key="KlaFocusBrush" Color="#E5E4E2"/>

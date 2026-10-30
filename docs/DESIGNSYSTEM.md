@@ -5,10 +5,12 @@ window construction. Use it to choose a resource, understand its appearance and
 assemble a window. The linked XAML files own executable values and templates;
 this guide explains their intended use and the shared design rules.
 
-The nine Python tool windows, four opt-in dialog bodies, five reference templates, Gallery and five
+The nine Python tool windows, four standard opt-in dialog bodies, five reference templates, Gallery and five
 compiled window classes use `KlaWindowShell`. PreviewFixture retains its
 standalone test chrome. Native/pyRevit dialogs and Recall's docked panel have
 separate host presentation; the standalone Recall body uses the shared system.
+The fifth opt-in body is a floating Command Switch using shared colors/styles
+with its own compact layout. Text omits the standard footer by design.
 
 - [Master design colors](#master-design-colors)
 - [GUI colors and resource keys](#gui-colors-and-resource-keys)
@@ -265,6 +267,7 @@ silently shrink fonts or invent a per-window button size.
 | --- | --- | --- |
 | `KlaInput` | TextBox | Standard 32-high input |
 | `KlaInputCompact` | TextBox | Compact 24-high form input |
+| `KlaTextPromptInput` | TextBox | 36-high input, FontSize 24, centered Segoe UI Bold; opt-in Text prompt only |
 | `KlaFilter` | TextBox | 24-high search/filter; font size 14 |
 | `KlaReadOnlyField` / `KlaCompactReadOnlyField` | TextBox | Read-only field, standard 32 or compact 24 high |
 | `KlaMultilineReadout` | TextBox | Wrapped read-only output, minimum height 64, bounded by the caller with scrolling |
@@ -398,6 +401,7 @@ showing/dismissal semantics and Revit operations.
 | [Generated GUI geometry](../lib/_icons/gui/KLCodeIcons.xaml) | Geometry-only leaf dictionary |
 | [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Primitives, Tokens, Chrome and Geometry; owns shell/basic styles, icon presenter/pen and generated images |
 | [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; adds field groups, compositions, options, states, tables, aliases and implicit-style policy |
+| [Command Switch styles](../lib/GUI/Resources/KLCodeCommandSwitch.xaml) | Merges Components; opt-in floating command/toggle pills using existing semantic colors |
 | [Compiled controls](../src/KLCode.Wpf/Resources/KLCodeControls.xaml) | Merges Components and supplies existing C# style names through BasedOn |
 | Window body XAML | Named controls, bindings, events and tool-specific arrangement |
 | Host/tool controller | Ownership, workflow, validation, lifetime and model/application actions |
@@ -436,6 +440,8 @@ and footer navigation are connected by the adapter. A Gallery presenter passes
 `navigate(uri)` to simulate navigation; an ordinary caller uses OS navigation.
 `fit_window_height(window)` is an optional measurement helper: it clamps the
 content height to the caller's MinHeight/MaxHeight and does not show the window.
+`window._kla_chrome.hide_footer()` collapses that shell instance's footer and
+named footer row. Text uses it; resources and other windows are unaffected.
 
 Installed pyRevit `6.5.3.26176+2017` exposes
 `load_xaml(self, xaml_source, literal_string=False, handle_esc=True, set_owner=True)`.
@@ -482,13 +488,15 @@ the owner's live Revit review complete.
 ## Reusable dialogs
 
 Use [GUI.dialogs](../lib/GUI/dialogs/README.md) for prepared-data dialogs.
-The four opt-in bodies do not migrate existing commands or their pyRevit calls.
+The five opt-in bodies do not migrate existing commands or their pyRevit calls.
 
 | Need | Modal API | Result |
 | --- | --- | --- |
-| Message / confirmation and details | `show_message(title, message, ...)` | `ok`, `yes`, `no`, `retry` or `cancel` action |
+| Message notice and optional details | `show_message(title, message, ...)` | `ok` or `cancel` action |
 | Grouped searchable single/multiple selection | `select_items(title, items, ...)` | `accept` with original payload(s), or `cancel` |
-| Described action alternatives | `choose_action(title, choices, ...)` | `accept` with stable key, or `cancel` |
+| Sheets, revisions, open documents | `select_sheets`, `select_revisions`, `select_open_documents` | Read-only collection followed by selection; explicit document/context required |
+| Floating Command Switch | `command_switch(title, choices, switches=..., ...)` | `accept` with command key/switch states, or `cancel` |
+| Existing Action choice (future redesign) | `choose_action(title, choices, ...)` | Existing highlighted-row/Continue contract retained |
 | Text with optional validation | `ask_text(title, prompt, ...)` | `accept` with raw text, including blank, or `cancel` |
 
 ```python
@@ -503,12 +511,16 @@ if result.action == 'accept':
 
 Importing the package is host-free. Factories lazily load WPF and return unshown
 bare WPF windows; modal helpers call ShowDialog and return `DialogResult`.
-Supply the owner and caller version. No current document is inferred or queried.
-Existing CustomAlert/SelectFromDict APIs retain their behavior.
+Supply the owner and caller version. No import/factory infers or queries the
+current document. Specialized modal helpers explicitly call separate read-only
+collectors before showing UI. Existing CustomAlert/SelectFromDict remain unchanged.
 
-Close, Cancel and Escape cancel. Enter invokes the explicit default action:
-confirmations prefer Cancel, then No, unless overridden; selection/text validate
-first; choice requires an enabled selection. These bare windows do not inherit
+Close/Cancel cancel. Selection requires Select, with Enter/double-click acceptance
+disabled in both checkbox modes. Text Enter validates/accepts; Message Enter
+acknowledges OK. The existing Action choice default remains deferred. Command
+Switch Enter chooses a focused command or sole enabled search match while search
+is focused; Escape clears search before cancelling. Other dialogs Escape cancel.
+These bare windows do not inherit
 pyRevit WPFWindow's competing Escape handler. The earlier host boundary and
 missing defaults in existing tools remain separate. Actual keyboard, owner/modal
 lifetime and DPI still require live acceptance.
@@ -518,19 +530,27 @@ order and hidden checks, and excludes disabled rows. All/None affects visible
 eligible rows only. Single selection enforces exclusive checking; highlighting
 alone does not check a row. No first row is checked implicitly. Text preserves
 raw input; required/validator failures remain inline. Validators return an error
-string or None. Inspect result.action explicitly: accepted blank, No and Cancel
+string or None. Inspect result.action explicitly: accepted blank and Cancel
 are different outcomes.
 
 Bodies reuse the shared shell, buttons/fields/lists, status brushes, icon
 geometry and green/gray footer roles. Opt-in `KlaDialogCheck` presents a label
 and description using the existing checkbox template; `KlaDialogDescription`
 handles secondary/disabled text; `KlaDialogListItem` disables unavailable rows.
-Message/details overflow is bounded and scrollable.
+Message/details overflow is bounded and scrollable. Initial Message height fits
+content; manual width changes no longer force a new height. Deferred Details
+measurement grows the bottom and protects the message viewport until capped.
+Text removes only its footer row and uses the larger Segoe UI Bold field,
+content-fitting prompt/error height and single-line entry. Command Switch is a
+compact, fixed-width, content-height floating panel without header/footer. Its
+buttons choose immediately, toggles remain visible during filtering, corner x
+cancels, and blank panel clicks leave it open.
 
-Search **Shared dialog** in Gallery for message, grouped selection, action
-choice and text previews, each in five
-fictional states. See the [API examples](../lib/GUI/dialogs/README.md) and
-[verification](knowledge/reviews/design-system/2026-10-29-shared-dialogs.md).
+Search **Shared dialog** in Gallery for Sheets, Revisions, Open Documents, List
+Single, List Multiple, Message, Text, Command Switch and existing Action choice.
+All nine entries have five fictional states. The collectors are never called
+by Gallery. See [API examples](../lib/GUI/dialogs/README.md) and
+[refinement verification](knowledge/reviews/design-system/2026-10-29-dialog-refinement.md).
 
 ## Creating a window
 

@@ -1,157 +1,174 @@
 # Reusable shared dialogs
 
-Use `GUI.dialogs` for new opt-in dialogs with the current shell, controls,
-icons and green/gray footer. Existing tools still use their existing APIs.
-The [SPEC](SPEC.md) owns behavior; [DESIGNSYSTEM.md](../../../docs/DESIGNSYSTEM.md)
-owns visual choices. These are Python/IronPython WPF windows, not compiled
-add-in replacements or drop-in pyRevit return types.
+Opt-in Python/IronPython WPF dialogs using KLCode resources. Existing tools keep
+their current calls. The [SPEC](SPEC.md) owns behavior, the
+[design system](../../../docs/DESIGNSYSTEM.md) owns visual rules, and the
+[consolidation plan](../../../docs/plans/custom-window-consolidation.md) owns
+delivery status. Action choice redesign is explicitly deferred.
 
-| Family | Construct only | Show modally and return a result | Intended future use |
-| --- | --- | --- | --- |
-| Message / confirmation | `create_message(title, message, **options)` | `show_message(...)` | Alerts, diagnostic details, Yes/No/Cancel, Retry/Cancel |
-| Single / multiple selection | `create_selection(title, items, **options)` | `select_items(...)` | Prepared sheets, revisions, views, open documents, parameters |
-| Described action choice | `create_choice(title, choices, **options)` | `choose_action(...)` | Command-switch or TaskDialog command-link workflows |
-| Text prompt | `create_text_prompt(title, prompt, **options)` | `ask_text(...)` | String entry with optional validation |
+## APIs and results
 
-All factory and modal functions accept `version=None`, `owner=None` and
-`navigate=None`. Pass the caller's pure tool version, such as `v1.2`. Omission
-leaves the version footer empty. An owner may be an existing shown WPF Window,
-`System.IntPtr`, or an integer native window handle. The library does not infer
-the active Revit owner. Supply it when adopting a dialog in a host command.
-Default footer navigation opens the established destinations; Gallery supplies
-a local callback instead.
+| Prepared-data factory (construct only) | Modal helper | Result on acceptance |
+| --- | --- | --- |
+| `create_message(title, message, ...)` | `show_message(...)` | action `ok`, value None |
+| `create_list_single(title, items, ...)` | `select_one(...)` | action `accept`, original payload |
+| `create_list_multiple(title, items, ...)` | `select_many(...)` | action `accept`, original payload list |
+| `create_sheet_selector(title, items, groups=None, ...)` | `select_sheets(title, document, ...)` | action `accept`, original sheet payload(s) |
+| `create_revision_selector(title, items, ...)` | `select_revisions(title, document, ...)` | action `accept`, original revision payload(s) |
+| `create_document_selector(title, items, ...)` | `select_open_documents(title, application, active_document, ...)` | action `accept`, original document payload(s) |
+| `create_text_prompt(title, prompt, ...)` | `ask_text(...)` | action `accept`, raw string |
+| `create_command_switch(title, choices, ...)` | `command_switch(...)` | action `accept`, command key and switch states |
+| `create_choice(title, choices, ...)` | `choose_action(...)` | Existing action key contract; redesign deferred |
 
-Importing this package loads only host-free models. Factories lazily load WPF;
-inside pyRevit they can use its framework bootstrap to resolve the installed
-IronPython WPF assembly. Call factories and show windows on the host UI thread.
-Bare `System.Windows.Window` classes avoid the extra Escape handler installed
-by `pyrevit.forms.WPFWindow`. This does not fix legacy tools' keyboard behavior.
+`create_selection(title, items, multiple=True, ...)` and `select_items(...)`
+remain the generic APIs. Named sheet/revision/document factories default to
+multiple selection and accept `multiple=False`. List Single/Multiple fixes its
+mode; do not also supply a `multiple` argument.
 
-## Results and cancellation
+All factories take `version=None`, `owner=None`, `navigate=None`. Owner may be a
+shown WPF Window, `System.IntPtr`, or integer native handle. Supply the host
+owner explicitly. Pure caller version, such as `v1.2`, is metadata; no extension
+version is inferred. Text and Command Switch intentionally display no version
+footer. Gallery supplies simulated navigation; ordinary shared footers use the
+established destinations. Command Switch has no navigation links.
 
-Every window starts with `DialogResult(action='cancel', value=None)`. Read
-`result.action`, `result.value` and `result.is_cancelled` explicitly. Do not
-test the result object's truthiness; it is not a Boolean pyRevit alert result.
+Factories return an unshown window. Modal helpers call ShowDialog and return
+`DialogResult`. Inspect `result.action`, `result.value`, `result.is_cancelled`
+explicitly; the object is not a Boolean pyRevit result. Close/Escape/Cancel or
+unaccepted window closure returns action `cancel`, value None. Accepted empty
+text and optional empty selection remain distinct from cancellation. No API
+exits the script, runs a chosen command, writes settings or changes a model.
 
-- Message actions are `ok`, `yes`, `no`, `retry`, `cancel`; their value is None.
-- Selection and action/text confirmation return `action='accept'`.
-- Multiple selection returns an ordered list of original payloads; single
-  selection returns a payload, or None if optional and unchecked.
-- Choice returns its stable action key. Text returns the exact string entered,
-  including whitespace or an accepted empty string.
-- Escape, header Close, Cancel, or closing the window without accepting returns
-  cancellation. No workflow action, `sys.exit`, transaction or persistence runs.
+Importing `GUI.dialogs` or its collectors requires neither WPF nor Revit. WPF
+loads lazily in factories, using the installed pyRevit framework bootstrap when
+needed. Use the host UI thread. Collectors run in a valid Revit API context
+before UI opens; callers own source-document lifetime and later operations.
 
-Construct-only functions return the actual window without showing it. Call
-`window.ShowDialog()` and read `window.result`, or use the modal helper. Modal
-showing, real owner/focus behavior and DPI/work-area acceptance require host
-review; the automated probe constructs and renders without showing windows.
-
-## Messages
+## Message and text
 
 ```python
-from GUI.dialogs import show_message
+from GUI.dialogs import show_message, ask_text
 
-result = show_message(__title__, 'Continue with the prepared selection?',
-                      buttons=('yes', 'no', 'cancel'), severity='warning',
-                      details='Caller-supplied diagnostic information.',
-                      version=__version__, owner=revit_window_handle)
-if result.action == 'yes':
-    pass  # The caller owns any later operation.
-```
-
-Options: `buttons=('ok',)`, `severity='information'`, `details=''`,
-`default_action=None`. Severity accepts information/warning/error/success.
-Use one to three distinct supported buttons. Default Enter action is Cancel
-when present, otherwise No when present, otherwise the first button; an
-explicit `default_action` must name a displayed action. No remains distinct
-from cancellation. Details starts collapsed. Message height fits content up to
-640 units, then scrolls. Resizing the width refits height.
-
-## Selection
-
-```python
-from GUI.dialogs import SelectionItem, SelectionGroup, select_items
-
-rows = [SelectionItem('type-width', 'Width', type_parameter,
-                      description='Type parameter', groups=('type',)),
-        SelectionItem('instance-width', 'Width', instance_parameter,
-                      description='Instance parameter', groups=('instance',)),
-        SelectionItem('read-only', 'Element ID', id_parameter,
-                      description='Read-only', enabled=False)]
-result = select_items(__title__, rows, multiple=True,
-    groups=[SelectionGroup('type', 'Type'), SelectionGroup('instance', 'Instance')],
-    prompt='Select Parameters', required=True, version=__version__,
-    owner=revit_window_handle)
-if result.action == 'accept':
-    selected_parameters = result.value
-```
-
-`SelectionItem(key, label, value=None, description='', groups=(), checked=False,
-enabled=True)` requires a unique, hashable, non-None key. Labels may repeat.
-Input order and payload identity are retained; check state is cloned. No first
-row is checked implicitly. `multiple=False` permits at most one initial check
-and enforces exclusive checking. Clicking a list row highlights it; the
-checkbox checks it. Space toggles a focused checkbox. Enter validates/accepts.
-
-`groups=None` derives group names from item memberships in input order. Supply
-`SelectionGroup(key, label)` rows for separate display names. None is reserved
-for All Items. An item can belong to several groups. Search matches label and
-description, ignoring case. Group/search filters intersect. Hidden checks stay
-checked. All Visible / None Visible touches visible eligible rows only; the
-accepted result includes hidden checked rows too. These batch buttons are
-hidden in single-selection mode. Disabled rows cannot be checked/accepted.
-
-Options: `multiple=True`, `groups=None`, `prompt='Select Items'`, `required=True`.
-Required selection shows inline feedback when nothing is checked. Optional
-multiple selection can accept an empty list; inspect action for cancellation.
-
-Callers collect and prepare Revit data. For example, preserve revision sequence
-order and issued rules; build sheet-set memberships and placeholder eligibility;
-label document/view/parameter rows and decide availability before opening.
-The library contains no model-query wrappers. Native pickers and progress or
-interactive-selection overlays remain their existing implementations.
-
-## Action choice and text
-
-```python
-from GUI.dialogs import ActionChoice, choose_action, ask_text
-
-choice = choose_action(__title__, [
-    ActionChoice('active', 'Active View', 'Use the current view.'),
-    ActionChoice('choose', 'Choose Views', 'Select views in the caller.'),
-    ActionChoice('blocked', 'Unavailable', 'Explain why.', enabled=False)],
-    version=__version__, owner=revit_window_handle)
-
+notice = show_message(__title__, 'Review is complete.', severity='information',
+    details='Optional caller-supplied diagnostics.', version=__version__, owner=owner_handle)
 text = ask_text(__title__, 'Enter a description.', default='', required=False,
     validator=lambda value: 'Use 100 characters or fewer.' if len(value) > 100 else None,
-    version=__version__, owner=revit_window_handle)
+    version=__version__, owner=owner_handle)
 if text.action == 'accept':
     entered_text = text.value  # May legitimately be ''.
 ```
 
-`ActionChoice(key, label, description='', enabled=True)` requires unique,
-hashable, non-None keys. Nothing starts selected. Continue stays disabled until
-an enabled choice is selected. Confirming returns its key; no action runs.
-Choice accepts `prompt='Choose an Action'`.
+Message options are `severity='information'`, `details=''`, plus shared metadata.
+Severity accepts information/warning/error/success. It is an OK-only notice;
+the former unused multi-button/confirmation options are removed. Initial height
+fits content up to 640. Manual width changes preserve chosen height. Details
+starts collapsed and expands the bottom after WPF applies its template, retaining
+the message viewport until capped. Collapse removes the added height. At the
+cap, message and read-only details scroll. Expanded minimum height protects the
+message/action area from being squeezed away.
 
-Text accepts `default=''`, `required=False`, `validator=None`. Required checks
-whitespace without altering the returned input. A validator receives raw text
-and returns an error string or None. It should be pure and quick; unexpected
-exceptions propagate as caller/programming errors. Validation errors remain
-inline with the window open. Editing clears prior feedback. Initial text focus
-selects the supplied default when the window loads.
+Text options are `default=''`, `required=False`, `validator=None`. The field is
+36 high, FontSize 24, centered Segoe UI Bold. Compact height fits prompt/error;
+long prompts scroll at the cap. Title/Close remain; `WindowChrome.hide_footer()`
+collapses only this template instance's footer row. Other windows keep theirs.
+Required checks whitespace without changing the returned string. A pure, quick
+validator returns an error string or None; unexpected exceptions propagate as
+programming errors. Editing clears feedback. Initial focus selects default text.
+Enter accepts valid text; Escape cancels. Message Enter acknowledges OK.
+
+## Selection and collectors
+
+```python
+from GUI.dialogs import SelectionItem, select_one, select_sheets
+
+rows = [SelectionItem('first', 'Typical Detail', first_payload, description='Steel'),
+        SelectionItem('second', 'Typical Detail', second_payload, description='Concrete')]
+result = select_one(__title__, rows, owner=owner_handle, version=__version__)
+sheets = select_sheets(__title__, explicit_document, include_placeholders=False,
+    owner=owner_handle, version=__version__)
+```
+
+`SelectionItem(key, label, value=None, description='', groups=(), checked=False,
+enabled=True)` uses unique hashable non-None keys; labels may repeat. Cloned
+checks preserve caller rows and original payload identity. No first row is
+checked implicitly. Single mode uses the same checkbox style, with exclusive
+checking even when the previous check is hidden. Both modes require **Select**:
+Enter and double-click do not accept. Space toggles a focused checkbox; keyboard
+activation of the focused Select button remains possible with Space.
+
+Options: `groups=None`, `prompt='Select Items'`, `required=True`,
+`all_label='All Items'`. Group names derive in input order unless supplied as
+`SelectionGroup(key, label)` rows. None is reserved for the implicit All group.
+Search matches label/description case-insensitively without regex or reordering.
+Group/search filters intersect. Hidden checks remain in the result. All Visible
+/ None Visible affects visible eligible rows only and is absent in single mode.
+Disabled rows cannot be accepted. Optional multiple selection may accept an
+empty list; optional single selection may accept None. Inspect action.
+
+The separate [collectors module](collectors.py) exposes:
+
+- `sheet_items(document, include_placeholders=False, filterfunc=None)` returns
+  `(rows, groups)`. Unique sheets sort by number/name; saved sheet sets share
+  one check state per sheet. Eligibility/placeholder filtering applies before
+  every grouping. The sheet factory labels its implicit group **All Sheets**.
+- `revision_items(document, filterfunc=None)` returns rows in sequence order,
+  with number/description/date/issued status. Both issued states are eligible
+  by default. Per-sheet numbering displays sequence because RevisionNumber is
+  not valid as a project-wide number there.
+- `document_items(application, active_document=None, include_active=False,
+  include_families=True, filterfunc=None)` excludes linked/active documents by
+  default and includes projects/families. It requires explicit active_document
+  unless include_active=True. Duplicate titles remain distinct; type/path is
+  secondary text. Original Document objects provide session keys/payloads.
+
+The modal specialized helpers collect then show. They forward inclusion/filter
+options to collectors and remaining options to windows. `select_open_documents`
+requires the active_document argument; use None with include_active=True when
+there is no active document. Prepared-data factories perform no Revit query and
+can be used with caller-prepared data instead. Family documents yield no sheets
+or revisions. These APIs are not drop-in pyRevit return-type replacements.
+
+## Command Switch
+
+```python
+from GUI.dialogs import ActionChoice, CommandSwitch, command_switch
+
+result = command_switch(__title__, [
+    ActionChoice('active', 'Active View', 'Use the current view.'),
+    ActionChoice('choose', 'Choose Views', 'Select views in the caller.')],
+    switches=[CommandSwitch('details', 'Include Details'),
+              CommandSwitch('preview', 'Preview Only', checked=True)], owner=owner_handle)
+if result.action == 'accept':
+    command_key = result.value['command']
+    switch_states = result.value['switches']
+```
+
+`ActionChoice(key, label, description='', enabled=True)` and
+`CommandSwitch(key, label, checked=False, enabled=True)` require unique hashable
+non-None keys within each collection. The floating panel has prompt/search,
+wrapping immediate command buttons, optional toggle pills and a corner x. No
+standard header/footer or Continue action. KLCode colors/roles come from
+[KLCodeCommandSwitch.xaml](../Resources/KLCodeCommandSwitch.xaml), which merges
+Components and defines opt-in styles. No upstream XAML/assets are copied.
+
+Typing moves to search and filters command labels/descriptions; optional toggles
+stay visible and keep cloned state. Tab traverses, Space toggles. Enter chooses
+the focused enabled command or sole enabled match while search is focused;
+Enter on a toggle never chooses a command. Escape clears search first, then
+cancels when empty. Corner x cancels. Blank panel clicks do not dismiss. Height
+fits content up to 500, then scrolls. Button descriptions are tooltips/help text.
+The result is `{'command': key, 'switches': {key: bool}}`; caller commands never run.
 
 ## Gallery and verification
 
-In UI Gallery, search **Shared dialog**. Four variants each offer Normal, Empty,
-Error, Disabled and Long content. The separate confirmation and parameter
-selection entries have been removed. Fictional rows never query Revit.
-The four XAML bodies use shared resources and opt-in `KlaDialogCheck`,
-`KlaDialogDescription` and `KlaDialogListItem` compositions.
+Search **Shared dialog** for the five selector presets, Message, Text, Command
+Switch and existing Action choice. Nine entries have five fictional states.
+Confirmation/Parameter previews remain removed. Action choice retains its
+current highlighted-row/Continue and default-key behavior pending future work.
 
-Run the Python contracts and Windows probe listed in
-[DESIGNSYSTEM.md](../../../docs/DESIGNSYSTEM.md#validation). The probe checks
-actual controls, results, layout at normal/minimum sizes and scrolling. It
-dispatches the Escape handler directly; live keyboard input, owner/modal
-lifetime, focus and DPI remain the owner's Revit checks.
+Run the Python suite and Windows probe in
+[DESIGNSYSTEM.md](../../../docs/DESIGNSYSTEM.md#validation). Probes check actual
+controls, bounded layout, regression cases and results without showing windows.
+Direct keyboard-handler dispatch does not prove live input/focus. Revit data,
+owner/modal lifetime, pointer-driven resize flicker, keyboard traversal and DPI
+remain explicitly identified host acceptance checks.

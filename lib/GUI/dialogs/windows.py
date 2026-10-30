@@ -6,7 +6,6 @@ import os
 from .models import DialogResult, SelectionGroup, SelectionState, validate_text
 
 _TYPES = None
-_BUTTONS = {'ok': 'OK', 'yes': 'Yes', 'no': 'No', 'retry': 'Retry', 'cancel': 'Cancel'}
 
 
 def _window_types():
@@ -20,11 +19,14 @@ def _window_types():
         # its framework bootstrap, rather than GUI.forms or a document-bound form.
         from pyrevit.framework import wpf
     from System import IntPtr
+    from System import Action
     from System.Windows import Window, Visibility
     from System.Windows.Interop import WindowInteropHelper
     from System.Windows.Controls import CheckBox
     from System.Windows.Controls.Primitives import ToggleButton
     from System.Windows.Media import VisualTreeHelper
+    from System.Windows.Input import Key
+    from System.Windows.Threading import DispatcherPriority
     from GUI.window_chrome import load_window, fit_window_height
 
     class DialogWindow(Window):
@@ -53,7 +55,7 @@ def _window_types():
             self.validation_text.Visibility = Visibility.Visible if text else Visibility.Collapsed
 
     class MessageWindow(DialogWindow):
-        def __init__(self, title, message, buttons, severity, details, default_action,
+        def __init__(self, title, message, severity, details,
                      version, owner, navigate):
             self.initialize('MessageDialog.xaml', title, version, owner, navigate)
             roles = {'information': ('Information', 'KlaInformationGeometry', 'KlaInfoBrush'),
@@ -67,42 +69,71 @@ def _window_types():
             self.message_body.Text = message
             self.message_details.Text = details
             self.message_expander.Visibility = Visibility.Visible if details else Visibility.Collapsed
-            for index, button in enumerate((self.action_one, self.action_two, self.action_three)):
-                if index < len(buttons):
-                    action = buttons[index]
-                    button.Tag = action
-                    button.Content = _BUTTONS[action]
-                    button.IsDefault = action == default_action
-                else:
-                    button.Visibility = Visibility.Collapsed
+            self.action_one.Content = 'OK'
+            self.action_one.IsDefault = True
+            self._details_open = False
+            self._details_growth = 0
+            self._details_pending = False
+            self._collapsed_min_height = self.MinHeight
             self._ready = True
             fit_window_height(self)
+            self._collapsed_details_height = self.message_expander.DesiredSize.Height
+            self.Closed += self.stop_layout
+
+        def stop_layout(self, sender, args):
+            self._ready = False
 
         def accept_message(self, sender, args):
-            self.finish(sender.Tag)
-
-        def message_size_changed(self, sender, args):
-            if self._ready and args.WidthChanged:
-                fit_window_height(self)
+            self.finish('ok')
 
         def details_changed(self, sender, args):
-            if self._ready:
-                fit_window_height(self)
+            if self._ready and not self._details_pending:
+                # Expanded is raised before the template has made its content
+                # visible. Measure after that transition, preserving manual size.
+                self._details_pending = True
+                self.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, Action(self.resize_details))
+
+        def resize_details(self):
+            from System.Windows import Size
+
+            self._details_pending = False
+            if not self._ready:
+                return
+            expanded = bool(self.message_expander.IsExpanded)
+            if expanded == self._details_open:
+                return
+            if expanded:
+                self.message_expander.Measure(Size(max(1, self.message_expander.ActualWidth), float('inf')))
+                extra = max(0, self.message_expander.DesiredSize.Height - self._collapsed_details_height)
+                previous = self.Height
+                self.MinHeight = min(self.MaxHeight, self._collapsed_min_height + extra)
+                self.Height = min(self.MaxHeight, max(self.MinHeight, previous + extra))
+                self._details_growth = self.Height - previous
+            else:
+                self.MinHeight = self._collapsed_min_height
+                self.Height = max(self.MinHeight, min(self.MaxHeight, self.Height - self._details_growth))
+                self._details_growth = 0
+            self._details_open = expanded
 
     class SelectionWindow(DialogWindow):
-        def __init__(self, title, items, multiple, groups, prompt, required,
+        def __init__(self, title, items, multiple, groups, prompt, required, all_label,
                      version, owner, navigate):
             self.state = SelectionState(items, multiple, groups)
             self.required = required
             self.initialize('SelectionDialog.xaml', title, version, owner, navigate)
             self.prompt_label.Content = prompt
-            self.group_filter.ItemsSource = [SelectionGroup(None, 'All Items')] + self.state.groups
+            self.group_filter.ItemsSource = [SelectionGroup(None, all_label)] + self.state.groups
             self.group_filter.SelectedIndex = 0
             self.group_row.Visibility = Visibility.Visible if self.state.groups else Visibility.Collapsed
             self.batch_actions.Visibility = Visibility.Visible if multiple else Visibility.Collapsed
             self._ready = True
             self.refresh()
             self.Loaded += self.focus_filter
+            self.PreviewKeyDown += self.block_enter
+
+        def block_enter(self, sender, args):
+            if args.Key == Key.Enter:
+                args.Handled = True
 
         def focus_filter(self, sender, args):
             self.filter_text.Focus()
@@ -194,12 +225,39 @@ def _window_types():
             self.required = required
             self.validator = validator
             self.initialize('TextPromptDialog.xaml', title, version, owner, navigate)
+            self._kla_chrome.hide_footer()
             self.prompt_label.Content = prompt
             self.input_text.Text = default
             self._ready = True
             self.Loaded += self.focus_input
+            self.Closed += self.stop_layout
+            self.fit_prompt()
+
+        def stop_layout(self, sender, args):
+            self._ready = False
+
+        def fit_prompt(self):
+            from math import ceil
+            from System.Windows import Size
+
+            if not self._ready:
+                return
+            inset = self.FindResource('KlaBodyInset')
+            bounds = Size(max(1, self.Width - inset.Left - inset.Right), float('inf'))
+            self.prompt_fields.Measure(bounds)
+            self.prompt_actions.Measure(bounds)
+            desired = (self.FindResource('KlaChromeRow').Value + inset.Top + inset.Bottom
+                       + self.prompt_fields.DesiredSize.Height + self.prompt_actions.DesiredSize.Height)
+            self.Height = max(self.MinHeight, min(self.MaxHeight, ceil(desired)))
+
+        def feedback(self, text):
+            DialogWindow.feedback(self, text)
+            # Let visibility/template changes settle before measuring raw fields;
+            # a constrained ScrollViewer reports viewport size instead of content.
+            self.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, Action(self.fit_prompt))
 
         def focus_input(self, sender, args):
+            self.fit_prompt()
             self.input_text.Focus()
             self.input_text.SelectAll()
 
@@ -220,25 +278,17 @@ def _window_types():
     return _TYPES
 
 
-def create_message(title, message, buttons=('ok',), severity='information', details='',
-                   default_action=None, version=None, owner=None, navigate=None):
-    buttons = tuple(buttons)
-    if (not 1 <= len(buttons) <= 3 or len(set(buttons)) != len(buttons)
-            or any(action not in _BUTTONS for action in buttons)):
-        raise ValueError('Use one to three distinct actions: ok, yes, no, retry, cancel.')
+def create_message(title, message, severity='information', details='',
+                   version=None, owner=None, navigate=None):
     if severity not in ('information', 'warning', 'error', 'success'):
         raise ValueError('Unknown message severity.')
-    if default_action is None:
-        default_action = next((action for action in ('cancel', 'no') if action in buttons), buttons[0])
-    if default_action not in buttons:
-        raise ValueError('Default action must be one of the displayed actions.')
-    return _window_types()[0](title, message, buttons, severity, details, default_action,
+    return _window_types()[0](title, message, severity, details,
                               version, owner, navigate)
 
 
 def create_selection(title, items, multiple=True, groups=None, prompt='Select Items',
-                     required=True, version=None, owner=None, navigate=None):
-    return _window_types()[1](title, items, multiple, groups, prompt, required, version, owner, navigate)
+                     required=True, all_label='All Items', version=None, owner=None, navigate=None):
+    return _window_types()[1](title, items, multiple, groups, prompt, required, all_label, version, owner, navigate)
 
 
 def create_choice(title, choices, prompt='Choose an Action', version=None, owner=None, navigate=None):

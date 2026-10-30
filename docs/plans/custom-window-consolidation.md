@@ -148,8 +148,8 @@ existing authorization:
    issues. First make resource packaging compatible with CLR/localization
    adapters; build supported targets and retain honest matching-host limits.
 
-Current inventory is 25 Window sources: five references, nine Python tool
-windows, four opt-in dialog bodies, five compiled windows, the shared-shell
+Current inventory is 26 Window sources: five references, nine Python tool
+windows, five opt-in dialog bodies, five compiled windows, the shared-shell
 Gallery and the PreviewFixture tooling exception.
 The nine Python and five compiled windows are the production/tool migration
 scope. Gallery remains the review harness; its previews and source/caller
@@ -216,8 +216,12 @@ initial delivery; this phase changes the current catalog.
 | ID | Slice | Status | Decision / completion condition |
 | --- | --- | --- | --- |
 | GUI-20 | Remove two Gallery variants | Implemented; locally verified | Confirmation/parameter entries and sample branches removed. 65 Gallery tests (one existing skip), 20 remaining dialog state layouts at normal/minimum sizes, and 91 custom/state WPF constructions pass; current catalog is 40 entries. Four bodies and message/selection APIs retained. |
-| GUI-21 | Refine remaining dialog/selector/switch design | Decisions captured; final confirmation pending | Four interview rounds recorded below. Text footer/type confirmed; Message sizing failure reproduced offscreen. Obtain one settled-design confirmation before implementing outcomes. |
+| GUI-21 | Refine remaining dialog/selector/switch design | Confirmed by owner | Owner explicitly said "confirmed, implement" after the final design summary. No further design approval gate for this scope. |
 | GUI-22 | Rework Action choice independently | Future; explicitly deferred by owner | Preserve the existing Action choice window/API. No layout or interaction changes in the current selector/message/text/command-switch delivery. Revisit as its own design effort. |
+| GUI-23 | Refine Message, Text and shared selector interactions | Implemented; locally verified | Details growth/manual-height regression, repeated expansion, footer isolation, exact 36/24 Segoe UI Bold field, unclipped validation and explicit Select pass in actual WPF. [Evidence](../knowledge/reviews/design-system/2026-10-29-dialog-refinement.md). |
+| GUI-24 | Read-only collectors and five selector presets | Implemented; boundary tested | Eleven collector tests, SDK/API checks, host-free imports and prepared-row/modal helpers pass. Five fictional Gallery presets verified. Actual Revit model collection remains owner acceptance. |
+| GUI-25 | Separate floating Command Switch | Implemented; locally verified | Seven model tests plus real-WPF construction, minimum/long layouts, filtering/toggle clones/results/Close/Escape handler checks pass. Actual focus/keyboard/owner remains live acceptance. |
+| GUI-26 | Documentation, independent review and verification | Local verification complete; owner host review pending | 380 Python tests (one existing skip), 17 C# tests, 116 WPF constructions/45 shared-dialog state layouts, both compiled runtimes, independent review, inspected renders, source-scope review and documentation audit pass. [Record and host limits](../knowledge/reviews/design-system/2026-10-29-dialog-refinement.md). |
 
 Settled: remove the two separate previews; retain Message, Selection, Action
 choice and Text for refinement; add the requested selector types and a separate
@@ -306,7 +310,7 @@ This reproduces the hidden-message/forced-height behavior; it does not establish
 live pointer-driven flicker. The first diagnostic lacked WPF initialization
 before importing Size; after importing wpf first, the diagnostic completed.
 
-## Final refinement design — awaiting owner confirmation
+## Final refinement design — confirmed for implementation
 
 The proposed delivery implements the recorded choices above, with these
 concrete behavior/verification conditions:
@@ -347,8 +351,9 @@ concrete behavior/verification conditions:
 Action choice redesign is explicitly deferred under GUI-22 and remains
 unchanged. Separate Confirmation/Parameter previews remain deleted. Existing
 tools, native pickers/progress overlays and unrelated GUI-14 work remain outside
-this delivery. The only pending decision is confirmation of this final design;
-no runtime behavior has changed during the interview.
+this delivery. The owner confirmed this final design and requested implementation.
+Runtime changes began only after that confirmation. Earlier "pending" statements
+above describe the recorded interview stage rather than a current approval gate.
 
 Useful inspected facts for subsequent rounds: sheet selector uses All Sheets and
 sheet sets, sorted sheet numbers; revisions follow SequenceNumber without an

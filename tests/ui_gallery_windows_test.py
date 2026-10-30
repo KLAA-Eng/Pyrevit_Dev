@@ -132,6 +132,8 @@ class GalleryWindowTests(unittest.TestCase):
             tree.body.extend(ast.parse(stream.read()).body)
         with open(os.path.join(ROOT, 'lib', 'GUI', 'dialogs', 'windows.py'), encoding='utf-8') as stream:
             tree.body.extend(ast.parse(stream.read()).body)
+        with open(os.path.join(ROOT, 'lib', 'GUI', 'dialogs', 'command_switch.py'), encoding='utf-8') as stream:
+            tree.body.extend(ast.parse(stream.read()).body)
         methods = {node.name for node in ast.walk(tree)
                    if isinstance(node, ast.FunctionDef)}
         events = {'Click', 'Checked', 'Unchecked', 'MouseDown', 'TextChanged',
