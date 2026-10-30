@@ -16,6 +16,7 @@ class CustomAlert(my_WPF):
     def __init__(self, message, title='KL&A Tools', is_warning=False):
         load_window(self, os.path.join(PATH_SCRIPT, 'CustomAlert.xaml'),
                     title or 'KL&A Tools')
+        self._kla_chrome.hide_footer()
         self.message_text.Text = message or ''
         self._set_alert_style(is_warning)
         fit_window_height(self)

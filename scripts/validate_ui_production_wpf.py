@@ -10,7 +10,7 @@ from __future__ import print_function
 import math
 
 from System import Uri
-from System.Windows import Window, Size, Rect, Point, ResourceDictionary, ResizeMode, TextWrapping
+from System.Windows import Window, Size, Rect, Point, ResourceDictionary, ResizeMode, TextWrapping, Visibility
 from System.Windows.Automation import AutomationProperties
 from System.Windows.Controls import (Border, Button, ContentControl, Image, Label,
                                      ScrollBarVisibility, ScrollViewer, StackPanel, TextBlock,
@@ -90,7 +90,11 @@ def validate_production_windows():
                 shell, chrome = window.window_shell, window._kla_chrome
                 token = window.FindResource
                 chrome_row, inset = token('KlaChromeRow').Value, token('KlaBodyInset')
-                assert chrome.header.ActualHeight == chrome.footer.ActualHeight == chrome_row, (identity, state)
+                assert chrome.header.ActualHeight == chrome_row, (identity, state)
+                assert chrome.footer.ActualHeight == (0 if identity == 'kla-custom-alert' else chrome_row), (identity, state)
+                if identity == 'kla-custom-alert':
+                    assert chrome.footer.Visibility == Visibility.Collapsed
+                    assert shell.Template.FindName('PART_FooterRow', shell).Height.Value == 0
                 origin = window.window_body.TranslatePoint(Point(0, 0), shell)
                 assert abs(origin.X - inset.Left) < 0.1 and abs(origin.Y - (chrome_row + inset.Top)) < 0.1, (identity, state, origin)
                 assert abs(window.window_body.ActualWidth - (width - inset.Left - inset.Right)) < 1, (identity, state)

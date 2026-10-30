@@ -10,7 +10,8 @@ compiled window classes use `KlaWindowShell`. PreviewFixture retains its
 standalone test chrome. Native/pyRevit dialogs and Recall's docked panel have
 separate host presentation; the standalone Recall body uses the shared system.
 The sixth opt-in body is a floating Command Switch using shared colors/styles
-with its own compact layout. Text omits the standard footer by design.
+with its own compact layout. Message, Text and KL&A Custom Alert omit the standard
+footer and its reserved row by design, retaining their title/Close controls.
 The current inventory has 25 standalone Window sources: nine Python tool
 windows, six opt-in bodies, three reference templates, five compiled windows,
 Gallery and PreviewFixture.
@@ -454,7 +455,8 @@ and footer navigation are connected by the adapter. A Gallery presenter passes
 `fit_window_height(window)` is an optional measurement helper: it clamps the
 content height to the caller's MinHeight/MaxHeight and does not show the window.
 `window._kla_chrome.hide_footer()` collapses that shell instance's footer and
-named footer row. Text uses it; resources and other windows are unaffected.
+named footer row. Message, Text and KL&A Custom Alert use it; the shared template
+and other windows retain their footers.
 
 Installed pyRevit `6.5.3.26176+2017` exposes
 `load_xaml(self, xaml_source, literal_string=False, handle_esc=True, set_owner=True)`.
@@ -527,7 +529,8 @@ Importing the package is host-free. Factories lazily load WPF and return unshown
 bare WPF windows; modal helpers call ShowDialog and return `DialogResult`.
 Supply the owner and caller version. No import/factory infers or queries the
 current document. Specialized modal helpers explicitly call separate read-only
-collectors before showing UI. Existing CustomAlert/SelectFromDict remain unchanged.
+collectors before showing UI. Existing CustomAlert/SelectFromDict retain their
+calling contracts; CustomAlert now omits its footer.
 
 Close/Cancel cancel. Selection requires Select, with Enter/double-click acceptance
 disabled in both checkbox modes. Text Enter validates/accepts; Message Enter

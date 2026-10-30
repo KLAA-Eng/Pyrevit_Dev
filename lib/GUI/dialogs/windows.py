@@ -58,6 +58,7 @@ def _window_types():
         def __init__(self, title, message, severity, details,
                      version, owner, navigate):
             self.initialize('MessageDialog.xaml', title, version, owner, navigate)
+            self._kla_chrome.hide_footer()
             roles = {'information': ('Information', 'KlaInformationGeometry', 'KlaInfoBrush'),
                      'warning': ('Warning', 'KlaWarningGeometry', 'KlaWarningBrush'),
                      'error': ('Error', 'KlaMessageErrorGeometry', 'KlaErrorBrush'),

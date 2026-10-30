@@ -256,6 +256,8 @@ def _window_type():
                 self.Title = title
             else:
                 load_window(self, path, title, launcher.get('tool_version'), self._preview_navigation)
+                if self.preview_id == 'kla-custom-alert':
+                    self._kla_chrome.hide_footer()
             if hasattr(self, 'main_title'):
                 self.main_title.Text = launcher.get('title', 'Preview')
             if hasattr(self, 'footer_version'):

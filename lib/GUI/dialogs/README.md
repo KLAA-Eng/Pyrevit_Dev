@@ -29,7 +29,7 @@ mode; do not also supply a `multiple` argument.
 All factories take `version=None`, `owner=None`, `navigate=None`. Owner may be a
 shown WPF Window, `System.IntPtr`, or integer native handle. Supply the host
 owner explicitly. Pure caller version, such as `v1.2`, is metadata; no extension
-version is inferred. Text and Command Switch intentionally display no version
+version is inferred. Message, Text and Command Switch intentionally display no version
 footer. Gallery supplies simulated navigation; ordinary shared footers use the
 established destinations. Command Switch has no navigation links.
 

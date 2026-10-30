@@ -33,7 +33,11 @@ def dialog_layout(window, width=None, height=None):
         return window
     chrome = window._kla_chrome
     assert chrome.header.ActualHeight == 24
-    assert chrome.footer.ActualHeight == (0 if hasattr(window, 'input_text') else 24)
+    footerless = hasattr(window, 'input_text') or hasattr(window, 'message_banner')
+    assert chrome.footer.ActualHeight == (0 if footerless else 24)
+    if footerless:
+        assert chrome.footer.Visibility == Visibility.Collapsed
+        assert window.window_shell.Template.FindName('PART_FooterRow', window.window_shell).Height.Value == 0
     assert str(chrome.version.Foreground) == '#FF808080'
     assert str(chrome.prototype.Foreground) == '#FF407058'
     actions = [control for control in descendants(window.window_body)
@@ -42,7 +46,7 @@ def dialog_layout(window, width=None, height=None):
     for button in actions:
         position = button.TranslatePoint(Point(0, 0), window.Content)
         assert position.X >= 0 and position.X + button.ActualWidth <= width, (window.Title, button.Content, position.X, width)
-        bottom = height if hasattr(window, 'input_text') else chrome.footer.TranslatePoint(Point(0, 0), window.Content).Y
+        bottom = height if footerless else chrome.footer.TranslatePoint(Point(0, 0), window.Content).Y
         assert position.Y + button.ActualHeight <= bottom, (window.Title, button.Content)
     return window
 

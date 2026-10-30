@@ -96,7 +96,7 @@ class WindowChrome(object):
             self.window.Close()
 
     def hide_footer(self):
-        """Opt out for a compact prompt, without changing the shared template."""
+        """Omit this window's footer and row without changing the shared template."""
         from System.Windows import GridLength, Visibility
 
         self.footer.Visibility = Visibility.Collapsed

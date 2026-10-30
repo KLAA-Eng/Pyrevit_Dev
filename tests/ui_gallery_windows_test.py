@@ -77,6 +77,7 @@ def host_modules(alerts):
         # The shared shell's real resource/template/event bindings run in the WPF probe.
         load(control, path)
         control.Title = title
+        control._kla_chrome = module(hide_footer=lambda: None)
 
     class Bitmap(object):
         def BeginInit(self):

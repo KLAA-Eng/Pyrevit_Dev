@@ -49,6 +49,9 @@ def validate_message_variants():
                                     severity=severity, details='First diagnostic line.\nSecond line.' if with_details else '')
             try:
                 message_layout(window)
+                assert window._kla_chrome.footer.Visibility == Visibility.Collapsed
+                assert window._kla_chrome.footer.ActualHeight == 0
+                assert window.window_shell.Template.FindName('PART_FooterRow', window.window_shell).Height.Value == 0
                 assert window.message_heading.FontSize == 18
                 assert str(window.message_heading.FontWeight) == 'SemiBold'
                 assert str(window.message_heading.FontFamily) == 'Segoe UI'

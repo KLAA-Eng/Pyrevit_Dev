@@ -9,7 +9,8 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   Factory functions construct windows; `show_*`/selection/prompt helpers show
   them modally and return `DialogResult`. No automatic script exit occurs.
 - AC-002: Message is an OK-only notice with information/warning/error/success
-  and optional collapsed Details. Initial height fits content up to the cap.
+  and optional collapsed Details. Both Message variants omit the shared footer
+  and its reserved row; title/Close and OK remain. Initial height fits content up to the cap.
   Width changes do not force height changes during manual resizing. Expanding
   Details grows the bottom, preserving the message viewport until capped;
   content remains scrollable. Repeated expansion/collapse does not drift size.
@@ -46,7 +47,7 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   extra blank space. Enter accepts valid text; title Close/Escape cancels.
 - AC-006: Existing shared palette, typography, controls and icons remain the
   presentation authority. Standard bodies use the shell/green-gray footer;
-  Text opts out of the footer only; floating Command Switch has its own compact
+  Message and Text omit the footer; floating Command Switch has its own compact
   panel. Owner is an explicit WPF window/native handle. No import queries the
   current document. All factories construct without showing; modal helpers
   show and return explicit results without running model operations.
@@ -96,7 +97,9 @@ Prepared-row factories are host-independent; optional modal convenience helpers
 invoke collectors in a valid Revit API context before showing UI. Callers own
 document lifetime and any subsequent operations. These APIs are not drop-in
 replacements for pyRevit return types. Existing multi-button Message options
-are retired from this unused opt-in API; existing CustomAlert is unchanged.
+are retired from this unused opt-in API; existing CustomAlert retains its API.
 
 Native file/folder/color pickers, progress and selection overlays, existing
-CustomAlert/SelectFromDict and packaged compiled assemblies are out of scope.
+CustomAlert/SelectFromDict workflow migration and packaged compiled assemblies
+are out of scope. The owner's subsequent presentation change removes the footer
+from both shared Message variants and legacy CustomAlert.

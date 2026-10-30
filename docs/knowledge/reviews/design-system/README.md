@@ -5,6 +5,7 @@ implementation guide is [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
 
 | Review | Scope |
 | --- | --- |
+| [2026-10-30 footerless alerts](2026-10-30-footerless-alerts.md) | Remove footer and reserved row from shared Message variants and legacy CustomAlert; preserve other shells and verify Details/overflow. |
 | [2026-10-30 shared window variants](2026-10-30-shared-window-variants.md) | Family/variant Gallery, Message severity and Details alignment, Command Switch presets, horizontal KLC-Rename, independent review and Windows evidence. |
 | [2026-10-30 template retirement](2026-10-30-template-retirement.md) | Remove duplicate Message/Selection template sources and controllers; retain Form/Options/Review and add shared Message Warning/Success previews. |
 | [2026-10-30 focus/summary removal](2026-10-30-focus-summary-cleanup.md) | Remove the green focus adorner and selector counts; preserve keyboard/state/validation and exact action spacing. |
