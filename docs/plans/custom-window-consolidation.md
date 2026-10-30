@@ -216,14 +216,15 @@ initial delivery; this phase changes the current catalog.
 | ID | Slice | Status | Decision / completion condition |
 | --- | --- | --- | --- |
 | GUI-20 | Remove two Gallery variants | Implemented; locally verified | Confirmation/parameter entries and sample branches removed. 65 Gallery tests (one existing skip), 20 remaining dialog state layouts at normal/minimum sizes, and 91 custom/state WPF constructions pass; current catalog is 40 entries. Four bodies and message/selection APIs retained. |
-| GUI-21 | Refine remaining dialog/selector/switch design | Interview open | Read installed pyRevit behavior first. Ask the independent decision frontier, record answers and obtain settled-design confirmation before implementing interview outcomes. |
+| GUI-21 | Refine remaining dialog/selector/switch design | Decisions captured; final confirmation pending | Four interview rounds recorded below. Text footer/type confirmed; Message sizing failure reproduced offscreen. Obtain one settled-design confirmation before implementing outcomes. |
+| GUI-22 | Rework Action choice independently | Future; explicitly deferred by owner | Preserve the existing Action choice window/API. No layout or interaction changes in the current selector/message/text/command-switch delivery. Revisit as its own design effort. |
 
 Settled: remove the two separate previews; retain Message, Selection, Action
-choice and Text for refinement; add the requested selector types and a KLCode
-command switch. Open: common selector structure/interaction, whether switch
-replaces Action choice, switch chrome and optional toggles, and per-dialog
-visual/behavior decisions. No new selector/switch implementation is approved
-by an unanswered interview question.
+choice and Text for refinement; add the requested selector types and a separate
+KLCode command switch. Round 1 decisions below supersede the initial proposals.
+Per-dialog refinements remain open. Collector defaults are settled in Round 2.
+Interview outcomes
+will be implemented after the complete design is confirmed as settled.
 
 Inspected reference: installed pyRevit 6.5.3 IronPython forms, under
 `%APPDATA%/pyRevit-Master/pyrevitlib/pyrevit/forms/`. `_ipy.py` owns
@@ -231,24 +232,123 @@ SelectFromList (1024), CommandSwitchWindow (1523), select_revisions (2434),
 select_sheets (2487), select_open_docs (2827); associated XAML owns layout.
 No upstream implementation/assets are copied by this review.
 
-Design tree / first independent frontier (recommendations are unaccepted):
+Design tree / settled Round 1 answers:
 
-- Selector family structure: recommend one shared body with five named presets
-  (Sheets, Revisions, Open Documents, List Single, List Multiple), optional groups.
-  Once settled, resolve domain labels/order/eligibility/search and field layout.
-- Selection interaction: recommend highlighted rows without checkboxes in single
-  mode, Select/Enter or double-click to accept; explicit checked rows only in
-  multiple mode, preserving hidden/group checks. pyRevit itself also returns
-  highlighted unchecked rows in multiple mode; do not silently inherit that.
-- Host/data boundary: recommend host-free bodies plus separate optional read-only
-  Revit collectors; Gallery stays fictional and no production callers migrate.
-  Collector defaults/API details follow agreement on that boundary.
-- Action choice relationship: recommend command switch replaces current Action
-  choice; resolve public API compatibility after this choice.
-- Switch presentation: recommend pyRevit's compact floating panel, prompt/search
-  and wrapping immediate-choice buttons in KLCode colors, as an explicit chrome
-  exception. Standard shared header/footer remains for the other dialogs.
-  Toggle switches, access keys and keyboard/filter details follow this decision.
+| Question | Owner decision | Next dependent decisions |
+| --- | --- | --- |
+| Q1: Selector family | Yes: one shared foundation with Sheets, Revisions, Open Documents, List Single and List Multiple presets; optional groups | Common search, domain labels/order/eligibility, layout |
+| Q2: Selection interaction | Single retains the same checkbox style, with at most one checked row. No double-click or Enter acceptance; use Select. Multiple returns checked rows only, preserving checks across groups/filtering | Multiple acceptance keys, visible batch controls, required/optional defaults |
+| Q3: Host/data boundary | Yes: host-free windows plus separate read-only Revit collectors. Gallery stays fictional and existing tools keep their current calls | Collector defaults/API details |
+| Q4: Action choice relationship | No to replacement: retain Action choice and add Command Switch as a separate dialog | Refine each dialog's distinct layout/behavior |
+| Q5: Switch presentation | Yes: pyRevit-style compact floating panel, prompt/search and wrapping immediate-choice buttons in KLCode colors; exception to standard header/footer | Optional toggles, access keys, keyboard/filter behavior |
+
+Rejected proposals: highlighted-row single selection, double-click/Enter
+acceptance for single selection, and replacement of Action choice. These are
+not implementation requirements. Single selection should uncheck a previous
+row when a new row is checked, including a previous check hidden by filtering.
+The current selector has IsDefault=True on Select; the implementation phase
+must correct that contract for both modes and prevent Enter acceptance.
+
+Design tree / settled Round 2 answers (all recommendations accepted):
+
+| Question | Owner decision | Consequence |
+| --- | --- | --- |
+| Q1: Multiple acceptance | Single and multiple match except for one/many checked rows; both require Select, with no Enter/double-click acceptance | Retain shared checkbox layout and explicit acceptance policy; batch actions remain meaningful only for multiple mode |
+| Q2: Search and batch scope | Case-insensitive label/description search; no fuzzy ranking or regex. All/None touches visible eligible rows only | Preserve hidden checks and source order |
+| Q3: Sheets | Sheet number/name labels, sorted by sheet number; All Sheets plus sheet-set groups. Exclude placeholders by default, with caller option to include them | Apply eligibility consistently in every group and return each sheet once |
+| Q4: Revisions | Number, description, date and issued status; sequence order. Include issued/unissued unless caller restricts eligibility | Read-only collector prepares labels/order/eligibility |
+| Q5: Open documents | Exclude links/active document by default; include project/family documents. Secondary type/path information distinguishes duplicate titles | Expose caller inclusion options without changing stable payload identity |
+| Q6: Command-switch toggles | Support optional on/off switches and return their states with chosen command | Resolve filtering/keyboard/dismissal behavior next |
+
+Next independent frontier: Message presentation/button scope; Text compactness
+and acceptance; Action choice layout/acceptance; floating command-switch
+keyboard, filtering of optional toggles and visible cancellation. Existing
+renders and actual XAML/controllers were inspected before asking this round.
+No runtime code changes have been made from these interview answers.
+
+Design tree / Round 3 answers:
+
+| Question | Owner decision | Remaining dependency |
+| --- | --- | --- |
+| Q1: Message | Yes: OK-only notice, severity icon/heading, wrapping, optional collapsed Details and bounded content fitting. Owner reports current behavior is glitchy | Identify the observed glitch before choosing a sizing/interaction fix; do not claim a reproduced cause |
+| Q2: Text | Yes to compact text prompt/inline validation/Cancel-OK/Enter acceptance/Escape cancellation. Increase input size to resemble pyRevit; remove "klcode fitter" | Interpret "fitter" as footer, pending confirmation; settle larger-field presentation |
+| Q3: Action choice | Rework independently later | GUI-22 is a future item; leave the current dialog/API unchanged now |
+| Q4: Switch keyboard | Yes: typing filters, Tab traverses controls, Space toggles; Enter chooses focused command or sole matching command while search is focused. Escape clears search, then cancels when empty | Implement after settled-design confirmation |
+| Q5: Switch toggle filtering | Yes: toggles stay visible while command buttons filter; preserve toggle states | Implement after settled-design confirmation |
+| Q6: Switch cancellation | Yes: small corner x for visible cancellation; clicking blank panel space keeps the window open | Implement after settled-design confirmation |
+
+Reference inspected for Text: installed GetValueWindow.xaml lines 181-189 uses
+a 36-unit-high input, FontSize=24 bold centered Courier New text, one line, and no
+Return/Tab insertion. Current KLCode Text uses a 32-unit input and the body font
+size. Proposed adaptation: match the larger 36/24 proportions and centered bold
+text while retaining KLCode Segoe UI and colors; this is not yet accepted.
+
+Message source inspection: MessageWindow.message_size_changed refits height
+whenever WidthChanged is true; details_changed also refits height via
+window_chrome.fit_window_height. This is a candidate for resize instability,
+not proof of the owner's unspecified glitch. Existing offscreen layout evidence
+does not establish glitch-free live resizing/expansion.
+
+Design tree / settled Round 4 clarifications:
+
+- Text: "fitter" means footer. Remove its Prototype/version/Outreach row while
+  retaining title and Close. Input uses the larger 36-high/FontSize=24 centered
+  proportions, specifically Segoe UI Bold and KLCode colors.
+- Message: owner observes jumping/flickering while resizing; expanding Details
+  hides the message instead of growing the bottom of the window.
+
+Sizing diagnostic, performed against the existing real WPF controls without
+source changes, visible windows or Revit: a short message initially measured
+Window.Height=240 and message_banner.ActualHeight=101. Expanding Details kept
+Height=240 while message_banner shrank to 26 and details measured 128. A direct
+width-handler dispatch after manually assigning Height=400 reset Height to 344.
+This reproduces the hidden-message/forced-height behavior; it does not establish
+live pointer-driven flicker. The first diagnostic lacked WPF initialization
+before importing Size; after importing wpf first, the diagnostic completed.
+
+## Final refinement design — awaiting owner confirmation
+
+The proposed delivery implements the recorded choices above, with these
+concrete behavior/verification conditions:
+
+1. Five named selector presets (Sheets, Revisions, Open Documents, List Single,
+   List Multiple) share checkbox styling/layout. Single permits one check;
+   multiple permits many. Select explicitly accepts; Enter and double-click
+   never accept either mode. Hidden checks, stable payload identity and ordering
+   remain intact; visible All/None is applicable only to multiple mode.
+2. Case-insensitive label/description search preserves input order. Sheets use
+   number/name order, All Sheets/sheet-set groups and consistent placeholder
+   filtering. Revisions show number/description/date/issued state in sequence
+   order. Documents default to excluding links/active document while including
+   project/family documents, with type/path descriptions. Separate collectors
+   only read Revit; imports/windows remain independent of the active document.
+3. Message is OK-only, retaining severity and optional collapsed Details. Fit
+   initially; manual resizing must not trigger forced height feedback. Details
+   grows downward while retaining the message viewport until the existing cap
+   is reached, when both contents remain available through bounded scrolling.
+   Regression checks must cover the measured 101-to-26 shrink and manual-height
+   replacement, repeated expansion/collapse, width changes and capped overflow.
+4. Text fits its content, has the larger single-line Segoe UI Bold field,
+   inline validation and Cancel/OK; Enter accepts, Escape cancels. Remove only
+   its footer row; retain title/Close and preserve raw/accepted-empty semantics.
+5. Add a separate pyRevit-shaped floating Command Switch in KLCode colors,
+   without the standard shared header/footer. Wrapping command buttons choose
+   immediately; optional toggles stay visible and retain state while commands
+   filter. Typing searches, Tab traverses, Space toggles; Enter chooses focused
+   command or a sole match while search is focused. Escape clears search then
+   cancels; corner x cancels; blank panel clicks do not dismiss. Return stable
+   choice keys and switch states without running caller operations.
+6. Gallery uses actual new/refined windows with fictional state coverage. Update
+   SPEC/API/design references and verify host-free logic, real WPF behavior and
+   inspected normal/minimum/long/error renders. Native Revit collectors, owner,
+   modal/focus/keyboard and DPI need clearly bounded host evidence; the owner
+   retains live Revit review. No packaged DLL or production command adoption.
+
+Action choice redesign is explicitly deferred under GUI-22 and remains
+unchanged. Separate Confirmation/Parameter previews remain deleted. Existing
+tools, native pickers/progress overlays and unrelated GUI-14 work remain outside
+this delivery. The only pending decision is confirmation of this final design;
+no runtime behavior has changed during the interview.
 
 Useful inspected facts for subsequent rounds: sheet selector uses All Sheets and
 sheet sets, sorted sheet numbers; revisions follow SequenceNumber without an
