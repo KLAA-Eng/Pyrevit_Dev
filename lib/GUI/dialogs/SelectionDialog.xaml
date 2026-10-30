@@ -3,7 +3,7 @@
         Title="Select Items" Width="432" Height="576" MinWidth="432" MinHeight="420" WindowStartupLocation="CenterScreen"
         ResizeMode="CanResizeWithGrip" Style="{StaticResource KlaWindow}">
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
-        <Grid x:Name="window_body">
+        <Grid x:Name="window_body" Focusable="True" KeyboardNavigation.IsTabStop="False" FocusVisualStyle="{x:Null}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
                 <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace4}"/>

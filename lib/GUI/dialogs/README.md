@@ -72,13 +72,15 @@ fits content up to 640. Manual width changes preserve chosen height. Details
 starts collapsed and expands the bottom after WPF applies its template, retaining
 the message viewport until capped. Collapse removes the added height. At the
 cap, message and read-only details scroll. Expanded minimum height protects the
-message/action area from being squeezed away.
+message/action area from being squeezed away. OK uses `KlaButton` (104 x 28),
+with an 8-unit gap below the message or Details content.
 
 Text options are `default=''`, `required=False`, `validator=None`. The field is
 36 high, FontSize 24, centered Segoe UI Bold. Compact height fits prompt/error;
 long prompts scroll at the cap. Title/Close remain; `WindowChrome.hide_footer()`
-collapses only this template instance's footer row. Other windows keep theirs.
-Prompt/input and input-or-validation/OK gaps are 8 units. OK is the only visible
+collapses only this template instance's footer row. It does not alter other shell instances.
+Prompt/input and input-or-validation/OK gaps are 8 units. OK uses the same
+104 x 28 `KlaButton` as Message and is the only visible
 action; title Close or Escape cancels. Natural minimum height keeps these gaps
 instead of stretching blank space above the action.
 Required checks whitespace without changing the returned string. A pure, quick
@@ -122,6 +124,8 @@ align after 16-unit icons and an 8-unit gap. Group uses Lucide Layers-2 through
 Select All/None buttons center above green Select with an 8-unit gap. No visible
 Cancel action; header Close/Escape cancels. No selected/visible summary is shown
 below the list. Validation remains inline; list/action gaps remain 8 units.
+Search text and Group text share an 8-unit rendered left inset. Selection opens
+with focus on its neutral body; Search is not focused or selected automatically.
 
 The separate [collectors module](collectors.py) exposes:
 

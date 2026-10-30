@@ -208,6 +208,7 @@ for entry in adapter_entries:
                            window.Width, window.Height)
         window.Close()
 gallery.Close()
+execfile(os.path.join(repo_root, 'scripts', 'validate_ui_input_alignment_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_foundation_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_templates_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_production_wpf.py'))

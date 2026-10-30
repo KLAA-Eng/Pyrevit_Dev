@@ -14,8 +14,8 @@
                     <TextBlock x:Name="validation_text" TextWrapping="Wrap" Foreground="{StaticResource KlaErrorBrush}" Visibility="Collapsed" Margin="0,8,0,0" AutomationProperties.LiveSetting="Polite"/>
                 </StackPanel>
             </ScrollViewer>
-            <Grid x:Name="prompt_actions" Grid.Row="1" Margin="0,8,0,0"><StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-    <Button x:Name="accept_button" Content="OK" Click="accept_text" Style="{StaticResource KlaButtonPrimary}" IsDefault="True"/>
+            <Grid x:Name="prompt_actions" Grid.Row="1" Margin="{StaticResource KlaActionTopGap}"><StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+    <Button x:Name="accept_button" Content="OK" Click="accept_text" Style="{StaticResource KlaButton}" IsDefault="True"/>
 </StackPanel></Grid>
         </Grid>
     </ContentControl>

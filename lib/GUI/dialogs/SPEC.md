@@ -35,6 +35,8 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   action, with an 8-unit row gap. No visible Cancel button; Close/Escape cancels.
   No selected/visible count summary is shown below the list. Validation remains
   inline, and removing the summary does not leave an empty spacing row.
+  Initial focus is the neutral body, with no search selection/autofocus.
+  Search text aligns with Group text at an 8-unit rendered input inset.
 - AC-004: Action choices return a stable key after explicit selection and
   confirmation. Disabled choices cannot be accepted; no initial choice exists.
   Its existing layout/keyboard behavior stays unchanged; redesign is deferred.
@@ -43,7 +45,8 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   Compact height fits prompt/validation. Input is 36 high, FontSize 24, centered
   Segoe UI Bold with KLCode colors. Retain title/Close; remove footer and its
   reserved row. Prompt/input and input-or-validation/OK gaps are 8. The only
-  visible action is OK; no Cancel button. Content-driven minimum height avoids
+  visible action is the same 104 x 28 `KlaButton` OK used by Message; no Cancel button.
+  Both use the standard 8-unit content-to-action gap. Content-driven minimum height avoids
   extra blank space. Enter accepts valid text; title Close/Escape cancels.
 - AC-006: Existing shared palette, typography, controls and icons remain the
   presentation authority. Standard bodies use the shell/green-gray footer;

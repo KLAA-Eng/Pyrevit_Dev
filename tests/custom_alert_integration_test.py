@@ -53,6 +53,7 @@ class CustomAlertPresentationTests(unittest.TestCase):
             controls(window)
             window.Title = title
             window.version = version
+            window._kla_chrome = module(hide_footer=lambda: actions.append('hide footer'))
             actions.append('load')
         def fit(window):
             self.assertTrue(hasattr(window.alert_icon, 'Content'))
@@ -78,7 +79,7 @@ class CustomAlertPresentationTests(unittest.TestCase):
         adapter, actions = self.load_adapter()
         window = adapter.CustomAlert('Review this warning.', title='Caller title', is_warning=True)
         self.assertEqual('Warning', window.alert_icon.automation_name)
-        self.assertEqual(['load', 'fit', 'show'], actions)
+        self.assertEqual(['load', 'hide footer', 'fit', 'show'], actions)
         self.assertEqual('Caller title', window.Title)
         self.assertIsNone(window.version)
         self.assertEqual('Review this warning.', window.message_text.Text)
@@ -89,7 +90,7 @@ class CustomAlertPresentationTests(unittest.TestCase):
     def test_information_keeps_empty_input_fallback_and_public_wrapper(self):
         adapter, actions = self.load_adapter()
         window = adapter.CustomAlert(None, title=None)
-        self.assertEqual(['load', 'fit', 'show'], actions)
+        self.assertEqual(['load', 'hide footer', 'fit', 'show'], actions)
         self.assertEqual('KL&A Tools', window.Title)
         self.assertEqual('', window.message_text.Text)
         self.assertEqual('Information', window.alert_heading.Text)

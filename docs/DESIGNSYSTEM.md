@@ -388,7 +388,9 @@ control sizes require different resource types.
 | `KlaBodyInset` | Thickness | `16,8,16,8`, shell body padding |
 | `KlaSectionPadding` | Thickness | 12, field-group inset |
 | `KlaCompactInset` | Thickness | `8,4`, compact component/cell padding |
-| `KlaInputPadding` | Thickness | `8,0`, input/button text padding |
+| `KlaInputPadding` | Thickness | `8,0`, button/toggle content padding |
+| `KlaTextBoxPadding` | Thickness | `5,0`, native TextBox padding; border and native text inset yield 8 units of rendered horizontal inset, matching ComboBox text |
+| `KlaActionTopGap` | Thickness | `0,8,0,0`, standard content-to-action gap for Message and Text Entry |
 | `KlaControlHeight`, `KlaCompactHeight`, `KlaCompactFieldHeight` | Double | Control heights of 32, 28 and 24 |
 
 `KlaGridSpace12` and `KlaGridSpace24` are not currently defined. If a new shared
@@ -564,11 +566,16 @@ content; manual width changes no longer force a new height. Deferred Details
 measurement grows the bottom and protects the message viewport until capped.
 Text removes only its footer row and uses the larger Segoe UI Bold field,
 content-fitting prompt/error height and single-line entry. Its only visible
-action is OK; prompt/input and input-or-error/OK gaps are 8 units. Close/Escape
+action is the same 104 x 28 `KlaButton` OK used by Message; both use an 8-unit
+content-to-action gap through `KlaActionTopGap`. Prompt/input spacing is also 8. Close/Escape
 still cancels. Shared selectors open at 432 x 576, retaining the established
 Selection geometry after retirement of the duplicate template.
 Search sits above optional Group; both fields are 24 high and align after their
-16-unit Search/Layers-2 icons plus an 8-unit gap. Template section gaps and a
+16-unit Search/Layers-2 icons plus an 8-unit gap. Actual Search/Rename text starts
+8 units inside the border, matching Group text. The foundation lets TextBoxView
+apply padding once; `KlaTextBoxPadding` compensates its native inset instead of
+adding a second content-host margin. Selectors open with neutral body focus;
+Search is not focused or selected automatically. Template section gaps and a
 centered gray Select All/None pair above green Select replace the former action
 row; Close/Escape cancels. The selected/visible summary below selector lists is
 removed; inline validation stays, with no empty summary gap. Command Switch is a

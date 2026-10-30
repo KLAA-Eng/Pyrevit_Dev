@@ -73,7 +73,7 @@
                 </ControlTemplate></Expander.Template>
                 <TextBox x:Name="message_details" Style="{StaticResource MessageDetailsReadout}" Height="128" Margin="0,8,0,0" AutomationProperties.Name="Detailed message"/>
             </Expander>
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="{StaticResource KlaActionTopGap}">
                 <Button x:Name="action_one" Click="accept_message" Style="{StaticResource KlaButton}"/>
             </StackPanel>
         </Grid>

@@ -15,6 +15,10 @@
     <Thickness x:Key="KlaLabelPadding">0</Thickness>
     <Thickness x:Key="KlaPairGap">0,0,8,0</Thickness>
     <Thickness x:Key="KlaInputPadding">8,0</Thickness>
+    <!-- Native TextBoxView adds two units and the border one: five yields
+         the same eight-unit rendered text inset as ComboBox selection text. -->
+    <Thickness x:Key="KlaTextBoxPadding">5,0</Thickness>
+    <Thickness x:Key="KlaActionTopGap">0,8,0,0</Thickness>
     <Thickness x:Key="KlaListPadding">1</Thickness>
     <Thickness x:Key="KlaItemPadding">4,1</Thickness>
     <Thickness x:Key="KlaBrandInset">8,0,0,0</Thickness>

@@ -5,6 +5,7 @@ implementation guide is [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
 
 | Review | Scope |
 | --- | --- |
+| [2026-10-30 input alignment and actions](2026-10-30-input-alignment.md) | Correct doubled foundation TextBox padding, neutral Selection focus, shared compact OK buttons and standard action spacing. |
 | [2026-10-30 footerless alerts](2026-10-30-footerless-alerts.md) | Remove footer and reserved row from shared Message variants and legacy CustomAlert; preserve other shells and verify Details/overflow. |
 | [2026-10-30 shared window variants](2026-10-30-shared-window-variants.md) | Family/variant Gallery, Message severity and Details alignment, Command Switch presets, horizontal KLC-Rename, independent review and Windows evidence. |
 | [2026-10-30 template retirement](2026-10-30-template-retirement.md) | Remove duplicate Message/Selection template sources and controllers; retain Form/Options/Review and add shared Message Warning/Success previews. |

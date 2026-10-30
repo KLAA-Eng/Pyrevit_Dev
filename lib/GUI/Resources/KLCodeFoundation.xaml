@@ -625,11 +625,12 @@
         <Setter Property="BorderBrush" Value="{StaticResource KlaBorderBrush}"/>
         <Setter Property="BorderThickness" Value="{StaticResource KlaHairline}"/>
         <Setter Property="Height" Value="{StaticResource KlaControlHeight}"/>
-        <Setter Property="Padding" Value="{StaticResource KlaInputPadding}"/>
+        <Setter Property="Padding" Value="{StaticResource KlaTextBoxPadding}"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TextBox">
             <Border x:Name="InputBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{StaticResource KlaRadiusControl}">
-                <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                <!-- TextBoxView already applies Padding; a host margin doubles it. -->
+                <ScrollViewer x:Name="PART_ContentHost"/>
             </Border>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="InputBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}"/></Trigger>

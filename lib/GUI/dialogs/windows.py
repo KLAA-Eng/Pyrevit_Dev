@@ -141,7 +141,7 @@ def _window_types():
                 args.Handled = True
 
         def focus_filter(self, sender, args):
-            self.filter_text.Focus()
+            self.window_body.Focus()
 
         def refresh(self):
             self._ready = False
