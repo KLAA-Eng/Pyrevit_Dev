@@ -203,3 +203,57 @@ File/folder/color pickers, progress/selection overlays, Revit queries, current
 CustomAlert/SelectFromDict contracts and packaged DLLs remain outside this slice.
 GUI-14's existing-tool keyboard issues remain separate. No production adoption
 or release/version delivery is implied by adding the new dialog APIs.
+
+## Shared dialog refinement interview
+
+The owner next requested removal of separate Confirmation and Parameter
+selection entries, a KLCode grilling review of the remaining dialogs, sheet,
+revision, open-document and single/multiple list selectors, plus a command
+switch matching pyRevit's visual layout with KLCode colors. Production tool
+migration remains excluded. Historical six-variant evidence above records the
+initial delivery; this phase changes the current catalog.
+
+| ID | Slice | Status | Decision / completion condition |
+| --- | --- | --- | --- |
+| GUI-20 | Remove two Gallery variants | Implemented; locally verified | Confirmation/parameter entries and sample branches removed. 65 Gallery tests (one existing skip), 20 remaining dialog state layouts at normal/minimum sizes, and 91 custom/state WPF constructions pass; current catalog is 40 entries. Four bodies and message/selection APIs retained. |
+| GUI-21 | Refine remaining dialog/selector/switch design | Interview open | Read installed pyRevit behavior first. Ask the independent decision frontier, record answers and obtain settled-design confirmation before implementing interview outcomes. |
+
+Settled: remove the two separate previews; retain Message, Selection, Action
+choice and Text for refinement; add the requested selector types and a KLCode
+command switch. Open: common selector structure/interaction, whether switch
+replaces Action choice, switch chrome and optional toggles, and per-dialog
+visual/behavior decisions. No new selector/switch implementation is approved
+by an unanswered interview question.
+
+Inspected reference: installed pyRevit 6.5.3 IronPython forms, under
+`%APPDATA%/pyRevit-Master/pyrevitlib/pyrevit/forms/`. `_ipy.py` owns
+SelectFromList (1024), CommandSwitchWindow (1523), select_revisions (2434),
+select_sheets (2487), select_open_docs (2827); associated XAML owns layout.
+No upstream implementation/assets are copied by this review.
+
+Design tree / first independent frontier (recommendations are unaccepted):
+
+- Selector family structure: recommend one shared body with five named presets
+  (Sheets, Revisions, Open Documents, List Single, List Multiple), optional groups.
+  Once settled, resolve domain labels/order/eligibility/search and field layout.
+- Selection interaction: recommend highlighted rows without checkboxes in single
+  mode, Select/Enter or double-click to accept; explicit checked rows only in
+  multiple mode, preserving hidden/group checks. pyRevit itself also returns
+  highlighted unchecked rows in multiple mode; do not silently inherit that.
+- Host/data boundary: recommend host-free bodies plus separate optional read-only
+  Revit collectors; Gallery stays fictional and no production callers migrate.
+  Collector defaults/API details follow agreement on that boundary.
+- Action choice relationship: recommend command switch replaces current Action
+  choice; resolve public API compatibility after this choice.
+- Switch presentation: recommend pyRevit's compact floating panel, prompt/search
+  and wrapping immediate-choice buttons in KLCode colors, as an explicit chrome
+  exception. Standard shared header/footer remains for the other dialogs.
+  Toggle switches, access keys and keyboard/filter details follow this decision.
+
+Useful inspected facts for subsequent rounds: sheet selector uses All Sheets and
+sheet sets, sorted sheet numbers; revisions follow SequenceNumber without an
+automatic issued/unissued exclusion; open documents excludes links and normally
+the active document, without explicitly excluding family documents. Generic
+pyRevit search supports fuzzy ranking/regex; these are optional behavior choices.
+The floating command switch supports optional toggles, keyboard filtering and
+immediate command choices; it has no separate Continue button.

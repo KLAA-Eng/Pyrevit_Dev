@@ -13,25 +13,19 @@ def create_dialog(launcher, state):
     long = state == 'Long content'
     if long:
         title += ' - A long fictional project and review context ' * 5
-    if identity in ('dialog-message', 'dialog-confirmation'):
+    if identity == 'dialog-message':
         message = ('This is a fictional preview. No model or file is changed.' if state != 'Empty' else '')
         if long:
             message = '\n\n'.join([message + ' Review the supplied context before continuing.'] * 32)
         window = create_message(title, message,
-            buttons=('yes', 'no', 'cancel') if identity == 'dialog-confirmation' else ('ok',),
-            severity='error' if state == 'Error' else ('warning' if identity == 'dialog-confirmation' else 'information'),
+            buttons=('ok',),
+            severity='error' if state == 'Error' else 'information',
             details='Fictional diagnostic detail.\nNo production command is invoked.' if state != 'Empty' else '', **options)
-    elif identity in ('dialog-selection', 'dialog-parameters'):
-        if identity == 'dialog-parameters':
-            rows = [SelectionItem('type-width', 'Width', 'type-width', 'Type parameter - Length', ('Type',)),
-                    SelectionItem('instance-width', 'Width', 'instance-width', 'Instance parameter - Length', ('Instance',)),
-                    SelectionItem('comments', 'Comments', 'comments', 'Instance parameter - Text', ('Instance',)),
-                    SelectionItem('element-id', 'Element ID', None, 'Read-only; unavailable', ('Instance',), enabled=False)]
-        else:
-            rows = [SelectionItem('s101', 'S101 - General Notes', 's101', 'Sheet - Documentation', ('All Sheets', 'Issue Set A')),
-                    SelectionItem('s201', 'S201 - Foundation Plan', 's201', 'Sheet - Structural', ('All Sheets', 'Issue Set A')),
-                    SelectionItem('s301', 'S301 - Framing Plan', 's301', 'Sheet - Structural', ('All Sheets', 'Issue Set B')),
-                    SelectionItem('placeholder', 'S901 - Placeholder', None, 'Unavailable in this fictional workflow', ('All Sheets',), enabled=False)]
+    elif identity == 'dialog-selection':
+        rows = [SelectionItem('s101', 'S101 - General Notes', 's101', 'Sheet - Documentation', ('All Sheets', 'Issue Set A')),
+                SelectionItem('s201', 'S201 - Foundation Plan', 's201', 'Sheet - Structural', ('All Sheets', 'Issue Set A')),
+                SelectionItem('s301', 'S301 - Framing Plan', 's301', 'Sheet - Structural', ('All Sheets', 'Issue Set B')),
+                SelectionItem('placeholder', 'S901 - Placeholder', None, 'Unavailable in this fictional workflow', ('All Sheets',), enabled=False)]
         if long:
             rows += [SelectionItem('extra-' + str(index), 'Long fictional selection row ' + str(index) + ' - review context ' * 10,
                                    index, 'Additional description ' * 12, ('Additional',)) for index in range(45)]

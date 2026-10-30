@@ -15,7 +15,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 class GalleryRegistryTests(unittest.TestCase):
     def test_shared_dialog_family_is_explicitly_allowlisted_with_five_states(self):
         rows = [row for row in gallery_entries(ROOT, {}) if row['category'] == 'Shared dialog']
-        self.assertEqual(6, len(rows))
+        self.assertEqual(4, len(rows))
+        self.assertNotIn('dialog-confirmation', [row['id'] for row in rows])
+        self.assertNotIn('dialog-parameters', [row['id'] for row in rows])
         self.assertEqual(4, len(set(row['source_path'] for row in rows)))
         for row in rows:
             self.assertTrue(row['can_launch'])

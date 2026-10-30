@@ -527,8 +527,8 @@ and description using the existing checkbox template; `KlaDialogDescription`
 handles secondary/disabled text; `KlaDialogListItem` disables unavailable rows.
 Message/details overflow is bounded and scrollable.
 
-Search **Shared dialog** in Gallery for message, confirmation, grouped
-selection, parameter selection, action choice and text previews, each in five
+Search **Shared dialog** in Gallery for message, grouped selection, action
+choice and text previews, each in five
 fictional states. See the [API examples](../lib/GUI/dialogs/README.md) and
 [verification](knowledge/reviews/design-system/2026-10-29-shared-dialogs.md).
 

@@ -19,7 +19,7 @@
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
 | v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
-| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, five shared reference templates and six opt-in dialog previews. | Gallery source/tests and the 2026-10-27/29 verification records; pending next main delivery. |
+| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, five shared reference templates and four opt-in dialog previews. | Gallery source/tests and the 2026-10-27/29 verification records; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -28,17 +28,17 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 ## Shared dialog previews — 2026-10-29
 
 The owner authorized reusable GUI windows and Gallery integration without
-migrating actual tools. Six **Shared dialog** entries exercise four actual
-`lib/GUI/dialogs/` XAML bodies: message, confirmation, grouped selection,
-parameter selection, action choice and text entry. Each supports Normal,
+migrating actual tools. Four **Shared dialog** entries exercise four actual
+`lib/GUI/dialogs/` XAML bodies: message, grouped selection, action choice and
+text entry. Separate confirmation and parameter-selection previews were removed
+at the owner's request. Each remaining entry supports Normal,
 Empty, Error, Disabled and Long content using fictional data. These source
 files are version inputs for this same unreleased v0.5 delivery.
 
 These adapters use the real opt-in dialog factories and explicit result
 contracts, with simulated footer navigation. No production tool class, query,
-transaction or workflow is invoked. Parameter selection includes duplicate
-Width labels with different stable keys. The existing pyRevit previews remain
-available for comparison. The catalog now contains 42 entries and 25 Window
+transaction or workflow is invoked. The existing pyRevit previews remain
+available for comparison. The catalog now contains 40 entries and 25 Window
 sources, with five compiled previews still deferred.
 
 The [dialog contract](../../../../lib/GUI/dialogs/SPEC.md) and

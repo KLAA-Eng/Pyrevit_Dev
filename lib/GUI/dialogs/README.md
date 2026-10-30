@@ -144,9 +144,9 @@ selects the supplied default when the window loads.
 
 ## Gallery and verification
 
-In UI Gallery, search **Shared dialog**. Six variants each offer Normal, Empty,
-Error, Disabled and Long content. Parameter selection deliberately includes two
-Width labels with distinct stable keys. Fictional rows never query Revit.
+In UI Gallery, search **Shared dialog**. Four variants each offer Normal, Empty,
+Error, Disabled and Long content. The separate confirmation and parameter
+selection entries have been removed. Fictional rows never query Revit.
 The four XAML bodies use shared resources and opt-in `KlaDialogCheck`,
 `KlaDialogDescription` and `KlaDialogListItem` compositions.
 

@@ -24,8 +24,9 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   typography, controls and green/gray footer. Enter invokes the default action;
   Escape follows the same cancellation path as Close. Explicit owners may be
   WPF windows or native handles. No implicit document/host lookup occurs.
-- AC-007: Gallery offers message, confirmation, grouped selection, parameter
-  selection, action choice and text prompt previews in five fictional states.
+- AC-007: Gallery offers message, grouped selection, action choice and text
+  prompt previews in five fictional states. Separate confirmation and parameter
+  previews were removed at the owner's request before the next refinement.
   These exercise real library windows without running production commands.
 
 Prepared rows are a caller responsibility. The library does not collect Revit
