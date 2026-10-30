@@ -25,4 +25,5 @@ by the selected authority. Preserve prior evidence. Handoffs belong in
 | Plan | Role |
 | --- | --- |
 | [Compiled-tools acceptance](compiled-tools-acceptance.md) | Task authority for re-establishing current evidence and completing Family Studio/Startup Importer host acceptance. |
+| [Section Detailer](section-detailer.md) | Task authority for the DevSandbox tool that overlays detail components on a live section. |
 | [Historical plans](archive/README.md) | Prior V1 and green-window plans; retained for rationale and provenance, not independent completion tracking. |

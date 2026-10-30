@@ -1,0 +1,23 @@
+title:
+  en_us: "Section\nDetailer"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 10.30.2026
+    Status: Unreleased
+    _____________________________________________________________________
+    Description:
+    Prototype: places KL&A steel section detail components over members cut by the active section view. Missing types load from the KLAA detail component library. Revit 2024+; adds detail components to the active view.
+    _____________________________________________________________________
+    How-to:
+    - Open a section view and click the button.
+    - Approve loading any missing types; pick a type when more than one family matches.
+    - Re-running offers to replace or add to components this tool placed earlier.
+    - Members running along the section, oblique members, and unsupported shapes are listed, not placed.
+    _____________________________________________________________________
+    Last update:
+    - [10.30.2026] - v0.0: Phase 1 prototype for steel members cut by the section.
+author: KL&A
+min_revit_version: 2024
+engine:
+  clean: true
