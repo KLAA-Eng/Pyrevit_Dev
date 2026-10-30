@@ -17,6 +17,7 @@ tooltip:
     - Search Shared dialog to review Message, Text, five selector presets, Command Switch, and existing Action choice.
     _____________________________________________________________________
     Last update:
+    - [10.29.2026] - v0.5 (Unreleased): Restore Window source header sorting in both directions.
     - [10.29.2026] - v0.5 (Unreleased): Refine Message/Text, add selector presets and floating Command Switch; Action choice redesign remains deferred.
     - [10.29.2026] - v0.5 (Unreleased): Remove separate confirmation and parameter-selection previews before dialog refinement.
     - [10.29.2026] - v0.5 (Unreleased): Add six previews of reusable shared dialogs; existing tools retain their current windows.

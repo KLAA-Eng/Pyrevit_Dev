@@ -29,6 +29,7 @@ windows remain visible and disabled by explicit owner decision.
 | GAL-06 | Live Revit acceptance | Pending owner review | Owner took actual Revit review on 2026-10-29; every supported family/state, input/dismissal, native pickers, DPI, and no production side effects |
 | GAL-07 | Remove retired rename forms and add Preview filter | Implemented; locally verified | 2026-10-28 owner request; source/caller regression checks and real WPF filter intersections; [verification](../knowledge/reviews/design-system/2026-10-28-gallery-retirement-and-preview-filter.md) |
 | GAL-08 | Register five template references | Implemented; locally verified | Selection/Form replace old main/generic FindReplace; Message/Options/Review add shared specimens; [family verification](../knowledge/reviews/design-system/2026-10-28-template-family.md) |
+| GAL-09 | Repair Window source header sorting | Implemented; locally verified | Missing template-column SortMemberPath made CanUserSort false (reproduced in actual WPF). Explicit RelativePath target fixes it; UI Automation header invocation verifies ascending/descending displayed values. Gallery filtering/deferred/preview regressions remain green. |
 | GAL-F01 | Enable five compiled previews | Deferred by owner | Future actual-view providers/actions, runtime builds, and matching-host validation |
 
 GAL-F01 covers Family Studio, Startup Importer source picker/review/blocking

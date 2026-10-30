@@ -14,7 +14,7 @@ import wpf
 from System import Uri, Action
 from System.Windows.Threading import Dispatcher, DispatcherFrame, DispatcherPriority
 from System.Windows import Window, Size, Rect
-from System.Windows.Media import PixelFormats
+from System.Windows.Media import PixelFormats, VisualTreeHelper
 from System.Windows.Media.Imaging import RenderTargetBitmap, PngBitmapEncoder, BitmapFrame
 from System.IO import FileStream, FileMode
 
@@ -72,6 +72,48 @@ namespace = {'__file__': command_path, '__name__': 'gallery_probe'}
 execfile(command_path, namespace)
 gallery = namespace['Gallery']()
 assert len(gallery._entries) == len(entries)
+source_column = next(column for column in gallery.EntriesGrid.Columns if column.Header == 'Window source')
+assert source_column.CanUserSort, 'Window source must support header sorting'
+gallery.Content.Measure(Size(gallery.Width, gallery.Height))
+gallery.Content.Arrange(Rect(0, 0, gallery.Width, gallery.Height))
+settle_layout(gallery.Content)
+
+# Invoke the real column header's UI Automation action, so default WPF sorting
+# rather than an independent Python sort orders the actual displayed rows.
+import clr
+clr.AddReference('UIAutomationProvider')
+from System.Windows.Automation.Peers import (DataGridColumnHeaderItemAutomationPeer,
+    DataGridColumnHeadersPresenterAutomationPeer, PatternInterface)
+from System.Windows.Automation.Provider import IInvokeProvider
+from System.Windows.Controls.Primitives import DataGridColumnHeadersPresenter
+
+
+def visual_children(parent):
+    for index in range(VisualTreeHelper.GetChildrenCount(parent)):
+        child = VisualTreeHelper.GetChild(parent, index)
+        yield child
+        for nested in visual_children(child):
+            yield nested
+
+
+source_presenter = next(control for control in visual_children(gallery.EntriesGrid)
+                        if isinstance(control, DataGridColumnHeadersPresenter))
+source_peer = DataGridColumnHeaderItemAutomationPeer(source_column.Header, source_column,
+    DataGridColumnHeadersPresenterAutomationPeer(source_presenter))
+source_invoke = source_peer.GetPattern(PatternInterface.Invoke)
+for direction in ('Ascending', 'Descending'):
+    IInvokeProvider.Invoke(source_invoke)
+    settle_layout(gallery.Content)
+    assert str(source_column.SortDirection) == direction
+    displayed = [row.RelativePath for row in gallery.EntriesGrid.Items]
+    assert len(displayed) == len(entries)
+    # .NET's default sort is culture-sensitive; compare with its own string
+    # comparer and keep Python's independent order out of the expected result.
+    from System.Globalization import CultureInfo
+    comparer = CultureInfo.CurrentCulture.CompareInfo
+    comparisons = [comparer.Compare(left, right) for left, right in zip(displayed, displayed[1:])]
+    assert all(value <= 0 if direction == 'Ascending' else value >= 0 for value in comparisons), direction
+print('Gallery Window source: actual header UIA action sorts ascending and descending.')
 gallery.FilterBox.Text = 'carbon'
 assert gallery.EntriesGrid.Items.Count > 0
 assert all('Carbon GWP Pull' in row.UsedBy for row in gallery.EntriesGrid.Items)

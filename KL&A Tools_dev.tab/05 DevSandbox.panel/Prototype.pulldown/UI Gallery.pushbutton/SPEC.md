@@ -96,6 +96,10 @@ API reference for built-in/native dialogs. Long values wrap and are available
 in full on hover; columns can be resized and the table scrolls horizontally
 when needed.
 
+Click **Window source** to toggle ascending/descending order by its displayed
+source/API value (`RelativePath`). Its wrapped template column explicitly sets
+SortMemberPath so WPF enables header sorting, matching the bound text columns.
+
 Select a window to see its description, source/API, calling tools with friendly
 titles and command paths, and an explicit reason if its preview is unavailable.
 The calling-tool list is built from source imports/calls, following shared helpers,

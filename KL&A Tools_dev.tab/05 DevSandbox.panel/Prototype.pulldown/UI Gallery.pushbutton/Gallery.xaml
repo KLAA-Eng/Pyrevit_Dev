@@ -23,7 +23,7 @@
                     <DataGridTextColumn Header="Origin" Binding="{Binding Origin}" Width="150"/>
                     <DataGridTextColumn Header="Window" Binding="{Binding Title}" Width="200"/>
                     <DataGridTextColumn Header="Preview" Binding="{Binding PreviewStatus}" Width="140"/>
-                    <DataGridTemplateColumn Header="Window source" Width="2*" MinWidth="260">
+                    <DataGridTemplateColumn Header="Window source" SortMemberPath="RelativePath" Width="2*" MinWidth="260">
                         <DataGridTemplateColumn.CellTemplate><DataTemplate>
                             <TextBlock Text="{Binding RelativePath}" ToolTip="{Binding RelativePath}" TextWrapping="Wrap"/>
                         </DataTemplate></DataGridTemplateColumn.CellTemplate>
