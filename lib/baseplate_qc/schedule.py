@@ -34,7 +34,8 @@ _BASE_PLATE_HEADERS = (
     ('embed', ('EMBED',)),
 )
 
-_MARK_RE = re.compile(r'^[A-Z]{1,4}\d+[A-Z]?$')
+# BP7, BP10A, and letter-only marks such as BPA.
+_MARK_RE = re.compile(r'^[A-Z]{1,4}[A-Z0-9]{0,4}$')
 _FEET_INCHES_RE = re.compile(r"^(\d+(?:\.\d+)?)'\s*-?\s*(.*)$")
 _MIXED_RE = re.compile(r'^(\d+)\s+(\d+)/(\d+)$')
 _FRACTION_RE = re.compile(r'^(\d+)/(\d+)$')
@@ -250,6 +251,14 @@ def read_base_plate_schedule(cells):
         names = [name for name, _ in columns]
         if 'type' not in names or 'length' not in names or 'width' not in names:
             continue
+        # Other headers inside the table (a second TYPE under ANCHOR, for
+        # example) keep their own columns so their text stays out of ours.
+        left = min(_center(header)[0] for header in headers)
+        right = max(_center(header)[0] for header in headers)
+        for index, header in enumerate(row):
+            if header not in headers and left < _center(header)[0] < right:
+                columns.append(('other{}'.format(index), _center(header)[0]))
+                headers.append(header)
         xmin, xmax = _column_bounds(headers)
         top = min(header['ymin'] for header in headers)
         return _read_base_plate_rows(_rows_below(cells, top, xmin, xmax), columns)
@@ -263,7 +272,8 @@ def _read_base_plate_rows(rows, columns):
     for row in rows:
         values = _assign(row, columns)
         mark = values.get('mark', '')
-        if not is_mark(mark):
+        # A lone word under MARK (a NOTE heading, say) is not a schedule row.
+        if not is_mark(mark) or len(values) == 1:
             if started:
                 break  # The table ended; text below belongs to notes or details.
             continue

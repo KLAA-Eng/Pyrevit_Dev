@@ -168,6 +168,25 @@ class ScheduleTests(unittest.TestCase):
         self.assertEqual({0.75: 1.5, 0.875: 2.0, 1.0: 2.5, 1.25: 2.5, 1.5: 2.5},
                          read_edge_distances(cells))
 
+    def test_letter_marks_and_a_second_type_column(self):
+        # BPA-style marks, with a second TYPE (anchor type) under ANCHOR.
+        xs = [0, 1, 2, 3, 4, 5.5, 7, 8, 9]
+        rows = [['MARK', 'TYPE', 'DIM L', 'DIM W', 'THICKNESS', 'TYPE', 'NUMBER', 'SIZE', 'EMBED'],
+                ['BPA', 'A', '11"', '11"', '3/4"', 'CAST-IN OR POST INSTALLED', '4', u'3/4"à', '9"'],
+                ['BPB', 'B', '9"', '5 1/2"', '3/4"', 'CAST-IN', '4', '3/4"', '9"'],
+                ['NOTE'],
+                ['BPZ', 'Z', '1"', '1"', '1"', '', '4', '3/4"', '9"']]
+        cells = table(rows, xs, 0.0)
+        cells[14]['xmin'] -= 0.8  # The long anchor type text is wider than its column.
+        cells[14]['xmax'] += 0.8
+        entries, problems = read_base_plate_schedule(cells)
+        self.assertEqual([], problems)
+        self.assertEqual(['BPA', 'BPB'], sorted(entries))
+        self.assertEqual(('A', 11.0, 11.0, 0.75, 4, 0.75, 9.0), tuple(
+            entries['BPA'][key] for key in ('type', 'length', 'width', 'thickness',
+                                            'rod_count', 'rod_diameter', 'embed')))
+        self.assertEqual(5.5, entries['BPB']['width'])
+
     def test_missing_header_reports_problem(self):
         entries, problems = read_base_plate_schedule([cell('MARK', 0, 0)])
         self.assertEqual({}, entries)
@@ -259,8 +278,84 @@ def detail_sheet():
     return cells, polylines, arcs, dims
 
 
+def embed_sheet():
+    """Two rows of details with the patterns of an embed plate schedule.
+
+    TYPE P: rods 2" (dimensioned) from the top edge and C from the others.
+    TYPE Q: column at one end 3" from the start, rods chained 3" + 3 1/2".
+    TYPE R: anchors drawn as small squares only.
+    TYPE S: a column drawn over the plate's bottom edge.
+    """
+    cells = [cell('NOTE: ALL ANCHOR RODS ARE F1554 GRADE 55', 4.0, -1.0, width=8.0)]
+    polylines, arcs, dims = [], [], []
+
+    def add_rods(points):
+        for x, y in points:
+            lines, circles = rod(x, y)
+            polylines.extend(lines)
+            arcs.extend(circles)
+
+    cells += [cell('TYPE P', 2.0, -5.0, width=1.0, height=0.46),
+              cell('TYPE Q', 6.0, -5.0, width=1.0, height=0.46),
+              cell('TYPE R', 2.0, -9.0, width=1.0, height=0.46),
+              cell('TYPE S', 6.0, -9.0, width=1.0, height=0.46)]
+
+    polylines.append(outline([(1.5, -4.2), (2.5, -4.2), (2.5, -3.2), (1.5, -3.2)]))
+    polylines.append(square(2.0, -3.7, 0.12))
+    add_rods([(1.65, -4.05), (2.35, -4.05), (1.65, -3.4), (2.35, -3.4)])
+    dims += [dim(1.0, 'L', (2.0, -3.0), True), dim(0.15, 'C', (2.4, -4.4), True),
+             dim(0.2, '2"', (2.7, -3.3), False)]
+
+    polylines.append(outline([(5.4, -4.0), (6.6, -4.0), (6.6, -3.5), (5.4, -3.5)]))
+    polylines.append(square(5.65, -3.75, 0.1))
+    add_rods([(5.95, -3.75), (6.45, -3.75)])
+    dims += [dim(1.2, 'L', (6.0, -3.3), True), dim(0.15, 'C', (6.5, -4.2), True),
+             dim(0.25, '3"', (5.5, -4.2), True), dim(0.3, '3 1/2"', (5.8, -4.2), True)]
+
+    polylines.append(outline([(1.5, -8.4), (2.5, -8.4), (2.5, -7.8), (1.5, -7.8)]))
+    polylines.append(outline([(1.85, -8.2), (2.15, -8.2), (2.15, -8.0), (1.85, -8.0)]))
+    for x, y in ((1.65, -8.25), (2.35, -8.25), (1.65, -7.95), (2.35, -7.95)):
+        polylines.append(square(x, y, 0.03))
+    dims += [dim(1.0, 'L', (2.0, -7.6), True), dim(0.15, 'C', (2.4, -8.6), True)]
+
+    # The plate's bottom edge stops at the column, which pokes 0.1 below it.
+    polylines += [[(5.9, -8.4), (5.4, -8.4), (5.4, -7.8), (6.6, -7.8), (6.6, -8.4), (6.1, -8.4)],
+                  [(5.9, -8.0), (5.9, -8.5), (6.1, -8.5), (6.1, -8.0), (5.9, -8.0)]]
+    add_rods([(5.55, -8.25), (6.45, -8.25), (5.55, -7.95), (6.45, -7.95)])
+    dims += [dim(1.2, 'L', (6.0, -7.6), True), dim(0.15, 'C', (6.5, -8.7), True)]
+    return cells, polylines, arcs, dims
+
+
 def rule_names(definition):
     return sorted((u[0], v[0]) for u, v in definition['rods'])
+
+
+class EmbedDetailTests(unittest.TestCase):
+    def setUp(self):
+        self.definitions, self.problems = read_type_details(*embed_sheet())
+
+    def test_every_type_reads(self):
+        self.assertEqual({}, self.problems)
+        self.assertEqual(['P', 'Q', 'R', 'S'], sorted(self.definitions))
+
+    def test_rods_use_a_dimensioned_edge_distance(self):
+        geometry = plate_geometry(self.definitions['P'], 14.0, 14.0, 1.5)
+        self.assertEqual([(1.5, 1.5), (1.5, 12.0), (12.5, 1.5), (12.5, 12.0)], sorted(geometry['rods']))
+
+    def test_column_at_one_end_and_chained_dimensions(self):
+        definition = self.definitions['Q']
+        self.assertIn('column off center', describe(definition))
+        geometry = plate_geometry(definition, 21.0, 5.5, 1.5)
+        self.assertEqual((3.0, 2.75), geometry['column'])
+        self.assertEqual([(6.5, 2.75), (19.5, 2.75)], sorted(geometry['rods']))
+
+    def test_square_anchor_symbols_count_as_rods(self):
+        self.assertEqual('rectangular plate, 4 rods', describe(self.definitions['R']))
+
+    def test_column_over_the_plate_edge_keeps_the_plate_size(self):
+        geometry = plate_geometry(self.definitions['S'], 15.0, 8.0, 1.5)
+        self.assertEqual([(1.5, 1.5), (1.5, 6.5), (13.5, 1.5), (13.5, 6.5)], sorted(geometry['rods']))
+        self.assertEqual(7.5, geometry['column'][0])  # Drawn at the bottom edge, centered along L.
 
 
 class DetailTests(unittest.TestCase):

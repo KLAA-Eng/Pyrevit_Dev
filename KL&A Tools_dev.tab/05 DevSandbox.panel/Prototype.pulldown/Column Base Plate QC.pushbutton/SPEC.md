@@ -39,7 +39,10 @@ past a wall face or clash with the column are visible at a glance.
   cell reading exactly `MARK` with `TYPE`, `DIM L`, and `DIM W`; `THICKNESS`,
   `NUMBER`, `SIZE`, and `EMBED` are read when present. Rows are rebuilt from
   the notes' heights and columns from the nearest header, and reading stops
-  at the first row below the table whose MARK cell is not a mark. Drafted
+  at the first row below the table whose MARK cell is not a mark (marks are
+  one to four letters then up to four letters or digits: `BP7`, `BPA`).
+  Other headers inside the table, such as a second `TYPE` under ANCHOR, keep
+  their own columns and are not read. Drafted
   ("dumb") schedules may hold one note per cell, one multi-line note per
   column (each line is placed in its row by sharing the note's height
   evenly), or one note per row with values separated by tabs or two or more
@@ -62,7 +65,8 @@ past a wall face or clash with the column are visible at a glance.
 A schedule drawn as an imported or linked CAD file cannot be read; its text
 is not available to the API. When the schedule rows, the anchor rod table,
 or any detail type cannot be read, the schedule view's text notes,
-linework, and dimensions are written to
+linework, dimensions, and the elements they came from are written (as
+ASCII) to
 `%LOCALAPPDATA%\KLA Tools\Column Base Plate QC\schedule_view.json` and the
 palette names the file. Walls in linked models are not used.
 
@@ -72,32 +76,44 @@ Types are read from the drawing, not built in, so a changed or added detail
 changes the plates (`lib/baseplate_qc/details.py`):
 
 - **Area.** A detail's area is above its label, half the gap to the
-  neighboring labels each side, up to the first wide text above (a table
-  note).
-- **Plate outline.** The largest closed loop of lines in the area (detail
-  lines, detail components, filled regions, or imported CAD). Lines dangling
-  off an outline are ignored. Four corners is a **square** plate (drawn
-  sides within 15%) or a **rectangular** plate; six corners is an
-  **L-shaped** plate. Any other outline, an outline not square to the page,
-  or an L whose legs differ by more than 15% is too complex: the type is left
-  out, the palette says why, and its columns are listed but not drawn.
+  neighboring labels each side, up to the first wide text (a table note) or
+  the next TYPE label above, so details can sit in several rows.
+- **Plate outline.** Lines in the area (detail lines, detail components,
+  filled regions, or imported CAD) are split where they cross or touch and
+  loose ends are trimmed, so leaders, centerlines, and a column drawn over
+  the plate leave the outline intact. The plate is the largest clean
+  outline with four corners (a **square** plate with drawn sides within
+  15%, or a **rectangular** plate) or six (an **L-shaped** plate), taken
+  from these outlines or from lines joined end to end, if it is at least
+  half the size of the largest outline. Otherwise the largest outline counts
+  as a rectangle when it nearly fills the rectangle on its longest edge runs
+  and has no long slanted edge (rounded corners, a column poking past an
+  edge). Anything else (a chamfered or angled plate, for example) is too
+  complex: the type is left out, the palette says why, and its columns are
+  listed but not drawn.
 - **L and W.** For square and rectangular plates, a dimension whose text is
   overridden to `L` gives the L direction (else the longer drawn side); W is
   across it. An L-shaped plate has two legs, each L long and W wide, meeting
-  at a W x W corner.
+  at a W x W corner; the legs may be drawn at different sizes.
 - **Anchor rods.** Circles inside the plate (concentric circles are one
-  rod). Each rod coordinate takes the nearest rule: "C" from a plate edge;
-  "C" from the inside of an L leg; "C" from an L leg end; the middle of the
-  plate or leg; or the middle plus or minus half of a dimensioned spacing.
-  A dimension counts as a spacing when it is measured (its length is the
-  true spacing, such as 2 1/2") or typed over with a size; a rule from a
-  spacing wins a near tie. A rod matching no rule leaves the type out.
+  rod), or, when there are none, small squares (anchor symbols or washers).
+  Each rod coordinate takes the nearest rule measured from a plate edge, an
+  L leg end, an L leg's inside edge, or the middle: "C"; one dimensioned
+  distance; two dimensioned distances chained; half a dimensioned spacing
+  either side of the middle; or the reference itself. A dimension counts
+  when it is measured (its drawn length is the true size) or typed over with
+  a size such as `2"`. On a near tie a single dimension beats two chained,
+  and either beats "C" or the middle. A rod matching no rule leaves the type
+  out.
 - **"C".** The drawn edge distance is the dimension typed over to `C`, else
   the smallest drawn rod-to-edge distance. The true "C" comes from the
   anchor rod requirements table for the scheduled rod diameter.
-- **Column.** The largest other loop inside the plate (not around a rod);
-  it must be centered on a square or rectangular plate, or in the corner
-  square of an L, or the type is left out.
+- **Column.** The largest other outline inside the plate that is not around
+  a rod and is bigger than the anchor symbols; when the column's lines touch
+  the plate's, the largest such enclosed face no bigger than a fifth of the
+  plate. It is placed by the same rules, so a column at one end of a plate
+  works (the palette says "column off center"). With no column drawn, it
+  sits in the middle of the plate, or of the corner square of an L.
 
 ## Layout rules
 

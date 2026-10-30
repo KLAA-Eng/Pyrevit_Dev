@@ -116,16 +116,17 @@ def note_cells(view, notes):
 
 
 def view_geometry(view):
-    """Return (polylines, arcs, dimension segments) drawn in a view, in its right/up coordinates.
+    """Return (polylines, arcs, dimension segments, sources) drawn in a view.
 
-    Detail lines, detail components, filled regions, and imported CAD all
-    give their curves; groups are skipped because their members are
-    collected on their own.
+    Points are in the view's right/up coordinates. Detail lines, detail
+    components, filled regions, and imported CAD all give their curves;
+    groups are skipped because their members are collected on their own.
+    sources describe each element read, for troubleshooting.
     """
     doc = view.Document
     right, up = view.RightDirection, view.UpDirection
     to_2d = lambda point: (point.DotProduct(right), point.DotProduct(up))
-    polylines, arcs, dims = [], [], []
+    polylines, arcs, dims, sources = [], [], [], []
 
     def add_curve(curve):
         try:
@@ -152,6 +153,7 @@ def view_geometry(view):
     for element in DB.FilteredElementCollector(doc, view.Id).WhereElementIsNotElementType():
         if isinstance(element, (DB.TextNote, DB.Group)) or element.OwnerViewId != view.Id:
             continue
+        counts = (len(polylines), len(arcs), len(dims))
         try:
             if isinstance(element, DB.Dimension):
                 dims.extend(_dimension_segments(element, to_2d))
@@ -163,7 +165,15 @@ def view_geometry(view):
                 walk(element.get_Geometry(options))
         except Exception:
             log('geometry skipped for {}:\n{}'.format(get_elementid_value(element.Id), traceback.format_exc()))
-    return polylines, arcs, dims
+        box = element.get_BoundingBox(view)
+        category = element.Category.Name if element.Category is not None else ''
+        symbol = doc.GetElement(element.GetTypeId())
+        sources.append({'id': get_elementid_value(element.Id), 'class': element.GetType().Name,
+                        'category': category, 'type': _element_name(symbol) if symbol is not None else '',
+                        'box': [to_2d(box.Min), to_2d(box.Max)] if box is not None else None,
+                        'polylines': [counts[0], len(polylines)], 'arcs': [counts[1], len(arcs)],
+                        'dims': [counts[2], len(dims)]})
+    return polylines, arcs, dims, sources
 
 
 def _dimension_segments(dimension, to_2d):
@@ -194,12 +204,12 @@ def read_schedule(doc, view_id):
     edges = read_edge_distances(cells)
     if not edges:
         problems.append('No anchor rod requirements table found; built-in edge distances are used.')
-    polylines, arcs, dims = view_geometry(view)
+    polylines, arcs, dims, sources = view_geometry(view)
     types, type_problems = read_type_details(cells, polylines, arcs, dims)
     if not types and not type_problems:
         problems.append('No TYPE A, TYPE B, ... detail labels found.')
     if not entries or not edges or type_problems or not types:
-        path = dump_view(view, cells, polylines, arcs, dims)
+        path = dump_view(view, cells, polylines, arcs, dims, sources)
         if path:
             problems.append('The view\'s text and linework were written to {} for '
                             'troubleshooting.'.format(path))
@@ -207,15 +217,31 @@ def read_schedule(doc, view_id):
             'problems': problems}
 
 
-def dump_view(view, cells, polylines, arcs, dims):
+def _ascii(value):
+    """Return value with text made ASCII (other characters as \\uXXXX).
+
+    IronPython's json writer fails on symbol-font characters such as the
+    diameter glyph.
+    """
+    if isinstance(value, dict):
+        return dict((_ascii(key), _ascii(item)) for key, item in value.items())
+    if isinstance(value, (list, tuple)):
+        return [_ascii(item) for item in value]
+    if isinstance(value, basestring):
+        return ''.join(char if ord(char) < 128 else '\\u{:04x}'.format(ord(char)) for char in value)
+    return value
+
+
+def dump_view(view, cells, polylines, arcs, dims, sources):
     """Write the view's text, linework, and dimensions so an unreadable schedule can be diagnosed."""
     path = os.path.join(os.path.dirname(LOG_PATH), 'schedule_view.json')
     try:
         if not os.path.isdir(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
+        data = _ascii({'view': _element_name(view), 'cells': cells, 'polylines': polylines,
+                       'arcs': arcs, 'dims': dims, 'sources': sources})
         with open(path, 'w') as dump:
-            json.dump({'view': _element_name(view), 'cells': cells, 'polylines': polylines,
-                       'arcs': arcs, 'dims': dims}, dump)
+            json.dump(data, dump)
         return path
     except Exception:
         log('schedule dump failed:\n' + traceback.format_exc())
