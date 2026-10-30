@@ -5,7 +5,7 @@ window construction. Use it to choose a resource, understand its appearance and
 assemble a window. The linked XAML files own executable values and templates;
 this guide explains their intended use and the shared design rules.
 
-The nine Python tool windows, five reference templates, Gallery and five
+The nine Python tool windows, four opt-in dialog bodies, five reference templates, Gallery and five
 compiled window classes use `KlaWindowShell`. PreviewFixture retains its
 standalone test chrome. Native/pyRevit dialogs and Recall's docked panel have
 separate host presentation; the standalone Recall body uses the shared system.
@@ -17,6 +17,7 @@ separate host presentation; the standalone Recall body uses the shared system.
 - [Window geometry and spacing](#window-geometry-and-spacing)
 - [Architecture and resource ownership](#architecture-and-resource-ownership)
 - [Host and keyboard contracts](#host-and-keyboard-contracts)
+- [Reusable dialogs](#reusable-dialogs)
 - [Creating a window](#creating-a-window)
 - [Validation](#validation)
 
@@ -477,6 +478,59 @@ the deployed DLLs.
 
 These are source contracts and known implementation limits. They do not mark
 the owner's live Revit review complete.
+
+## Reusable dialogs
+
+Use [GUI.dialogs](../lib/GUI/dialogs/README.md) for prepared-data dialogs.
+The four opt-in bodies do not migrate existing commands or their pyRevit calls.
+
+| Need | Modal API | Result |
+| --- | --- | --- |
+| Message / confirmation and details | `show_message(title, message, ...)` | `ok`, `yes`, `no`, `retry` or `cancel` action |
+| Grouped searchable single/multiple selection | `select_items(title, items, ...)` | `accept` with original payload(s), or `cancel` |
+| Described action alternatives | `choose_action(title, choices, ...)` | `accept` with stable key, or `cancel` |
+| Text with optional validation | `ask_text(title, prompt, ...)` | `accept` with raw text, including blank, or `cancel` |
+
+```python
+from GUI.dialogs import SelectionItem, select_items
+
+rows = [SelectionItem('first', 'Example', first_payload),
+        SelectionItem('second', 'Example', second_payload)]
+result = select_items(__title__, rows, version=__version__, owner=owner_handle)
+if result.action == 'accept':
+    selected_payloads = result.value
+```
+
+Importing the package is host-free. Factories lazily load WPF and return unshown
+bare WPF windows; modal helpers call ShowDialog and return `DialogResult`.
+Supply the owner and caller version. No current document is inferred or queried.
+Existing CustomAlert/SelectFromDict APIs retain their behavior.
+
+Close, Cancel and Escape cancel. Enter invokes the explicit default action:
+confirmations prefer Cancel, then No, unless overridden; selection/text validate
+first; choice requires an enabled selection. These bare windows do not inherit
+pyRevit WPFWindow's competing Escape handler. The earlier host boundary and
+missing defaults in existing tools remain separate. Actual keyboard, owner/modal
+lifetime and DPI still require live acceptance.
+
+Selection uses stable keys for duplicate labels, clones checks, preserves input
+order and hidden checks, and excludes disabled rows. All/None affects visible
+eligible rows only. Single selection enforces exclusive checking; highlighting
+alone does not check a row. No first row is checked implicitly. Text preserves
+raw input; required/validator failures remain inline. Validators return an error
+string or None. Inspect result.action explicitly: accepted blank, No and Cancel
+are different outcomes.
+
+Bodies reuse the shared shell, buttons/fields/lists, status brushes, icon
+geometry and green/gray footer roles. Opt-in `KlaDialogCheck` presents a label
+and description using the existing checkbox template; `KlaDialogDescription`
+handles secondary/disabled text; `KlaDialogListItem` disables unavailable rows.
+Message/details overflow is bounded and scrollable.
+
+Search **Shared dialog** in Gallery for message, confirmation, grouped
+selection, parameter selection, action choice and text previews, each in five
+fictional states. See the [API examples](../lib/GUI/dialogs/README.md) and
+[verification](knowledge/reviews/design-system/2026-10-29-shared-dialogs.md).
 
 ## Creating a window
 

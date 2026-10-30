@@ -13,6 +13,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class GalleryRegistryTests(unittest.TestCase):
+    def test_shared_dialog_family_is_explicitly_allowlisted_with_five_states(self):
+        rows = [row for row in gallery_entries(ROOT, {}) if row['category'] == 'Shared dialog']
+        self.assertEqual(6, len(rows))
+        self.assertEqual(4, len(set(row['source_path'] for row in rows)))
+        for row in rows:
+            self.assertTrue(row['can_launch'])
+            self.assertEqual(5, len(row['states']))
+            self.assertTrue(os.path.isfile(row['source_path']))
+            self.assertIn('Existing tools retain', row['description'])
+
     def test_origins_distinguish_pyrevit_wrappers_from_native_dialogs(self):
         rows = dict((row['id'], row) for row in gallery_entries(ROOT, {}))
         self.assertEqual('Repository custom', rows['kla-select-from-dict']['origin'])

@@ -1,0 +1,253 @@
+"""Lazy WPF factories. No Revit queries, transactions or script termination."""
+from __future__ import unicode_literals
+
+import os
+
+from .models import DialogResult, SelectionGroup, SelectionState, validate_text
+
+_TYPES = None
+_BUTTONS = {'ok': 'OK', 'yes': 'Yes', 'no': 'No', 'retry': 'Retry', 'cancel': 'Cancel'}
+
+
+def _window_types():
+    global _TYPES
+    if _TYPES is not None:
+        return _TYPES
+    try:
+        import wpf
+    except ImportError:
+        # pyRevit knows the installed engine's assembly prefix/path. Load only
+        # its framework bootstrap, rather than GUI.forms or a document-bound form.
+        from pyrevit.framework import wpf
+    from System import IntPtr
+    from System.Windows import Window, Visibility
+    from System.Windows.Interop import WindowInteropHelper
+    from System.Windows.Controls import CheckBox
+    from System.Windows.Controls.Primitives import ToggleButton
+    from System.Windows.Media import VisualTreeHelper
+    from GUI.window_chrome import load_window, fit_window_height
+
+    class DialogWindow(Window):
+        def initialize(self, filename, title, version, owner, navigate):
+            self.result = DialogResult()
+            self._ready = False
+            load_window(self, os.path.join(os.path.dirname(__file__), filename), title,
+                        version=version, navigate=navigate, close_handler=self.cancel)
+            if owner is not None:
+                if isinstance(owner, Window):
+                    self.Owner = owner
+                else:
+                    WindowInteropHelper(self).Owner = owner if isinstance(owner, IntPtr) else IntPtr(owner)
+                from System.Windows import WindowStartupLocation
+                self.WindowStartupLocation = WindowStartupLocation.CenterOwner
+
+        def finish(self, action, value=None):
+            self.result = DialogResult(action, value)
+            self.Close()
+
+        def cancel(self, sender=None, args=None):
+            self.finish('cancel')
+
+        def feedback(self, text):
+            self.validation_text.Text = text or ''
+            self.validation_text.Visibility = Visibility.Visible if text else Visibility.Collapsed
+
+    class MessageWindow(DialogWindow):
+        def __init__(self, title, message, buttons, severity, details, default_action,
+                     version, owner, navigate):
+            self.initialize('MessageDialog.xaml', title, version, owner, navigate)
+            roles = {'information': ('Information', 'KlaInformationGeometry', 'KlaInfoBrush'),
+                     'warning': ('Warning', 'KlaWarningGeometry', 'KlaWarningBrush'),
+                     'error': ('Error', 'KlaErrorGeometry', 'KlaErrorBrush'),
+                     'success': ('Success', 'KlaSuccessGeometry', 'KlaReadyBrush')}
+            heading, icon, brush = roles[severity]
+            self.message_heading.Text = heading
+            self.message_icon.Content = self.FindResource(icon)
+            self.message_banner.BorderBrush = self.FindResource(brush)
+            self.message_body.Text = message
+            self.message_details.Text = details
+            self.message_expander.Visibility = Visibility.Visible if details else Visibility.Collapsed
+            for index, button in enumerate((self.action_one, self.action_two, self.action_three)):
+                if index < len(buttons):
+                    action = buttons[index]
+                    button.Tag = action
+                    button.Content = _BUTTONS[action]
+                    button.IsDefault = action == default_action
+                else:
+                    button.Visibility = Visibility.Collapsed
+            self._ready = True
+            fit_window_height(self)
+
+        def accept_message(self, sender, args):
+            self.finish(sender.Tag)
+
+        def message_size_changed(self, sender, args):
+            if self._ready and args.WidthChanged:
+                fit_window_height(self)
+
+        def details_changed(self, sender, args):
+            if self._ready:
+                fit_window_height(self)
+
+    class SelectionWindow(DialogWindow):
+        def __init__(self, title, items, multiple, groups, prompt, required,
+                     version, owner, navigate):
+            self.state = SelectionState(items, multiple, groups)
+            self.required = required
+            self.initialize('SelectionDialog.xaml', title, version, owner, navigate)
+            self.prompt_label.Content = prompt
+            self.group_filter.ItemsSource = [SelectionGroup(None, 'All Items')] + self.state.groups
+            self.group_filter.SelectedIndex = 0
+            self.group_row.Visibility = Visibility.Visible if self.state.groups else Visibility.Collapsed
+            self.batch_actions.Visibility = Visibility.Visible if multiple else Visibility.Collapsed
+            self._ready = True
+            self.refresh()
+            self.Loaded += self.focus_filter
+
+        def focus_filter(self, sender, args):
+            self.filter_text.Focus()
+
+        def refresh(self):
+            self._ready = False
+            self.items_list.ItemsSource = None
+            self.items_list.ItemsSource = self.state.visible_items
+            self.update_summary()
+            self._ready = True
+
+        def update_summary(self):
+            count = len(self.state.selected_values)
+            self.summary_text.Text = '{} selected; {} of {} visible. All / None affects visible items.'.format(
+                count, len(self.state.visible_items), len(self.state.items)) if self.state.multiple else '{} selected; {} of {} visible.'.format(
+                    count, len(self.state.visible_items), len(self.state.items))
+
+        def update_checks(self, parent=None):
+            # Pull changed checks into realized controls without rebuilding the list:
+            # Space/Tab retain keyboard focus and scrolling stays where the user left it.
+            parent = self.items_list if parent is None else parent
+            for index in range(VisualTreeHelper.GetChildrenCount(parent)):
+                child = VisualTreeHelper.GetChild(parent, index)
+                if isinstance(child, CheckBox):
+                    binding = child.GetBindingExpression(ToggleButton.IsCheckedProperty)
+                    if binding is not None:
+                        binding.UpdateTarget()
+                self.update_checks(child)
+
+        def filter_changed(self, sender, args):
+            if not self._ready:
+                return
+            self.state.query = self.filter_text.Text
+            group = self.group_filter.SelectedItem
+            self.state.group = group.Key if group is not None else None
+            self.refresh()
+
+        def item_checked(self, sender, args):
+            if self._ready:
+                self.state.set_checked(sender.DataContext.Key, sender.IsChecked == True)
+                self.update_checks()
+                self.update_summary()
+                self.feedback(None)
+
+        def check_all(self, sender, args):
+            self.state.set_visible_checked(True)
+            self.update_checks()
+            self.update_summary()
+            self.feedback(None)
+
+        def check_none(self, sender, args):
+            self.state.set_visible_checked(False)
+            self.update_checks()
+            self.update_summary()
+
+        def accept_selection(self, sender=None, args=None):
+            values = self.state.selected_values
+            if self.required and not values:
+                self.feedback('Select at least one item.' if self.state.multiple else 'Select an item.')
+                return
+            self.finish('accept', values if self.state.multiple else (values[0] if values else None))
+
+    class ChoiceWindow(DialogWindow):
+        def __init__(self, title, choices, prompt, version, owner, navigate):
+            self.initialize('ActionChoiceDialog.xaml', title, version, owner, navigate)
+            self.prompt_label.Content = prompt
+            self.choices_list.ItemsSource = choices
+            self.accept_button.IsEnabled = False
+            self._ready = True
+            self.Loaded += self.focus_choices
+
+        def focus_choices(self, sender, args):
+            self.choices_list.Focus()
+
+        def choice_changed(self, sender, args):
+            if self._ready:
+                choice = self.choices_list.SelectedItem
+                self.accept_button.IsEnabled = choice is not None and choice.CanSelect
+
+        def accept_choice(self, sender=None, args=None):
+            choice = self.choices_list.SelectedItem
+            if choice is None or not choice.CanSelect:
+                self.feedback('Choose an available action.')
+                return
+            self.finish('accept', choice.Key)
+
+    class TextWindow(DialogWindow):
+        def __init__(self, title, prompt, default, required, validator, version, owner, navigate):
+            self.required = required
+            self.validator = validator
+            self.initialize('TextPromptDialog.xaml', title, version, owner, navigate)
+            self.prompt_label.Content = prompt
+            self.input_text.Text = default
+            self._ready = True
+            self.Loaded += self.focus_input
+
+        def focus_input(self, sender, args):
+            self.input_text.Focus()
+            self.input_text.SelectAll()
+
+        def text_changed(self, sender, args):
+            if self._ready:
+                self.feedback(None)
+
+        def accept_text(self, sender=None, args=None):
+            value = self.input_text.Text
+            error = validate_text(value, self.required, self.validator)
+            if error:
+                self.feedback(error)
+                self.input_text.Focus()
+                return
+            self.finish('accept', value)
+
+    _TYPES = (MessageWindow, SelectionWindow, ChoiceWindow, TextWindow)
+    return _TYPES
+
+
+def create_message(title, message, buttons=('ok',), severity='information', details='',
+                   default_action=None, version=None, owner=None, navigate=None):
+    buttons = tuple(buttons)
+    if (not 1 <= len(buttons) <= 3 or len(set(buttons)) != len(buttons)
+            or any(action not in _BUTTONS for action in buttons)):
+        raise ValueError('Use one to three distinct actions: ok, yes, no, retry, cancel.')
+    if severity not in ('information', 'warning', 'error', 'success'):
+        raise ValueError('Unknown message severity.')
+    if default_action is None:
+        default_action = next((action for action in ('cancel', 'no') if action in buttons), buttons[0])
+    if default_action not in buttons:
+        raise ValueError('Default action must be one of the displayed actions.')
+    return _window_types()[0](title, message, buttons, severity, details, default_action,
+                              version, owner, navigate)
+
+
+def create_selection(title, items, multiple=True, groups=None, prompt='Select Items',
+                     required=True, version=None, owner=None, navigate=None):
+    return _window_types()[1](title, items, multiple, groups, prompt, required, version, owner, navigate)
+
+
+def create_choice(title, choices, prompt='Choose an Action', version=None, owner=None, navigate=None):
+    choices = list(choices)
+    if len(set(choice.Key for choice in choices)) != len(choices):
+        raise ValueError('Action keys must be unique.')
+    return _window_types()[2](title, choices, prompt, version, owner, navigate)
+
+
+def create_text_prompt(title, prompt, default='', required=False, validator=None,
+                       version=None, owner=None, navigate=None):
+    return _window_types()[3](title, prompt, default, required, validator, version, owner, navigate)

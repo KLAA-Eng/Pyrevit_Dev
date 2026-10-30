@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | Unreleased |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/UI Gallery.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/`; `lib/GUI/_templates/`; `lib/GUI/Resources/KLCodeFoundation.xaml`; `lib/GUI/Resources/KLCodeFoundationTokens.xaml`; `lib/GUI/Resources/KLCodeComponents.xaml`; `lib/GUI/window_chrome.py`; `lib/GUI/window_metadata.py` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/`; `lib/GUI/_templates/`; `lib/GUI/dialogs/`; `lib/GUI/Resources/KLCodeFoundation.xaml`; `lib/GUI/Resources/KLCodeFoundationTokens.xaml`; `lib/GUI/Resources/KLCodeComponents.xaml`; `lib/GUI/window_chrome.py`; `lib/GUI/window_metadata.py` |
 
 ## Tool version history
 
@@ -19,11 +19,33 @@
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
 | v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
-| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, and the five shared reference templates. | Gallery source/tests and the 2026-10-27 verification records; pending next main delivery. |
+| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, five shared reference templates and six opt-in dialog previews. | Gallery source/tests and the 2026-10-27/29 verification records; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
 main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
+## Shared dialog previews — 2026-10-29
+
+The owner authorized reusable GUI windows and Gallery integration without
+migrating actual tools. Six **Shared dialog** entries exercise four actual
+`lib/GUI/dialogs/` XAML bodies: message, confirmation, grouped selection,
+parameter selection, action choice and text entry. Each supports Normal,
+Empty, Error, Disabled and Long content using fictional data. These source
+files are version inputs for this same unreleased v0.5 delivery.
+
+These adapters use the real opt-in dialog factories and explicit result
+contracts, with simulated footer navigation. No production tool class, query,
+transaction or workflow is invoked. Parameter selection includes duplicate
+Width labels with different stable keys. The existing pyRevit previews remain
+available for comparison. The catalog now contains 42 entries and 25 Window
+sources, with five compiled previews still deferred.
+
+The [dialog contract](../../../../lib/GUI/dialogs/SPEC.md) and
+[API guide](../../../../lib/GUI/dialogs/README.md) own the reusable behavior;
+the [consolidation plan](../../../../docs/plans/custom-window-consolidation.md)
+owns this slice's tasks. [Verification](../../../../docs/knowledge/reviews/design-system/2026-10-29-shared-dialogs.md)
+records actual WPF results and live-host limits.
 
 ## Purpose
 

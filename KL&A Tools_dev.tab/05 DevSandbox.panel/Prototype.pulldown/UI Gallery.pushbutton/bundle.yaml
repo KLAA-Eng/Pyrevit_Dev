@@ -14,7 +14,9 @@ tooltip:
     - Select a row to see the calling tools and preview availability.
     - Choose a supported preview state and Open preview. All tool actions are simulated.
     - Search Template - to review Selection, Form, Message, Options, and Review references.
+    - Search Shared dialog to review the new message, confirmation, selection, action, and text windows.
     _____________________________________________________________________
     Last update:
+    - [10.29.2026] - v0.5 (Unreleased): Add six previews of reusable shared dialogs; existing tools retain their current windows.
     - [10.27.2026] - v0.5 (Unreleased): Add origins, source paths, tool callers, interactive states, faithful Recall, standalone coverage, and the shared main-template reference.
 author: KL&A

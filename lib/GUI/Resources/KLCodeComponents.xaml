@@ -391,6 +391,30 @@
     <Style x:Key="KlaListItem" TargetType="ListBoxItem" BasedOn="{StaticResource KlaFoundationListItem}"/>
     <Style x:Key="KlaLink" TargetType="Hyperlink" BasedOn="{StaticResource KlaFoundationLink}"/>
 
+    <!-- Opt-in rows for the reusable dialogs; existing tool lists are unaffected. -->
+    <Style x:Key="KlaDialogDescription" TargetType="TextBlock" BasedOn="{StaticResource KlaInfoText}">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="KlaDialogCheck" TargetType="CheckBox" BasedOn="{StaticResource KlaCheck}">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="ContentTemplate"><Setter.Value><DataTemplate>
+            <StackPanel>
+                <TextBlock Text="{Binding Label}" TextWrapping="Wrap" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=CheckBox}}"/>
+                <TextBlock Text="{Binding Description}" Style="{StaticResource KlaDialogDescription}"/>
+            </StackPanel>
+        </DataTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="KlaDialogListItem" TargetType="ListBoxItem" BasedOn="{StaticResource KlaListItem}">
+        <Setter Property="IsEnabled" Value="{Binding CanSelect}"/>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style x:Key="KlaSplitter" TargetType="GridSplitter">
         <Setter Property="Background" Value="{StaticResource KlaComponentBorderBrush}"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>

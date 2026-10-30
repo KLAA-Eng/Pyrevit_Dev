@@ -1,0 +1,23 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Enter Text" Width="560" Height="280" MinWidth="480" MinHeight="280" WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResizeWithGrip" Style="{StaticResource KlaWindow}" >
+    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+        <Grid x:Name="window_body">
+            <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <Label x:Name="prompt_label" Target="{Binding ElementName=input_text}" Style="{StaticResource KlaPromptLabel}" HorizontalContentAlignment="Stretch">
+                        <Label.ContentTemplate><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap"/></DataTemplate></Label.ContentTemplate>
+                    </Label>
+                    <TextBox x:Name="input_text" Style="{StaticResource KlaInput}" TextChanged="text_changed" AutomationProperties.Name="Text value"/>
+                    <TextBlock x:Name="validation_text" TextWrapping="Wrap" Foreground="{StaticResource KlaErrorBrush}" Visibility="Collapsed" Margin="0,8,0,0" AutomationProperties.LiveSetting="Polite"/>
+                </StackPanel>
+            </ScrollViewer>
+            <Grid Grid.Row="1" Margin="0,16,0,0"><StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+    <Button Content="Cancel" Click="cancel" Style="{StaticResource KlaButtonSecondary}" Margin="0,0,8,0"/>
+    <Button x:Name="accept_button" Content="OK" Click="accept_text" Style="{StaticResource KlaButtonPrimary}" IsDefault="True"/>
+</StackPanel></Grid>
+        </Grid>
+    </ContentControl>
+</Window>

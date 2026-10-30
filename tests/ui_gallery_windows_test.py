@@ -130,6 +130,8 @@ class GalleryWindowTests(unittest.TestCase):
             tree = ast.parse(stream.read())
         with open(os.path.join(ROOT, 'lib', 'ui_gallery', 'templates.py'), encoding='utf-8') as stream:
             tree.body.extend(ast.parse(stream.read()).body)
+        with open(os.path.join(ROOT, 'lib', 'GUI', 'dialogs', 'windows.py'), encoding='utf-8') as stream:
+            tree.body.extend(ast.parse(stream.read()).body)
         methods = {node.name for node in ast.walk(tree)
                    if isinstance(node, ast.FunctionDef)}
         events = {'Click', 'Checked', 'Unchecked', 'MouseDown', 'TextChanged',
@@ -169,6 +171,10 @@ class GalleryWindowTests(unittest.TestCase):
         alerts = []
         with patch.dict(sys.modules, host_modules(alerts)):
             for identifier, relative in windows.SOURCES.items():
+                # The new reusable dialogs run in the real IronPython/WPF probe;
+                # this older control fake models the legacy Gallery adapters only.
+                if identifier in windows.DIALOG_FILES:
+                    continue
                 if not os.path.isfile(windows.source_path(ROOT, relative)):
                     continue
                 for state in STATES:

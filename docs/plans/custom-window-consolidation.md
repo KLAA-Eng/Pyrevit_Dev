@@ -12,7 +12,7 @@ owns the reference-window implementation and usage.
 The full direction covers repository-owned standalone Python and compiled WPF
 windows, with thin host adapters and shared presentation rather than shared
 workflow inheritance. Preserve tool operations, modal/modeless lifecycles,
-and existing action placement. pyRevit/native dialogs, ribbon icon redesign,
+and existing action placement. Existing pyRevit/native tool calls, ribbon icon redesign,
 docked panels, and model-operation changes are excluded. The five compiled
 Gallery previews remain deferred under the separate Gallery plan.
 
@@ -148,8 +148,9 @@ existing authorization:
    issues. First make resource packaging compatible with CLR/localization
    adapters; build supported targets and retain honest matching-host limits.
 
-Current inventory is 21 Window sources: five references, nine Python tool
-windows, five compiled windows, the shared-shell Gallery and the PreviewFixture tooling exception.
+Current inventory is 25 Window sources: five references, nine Python tool
+windows, four opt-in dialog bodies, five compiled windows, the shared-shell
+Gallery and the PreviewFixture tooling exception.
 The nine Python and five compiled windows are the production/tool migration
 scope. Gallery remains the review harness; its previews and source/caller
 inventory must follow migrated sources. Only its static fixture retains test
@@ -183,3 +184,22 @@ on the new shared keys. No data/model migration or packaged compiled asset
 replacement is involved. Extension/tool versions remain unchanged; this is not
 a release delivery. The local source/build checks do not close GUI-08 or the
 separate compiled-tools host acceptance plan.
+
+## Opt-in reusable dialogs — authorized 2026-10-29
+
+The owner approved new reusable windows and GUI-system integration, explicitly
+excluding migration of existing tools. Use KLCode requirements, implementation,
+interface-development and test-first workflows. The library's acceptance
+contract lives in [GUI/dialogs/SPEC.md](../../lib/GUI/dialogs/SPEC.md).
+
+| ID | Slice | Status | Evidence / completion condition |
+| --- | --- | --- | --- |
+| GUI-16 | Host-free results and selection models | Implemented; verified | First duplicate-label/hidden-check test failed for missing library, then passed. Ten model/import tests cover host-free import, single selection, hidden checks, cancellation, validation and bad keys. |
+| GUI-17 | Message, selection, choice and text windows | Implemented; Windows verified | Four bodies reuse the shell/resources, with explicit results and lazy factories. Actual WPF layouts/actions and inspected normal/minimum/long/error renders pass. |
+| GUI-18 | Gallery and practical API documentation | Implemented | Six variants, five states each; API guide, design reference and Gallery SPEC updated. Production calls and existing reference templates preserved. |
+| GUI-19 | Verification and review evidence | Local checks complete; owner host review pending | [Evidence](../knowledge/reviews/design-system/2026-10-29-shared-dialogs.md): Python suite, actual IronPython/WPF layouts/actions, both compiled runtimes, source-scope self-review and inspected renders. Live Revit review stays owner-owned. |
+
+File/folder/color pickers, progress/selection overlays, Revit queries, current
+CustomAlert/SelectFromDict contracts and packaged DLLs remain outside this slice.
+GUI-14's existing-tool keyboard issues remain separate. No production adoption
+or release/version delivery is implied by adding the new dialog APIs.

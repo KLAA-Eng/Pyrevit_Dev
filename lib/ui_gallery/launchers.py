@@ -7,6 +7,7 @@ of Revit and prevents filesystem XAML discovery from becoming executable.
 from __future__ import unicode_literals
 
 from .template_data import TEMPLATE_FILES
+from .dialog_data import DIALOG_FILES, DIALOG_TITLES
 
 
 _LAUNCHERS = (
@@ -371,8 +372,14 @@ def gallery_launchers():
                       description='Shared {} reference with fictional data and local actions.'.format(identity.split('-')[1]),
                       uses_seed_data=True, can_launch=True)
                  for identity, filename in TEMPLATE_FILES.items()]
+    dialogs = [dict(id=identity, category='Shared dialog', title=DIALOG_TITLES[identity],
+                    relative_path='lib/GUI/dialogs/' + filename,
+                    called_by='UI Gallery opt-in dialog preview; no production callers migrated',
+                    description='Reusable custom dialog with fictional data and explicit results. Existing tools retain their current dialogs.',
+                    uses_seed_data=True, can_launch=True)
+               for identity, filename in DIALOG_FILES.items()]
     return [_with_sample_data_label(launcher)
-            for launcher in sorted(list(_LAUNCHERS) + templates, key=lambda item: item['id'])]
+            for launcher in sorted(list(_LAUNCHERS) + templates + dialogs, key=lambda item: item['id'])]
 
 
 def launcher_by_id(launcher_id):

@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 import os
 
 from .template_data import TEMPLATE_FILES
+from .dialog_data import DIALOG_FILES
 from find_replace.layout import results_height  # host-free constants shared with the production dialog
 
 from ui_gallery.scenarios import (PreviewItem, alert_message, filtered_items, naming_values,
@@ -37,6 +38,7 @@ SOURCES = {
 
 
 SOURCES.update((identity, 'lib/GUI/_templates/' + filename) for identity, filename in TEMPLATE_FILES.items())
+SOURCES.update((identity, 'lib/GUI/dialogs/' + filename) for identity, filename in DIALOG_FILES.items())
 
 def source_path(extension_root, relative_path):
     """Resolve the stable tab alias without allowing paths outside the repo."""
@@ -70,6 +72,9 @@ def create_custom(extension_root, launcher, state='Normal'):
     if identifier in TEMPLATE_FILES:
         from .templates import create_template
         return create_template(launcher, state, path)
+    if identifier in DIALOG_FILES:
+        from .dialogs import create_dialog
+        return create_dialog(launcher, state)
     window_type = _window_type()
     return window_type(extension_root, launcher, state, path)
 
@@ -78,6 +83,8 @@ def launch_custom(extension_root, launcher, state='Normal'):
     """Show a real-XAML preview; all action results are local simulations."""
     window = create_custom(extension_root, launcher, state)
     window.ShowDialog()
+    if launcher['id'] in DIALOG_FILES:
+        return 'Fictional dialog result: {}.'.format(window.result.action)
     return window.preview_result
 
 

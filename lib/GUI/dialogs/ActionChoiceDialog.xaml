@@ -1,0 +1,29 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Choose Action" Width="600" Height="440" MinWidth="480" MinHeight="340" WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResizeWithGrip" Style="{StaticResource KlaWindow}" >
+    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+        <Grid x:Name="window_body">
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <Label x:Name="prompt_label" Target="{Binding ElementName=choices_list}" Style="{StaticResource KlaPromptLabel}"/>
+            <ListBox x:Name="choices_list" Grid.Row="1" Style="{StaticResource KlaList}" SelectionChanged="choice_changed" AutomationProperties.Name="Available actions">
+                <ListBox.ItemContainerStyle>
+    <Style TargetType="ListBoxItem" BasedOn="{StaticResource KlaDialogListItem}"/>
+</ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0,8,0,8">
+                            <TextBlock Text="{Binding Label}" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding Description}" Style="{StaticResource KlaDialogDescription}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Grid Grid.Row="2"><TextBlock x:Name="validation_text" TextWrapping="Wrap" Foreground="{StaticResource KlaErrorBrush}" Visibility="Collapsed" Margin="0,8,0,0" AutomationProperties.LiveSetting="Polite"/></Grid>
+            <Grid Grid.Row="3" Margin="0,16,0,0"><StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+    <Button Content="Cancel" Click="cancel" Style="{StaticResource KlaButtonSecondary}" Margin="0,0,8,0"/>
+    <Button x:Name="accept_button" Content="Continue" Click="accept_choice" Style="{StaticResource KlaButtonPrimary}" IsDefault="True"/>
+</StackPanel></Grid>
+        </Grid>
+    </ContentControl>
+</Window>
