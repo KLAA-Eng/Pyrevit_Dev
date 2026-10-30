@@ -7,16 +7,16 @@ tooltip:
     Status: Unreleased
     _____________________________________________________________________
     Description:
-    Prototype: places KL&A steel and wood detail components over framing and columns in the active section view: Section components on members cut or beyond, Side components on members along the section, and one component per ply for built-up wood. Missing types load from the KLAA detail component library. Revit 2023+; adds detail components to the active view.
+    Prototype: places KL&A steel and wood detail components over framing and columns in the active section view: Section components on members cut or beyond (oblique cut members sized from the member), Side components on members along the section, wood matched by modeled depth and width and stacked as single plies, 2x double top and single bottom plates on wood walls matching the stud width, sheathing on floors and sloped or flat roofs, Break Line small where members leave the crop, elevation symbols at visible floor and steel tops (T/ text in the description, elevation left blank), and a halftoned S-OBJ4 outline around a linked architectural model. Missing types load from the KLAA detail component library. Revit 2023+; adds detail components to the active view.
     _____________________________________________________________________
     How-to:
     - Open a section view and click the button.
     - Approve loading any missing types; pick a family when more than one matches.
     - Re-running offers to replace or add to components this tool placed earlier.
-    - Oblique or curved members and unsupported shapes are listed, not placed.
+    - Oblique members beyond the cut, curved members, and unsupported shapes are listed, not placed.
     _____________________________________________________________________
     Last update:
-    - [10.30.2026] - v0.0: Prototype for steel and wood members cut, beyond, and along the section.
+    - [10.30.2026] - v0.0: Prototype for steel and wood members cut, beyond, and along the section, with break lines, elevations, sheathing, and a linked model outline.
 author: KL&A
 min_revit_version: 2023
 engine:

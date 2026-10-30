@@ -32,7 +32,8 @@ def classify_member(axis, view_direction):
 
     ``end_on`` runs into the view (cut or beyond, shown by its profile),
     ``in_plane`` runs along the view (shown from the side), and ``oblique``
-    is anything between; oblique members are reported, not placed.
+    is anything between; oblique members cut by the section get a section
+    component sized from the member, not from the stretched cut face.
     """
     axis = _unit(axis)
     if axis is None:
@@ -43,6 +44,31 @@ def classify_member(axis, view_direction):
     if alignment <= IN_PLANE_TOLERANCE:
         return IN_PLANE
     return OBLIQUE
+
+
+def member_size(points, axis, depth):
+    """Return a member's ``(depth, width)`` from its 3D points.
+
+    Sizes are measured square to the axis: depth along ``depth`` with any
+    component along the axis removed, width along axis x depth. Returns
+    None when the directions are missing or parallel.
+    """
+    axis = _unit(axis)
+    if axis is None or depth is None or not points:
+        return None
+    along = dot(depth, axis)
+    depth = [d - along * a for d, a in zip(depth, axis)]
+    if math.sqrt(dot(depth, depth)) < ANGLE_SNAP:
+        return None
+    depth = _unit(depth)
+    across = (axis[1] * depth[2] - axis[2] * depth[1],
+              axis[2] * depth[0] - axis[0] * depth[2],
+              axis[0] * depth[1] - axis[1] * depth[0])
+    sizes = []
+    for direction in (depth, across):
+        values = [dot(point, direction) for point in points]
+        sizes.append(max(values) - min(values))
+    return tuple(sizes)
 
 
 def crosses_plane(start, end, origin, normal):
@@ -115,6 +141,41 @@ def side_segment(points, axis_2d, depth_2d):
         return None
     return ((axis[0] * start + across[0] * middle, axis[1] * start + across[1] * middle),
             (axis[0] * end + across[0] * middle, axis[1] * end + across[1] * middle))
+
+
+def signed_area(loop):
+    """Return a closed 2D loop's area, positive when counterclockwise."""
+    return sum(a[0] * b[1] - b[0] * a[1]
+               for a, b in zip(loop, loop[1:] + loop[:1])) / 2.0
+
+
+def top_edges(loop, min_up=0.1):
+    """Return the edges of a closed 2D loop that face up, running left to right.
+
+    An edge faces up when its outward normal has a ``v`` component above
+    ``min_up``, so a sloped roof's top surface counts and its vertical ends
+    do not.
+    """
+    outward = 1.0 if signed_area(loop) > 0 else -1.0
+    edges = []
+    for a, b in zip(loop, loop[1:] + loop[:1]):
+        du, dv = b[0] - a[0], b[1] - a[1]
+        length = math.hypot(du, dv)
+        if length == 0 or -outward * du / length <= min_up:
+            continue
+        edges.append((a, b) if du > 0 else (b, a))
+    return edges
+
+
+def offset_down(segment, distance):
+    """Return a left-to-right 2D segment moved ``distance`` square to it, downward."""
+    (u0, v0), (u1, v1) = segment
+    du, dv = u1 - u0, v1 - v0
+    length = math.hypot(du, dv)
+    if length == 0:
+        return None
+    nu, nv = dv / length * distance, -du / length * distance
+    return (u0 + nu, v0 + nv), (u1 + nu, v1 + nv)
 
 
 def clip_segment(start, end, rect):

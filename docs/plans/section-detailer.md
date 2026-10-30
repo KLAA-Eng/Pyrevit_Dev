@@ -55,7 +55,7 @@ places, orients, and finishes the 2D content.
 | Phase | Scope | Exit |
 | --- | --- | --- |
 | P1 | C1, C2, C4 for steel and wood members cut, beyond, and along the section; built-up wood as single plies; library loading; prompt on ambiguity; report unmatched | Live test in representative steel and wood sections |
-| P2 | Browse for families outside the library, C5 break lines, C6 grids | Live test with cropped views and visible grids |
+| P2 | C5 break lines (`Break Line small`), floor elevation symbols, center alignment by drawn extents; then browse for families outside the library and C6 grids | Live test with cropped views, floors, and visible grids |
 | P3 | Concrete/CMU, C8 reference detail | Live test on a mixed-material detail |
 | P4 | C7 architectural outline, re-run update/clear | Live test with linked architectural model |
 
@@ -80,8 +80,27 @@ Decided 2026-10-30 from the library on the office share.
   Pipe → `5_Pipe_Section`. In-plane members use the matching `_Side` family.
 - Wood families (`Div 06 - Wood and Plastic`) use single-ply catalog sizes
   (`2x10`, `1 3/4x11 7/8`, `5 1/8x12`, heavy timber `6x10 WBx`); prefixed
-  variants such as `PT 2x10` and `Rafter 2x10` share a size. Built-up members
-  are drawn as one single-ply component per ply (decided 2026-10-30).
+  variants such as `PT 2x10` and `Rafter 2x10` share a size. Wood is matched
+  by modeled depth and width against the catalogs' `Width`/`Depth` columns,
+  then stacked side by side to make up the width: LVL from 1 3/4 in plies,
+  sawn lumber from 1 1/2 in plies (decided 2026-10-30). Members seen from
+  the side get the material's `_Side` family for the visible length.
+- Floor sheathing layers get `6_Sheathing_Ply_Section`. Elevation symbols
+  go only on floor and steel tops visible in the crop (`T/STEEL` for steel);
+  the `T/` text goes in `Description` and `Elevation` is left blank.
+  Oblique members cut by the section get a section component sized from the
+  member, square to its axis. Wood walls cut by the section get a 2x double
+  top plate and single bottom plate laid flat, sized to the stud layer.
+  Roof sheathing layers get the sheathing component along the roof's cut
+  top surface, sloped or flat.
+  A visible linked architectural model is outlined with halftoned `S-OBJ4`
+  detail lines, and no components are placed on linked elements (decided
+  2026-10-30).
+- Families do not all insert at their center; placements are aligned
+  center-to-center from drawn extents (decided 2026-10-30).
+- Break lines default to the `Break Line small` type. Floor tops get the
+  `Elevation_KLAA_17SY` generic annotation (`KLAA Annotations\Symbols`),
+  aligned to the floor top (decided 2026-10-30).
 - Side catalogs for rectangular HSS are named by seen face and wall
   (`HSS6x1/4`), not the full designation.
 - Break line: `00_Break_Line_Pick_KLAA_15DC` (also `00_Dbl_Break_Line_Pick`,
@@ -91,8 +110,6 @@ Decided 2026-10-30 from the library on the office share.
 
 ## Open decisions
 
-- Whether "architectural outline" means linked architectural model content,
-  host architectural categories, or an outline of the whole cut assembly.
 - Whether the overlay stays in the live section or is also pushed to a drafting
   view for reuse.
 - Whether model elements should be hidden/halftoned after the overlay.
@@ -101,9 +118,9 @@ Decided 2026-10-30 from the library on the office share.
 
 | ID | Task | Status | Evidence |
 | --- | --- | --- | --- |
-| SD-1 | Resolve open decisions | Library conventions decided; others open | This plan, KL&A detail component library section |
+| SD-1 | Resolve open decisions | Library conventions and outline scope (linked model) decided; others open | This plan, KL&A detail component library section |
 | SD-2 | Scaffold DevSandbox command, `SPEC.md`, `lib/` module with tests | Implementation complete | `lib/section_detailer/`, `tests/section_detailer_test.py` |
 | SD-3 | Deliver P1 (steel and wood; cut, beyond, and along) | Implementation complete; live Revit acceptance pending | Command `SPEC.md` validation evidence |
-| SD-4 | Deliver P2 | Not started | |
+| SD-4 | Deliver P2 | Break lines, floor and steel elevations, sheathing, and alignment implemented; grids and browsing not started; live acceptance pending | Command `SPEC.md` |
 | SD-5 | Deliver P3 | Not started | |
-| SD-6 | Deliver P4 | Not started | |
+| SD-6 | Deliver P4 | Linked model outline (halftoned `S-OBJ4`) implemented; re-run update not started; live acceptance pending | Command `SPEC.md` |

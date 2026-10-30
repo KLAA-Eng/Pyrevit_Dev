@@ -49,16 +49,19 @@ _WOOD_MATERIALS = (
     ('LSL', re.compile(r'\bLSL')),
 )
 
+# Stacked materials are drawn as plies of this width (in), side by side.
+_STACK_PLIES = {'LVL': 1.75, 'Sawn': 1.5}
+# Modeled and catalog wood sizes agree within this many inches.
+WOOD_TOLERANCE = 1.0 / 16
+_WOOD_WORDS = re.compile(r'WOOD|LUMBER|TIMBER|\bSPF\b|\bDF\b|DOUGLAS|\bHF\b|\bSYP\b')
+
 _LIBRARY_FILE = re.compile(
     r'^(?P<base>.+?)_KLAA_(?P<revision>\d+)?DC\.rfa$', re.IGNORECASE)
 _DECIMAL = re.compile(r'^\d*\.\d+$|^\d+\.\d*$')
 _NUMBER = r'\d+(?:\.\d+|[ -]\d+/\d+|/\d+)?|\.\d+'
 _WOOD_SIZE = re.compile(
     r'(?<![A-Za-z\d./])(' + _NUMBER + r')\s*[xX]\s*(' + _NUMBER + r')')
-_LEADING_PLIES = re.compile(
-    r'^\s*(?:\(\s*(\d+)\s*\)|(\d+)\s*[-\u2013]\s*(?=\d+(?:\.\d+|\s+\d+/\d+)?\s*[xX])'
-    r'|(\d+)\s*-?\s*PLY\b)\s*', re.IGNORECASE)
-_TRAILING_PLIES = re.compile(r'\(\s*(\d+)\s*\)\s*$|\b(\d+)\s*-?\s*PLY\b', re.IGNORECASE)
+
 
 
 def _normalize_token(token):
@@ -157,39 +160,96 @@ def wood_size_key(name):
     return round(width, 4), round(depth, 4)
 
 
-def parse_wood(type_name, family_name=''):
-    """Return wood member facts from a type name, else None.
+def format_inches(value):
+    """Return inches as lumber-style text to 1/16: 11.875 -> ``11 7/8``."""
+    sixteenths = int(round(value * 16))
+    whole, remainder = divmod(sixteenths, 16)
+    if not remainder:
+        return str(whole)
+    bottom = 16
+    while remainder % 2 == 0:
+        remainder //= 2
+        bottom //= 2
+    fraction = '{}/{}'.format(remainder, bottom)
+    return '{} {}'.format(whole, fraction) if whole else fraction
 
-    The result is a dict with ``plies`` (from ``3-2x10``, ``(3) 2x10``,
-    ``2x10 (3)``, or ``3 PLY``), ``size`` (the single-ply name text such as
-    ``2x10``), and ``material`` (Sawn, LVL, PSL, LSL, or Glulam, read from the
-    type and family names).
-    """
-    text = (type_name or '').strip()
-    plies = 1
-    leading = _LEADING_PLIES.match(text)
-    if leading:
-        plies = int(next(group for group in leading.groups() if group))
-        text = text[leading.end():]
-    else:
-        trailing = _TRAILING_PLIES.search(text)
-        if trailing:
-            plies = int(next(group for group in trailing.groups() if group))
-            text = text[:trailing.start()]
-    match = _WOOD_SIZE.search(text)
-    if not match or wood_size_key(match.group(0)) is None:
-        return None
+
+def wood_material(type_name, family_name=''):
+    """Return Sawn, LVL, PSL, LSL, or Glulam from the type and family names."""
     words = '{} {}'.format(type_name or '', family_name or '').upper()
-    material = 'Sawn'
     for name, pattern in _WOOD_MATERIALS:
         if pattern.search(words):
-            material = name
-            break
-    return {
-        'plies': max(plies, 1),
-        'size': re.sub(r'\s+', ' ', match.group(0)).strip(),
-        'material': material,
-    }
+            return name
+    return 'Sawn'
+
+
+def is_wood_name(type_name, family_name=''):
+    """Return True when the names read as a wood member."""
+    words = '{} {}'.format(type_name or '', family_name or '').upper()
+    if wood_size_key(type_name) is not None or _WOOD_WORDS.search(words):
+        return True
+    return any(pattern.search(words) for _, pattern in _WOOD_MATERIALS)
+
+
+def parse_catalog_sizes(text):
+    """Return ``(name, width, depth)`` in inches from a wood type catalog.
+
+    KLAA wood catalogs carry ``Width`` and ``Depth`` length columns, in
+    either order. Rows without both values are skipped.
+    """
+    lines = (text or '').splitlines()
+    if not lines:
+        return []
+    columns = {}
+    for index, header in enumerate(lines[0].split(',')):
+        parts = header.split('##')
+        if parts[0].strip() in ('Width', 'Depth'):
+            unit = parts[2].strip().lower() if len(parts) > 2 else 'inches'
+            columns[parts[0].strip()] = (index, 12.0 if unit == 'feet' else 1.0)
+    if len(columns) < 2:
+        return []
+    sizes = []
+    for line in lines[1:]:
+        cells = line.split(',')
+        name = cells[0].strip()
+        values = []
+        for key in ('Width', 'Depth'):
+            index, scale = columns[key]
+            value = parse_number(cells[index]) if index < len(cells) else None
+            values.append(None if value is None else value * scale)
+        if name and None not in values:
+            sizes.append((name, values[0], values[1]))
+    return sizes
+
+
+def choose_wood_stack(sizes, depth, width=None, material='Sawn', seen_width=False,
+                      tolerance=WOOD_TOLERANCE):
+    """Return ``(type_name, plies)`` that builds a wood member, else None.
+
+    ``sizes`` are ``(name, width, depth)`` in inches from one family. The
+    type's depth must match the member's. With ``width`` (a member seen
+    end-on), a whole number of the type side by side must make up the
+    width: LVL and sawn lumber prefer their 1 3/4 in and 1 1/2 in plies,
+    other materials the fewest pieces. Without ``width`` (a member seen from
+    its side) one piece is used. ``seen_width`` matches the type's width
+    instead of its depth, for a member seen on its flat.
+    """
+    ply = _STACK_PLIES.get(material)
+    best = None
+    for name, type_width, type_depth in sizes:
+        seen = type_width if seen_width else type_depth
+        if abs(seen - depth) > tolerance or type_width <= 0:
+            continue
+        plies = 1
+        if width is not None:
+            plies = int(round(width / type_width))
+            if plies < 1 or abs(plies * type_width - width) > tolerance:
+                continue
+        stacked = 0 if ply and abs(type_width - ply) <= tolerance else 1
+        rank = (stacked, plies, len(name), name)
+        if best is None or rank < best[0]:
+            best = (rank, (name, plies))
+    return best[1] if best else None
 
 
 def wood_family_bases(material, view_kind=VIEW_SECTION):
@@ -198,12 +258,15 @@ def wood_family_bases(material, view_kind=VIEW_SECTION):
             for stem in _WOOD_FAMILIES.get(material, ())]
 
 
-def member_spec(type_name, family_name='', view_kind=VIEW_SECTION, show_width=False):
+def member_spec(type_name, family_name='', view_kind=VIEW_SECTION, show_width=False,
+                wood=False):
     """Return what to look for when detailing a member, else None.
 
     The dict holds ``kind`` (steel or wood), ``target`` (the type name to
-    match), ``bases`` (KLAA family stems in preference order), ``folder``
-    (library subfolder), and ``plies``.
+    match), ``bases`` (KLAA family stems in preference order), and
+    ``folder`` (library subfolder). Wood is matched by modeled size, so its
+    ``target`` is left for the caller to fill and ``material`` is added.
+    ``wood`` marks a member whose structural material is wood.
     """
     if shape_key(type_name):
         designation = normalize_designation(type_name)
@@ -214,18 +277,16 @@ def member_spec(type_name, family_name='', view_kind=VIEW_SECTION, show_width=Fa
             'target': designation,
             'bases': [family_base(shape_key(type_name), view_kind)],
             'folder': METALS_FOLDER,
-            'plies': 1,
         }
-    wood = parse_wood(type_name, family_name)
-    if wood is None:
+    if not (wood or is_wood_name(type_name, family_name)):
         return None
+    material = wood_material(type_name, family_name)
     return {
         'kind': WOOD,
-        'target': wood['size'],
-        'bases': wood_family_bases(wood['material'], view_kind),
+        'target': None,
+        'bases': wood_family_bases(material, view_kind),
         'folder': WOOD_FOLDER,
-        'plies': wood['plies'],
-        'material': wood['material'],
+        'material': material,
     }
 
 

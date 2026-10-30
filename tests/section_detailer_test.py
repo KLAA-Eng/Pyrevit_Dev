@@ -11,6 +11,22 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 
+from lib.section_detailer.annotations import (
+    BOTTOM,
+    LEFT,
+    RIGHT,
+    TOP,
+    break_segment,
+    crop_crossings,
+    floor_label,
+    inset_rect,
+    merge_crossings,
+    plate_centers,
+    sheathing_layer,
+    stud_layer,
+    unique_tops,
+    visible_top,
+)
 from lib.section_detailer.matching import (
     METALS_FOLDER,
     STEEL,
@@ -18,22 +34,27 @@ from lib.section_detailer.matching import (
     WOOD,
     WOOD_FOLDER,
     best_per_family,
+    choose_wood_stack,
     family_base,
     family_matches_base,
     find_catalog_type,
+    format_inches,
+    is_wood_name,
     member_spec,
     normalize_designation,
     parse_library_filename,
     parse_number,
+    parse_catalog_sizes,
     parse_type_catalog,
-    parse_wood,
     pick_library_file,
     rank_candidates,
     shape_key,
     side_designation,
     wood_family_bases,
+    wood_material,
     wood_size_key,
 )
+from lib.section_detailer.outline import boundary_segments, join_collinear
 from lib.section_detailer.view_geometry import (
     END_ON,
     IN_PLANE,
@@ -43,9 +64,12 @@ from lib.section_detailer.view_geometry import (
     clip_segment,
     crosses_plane,
     extent_along,
+    member_size,
+    offset_down,
     ply_offsets,
     rotation_in_view,
     side_segment,
+    top_edges,
     to_view,
     width_direction,
 )
@@ -119,12 +143,14 @@ class SideAndSpecTests(unittest.TestCase):
     def test_wood_spec(self):
         spec = member_spec('3-2x10', 'Dimension Lumber')
         self.assertEqual(spec['kind'], WOOD)
-        self.assertEqual(spec['plies'], 3)
-        self.assertEqual(spec['target'], '2x10')
+        self.assertEqual(spec['material'], 'Sawn')
+        self.assertIsNone(spec['target'])
         self.assertEqual(spec['folder'], WOOD_FOLDER)
         self.assertEqual(spec['bases'], ['6_Lumber_Dimension_Section',
                                          '6_HeavyTimber_Section'])
         self.assertIsNone(member_spec('Rectangular Beam', 'Concrete'))
+        flagged = member_spec('Beam 1', 'Rectangular Beam', VIEW_SIDE, wood=True)
+        self.assertEqual(flagged['bases'], ['6_Lumber_Dimension_Side', '6_HeavyTimber_Side'])
 
 
 class WoodTests(unittest.TestCase):
@@ -145,26 +171,179 @@ class WoodTests(unittest.TestCase):
         self.assertIsNone(wood_size_key('W12x26'))
         self.assertIsNone(wood_size_key('HSS6x1/4'))
 
-    def test_built_up_plies(self):
-        cases = {
-            '2x10': (1, '2x10'),
-            '3-2x10': (3, '2x10'),
-            '(2) 2x12': (2, '2x12'),
-            '2x12 (2)': (2, '2x12'),
-            '3 PLY 1 3/4x11 7/8 LVL': (3, '1 3/4x11 7/8'),
-            '2-1 3/4x11 7/8': (2, '1 3/4x11 7/8'),
-            '1-3/4x11-7/8': (1, '1-3/4x11-7/8'),
-        }
-        for name, (plies, size) in cases.items():
-            parsed = parse_wood(name)
-            self.assertEqual((parsed['plies'], parsed['size']), (plies, size), name)
+    def test_inches_format_as_lumber_text(self):
+        self.assertEqual(format_inches(11.875), '11 7/8')
+        self.assertEqual(format_inches(1.75), '1 3/4')
+        self.assertEqual(format_inches(12.0), '12')
+        self.assertEqual(format_inches(0.5), '1/2')
 
     def test_material_from_type_or_family(self):
-        self.assertEqual(parse_wood('2x10')['material'], 'Sawn')
-        self.assertEqual(parse_wood('1 3/4x11 7/8', 'LVL Beam')['material'], 'LVL')
-        self.assertEqual(parse_wood('5 1/8x12', 'Glulam-Rectangular')['material'], 'Glulam')
-        self.assertEqual(parse_wood('3 1/2x11 7/8 PSL')['material'], 'PSL')
-        self.assertIsNone(parse_wood('Rectangular Beam'))
+        self.assertEqual(wood_material('2x10'), 'Sawn')
+        self.assertEqual(wood_material('1 3/4x11 7/8', 'LVL Beam'), 'LVL')
+        self.assertEqual(wood_material('5 1/8x12', 'Glulam-Rectangular'), 'Glulam')
+        self.assertEqual(wood_material('3 1/2x11 7/8 PSL'), 'PSL')
+        self.assertTrue(is_wood_name('2x10'))
+        self.assertTrue(is_wood_name('Beam', 'Dimension Lumber'))
+        self.assertTrue(is_wood_name('11 7/8 Beam', 'LVL'))
+        self.assertFalse(is_wood_name('Rectangular Beam', 'Concrete'))
+
+
+class WoodStackTests(unittest.TestCase):
+    LVL = [('1 3/4x11 7/8', 1.75, 11.875), ('Rim 1 3/4x11 7/8', 1.75, 11.875),
+           ('3 1/2x11 7/8', 3.5, 11.875), ('1 3/4x14', 1.75, 14.0)]
+    SAWN = [('PT 2x10', 1.5, 9.25), ('2x10', 1.5, 9.25), ('4x8', 3.5, 7.25),
+            ('2x12', 1.5, 11.25)]
+
+    def test_catalog_sizes_follow_the_header(self):
+        width_first = (',Width##length##inches,Depth##length##inches,Type Comments##other##\n'
+                       '1 3/4x11 7/8,1.75,11.875,LVL\n\n')
+        depth_first = (',Depth##length##inches,Width##length##inches,Type Comments##Other##\n'
+                       '6x10 WBx,9.5,5.5,WOOD BEAM\n')
+        self.assertEqual(parse_catalog_sizes(width_first), [('1 3/4x11 7/8', 1.75, 11.875)])
+        self.assertEqual(parse_catalog_sizes(depth_first), [('6x10 WBx', 5.5, 9.5)])
+        self.assertEqual(parse_catalog_sizes(CATALOG), [])
+
+    def test_lvl_stacks_single_plies_by_depth(self):
+        self.assertEqual(choose_wood_stack(self.LVL, 11.875, 3.5, 'LVL'), ('1 3/4x11 7/8', 2))
+        self.assertEqual(choose_wood_stack(self.LVL, 11.875, 5.25, 'LVL'), ('1 3/4x11 7/8', 3))
+        self.assertEqual(choose_wood_stack(self.LVL, 14.0, 1.75, 'LVL'), ('1 3/4x14', 1))
+        self.assertIsNone(choose_wood_stack(self.LVL, 9.25, 3.5, 'LVL'))
+
+    def test_sawn_stacks_plies_or_uses_a_solid_size(self):
+        self.assertEqual(choose_wood_stack(self.SAWN, 9.25, 4.5, 'Sawn'), ('2x10', 3))
+        self.assertEqual(choose_wood_stack(self.SAWN, 7.25, 3.5, 'Sawn'), ('4x8', 1))
+        self.assertIsNone(choose_wood_stack(self.SAWN, 9.25, 3.5, 'Sawn'))
+
+    def test_solid_materials_prefer_fewest_pieces(self):
+        psl = [('1 3/4x11 7/8', 1.75, 11.875), ('3 1/2x11 7/8', 3.5, 11.875)]
+        self.assertEqual(choose_wood_stack(psl, 11.875, 3.5, 'PSL'), ('3 1/2x11 7/8', 1))
+
+    def test_side_view_matches_depth_only(self):
+        self.assertEqual(choose_wood_stack(self.SAWN, 9.25), ('2x10', 1))
+        self.assertEqual(choose_wood_stack(self.LVL, 11.875, material='LVL'),
+                         ('1 3/4x11 7/8', 1))
+        self.assertEqual(choose_wood_stack(self.SAWN, 1.5, seen_width=True)[0], '2x10')
+
+    def test_modeled_sizes_match_within_a_sixteenth(self):
+        self.assertEqual(choose_wood_stack(self.SAWN, 9.26, 3.01, 'Sawn'), ('2x10', 2))
+        self.assertIsNone(choose_wood_stack(self.SAWN, 9.5, 3.0, 'Sawn'))
+
+
+class AnnotationTests(unittest.TestCase):
+    RECT = (0.0, 0.0, 10.0, 10.0)
+
+    def test_inset_rect(self):
+        self.assertEqual(inset_rect(self.RECT, 0.25), (0.25, 0.25, 9.75, 9.75))
+        self.assertIsNone(inset_rect(None))
+
+    def test_horizontal_members_break_at_side_edges(self):
+        joist = [(-5, 4), (8, 4), (8, 5), (-5, 5)]
+        self.assertEqual(crop_crossings(joist, (1, 0), self.RECT), [(LEFT, 4, 5)])
+        through = [(-5, 4), (15, 4), (15, 5), (-5, 5)]
+        self.assertEqual(crop_crossings(through, (1, 0), self.RECT),
+                         [(LEFT, 4, 5), (RIGHT, 4, 5)])
+        inside = [(1, 4), (8, 4), (8, 5), (1, 5)]
+        self.assertEqual(crop_crossings(inside, (1, 0), self.RECT), [])
+
+    def test_vertical_members_break_at_top_and_bottom(self):
+        column = [(4, 2), (5, 2), (5, 14), (4, 14)]
+        self.assertEqual(crop_crossings(column, (0, 1), self.RECT), [(TOP, 4, 5)])
+        self.assertEqual(crop_crossings(column, (1, 1), self.RECT), [])
+
+    def test_touching_members_share_one_break(self):
+        crossings = [(LEFT, 4.0, 5.0), (LEFT, 5.0, 5.1), (LEFT, 7.0, 8.0),
+                     (TOP, 1.0, 2.0)]
+        self.assertEqual(merge_crossings(crossings, 0.01),
+                         [(LEFT, 4.0, 5.1), (LEFT, 7.0, 8.0), (TOP, 1.0, 2.0)])
+
+    def test_break_lines_keep_the_outside_on_their_right(self):
+        self.assertEqual(break_segment(LEFT, 4, 5, self.RECT), ((0, 5), (0, 4)))
+        self.assertEqual(break_segment(RIGHT, 4, 5, self.RECT), ((10, 4), (10, 5)))
+        self.assertEqual(break_segment(TOP, 4, 5, self.RECT), ((5, 10), (4, 10)))
+        self.assertEqual(break_segment(BOTTOM, 4, 5, self.RECT), ((4, 0), (5, 0)))
+        self.assertEqual(break_segment(LEFT, 4, 5, self.RECT, outside_on_right=False),
+                         ((0, 4), (0, 5)))
+
+    def test_floor_labels(self):
+        self.assertEqual(floor_label('3/4" Plywood Subfloor'), 'T/SHEATHING')
+        self.assertEqual(floor_label('Floor', ['OSB Sheathing']), 'T/SHEATHING')
+        self.assertEqual(floor_label('6" Concrete Slab'), 'T/SLAB')
+        self.assertEqual(floor_label('Generic 12"'), 'T/FLOOR')
+
+    def test_floors_at_one_height_share_a_symbol(self):
+        tops = [(10.0, 3.0, 'T/SHEATHING'), (10.005, 8.0, 'T/SHEATHING'),
+                (0.0, 5.0, 'T/SLAB')]
+        self.assertEqual(unique_tops(tops, 0.01),
+                         [(0.0, 5.0, 'T/SLAB'), (10.005, 8.0, 'T/SHEATHING')])
+
+
+class ElevationAndSheathingTests(unittest.TestCase):
+    TRIM = (0.0, 0.0, 10.0, 10.0)
+
+    def test_tops_show_only_inside_the_crop(self):
+        beam = [(2.0, 4.0), (3.0, 4.0), (3.0, 5.0), (2.0, 5.0)]
+        self.assertEqual(visible_top(beam, 'T/STEEL', self.TRIM), (5.0, 3.0, 'T/STEEL'))
+        above = [(2.0, 11.0), (3.0, 12.0)]
+        self.assertIsNone(visible_top(above, 'T/STEEL', self.TRIM))
+        aside = [(11.0, 4.0), (12.0, 5.0)]
+        self.assertIsNone(visible_top(aside, 'T/STEEL', self.TRIM))
+        long_floor = [(-5.0, 6.0), (20.0, 6.5)]
+        self.assertEqual(visible_top(long_floor, 'T/SHEATHING', self.TRIM)[1], 10.0)
+        self.assertEqual(visible_top(above, 'T/STEEL', None), (12.0, 3.0, 'T/STEEL'))
+
+    def test_sheathing_layer_from_materials(self):
+        layers = [('Finish Flooring', 0.05), ('Plywood, Sheathing', 0.0625), ('Wood Joist', 1.0)]
+        self.assertEqual(sheathing_layer('Wood Floor', layers), (0.05, 0.0625))
+        self.assertEqual(sheathing_layer('3/4 OSB Sheathing', [('Default', 0.0625)]),
+                         (0.0, 0.0625))
+        self.assertIsNone(sheathing_layer('Concrete Slab', [('Concrete', 0.5)]))
+
+    def test_stud_layer_from_materials_or_type_name(self):
+        wall = [('Plywood, Sheathing', 0.05, False), ('Wood Stud Layer', 5.5 / 12, True),
+                ('Gypsum Wall Board', 0.05, False)]
+        self.assertEqual(stud_layer('Exterior - 2x6 Wood Stud', wall), (0.05, 5.5 / 12))
+        generic = [('Default', 0.05, False), ('Default', 3.5 / 12, True)]
+        self.assertEqual(stud_layer('Interior - 2x4 Wood Stud', generic), (0.05, 3.5 / 12))
+        self.assertEqual(stud_layer('2x6 Stud', [('Default', 0.5, False)]), (0.0, 0.5))
+        self.assertIsNone(stud_layer('8" CMU', [('Masonry - CMU', 0.6667, True)]))
+        self.assertIsNone(stud_layer('Generic - 8"', generic))
+
+    def test_plates_stack_down_from_the_top_and_up_from_the_bottom(self):
+        plate = 1.5 / 12
+        centers = plate_centers(0.0, 9.0, 2.0, None)
+        self.assertEqual(len(centers), 3)
+        self.assertAlmostEqual(centers[0][1], 9.0 - plate / 2)
+        self.assertAlmostEqual(centers[1][1], 9.0 - plate * 1.5)
+        self.assertAlmostEqual(centers[2][1], plate / 2)
+        self.assertEqual(len(plate_centers(0.0, 9.0, 2.0, (0.0, 1.0, 10.0, 20.0))), 2)
+        self.assertEqual(plate_centers(0.0, 0.3, 2.0, None), [])
+
+
+class OutlineTests(unittest.TestCase):
+    @staticmethod
+    def square(u, v, size=1.0):
+        return [[(u, v), (u + size, v), (u + size, v + size), (u, v + size)]]
+
+    @staticmethod
+    def total(segments):
+        return sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in segments)
+
+    def test_shared_edges_are_dropped(self):
+        segments = join_collinear(boundary_segments([self.square(0, 0), self.square(1, 0)]))
+        self.assertEqual(len(segments), 4)
+        self.assertAlmostEqual(self.total(segments), 6.0)
+
+    def test_partial_overlap_keeps_the_exposed_part(self):
+        segments = boundary_segments([self.square(0, 0, 2.0), self.square(2, 1)])
+        self.assertAlmostEqual(self.total(segments), 10.0)
+
+    def test_edges_inside_another_region_are_dropped(self):
+        segments = boundary_segments([self.square(0, 0, 4.0), self.square(1, 1)])
+        self.assertAlmostEqual(self.total(segments), 16.0)
+
+    def test_corners_are_not_joined(self):
+        segments = join_collinear([((0, 0), (1, 0)), ((1, 0), (1, 1)), ((1, 1), (2, 1))])
+        self.assertEqual(len(segments), 3)
 
 
 class LibraryTests(unittest.TestCase):
@@ -268,6 +447,40 @@ class ViewGeometryTests(unittest.TestCase):
         self.assertEqual(classify_member((0, 0, 12), self.VIEW), IN_PLANE)
         self.assertEqual(classify_member((1, 1, 0), self.VIEW), OBLIQUE)
         self.assertEqual(classify_member((0, 0, 0), self.VIEW), OBLIQUE)
+
+    def test_roof_top_edges_follow_the_slope(self):
+        # A 6:12 roof cut face with plumb ends, wound either way.
+        roof = [(0.0, 0.0), (4.0, 2.0), (4.0, 3.0), (0.0, 1.0)]
+        for loop in (roof, roof[::-1]):
+            self.assertEqual(top_edges(loop), [((0.0, 1.0), (4.0, 3.0))])
+        flat = [(0.0, 0.0), (5.0, 0.0), (5.0, 1.0), (0.0, 1.0)]
+        self.assertEqual(top_edges(flat), [((0.0, 1.0), (5.0, 1.0))])
+
+    def test_offset_down_is_square_to_the_segment(self):
+        start, end = offset_down(((0.0, 1.0), (4.0, 3.0)), math.sqrt(5.0))
+        self.assertAlmostEqual(start[0], 1.0)
+        self.assertAlmostEqual(start[1], -1.0)
+        self.assertAlmostEqual(end[0], 5.0)
+        self.assertAlmostEqual(end[1], 1.0)
+        self.assertEqual(offset_down(((0.0, 2.0), (3.0, 2.0)), 0.5), ((0.0, 1.5), (3.0, 1.5)))
+
+    def test_member_size_is_square_to_the_axis(self):
+        # A 3 1/2 wide x 11 7/8 deep beam, 10 ft long, skewed 45 deg in plan.
+        half = math.sqrt(0.5)
+        axis = (half, half, 0.0)
+        across = (-half, half, 0.0)
+        points = []
+        for length in (0.0, 10.0):
+            for width in (-1.75 / 12, 1.75 / 12):
+                for height in (0.0, 11.875 / 12):
+                    points.append(tuple(length * a + width * c + (height if i == 2 else 0.0)
+                                        for i, (a, c) in enumerate(zip(axis, across))))
+        depth, width = member_size(points, axis, (0.0, 0.0, 1.0))
+        self.assertAlmostEqual(depth * 12, 11.875)
+        self.assertAlmostEqual(width * 12, 3.5)
+        tilted = member_size(points, axis, (0.1, 0.1, 1.0))
+        self.assertAlmostEqual(tilted[0] * 12, 11.875)
+        self.assertIsNone(member_size(points, axis, axis))
 
     def test_segment_crossing_uses_signed_distances(self):
         origin = (0.0, 0.0, 0.0)
