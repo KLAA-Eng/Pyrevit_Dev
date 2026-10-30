@@ -37,6 +37,7 @@ sys.modules['pyrevit'] = pyrevit
 from ui_gallery.registry import gallery_entries
 from ui_gallery.windows import create_custom
 from ui_gallery.scenarios import STATES
+from ui_gallery.variants import preview_entries
 
 
 def settle_layout(content):
@@ -66,6 +67,7 @@ def render_content(window, filename, width, height):
 
 
 entries = gallery_entries(repo_root)
+adapter_entries = list(preview_entries(entries))
 command_path = os.path.join(repo_root, 'KL&A Tools_dev.tab', '05 DevSandbox.panel',
                             'Prototype.pulldown', 'UI Gallery.pushbutton', 'script.py')
 namespace = {'__file__': command_path, '__name__': 'gallery_probe'}
@@ -75,6 +77,25 @@ assert len(gallery._entries) == len(entries)
 gallery.EntriesGrid.SelectedItem = next(row for row in gallery.EntriesGrid.Items
                                        if row.Entry['id'] == 'dialog-message')
 assert list(gallery.StateSelector.Items) == ['Normal', 'Empty', 'Warning', 'Error', 'Success', 'Disabled', 'Long content']
+assert [item.Label for item in gallery.VariantSelector.Items] == ['Without Details', 'With Details']
+gallery.VariantSelector.SelectedIndex = 1
+gallery.StateSelector.SelectedItem = 'Success'
+gallery.FilterBox.Text = 'Revisions'
+assert gallery.EntriesGrid.Items.Count > 0
+selection_row = next(row for row in gallery.EntriesGrid.Items if row.Entry['id'] == 'dialog-selection')
+gallery.EntriesGrid.SelectedItem = selection_row
+assert gallery.VariantSelector.Items.Count == 5
+gallery.VariantSelector.SelectedIndex = 2
+gallery.StateSelector.SelectedItem = 'Long content'
+gallery.FilterBox.Text = 'no_such_window_variant'
+assert gallery.VariantSelector.Items.Count == 0
+gallery.FilterBox.Text = ''
+gallery.EntriesGrid.SelectedItem = next(row for row in gallery.EntriesGrid.Items if row.Entry['id'] == 'dialog-message')
+assert gallery.VariantSelector.SelectedItem.Label == 'With Details'
+assert gallery.StateSelector.SelectedItem == 'Success'
+gallery.EntriesGrid.SelectedItem = next(row for row in gallery.EntriesGrid.Items if row.Entry['id'] == 'dialog-selection')
+assert gallery.VariantSelector.SelectedItem.Label == 'Open Documents'
+assert gallery.StateSelector.SelectedItem == 'Long content'
 source_column = next(column for column in gallery.EntriesGrid.Columns if column.Header == 'Window source')
 assert source_column.CanUserSort, 'Window source must support header sorting'
 gallery.Content.Measure(Size(gallery.Width, gallery.Height))
@@ -101,22 +122,23 @@ def visual_children(parent):
 
 source_presenter = next(control for control in visual_children(gallery.EntriesGrid)
                         if isinstance(control, DataGridColumnHeadersPresenter))
-source_peer = DataGridColumnHeaderItemAutomationPeer(source_column.Header, source_column,
-    DataGridColumnHeadersPresenterAutomationPeer(source_presenter))
-source_invoke = source_peer.GetPattern(PatternInterface.Invoke)
-for direction in ('Ascending', 'Descending'):
-    IInvokeProvider.Invoke(source_invoke)
-    settle_layout(gallery.Content)
-    assert str(source_column.SortDirection) == direction
-    displayed = [row.RelativePath for row in gallery.EntriesGrid.Items]
-    assert len(displayed) == len(entries)
-    # .NET's default sort is culture-sensitive; compare with its own string
-    # comparer and keep Python's independent order out of the expected result.
-    from System.Globalization import CultureInfo
-    comparer = CultureInfo.CurrentCulture.CompareInfo
-    comparisons = [comparer.Compare(left, right) for left, right in zip(displayed, displayed[1:])]
-    assert all(value <= 0 if direction == 'Ascending' else value >= 0 for value in comparisons), direction
-print('Gallery Window source: actual header UIA action sorts ascending and descending.')
+variant_column = next(column for column in gallery.EntriesGrid.Columns if column.Header == 'Variant')
+for column, property_name in ((source_column, 'RelativePath'), (variant_column, 'VariantLabels')):
+    assert column.CanUserSort
+    peer = DataGridColumnHeaderItemAutomationPeer(column.Header, column,
+        DataGridColumnHeadersPresenterAutomationPeer(source_presenter))
+    invoke = peer.GetPattern(PatternInterface.Invoke)
+    for direction in ('Ascending', 'Descending'):
+        IInvokeProvider.Invoke(invoke)
+        settle_layout(gallery.Content)
+        assert str(column.SortDirection) == direction
+        displayed = [getattr(row, property_name) for row in gallery.EntriesGrid.Items]
+        assert len(displayed) == len(entries)
+        from System.Globalization import CultureInfo
+        comparer = CultureInfo.CurrentCulture.CompareInfo
+        comparisons = [comparer.Compare(left, right) for left, right in zip(displayed, displayed[1:])]
+        assert all(value <= 0 if direction == 'Ascending' else value >= 0 for value in comparisons), direction
+print('Gallery Window source and Variant: actual header UIA actions sort ascending and descending; variant/state memory survives filters.')
 gallery.FilterBox.Text = 'carbon'
 assert gallery.EntriesGrid.Items.Count > 0
 assert all('Carbon GWP Pull' in row.UsedBy for row in gallery.EntriesGrid.Items)
@@ -161,9 +183,17 @@ if output_directory:
                                             if row.Entry['id'] == 'kla-select-from-dict')
     render_content(gallery, os.path.join(output_directory, 'gallery-1060.png'), 1060, 706)
     render_content(gallery, os.path.join(output_directory, 'gallery-900.png'), 900, 586)
+    gallery.FilterBox.Text = 'Shared dialog'
+    assert gallery.EntriesGrid.Items.Count == 6
+    gallery.EntriesGrid.SelectedItem = next(row for row in gallery.EntriesGrid.Items
+                                            if row.Entry['id'] == 'dialog-message')
+    gallery.VariantSelector.SelectedIndex = 1
+    gallery.StateSelector.SelectedItem = 'Warning'
+    render_content(gallery, os.path.join(output_directory, 'gallery-shared-variants.png'), 1060, 760)
+    gallery.FilterBox.Text = ''
 
 count = 0
-for entry in entries:
+for entry in adapter_entries:
     if entry['origin'] != 'Repository custom' or not entry['can_launch'] or entry['id'] == 'ui-gallery':
         continue
     for state in entry['states']:
@@ -182,6 +212,8 @@ execfile(os.path.join(repo_root, 'scripts', 'validate_ui_foundation_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_templates_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_production_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_dialogs_wpf.py'))
+execfile(os.path.join(repo_root, 'scripts', 'validate_ui_message_variants_wpf.py'))
+execfile(os.path.join(repo_root, 'scripts', 'validate_ui_rename_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_focus_wpf.py'))
 print('IronPython {}: {} catalog entries; {} real-WPF custom/state constructions; Gallery filters/deferred selection passed.'.format(sys.version.split()[0], len(entries), count))
 if show_focus_probe:

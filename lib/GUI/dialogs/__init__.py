@@ -1,6 +1,7 @@
 """Opt-in shared dialogs. Importing this package does not load WPF or Revit."""
 from .models import ActionChoice, DialogResult, SelectionGroup, SelectionItem
 from .switch_models import CommandSwitch
+from .rename_models import RenameField
 
 
 def create_message(title, message, **options):
@@ -24,8 +25,13 @@ def create_text_prompt(title, prompt, **options):
 
 
 def create_command_switch(title, choices, **options):
-    from .command_switch import create_command_switch as factory
+    from .command_switch_window import create_command_switch as factory
     return factory(title, choices, **options)
+
+
+def create_rename(title, fields, version=None, owner=None, navigate=None):
+    from .rename_window import create_rename as factory
+    return factory(title, fields, version=version, owner=owner, navigate=navigate)
 
 
 def _show(window):
@@ -51,6 +57,10 @@ def ask_text(title, prompt, **options):
 
 def command_switch(title, choices, **options):
     return _show(create_command_switch(title, choices, **options))
+
+
+def rename(title, fields, version=None, owner=None, navigate=None):
+    return _show(create_rename(title, fields, version=version, owner=owner, navigate=navigate))
 
 
 def create_list_single(title, items, **options):

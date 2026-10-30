@@ -1,0 +1,18 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Rename" Width="384" Height="313" MinWidth="384" MinHeight="313" MaxHeight="640"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Style="{StaticResource KlaWindow}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+        <Grid x:Name="window_body">
+            <ScrollViewer x:Name="rename_scroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+                    <Grid x:Name="fields_panel"/>
+                    <TextBlock x:Name="validation_text" TextWrapping="Wrap" Foreground="{StaticResource KlaErrorBrush}"
+                               Visibility="Collapsed" Margin="0,8,0,0" AutomationProperties.LiveSetting="Polite"/>
+                    <Button x:Name="accept_button" Content="Rename" Click="accept_rename" IsDefault="True"
+                            Style="{StaticResource KlaButtonPrimary}" Margin="0,8,0,0" AutomationProperties.Name="Rename"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </ContentControl>
+</Window>

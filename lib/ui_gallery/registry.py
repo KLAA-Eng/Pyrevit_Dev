@@ -6,6 +6,7 @@ import os
 from .catalog import catalog_xaml_sources
 from .launchers import gallery_launchers
 from .dialog_data import MESSAGE_STATES
+from .variants import variant_labels
 
 
 ORIGINS = ('Repository custom', 'pyRevit built-in', 'Revit/Windows native')
@@ -80,6 +81,7 @@ def _prepare(row, extension_root):
     row['preview_status'] = 'Interactive preview'
     row['unavailable_reason'] = ''
     row['callers'] = []
+    row['variant_labels'] = variant_labels(row)
     row['source_path'] = resolve_source(extension_root, row.get('relative_path', ''))
     if identity in _LISTS:
         row['can_launch'] = True
@@ -142,8 +144,8 @@ def matching_entries(entries, query='', origin='All origins', preview='All previ
             continue
         if preview != 'All previews' and row.get('preview_status') != preview:
             continue
-        values = [row.get(key, '') for key in ('title', 'origin', 'relative_path',
-                  'description', 'called_by', 'preview_status', 'unavailable_reason')]
+        values = [row.get(key, '') for key in ('title', 'category', 'origin', 'relative_path',
+                  'description', 'called_by', 'preview_status', 'unavailable_reason', 'variant_labels')]
         values.extend(caller.get(key, '') for caller in row.get('callers', [])
                       for key in ('title', 'path'))
         if not query or any(query in value.lower() for value in values):

@@ -29,6 +29,7 @@ if LIB_DIR not in sys.path:
 from ui_gallery.registry import ORIGINS, gallery_entries, matching_entries
 from ui_gallery.builtin import launch_builtin
 from ui_gallery.windows import launch_custom
+from ui_gallery.variants import PreviewMemory, preview_launcher, variants
 from GUI.window_chrome import load_window
 
 XAML_PATH = os.path.join(os.path.dirname(__file__), 'Gallery.xaml')
@@ -41,12 +42,19 @@ class CallerRow(object):
         self.Evidence = '\n'.join(caller.get('via', []))
 
 
+class VariantRow(object):
+    def __init__(self, choice):
+        self.Id = choice['id']
+        self.Label = choice['label']
+
+
 class GalleryRow(object):
     def __init__(self, entry):
         self.Entry = entry
         self.Title = entry['title']
         self.Origin = entry['origin']
         self.PreviewStatus = entry['preview_status']
+        self.VariantLabels = entry['variant_labels']
         self.Description = entry['description']
         self.RelativePath = entry.get('relative_path') or entry['called_by']
         self.CallerRows = [CallerRow(caller) for caller in entry['callers']]
@@ -58,6 +66,8 @@ class GalleryRow(object):
 class Gallery(forms.WPFWindow):
     def __init__(self):
         self._ready = False
+        self._updating_preview = False
+        self._preview_memory = PreviewMemory()
         Window.__init__(self)
         load_window(self, XAML_PATH, __title__, __version__)
         self._entries = gallery_entries(EXTENSION_ROOT)
@@ -89,7 +99,7 @@ class Gallery(forms.WPFWindow):
                                    self.PreviewFilter.SelectedItem or 'All previews')
         rows = [GalleryRow(entry) for entry in entries]
         self.EntriesGrid.ItemsSource = rows
-        self.CountText.Text = '{} standalone entries; {} available; {} deferred'.format(
+        self.CountText.Text = '{} window families; {} available; {} deferred'.format(
             len(rows), sum(row.CanLaunch for row in rows),
             sum(row.PreviewStatus == 'Deferred' for row in rows))
         self.EntriesGrid.SelectedItem = next(
@@ -109,11 +119,28 @@ class Gallery(forms.WPFWindow):
         self.CallerSummary.Text = ('{} calling tools'.format(len(row.CallerRows)) if row and row.CallerRows
                                    else 'No current tool caller found; this may be a template or legacy preview.')
         self.AvailabilityText.Text = row.Reason if row else 'Select a window to preview.'
-        self.StateSelector.ItemsSource = row.Entry['states'] if row else []
-        self.StateSelector.SelectedIndex = 0 if row and row.Entry['states'] else -1
-        self.StateSelector.IsEnabled = bool(row and row.CanLaunch)
+        self._updating_preview = True
+        try:
+            choices = [VariantRow(item) for item in variants(row.Entry)] if row else []
+            self.VariantSelector.ItemsSource = choices
+            variant_id, state = self._preview_memory.get(row.Entry) if row else (None, None)
+            self.VariantSelector.SelectedItem = next((item for item in choices if item.Id == variant_id), None)
+            self.VariantSelector.IsEnabled = bool(row and row.CanLaunch and len(choices) > 1)
+            self.StateSelector.ItemsSource = row.Entry['states'] if row else []
+            self.StateSelector.SelectedItem = state
+            self.StateSelector.IsEnabled = bool(row and row.CanLaunch)
+        finally:
+            self._updating_preview = False
         self.LaunchButton.IsEnabled = bool(row and row.CanLaunch)
         self.LastResult.Text = ''
+
+    def preview_choice_changed(self, sender, args):
+        if not self._ready or self._updating_preview:
+            return
+        row = self.EntriesGrid.SelectedItem
+        choice = self.VariantSelector.SelectedItem
+        if row and choice:
+            self._preview_memory.set(row.Entry, choice.Id, self.StateSelector.SelectedItem)
 
     def launch_selected(self, sender, args):
         row = self.EntriesGrid.SelectedItem
@@ -121,14 +148,16 @@ class Gallery(forms.WPFWindow):
             return
         state = self.StateSelector.SelectedItem or 'Normal'
         try:
-            identity = row.Entry['id']
+            choice = self.VariantSelector.SelectedItem
+            launcher = preview_launcher(row.Entry, choice.Id if choice else None)
+            identity = launcher['id']
             if identity == 'ui-gallery':
                 Gallery().ShowDialog()
                 result = 'Gallery preview closed.'
             elif row.Origin == 'Repository custom':
-                result = launch_custom(EXTENSION_ROOT, dict(row.Entry, tool_version=__version__), state)
+                result = launch_custom(EXTENSION_ROOT, dict(launcher, tool_version=__version__), state)
             else:
-                result = launch_builtin(row.Entry, state)
+                result = launch_builtin(launcher, state)
             self.LastResult.Text = result or 'Preview closed. No tool command was run.'
         except Exception as error:
             self.LastResult.Text = 'Preview could not open: {}'.format(error)

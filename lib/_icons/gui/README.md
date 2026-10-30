@@ -56,11 +56,24 @@ for icon-only and icon/text actions, fixed-color images and accessible naming.
 | Warning | KlaWarningGeometry | KlaIconWarning |
 | Error/blocking | KlaErrorGeometry | KlaIconError |
 | Success | KlaSuccessGeometry | KlaIconSuccess |
+| Shared Message error | KlaMessageErrorGeometry | KlaIconMessageError |
+| Shared Message success | KlaMessageSuccessGeometry | KlaIconMessageSuccess |
+| Collapsed Details | KlaChevronRightGeometry | KlaIconChevronRight |
+| Expanded Details | KlaChevronDownGeometry | KlaIconChevronDown |
 
 Message headings may use feedback symbols where applicable. Existing status
 chips retain words and borders. Larger Browse/Reset/Copy/Open Folder actions
 remain text-only. Icon artwork does not change a tool's classification or
 operation. Compiled hosts package this same dictionary through their adapter.
+
+Shared Message uses [Octagon Alert](https://lucide.dev/icons/octagon-alert) and
+[Check Check](https://lucide.dev/icons/check-check) through its own error/success
+roles, preserving the existing Circle X/Circle Check roles used elsewhere.
+Information and Warning retain Info and Triangle Alert. Message severity symbols
+render at 24 units in the severity color; Details uses 16-unit
+[Right](https://lucide.dev/icons/chevron-right)/[Down](https://lucide.dev/icons/chevron-down)
+chevrons for collapsed/expanded state. All 22 roles retain the existing pinned
+source revision and license; the default presenter remains 16 units.
 
 The Group role uses [Lucide Layers-2](https://lucide.dev/icons/layers-2), chosen
 for the owner-requested shared-selector group dropdown on 2026-10-29. Its stack

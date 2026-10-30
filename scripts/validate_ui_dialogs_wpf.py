@@ -80,8 +80,8 @@ def validate_shared_dialogs():
     window.Close()
     count = 0
     for identity in sorted(DIALOG_FILES):
-        entry = next(row for row in entries if row['id'] == identity)
-        assert len(entry['states']) == (7 if identity == 'dialog-message' else 5) and entry['can_launch']
+        entry = next(row for row in adapter_entries if row['id'] == identity)
+        assert len(entry['states']) == (7 if identity in ('dialog-message', 'dialog-message-plain') else 5) and entry['can_launch']
         for state in entry['states']:
             window = create_custom(repo_root, dict(entry, tool_version=namespace['__version__']), state)
             dialog_layout(window)
@@ -123,10 +123,19 @@ def validate_shared_dialogs():
                     assert window.group_filter.Items[0].Label == 'All Sheets'
             if hasattr(window, 'message_expander'):
                 assert not window.message_expander.IsExpanded
+                assert window.message_expander.Visibility == (Visibility.Visible if identity == 'dialog-message' else Visibility.Collapsed)
                 expected = {'Warning': ('Warning', 'KlaWarningBrush'), 'Error': ('Error', 'KlaErrorBrush'),
                             'Success': ('Success', 'KlaReadyBrush')}.get(state, ('Information', 'KlaInfoBrush'))
                 assert window.message_heading.Text == expected[0]
                 assert window.message_banner.BorderBrush == window.FindResource(expected[1])
+                assert window.message_heading.Foreground == window.message_banner.BorderBrush
+                assert window.message_icon.Foreground == window.message_banner.BorderBrush
+                assert window.message_icon.Width == window.message_icon.Height == 24
+                assert window.message_heading.FontSize == 18
+            if hasattr(window, 'toggles_panel'):
+                import GUI.dialogs as shared_api
+                assert callable(shared_api.command_switch), 'Lazy loading must preserve the public modal helper'
+                assert window.toggles_panel.Children.Count == (2 if identity == 'dialog-command-switch' else 0)
             if hasattr(window, 'input_text'):
                 assert window.input_text.ActualHeight == 36 and window.input_text.FontSize == 24
                 assert str(window.input_text.FontWeight) == 'Bold' and str(window.input_text.FontFamily) == 'Segoe UI'

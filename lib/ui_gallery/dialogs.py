@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 from GUI.dialogs import (ActionChoice, CommandSwitch, SelectionItem, create_message,
                          create_list_single, create_list_multiple, create_sheet_selector,
                          create_revision_selector, create_document_selector,
-                         create_choice, create_text_prompt, create_command_switch)
+                         create_choice, create_text_prompt, create_command_switch,
+                         RenameField, create_rename)
 
 
 def _selection_rows(identity):
@@ -35,13 +36,13 @@ def create_dialog(launcher, state):
     is_long = state == 'Long content'
     if is_long:
         title += ' - A long fictional project and review context ' * 5
-    if identity == 'dialog-message':
+    if identity in ('dialog-message', 'dialog-message-plain'):
         message = 'This is a fictional preview. No model or file is changed.' if state != 'Empty' else ''
         if is_long:
             message = '\n\n'.join([message + ' Review the supplied context before continuing.'] * 32)
         severity = {'Warning': 'warning', 'Error': 'error', 'Success': 'success'}.get(state, 'information')
         window = create_message(title, message, severity=severity,
-            details='Fictional diagnostic detail.\nNo production command is invoked.' if state != 'Empty' else '', **options)
+            details='Fictional diagnostic detail.\nNo production command is invoked.' if identity == 'dialog-message' else '', **options)
     elif identity in ('dialog-sheets', 'dialog-revisions', 'dialog-documents', 'dialog-list-single', 'dialog-list-multiple'):
         rows = _selection_rows(identity)
         if is_long:
@@ -53,20 +54,20 @@ def create_dialog(launcher, state):
         window = factory(title, [] if state == 'Empty' else rows, **options)
         if state == 'Error':
             window.accept_selection()
-    elif identity in ('dialog-actions', 'dialog-command-switch'):
+    elif identity in ('dialog-actions', 'dialog-command-switch', 'dialog-command-switch-plain'):
         rows = [ActionChoice('active', 'Use Active View', 'Continue with the current view.'),
                 ActionChoice('selected', 'Choose Views', 'Open a selection workflow in a future caller.'),
                 ActionChoice('unavailable', 'Unavailable Action', 'This action is disabled.', enabled=False)]
         if is_long:
-            if identity == 'dialog-command-switch':
+            if identity != 'dialog-actions':
                 rows += [ActionChoice('extra-' + str(index), 'Additional command ' + str(index) + ' - detailed context ' * 6,
                                       'Long explanation ' * 24) for index in range(30)]
             else:
                 rows += [ActionChoice('extra-' + str(index), 'Additional action ' + str(index), 'Long explanation ' * 24) for index in range(20)]
-        if identity == 'dialog-command-switch':
+        if identity != 'dialog-actions':
             switches = [CommandSwitch('details', 'Include Details'), CommandSwitch('preview', 'Preview Only', checked=True)]
             window = create_command_switch(title, [] if state == 'Empty' else rows,
-                                            switches=() if state == 'Empty' else switches, **options)
+                                            switches=switches if identity == 'dialog-command-switch' else (), **options)
             if state == 'Error':
                 window.status_text.Text = 'Fictional feedback: choose an available command.'
                 window.status_text.Visibility = Visibility.Visible
@@ -75,6 +76,17 @@ def create_dialog(launcher, state):
             window = create_choice(title, [] if state == 'Empty' else rows, **options)
             if state == 'Error':
                 window.accept_choice()
+    elif identity in ('dialog-rename', 'dialog-rename-two', 'dialog-rename-three'):
+        count = {'dialog-rename': 1, 'dialog-rename-two': 2, 'dialog-rename-three': 3}[identity]
+        names = ['Name'] if count == 1 else ['Number', 'Name', 'Description'][:count]
+        fields = [RenameField('field-' + str(index), label, find='' if state in ('Empty', 'Error') else 'Existing',
+                              replace='Replacement' if state == 'Error' and index == 0 else
+                                      ('' if state == 'Empty' else 'Updated'),
+                              prefix='Review context ' * 12 if is_long else '', allow_case=label != 'Number')
+                  for index, label in enumerate(names)]
+        window = create_rename(title, fields, **options)
+        if state == 'Error':
+            window.accept_rename()
     else:
         prompt = 'Enter a description.' if not is_long else 'Enter a description for this fictional review. ' * 12
         window = create_text_prompt(title, prompt, default='' if state in ('Empty', 'Error') else ('Fictional description ' * 30 if is_long else 'Fictional description'),

@@ -15,15 +15,27 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 class GalleryRegistryTests(unittest.TestCase):
     def test_shared_dialog_family_has_explicit_sources_and_supported_states(self):
         rows = [row for row in gallery_entries(ROOT, {}) if row['category'] == 'Shared dialog']
-        self.assertEqual(9, len(rows))
+        self.assertEqual(6, len(rows))
         self.assertNotIn('dialog-confirmation', [row['id'] for row in rows])
         self.assertNotIn('dialog-parameters', [row['id'] for row in rows])
-        self.assertEqual(5, len(set(row['source_path'] for row in rows)))
+        self.assertEqual(6, len(set(row['source_path'] for row in rows)))
         for row in rows:
             self.assertTrue(row['can_launch'])
             self.assertEqual(7 if row['id'] == 'dialog-message' else 5, len(row['states']))
             self.assertTrue(os.path.isfile(row['source_path']))
             self.assertIn('Existing tools retain', row['description'])
+
+    def test_shared_families_keep_all_variants_and_search_returns_family_once(self):
+        rows = gallery_entries(ROOT, {})
+        selection = next(row for row in rows if row['id'] == 'dialog-selection')
+        self.assertEqual(['Sheets', 'Revisions', 'Open Documents', 'List Single', 'List Multiple'],
+                         [item['label'] for item in selection['variants']])
+        self.assertNotIn('dialog-sheets', [row['id'] for row in rows])
+        self.assertEqual([selection], matching_entries(rows, 'List Multiple'))
+        self.assertEqual(5, len(selection['variants']))
+        self.assertIn('pyrevit-select-list', [row['id'] for row in rows])
+        self.assertIn('pyrevit-select-list-single', [row['id'] for row in rows])
+        self.assertEqual(6, len(matching_entries(rows, 'Shared dialog')))
 
     def test_origins_distinguish_pyrevit_wrappers_from_native_dialogs(self):
         rows = dict((row['id'], row) for row in gallery_entries(ROOT, {}))

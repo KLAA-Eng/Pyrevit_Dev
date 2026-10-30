@@ -15,9 +15,8 @@ request on 2026-10-30. Their canonical references are now the actual shared
 [Selection dialog](../dialogs/SelectionDialog.xaml) and
 [Message dialog](../dialogs/MessageDialog.xaml), with the
 [shared dialog API guide](../dialogs/README.md). Search `Shared dialog` in
-Gallery to review those implementations. The old
-[Selection guide](KLCodeSelectionTemplate.md) remains a retired navigation
-pointer for historical links, without duplicate example/window code.
+Gallery to review those implementations. The former Selection guide is retired;
+the shared dialog API guide is the current reference.
 
 The generic FindReplace visual was adapted into Form; its unused Revit-dependent
 Python wrapper/export was retired after caller inspection. Actual Core view/sheet

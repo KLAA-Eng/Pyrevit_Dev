@@ -10,7 +10,8 @@ from __future__ import unicode_literals
 import os
 
 from .template_data import TEMPLATE_FILES
-from .dialog_data import DIALOG_FILES, MESSAGE_STATES
+from .dialog_data import DIALOG_FILES, DIALOG_FAMILIES, MESSAGE_STATES
+from .variants import preview_launcher
 from find_replace.layout import results_height  # host-free constants shared with the production dialog
 
 from ui_gallery.scenarios import (PreviewItem, alert_message, filtered_items, naming_values,
@@ -55,17 +56,19 @@ def source_path(extension_root, relative_path):
 
 
 def supports(launcher_id):
-    return launcher_id in SOURCES
+    return launcher_id in SOURCES or any(identity == launcher_id for identity, unused, choices in DIALOG_FAMILIES)
 
 
 def create_custom(extension_root, launcher, state='Normal'):
     """Construct an allowed preview without showing it (also supports host QA)."""
+    if launcher.get('variants'):
+        launcher = preview_launcher(launcher, launcher.get('variant_id'))
     identifier = launcher['id']
     if identifier in DEFERRED_IDS:
         raise ValueError('Compiled window previews are deferred; this entry stays disabled.')
     if identifier not in SOURCES:
         raise ValueError('No reviewed custom preview adapter: {}'.format(identifier))
-    if identifier == 'dialog-message':
+    if identifier in ('dialog-message', 'dialog-message-plain'):
         validate_state(state, MESSAGE_STATES)
     else:
         validate_state(state)
@@ -84,6 +87,8 @@ def create_custom(extension_root, launcher, state='Normal'):
 
 def launch_custom(extension_root, launcher, state='Normal'):
     """Show a real-XAML preview; all action results are local simulations."""
+    if launcher.get('variants'):
+        launcher = preview_launcher(launcher, launcher.get('variant_id'))
     window = create_custom(extension_root, launcher, state)
     window.ShowDialog()
     if launcher['id'] in DIALOG_FILES:

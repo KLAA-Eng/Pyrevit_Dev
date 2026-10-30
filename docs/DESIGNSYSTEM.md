@@ -5,14 +5,14 @@ window construction. Use it to choose a resource, understand its appearance and
 assemble a window. The linked XAML files own executable values and templates;
 this guide explains their intended use and the shared design rules.
 
-The nine Python tool windows, four standard opt-in dialog bodies, three reference templates, Gallery and five
+The nine Python tool windows, five standard opt-in dialog bodies, three reference templates, Gallery and five
 compiled window classes use `KlaWindowShell`. PreviewFixture retains its
 standalone test chrome. Native/pyRevit dialogs and Recall's docked panel have
 separate host presentation; the standalone Recall body uses the shared system.
-The fifth opt-in body is a floating Command Switch using shared colors/styles
+The sixth opt-in body is a floating Command Switch using shared colors/styles
 with its own compact layout. Text omits the standard footer by design.
-The current inventory has 24 standalone Window sources: nine Python tool
-windows, five opt-in bodies, three reference templates, five compiled windows,
+The current inventory has 25 standalone Window sources: nine Python tool
+windows, six opt-in bodies, three reference templates, five compiled windows,
 Gallery and PreviewFixture.
 
 - [Master design colors](#master-design-colors)
@@ -138,7 +138,7 @@ a second palette or set of control templates.
 ### In-window GUI icons
 
 Use the approved semantic roles in the **[GUI icon catalog](../lib/_icons/gui/README.md)**.
-That catalog owns the complete 18-role key table, from Search and Group to
+That catalog owns the complete 22-role key table, from Search and Group to
 Information, Warning, Error and Success. Original SVGs, the pinned revision in
 [source.json](../lib/_icons/gui/source.json), and
 [license notices](../lib/_icons/gui/LICENSE.lucide.txt) stay together.
@@ -188,7 +188,12 @@ also available:
        Focusable="False" IsHitTestVisible="False"/>
 ```
 
-Message headings may use the feedback symbols. Status chips keep their words
+Shared Message uses 24-unit severity icons: Lucide octagon-alert, triangle-alert,
+info and check-check for error, warning, information and success. Its 18-unit
+Segoe UI SemiBold heading and icon match the outline severity color; body and
+details remain 12-unit text. A 16-unit right/down chevron reflects collapsed or
+expanded Details. This exception is local to Message; global semantic icon roles
+remain unchanged. Status chips keep their words
 and borders. Larger Browse, Reset, Copy and Open Folder actions remain text-only.
 An icon does not change the tool's behavior or classification.
 
@@ -496,7 +501,7 @@ the owner's live Revit review complete.
 ## Reusable dialogs
 
 Use [GUI.dialogs](../lib/GUI/dialogs/README.md) for prepared-data dialogs.
-The five opt-in bodies do not migrate existing commands or their pyRevit calls.
+The six opt-in bodies do not migrate existing commands or their pyRevit calls.
 
 | Need | Modal API | Result |
 | --- | --- | --- |
@@ -504,6 +509,7 @@ The five opt-in bodies do not migrate existing commands or their pyRevit calls.
 | Grouped searchable single/multiple selection | `select_items(title, items, ...)` | `accept` with original payload(s), or `cancel` |
 | Sheets, revisions, open documents | `select_sheets`, `select_revisions`, `select_open_documents` | Read-only collection followed by selection; explicit document/context required |
 | Floating Command Switch | `command_switch(title, choices, switches=..., ...)` | `accept` with command key/switch states, or `cancel` |
+| Rename property rules | `rename(title, fields, ...)` | Accepted rules or a separate case action, or `cancel` |
 | Existing Action choice (future redesign) | `choose_action(title, choices, ...)` | Existing highlighted-row/Continue contract retained |
 | Text with optional validation | `ask_text(title, prompt, ...)` | `accept` with raw text, including blank, or `cancel` |
 
@@ -545,6 +551,11 @@ Bodies reuse the shared shell, buttons/fields/lists, status brushes, icon
 geometry and green/gray footer roles. Opt-in `KlaDialogCheck` presents a label
 and description using the existing checkbox template; `KlaDialogDescription`
 handles secondary/disabled text; `KlaDialogListItem` disables unavailable rows.
+KLC-Rename arranges one to three caller-defined property groups horizontally,
+each with Find/Replace and Prefix/Suffix. Optional case buttons are separate
+actions for their group; Rename validates and returns the entered rules. The
+dialog does not preview or perform model changes.
+
 Message/details overflow is bounded and scrollable. Initial Message height fits
 content; manual width changes no longer force a new height. Deferred Details
 measurement grows the bottom and protects the message viewport until capped.
@@ -564,12 +575,17 @@ no corner x and starts with neutral panel focus rather than selected search;
 typing or Tab can enter search. Escape clears search then cancels; blank panel
 clicks leave it open.
 
-Search **Shared dialog** in Gallery for Sheets, Revisions, Open Documents, List
-Single, List Multiple, Message, Text, Command Switch and existing Action choice.
-The Message preview offers Normal, Empty, Warning, Error, Success, Disabled and
-Long content; other shared dialogs and the three reference templates offer five
-states. Gallery has 43 entries. The collectors are never called
-by Gallery. See [API examples](../lib/GUI/dialogs/README.md) and
+Gallery presents one row per shared family: Message, Selection, Action choice,
+Text, Command Switch and KLC-Rename. Variant labels are searchable and a
+dropdown beside State selects the variant; each family remembers its variant and
+state for the session. Selection offers Sheets, Revisions, Open Documents, List
+Single and List Multiple; Command Switch offers Commands only and Commands with
+toggles; KLC-Rename offers Single field, Two fields and Multiple fields. Both
+Message variants, Without Details and With Details, offer Normal, Empty, Warning,
+Error, Success, Disabled and Long content; With Details retains diagnostics in
+Empty. The other shared variants and three reference templates offer five
+states. Gallery has 40 entries. The collectors are never called by Gallery. See
+[API examples](../lib/GUI/dialogs/README.md) and
 [refinement verification](knowledge/reviews/design-system/2026-10-29-dialog-refinement.md).
 
 ## Creating a window

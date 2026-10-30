@@ -78,7 +78,7 @@ a window or invoking production commands:
 
 Reproduce using `gui_window*test.py` and `ui_gallery*test.py` unittest discovery,
 and `scripts/validate_ui_gallery_wpf.ps1` as documented in the
-[template guide](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.md).
+[current shared Selection guide](../../../../lib/GUI/dialogs/README.md#selection-and-collectors).
 These checks do not establish actual keyboard/hover/pressed input, dragging,
 Narrator, DPI/mixed-monitor behavior, or live Revit ownership. Those limits from
 the initial delivery remain unchanged. Owner acceptance of this revised

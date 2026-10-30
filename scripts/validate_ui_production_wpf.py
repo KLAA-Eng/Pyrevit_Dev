@@ -27,7 +27,8 @@ PRODUCTION_IDS = (
 ICON_ROLES = ('Search', 'TextFilter', 'Regex', 'ClearSearch', 'ReadElement',
               'ReadViewFilters', 'FilterElement', 'PickElement',
               'RectangleSelection', 'CurrentSelection', 'ListView', 'GridView',
-              'Favorite', 'Information', 'Warning', 'Error', 'Success', 'Group')
+              'Favorite', 'Information', 'Warning', 'Error', 'Success', 'Group',
+              'MessageError', 'MessageSuccess', 'ChevronRight', 'ChevronDown')
 FOOTER_ACTIONS = {
     'kla-select-from-dict': 'button_main',
     'kla-create-from-rooms': 'button_main',
@@ -221,8 +222,8 @@ def validate_gui_icons():
             block.Children.Add(label)
             panel.Children.Add(block)
             presenters.append(icon)
-        panel.Measure(Size(700, 224))
-        panel.Arrange(Rect(0, 0, 700, 224))
+        panel.Measure(Size(700, 280))
+        panel.Arrange(Rect(0, 0, 700, 280))
         settle_layout(panel)
         for icon in presenters:
             assert icon.ActualWidth == icon.ActualHeight == 16
@@ -236,8 +237,8 @@ def validate_gui_icons():
         owner.Foreground = resources['text_white']
         settle_layout(panel)
         if output_directory:
-            render_content(owner, os.path.join(output_directory, 'gui-icons-18-native.png'), 700, 224)
-        print('GUI icons: all18 geometry/DrawingImage resources load at24-unit bounds;16-unit presenters inherit foreground and show disabled stroke at1.5 thickness.')
+            render_content(owner, os.path.join(output_directory, 'gui-icons-22-native.png'), 700, 280)
+        print('GUI icons: all22 geometry/DrawingImage resources load at24-unit bounds;16-unit presenters inherit foreground and show disabled stroke at1.5 thickness.')
     finally:
         owner.Close()
 

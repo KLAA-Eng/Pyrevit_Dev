@@ -60,12 +60,15 @@ def _window_types():
             self.initialize('MessageDialog.xaml', title, version, owner, navigate)
             roles = {'information': ('Information', 'KlaInformationGeometry', 'KlaInfoBrush'),
                      'warning': ('Warning', 'KlaWarningGeometry', 'KlaWarningBrush'),
-                     'error': ('Error', 'KlaErrorGeometry', 'KlaErrorBrush'),
-                     'success': ('Success', 'KlaSuccessGeometry', 'KlaReadyBrush')}
+                     'error': ('Error', 'KlaMessageErrorGeometry', 'KlaErrorBrush'),
+                     'success': ('Success', 'KlaMessageSuccessGeometry', 'KlaReadyBrush')}
             heading, icon, brush = roles[severity]
             self.message_heading.Text = heading
             self.message_icon.Content = self.FindResource(icon)
-            self.message_banner.BorderBrush = self.FindResource(brush)
+            severity_brush = self.FindResource(brush)
+            self.message_banner.BorderBrush = severity_brush
+            self.message_icon.Foreground = severity_brush
+            self.message_heading.Foreground = severity_brush
             self.message_body.Text = message
             self.message_details.Text = details
             self.message_expander.Visibility = Visibility.Visible if details else Visibility.Collapsed

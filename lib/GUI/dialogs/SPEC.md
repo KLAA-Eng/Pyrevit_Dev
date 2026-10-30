@@ -13,7 +13,12 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   Width changes do not force height changes during manual resizing. Expanding
   Details grows the bottom, preserving the message viewport until capped;
   content remains scrollable. Repeated expansion/collapse does not drift size.
-  Close/Escape cancels; OK returns action `ok`.
+  Close/Escape cancels; OK returns action `ok`. The 24-unit severity icon and
+  18-unit Segoe UI SemiBold heading match the outline severity color; body and
+  details text remain 12. Message-only icons are octagon-alert, triangle-alert,
+  info and check-check for error, warning, information and success. Details uses
+  a 16-unit right/down chevron; expanded text aligns with the body and the icon
+  centers vertically beside the heading. Global icon roles remain unchanged.
 - AC-003: Generic single/multiple selection preserves input order, payload
   identity, duplicate labels, caller-owned rows, explicit initial checks and
   checks hidden by groups/search. No first item is checked automatically.
@@ -45,13 +50,16 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   panel. Owner is an explicit WPF window/native handle. No import queries the
   current document. All factories construct without showing; modal helpers
   show and return explicit results without running model operations.
-- AC-007: Gallery offers Message, Sheets, Revisions, Open Documents, List Single,
-  List Multiple, existing Action choice, Text and Command Switch. Shared Message
-  offers Normal, Empty, Warning, Error, Success, Disabled and Long content; other
-  shared dialogs retain five states. Separate Confirmation/Parameter entries
-  and duplicate Selection/Message templates stay removed. Form, Options and
-  Review remain reference templates.
-  Neither model collectors nor production commands run from these previews.
+- AC-007: Gallery has one row per shared family, listing available variants and
+  selecting one beside State. Search includes variant labels; variant and state
+  persist per family for the session. Selection has Sheets, Revisions, Open
+  Documents, List Single and List Multiple; Message has Without Details and With
+  Details; Command Switch has Commands only and Commands with toggles; Rename
+  has Single field, Two fields and Multiple fields. Both Message variants offer
+  Normal, Empty, Warning, Error, Success, Disabled and Long content; With Details
+  retains diagnostics in Empty. Other shared variants retain five standard
+  states. Other catalog rows remain available. Previews use fictional data and
+  invoke neither model collectors nor production commands.
 - AC-008: Read-only collectors are separate from windows and lazy-load Revit.
   Sheets sort by number, group by saved sheet sets plus implicit All Sheets,
   and exclude placeholders by default consistently in every group. Caller can
@@ -76,6 +84,13 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   white underline or focus-square override. No light-green frame surrounds a
   focused button or checkbox/label. Controls remain focusable/keyboard usable;
   input/dropdown field-focus styling and ordinary control borders stay unchanged.
+- AC-011: KLC-Rename accepts one to three caller-defined property groups laid
+  out horizontally. Each group has one Find/Replace pair and Prefix/Suffix;
+  optional Uppercase/Lowercase buttons act separately for that field and return
+  the operation and field. Rename validates and returns all entered rules;
+  Enter activates it. Invalid rules stay open with inline feedback. Close/Escape
+  cancels. Case actions close without applying model changes. No live preview,
+  Revit mutation or existing tool migration is part of this shared dialog.
 
 Prepared-row factories are host-independent; optional modal convenience helpers
 invoke collectors in a valid Revit API context before showing UI. Callers own

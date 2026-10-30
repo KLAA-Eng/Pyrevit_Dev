@@ -40,6 +40,9 @@ ROLES = {
     'ListView': 'list', 'GridView': 'layout-grid', 'Favorite': 'star',
     'Information': 'info', 'Warning': 'triangle-alert', 'Error': 'circle-x',
     'Success': 'circle-check', 'Group': 'layers-2',
+    # Message-specific roles leave the shared Error/Success meanings intact.
+    'MessageError': 'octagon-alert', 'MessageSuccess': 'check-check',
+    'ChevronRight': 'chevron-right', 'ChevronDown': 'chevron-down',
 }
 
 

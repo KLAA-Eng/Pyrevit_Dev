@@ -21,8 +21,21 @@
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Origin" Binding="{Binding Origin}" Width="150"/>
-                    <DataGridTextColumn Header="Window" Binding="{Binding Title}" Width="200"/>
-                    <DataGridTextColumn Header="Preview" Binding="{Binding PreviewStatus}" Width="140"/>
+                    <DataGridTemplateColumn Header="Window" SortMemberPath="Title" Width="200">
+                        <DataGridTemplateColumn.CellTemplate><DataTemplate>
+                            <TextBlock Text="{Binding Title}" ToolTip="{Binding Title}" TextWrapping="Wrap"/>
+                        </DataTemplate></DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Variant" SortMemberPath="VariantLabels" Width="180">
+                        <DataGridTemplateColumn.CellTemplate><DataTemplate>
+                            <TextBlock Text="{Binding VariantLabels}" ToolTip="{Binding VariantLabels}" TextWrapping="Wrap"/>
+                        </DataTemplate></DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Preview" SortMemberPath="PreviewStatus" Width="140">
+                        <DataGridTemplateColumn.CellTemplate><DataTemplate>
+                            <TextBlock Text="{Binding PreviewStatus}" TextWrapping="Wrap"/>
+                        </DataTemplate></DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTemplateColumn Header="Window source" SortMemberPath="RelativePath" Width="2*" MinWidth="260">
                         <DataGridTemplateColumn.CellTemplate><DataTemplate>
                             <TextBlock Text="{Binding RelativePath}" ToolTip="{Binding RelativePath}" TextWrapping="Wrap"/>
@@ -58,11 +71,13 @@
                 </Grid>
             </Border>
             <Grid Grid.Row="5" Margin="0,8,0,0">
-                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="140"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <Label Content="Preview _state" Target="{Binding ElementName=StateSelector}" Foreground="{StaticResource KlaTextBrush}" VerticalAlignment="Center"/>
-                <ComboBox x:Name="StateSelector" Grid.Column="1" Style="{StaticResource KlaCompactComboBox}" AutomationProperties.Name="Preview state"/>
-                <Button x:Name="LaunchButton" Grid.Column="3" Content="_Open preview" Click="launch_selected" Style="{StaticResource KlaFoundationButton}"/>
-                <TextBlock x:Name="LastResult" Grid.Column="4" Margin="12,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{StaticResource KlaTextMutedBrush}"/>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="180"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="140"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Label Content="_Variant" Target="{Binding ElementName=VariantSelector}" Foreground="{StaticResource KlaTextBrush}" VerticalAlignment="Center"/>
+                <ComboBox x:Name="VariantSelector" Grid.Column="1" Style="{StaticResource KlaCompactComboBox}" DisplayMemberPath="Label" SelectionChanged="preview_choice_changed" AutomationProperties.Name="Preview variant"/>
+                <Label Grid.Column="3" Content="Preview _state" Target="{Binding ElementName=StateSelector}" Foreground="{StaticResource KlaTextBrush}" VerticalAlignment="Center"/>
+                <ComboBox x:Name="StateSelector" Grid.Column="4" Style="{StaticResource KlaCompactComboBox}" SelectionChanged="preview_choice_changed" AutomationProperties.Name="Preview state"/>
+                <Button x:Name="LaunchButton" Grid.Column="6" Content="_Open preview" Click="launch_selected" Style="{StaticResource KlaFoundationButton}"/>
+                <TextBlock x:Name="LastResult" Grid.Column="7" Margin="12,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{StaticResource KlaTextMutedBrush}"/>
             </Grid>
         </Grid>
     </ContentControl>

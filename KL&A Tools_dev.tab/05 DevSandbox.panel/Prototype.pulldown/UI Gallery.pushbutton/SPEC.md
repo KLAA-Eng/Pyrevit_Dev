@@ -19,7 +19,7 @@
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
 | v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
-| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, three reference templates and nine shared-dialog previews, including Warning/Success for Message. | Gallery source/tests and the 2026-10-27/30 verification records; pending next main delivery. |
+| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, three reference templates and shared-dialog family previews. | Gallery source and dated verification records; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -28,19 +28,24 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 ## Shared dialog previews — 2026-10-29
 
 The owner authorized reusable GUI windows and Gallery integration without
-migrating actual tools. Nine **Shared dialog** entries exercise five actual
-`lib/GUI/dialogs/` XAML bodies: Message, Sheets, Revisions, Open Documents,
-List Single, List Multiple, existing Action choice, Text and Command Switch.
-Separate confirmation and parameter-selection previews were removed
-at the owner's request. Shared Message supports Normal, Empty, Warning, Error,
-Success, Disabled and Long content; the other shared entries retain Normal,
-Empty, Error, Disabled and Long content using fictional data. These source
+migrating actual tools. Six **Shared dialog** family rows exercise the actual
+`lib/GUI/dialogs/` XAML bodies: Message, Selection, existing Action choice,
+Text, Command Switch and KLC-Rename. Variant lists the available labels; a
+dropdown beside State selects the preview. Search includes variant names, and
+each family's variant and state are remembered for the session. Selection has
+Sheets, Revisions, Open Documents, List Single and List Multiple. Message has
+Without Details and With Details, each offering Normal, Empty, Warning, Error,
+Success, Disabled and Long content; With Details retains diagnostics in Empty.
+Command Switch has Commands only and Commands with toggles; KLC-Rename has
+Single field, Two fields and Multiple fields (three groups). Other shared
+variants retain Normal, Empty, Error, Disabled and Long content. Separate
+confirmation and parameter-selection previews remain removed. These source
 files are version inputs for this same unreleased v0.5 delivery.
 
 These adapters use the real opt-in dialog factories and explicit result
 contracts, with simulated footer navigation. No production tool class, query,
 transaction or workflow is invoked. The existing pyRevit previews remain
-available for comparison. The catalog now contains 43 entries and 24 Window
+available for comparison. The catalog contains 40 entries and 25 Window
 sources, with five compiled previews still deferred.
 
 The [dialog contract](../../../../lib/GUI/dialogs/SPEC.md) and
@@ -83,7 +88,7 @@ owns dated validation evidence and limitations.
 
 ## Behavior and GUI
 
-Search by window name, source path, tool name, or calling-tool path. Filter by:
+Search by window name, variant label, source path, tool name, or calling-tool path. Filter by:
 
 - Repository custom: windows supplied by this repository, including imported
   legacy forms and compiled WPF windows; this label does not assert authorship.
@@ -120,7 +125,7 @@ It describes statically reachable callers, not proof that every runtime branch r
 Dynamic imports/getattr and parameterized routes can be unresolved. Templates,
 retired forms, and orphaned library windows may have no current tool caller.
 
-Choose a supported state and **Open preview**. Custom previews load actual
+Choose a supported variant and state and **Open preview**. Custom previews load actual
 repository XAML and resources with Gallery-owned handlers and fictional data.
 Standard custom states are Normal, Empty, Error, Disabled, and Long content;
 the shared Message dialog additionally offers Warning and Success.
@@ -143,6 +148,8 @@ Form validates compact naming-rule fields without a Sample Preview, and Review
 separates checked items from selected detail. Sample operations remain local.
 The shared Message preview uses caller-selected severity and its corrected
 Details/manual-size behavior; Warning/Success do not create duplicate windows.
+KLC-Rename returns fictional rules or a separate field case action; it performs
+no model operation or live before/after preview.
 Review's Check All affects only eligible rows shown by the filter, preserving
 hidden checks. Apply Checked validates the full checked collection. Clicking a
 row updates details without checking it. Ready/Warning/Blocked chips center in

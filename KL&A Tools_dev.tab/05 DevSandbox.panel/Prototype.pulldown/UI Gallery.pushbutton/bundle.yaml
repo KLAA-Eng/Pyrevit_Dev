@@ -12,12 +12,13 @@ tooltip:
     How-to:
     - Search by window or tool name, or filter Origin and Preview availability.
     - Select a row to see the calling tools and preview availability.
-    - Choose a supported preview state and Open preview. All tool actions are simulated.
+    - Choose a supported variant and preview state, then Open preview. All tool actions are simulated.
     - Search Template - to review Form, Options, and Review references.
     - Select Shared dialog - Message and choose Warning or Success to preview those message severities.
-    - Search Shared dialog to review Message, Text, five selector presets, Command Switch, and existing Action choice.
+    - Search Shared dialog to review shared families, including Selection presets and KLC-Rename variants.
     _____________________________________________________________________
     Last update:
+    - [10.30.2026] - v0.5 (Unreleased): Group shared previews by family and variant; add KLC-Rename and Message presentation refinements.
     - [10.30.2026] - v0.5 (Unreleased): Remove duplicate Message/Selection templates; add Warning and Success states to the shared Message preview.
     - [10.30.2026] - v0.5 (Unreleased): Remove green button/checkbox focus frames and selector selected/visible summaries.
     - [10.30.2026] - v0.5 (Unreleased): Polish Text/selector spacing and actions, add Group icon, and remove switch x/autofocus plus persistent white click-focus marks.

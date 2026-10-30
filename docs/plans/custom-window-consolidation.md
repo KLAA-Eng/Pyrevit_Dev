@@ -149,8 +149,8 @@ existing authorization:
    issues. First make resource packaging compatible with CLR/localization
    adapters; build supported targets and retain honest matching-host limits.
 
-Current inventory is 24 Window sources: three references, nine Python tool
-windows, five opt-in dialog bodies, five compiled windows, the shared-shell
+Current inventory is 25 Window sources: three references, nine Python tool
+windows, six opt-in dialog bodies, five compiled windows, the shared-shell
 Gallery and the PreviewFixture tooling exception.
 The nine Python and five compiled windows are the production/tool migration
 scope. Gallery remains the review harness; its previews and source/caller
@@ -384,3 +384,57 @@ own the dated evidence. The main Gallery/WPF probe remains offscreen by default;
 `-ShowFocusProbe` separately shows and closes two owned fictional windows.
 Physical keyboard/pointer/DPI and Revit owner/model acceptance remain bounded
 host checks. Compiled source/smoke verification does not replace deployed DLLs.
+
+## Shared window variants interview — 2026-10-30
+
+The owner requested KLCode grilling before implementing this broader slice.
+This plan remains its task/decision authority; Gallery behavior changes will
+also update its adjacent SPEC. The owner confirmed the settled design and
+authorized implementation after resolving the final case-action question.
+
+Settled first-round choices:
+
+- Message has Without Details and With Details variants using one shared base.
+  Without Details retains current sizing/resizing and OK. Both offer Normal,
+  Empty, Warning, Error, Success, Disabled and Long content. With Details/Empty
+  retains sample diagnostics while the message body is empty.
+- Severity heading and icon match the outline color. Body text keeps its normal
+  color. Apply the new icons only to shared Message: Lucide octagon-alert,
+  triangle-alert, info and check-check for error/warning/information/success;
+  Details uses chevron-right when collapsed and chevron-down when expanded.
+- Severity icons increase from 16 to 24; severity headings increase from 14 to
+  18, Segoe UI SemiBold. Details chevrons retain the normal small 16-unit size.
+  Body/details text remains 12. Align expanded Details text horizontally with
+  the main body text and vertically center the severity icon beside its heading.
+- Gallery has one row per shared window family. Variant lists available labels;
+  a dropdown beside State selects the preview. Search includes variant labels;
+  remember family variant/state for the current session. Selection contains
+  Sheets, Revisions, Open Documents, List Single and List Multiple variants.
+- Command Switch variants are Commands only and Commands with toggles,
+  preserving current visuals and keyboard behavior.
+- KLC-Rename is one shared base with caller-defined property groups, each with
+  one Find/Replace pair plus Prefix/Suffix. Multiple sequential replacement rules
+  on one property are outside this interpretation.
+- KLC-Rename supports exactly one, two or three groups, arranged horizontally;
+  Gallery offers Single field, Two fields and Multiple fields (three groups),
+  each with the same five standard preview states. No wrapping groups vertically.
+- Uppercase/Lowercase controls are optional per property group. These remain
+  separate actions, returning the operation and property key and closing the
+  dialog without applying Find/Replace/Prefix/Suffix rules.
+- Rename accepts entered rules and returns them to its caller; no live
+  before/after preview or model operation occurs in this shared dialog.
+  Enter activates Rename; invalid rules stay open with inline validation.
+  Close/Escape cancels. Retain the standard shared header/footer.
+- Continue opt-in shared windows and fictional Gallery previews; do not migrate
+  production tools in this delivery.
+
+Read-only agents inspected Gallery grouping, current shared/rename contracts
+and official Lucide candidates before the interview. All choices above are
+settled. No further interview approval gate applies to routine implementation.
+
+| ID | Delivered behavior | Dependencies / scope | Status / evidence |
+| --- | --- | --- | --- |
+| GUI-31 | Family/variant Gallery rows, picker, search and session choices | Registry, explicit adapter allowlist, Gallery UI and existing SPEC | Implemented; locally verified. 40 rows; variant/state memory, category/variant search, direct-family result handling and both source/Variant UIA sorting pass. |
+| GUI-32 | Message variants, severity presentation and aligned Details | Existing Message base, message-only icon roles, canonical pinned Lucide assets | Implemented; locally verified. Both seven-state variants, severity sizes/colors, actual text edges, disclosure/copy/scroll/resize checks pass. |
+| GUI-33 | KLC-Rename shared base and 1/2/3-group variants | Caller-owned fields, pure validation/results, lazy public API; Gallery integration follows GUI-31 | Implemented; locally verified. 15 layouts, cloned inputs/results, separate case actions, validation/minimum-height recovery, disabled guard and keyboard/cancel paths pass. |
+| GUI-34 | Integrated review, documentation and local milestone | GUI-31/32/33; owning SPEC/API/design references | Locally verified; 399 Python tests (one existing skip), 135 WPF constructions, 17 compiled source tests and both runtime smokes pass. Independent findings fixed and rechecked. [Evidence](../knowledge/reviews/design-system/2026-10-30-shared-window-variants.md). Existing production calls and packaged DLLs remain untouched; live Revit acceptance stays owner-owned. |

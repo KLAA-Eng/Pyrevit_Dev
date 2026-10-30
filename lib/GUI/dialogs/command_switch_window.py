@@ -1,4 +1,4 @@
-"""Lazy bare-WPF floating chooser. No commands run and no model is queried."""
+"""Lazy bare-WPF chooser adapter; distinct from the public command_switch helper."""
 from __future__ import unicode_literals
 
 import os

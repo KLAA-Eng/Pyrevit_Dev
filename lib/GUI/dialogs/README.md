@@ -18,6 +18,7 @@ delivery status. Action choice redesign is explicitly deferred.
 | `create_document_selector(title, items, ...)` | `select_open_documents(title, application, active_document, ...)` | action `accept`, original document payload(s) |
 | `create_text_prompt(title, prompt, ...)` | `ask_text(...)` | action `accept`, raw string |
 | `create_command_switch(title, choices, ...)` | `command_switch(...)` | action `accept`, command key and switch states |
+| `create_rename(title, fields, ...)` | `rename(...)` | action `accept`, rules or a separate case action |
 | `create_choice(title, choices, ...)` | `choose_action(...)` | Existing action key contract; redesign deferred |
 
 `create_selection(title, items, multiple=True, ...)` and `select_items(...)`
@@ -59,8 +60,14 @@ if text.action == 'accept':
 ```
 
 Message options are `severity='information'`, `details=''`, plus shared metadata.
-Severity accepts information/warning/error/success. It is an OK-only notice;
-the former unused multi-button/confirmation options are removed. Initial height
+Severity accepts information/warning/error/success. It is an OK-only notice.
+the 24-unit icon and 18-unit Segoe UI SemiBold heading match the outline
+severity color; body and details text stay 12. Message uses octagon-alert,
+triangle-alert, info and check-check for error, warning, information and success
+without changing global roles. Its 16-unit Details chevron points right/down
+when collapsed/expanded; expanded text aligns with the body and the severity
+icon centers vertically beside the heading.
+The former unused multi-button/confirmation options are removed. Initial height
 fits content up to 640. Manual width changes preserve chosen height. Details
 starts collapsed and expands the bottom after WPF applies its template, retaining
 the message viewport until capped. Collapse removes the added height. At the
@@ -171,11 +178,32 @@ cancels when empty. Blank panel clicks do not dismiss. Height
 fits content up to 500, then scrolls. Button descriptions are tooltips/help text.
 The result is `{'command': key, 'switches': {key: bool}}`; caller commands never run.
 
+## KLC-Rename
+
+`RenameField(key, label, find='', replace='', prefix='', suffix='',
+allow_case=True)` describes a property group. `create_rename(title, fields,
+version=None, owner=None, navigate=None)` constructs the window; `rename(...)`
+shows it. One to three groups are arranged horizontally, with minimum widths
+384, 712 and 1040 respectively. Each has one Find/Replace pair and Prefix/Suffix.
+Optional Uppercase/Lowercase buttons are separate actions for their own field.
+
+Rename validates and returns action `accept` with value `{'operation': 'rename',
+'fields': {key: {'find': ..., 'replace': ..., 'prefix': ..., 'suffix': ...}}}`.
+Enter activates Rename. Case buttons close with action `accept` and value
+`{'operation': 'upper' or 'lower', 'field': key}`. Invalid rules stay open with
+inline feedback. Close/Escape cancels with value None. The dialog performs no
+model mutation or live before/after preview; the caller owns any later action.
+
 ## Gallery and verification
 
-Search **Shared dialog** for the five selector presets, Message, Text, Command
-Switch and existing Action choice. Message offers Normal, Empty, Warning, Error,
-Success, Disabled and Long content; the other eight entries retain five states.
+Gallery has one row per shared family, with Variant beside State. Search includes
+variant names; each family's variant and state are remembered for the session.
+Selection offers Sheets, Revisions, Open Documents, List Single and List Multiple.
+Message offers Without Details and With Details, each with Normal, Empty, Warning,
+Error, Success, Disabled and Long content; With Details keeps diagnostics in
+Empty. Command Switch offers Commands only and Commands with toggles. KLC-Rename
+offers Single field, Two fields and Multiple fields (three groups). Other shared
+variants retain five standard states.
 The duplicate Message/Selection templates are retired; Form, Options and Review
 remain. Confirmation/Parameter previews remain removed. Action choice retains its
 current highlighted-row/Continue and default-key behavior pending future work.

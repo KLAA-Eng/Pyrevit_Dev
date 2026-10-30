@@ -111,6 +111,22 @@ def host_modules(alerts):
 
 
 class GalleryWindowTests(unittest.TestCase):
+    def test_shared_family_has_a_reviewed_preview_adapter(self):
+        self.assertTrue(windows.supports('dialog-selection'))
+        self.assertFalse(windows.supports('dialog-unreviewed'))
+
+    def test_family_launch_returns_shared_result_for_resolved_selection(self):
+        entry = dict(id='dialog-selection', title='Selection', variants=[
+            dict(id='dialog-list-single', label='List Single')])
+        class Window(object):
+            result = type('Result', (), {'action': 'accept'})()
+            def ShowDialog(self):
+                pass
+        with patch.object(windows, 'create_custom', return_value=Window()) as factory:
+            result = windows.launch_custom('', entry)
+        self.assertEqual('Fictional dialog result: accept.', result)
+        self.assertEqual('dialog-list-single', factory.call_args[0][1]['id'])
+
     def test_message_severity_states_do_not_open_other_window_families(self):
         for identity in ('template-form', 'dialog-list-single'):
             for state in ('Warning', 'Success'):
@@ -138,7 +154,9 @@ class GalleryWindowTests(unittest.TestCase):
             tree.body.extend(ast.parse(stream.read()).body)
         with open(os.path.join(ROOT, 'lib', 'GUI', 'dialogs', 'windows.py'), encoding='utf-8') as stream:
             tree.body.extend(ast.parse(stream.read()).body)
-        with open(os.path.join(ROOT, 'lib', 'GUI', 'dialogs', 'command_switch.py'), encoding='utf-8') as stream:
+        with open(os.path.join(ROOT, 'lib', 'GUI', 'dialogs', 'command_switch_window.py'), encoding='utf-8') as stream:
+            tree.body.extend(ast.parse(stream.read()).body)
+        with open(os.path.join(ROOT, 'lib', 'GUI', 'dialogs', 'rename_window.py'), encoding='utf-8') as stream:
             tree.body.extend(ast.parse(stream.read()).body)
         methods = {node.name for node in ast.walk(tree)
                    if isinstance(node, ast.FunctionDef)}

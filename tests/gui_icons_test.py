@@ -1,5 +1,6 @@
 """Deterministic artwork generation; actual WPF rendering has a separate probe."""
 import importlib.util
+import json
 from pathlib import Path
 import unittest
 import xml.etree.ElementTree as ET
@@ -13,8 +14,19 @@ X = '{' + icons.XAML + '}'
 
 
 class GuiIconTests(unittest.TestCase):
+    def test_message_roles_preserve_other_severity_consumers_and_use_pinned_sources(self):
+        self.assertEqual('circle-x', icons.ROLES['Error'])
+        self.assertEqual('circle-check', icons.ROLES['Success'])
+        self.assertEqual('octagon-alert', icons.ROLES['MessageError'])
+        self.assertEqual('check-check', icons.ROLES['MessageSuccess'])
+        self.assertEqual('chevron-right', icons.ROLES['ChevronRight'])
+        self.assertEqual('chevron-down', icons.ROLES['ChevronDown'])
+        source = json.loads((icons.ASSETS / 'source.json').read_text(encoding='utf-8'))
+        self.assertEqual('be09619c1c1124ad09c19fc3e87ee3b939409bbd', source['commit'])
+        self.assertTrue(set(icons.ROLES.values()).issubset(source['icons']))
+
     def test_generated_geometry_dictionary_is_a_leaf_that_matches_the_sources(self):
-        self.assertEqual(18, len(icons.ROLES))
+        self.assertEqual(22, len(icons.ROLES))
         self.assertEqual(icons.generate_icons(), (icons.ASSETS / 'KLCodeIcons.xaml').read_text(encoding='utf-8'))
         dictionary = ET.fromstring(icons.generate_icons())
         self.assertEqual({P + 'GeometryGroup'}, {node.tag for node in dictionary})

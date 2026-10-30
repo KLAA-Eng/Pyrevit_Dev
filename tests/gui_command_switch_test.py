@@ -13,7 +13,7 @@ from GUI.dialogs.switch_models import CommandSwitch, SwitchState
 
 class CommandSwitchTests(unittest.TestCase):
     def test_importing_factory_does_not_load_wpf_or_pyrevit(self):
-        code = "import sys; sys.path.insert(0, 'lib'); import GUI.dialogs.command_switch; assert 'wpf' not in sys.modules; assert 'pyrevit' not in sys.modules"
+        code = "import sys; sys.path.insert(0, 'lib'); import GUI.dialogs as dialogs; import GUI.dialogs.command_switch_window; assert callable(dialogs.command_switch); assert 'wpf' not in sys.modules; assert 'pyrevit' not in sys.modules"
         subprocess.check_call([sys.executable, '-B', '-c', code], cwd=ROOT)
 
     def test_filter_preserves_order_and_separate_switch_state(self):

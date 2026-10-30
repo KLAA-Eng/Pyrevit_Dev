@@ -17,6 +17,10 @@ Native picker results are discarded. Docked panels, overlays, production GUI
 fixes, release preparation, and remote publication are excluded. Five compiled
 windows remain visible and disabled by explicit owner decision.
 
+The 2026-10-30 shared family/variant delivery is owned by GUI-31 through GUI-34
+in the [consolidation plan](custom-window-consolidation.md). This ledger preserves
+the earlier Gallery milestones and owner-owned live acceptance.
+
 ## Task ledger
 
 | ID | Task | Status | Acceptance/evidence |

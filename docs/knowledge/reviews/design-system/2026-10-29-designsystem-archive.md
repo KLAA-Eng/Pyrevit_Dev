@@ -83,7 +83,7 @@ optional close callback retains caller-specific cancellation. The compiled
 `KLCode.Wpf.WindowChrome` adapter binds the same shell parts while preserving
 CLR/localization, tool DataContext and lifecycle responsibilities.
 
-The [main template guide](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.md) explains
+The [current shared Selection guide](../../../../lib/GUI/dialogs/README.md#selection-and-collectors) explains
 the 432 x 576 reference and creating a new body. The
 [first-delivery verification](2026-10-27-custom-window-foundation.md)
 contains actual WPF renders and proof limits. Native/pyRevit dialogs, ribbon
@@ -102,7 +102,7 @@ assemble shared visual parts instead of copying their formatting.
 | --- | --- | --- |
 | Shared values | Names for sizes, gaps, fonts and state colors | [KLCodeFoundationTokens.xaml](../../../../lib/GUI/Resources/KLCodeFoundationTokens.xaml) |
 | Shared parts/frame | Styles format controls; templates draw their inner pieces/states; `KlaWindowShell` supplies header/footer around a body | [Foundation](../../../../lib/GUI/Resources/KLCodeFoundation.xaml) and [Components](../../../../lib/GUI/Resources/KLCodeComponents.xaml) |
-| Window body | The tool's arrangement of search, fields, lists and actions | [Retired main-template guide](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.md) and each tool's own XAML |
+| Window body | The tool's arrangement of search, fields, lists and actions | [Current shared Selection guide](../../../../lib/GUI/dialogs/README.md#selection-and-collectors) and each tool's own XAML |
 | Assembly/events | Load the resources/body and connect Close, dragging and footer navigation | [window_chrome.py](../../../../lib/GUI/window_chrome.py) |
 | Caller identity | Supply title, pure tool version and shared link destinations | [window_metadata.py](../../../../lib/GUI/window_metadata.py) |
 | Tool logic | Supply data, filtering/validation, showing/lifetime and Revit operations | Each tool's Python/C# code |
@@ -540,6 +540,6 @@ These entries are not pure shared-style consumers. Some define local resources a
 | UI Gallery preview fixture | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml` | No shared dictionary or KLCode header treatment. | A deliberately minimal preview/test fixture. |
 
 Future custom-window work should follow the approved foundation and
-[main template guide](../../../../lib/GUI/_templates/KLCodeSelectionTemplate.md), with adoption
+[current shared Selection guide](../../../../lib/GUI/dialogs/README.md#selection-and-collectors), with adoption
 scheduled through the consolidation plan after owner review. Keep workflow
 content local; promote reusable visual rules into the shared foundation.
