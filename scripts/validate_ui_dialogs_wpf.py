@@ -110,7 +110,7 @@ def validate_shared_dialogs():
                     group = window.group_filter.TranslatePoint(Point(0, 0), window.Content)
                     assert abs(search.X - group.X) < 1 and group.Y - search.Y == 32
                     assert window.group_filter.ActualHeight == 24
-                    assert window.group_icon.Content == window.FindResource('klgeoGroup')
+                    assert window.group_icon.Content == window.FindResource('kliconGroup')
                 if window.state.multiple:
                     batch = list(window.batch_actions.Children)
                     assert [button.Content for button in batch] == ['Select All', 'Select None']

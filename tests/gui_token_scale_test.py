@@ -29,7 +29,7 @@ class TokenScaleTests(unittest.TestCase):
         primitives = lint.read(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeSharedPrimitives.xaml')
         chrome = lint.read(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeChrome.xaml')
         wordmark = lint.read(PROJECT_ROOT, 'lib/_logos/KLCodeWordmark.xaml')
-        icons = lint.read(PROJECT_ROOT, 'lib/_icons/gui/KLCodeIcons.xaml')
+        icons = lint.read(PROJECT_ROOT, 'lib/_icons/gui/klIcons.xaml')
         defined = set(re.findall(r'x:Key="([^"]+)"', tokens + palette + primitives + icons + chrome + wordmark))
         for path in lint.STRICT:
             text = lint.read(PROJECT_ROOT, path)

@@ -25,12 +25,12 @@ class CustomAlert(my_WPF):
     def _set_alert_style(self, is_warning):
         if is_warning:
             self.alert_heading.Text = 'Warning'
-            self.alert_icon.Content = self.Resources['klgeoWarnAlert']
+            self.alert_icon.Content = self.Resources['kliconWarnAlert']
             AutomationProperties.SetName(self.alert_icon, 'Warning')
             self.alert_banner.BorderBrush = self.Resources['KlaWarningBrush']
             return
         self.alert_heading.Text = 'Information'
-        self.alert_icon.Content = self.Resources['klgeoInfoAlert']
+        self.alert_icon.Content = self.Resources['kliconInfoAlert']
         AutomationProperties.SetName(self.alert_icon, 'Information')
         self.alert_banner.BorderBrush = self.Resources['KlaInfoBrush']
 

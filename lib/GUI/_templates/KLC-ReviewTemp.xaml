@@ -29,7 +29,7 @@
                 <ContentControl
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search"
-                    Content="{StaticResource klgeoSearch}"
+                    Content="{StaticResource kliconSearch}"
                     Style="{StaticResource KlaGuiIcon}" />
                 <TextBox
                     x:Name="review_search"

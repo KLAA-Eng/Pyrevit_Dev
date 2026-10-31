@@ -788,7 +788,7 @@
                             <ContentControl
                                 x:Name="DetailsChevron"
                                 Margin="{StaticResource KlaIconTextGap}"
-                                Content="{StaticResource klgeoChevRight}"
+                                Content="{StaticResource kliconChevRight}"
                                 Foreground="{TemplateBinding Foreground}"
                                 Style="{StaticResource KlaGuiIcon}" />
                             <ContentPresenter VerticalAlignment="Center" />
@@ -796,7 +796,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="DetailsChevron" Property="Content" Value="{StaticResource klgeoChevDown}" />
+                            <Setter TargetName="DetailsChevron" Property="Content" Value="{StaticResource kliconChevDown}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />

@@ -208,9 +208,8 @@ def validate_gui_icons():
     presenters = []
     try:
         for role in ICON_ROLES:
-            geometry = resources['klgeo' + role]
+            geometry = resources['klicon' + role]
             assert isinstance(geometry, Geometry) and not geometry.Bounds.IsEmpty, role
-            assert not resources.Contains('klicon' + role), 'geometry is the only icon form: ' + role
             block = StackPanel()
             icon = ContentControl()
             icon.Style = resources['KlaGuiIcon']

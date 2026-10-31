@@ -29,7 +29,7 @@
                         <ContentControl
                             x:Name="alert_icon"
                             VerticalAlignment="Center"
-                            Content="{StaticResource klgeoInfoAlert}"
+                            Content="{StaticResource kliconInfoAlert}"
                             Style="{StaticResource KlaGuiIcon}" />
                         <TextBlock
                             x:Name="alert_heading"

@@ -6,11 +6,11 @@
     <UserControl.Resources>
         <ContentControl
             x:Key="filterIcon"
-            Content="{StaticResource klgeoFutureFilterList}"
+            Content="{StaticResource kliconFutureFilterList}"
             Style="{StaticResource KlaGuiIcon}" />
         <ContentControl
             x:Key="regexIcon"
-            Content="{StaticResource klgeoFutureRegex}"
+            Content="{StaticResource kliconFutureRegex}"
             Style="{StaticResource KlaGuiIcon}" />
         <Style x:Key="RecallParameterList" TargetType="ListView">
             <Setter Property="Background" Value="{StaticResource header_background}" />
@@ -86,7 +86,7 @@
                     Click="clear_search"
                     Style="{StaticResource KlaIconButton}"
                     Visibility="Collapsed">
-                    <ContentControl Content="{StaticResource klgeoFutureClearSearch}" Style="{StaticResource KlaGuiIcon}" />
+                    <ContentControl Content="{StaticResource kliconFutureClearSearch}" Style="{StaticResource KlaGuiIcon}" />
                 </Button>
             </Grid>
         </Grid>
@@ -168,7 +168,7 @@
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
                         Margin="0,0,4,0"
-                        Content="{StaticResource klgeoFutureTags}"
+                        Content="{StaticResource kliconFutureTags}"
                         Style="{StaticResource KlaGuiIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
@@ -184,7 +184,7 @@
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
                         Margin="0,0,4,0"
-                        Content="{StaticResource klgeoFutureRead}"
+                        Content="{StaticResource kliconFutureRead}"
                         Style="{StaticResource KlaGuiIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
@@ -200,7 +200,7 @@
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
                         Margin="0,0,4,0"
-                        Content="{StaticResource klgeoFutureFilterFunnel}"
+                        Content="{StaticResource kliconFutureFilterFunnel}"
                         Style="{StaticResource KlaGuiIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
@@ -223,7 +223,7 @@
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
                         Margin="0,0,4,0"
-                        Content="{StaticResource klgeoFuturePointer}"
+                        Content="{StaticResource kliconFuturePointer}"
                         Style="{StaticResource KlaGuiIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
@@ -241,7 +241,7 @@
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
                         Margin="0,0,4,0"
-                        Content="{StaticResource klgeoFutureRectSelect}"
+                        Content="{StaticResource kliconFutureRectSelect}"
                         Style="{StaticResource KlaGuiIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
@@ -258,7 +258,7 @@
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
                         Margin="0,0,4,0"
-                        Content="{StaticResource klgeoSuccessAlert}"
+                        Content="{StaticResource kliconSuccessAlert}"
                         Style="{StaticResource KlaGuiIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"

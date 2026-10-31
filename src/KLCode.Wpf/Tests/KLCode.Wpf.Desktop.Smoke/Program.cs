@@ -73,7 +73,7 @@ internal static class Program
             identity + " original gray footer version");
         double chromeRow = ((GridLength)window.FindResource("KlaChromeRow")).Value;
         Require(header.ActualHeight == chromeRow && footerGrid.ActualHeight == chromeRow, identity + " chrome heights");
-        Require(window.FindResource("klgeoSearch") is Geometry, identity + " canonical vector search geometry");
+        Require(window.FindResource("kliconSearch") is Geometry, identity + " canonical vector search geometry");
         foreach (string[] pair in new[]
         {
             new[] { "header_background", "KlaWindowBrush" },

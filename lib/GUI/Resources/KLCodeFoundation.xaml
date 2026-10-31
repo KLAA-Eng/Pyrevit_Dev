@@ -6,10 +6,10 @@
         <!--  Footer destinations and default chrome labels, read by both adapters; labels are DynamicResource so locale dictionaries override.  -->
         <ResourceDictionary Source="KLCodeChrome.xaml" />
         <!--  Geometry-only leaf (generated); the KlaGuiIcon presenter below draws it with the tokens.  -->
-        <ResourceDictionary Source="../../_icons/gui/KLCodeIcons.xaml" />
+        <ResourceDictionary Source="../../_icons/gui/klIcons.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <!-- GUI icons: KlaGuiIcon presents a klgeo<Role> geometry at KlaIconSize on the KlaIconCanvas with the KlaIconStroke pen,
+    <!-- GUI icons: KlaGuiIcon presents a klicon<Role> geometry at KlaIconSize on the KlaIconCanvas with the KlaIconStroke pen,
          inheriting the control's foreground; disabled icons take KlaDisabledTextBrush. It is the only way to draw a GUI icon.-->
     <Style x:Key="KlaGuiIcon" TargetType="ContentControl">
         <Setter Property="Width" Value="{StaticResource KlaIconSize}" />

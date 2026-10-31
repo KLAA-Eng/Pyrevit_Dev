@@ -294,7 +294,7 @@ def _window_type():
             if self.preview_id == 'kla-custom-alert':
                 self.alert_heading.Text = 'Warning' if self.preview_state == 'Error' else 'Information'
                 severity = 'Warning' if self.preview_state == 'Error' else 'Information'
-                self.alert_icon.Content = self.Resources['klgeoWarnAlert' if severity == 'Warning' else 'klgeoInfoAlert']
+                self.alert_icon.Content = self.Resources['kliconWarnAlert' if severity == 'Warning' else 'kliconInfoAlert']
                 self.alert_banner.BorderBrush = self.Resources['KlaWarningBrush' if severity == 'Warning' else 'KlaInfoBrush']
                 self.message_text.Text = alert_message(self.preview_state)
             elif self.preview_id == 'kla-match-properties-recall':

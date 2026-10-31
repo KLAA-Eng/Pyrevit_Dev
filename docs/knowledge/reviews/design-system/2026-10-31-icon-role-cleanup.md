@@ -50,3 +50,13 @@ referenced in the repository resolve; every XAML file parses; 432 Python tests
 with the one existing macOS path-case failure; C# source contracts 17 of 17; the
 Windows smoke project builds. Not rendered; the five windows' filter rows should
 be compared with their earlier renders on Windows.
+
+## Final key prefix and file name
+
+The owner then set the geometry key prefix to `klicon<Role>` (the image form it
+once named no longer exists) and renamed the generated dictionary to
+`lib/_icons/gui/klIcons.xaml`. Every consumer, the Foundation merge, the
+compiled `KLCode.Wpf` page link and its source contract, the probes, tests and
+docs follow. All 19 generated keys are referenced and every reference resolves;
+432 Python tests with the one existing macOS path-case failure; C# source
+contracts 17 of 17; the Windows smoke project builds.

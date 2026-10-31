@@ -32,15 +32,15 @@ public partial class KlaAlertWindow : Window
         {
             case KlaAlertKind.Warning:
                 resourceKey = "KlaWarningBrush";
-                AlertIcon.Content = FindResource("klgeoWarnAlert");
+                AlertIcon.Content = FindResource("kliconWarnAlert");
                 break;
             case KlaAlertKind.Blocking:
                 resourceKey = "KlaBlockingBrush";
-                AlertIcon.Content = FindResource("klgeoErrorAlert");
+                AlertIcon.Content = FindResource("kliconErrorAlert");
                 break;
             default:
                 resourceKey = "KlaInfoBrush";
-                AlertIcon.Content = FindResource("klgeoInfoAlert");
+                AlertIcon.Content = FindResource("kliconInfoAlert");
                 break;
         }
 

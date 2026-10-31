@@ -159,7 +159,7 @@ instead of per-window file paths or copied geometry.
 
 | Need | Choose | Behavior |
 | --- | --- | --- |
-| Any GUI icon, decorative or inside a button, toggle or stateful control | `KlaGuiIcon` + a `klgeo<Role>` resource | Inherits foreground; the style uses `KlaDisabledTextBrush` when disabled |
+| Any GUI icon, decorative or inside a button, toggle or stateful control | `KlaGuiIcon` + a `klicon<Role>` resource | Inherits foreground; the style uses `KlaDisabledTextBrush` when disabled |
 
 This presenter is the only way to draw a GUI icon; the generator no longer
 writes fixed-color ImageSources (2026-10-31). Use it inside an action:
@@ -168,7 +168,7 @@ writes fixed-color ImageSources (2026-10-31). Use it inside an action:
 <Button Style="{StaticResource KlaIconButton}"
         AutomationProperties.Name="Search">
     <ContentControl Style="{StaticResource KlaGuiIcon}"
-                    Content="{StaticResource klgeoSearch}"/>
+                    Content="{StaticResource kliconSearch}"/>
 </Button>
 ```
 
@@ -178,7 +178,7 @@ For an icon/text action, let both children follow the button's foreground:
 <Button Style="{StaticResource KlaIconTextButton}">
     <StackPanel Orientation="Horizontal">
         <ContentControl Style="{StaticResource KlaGuiIcon}"
-                        Content="{StaticResource klgeoGroup}"
+                        Content="{StaticResource kliconGroup}"
                         Margin="{StaticResource KlaPairGap}"/>
         <TextBlock Text="Sheet Sets" VerticalAlignment="Center"
                    Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
@@ -194,7 +194,7 @@ takes the surrounding foreground:
 
 ```xml
 <ContentControl Style="{StaticResource KlaGuiIcon}"
-                Content="{StaticResource klgeoSearch}"
+                Content="{StaticResource kliconSearch}"
                 VerticalAlignment="Center" AutomationProperties.Name="Search"/>
 ```
 
@@ -212,14 +212,14 @@ An icon does not change the tool's behavior or classification.
 
 [generate_gui_icons.py](../scripts/generate_gui_icons.py) generates two outputs:
 
-- [KLCodeIcons.xaml](../lib/_icons/gui/KLCodeIcons.xaml): geometry-only `klgeo<Role>` resources.
+- [klIcons.xaml](../lib/_icons/gui/klIcons.xaml): geometry-only `klicon<Role>` resources.
 - [KLCodeWordmark.xaml](../lib/_logos/KLCodeWordmark.xaml): wordmark geometry and drawing offset from the repository SVG.
 
 Edit attributed SVG sources and the generator's role mappings, then run
 `python -B scripts/generate_gui_icons.py`. Use `--check` to detect stale outputs.
 Do not hand-edit generated XAML, and keep XAML formatters (XAML Styler and the
 like) off it: the generator's contract is byte equality, so a formatting pass over
-`KLCodeIcons.xaml` or `KLCodeWordmark.xaml` fails `--check` and the `gui_icons`
+`klIcons.xaml` or `KLCodeWordmark.xaml` fails `--check` and the `gui_icons`
 tests. When formatting the hand-written resources, pass the formatter an
 explicit file list that leaves the two generated files out, then run `--check`
 to confirm. `scripts/release_check.py` runs the check.
@@ -445,7 +445,7 @@ showing/dismissal semantics and Revit operations.
 | [Foundation tokens](../lib/GUI/Resources/KLCodeFoundationTokens.xaml) | Typed dimensions/fonts/insets and semantic component/state brushes |
 | [Shared primitives](../lib/GUI/Resources/KLCodeSharedPrimitives.xaml) | Merges Palette and generated wordmark; defines wordmark/footer-link/scrollbar presentation |
 | [Chrome data](../lib/GUI/Resources/KLCodeChrome.xaml) | Footer URIs and default English labels |
-| [Generated GUI geometry](../lib/_icons/gui/KLCodeIcons.xaml) | Geometry-only leaf dictionary |
+| [Generated GUI geometry](../lib/_icons/gui/klIcons.xaml) | Geometry-only leaf dictionary |
 | [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Primitives, Tokens, Chrome and Geometry; owns shell/basic styles, icon presenter/pen and generated images |
 | [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; adds field groups, compositions, options, states, tables, aliases and implicit-style policy |
 | [Command Switch styles](../lib/GUI/Resources/KLCodeCommandSwitch.xaml) | Merges Components; opt-in floating command/toggle pills using existing semantic colors |

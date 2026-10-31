@@ -27,10 +27,10 @@ class GuiIconTests(unittest.TestCase):
 
     def test_generated_geometry_dictionary_is_a_leaf_that_matches_the_sources(self):
         self.assertEqual(19, len(icons.ROLES))
-        self.assertEqual(icons.generate_icons(), (icons.ASSETS / 'KLCodeIcons.xaml').read_text(encoding='utf-8'))
+        self.assertEqual(icons.generate_icons(), (icons.ASSETS / 'klIcons.xaml').read_text(encoding='utf-8'))
         dictionary = ET.fromstring(icons.generate_icons())
         self.assertEqual({P + 'GeometryGroup'}, {node.tag for node in dictionary})
-        self.assertEqual({'klgeo' + role for role in icons.ROLES}, {node.attrib.get(X + 'Key') for node in dictionary})
+        self.assertEqual({'klicon' + role for role in icons.ROLES}, {node.attrib.get(X + 'Key') for node in dictionary})
         self.assertNotIn('StaticResource', icons.generate_icons())
 
     def test_geometry_is_the_only_icon_form(self):
@@ -43,9 +43,9 @@ class GuiIconTests(unittest.TestCase):
         self.assertNotIn('generated-icons', foundation)
         self.assertIn('KlaGuiIcon', {node.attrib.get(X + 'Key') for node in shell.iter(P + 'Style')})
         merged = [node.attrib.get('Source') for node in shell.iter(P + 'ResourceDictionary')]
-        self.assertIn('../../_icons/gui/KLCodeIcons.xaml', merged)
+        self.assertIn('../../_icons/gui/klIcons.xaml', merged)
         tokens = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeFoundationTokens.xaml').read_text(encoding='utf-8')
-        self.assertNotIn('KLCodeIcons.xaml', tokens, 'icons are merged by the foundation, not by the tokens')
+        self.assertNotIn('klIcons.xaml', tokens, 'icons are merged by the foundation, not by the tokens')
         self.assertFalse(hasattr(icons, 'generate_images'))
 
     def test_wordmark_keeps_svg_geometry_separate_from_the_drawing_offset(self):
