@@ -193,7 +193,7 @@ empty list; optional single selection may accept None. Inspect action.
 Initial size is the Selection template's 432 x 576 (minimum 432 x 420). Search
 comes first; the optional group dropdown below it is also 24 high. Both fields
 align after 16-unit icons and an 8-unit gap. Group uses Lucide Layers-2 through
-`KlaGroupGeometry`. Section spacing follows the template's 8/4-unit gaps; gray
+`klgeoGroup`. Section spacing follows the template's 8/4-unit gaps; gray
 Select All/None buttons center above green Select with an 8-unit gap. No visible
 Cancel action; header Close/Escape cancels. No selected/visible summary is shown
 below the list. Validation remains inline; list/action gaps remain 8 units.

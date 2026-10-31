@@ -38,10 +38,10 @@ def message_layout(window):
 
 
 def validate_message_variants():
-    roles = {'information': ('KlaInformationGeometry', 'KlaInfoBrush'),
-             'warning': ('KlaWarningGeometry', 'KlaWarningBrush'),
-             'error': ('KlaMessageErrorGeometry', 'KlaErrorBrush'),
-             'success': ('KlaMessageSuccessGeometry', 'KlaReadyBrush')}
+    roles = {'information': ('klgeoInfoAlert', 'KlaInfoBrush'),
+             'warning': ('klgeoWarnAlert', 'KlaWarningBrush'),
+             'error': ('klgeoErrorAlert', 'KlaErrorBrush'),
+             'success': ('klgeoSuccessAlert', 'KlaReadyBrush')}
     count = 0
     for severity, (geometry, brush) in sorted(roles.items()):
         for with_details in (False, True):
@@ -73,13 +73,13 @@ def validate_message_variants():
                     assert header.Foreground == window.message_body.Foreground
                     icon = header.Template.FindName('DetailsChevron', header)
                     assert icon.ActualWidth == icon.ActualHeight == 16
-                    assert icon.Content == window.FindResource('KlaChevronRightGeometry')
+                    assert icon.Content == window.FindResource('klgeoChevRight')
                     peer = ToggleButtonAutomationPeer(header)
                     assert peer.GetName() == 'Details'
                     peer.GetPattern(PatternInterface.Toggle).Toggle()
                     message_layout(window)
                     assert window.message_expander.IsExpanded
-                    assert icon.Content == window.FindResource('KlaChevronDownGeometry')
+                    assert icon.Content == window.FindResource('klgeoChevDown')
                     assert window.Height > initial_height
                     assert window.message_banner.ActualHeight >= initial_body - 1
                     body_left = window.message_body.TranslatePoint(Point(0, 0), window.window_body).X
@@ -100,7 +100,7 @@ def validate_message_variants():
                         window.message_expander.IsExpanded = False
                         message_layout(window)
                         assert window.Height == initial_height
-                        assert icon.Content == window.FindResource('KlaChevronRightGeometry')
+                        assert icon.Content == window.FindResource('klgeoChevRight')
                         window.message_expander.IsExpanded = True
                         message_layout(window)
                         assert window.message_banner.ActualHeight >= initial_body - 1

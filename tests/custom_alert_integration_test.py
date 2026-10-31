@@ -48,7 +48,7 @@ class CustomAlertPresentationTests(unittest.TestCase):
             for name in ('main_title', 'message_text', 'alert_heading', 'alert_icon', 'alert_banner'):
                 setattr(window, name, types.SimpleNamespace())
             window.Resources = dict((key, key) for key in (
-                'KlaWarningGeometry', 'KlaInformationGeometry', 'KlaWarningBrush', 'KlaInfoBrush'))
+                'klgeoWarnAlert', 'klgeoInfoAlert', 'KlaWarningBrush', 'KlaInfoBrush'))
         def load(window, path, title, version=None):
             controls(window)
             window.Title = title
@@ -84,7 +84,7 @@ class CustomAlertPresentationTests(unittest.TestCase):
         self.assertIsNone(window.version)
         self.assertEqual('Review this warning.', window.message_text.Text)
         self.assertEqual('Warning', window.alert_heading.Text)
-        self.assertEqual('KlaWarningGeometry', window.alert_icon.Content)
+        self.assertEqual('klgeoWarnAlert', window.alert_icon.Content)
         self.assertEqual('KlaWarningBrush', window.alert_banner.BorderBrush)
 
     def test_information_keeps_empty_input_fallback_and_public_wrapper(self):
@@ -94,7 +94,7 @@ class CustomAlertPresentationTests(unittest.TestCase):
         self.assertEqual('KL&A Tools', window.Title)
         self.assertEqual('', window.message_text.Text)
         self.assertEqual('Information', window.alert_heading.Text)
-        self.assertEqual('KlaInformationGeometry', window.alert_icon.Content)
+        self.assertEqual('klgeoInfoAlert', window.alert_icon.Content)
         self.assertEqual('KlaInfoBrush', window.alert_banner.BorderBrush)
         with patch.object(adapter, 'CustomAlert') as constructor:
             self.assertIsNone(adapter.show_alert('Message', 'Tool', True))

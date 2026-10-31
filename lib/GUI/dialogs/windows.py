@@ -64,10 +64,10 @@ def _window_types():
             # Keep the caller title for task switching/accessibility; the
             # message chrome intentionally has an empty center title area.
             self._kla_chrome.title.Visibility = Visibility.Collapsed
-            roles = {'information': ('Information', 'KlaInformationGeometry', 'KlaInfoBrush'),
-                     'warning': ('Warning', 'KlaWarningGeometry', 'KlaWarningBrush'),
-                     'error': ('Error', 'KlaMessageErrorGeometry', 'KlaErrorBrush'),
-                     'success': ('Success', 'KlaMessageSuccessGeometry', 'KlaReadyBrush')}
+            roles = {'information': ('Information', 'klgeoInfoAlert', 'KlaInfoBrush'),
+                     'warning': ('Warning', 'klgeoWarnAlert', 'KlaWarningBrush'),
+                     'error': ('Error', 'klgeoErrorAlert', 'KlaErrorBrush'),
+                     'success': ('Success', 'klgeoSuccessAlert', 'KlaReadyBrush')}
             heading, icon, brush = roles[severity]
             self.message_heading.Text = heading
             self.message_icon.Content = self.FindResource(icon)

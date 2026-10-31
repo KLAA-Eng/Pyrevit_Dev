@@ -159,16 +159,16 @@ instead of per-window file paths or copied geometry.
 
 | Need | Choose | Behavior |
 | --- | --- | --- |
-| Icon inside a button, toggle or stateful control | `KlaGuiIcon` + a `Kla<Role>Geometry` resource | Inherits foreground; the style uses `KlaDisabledTextBrush` when disabled |
-| Fixed-color artwork required as an `Image.Source` | `KlaIcon<Role>` DrawingImage | Uses the shared `KlaGuiIconPen` with `KlaTextBrush`; does not inherit the Image/parent foreground or automatically recolor when disabled |
+| Icon inside a button, toggle or stateful control | `KlaGuiIcon` + a `klgeo<Role>` resource | Inherits foreground; the style uses `KlaDisabledTextBrush` when disabled |
+| Fixed-color artwork required as an `Image.Source` | `klicon<Role>` DrawingImage | Uses the shared `KlaGuiIconPen` with `KlaTextBrush`; does not inherit the Image/parent foreground or automatically recolor when disabled |
 
 Use the presenter for an interactive icon that must follow control state:
 
 ```xml
 <Button Style="{StaticResource KlaIconButton}"
-        AutomationProperties.Name="Clear search">
+        AutomationProperties.Name="Search">
     <ContentControl Style="{StaticResource KlaGuiIcon}"
-                    Content="{StaticResource KlaClearSearchGeometry}"/>
+                    Content="{StaticResource klgeoSearch}"/>
 </Button>
 ```
 
@@ -178,9 +178,9 @@ For an icon/text action, let both children follow the button's foreground:
 <Button Style="{StaticResource KlaIconTextButton}">
     <StackPanel Orientation="Horizontal">
         <ContentControl Style="{StaticResource KlaGuiIcon}"
-                        Content="{StaticResource KlaReadElementGeometry}"
+                        Content="{StaticResource klgeoGroup}"
                         Margin="{StaticResource KlaPairGap}"/>
-        <TextBlock Text="Read Element" VerticalAlignment="Center"
+        <TextBlock Text="Sheet Sets" VerticalAlignment="Center"
                    Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
     </StackPanel>
 </Button>
@@ -192,7 +192,7 @@ the containing action needs an accessible name. A fixed-color search image is
 also available:
 
 ```xml
-<Image Source="{StaticResource KlaIconSearch}"
+<Image Source="{StaticResource kliconSearch}"
        Width="{StaticResource KlaIconSize}" Height="{StaticResource KlaIconSize}"
        Focusable="False" IsHitTestVisible="False"/>
 ```

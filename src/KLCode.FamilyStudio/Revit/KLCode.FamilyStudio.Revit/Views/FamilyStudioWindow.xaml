@@ -31,7 +31,7 @@
                             <ColumnDefinition Width="24" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Image Source="{StaticResource KlaIconSearch}" AutomationProperties.Name="Search" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
+                        <Image Source="{StaticResource kliconSearch}" AutomationProperties.Name="Search" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
                         <TextBox x:Name="SearchBox" Grid.Column="1" BorderThickness="0" Background="Transparent" ToolTip="{StaticResource SearchPlaceholderLabel}" KeyDown="OnSearchBoxKeyDown" />
                     </Grid>
                 </Border>
@@ -47,7 +47,7 @@
                             <RadioButton.ContentTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaListViewGeometry}" />
+                                        <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource klgeoList}" />
                                         <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="8,0,0,0" />
                                     </StackPanel>
                                 </DataTemplate>
@@ -57,7 +57,7 @@
                             <RadioButton.ContentTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaGridViewGeometry}" />
+                                        <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource klgeoGrid}" />
                                         <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="8,0,0,0" />
                                     </StackPanel>
                                 </DataTemplate>
@@ -256,7 +256,7 @@
                         <Button.ContentTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaFavoriteGeometry}" />
+                                    <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource klgeoFav}" />
                                     <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="8,0,0,0" />
                                 </StackPanel>
                             </DataTemplate>

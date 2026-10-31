@@ -24,11 +24,10 @@ PRODUCTION_IDS = (
     'kla-select-from-dict', 'kla-create-from-rooms', 'kla-custom-alert',
     'kla-duplicate-sheets', 'kla-find-replace-views', 'kla-find-replace-sheets',
     'kla-match-properties-recall', 'kla-steel-psf', 'kla-view-range')
-ICON_ROLES = ('Search', 'TextFilter', 'Regex', 'ClearSearch', 'ReadElement',
-              'ReadViewFilters', 'FilterElement', 'PickElement',
-              'RectangleSelection', 'CurrentSelection', 'ListView', 'GridView',
-              'Favorite', 'Information', 'Warning', 'Error', 'Success', 'Group',
-              'MessageError', 'MessageSuccess', 'ChevronRight', 'ChevronDown')
+ICON_ROLES = ('Search', 'Group', 'InfoAlert', 'WarnAlert', 'ErrorAlert', 'SuccessAlert',
+              'ChevRight', 'ChevDown', 'List', 'Grid', 'Fav',
+              'FutureFilterList', 'FutureRegex', 'FutureClearSearch', 'FutureTags',
+              'FutureRead', 'FutureFilterFunnel', 'FuturePointer', 'FutureRectSelect')
 FOOTER_ACTIONS = {
     'kla-select-from-dict': 'button_main',
     'kla-create-from-rooms': 'button_main',
@@ -209,8 +208,8 @@ def validate_gui_icons():
     presenters = []
     try:
         for role in ICON_ROLES:
-            geometry = resources['Kla' + role + 'Geometry']
-            image = resources['KlaIcon' + role]
+            geometry = resources['klgeo' + role]
+            image = resources['klicon' + role]
             assert isinstance(geometry, Geometry) and not geometry.Bounds.IsEmpty, role
             assert isinstance(image, DrawingImage), role
             assert image.Width == image.Height == 24, (role, image.Width, image.Height)
@@ -241,8 +240,8 @@ def validate_gui_icons():
         owner.Foreground = resources['text_white']
         settle_layout(panel)
         if output_directory:
-            render_content(owner, os.path.join(output_directory, 'gui-icons-22-native.png'), 700, 280)
-        print('GUI icons: all22 geometry/DrawingImage resources load at24-unit bounds;16-unit presenters inherit foreground and show disabled stroke at1.5 thickness.')
+            render_content(owner, os.path.join(output_directory, 'gui-icons-%d-native.png' % len(ICON_ROLES)), 700, 280)
+        print('GUI icons: all %d geometry/DrawingImage resources load at 24-unit bounds; 16-unit presenters inherit foreground and show disabled stroke at 1.5 thickness.' % len(ICON_ROLES))
     finally:
         owner.Close()
 

@@ -14,8 +14,6 @@
     "check-check",
     "info",
     "triangle-alert",
-    "circle-x",
-    "circle-check",
     "star",
     "list",
     "layout-grid",
@@ -24,6 +22,6 @@
     "chevron-right",
     "chevron-down"
   ],
-  "status": "Original 17 GUI mappings, family, stroke and placement approved by owner, 2026-10-28; Group/layers-2 added for the owner-requested selector group dropdown, 2026-10-29; MessageError/octagon-alert, MessageSuccess/check-check and right/down chevrons approved for shared Message variants, 2026-10-30; colours come from the foundation tokens, not this manifest",
+  "status": "Original 17 GUI mappings, family, stroke and placement approved by owner, 2026-10-28; Group/layers-2 added for the owner-requested selector group dropdown, 2026-10-29; MessageError/octagon-alert, MessageSuccess/check-check and right/down chevrons approved for shared Message variants, 2026-10-30; circle-check removed with the unused Success role and circle-x merged into the error alert role (octagon-alert), 2026-10-31; colours come from the foundation tokens, not this manifest",
   "stroke_width": 1.5
 }

@@ -47,8 +47,8 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    <!-- generated-icons:begin — KlaIcon<Role> ImageSources, written by scripts/generate_gui_icons.py; edit the SVG sources, not this block. -->
-    <DrawingImage x:Key="KlaIconChevronDown">
+    <!-- generated-icons:begin — klicon<Role> ImageSources, written by scripts/generate_gui_icons.py; edit the SVG sources, not this block. -->
+    <DrawingImage x:Key="kliconChevDown">
         <DrawingImage.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Transparent">
@@ -64,7 +64,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <DrawingImage x:Key="KlaIconChevronRight">
+    <DrawingImage x:Key="kliconChevRight">
         <DrawingImage.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Transparent">
@@ -80,7 +80,49 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <DrawingImage x:Key="KlaIconClearSearch">
+    <DrawingImage x:Key="kliconErrorAlert">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,24,24" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M12 16h.01" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M12 8v4" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <DrawingImage x:Key="kliconFav">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,24,24" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <DrawingImage x:Key="kliconFutureClearSearch">
         <DrawingImage.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Transparent">
@@ -101,70 +143,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <DrawingImage x:Key="KlaIconCurrentSelection">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <GeometryDrawing Brush="Transparent">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,24,24" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M18 6 7 17l-5-5" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="m22 10-7.5 7.5L13 16" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="KlaIconError">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <GeometryDrawing Brush="Transparent">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,24,24" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <EllipseGeometry Center="12,12" RadiusX="10" RadiusY="10" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="m15 9-6 6" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="m9 9 6 6" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="KlaIconFavorite">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <GeometryDrawing Brush="Transparent">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,24,24" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="KlaIconFilterElement">
+    <DrawingImage x:Key="kliconFutureFilterFunnel">
         <DrawingImage.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Transparent">
@@ -180,7 +159,158 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <DrawingImage x:Key="KlaIconGridView">
+    <DrawingImage x:Key="kliconFutureFilterList">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,24,24" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M2 5h20" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M6 12h12" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M9 19h6" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <DrawingImage x:Key="kliconFuturePointer">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,24,24" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <DrawingImage x:Key="kliconFutureRead">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,24,24" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="12,12" RadiusX="3" RadiusY="3" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <DrawingImage x:Key="kliconFutureRectSelect">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,24,24" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M3 7V5a2 2 0 0 1 2-2h2" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M17 3h2a2 2 0 0 1 2 2v2" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M21 17v2a2 2 0 0 1-2 2h-2" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M7 21H5a2 2 0 0 1-2-2v-2" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <DrawingImage x:Key="kliconFutureRegex">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,24,24" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M17 3v10" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="m12.67 5.5 8.66 5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="m12.67 10.5 8.66-5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M9 17a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <DrawingImage x:Key="kliconFutureTags">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,24,24" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M13.172 2a2 2 0 0 1 1.414.586l6.71 6.71a2.4 2.4 0 0 1 0 3.408l-4.592 4.592a2.4 2.4 0 0 1-3.408 0l-6.71-6.71A2 2 0 0 1 6 9.172V3a1 1 0 0 1 1-1z" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
+                    <GeometryDrawing.Geometry>
+                        <PathGeometry Figures="M2 7v6.172a2 2 0 0 0 .586 1.414l6.71 6.71a2.4 2.4 0 0 0 3.191.193" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}" Brush="{StaticResource KlaTextBrush}">
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="10.5,6.5" RadiusX=".5" RadiusY=".5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+    <DrawingImage x:Key="kliconGrid">
         <DrawingImage.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Transparent">
@@ -211,7 +341,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <DrawingImage x:Key="KlaIconGroup">
+    <DrawingImage x:Key="kliconGroup">
         <DrawingImage.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Transparent">
@@ -232,7 +362,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <DrawingImage x:Key="KlaIconInformation">
+    <DrawingImage x:Key="kliconInfoAlert">
         <DrawingImage.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Transparent">
@@ -258,7 +388,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <DrawingImage x:Key="KlaIconListView">
+    <DrawingImage x:Key="kliconList">
         <DrawingImage.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Transparent">
@@ -299,179 +429,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <DrawingImage x:Key="KlaIconMessageError">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <GeometryDrawing Brush="Transparent">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,24,24" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M12 16h.01" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M12 8v4" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="KlaIconMessageSuccess">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <GeometryDrawing Brush="Transparent">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,24,24" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M18 6 7 17l-5-5" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="m22 10-7.5 7.5L13 16" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="KlaIconPickElement">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <GeometryDrawing Brush="Transparent">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,24,24" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="KlaIconReadElement">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <GeometryDrawing Brush="Transparent">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,24,24" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M13.172 2a2 2 0 0 1 1.414.586l6.71 6.71a2.4 2.4 0 0 1 0 3.408l-4.592 4.592a2.4 2.4 0 0 1-3.408 0l-6.71-6.71A2 2 0 0 1 6 9.172V3a1 1 0 0 1 1-1z" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M2 7v6.172a2 2 0 0 0 .586 1.414l6.71 6.71a2.4 2.4 0 0 0 3.191.193" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}" Brush="{StaticResource KlaTextBrush}">
-                    <GeometryDrawing.Geometry>
-                        <EllipseGeometry Center="10.5,6.5" RadiusX=".5" RadiusY=".5" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="KlaIconReadViewFilters">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <GeometryDrawing Brush="Transparent">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,24,24" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <EllipseGeometry Center="12,12" RadiusX="3" RadiusY="3" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="KlaIconRectangleSelection">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <GeometryDrawing Brush="Transparent">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,24,24" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M3 7V5a2 2 0 0 1 2-2h2" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M17 3h2a2 2 0 0 1 2 2v2" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M21 17v2a2 2 0 0 1-2 2h-2" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M7 21H5a2 2 0 0 1-2-2v-2" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="KlaIconRegex">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <GeometryDrawing Brush="Transparent">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,24,24" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M17 3v10" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="m12.67 5.5 8.66 5" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="m12.67 10.5 8.66-5" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M9 17a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2z" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="KlaIconSearch">
+    <DrawingImage x:Key="kliconSearch">
         <DrawingImage.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Transparent">
@@ -492,7 +450,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <DrawingImage x:Key="KlaIconSuccess">
+    <DrawingImage x:Key="kliconSuccessAlert">
         <DrawingImage.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Transparent">
@@ -502,44 +460,18 @@
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
                     <GeometryDrawing.Geometry>
-                        <EllipseGeometry Center="12,12" RadiusX="10" RadiusY="10" />
+                        <PathGeometry Figures="M18 6 7 17l-5-5" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
                     <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="m16 9-5.5 5.5L8 12" />
+                        <PathGeometry Figures="m22 10-7.5 7.5L13 16" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <DrawingImage x:Key="KlaIconTextFilter">
-        <DrawingImage.Drawing>
-            <DrawingGroup>
-                <GeometryDrawing Brush="Transparent">
-                    <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,24,24" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M2 5h20" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M6 12h12" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
-                    <GeometryDrawing.Geometry>
-                        <PathGeometry Figures="M9 19h6" />
-                    </GeometryDrawing.Geometry>
-                </GeometryDrawing>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-    <DrawingImage x:Key="KlaIconWarning">
+    <DrawingImage x:Key="kliconWarnAlert">
         <DrawingImage.Drawing>
             <DrawingGroup>
                 <GeometryDrawing Brush="Transparent">

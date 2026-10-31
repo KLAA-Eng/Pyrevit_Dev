@@ -241,7 +241,7 @@ build the correct runtime assemblies, and validate in the matching Revit hosts.
   interactions, generated checkbox bindings and minimum-size evidence.
 - `scripts/validate_ui_production_wpf.py`: 45 production-window state layouts,
   compact naming fields, caller identity, localized Recall captions, overflow
-  scrolling and the 22 vector icon roles.
+  scrolling and the 19 vector icon roles.
 
 ## Model and external effects
 

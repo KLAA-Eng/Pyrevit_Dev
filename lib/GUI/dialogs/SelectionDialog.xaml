@@ -36,7 +36,7 @@
                     <ContentControl
                         x:Name="search_icon"
                         VerticalAlignment="Center"
-                        Content="{StaticResource KlaSearchGeometry}"
+                        Content="{StaticResource klgeoSearch}"
                         Style="{StaticResource KlaGuiIcon}" />
                     <TextBox
                         x:Name="filter_text"
@@ -54,7 +54,7 @@
                     <ContentControl
                         x:Name="group_icon"
                         VerticalAlignment="Center"
-                        Content="{StaticResource KlaGroupGeometry}"
+                        Content="{StaticResource klgeoGroup}"
                         Style="{StaticResource KlaGuiIcon}" />
                     <ComboBox
                         x:Name="group_filter"

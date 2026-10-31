@@ -15,10 +15,10 @@ from .choice_models import ChoiceState
 
 _WINDOW_TYPE = None
 _SEVERITY_ROLES = {
-    'information': ('KlaInformationGeometry', 'KlaInfoBrush'),
-    'warning': ('KlaWarningGeometry', 'KlaWarningBrush'),
-    'error': ('KlaMessageErrorGeometry', 'KlaErrorBrush'),
-    'success': ('KlaMessageSuccessGeometry', 'KlaReadyBrush')}
+    'information': ('klgeoInfoAlert', 'KlaInfoBrush'),
+    'warning': ('klgeoWarnAlert', 'KlaWarningBrush'),
+    'error': ('klgeoErrorAlert', 'KlaErrorBrush'),
+    'success': ('klgeoSuccessAlert', 'KlaReadyBrush')}
 
 
 def _window_type():

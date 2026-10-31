@@ -15,22 +15,22 @@ X = '{' + icons.XAML + '}'
 
 class GuiIconTests(unittest.TestCase):
     def test_message_roles_preserve_other_severity_consumers_and_use_pinned_sources(self):
-        self.assertEqual('circle-x', icons.ROLES['Error'])
-        self.assertEqual('circle-check', icons.ROLES['Success'])
-        self.assertEqual('octagon-alert', icons.ROLES['MessageError'])
-        self.assertEqual('check-check', icons.ROLES['MessageSuccess'])
-        self.assertEqual('chevron-right', icons.ROLES['ChevronRight'])
-        self.assertEqual('chevron-down', icons.ROLES['ChevronDown'])
+        self.assertNotIn('Error', icons.ROLES, 'circle-x was merged into the error alert role')
+        self.assertEqual('octagon-alert', icons.ROLES['ErrorAlert'])
+        self.assertEqual('check-check', icons.ROLES['SuccessAlert'])
+        self.assertEqual('chevron-right', icons.ROLES['ChevRight'])
+        self.assertEqual('chevron-down', icons.ROLES['ChevDown'])
+        self.assertNotIn('FutureCurrentSelection', icons.ROLES, 'merged into SuccessAlert')
         source = json.loads((icons.ASSETS / 'source.json').read_text(encoding='utf-8'))
         self.assertEqual('be09619c1c1124ad09c19fc3e87ee3b939409bbd', source['commit'])
         self.assertTrue(set(icons.ROLES.values()).issubset(source['icons']))
 
     def test_generated_geometry_dictionary_is_a_leaf_that_matches_the_sources(self):
-        self.assertEqual(22, len(icons.ROLES))
+        self.assertEqual(19, len(icons.ROLES))
         self.assertEqual(icons.generate_icons(), (icons.ASSETS / 'KLCodeIcons.xaml').read_text(encoding='utf-8'))
         dictionary = ET.fromstring(icons.generate_icons())
         self.assertEqual({P + 'GeometryGroup'}, {node.tag for node in dictionary})
-        self.assertEqual({'Kla' + role + 'Geometry' for role in icons.ROLES}, {node.attrib.get(X + 'Key') for node in dictionary})
+        self.assertEqual({'klgeo' + role for role in icons.ROLES}, {node.attrib.get(X + 'Key') for node in dictionary})
         self.assertNotIn('StaticResource', icons.generate_icons())
 
     def test_foundation_block_draws_every_role_with_the_token_pen_and_text_brush(self):
@@ -39,7 +39,7 @@ class GuiIconTests(unittest.TestCase):
         block = ET.fromstring('<ResourceDictionary xmlns="%s" xmlns:x="%s">%s</ResourceDictionary>' % (
             icons.WPF, icons.XAML, icons.generate_images().split('\n', 1)[1].rsplit('\n', 2)[0]))
         images = block.findall(P + 'DrawingImage')
-        self.assertEqual({'KlaIcon' + role for role in icons.ROLES}, {image.attrib.get(X + 'Key') for image in images})
+        self.assertEqual({'klicon' + role for role in icons.ROLES}, {image.attrib.get(X + 'Key') for image in images})
         for image in images:
             drawing = image.find('.//' + P + 'GeometryDrawing')
             self.assertEqual('Transparent', drawing.attrib['Brush'])

@@ -32,7 +32,7 @@
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search"
                     IsHitTestVisible="False"
-                    Source="{StaticResource KlaIconSearch}" />
+                    Source="{StaticResource kliconSearch}" />
                 <TextBox
                     x:Name="review_search"
                     Grid.Column="2"
