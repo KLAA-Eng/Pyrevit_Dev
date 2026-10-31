@@ -141,4 +141,3 @@ public partial class StartupSourcePickerWindow : Window
 
     private void OnCancelClick(object sender, RoutedEventArgs e) => DialogResult = false;
 }
-

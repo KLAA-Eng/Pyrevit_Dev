@@ -5,17 +5,17 @@
 
     <Grid Margin="8">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />  
+            <RowDefinition Height="Auto" />
             <!--  search bar  -->
-            <RowDefinition Height="Auto" />  
+            <RowDefinition Height="Auto" />
             <!--  check/uncheck/toggle  -->
-            <RowDefinition Height="*" />     
+            <RowDefinition Height="*" />
             <!--  parameter list  -->
-            <RowDefinition Height="Auto" />  
+            <RowDefinition Height="Auto" />
             <!--  category filter  -->
-            <RowDefinition Height="Auto" />  
+            <RowDefinition Height="Auto" />
             <!--  source buttons  -->
-            <RowDefinition Height="Auto" />  
+            <RowDefinition Height="Auto" />
             <!--  paste buttons  -->
         </Grid.RowDefinitions>
 
