@@ -6,14 +6,13 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
 [LICENSE.lucide.txt](LICENSE.lucide.txt) retains the upstream attribution/notices.
 
 - `svg/` contains the original approved SVG sources.
-- `klIcons.xaml` is generated framework-native WPF geometry only (one
-  `klicon<Role>` per role) — a leaf with no brushes. Windows need no SVG
-  renderer or added runtime package.
-- `scripts/generate_gui_icons.py` owns semantic role mappings and generation. It
-  also writes the wordmark geometry in `lib/_logos/KLCodeWordmark.xaml`. Run it
-  after changing sources; `--check` detects stale generated resources.
+- `klIcons.xaml` is generated framework-native WPF geometry only — one
+  `klicon<Role>` per role plus the KLCode logo (`klcLogo*`) — a leaf with no
+  brushes. Windows need no SVG renderer or added runtime package.
+- `scripts/generate_gui_icons.py` owns semantic role mappings and generation.
+  Run it after changing sources; `--check` detects stale generated resources.
 
-`KLCodeFoundation.xaml` merges the geometry and owns the presenter, bound to
+`KLCodeSharedPrimitives.xaml` merges the geometry; `KLCodeFoundation.xaml` owns the presenter, bound to
 tokens (`KlaIconSize`, `KlaIconCanvas`, `KlaIconStroke`, `KlaDisabledTextBrush`).
 The presenter is the only way to draw a GUI icon: it follows its parent's
 foreground and turns gray when disabled. There are no fixed-color ImageSources

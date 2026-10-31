@@ -208,20 +208,20 @@ remain unchanged. Status chips keep their words
 and borders. Larger Browse, Reset, Copy and Open Folder actions remain text-only.
 An icon does not change the tool's behavior or classification.
 
-### Generating artwork and the wordmark
+### Generating artwork and the KLCode logo
 
-[generate_gui_icons.py](../scripts/generate_gui_icons.py) generates two outputs:
-
-- [klIcons.xaml](../lib/_icons/gui/klIcons.xaml): geometry-only `klicon<Role>` resources.
-- [KLCodeWordmark.xaml](../lib/_logos/KLCodeWordmark.xaml): wordmark geometry and drawing offset from the repository SVG.
+[generate_gui_icons.py](../scripts/generate_gui_icons.py) generates one file,
+[klIcons.xaml](../lib/_icons/gui/klIcons.xaml): the geometry-only `klicon<Role>`
+icon resources and the KLCode logo (`klcLogoSlash`, `klcLogoLetters`, its
+`klcLogoOrigin` drawing offset and canvas size) from the repository SVG.
 
 Edit attributed SVG sources and the generator's role mappings, then run
 `python -B scripts/generate_gui_icons.py`. Use `--check` to detect stale outputs.
 Do not hand-edit generated XAML, and keep XAML formatters (XAML Styler and the
 like) off it: the generator's contract is byte equality, so a formatting pass over
-`klIcons.xaml` or `KLCodeWordmark.xaml` fails `--check` and the `gui_icons`
-tests. When formatting the hand-written resources, pass the formatter an
-explicit file list that leaves the two generated files out, then run `--check`
+`klIcons.xaml` fails `--check` and the `gui_icons` tests. When formatting the
+hand-written resources, pass the formatter an explicit file list that leaves the
+generated file out, then run `--check`
 to confirm. `scripts/release_check.py` runs the check.
 The shared wordmark template uses the generated
 geometry at 70 x 12; its Path drawing transform preserves the former rendering.
@@ -443,10 +443,10 @@ showing/dismissal semantics and Revit operations.
 | --- | --- |
 | [Palette](../lib/GUI/Resources/KLCode_palette.xaml) | Brand role brushes and legacy color aliases |
 | [Foundation tokens](../lib/GUI/Resources/KLCodeFoundationTokens.xaml) | Typed dimensions/fonts/insets and semantic component/state brushes |
-| [Shared primitives](../lib/GUI/Resources/KLCodeSharedPrimitives.xaml) | Merges Palette and generated wordmark; defines wordmark/footer-link/scrollbar presentation |
+| [Shared primitives](../lib/GUI/Resources/KLCodeSharedPrimitives.xaml) | Merges Palette and the generated `klIcons.xaml`; defines the `klcLogo` template and footer-link/scrollbar presentation |
 | [Chrome data](../lib/GUI/Resources/KLCodeChrome.xaml) | Footer URIs and default English labels |
-| [Generated GUI geometry](../lib/_icons/gui/klIcons.xaml) | Geometry-only leaf dictionary |
-| [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Primitives, Tokens, Chrome and Geometry; owns shell/basic styles, icon presenter/pen and generated images |
+| [Generated GUI geometry](../lib/_icons/gui/klIcons.xaml) | Geometry-only leaf dictionary: icons and the KLCode logo |
+| [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Primitives (and through them the geometry), Tokens and Chrome; owns shell/basic styles and the icon presenter |
 | [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; adds field groups, compositions, options, states, tables, aliases and implicit-style policy |
 | [Command Switch styles](../lib/GUI/Resources/KLCodeCommandSwitch.xaml) | Merges Components; opt-in floating command/toggle pills using existing semantic colors |
 | [Compiled controls](../src/KLCode.Wpf/Resources/KLCodeControls.xaml) | Merges Components and supplies existing C# style names through BasedOn |

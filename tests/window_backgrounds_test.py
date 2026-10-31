@@ -125,7 +125,7 @@ class WindowBackgroundTests(unittest.TestCase):
             shell = stream.read()
         self.assertIn('Width="{StaticResource KlaWordmarkWidth}"', shell)
         self.assertIn('Height="{StaticResource KlaWordmarkHeight}"', shell)
-        self.assertIn('ContentTemplate="{StaticResource KLCodeWordmark}"', shell)
+        self.assertIn('ContentTemplate="{StaticResource klcLogo}"', shell)
         self.assertIn('Height="{StaticResource KlaChromeRow}"', shell)
         self.assertIn('Style="{StaticResource KlaFoundationCloseButton}"', shell)
 

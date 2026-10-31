@@ -292,7 +292,7 @@ def validate_wordmark():
     owner.Resources.MergedDictionaries.Add(shared_resources())
     actual = ContentControl()
     actual.Content = 'wordmark'
-    actual.ContentTemplate = owner.FindResource('KLCodeWordmark')
+    actual.ContentTemplate = owner.FindResource('klcLogo')
     expected = Viewbox()
     expected.Width, expected.Height, expected.SnapsToDevicePixels = 70, 12, True
     canvas = Canvas()

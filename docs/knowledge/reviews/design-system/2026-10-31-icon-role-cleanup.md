@@ -60,3 +60,18 @@ compiled `KLCode.Wpf` page link and its source contract, the probes, tests and
 docs follow. All 19 generated keys are referenced and every reference resolves;
 432 Python tests with the one existing macOS path-case failure; C# source
 contracts 17 of 17; the Windows smoke project builds.
+
+## The KLCode logo moves into klIcons.xaml
+
+The wordmark dictionary `lib/_logos/KLCodeWordmark.xaml` existed only because
+the shared primitives needed the logo without the rest of the foundation. The
+generator now writes the logo into `klIcons.xaml` with `klcLogo` keys
+(`klcLogoSlash`, `klcLogoLetters`, `klcLogoOrigin`, `klcLogoCanvasWidth`,
+`klcLogoCanvasHeight`), and the shared primitives' DataTemplate is `klcLogo`.
+`KLCodeSharedPrimitives.xaml` merges `klIcons.xaml` once; the Foundation gets it
+through the primitives instead of merging it a second time. The old file, its
+compiled page link and the generator's second output are gone. The layout
+tokens `KlaWordmarkWidth` / `KlaWordmarkHeight` (70 x 12 in the header) keep
+their names. Verification: 25 generated keys, every reference resolves; 432
+Python tests with the one existing macOS failure; C# source contracts 17 of 17;
+the Windows smoke project builds. Not rendered.

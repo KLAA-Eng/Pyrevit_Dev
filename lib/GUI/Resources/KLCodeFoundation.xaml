@@ -1,12 +1,11 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
-        <!--  Shared data-only primitives load in loose Python XAML and compiled WPF.  -->
+        <!--  Shared data-only primitives load in loose Python XAML and compiled WPF; they also merge the generated
+              klIcons.xaml (icon geometry and the KLCode logo), which the KlaGuiIcon presenter below draws with the tokens.  -->
         <ResourceDictionary Source="KLCodeSharedPrimitives.xaml" />
         <ResourceDictionary Source="KLCodeFoundationTokens.xaml" />
         <!--  Footer destinations and default chrome labels, read by both adapters; labels are DynamicResource so locale dictionaries override.  -->
         <ResourceDictionary Source="KLCodeChrome.xaml" />
-        <!--  Geometry-only leaf (generated); the KlaGuiIcon presenter below draws it with the tokens.  -->
-        <ResourceDictionary Source="../../_icons/gui/klIcons.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <!-- GUI icons: KlaGuiIcon presents a klicon<Role> geometry at KlaIconSize on the KlaIconCanvas with the KlaIconStroke pen,
@@ -346,7 +345,7 @@
                                 Margin="{StaticResource KlaBrandInset}"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
-                                ContentTemplate="{StaticResource KLCodeWordmark}"
+                                ContentTemplate="{StaticResource klcLogo}"
                                 Focusable="False"
                                 IsHitTestVisible="False" />
                             <TextBlock
