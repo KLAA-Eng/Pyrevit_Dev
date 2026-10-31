@@ -81,6 +81,16 @@ public sealed class DesignSystemResourceContractTests
         {
             Assert.IsFalse(keys.Contains(alias), "Removed palette alias returned: " + alias);
         }
+        HashSet<string> componentKeys = LoadXaml("lib/GUI/Resources/KLCodeComponents.xaml")
+            .Descendants()
+            .Select(element => (string?)element.Attribute(Xaml + "Key"))
+            .Where(key => key is not null)
+            .Select(key => key!)
+            .ToHashSet(StringComparer.Ordinal);
+        foreach (string alias in new[] { "KlaPanelBrush", "KlaMutedTextBrush", "KlaSubtleTextBrush", "KlaBlockingBrush" })
+        {
+            Assert.IsFalse(componentKeys.Contains(alias), "Removed compiled-host brush alias returned: " + alias);
+        }
         Assert.IsFalse(
             palette.Descendants().Attributes().Any(IsEventAttribute),
             "The canonical palette must remain data-only so compiled WPF can load it.");

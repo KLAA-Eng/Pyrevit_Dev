@@ -45,7 +45,7 @@
                         <Border Style="{StaticResource KlaGroupBorderStyle}">
                             <TextBlock Margin="0,2,0,0">
                                 <Run Text="{StaticResource ActiveProjectLabel}" />
-                                <Run Text="{Binding DestinationProject}" Foreground="{StaticResource KlaSubtleTextBrush}" />
+                                <Run Text="{Binding DestinationProject}" Foreground="{StaticResource KlaMutedBrush}" />
                             </TextBlock>
                         </Border>
                         <TextBlock Text="{StaticResource DestinationGroupLabel}" Style="{StaticResource KlaGroupCaptionStyle}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,-8,0,0" />

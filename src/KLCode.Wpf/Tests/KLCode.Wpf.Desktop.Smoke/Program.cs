@@ -74,16 +74,9 @@ internal static class Program
         double chromeRow = ((GridLength)window.FindResource("KlaChromeRow")).Value;
         Require(header.ActualHeight == chromeRow && footerGrid.ActualHeight == chromeRow, identity + " chrome heights");
         Require(window.FindResource("kliconSearch") is Geometry, identity + " canonical vector search geometry");
-        foreach (string[] pair in new[]
+        foreach (string alias in new[] { "KlaPanelBrush", "KlaMutedTextBrush", "KlaSubtleTextBrush", "KlaBlockingBrush" })
         {
-            new[] { "KlaPanelBrush", "KlaComponentSurfaceBrush" },
-            new[] { "KlaSubtleTextBrush", "KlaMutedBrush" },
-            new[] { "KlaBlockingBrush", "KlaErrorBrush" },
-        })
-        {
-            Require(((SolidColorBrush)window.FindResource(pair[0])).Color ==
-                ((SolidColorBrush)window.FindResource(pair[1])).Color,
-                identity + " brush alias " + pair[0]);
+            Require(window.TryFindResource(alias) == null, identity + " removed brush alias " + alias);
         }
         Button close = (Button)shell.Template.FindName("PART_Close", shell);
         Require((string)close.Content == (string)window.FindResource("CloseLabel"), identity + " localized Close");

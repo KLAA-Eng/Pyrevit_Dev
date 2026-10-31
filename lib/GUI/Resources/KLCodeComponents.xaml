@@ -629,12 +629,6 @@
     <Style BasedOn="{StaticResource KlaCompactComboBox}" TargetType="ComboBox" />
     <Style BasedOn="{StaticResource KlaFoundationCheckBox}" TargetType="CheckBox" />
 
-    <!--  Compiled-host brush names (formerly KLCodeCompiledTokens.xaml): aliases of the shared brushes, so one token chain serves both hosts.  -->
-    <SolidColorBrush x:Key="KlaPanelBrush" Color="{Binding Color, Source={StaticResource KlaComponentSurfaceBrush}}" />
-    <SolidColorBrush x:Key="KlaMutedTextBrush" Color="{Binding Color, Source={StaticResource KlaMutedBrush}}" />
-    <SolidColorBrush x:Key="KlaSubtleTextBrush" Color="{Binding Color, Source={StaticResource KlaMutedBrush}}" />
-    <SolidColorBrush x:Key="KlaBlockingBrush" Color="{Binding Color, Source={StaticResource KlaErrorBrush}}" />
-
     <!--  Role-named aliases (the names new XAML should use); the KlaFoundation* keys stay for existing consumers.  -->
     <Style
         x:Key="KlaWindow"

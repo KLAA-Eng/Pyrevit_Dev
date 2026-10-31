@@ -35,7 +35,7 @@ public partial class KlaAlertWindow : Window
                 AlertIcon.Content = FindResource("kliconWarnAlert");
                 break;
             case KlaAlertKind.Blocking:
-                resourceKey = "KlaBlockingBrush";
+                resourceKey = "KlaErrorBrush";
                 AlertIcon.Content = FindResource("kliconErrorAlert");
                 break;
             default:

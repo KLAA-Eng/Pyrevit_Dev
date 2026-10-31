@@ -116,23 +116,16 @@ Disabled controls use explicit brushes rather than stacked opacity reductions.
 
 ### Compatibility keys
 
-The palette's 2019 aliases (`header_background`, `text_white`, `text_gray`,
-`text_green`, `border_green`, `border_green_dark`, `button_fg_normal`,
-`button_bg_normal`, `button_bg_hover`) were removed on 2026-10-31; every window
-names the role brushes above. The token aliases below remain for existing
-windows; new markup should prefer the role keys. Brush aliases bind their color
-to the canonical brush; they are separate brush instances rather than a promise
-of object identity. Some role
+There are no brush aliases. The palette's 2019 aliases (`header_background`,
+`text_white`, `text_gray`, `text_green`, `border_green`, `border_green_dark`,
+`button_fg_normal`, `button_bg_normal`, `button_bg_hover`) and the compiled-host
+aliases in Components (`KlaPanelBrush`, `KlaMutedTextBrush`, `KlaSubtleTextBrush`,
+`KlaBlockingBrush`) were removed on 2026-10-31; every window names the role
+brushes above, and the C# contract and smoke tests keep them gone. Some role
 brushes share a value by design and stay separate roles: `KlaTextMutedBrush`
 and `KlaMutedBrush`, `KlaFooterLinkBrush` and `KlaAccentHoverBrush`,
 `KlaAccentBrush` and `KlaBorderStrongBrush`, `KlaFooterVersionBrush` and
 `KlaPlaceholderBrush`. Change a role's value only for that role.
-
-| Existing key | Canonical role |
-| --- | --- |
-| `KlaPanelBrush` | `KlaComponentSurfaceBrush` |
-| `KlaMutedTextBrush`, `KlaSubtleTextBrush` | `KlaMutedBrush` |
-| `KlaBlockingBrush` | `KlaErrorBrush` |
 
 `Kla*Style` names in the [compiled adapter](../src/KLCode.Wpf/Resources/KLCodeControls.xaml)
 are compatibility styles based on the same shared controls. They do not define

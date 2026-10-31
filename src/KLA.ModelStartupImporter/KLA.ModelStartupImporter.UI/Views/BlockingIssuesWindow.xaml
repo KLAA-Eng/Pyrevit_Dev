@@ -12,15 +12,15 @@
                         <ColumnDefinition Width="26" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <ContentControl Content="{StaticResource kliconErrorAlert}" Style="{StaticResource KlaGuiIcon}" Foreground="{StaticResource KlaBlockingBrush}" />
+                    <ContentControl Content="{StaticResource kliconErrorAlert}" Style="{StaticResource KlaGuiIcon}" Foreground="{StaticResource KlaErrorBrush}" />
                     <TextBlock Grid.Column="1" Text="{StaticResource ResolveIssuesInstruction}" FontSize="12" TextWrapping="Wrap" />
                 </Grid>
             </Border>
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel Margin="12,4">
-                    <Border BorderBrush="{StaticResource KlaBlockingBrush}" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,0,0,8">
+                    <Border BorderBrush="{StaticResource KlaErrorBrush}" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,0,0,8">
                         <StackPanel>
-                            <TextBlock Text="{Binding UnknownHeading}" Foreground="{StaticResource KlaBlockingBrush}" FontWeight="SemiBold" Margin="0,0,0,6" />
+                            <TextBlock Text="{Binding UnknownHeading}" Foreground="{StaticResource KlaErrorBrush}" FontWeight="SemiBold" Margin="0,0,0,6" />
                             <ItemsControl ItemsSource="{Binding UnknownItems}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>

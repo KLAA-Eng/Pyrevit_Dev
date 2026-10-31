@@ -12,14 +12,14 @@
                         <TextBlock Text="{Binding MatchedSummary}" FontSize="11" Foreground="{StaticResource KlaInfoBrush}" />
                     </Border>
                     <Border Style="{StaticResource KlaNeutralChipStyle}" Margin="0,0,6,0">
-                        <TextBlock Text="{Binding ExistingSummary}" FontSize="11" Foreground="{StaticResource KlaMutedTextBrush}" />
+                        <TextBlock Text="{Binding ExistingSummary}" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" />
                     </Border>
                     <Border Style="{StaticResource KlaNeutralChipStyle}">
-                        <TextBlock Text="{Binding UncheckedSummary}" FontSize="11" Foreground="{StaticResource KlaMutedTextBrush}" />
+                        <TextBlock Text="{Binding UncheckedSummary}" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" />
                     </Border>
                 </WrapPanel>
                 <Border Style="{StaticResource KlaNeutralChipStyle}" HorizontalAlignment="Right">
-                    <TextBlock Text="{Binding CatalogSummary}" FontSize="11" Foreground="{StaticResource KlaSubtleTextBrush}" />
+                    <TextBlock Text="{Binding CatalogSummary}" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" />
                 </Border>
             </Grid>
             <Grid Grid.Row="1" Margin="0,4">
@@ -34,7 +34,7 @@
                             <RowDefinition Height="28" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <Grid Grid.Row="0" Background="{StaticResource KlaPanelBrush}" Margin="0">
+                        <Grid Grid.Row="0" Background="{StaticResource KlaComponentSurfaceBrush}" Margin="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="32" />
                                 <ColumnDefinition Width="78" />
@@ -42,10 +42,10 @@
                                 <ColumnDefinition Width="96" />
                                 <ColumnDefinition Width="104" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="1" Text="{StaticResource ItemIdLabel}" Foreground="{StaticResource KlaMutedTextBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="2" Text="{StaticResource ItemTitleLabel}" Foreground="{StaticResource KlaMutedTextBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="3" Text="{StaticResource ItemCategoryLabel}" Foreground="{StaticResource KlaMutedTextBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="4" Text="{StaticResource ItemStatusLabel}" Foreground="{StaticResource KlaMutedTextBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{StaticResource ItemIdLabel}" Foreground="{StaticResource KlaMutedBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="{StaticResource ItemTitleLabel}" Foreground="{StaticResource KlaMutedBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="3" Text="{StaticResource ItemCategoryLabel}" Foreground="{StaticResource KlaMutedBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="4" Text="{StaticResource ItemStatusLabel}" Foreground="{StaticResource KlaMutedBrush}" FontWeight="SemiBold" FontSize="11" VerticalAlignment="Center" />
                         </Grid>
                         <ListBox Grid.Row="1" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow, Mode=TwoWay}" BorderThickness="0" Background="Transparent" Padding="2" ItemContainerStyle="{StaticResource KlaListBoxItemStyle}" ScrollViewer.VerticalScrollBarVisibility="Visible">
                             <ListBox.ItemTemplate>
@@ -61,9 +61,9 @@
                                         <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}" IsEnabled="{Binding IsActionable}" VerticalAlignment="Center" />
                                         <TextBlock Grid.Column="1" Text="{Binding ItemId}" FontFamily="Consolas" FontSize="11" VerticalAlignment="Center" />
                                         <TextBlock Grid.Column="2" Text="{Binding Title}" FontSize="11" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,6,0" />
-                                        <TextBlock Grid.Column="3" Text="{Binding Category}" FontSize="11" Foreground="{StaticResource KlaMutedTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="3" Text="{Binding Category}" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                                         <Border Grid.Column="4" x:Name="StatusBorder" Style="{StaticResource KlaTableStatusChip}">
-                                            <TextBlock x:Name="StatusText" Text="{Binding Status}" FontSize="10" Foreground="{StaticResource KlaMutedTextBrush}" />
+                                            <TextBlock x:Name="StatusText" Text="{Binding Status}" FontSize="10" Foreground="{StaticResource KlaMutedBrush}" />
                                         </Border>
                                     </Grid>
                                     <DataTemplate.Triggers>
@@ -79,14 +79,14 @@
                 </Border>
                 <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel>
-                        <TextBlock Foreground="{StaticResource KlaMutedTextBrush}" FontSize="12" Margin="0,0,0,8">
+                        <TextBlock Foreground="{StaticResource KlaMutedBrush}" FontSize="12" Margin="0,0,0,8">
                             <Run Text="{StaticResource SelectedItemPrefix}" />
                             <Run Text="{Binding SelectedRow.ItemId, Mode=OneWay}" />
                         </TextBlock>
                         <Border Height="210" Style="{StaticResource KlaPreviewBorderStyle}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding SelectedRow.SourceName}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource KlaMutedTextBrush}" HorizontalAlignment="Center" />
-                                <TextBlock Text="{StaticResource SeedPreviewPlaceholderLabel}" FontSize="11" Foreground="{StaticResource KlaMutedTextBrush}" Margin="0,6,0,0" />
+                                <TextBlock Text="{Binding SelectedRow.SourceName}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" HorizontalAlignment="Center" />
+                                <TextBlock Text="{StaticResource SeedPreviewPlaceholderLabel}" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" Margin="0,6,0,0" />
                             </StackPanel>
                         </Border>
                         <TextBlock Text="{Binding SelectedRow.Title}" FontSize="12" Margin="0,8,0,8" TextWrapping="Wrap" />
@@ -102,11 +102,11 @@
                                             <Border Background="{StaticResource KlaAccentBrush}" Padding="4">
                                                 <TextBlock Text="{Binding SelectedRow.TargetKind}" FontSize="11" HorizontalAlignment="Center" />
                                             </Border>
-                                            <TextBlock Grid.Column="1" Text="{StaticResource SheetTargetLabel}" Foreground="{StaticResource KlaSubtleTextBrush}" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="{StaticResource SheetTargetLabel}" Foreground="{StaticResource KlaMutedBrush}" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Grid>
                                     </Border>
                                     <TextBlock Margin="0,8,0,0" FontSize="11" TextWrapping="Wrap">
-                                        <Run Text="{StaticResource NewTargetPrefix}" Foreground="{StaticResource KlaMutedTextBrush}" />
+                                        <Run Text="{StaticResource NewTargetPrefix}" Foreground="{StaticResource KlaMutedBrush}" />
                                     <Run Text="{Binding SelectedRow.TargetName, Mode=OneWay}" />
                                     </TextBlock>
                                     <TextBlock Text="{StaticResource NativeEditableLabel}" Style="{StaticResource KlaMutedTextStyle}" Margin="0,4,0,0" TextWrapping="Wrap" />
@@ -115,8 +115,8 @@
                             <TextBlock Text="{StaticResource PlacementTargetGroupLabel}" Style="{StaticResource KlaGroupCaptionStyle}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,-8,0,0" />
                         </Grid>
                         <TextBlock FontSize="11" TextWrapping="Wrap">
-                            <Run Text="{StaticResource RequiresPrefix}" Foreground="{StaticResource KlaMutedTextBrush}" />
-                        <Run Text="{Binding SelectedRow.Requirements, Mode=OneWay}" Foreground="{StaticResource KlaSubtleTextBrush}" />
+                            <Run Text="{StaticResource RequiresPrefix}" Foreground="{StaticResource KlaMutedBrush}" />
+                        <Run Text="{Binding SelectedRow.Requirements, Mode=OneWay}" Foreground="{StaticResource KlaMutedBrush}" />
                         </TextBlock>
                     <TextBlock Text="{StaticResource RequirementsPreflightLabel}" Foreground="{StaticResource KlaInfoBrush}" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap" />
                     </StackPanel>

@@ -90,11 +90,11 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
-                        <TextBlock Text="{StaticResource FamiliesCaptionLabel}" Foreground="{StaticResource KlaMutedTextBrush}" FontSize="12" />
+                        <TextBlock Text="{StaticResource FamiliesCaptionLabel}" Foreground="{StaticResource KlaMutedBrush}" FontSize="12" />
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Content="{StaticResource FavoritesLabel}" Style="{StaticResource KlaLinkButtonStyle}" Margin="0,0,8,0" Click="OnFavoritesClick" />
                             <Button Content="{StaticResource RecentLabel}" Style="{StaticResource KlaLinkButtonStyle}" Margin="0,0,12,0" Click="OnRecentClick" />
-                            <TextBlock x:Name="ResultCount" Foreground="{StaticResource KlaMutedTextBrush}" FontSize="12" VerticalAlignment="Center" />
+                            <TextBlock x:Name="ResultCount" Foreground="{StaticResource KlaMutedBrush}" FontSize="12" VerticalAlignment="Center" />
                         </StackPanel>
                     </Grid>
                     <Grid Grid.Row="1">
@@ -110,10 +110,10 @@
                                         <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked, Mode=TwoWay}" Tag="{Binding Id}" VerticalAlignment="Center" Checked="OnBatchChecked" Unchecked="OnBatchUnchecked" />
                                         <StackPanel Grid.Column="1">
                                             <TextBlock Text="{Binding Name}" FontSize="12" Foreground="{StaticResource KlaTextBrush}" TextTrimming="CharacterEllipsis" />
-                                            <TextBlock Text="{Binding Subtitle}" FontSize="11" Foreground="{StaticResource KlaMutedTextBrush}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Subtitle}" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" TextTrimming="CharacterEllipsis" />
                                         </StackPanel>
                                         <Border Grid.Column="2" Style="{StaticResource KlaBlockingChipStyle}" Margin="8,0,2,0" Visibility="{Binding FlagVisibility}">
-                                            <TextBlock Text="{Binding FlagText}" FontSize="10" Foreground="{StaticResource KlaBlockingBrush}" />
+                                            <TextBlock Text="{Binding FlagText}" FontSize="10" Foreground="{StaticResource KlaErrorBrush}" />
                                         </Border>
                                     </Grid>
                                 </DataTemplate>
@@ -131,13 +131,13 @@
                                         <StackPanel>
                                             <Border Height="112" Style="{StaticResource KlaPreviewBorderStyle}" CornerRadius="3">
                                                 <Grid>
-                                                    <TextBlock Text="{StaticResource PreviewUnavailableLabel}" Foreground="{StaticResource KlaMutedTextBrush}" FontFamily="Consolas" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{StaticResource PreviewUnavailableLabel}" Foreground="{StaticResource KlaMutedBrush}" FontFamily="Consolas" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                                     <Image Source="{Binding ThumbnailPath}" Stretch="Uniform" />
                                                     <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Tag="{Binding Id}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0" Checked="OnBatchChecked" Unchecked="OnBatchUnchecked" />
                                                 </Grid>
                                             </Border>
                                             <TextBlock Text="{Binding Name}" FontSize="11" Foreground="{StaticResource KlaTextBrush}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis" />
-                                            <TextBlock Text="{Binding Category}" FontSize="10" Foreground="{StaticResource KlaMutedTextBrush}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Category}" FontSize="10" Foreground="{StaticResource KlaMutedBrush}" TextTrimming="CharacterEllipsis" />
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
@@ -145,7 +145,7 @@
                         </ListBox>
                         <StackPanel x:Name="EmptyState" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock Text="{StaticResource EmptyStateTitle}" FontSize="14" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                            <TextBlock Text="{StaticResource EmptyStateBody}" Foreground="{StaticResource KlaMutedTextBrush}" Margin="0,6,0,12" />
+                            <TextBlock Text="{StaticResource EmptyStateBody}" Foreground="{StaticResource KlaMutedBrush}" Margin="0,6,0,12" />
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <Button Content="{StaticResource ClearFiltersLabel}" Style="{StaticResource KlaButtonStyle}" Margin="0,0,8,0" Click="OnClearFiltersClick" />
                                 <Button Content="{StaticResource RefreshLibraryLabel}" Style="{StaticResource KlaButtonStyle}" Click="OnRefreshClick" />
@@ -157,7 +157,7 @@
                     <StackPanel Margin="2,0,4,0">
                         <Border Height="318" Style="{StaticResource KlaPreviewBorderStyle}">
                             <Grid>
-                                <TextBlock x:Name="PreviewPlaceholder" Text="{StaticResource PreviewUnavailableLabel}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource KlaMutedTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock x:Name="PreviewPlaceholder" Text="{StaticResource PreviewUnavailableLabel}" FontFamily="Consolas" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 <Image x:Name="Thumbnail" Stretch="Uniform" />
                             </Grid>
                         </Border>
@@ -167,10 +167,10 @@
                                 <TextBlock x:Name="StatusText" FontSize="11" Foreground="{StaticResource KlaWarningBrush}" />
                             </Border>
                             <Border Style="{StaticResource KlaChipBorderStyle}" Margin="0,0,6,0">
-                                <TextBlock x:Name="CategoryText" FontSize="11" Foreground="{StaticResource KlaMutedTextBrush}" />
+                                <TextBlock x:Name="CategoryText" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" />
                             </Border>
                             <Border Style="{StaticResource KlaChipBorderStyle}">
-                                <TextBlock x:Name="DisciplineText" FontSize="11" Foreground="{StaticResource KlaMutedTextBrush}" />
+                                <TextBlock x:Name="DisciplineText" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" />
                             </Border>
                         </WrapPanel>
                         <Grid Margin="0,4,0,8">
@@ -210,7 +210,7 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Style="{StaticResource KlaNeutralChipStyle}" Background="{StaticResource KlaPanelBrush}" Margin="0,0,5,4">
+                                            <Border Style="{StaticResource KlaNeutralChipStyle}" Background="{StaticResource KlaComponentSurfaceBrush}" Margin="0,0,5,4">
                                                 <TextBlock Text="{Binding}" FontSize="11" />
                                             </Border>
                                         </DataTemplate>
