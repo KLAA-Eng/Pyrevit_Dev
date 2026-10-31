@@ -73,8 +73,8 @@
      <CornerRadius x:Key="KlaRadiusRadio">8</CornerRadius>
      <GridLength x:Key="KlaHeaderSideColumn">86</GridLength>
      <GridLength x:Key="KlaFooterSideColumn">100</GridLength>
-     <sys:Double x:Key="KlaWordmarkWidth">70</sys:Double>
-     <sys:Double x:Key="KlaWordmarkHeight">12</sys:Double>
+     <sys:Double x:Key="klcLogoWidth">70</sys:Double>
+     <sys:Double x:Key="klcLogoHeight">12</sys:Double>
      <sys:Double x:Key="KlaCloseWidth">60</sys:Double>
      <sys:Double x:Key="KlaCloseHeight">18</sys:Double>
      <sys:Double x:Key="KlaCloseFontSize">10</sys:Double>

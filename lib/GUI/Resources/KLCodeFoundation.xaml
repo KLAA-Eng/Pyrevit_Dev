@@ -340,8 +340,8 @@
                                 <ColumnDefinition Width="{StaticResource KlaHeaderSideColumn}" />
                             </Grid.ColumnDefinitions>
                             <ContentControl
-                                Width="{StaticResource KlaWordmarkWidth}"
-                                Height="{StaticResource KlaWordmarkHeight}"
+                                Width="{StaticResource klcLogoWidth}"
+                                Height="{StaticResource klcLogoHeight}"
                                 Margin="{StaticResource KlaBrandInset}"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"

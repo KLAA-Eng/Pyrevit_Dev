@@ -70,8 +70,7 @@ generator now writes the logo into `klIcons.xaml` with `klcLogo` keys
 `klcLogoCanvasHeight`), and the shared primitives' DataTemplate is `klcLogo`.
 `KLCodeSharedPrimitives.xaml` merges `klIcons.xaml` once; the Foundation gets it
 through the primitives instead of merging it a second time. The old file, its
-compiled page link and the generator's second output are gone. The layout
-tokens `KlaWordmarkWidth` / `KlaWordmarkHeight` (70 x 12 in the header) keep
-their names. Verification: 25 generated keys, every reference resolves; 432
+compiled page link and the generator's second output are gone. The header's
+layout tokens are renamed to match: `klcLogoWidth` / `klcLogoHeight` (70 x 12). Verification: 25 generated keys, every reference resolves; 432
 Python tests with the one existing macOS failure; C# source contracts 17 of 17;
 the Windows smoke project builds. Not rendered.
