@@ -213,8 +213,10 @@ like) off it: the generator's contract is byte equality, so a formatting pass ov
 hand-written resources, pass the formatter an explicit file list that leaves the
 generated file out, then run `--check`
 to confirm. `scripts/release_check.py` runs the check.
-The shared `klcLogo` template draws the generated
-geometry at 128 x 18 (`klcLogoWidth` / `klcLogoHeight`); its Path transform is the SVG's own.
+The generated `klcLogo` template draws it: an unsized Viewbox that fills the
+header's `klcLogoWidth` x `klcLogoHeight` slot (128 x 18), the SVG's own transform,
+and fills that reference `KlaBorderBrush` / `KlaTextBrush` dynamically, since
+`klIcons.xaml` does not load the palette. Resize the logo through the two tokens.
 No runtime SVG renderer is required.
 
 ### Ribbon assets
@@ -433,9 +435,9 @@ showing/dismissal semantics and Revit operations.
 | --- | --- |
 | [Palette](../lib/GUI/Resources/KLCode_palette.xaml) | Brand role brushes |
 | [Foundation tokens](../lib/GUI/Resources/KLCodeFoundationTokens.xaml) | Typed dimensions/fonts/insets and semantic component/state brushes |
-| [Shared primitives](../lib/GUI/Resources/KLCodeSharedPrimitives.xaml) | Merges Palette and the generated `klIcons.xaml`; defines the `klcLogo` template and footer-link/scrollbar presentation |
+| [Shared primitives](../lib/GUI/Resources/KLCodeSharedPrimitives.xaml) | Merges Palette and the generated `klIcons.xaml`; defines footer-link/scrollbar presentation |
 | [Chrome data](../lib/GUI/Resources/KLCodeChrome.xaml) | Footer URIs and default English labels |
-| [Generated GUI geometry](../lib/GUI/Resources/klIcons.xaml) | Geometry-only leaf dictionary: icons and the KLCode logo |
+| [Generated GUI geometry](../lib/GUI/Resources/klIcons.xaml) | Generated leaf: icon geometry, the KLCode logo and its `klcLogo` template; defines no brushes |
 | [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Primitives (and through them the geometry), Tokens and Chrome; owns shell/basic styles and the icon presenter |
 | [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; adds field groups, compositions, options, states, tables, aliases and implicit-style policy |
 | [Command Switch styles](../lib/GUI/Resources/KLCodeCommandSwitch.xaml) | Merges Components; opt-in floating command/toggle pills using existing semantic colors |

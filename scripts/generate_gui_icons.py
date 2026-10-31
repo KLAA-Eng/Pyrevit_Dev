@@ -1,12 +1,12 @@
 """Generate framework-native GUI artwork from the attributed sources.
 
 One output, deterministic (``--check`` fails when it is stale): ``lib/GUI/Resources/klIcons.xaml``, a
-geometry-only leaf dictionary with no brushes, holding
+leaf dictionary that defines no brushes, holding
 
 * one ``klicon<Role>`` GeometryGroup per role, drawn by the foundation's ``KlaGuiIcon`` presenter, and
 * the KLCode logo (``klcLogo*``): the slash and letter geometry from ``lib/_logos/klcLogo.svg``, the SVG
-  group's scale and offset as one transform, and the view-box canvas, drawn by the shared primitives'
-  ``klcLogo`` DataTemplate.
+  group's scale and offset as one transform, the view-box canvas, and the ``klcLogo`` DataTemplate that draws
+  them: an unsized Viewbox the host sizes, filled with the palette's KlaBorderBrush / KlaTextBrush by reference.
 
 This development script runs under CPython; generated WPF resources require no SVG renderer or Python
 dependency in command paths. Source geometry stays local.
@@ -200,6 +200,23 @@ def _append_logo(root):
     for key, value in (('klcLogoCanvasWidth', w), ('klcLogoCanvasHeight', h)):
         node = ET.SubElement(root, '{' + SYS + '}Double', {'{' + XAML + '}Key': key})
         node.text = '%g' % value
+    _append_logo_template(root)
+
+
+# Palette role brushes for the two logo outlines. DynamicResource: klIcons.xaml does not merge the palette,
+# so the fills resolve from the window that draws the logo, which always has the palette loaded.
+LOGO_FILLS = (('klcLogoSlash', 'KlaBorderBrush'), ('klcLogoLetters', 'KlaTextBrush'))
+
+
+def _append_logo_template(root):
+    """The klcLogo DataTemplate: an unsized Viewbox, so the host (the header's klcLogoWidth x klcLogoHeight slot) sizes it."""
+    template = element(root, 'DataTemplate', {'{' + XAML + '}Key': 'klcLogo'})
+    box = element(template, 'Viewbox', {'SnapsToDevicePixels': 'True', 'Stretch': 'Uniform'})
+    canvas = element(box, 'Canvas', {'Width': '{StaticResource klcLogoCanvasWidth}',
+                                     'Height': '{StaticResource klcLogoCanvasHeight}', 'ClipToBounds': 'True'})
+    for geometry_key, brush in LOGO_FILLS:
+        element(canvas, 'Path', {'Data': '{StaticResource %s}' % geometry_key, 'Fill': '{DynamicResource %s}' % brush,
+                                 'RenderTransform': '{StaticResource klcLogoTransform}'})
 
 
 def main():

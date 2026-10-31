@@ -91,4 +91,12 @@
     <MatrixTransform x:Key="klcLogoTransform" Matrix="1.0666642,0,0,1.0681867,-34.133255,-69.02212" />
     <sys:Double x:Key="klcLogoCanvasWidth">1024</sys:Double>
     <sys:Double x:Key="klcLogoCanvasHeight">146</sys:Double>
+    <DataTemplate x:Key="klcLogo">
+        <Viewbox SnapsToDevicePixels="True" Stretch="Uniform">
+            <Canvas Width="{StaticResource klcLogoCanvasWidth}" Height="{StaticResource klcLogoCanvasHeight}" ClipToBounds="True">
+                <Path Data="{StaticResource klcLogoSlash}" Fill="{DynamicResource KlaBorderBrush}" RenderTransform="{StaticResource klcLogoTransform}" />
+                <Path Data="{StaticResource klcLogoLetters}" Fill="{DynamicResource KlaTextBrush}" RenderTransform="{StaticResource klcLogoTransform}" />
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
 </ResourceDictionary>

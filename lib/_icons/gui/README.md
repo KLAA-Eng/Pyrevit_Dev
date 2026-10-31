@@ -7,7 +7,7 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
 
 - `svg/` contains the original approved SVG sources.
 - [`lib/GUI/Resources/klIcons.xaml`](../../GUI/Resources/klIcons.xaml) is generated framework-native WPF geometry only — one
-  `klicon<Role>` per role plus the KLCode logo (`klcLogo*`) — a leaf with no
+  `klicon<Role>` per role plus the KLCode logo (`klcLogo*`) and its `klcLogo` template — a leaf that defines no
   brushes. Windows need no SVG renderer or added runtime package.
 - `scripts/generate_gui_icons.py` owns semantic role mappings and generation.
   Run it after changing sources; `--check` detects stale generated resources.

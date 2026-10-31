@@ -92,3 +92,17 @@ KLC-Rename. The production probe now compares the template with a direct render
 of klcLogo.svg at 128 x 18. Verification as before: 24 generated keys resolve;
 432 Python tests with the one existing macOS failure; C# source contracts 17 of
 17; smoke project builds. Not rendered.
+
+## The klcLogo template is generated
+
+The generator now also writes the `klcLogo` DataTemplate into `klIcons.xaml`,
+after the resources it references, and the hand-written copy leaves
+`KLCodeSharedPrimitives.xaml`. The template's Viewbox is unsized, so the header's
+`klcLogoWidth` x `klcLogoHeight` slot (128 x 18) is the one place the logo size
+is set. The two fills reference `KlaBorderBrush` and `KlaTextBrush` with
+DynamicResource, because `klIcons.xaml` does not load the palette; they resolve
+from the window, which always has it. The file still defines no brushes, and its
+static references stay inside the file (both tested). Verification: 432 Python
+tests with the one existing macOS failure; C# source contracts 17 of 17; smoke
+project builds. The production probe's pixel comparison at 128 x 18 covers the
+generated template on Windows; not yet run.
