@@ -1,25 +1,26 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Строка поиска -->
+    <!--  Строка поиска  -->
     <system:String x:Key="TooltipToggleRegex">Переключить режим: регулярное / подстроковое выражение</system:String>
 
-    <!-- Кнопки выбора -->
+    <!--  Кнопки выбора  -->
     <system:String x:Key="BtnCheckAll">Выбрать все</system:String>
     <system:String x:Key="BtnUncheckAll">Снять все</system:String>
     <system:String x:Key="BtnToggleAll">Переключить все</system:String>
 
-    <!-- Заголовки столбцов -->
+    <!--  Заголовки столбцов  -->
     <system:String x:Key="ColParameter">Параметр</system:String>
     <system:String x:Key="ColValue">Значение</system:String>
     <system:String x:Key="ColCategory">Категория</system:String>
 
-    <!-- Флажок фильтра категорий -->
+    <!--  Флажок фильтра категорий  -->
     <system:String x:Key="ChkRestrictCategories">Ограничить выбор категориями элементов</system:String>
     <system:String x:Key="TooltipRestrictCategories">Если включено, прямоугольный выбор захватывает только элементы, чья категория соответствует отмеченным параметрам</system:String>
 
-    <!-- Кнопки источника -->
+    <!--  Кнопки источника  -->
     <system:String x:Key="BtnElemParams">Пар. элемента</system:String>
     <system:String x:Key="TooltipElemParams">Выбрать элемент и интерактивно указать параметры для копирования</system:String>
     <system:String x:Key="BtnViewFilters">Фильтры вида</system:String>
@@ -27,7 +28,7 @@
     <system:String x:Key="BtnFilterElem">Фильтр+Элем.</system:String>
     <system:String x:Key="TooltipFilterElem">Считать наиболее распространённое значение параметра фильтра из выбранного элемента</system:String>
 
-    <!-- Кнопки вставки -->
+    <!--  Кнопки вставки  -->
     <system:String x:Key="BtnPasteOne">Вставить 1</system:String>
     <system:String x:Key="TooltipPasteOne">Повторно выбирать один элемент и вставлять отмеченные параметры</system:String>
     <system:String x:Key="BtnPasteBox">Вставить рамкой</system:String>

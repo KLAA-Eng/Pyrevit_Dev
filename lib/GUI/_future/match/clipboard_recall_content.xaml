@@ -1,103 +1,269 @@
-﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Background="{StaticResource header_background}">
-    <!-- Standalone Recall only. The docked panel retains clipboard_content.xaml. -->
+﻿<UserControl
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource header_background}">
+    <!--  Standalone Recall only. The docked panel retains clipboard_content.xaml.  -->
     <UserControl.Resources>
-        <ContentControl x:Key="filterIcon" Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaTextFilterGeometry}"/>
-        <ContentControl x:Key="regexIcon" Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaRegexGeometry}"/>
+        <ContentControl
+            x:Key="filterIcon"
+            Content="{StaticResource KlaTextFilterGeometry}"
+            Style="{StaticResource KlaGuiIcon}" />
+        <ContentControl
+            x:Key="regexIcon"
+            Content="{StaticResource KlaRegexGeometry}"
+            Style="{StaticResource KlaGuiIcon}" />
         <Style x:Key="RecallParameterList" TargetType="ListView">
-            <Setter Property="Background" Value="{StaticResource header_background}"/>
-            <Setter Property="Foreground" Value="{StaticResource text_white}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource border_green_dark}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
-            <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
-            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
-            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="Background" Value="{StaticResource header_background}" />
+            <Setter Property="Foreground" Value="{StaticResource text_white}" />
+            <Setter Property="BorderBrush" Value="{StaticResource border_green_dark}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
+            <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
         </Style>
-        <Style x:Key="RecallParameterRow" TargetType="ListViewItem" BasedOn="{StaticResource KlaFoundationListItem}"/>
+        <Style
+            x:Key="RecallParameterRow"
+            BasedOn="{StaticResource KlaFoundationListItem}"
+            TargetType="ListViewItem" />
         <Style x:Key="RecallColumnHeader" TargetType="GridViewColumnHeader">
-            <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}"/>
-            <Setter Property="Foreground" Value="{StaticResource text_white}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource border_green_dark}"/>
-            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-            <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}"/>
-            <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}"/>
-            <Setter Property="Padding" Value="4"/>
-            <Style.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{StaticResource button_bg_hover}"/></Trigger></Style.Triggers>
+            <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource text_white}" />
+            <Setter Property="BorderBrush" Value="{StaticResource border_green_dark}" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
+            <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
+            <Setter Property="Padding" Value="4" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource button_bg_hover}" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="28"/><RowDefinition Height="8"/>
-            <RowDefinition Height="28"/><RowDefinition Height="8"/>
-            <RowDefinition Height="*"/><RowDefinition Height="8"/>
-            <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
-            <RowDefinition Height="28"/>
+            <RowDefinition Height="28" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="28" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="28" />
         </Grid.RowDefinitions>
         <Grid>
-            <Grid.ColumnDefinitions><ColumnDefinition Width="28"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-            <ToggleButton x:Name="regexToggle_b" Width="28" Style="{StaticResource KlaToggle}" Content="{DynamicResource filterIcon}" Click="toggle_regex" ToolTip="{DynamicResource TooltipToggleRegex}" AutomationProperties.Name="Use regular expression search"/>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="28" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ToggleButton
+                x:Name="regexToggle_b"
+                Width="28"
+                AutomationProperties.Name="Use regular expression search"
+                Click="toggle_regex"
+                Content="{DynamicResource filterIcon}"
+                Style="{StaticResource KlaToggle}"
+                ToolTip="{DynamicResource TooltipToggleRegex}" />
             <Grid Grid.Column="2">
-                <TextBox x:Name="search_tb" Style="{StaticResource KlaFoundationFilter}" Padding="8,0,28,0" VerticalAlignment="Center" TextChanged="search_changed" AutomationProperties.Name="Search recalled parameters"/>
-                <Button x:Name="clrsearch_b" Style="{StaticResource KlaIconButton}" Background="Transparent" Width="24" Height="24" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed" Click="clear_search" AutomationProperties.Name="Clear parameter search">
-                    <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaClearSearchGeometry}"/>
+                <TextBox
+                    x:Name="search_tb"
+                    Padding="8,0,28,0"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="Search recalled parameters"
+                    Style="{StaticResource KlaFoundationFilter}"
+                    TextChanged="search_changed" />
+                <Button
+                    x:Name="clrsearch_b"
+                    Width="24"
+                    Height="24"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="Clear parameter search"
+                    Background="Transparent"
+                    Click="clear_search"
+                    Style="{StaticResource KlaIconButton}"
+                    Visibility="Collapsed">
+                    <ContentControl Content="{StaticResource KlaClearSearchGeometry}" Style="{StaticResource KlaGuiIcon}" />
                 </Button>
             </Grid>
         </Grid>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="{DynamicResource BtnCheckAll}" Style="{StaticResource KlaFoundationButton}" Click="check_all" Margin="0,0,8,0"/>
-            <Button Content="{DynamicResource BtnUncheckAll}" Style="{StaticResource KlaFoundationButton}" Click="uncheck_all" Margin="0,0,8,0"/>
-            <Button Content="{DynamicResource BtnToggleAll}" Style="{StaticResource KlaFoundationButton}" Click="toggle_all"/>
+        <StackPanel
+            Grid.Row="2"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Button
+                Margin="0,0,8,0"
+                Click="check_all"
+                Content="{DynamicResource BtnCheckAll}"
+                Style="{StaticResource KlaFoundationButton}" />
+            <Button
+                Margin="0,0,8,0"
+                Click="uncheck_all"
+                Content="{DynamicResource BtnUncheckAll}"
+                Style="{StaticResource KlaFoundationButton}" />
+            <Button
+                Click="toggle_all"
+                Content="{DynamicResource BtnToggleAll}"
+                Style="{StaticResource KlaFoundationButton}" />
         </StackPanel>
-        <ListView x:Name="paramListView" Grid.Row="4" Style="{StaticResource RecallParameterList}" ItemContainerStyle="{StaticResource RecallParameterRow}" SelectionMode="Single" AutomationProperties.Name="Recalled parameter values">
-            <ListView.View><GridView ColumnHeaderContainerStyle="{StaticResource RecallColumnHeader}">
-                <GridViewColumn Width="32"><GridViewColumn.CellTemplate><DataTemplate>
-                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Style="{StaticResource KlaFoundationCheckBox}" Click="checkbox_click" AutomationProperties.Name="Include recalled parameter"/>
-                </DataTemplate></GridViewColumn.CellTemplate></GridViewColumn>
-                <GridViewColumn Width="132" DisplayMemberBinding="{Binding Name}"><GridViewColumn.Header><TextBlock Text="{DynamicResource ColParameter}"/></GridViewColumn.Header></GridViewColumn>
-                <GridViewColumn Width="160" DisplayMemberBinding="{Binding DisplayValue}"><GridViewColumn.Header><TextBlock Text="{DynamicResource ColValue}"/></GridViewColumn.Header></GridViewColumn>
-                <GridViewColumn x:Name="categoryColumn" Width="100" DisplayMemberBinding="{Binding Category}"><GridViewColumn.Header><TextBlock Text="{DynamicResource ColCategory}"/></GridViewColumn.Header></GridViewColumn>
-            </GridView></ListView.View>
+        <ListView
+            x:Name="paramListView"
+            Grid.Row="4"
+            AutomationProperties.Name="Recalled parameter values"
+            ItemContainerStyle="{StaticResource RecallParameterRow}"
+            SelectionMode="Single"
+            Style="{StaticResource RecallParameterList}">
+            <ListView.View>
+                <GridView ColumnHeaderContainerStyle="{StaticResource RecallColumnHeader}">
+                    <GridViewColumn Width="32">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    AutomationProperties.Name="Include recalled parameter"
+                                    Click="checkbox_click"
+                                    IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                    Style="{StaticResource KlaFoundationCheckBox}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="132" DisplayMemberBinding="{Binding Name}">
+                        <GridViewColumn.Header>
+                            <TextBlock Text="{DynamicResource ColParameter}" />
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                    <GridViewColumn Width="160" DisplayMemberBinding="{Binding DisplayValue}">
+                        <GridViewColumn.Header>
+                            <TextBlock Text="{DynamicResource ColValue}" />
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                    <GridViewColumn
+                        x:Name="categoryColumn"
+                        Width="100"
+                        DisplayMemberBinding="{Binding Category}">
+                        <GridViewColumn.Header>
+                            <TextBlock Text="{DynamicResource ColCategory}" />
+                        </GridViewColumn.Header>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
         </ListView>
-        <CheckBox x:Name="categoryFilterCheck" Grid.Row="6" Content="{DynamicResource ChkRestrictCategories}" Style="{StaticResource KlaFoundationCheckBox}" Margin="0,0,0,8" ToolTip="{DynamicResource TooltipRestrictCategories}"/>
-        <UniformGrid Grid.Row="7" Rows="1" Margin="0,0,0,8">
-            <Button Style="{StaticResource KlaIconTextButton}" Click="load_from_element" ToolTip="{DynamicResource TooltipElemParams}">
+        <CheckBox
+            x:Name="categoryFilterCheck"
+            Grid.Row="6"
+            Margin="0,0,0,8"
+            Content="{DynamicResource ChkRestrictCategories}"
+            Style="{StaticResource KlaFoundationCheckBox}"
+            ToolTip="{DynamicResource TooltipRestrictCategories}" />
+        <UniformGrid
+            Grid.Row="7"
+            Margin="0,0,0,8"
+            Rows="1">
+            <Button
+                Click="load_from_element"
+                Style="{StaticResource KlaIconTextButton}"
+                ToolTip="{DynamicResource TooltipElemParams}">
                 <StackPanel Orientation="Horizontal">
-                    <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaReadElementGeometry}" Margin="0,0,4,0"/>
-                    <TextBlock Text="{DynamicResource BtnElemParams}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" VerticalAlignment="Center"/>
+                    <ContentControl
+                        Margin="0,0,4,0"
+                        Content="{StaticResource KlaReadElementGeometry}"
+                        Style="{StaticResource KlaGuiIcon}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                        Text="{DynamicResource BtnElemParams}" />
                 </StackPanel>
             </Button>
-            <Button x:Name="loadViewFiltersBtn" Style="{StaticResource KlaIconTextButton}" Click="load_from_view_filters" ToolTip="{DynamicResource TooltipViewFilters}">
+            <Button
+                x:Name="loadViewFiltersBtn"
+                Click="load_from_view_filters"
+                Style="{StaticResource KlaIconTextButton}"
+                ToolTip="{DynamicResource TooltipViewFilters}">
                 <StackPanel Orientation="Horizontal">
-                    <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaReadViewFiltersGeometry}" Margin="0,0,4,0"/>
-                    <TextBlock Text="{DynamicResource BtnViewFilters}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" VerticalAlignment="Center"/>
+                    <ContentControl
+                        Margin="0,0,4,0"
+                        Content="{StaticResource KlaReadViewFiltersGeometry}"
+                        Style="{StaticResource KlaGuiIcon}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                        Text="{DynamicResource BtnViewFilters}" />
                 </StackPanel>
             </Button>
-            <Button x:Name="loadFilterElemBtn" Style="{StaticResource KlaIconTextButton}" Click="load_from_filter_and_element" ToolTip="{DynamicResource TooltipFilterElem}">
+            <Button
+                x:Name="loadFilterElemBtn"
+                Click="load_from_filter_and_element"
+                Style="{StaticResource KlaIconTextButton}"
+                ToolTip="{DynamicResource TooltipFilterElem}">
                 <StackPanel Orientation="Horizontal">
-                    <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaFilterElementGeometry}" Margin="0,0,4,0"/>
-                    <TextBlock Text="{DynamicResource BtnFilterElem}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" VerticalAlignment="Center"/>
+                    <ContentControl
+                        Margin="0,0,4,0"
+                        Content="{StaticResource KlaFilterElementGeometry}"
+                        Style="{StaticResource KlaGuiIcon}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                        Text="{DynamicResource BtnFilterElem}" />
                 </StackPanel>
             </Button>
         </UniformGrid>
-        <StackPanel Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="pasteSingleBtn" Style="{StaticResource KlaIconTextButton}" IsEnabled="False" Click="paste_single" ToolTip="{DynamicResource TooltipPasteOne}" Margin="0,0,8,0">
+        <StackPanel
+            Grid.Row="8"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal">
+            <Button
+                x:Name="pasteSingleBtn"
+                Margin="0,0,8,0"
+                Click="paste_single"
+                IsEnabled="False"
+                Style="{StaticResource KlaIconTextButton}"
+                ToolTip="{DynamicResource TooltipPasteOne}">
                 <StackPanel Orientation="Horizontal">
-                    <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaPickElementGeometry}" Margin="0,0,4,0"/>
-                    <TextBlock Text="{DynamicResource BtnPasteOne}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" VerticalAlignment="Center"/>
+                    <ContentControl
+                        Margin="0,0,4,0"
+                        Content="{StaticResource KlaPickElementGeometry}"
+                        Style="{StaticResource KlaGuiIcon}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                        Text="{DynamicResource BtnPasteOne}" />
                 </StackPanel>
             </Button>
-            <Button x:Name="pasteRectBtn" Style="{StaticResource KlaIconTextButton}" IsEnabled="False" Click="paste_rectangle" ToolTip="{DynamicResource TooltipPasteBox}" Margin="0,0,8,0">
+            <Button
+                x:Name="pasteRectBtn"
+                Margin="0,0,8,0"
+                Click="paste_rectangle"
+                IsEnabled="False"
+                Style="{StaticResource KlaIconTextButton}"
+                ToolTip="{DynamicResource TooltipPasteBox}">
                 <StackPanel Orientation="Horizontal">
-                    <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaRectangleSelectionGeometry}" Margin="0,0,4,0"/>
-                    <TextBlock Text="{DynamicResource BtnPasteBox}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" VerticalAlignment="Center"/>
+                    <ContentControl
+                        Margin="0,0,4,0"
+                        Content="{StaticResource KlaRectangleSelectionGeometry}"
+                        Style="{StaticResource KlaGuiIcon}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                        Text="{DynamicResource BtnPasteBox}" />
                 </StackPanel>
             </Button>
-            <Button x:Name="pasteSelBtn" Style="{StaticResource KlaIconTextButton}" IsEnabled="False" Click="paste_selection" ToolTip="{DynamicResource TooltipPasteSel}">
+            <Button
+                x:Name="pasteSelBtn"
+                Click="paste_selection"
+                IsEnabled="False"
+                Style="{StaticResource KlaIconTextButton}"
+                ToolTip="{DynamicResource TooltipPasteSel}">
                 <StackPanel Orientation="Horizontal">
-                    <ContentControl Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaCurrentSelectionGeometry}" Margin="0,0,4,0"/>
-                    <TextBlock Text="{DynamicResource BtnPasteSel}" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" VerticalAlignment="Center"/>
+                    <ContentControl
+                        Margin="0,0,4,0"
+                        Content="{StaticResource KlaCurrentSelectionGeometry}"
+                        Style="{StaticResource KlaGuiIcon}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                        Text="{DynamicResource BtnPasteSel}" />
                 </StackPanel>
             </Button>
         </StackPanel>

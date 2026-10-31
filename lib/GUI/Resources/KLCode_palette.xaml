@@ -1,18 +1,27 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- Role brushes: the names the foundation and components use. Each value is a KL&A brand colour. -->
-    <SolidColorBrush x:Key="KlaWindowBrush" Color="#1A252B" />          <!-- KLCharcoal: window, chrome, fields, lists -->
-    <SolidColorBrush x:Key="KlaTextBrush" Color="#E5E4E2" />            <!-- KLWhite: body text, labels, icons -->
-    <SolidColorBrush x:Key="KlaTextMutedBrush" Color="#B5C2BD" />       <!-- muted text: captions and secondary information -->
-    <SolidColorBrush x:Key="KlaFooterLinkBrush" Color="#407058" />     <!-- original Prototype/Outreach green -->
-    <SolidColorBrush x:Key="KlaFooterVersionBrush" Color="#808080" />  <!-- original footer version gray -->
-    <SolidColorBrush x:Key="KlaTextOnAccentBrush" Color="White" />      <!-- labels on accent fills -->
-    <SolidColorBrush x:Key="KlaAccentBrush" Color="#286048" />          <!-- KLGreen-dark: action and checked fills -->
-    <SolidColorBrush x:Key="KlaAccentHoverBrush" Color="#407058" />     <!-- KLGreen-secondary: hover fills -->
-    <SolidColorBrush x:Key="KlaBorderBrush" Color="#33714F" />          <!-- KLGreen: input and dropdown borders, wordmark slash, scrollbar thumb -->
-    <SolidColorBrush x:Key="KlaBorderStrongBrush" Color="#286048" />    <!-- KLGreen-dark: sections, lists, grid lines -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--  Role brushes: the names the foundation and components use. Each value is a KL&A brand colour.  -->
+    <SolidColorBrush x:Key="KlaWindowBrush" Color="#1A252B" />          
+    <!--  KLCharcoal: window, chrome, fields, lists  -->
+    <SolidColorBrush x:Key="KlaTextBrush" Color="#E5E4E2" />            
+    <!--  KLWhite: body text, labels, icons  -->
+    <SolidColorBrush x:Key="KlaTextMutedBrush" Color="#B5C2BD" />       
+    <!--  muted text: captions and secondary information  -->
+    <SolidColorBrush x:Key="KlaFooterLinkBrush" Color="#407058" />     
+    <!--  original Prototype/Outreach green  -->
+    <SolidColorBrush x:Key="KlaFooterVersionBrush" Color="#808080" />  
+    <!--  original footer version gray  -->
+    <SolidColorBrush x:Key="KlaTextOnAccentBrush" Color="White" />      
+    <!--  labels on accent fills  -->
+    <SolidColorBrush x:Key="KlaAccentBrush" Color="#286048" />          
+    <!--  KLGreen-dark: action and checked fills  -->
+    <SolidColorBrush x:Key="KlaAccentHoverBrush" Color="#407058" />     
+    <!--  KLGreen-secondary: hover fills  -->
+    <SolidColorBrush x:Key="KlaBorderBrush" Color="#33714F" />          
+    <!--  KLGreen: input and dropdown borders, wordmark slash, scrollbar thumb  -->
+    <SolidColorBrush x:Key="KlaBorderStrongBrush" Color="#286048" />    
+    <!--  KLGreen-dark: sections, lists, grid lines  -->
 
-    <!-- Legacy aliases (2019 names). Consumers that still name these resolve to the role brushes above; new XAML uses the role names. -->
+    <!--  Legacy aliases (2019 names). Consumers that still name these resolve to the role brushes above; new XAML uses the role names.  -->
     <SolidColorBrush x:Key="header_background" Color="{Binding Color, Source={StaticResource KlaWindowBrush}}" />
     <SolidColorBrush x:Key="text_white" Color="{Binding Color, Source={StaticResource KlaTextBrush}}" />
     <SolidColorBrush x:Key="text_gray" Color="{Binding Color, Source={StaticResource KlaTextMutedBrush}}" />

@@ -1,43 +1,123 @@
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Select Items" Width="432" Height="576" MinWidth="432" MinHeight="420" WindowStartupLocation="CenterScreen"
-        ResizeMode="CanResizeWithGrip" Style="{StaticResource KlaWindow}">
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Select Items"
+    Width="432"
+    Height="576"
+    MinWidth="432"
+    MinHeight="420"
+    ResizeMode="CanResizeWithGrip"
+    Style="{StaticResource KlaWindow}"
+    WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
-        <Grid x:Name="window_body" Focusable="True" KeyboardNavigation.IsTabStop="False" FocusVisualStyle="{x:Null}">
+        <Grid
+            x:Name="window_body"
+            FocusVisualStyle="{x:Null}"
+            Focusable="True"
+            KeyboardNavigation.IsTabStop="False">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace4}"/>
-                <RowDefinition Height="*"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="Auto"/><RowDefinition x:Name="secondary_gap" Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="{StaticResource KlaControlRow}"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="{StaticResource KlaGridSpace4}" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition x:Name="secondary_gap" Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="{StaticResource KlaControlRow}" />
             </Grid.RowDefinitions>
             <StackPanel>
                 <Grid x:Name="search_row">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaGridSpace16}"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <ContentControl x:Name="search_icon" Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaSearchGeometry}" VerticalAlignment="Center"/>
-                    <TextBox x:Name="filter_text" Grid.Column="2" TextChanged="filter_changed" Style="{StaticResource KlaFilter}" AutomationProperties.Name="Search items"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource KlaGridSpace16}" />
+                        <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ContentControl
+                        x:Name="search_icon"
+                        VerticalAlignment="Center"
+                        Content="{StaticResource KlaSearchGeometry}"
+                        Style="{StaticResource KlaGuiIcon}" />
+                    <TextBox
+                        x:Name="filter_text"
+                        Grid.Column="2"
+                        AutomationProperties.Name="Search items"
+                        Style="{StaticResource KlaFilter}"
+                        TextChanged="filter_changed" />
                 </Grid>
                 <Grid x:Name="group_row" Margin="0,8,0,0">
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaGridSpace16}"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                    <ContentControl x:Name="group_icon" Style="{StaticResource KlaGuiIcon}" Content="{StaticResource KlaGroupGeometry}" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="group_filter" Grid.Column="2" DisplayMemberPath="Label" SelectionChanged="filter_changed" Style="{StaticResource KlaCompactComboBox}" AutomationProperties.Name="Item group"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource KlaGridSpace16}" />
+                        <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ContentControl
+                        x:Name="group_icon"
+                        VerticalAlignment="Center"
+                        Content="{StaticResource KlaGroupGeometry}"
+                        Style="{StaticResource KlaGuiIcon}" />
+                    <ComboBox
+                        x:Name="group_filter"
+                        Grid.Column="2"
+                        AutomationProperties.Name="Item group"
+                        DisplayMemberPath="Label"
+                        SelectionChanged="filter_changed"
+                        Style="{StaticResource KlaCompactComboBox}" />
                 </Grid>
             </StackPanel>
-            <Label x:Name="prompt_label" Grid.Row="2" Target="{Binding ElementName=items_list}" Style="{StaticResource KlaPromptLabel}"/>
-            <ListBox x:Name="items_list" Grid.Row="4" Style="{StaticResource KlaList}" AutomationProperties.Name="Selectable items">
-                <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource KlaDialogListItem}"/></ListBox.ItemContainerStyle>
-                <ListBox.ItemTemplate><DataTemplate>
-                    <CheckBox Content="{Binding}" IsChecked="{Binding IsChecked, Mode=OneWay}" IsEnabled="{Binding CanSelect}" Click="item_checked" Style="{StaticResource KlaDialogCheck}" AutomationProperties.Name="{Binding Label}"/>
-                </DataTemplate></ListBox.ItemTemplate>
+            <Label
+                x:Name="prompt_label"
+                Grid.Row="2"
+                Style="{StaticResource KlaPromptLabel}"
+                Target="{Binding ElementName=items_list}" />
+            <ListBox
+                x:Name="items_list"
+                Grid.Row="4"
+                AutomationProperties.Name="Selectable items"
+                Style="{StaticResource KlaList}">
+                <ListBox.ItemContainerStyle>
+                    <Style BasedOn="{StaticResource KlaDialogListItem}" TargetType="ListBoxItem" />
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox
+                            AutomationProperties.Name="{Binding Label}"
+                            Click="item_checked"
+                            Content="{Binding}"
+                            IsChecked="{Binding IsChecked, Mode=OneWay}"
+                            IsEnabled="{Binding CanSelect}"
+                            Style="{StaticResource KlaDialogCheck}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
             <StackPanel Grid.Row="6">
-                <TextBlock x:Name="validation_text" TextWrapping="Wrap" Foreground="{StaticResource KlaErrorBrush}" Visibility="Collapsed" AutomationProperties.LiveSetting="Polite"/>
-                <StackPanel x:Name="batch_actions" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Select All" Click="check_all" Style="{StaticResource KlaButtonSecondary}" Margin="{StaticResource KlaPairGap}"/>
-                    <Button Content="Select None" Click="check_none" Style="{StaticResource KlaButtonSecondary}"/>
+                <TextBlock
+                    x:Name="validation_text"
+                    AutomationProperties.LiveSetting="Polite"
+                    Foreground="{StaticResource KlaErrorBrush}"
+                    TextWrapping="Wrap"
+                    Visibility="Collapsed" />
+                <StackPanel
+                    x:Name="batch_actions"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Button
+                        Margin="{StaticResource KlaPairGap}"
+                        Click="check_all"
+                        Content="Select All"
+                        Style="{StaticResource KlaButtonSecondary}" />
+                    <Button
+                        Click="check_none"
+                        Content="Select None"
+                        Style="{StaticResource KlaButtonSecondary}" />
                 </StackPanel>
             </StackPanel>
-            <Button x:Name="accept_button" Grid.Row="8" Content="Select" Click="accept_selection" Style="{StaticResource KlaButtonPrimary}"/>
+            <Button
+                x:Name="accept_button"
+                Grid.Row="8"
+                Click="accept_selection"
+                Content="Select"
+                Style="{StaticResource KlaButtonPrimary}" />
         </Grid>
     </ContentControl>
 </Window>

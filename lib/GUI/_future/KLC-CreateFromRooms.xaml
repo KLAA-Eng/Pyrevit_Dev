@@ -1,33 +1,100 @@
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Create From Rooms" Width="400" Height="406" MinWidth="400" MinHeight="406" MaxHeight="406"
-        WindowStartupLocation="CenterScreen" ShowInTaskbar="True"
-        Style="{StaticResource KlaFoundationWindow}">
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Create From Rooms"
+    Width="400"
+    Height="406"
+    MinWidth="400"
+    MinHeight="406"
+    MaxHeight="406"
+    ShowInTaskbar="True"
+    Style="{StaticResource KlaFoundationWindow}"
+    WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
         <ItemsControl x:Name="window_body" Style="{StaticResource KlaFilteredCheckList}">
             <Grid>
-                <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaGridSpace16}"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <Image x:Name="filter_icon" Source="{StaticResource KlaIconSearch}" AutomationProperties.Name="Search" Width="{StaticResource KlaIconSize}" Height="{StaticResource KlaIconSize}" VerticalAlignment="Center" IsHitTestVisible="False"/>
-                <TextBox x:Name="textbox_filter" Grid.Column="2" TextChanged="text_filter_updated" Style="{StaticResource KlaFoundationFilter}" AutomationProperties.Name="Filter available types"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource KlaGridSpace16}" />
+                    <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Image
+                    x:Name="filter_icon"
+                    Width="{StaticResource KlaIconSize}"
+                    Height="{StaticResource KlaIconSize}"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="Search"
+                    IsHitTestVisible="False"
+                    Source="{StaticResource KlaIconSearch}" />
+                <TextBox
+                    x:Name="textbox_filter"
+                    Grid.Column="2"
+                    AutomationProperties.Name="Filter available types"
+                    Style="{StaticResource KlaFoundationFilter}"
+                    TextChanged="text_filter_updated" />
             </Grid>
-            <Label x:Name="text_label" Grid.Row="2" Content="Select Type:" Target="{Binding ElementName=main_ListBox}" Style="{StaticResource KlaFoundationPromptLabel}"/>
-            <ListBox x:Name="main_ListBox" Grid.Row="4" SelectionMode="Single" Style="{StaticResource KlaFoundationList}" AutomationProperties.Name="Available types">
-                <ListBox.ItemTemplate><DataTemplate>
-                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Checked="UIe_ItemChecked" Style="{StaticResource KlaFoundationCheckBox}"/>
-                </DataTemplate></ListBox.ItemTemplate>
+            <Label
+                x:Name="text_label"
+                Grid.Row="2"
+                Content="Select Type:"
+                Style="{StaticResource KlaFoundationPromptLabel}"
+                Target="{Binding ElementName=main_ListBox}" />
+            <ListBox
+                x:Name="main_ListBox"
+                Grid.Row="4"
+                AutomationProperties.Name="Available types"
+                SelectionMode="Single"
+                Style="{StaticResource KlaFoundationList}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox
+                            Checked="UIe_ItemChecked"
+                            Content="{Binding Name}"
+                            IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource KlaFoundationCheckBox}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
             <StackPanel x:Name="UI_stack_region_settings" Grid.Row="6">
-                <Label Content="Additional Settings:" Target="{Binding ElementName=UI_offset}" Style="{StaticResource KlaFoundationPromptLabel}" Margin="0,0,0,8"/>
+                <Label
+                    Margin="0,0,0,8"
+                    Content="Additional Settings:"
+                    Style="{StaticResource KlaFoundationPromptLabel}"
+                    Target="{Binding ElementName=UI_offset}" />
                 <Border Style="{StaticResource KlaSection}">
                     <Grid HorizontalAlignment="Left">
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}"/><ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-                        <Label Content="Offset:" Target="{Binding ElementName=UI_offset}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                        <TextBox x:Name="UI_offset" Grid.Column="1" Text="0" PreviewTextInput="NumberValidationTextBox" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Offset from level in centimeters"/>
-                        <TextBlock Grid.Column="3" Text="cm" Style="{StaticResource KlaInfoText}" VerticalAlignment="Center"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}" />
+                            <ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}" />
+                            <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Content="Offset:"
+                            Style="{StaticResource KlaCompactFieldLabel}"
+                            Target="{Binding ElementName=UI_offset}" />
+                        <TextBox
+                            x:Name="UI_offset"
+                            Grid.Column="1"
+                            AutomationProperties.Name="Offset from level in centimeters"
+                            PreviewTextInput="NumberValidationTextBox"
+                            Style="{StaticResource KlaCompactFieldInput}"
+                            Text="0" />
+                        <TextBlock
+                            Grid.Column="3"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource KlaInfoText}"
+                            Text="cm" />
                     </Grid>
                 </Border>
             </StackPanel>
-            <Button x:Name="button_main" Grid.Row="8" Content="Create" Click="button_run" Style="{StaticResource KlaFoundationMainButton}" IsDefault="True"/>
+            <Button
+                x:Name="button_main"
+                Grid.Row="8"
+                Click="button_run"
+                Content="Create"
+                IsDefault="True"
+                Style="{StaticResource KlaFoundationMainButton}" />
         </ItemsControl>
     </ContentControl>
 </Window>

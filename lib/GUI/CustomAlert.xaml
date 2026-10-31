@@ -1,20 +1,50 @@
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="KL&amp;A Tools" Width="440" Height="200" MinWidth="440" MaxWidth="440" MinHeight="200" MaxHeight="640"
-        WindowStartupLocation="CenterScreen" ShowInTaskbar="True"
-        Style="{StaticResource KlaFoundationWindow}">
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="KL&amp;A Tools"
+    Width="440"
+    Height="200"
+    MinWidth="440"
+    MinHeight="200"
+    MaxWidth="440"
+    MaxHeight="640"
+    ShowInTaskbar="True"
+    Style="{StaticResource KlaFoundationWindow}"
+    WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
         <Grid x:Name="window_body">
             <Border x:Name="alert_banner" Style="{StaticResource KlaBanner}">
                 <Grid>
-                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
                     <Grid>
-                        <Grid.ColumnDefinitions><ColumnDefinition Width="{StaticResource KlaGridSpace16}"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                        <ContentControl x:Name="alert_icon" Content="{StaticResource KlaInformationGeometry}" Style="{StaticResource KlaGuiIcon}" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="alert_heading" Grid.Column="2" Text="Information" Style="{StaticResource KlaSectionHeading}"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{StaticResource KlaGridSpace16}" />
+                            <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ContentControl
+                            x:Name="alert_icon"
+                            VerticalAlignment="Center"
+                            Content="{StaticResource KlaInformationGeometry}"
+                            Style="{StaticResource KlaGuiIcon}" />
+                        <TextBlock
+                            x:Name="alert_heading"
+                            Grid.Column="2"
+                            Style="{StaticResource KlaSectionHeading}"
+                            Text="Information" />
                     </Grid>
-                    <ScrollViewer x:Name="alert_scroll" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="True" AutomationProperties.Name="Alert message">
-                        <TextBlock x:Name="message_text" Style="{StaticResource KlaInfoText}"/>
+                    <ScrollViewer
+                        x:Name="alert_scroll"
+                        Grid.Row="2"
+                        AutomationProperties.Name="Alert message"
+                        Focusable="True"
+                        HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Auto">
+                        <TextBlock x:Name="message_text" Style="{StaticResource KlaInfoText}" />
                     </ScrollViewer>
                 </Grid>
             </Border>

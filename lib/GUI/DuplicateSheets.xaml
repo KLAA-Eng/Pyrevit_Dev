@@ -1,104 +1,332 @@
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Duplicate Sheets" Width="1050" Height="688"
-        WindowStartupLocation="CenterScreen" ShowInTaskbar="False"
-        Style="{StaticResource KlaFoundationWindow}">
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Duplicate Sheets"
+    Width="1050"
+    Height="688"
+    ShowInTaskbar="False"
+    Style="{StaticResource KlaFoundationWindow}"
+    WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/>
-                <RowDefinition Height="Auto"/><RowDefinition Height="*" MinHeight="8"/>
-                <RowDefinition Height="{StaticResource KlaControlRow}"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" MinHeight="8" />
+                <RowDefinition Height="{StaticResource KlaControlRow}" />
             </Grid.RowDefinitions>
-            <Label Content="Naming" Style="{StaticResource KlaFoundationPromptLabel}"/>
+            <Label Content="Naming" Style="{StaticResource KlaFoundationPromptLabel}" />
             <Border Grid.Row="2" Style="{StaticResource KlaSection}">
                 <Grid>
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
-                        <Label Content="View Name" Style="{StaticResource KlaFieldLabel}" Margin="0,0,0,8"/>
+                        <Label
+                            Margin="0,0,0,8"
+                            Content="View Name"
+                            Style="{StaticResource KlaFieldLabel}" />
                         <ItemsControl Style="{StaticResource KlaFieldRows}">
-                            <Label Grid.Row="0" Content="Find:" Target="{Binding ElementName=UI_view_find}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_view_find" Grid.Row="0" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="View name find"/>
-                            <Label Grid.Row="2" Content="Replace:" Target="{Binding ElementName=UI_view_replace}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_view_replace" Grid.Row="2" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="View name replace"/>
-                            <Label Grid.Row="4" Content="Prefix:" Target="{Binding ElementName=UI_view_prefix}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_view_prefix" Grid.Row="4" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="View name prefix"/>
-                            <Label Grid.Row="6" Content="Suffix:" Target="{Binding ElementName=UI_view_suffix}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_view_suffix" Grid.Row="6" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="View name suffix"/>
+                            <Label
+                                Grid.Row="0"
+                                Content="Find:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_view_find}" />
+                            <TextBox
+                                x:Name="UI_view_find"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                AutomationProperties.Name="View name find"
+                                Style="{StaticResource KlaCompactFieldInput}" />
+                            <Label
+                                Grid.Row="2"
+                                Content="Replace:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_view_replace}" />
+                            <TextBox
+                                x:Name="UI_view_replace"
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                AutomationProperties.Name="View name replace"
+                                Style="{StaticResource KlaCompactFieldInput}" />
+                            <Label
+                                Grid.Row="4"
+                                Content="Prefix:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_view_prefix}" />
+                            <TextBox
+                                x:Name="UI_view_prefix"
+                                Grid.Row="4"
+                                Grid.Column="1"
+                                AutomationProperties.Name="View name prefix"
+                                Style="{StaticResource KlaCompactFieldInput}" />
+                            <Label
+                                Grid.Row="6"
+                                Content="Suffix:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_view_suffix}" />
+                            <TextBox
+                                x:Name="UI_view_suffix"
+                                Grid.Row="6"
+                                Grid.Column="1"
+                                AutomationProperties.Name="View name suffix"
+                                Style="{StaticResource KlaCompactFieldInput}" />
                         </ItemsControl>
                     </StackPanel>
                     <StackPanel Grid.Column="2">
-                        <Label Content="Sheet Number" Style="{StaticResource KlaFieldLabel}" Margin="0,0,0,8"/>
+                        <Label
+                            Margin="0,0,0,8"
+                            Content="Sheet Number"
+                            Style="{StaticResource KlaFieldLabel}" />
                         <ItemsControl Style="{StaticResource KlaFieldRows}">
-                            <Label Grid.Row="0" Content="Find:" Target="{Binding ElementName=UI_sheet_number_find}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_sheet_number_find" Grid.Row="0" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet number find"/>
-                            <Label Grid.Row="2" Content="Replace:" Target="{Binding ElementName=UI_sheet_number_replace}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_sheet_number_replace" Grid.Row="2" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet number replace"/>
-                            <Label Grid.Row="4" Content="Prefix:" Target="{Binding ElementName=UI_sheet_number_prefix}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_sheet_number_prefix" Grid.Row="4" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet number prefix"/>
-                            <Label Grid.Row="6" Content="Suffix:" Target="{Binding ElementName=UI_sheet_number_suffix}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_sheet_number_suffix" Grid.Row="6" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet number suffix"/>
+                            <Label
+                                Grid.Row="0"
+                                Content="Find:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_sheet_number_find}" />
+                            <TextBox
+                                x:Name="UI_sheet_number_find"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                AutomationProperties.Name="Sheet number find"
+                                Style="{StaticResource KlaCompactFieldInput}" />
+                            <Label
+                                Grid.Row="2"
+                                Content="Replace:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_sheet_number_replace}" />
+                            <TextBox
+                                x:Name="UI_sheet_number_replace"
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                AutomationProperties.Name="Sheet number replace"
+                                Style="{StaticResource KlaCompactFieldInput}" />
+                            <Label
+                                Grid.Row="4"
+                                Content="Prefix:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_sheet_number_prefix}" />
+                            <TextBox
+                                x:Name="UI_sheet_number_prefix"
+                                Grid.Row="4"
+                                Grid.Column="1"
+                                AutomationProperties.Name="Sheet number prefix"
+                                Style="{StaticResource KlaCompactFieldInput}" />
+                            <Label
+                                Grid.Row="6"
+                                Content="Suffix:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_sheet_number_suffix}" />
+                            <TextBox
+                                x:Name="UI_sheet_number_suffix"
+                                Grid.Row="6"
+                                Grid.Column="1"
+                                AutomationProperties.Name="Sheet number suffix"
+                                Style="{StaticResource KlaCompactFieldInput}" />
                         </ItemsControl>
                     </StackPanel>
                     <StackPanel Grid.Column="4">
-                        <Label Content="Sheet Name" Style="{StaticResource KlaFieldLabel}" Margin="0,0,0,8"/>
+                        <Label
+                            Margin="0,0,0,8"
+                            Content="Sheet Name"
+                            Style="{StaticResource KlaFieldLabel}" />
                         <ItemsControl Style="{StaticResource KlaFieldRows}">
-                            <Label Grid.Row="0" Content="Find:" Target="{Binding ElementName=UI_sheet_name_find}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_sheet_name_find" Grid.Row="0" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet name find"/>
-                            <Label Grid.Row="2" Content="Replace:" Target="{Binding ElementName=UI_sheet_name_replace}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_sheet_name_replace" Grid.Row="2" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet name replace"/>
-                            <Label Grid.Row="4" Content="Prefix:" Target="{Binding ElementName=UI_sheet_name_prefix}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_sheet_name_prefix" Grid.Row="4" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet name prefix"/>
-                            <Label Grid.Row="6" Content="Suffix:" Target="{Binding ElementName=UI_sheet_name_suffix}" Style="{StaticResource KlaCompactFieldLabel}"/>
-                            <TextBox x:Name="UI_sheet_name_suffix" Grid.Row="6" Grid.Column="1" Style="{StaticResource KlaCompactFieldInput}" AutomationProperties.Name="Sheet name suffix"/>
+                            <Label
+                                Grid.Row="0"
+                                Content="Find:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_sheet_name_find}" />
+                            <TextBox
+                                x:Name="UI_sheet_name_find"
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                AutomationProperties.Name="Sheet name find"
+                                Style="{StaticResource KlaCompactFieldInput}" />
+                            <Label
+                                Grid.Row="2"
+                                Content="Replace:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_sheet_name_replace}" />
+                            <TextBox
+                                x:Name="UI_sheet_name_replace"
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                AutomationProperties.Name="Sheet name replace"
+                                Style="{StaticResource KlaCompactFieldInput}" />
+                            <Label
+                                Grid.Row="4"
+                                Content="Prefix:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_sheet_name_prefix}" />
+                            <TextBox
+                                x:Name="UI_sheet_name_prefix"
+                                Grid.Row="4"
+                                Grid.Column="1"
+                                AutomationProperties.Name="Sheet name prefix"
+                                Style="{StaticResource KlaCompactFieldInput}" />
+                            <Label
+                                Grid.Row="6"
+                                Content="Suffix:"
+                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Target="{Binding ElementName=UI_sheet_name_suffix}" />
+                            <TextBox
+                                x:Name="UI_sheet_name_suffix"
+                                Grid.Row="6"
+                                Grid.Column="1"
+                                AutomationProperties.Name="Sheet name suffix"
+                                Style="{StaticResource KlaCompactFieldInput}" />
                         </ItemsControl>
                     </StackPanel>
                 </Grid>
             </Border>
-            <Label Grid.Row="4" Content="Include Elements" Style="{StaticResource KlaFoundationPromptLabel}"/>
+            <Label
+                Grid.Row="4"
+                Content="Include Elements"
+                Style="{StaticResource KlaFoundationPromptLabel}" />
             <Border Grid.Row="6" Style="{StaticResource KlaSection}">
-                <UniformGrid Rows="2" Columns="6">
-                    <CheckBox x:Name="UI_checkbox_views" Content="Views" IsChecked="True" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
-                    <CheckBox x:Name="UI_checkbox_legends" Content="Legends" IsChecked="True" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
-                    <CheckBox x:Name="UI_checkbox_schedules" Content="Schedules" IsChecked="True" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
-                    <CheckBox x:Name="UI_checkbox_images" Content="Images" IsChecked="True" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
-                    <CheckBox x:Name="UI_checkbox_lines" Content="Lines" IsChecked="True" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
-                    <CheckBox x:Name="UI_checkbox_text" Content="Text" IsChecked="True" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
-                    <CheckBox x:Name="UI_checkbox_clouds" Content="Clouds" IsChecked="False" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
-                    <CheckBox x:Name="UI_checkbox_dwgs" Content="DWGs" IsChecked="False" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
-                    <CheckBox x:Name="UI_checkbox_symbols" Content="Symbols" IsChecked="False" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
-                    <CheckBox x:Name="UI_checkbox_dimensions" Content="Dimensions" IsChecked="False" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
-                    <CheckBox x:Name="UI_checkbox_additional_revisions" Content="Additional Revisions" IsChecked="False" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
+                <UniformGrid Columns="6" Rows="2">
+                    <CheckBox
+                        x:Name="UI_checkbox_views"
+                        MinHeight="{StaticResource KlaCompactHeight}"
+                        Content="Views"
+                        IsChecked="True"
+                        Style="{StaticResource KlaFoundationCheckBox}" />
+                    <CheckBox
+                        x:Name="UI_checkbox_legends"
+                        MinHeight="{StaticResource KlaCompactHeight}"
+                        Content="Legends"
+                        IsChecked="True"
+                        Style="{StaticResource KlaFoundationCheckBox}" />
+                    <CheckBox
+                        x:Name="UI_checkbox_schedules"
+                        MinHeight="{StaticResource KlaCompactHeight}"
+                        Content="Schedules"
+                        IsChecked="True"
+                        Style="{StaticResource KlaFoundationCheckBox}" />
+                    <CheckBox
+                        x:Name="UI_checkbox_images"
+                        MinHeight="{StaticResource KlaCompactHeight}"
+                        Content="Images"
+                        IsChecked="True"
+                        Style="{StaticResource KlaFoundationCheckBox}" />
+                    <CheckBox
+                        x:Name="UI_checkbox_lines"
+                        MinHeight="{StaticResource KlaCompactHeight}"
+                        Content="Lines"
+                        IsChecked="True"
+                        Style="{StaticResource KlaFoundationCheckBox}" />
+                    <CheckBox
+                        x:Name="UI_checkbox_text"
+                        MinHeight="{StaticResource KlaCompactHeight}"
+                        Content="Text"
+                        IsChecked="True"
+                        Style="{StaticResource KlaFoundationCheckBox}" />
+                    <CheckBox
+                        x:Name="UI_checkbox_clouds"
+                        MinHeight="{StaticResource KlaCompactHeight}"
+                        Content="Clouds"
+                        IsChecked="False"
+                        Style="{StaticResource KlaFoundationCheckBox}" />
+                    <CheckBox
+                        x:Name="UI_checkbox_dwgs"
+                        MinHeight="{StaticResource KlaCompactHeight}"
+                        Content="DWGs"
+                        IsChecked="False"
+                        Style="{StaticResource KlaFoundationCheckBox}" />
+                    <CheckBox
+                        x:Name="UI_checkbox_symbols"
+                        MinHeight="{StaticResource KlaCompactHeight}"
+                        Content="Symbols"
+                        IsChecked="False"
+                        Style="{StaticResource KlaFoundationCheckBox}" />
+                    <CheckBox
+                        x:Name="UI_checkbox_dimensions"
+                        MinHeight="{StaticResource KlaCompactHeight}"
+                        Content="Dimensions"
+                        IsChecked="False"
+                        Style="{StaticResource KlaFoundationCheckBox}" />
+                    <CheckBox
+                        x:Name="UI_checkbox_additional_revisions"
+                        MinHeight="{StaticResource KlaCompactHeight}"
+                        Content="Additional Revisions"
+                        IsChecked="False"
+                        Style="{StaticResource KlaFoundationCheckBox}" />
                 </UniformGrid>
             </Border>
             <Grid Grid.Row="8">
-                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="{StaticResource KlaGridSpace8}"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
                 <Grid>
-                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                    <Label Content="Use Existing [True] / Duplicate [False]" Style="{StaticResource KlaFoundationPromptLabel}"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Label Content="Use Existing [True] / Duplicate [False]" Style="{StaticResource KlaFoundationPromptLabel}" />
                     <Border Grid.Row="2" Style="{StaticResource KlaSection}">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <CheckBox x:Name="UI_checkbox_use_existing_legend" Content="Legends" IsChecked="True" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
-                            <CheckBox x:Name="UI_checkbox_use_existing_schedules" Content="Schedules" IsChecked="True" Style="{StaticResource KlaFoundationCheckBox}" MinHeight="{StaticResource KlaCompactHeight}"/>
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <CheckBox
+                                x:Name="UI_checkbox_use_existing_legend"
+                                MinHeight="{StaticResource KlaCompactHeight}"
+                                Content="Legends"
+                                IsChecked="True"
+                                Style="{StaticResource KlaFoundationCheckBox}" />
+                            <CheckBox
+                                x:Name="UI_checkbox_use_existing_schedules"
+                                MinHeight="{StaticResource KlaCompactHeight}"
+                                Content="Schedules"
+                                IsChecked="True"
+                                Style="{StaticResource KlaFoundationCheckBox}" />
                         </StackPanel>
                     </Border>
                 </Grid>
                 <Grid Grid.Column="2">
-                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="{StaticResource KlaGridSpace8}"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                    <Label Content="View Duplicate Options" Style="{StaticResource KlaFoundationPromptLabel}"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label Content="View Duplicate Options" Style="{StaticResource KlaFoundationPromptLabel}" />
                     <Border Grid.Row="2" Style="{StaticResource KlaSection}">
-                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                            <RadioButton Content="Duplicate" Checked="radiobutton_duplicate_option" IsChecked="True" Style="{StaticResource KlaRadioButton}"/>
-                            <RadioButton Content="Duplicate detailing" Checked="radiobutton_duplicate_option" Style="{StaticResource KlaRadioButton}"/>
-                            <RadioButton Content="Duplicate Dependent" Checked="radiobutton_duplicate_option" Style="{StaticResource KlaRadioButton}"/>
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <RadioButton
+                                Checked="radiobutton_duplicate_option"
+                                Content="Duplicate"
+                                IsChecked="True"
+                                Style="{StaticResource KlaRadioButton}" />
+                            <RadioButton
+                                Checked="radiobutton_duplicate_option"
+                                Content="Duplicate detailing"
+                                Style="{StaticResource KlaRadioButton}" />
+                            <RadioButton
+                                Checked="radiobutton_duplicate_option"
+                                Content="Duplicate Dependent"
+                                Style="{StaticResource KlaRadioButton}" />
                         </StackPanel>
                     </Border>
                 </Grid>
             </Grid>
-            <Button x:Name="primary_action" Grid.Row="10" Content="Duplicate Selected Sheets" Click="button_run" Style="{StaticResource KlaFoundationMainButton}" IsDefault="True"/>
+            <Button
+                x:Name="primary_action"
+                Grid.Row="10"
+                Click="button_run"
+                Content="Duplicate Selected Sheets"
+                IsDefault="True"
+                Style="{StaticResource KlaFoundationMainButton}" />
         </Grid>
     </ContentControl>
 </Window>

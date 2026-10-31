@@ -1,80 +1,170 @@
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Message" Width="560" Height="300" MinWidth="480" MinHeight="240" MaxHeight="640" WindowStartupLocation="CenterScreen"
-        ResizeMode="CanResizeWithGrip" Style="{StaticResource KlaWindow}">
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Message"
+    Width="560"
+    Height="300"
+    MinWidth="480"
+    MinHeight="240"
+    MaxHeight="640"
+    ResizeMode="CanResizeWithGrip"
+    Style="{StaticResource KlaWindow}"
+    WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <!-- Message-only presentation keeps other consumers of the shared
-             heading, severity geometries and readout styles unchanged. -->
+        <!--
+            Message-only presentation keeps other consumers of the shared
+            heading, severity geometries and readout styles unchanged.
+        -->
         <Style x:Key="MessageDetailsToggle" TargetType="ToggleButton">
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Expander}}"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ToggleButton">
-                <Border Background="Transparent">
-                    <StackPanel Orientation="Horizontal">
-                        <ContentControl x:Name="DetailsChevron" Style="{StaticResource KlaGuiIcon}"
-                                        Content="{StaticResource KlaChevronRightGeometry}" Margin="0,0,4,0"
-                                        Foreground="{TemplateBinding Foreground}"/>
-                        <ContentPresenter VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Border>
-                <ControlTemplate.Triggers>
-                    <Trigger Property="IsChecked" Value="True">
-                        <Setter TargetName="DetailsChevron" Property="Content" Value="{StaticResource KlaChevronDownGeometry}"/>
-                    </Trigger>
-                    <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
-                </ControlTemplate.Triggers>
-            </ControlTemplate></Setter.Value></Setter>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Expander}}" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border Background="Transparent">
+                            <StackPanel Orientation="Horizontal">
+                                <ContentControl
+                                    x:Name="DetailsChevron"
+                                    Margin="0,0,4,0"
+                                    Content="{StaticResource KlaChevronRightGeometry}"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    Style="{StaticResource KlaGuiIcon}" />
+                                <ContentPresenter VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="DetailsChevron" Property="Content" Value="{StaticResource KlaChevronDownGeometry}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
-        <Style x:Key="MessageDetailsReadout" TargetType="TextBox" BasedOn="{StaticResource KlaMultilineReadout}">
-            <!-- The native TextBoxView reserves two horizontal units; ten
-                 plus that inset and the hairline matches the body at 13. -->
-            <Setter Property="Padding" Value="10,8"/>
-            <!-- TextBoxView already consumes Padding. Applying it again as the
-                 content-host margin shifts the actual first character. -->
-            <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TextBox">
-                <Border x:Name="InputBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{StaticResource KlaRadiusControl}">
-                    <ScrollViewer x:Name="PART_ContentHost"/>
-                </Border>
-                <ControlTemplate.Triggers>
-                    <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="InputBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}"/></Trigger>
-                    <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}"/></Trigger>
-                </ControlTemplate.Triggers>
-            </ControlTemplate></Setter.Value></Setter>
+        <Style
+            x:Key="MessageDetailsReadout"
+            BasedOn="{StaticResource KlaMultilineReadout}"
+            TargetType="TextBox">
+            <!--
+                The native TextBoxView reserves two horizontal units; ten
+                plus that inset and the hairline matches the body at 13.
+            -->
+            <Setter Property="Padding" Value="10,8" />
+            <!--
+                TextBoxView already consumes Padding. Applying it again as the
+                content-host margin shifts the actual first character.
+            -->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border
+                            x:Name="InputBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{StaticResource KlaRadiusControl}">
+                            <ScrollViewer x:Name="PART_ContentHost" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="InputBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
         <Grid x:Name="window_body">
-            <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Border x:Name="message_banner" Style="{StaticResource KlaBanner}">
                 <Grid>
-                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <ContentControl x:Name="message_icon" Style="{StaticResource KlaGuiIcon}" Width="32" Height="32" Margin="0,0,8,0"/>
-                        <TextBlock x:Name="message_heading" Style="{StaticResource KlaSectionHeading}" FontSize="22" VerticalAlignment="Center"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                        <ContentControl
+                            x:Name="message_icon"
+                            Width="32"
+                            Height="32"
+                            Margin="0,0,8,0"
+                            Style="{StaticResource KlaGuiIcon}" />
+                        <TextBlock
+                            x:Name="message_heading"
+                            VerticalAlignment="Center"
+                            FontSize="22"
+                            Style="{StaticResource KlaSectionHeading}" />
                     </StackPanel>
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="True" AutomationProperties.Name="Message content">
-                        <TextBlock x:Name="message_body" Style="{StaticResource KlaInfoText}" TextWrapping="Wrap"/>
+                    <ScrollViewer
+                        Grid.Row="1"
+                        AutomationProperties.Name="Message content"
+                        Focusable="True"
+                        HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Auto">
+                        <TextBlock
+                            x:Name="message_body"
+                            Style="{StaticResource KlaInfoText}"
+                            TextWrapping="Wrap" />
                     </ScrollViewer>
                 </Grid>
             </Border>
-            <Expander x:Name="message_expander" Grid.Row="1" Header="Details" IsExpanded="False" Foreground="{Binding Foreground, ElementName=message_body}" Margin="0,8,0,0" Expanded="details_changed" Collapsed="details_changed">
-                <Expander.Template><ControlTemplate TargetType="Expander">
-                    <StackPanel>
-                        <ToggleButton x:Name="DetailsToggle" Style="{StaticResource MessageDetailsToggle}" Content="{TemplateBinding Header}"
-                                      IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                                      AutomationProperties.Name="Details"/>
-                        <ContentPresenter x:Name="DetailsContent" Visibility="Collapsed"/>
-                    </StackPanel>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsExpanded" Value="True"><Setter TargetName="DetailsContent" Property="Visibility" Value="Visible"/></Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate></Expander.Template>
-                <TextBox x:Name="message_details" Style="{StaticResource MessageDetailsReadout}" Foreground="{Binding Foreground, ElementName=message_body}" Height="128" Margin="0,8,0,0" AutomationProperties.Name="Detailed message"/>
+            <Expander
+                x:Name="message_expander"
+                Grid.Row="1"
+                Margin="0,8,0,0"
+                Collapsed="details_changed"
+                Expanded="details_changed"
+                Foreground="{Binding Foreground, ElementName=message_body}"
+                Header="Details"
+                IsExpanded="False">
+                <Expander.Template>
+                    <ControlTemplate TargetType="Expander">
+                        <StackPanel>
+                            <ToggleButton
+                                x:Name="DetailsToggle"
+                                AutomationProperties.Name="Details"
+                                Content="{TemplateBinding Header}"
+                                IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                Style="{StaticResource MessageDetailsToggle}" />
+                            <ContentPresenter x:Name="DetailsContent" Visibility="Collapsed" />
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="True">
+                                <Setter TargetName="DetailsContent" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Expander.Template>
+                <TextBox
+                    x:Name="message_details"
+                    Height="128"
+                    Margin="0,8,0,0"
+                    AutomationProperties.Name="Detailed message"
+                    Foreground="{Binding Foreground, ElementName=message_body}"
+                    Style="{StaticResource MessageDetailsReadout}" />
             </Expander>
-            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="{StaticResource KlaActionTopGap}">
-                <Button x:Name="action_one" Click="accept_message" Style="{StaticResource KlaButton}"/>
+            <StackPanel
+                Grid.Row="2"
+                Margin="{StaticResource KlaActionTopGap}"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal">
+                <Button
+                    x:Name="action_one"
+                    Click="accept_message"
+                    Style="{StaticResource KlaButton}" />
             </StackPanel>
         </Grid>
     </ContentControl>

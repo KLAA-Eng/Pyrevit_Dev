@@ -9,30 +9,49 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Border x:Name="rectangle" Background="{StaticResource KlaBorderBrush}" Height="{TemplateBinding Height}" SnapsToDevicePixels="True" Width="{TemplateBinding Width}" CornerRadius="8" />
+                    <Border
+                        x:Name="rectangle"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        Background="{StaticResource KlaBorderBrush}"
+                        CornerRadius="8"
+                        SnapsToDevicePixels="True" />
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="true">
-                            <Setter Property="Background" TargetName="rectangle" Value="{StaticResource KlaBorderBrush}" />
+                            <Setter TargetName="rectangle" Property="Background" Value="{StaticResource KlaBorderBrush}" />
                         </Trigger>
                         <Trigger Property="IsDragging" Value="true">
-                            <Setter Property="Background" TargetName="rectangle" Value="{StaticResource KlaBorderBrush}" />
+                            <Setter TargetName="rectangle" Property="Background" Value="{StaticResource KlaBorderBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    <!-- Footer links retain the original green and underline; hover/focus is supplied by the foundation link style. -->
+    <!--  Footer links retain the original green and underline; hover/focus is supplied by the foundation link style.  -->
     <Style x:Key="KLCodeFooterLink" TargetType="Hyperlink">
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="Foreground" Value="{StaticResource KlaFooterLinkBrush}" />
     </Style>
-    <!-- The wordmark geometry is generated from lib/_logos/KLCode_text_1024x256px.svg (KLCodeWordmark.xaml); the fills are palette roles. -->
+    <!--  The wordmark geometry is generated from lib/_logos/KLCode_text_1024x256px.svg (KLCodeWordmark.xaml); the fills are palette roles.  -->
     <DataTemplate x:Key="KLCodeWordmark">
-        <Viewbox Width="70" Height="12" Stretch="Uniform" SnapsToDevicePixels="True">
-            <Canvas Width="{StaticResource KlaWordmarkCanvasWidth}" Height="{StaticResource KlaWordmarkCanvasHeight}" ClipToBounds="True">
-                <Path Fill="{StaticResource KlaBorderBrush}" Data="{StaticResource KlaWordmarkSlashGeometry}" RenderTransform="{StaticResource KlaWordmarkOrigin}" />
-                <Path Fill="{StaticResource KlaTextBrush}" Data="{StaticResource KlaWordmarkLettersGeometry}" RenderTransform="{StaticResource KlaWordmarkOrigin}" />
+        <Viewbox
+            Width="70"
+            Height="12"
+            SnapsToDevicePixels="True"
+            Stretch="Uniform">
+            <Canvas
+                Width="{StaticResource KlaWordmarkCanvasWidth}"
+                Height="{StaticResource KlaWordmarkCanvasHeight}"
+                ClipToBounds="True">
+                <Path
+                    Data="{StaticResource KlaWordmarkSlashGeometry}"
+                    Fill="{StaticResource KlaBorderBrush}"
+                    RenderTransform="{StaticResource KlaWordmarkOrigin}" />
+                <Path
+                    Data="{StaticResource KlaWordmarkLettersGeometry}"
+                    Fill="{StaticResource KlaTextBrush}"
+                    RenderTransform="{StaticResource KlaWordmarkOrigin}" />
             </Canvas>
         </Viewbox>
     </DataTemplate>
@@ -45,12 +64,19 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ScrollBar}">
-                    <!-- Vertical: the Track runs bottom-to-top, so it is reversed. -->
+                    <!--  Vertical: the Track runs bottom-to-top, so it is reversed.  -->
                     <Grid x:Name="Bg" SnapsToDevicePixels="true">
-                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="10" />
-                        <Track x:Name="PART_Track" IsDirectionReversed="true" IsEnabled="{TemplateBinding IsMouseOver}">
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="10" />
+                        <Track
+                            x:Name="PART_Track"
+                            IsDirectionReversed="true"
+                            IsEnabled="{TemplateBinding IsMouseOver}">
                             <Track.Thumb>
-                                <Thumb Style="{StaticResource ScrollBarThumbVertical}" Margin="2" />
+                                <Thumb Margin="2" Style="{StaticResource ScrollBarThumbVertical}" />
                             </Track.Thumb>
                         </Track>
                     </Grid>
@@ -58,16 +84,23 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <!-- Horizontal bars (KlaDataGrid, Recall's list) share the look; the Track runs left-to-right, so it is not reversed. -->
+            <!--  Horizontal bars (KlaDataGrid, Recall's list) share the look; the Track runs left-to-right, so it is not reversed.  -->
             <Trigger Property="Orientation" Value="Horizontal">
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ScrollBar}">
                             <Grid x:Name="Bg" SnapsToDevicePixels="true">
-                                <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="10" />
-                                <Track x:Name="PART_Track" IsDirectionReversed="false" IsEnabled="{TemplateBinding IsMouseOver}">
+                                <Border
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="10" />
+                                <Track
+                                    x:Name="PART_Track"
+                                    IsDirectionReversed="false"
+                                    IsEnabled="{TemplateBinding IsMouseOver}">
                                     <Track.Thumb>
-                                        <Thumb Style="{StaticResource ScrollBarThumbVertical}" Margin="2" />
+                                        <Thumb Margin="2" Style="{StaticResource ScrollBarThumbVertical}" />
                                     </Track.Thumb>
                                 </Track>
                             </Grid>
