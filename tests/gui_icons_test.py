@@ -33,39 +33,20 @@ class GuiIconTests(unittest.TestCase):
         self.assertEqual({'klgeo' + role for role in icons.ROLES}, {node.attrib.get(X + 'Key') for node in dictionary})
         self.assertNotIn('StaticResource', icons.generate_icons())
 
-    def test_foundation_block_draws_every_role_with_the_token_pen_and_text_brush(self):
-        foundation = icons.FOUNDATION.read_text(encoding='utf-8')
-        self.assertEqual(foundation, icons.apply_foundation_block(foundation, icons.generate_images()))
-        block = ET.fromstring('<ResourceDictionary xmlns="%s" xmlns:x="%s">%s</ResourceDictionary>' % (
-            icons.WPF, icons.XAML, icons.generate_images().split('\n', 1)[1].rsplit('\n', 2)[0]))
-        images = block.findall(P + 'DrawingImage')
-        self.assertEqual({'klicon' + role for role in icons.ROLES}, {image.attrib.get(X + 'Key') for image in images})
-        for image in images:
-            drawing = image.find('.//' + P + 'GeometryDrawing')
-            self.assertEqual('Transparent', drawing.attrib['Brush'])
-            self.assertEqual('0,0,24,24', drawing.find('.//' + P + 'RectangleGeometry').attrib['Rect'])
-            for part in image.findall('.//' + P + 'GeometryDrawing')[1:]:
-                self.assertEqual('{StaticResource KlaGuiIconPen}', part.attrib['Pen'])
-                self.assertIn(part.attrib.get('Brush', '{StaticResource KlaTextBrush}'), ('{StaticResource KlaTextBrush}',))
-        # Parsed, not matched as text: the hand-written part of the foundation may be reformatted.
+    def test_geometry_is_the_only_icon_form(self):
+        foundation_path = ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeFoundation.xaml'
+        foundation = foundation_path.read_text(encoding='utf-8')
+        # Parsed, not matched as text: the foundation may be reformatted.
         shell = ET.fromstring(foundation)
-        pens = [node for node in shell.iter(P + 'Pen') if node.attrib.get(X + 'Key') == 'KlaGuiIconPen']
-        self.assertEqual(1, len(pens))
-        self.assertEqual('{StaticResource KlaTextBrush}', pens[0].attrib.get('Brush'))
-        self.assertEqual('{StaticResource KlaIconStroke}', pens[0].attrib.get('Thickness'))
+        self.assertEqual([], list(shell.iter(P + 'DrawingImage')), 'no generated ImageSources')
+        self.assertEqual([], [node for node in shell.iter(P + 'Pen') if node.attrib.get(X + 'Key') == 'KlaGuiIconPen'])
+        self.assertNotIn('generated-icons', foundation)
+        self.assertIn('KlaGuiIcon', {node.attrib.get(X + 'Key') for node in shell.iter(P + 'Style')})
         merged = [node.attrib.get('Source') for node in shell.iter(P + 'ResourceDictionary')]
         self.assertIn('../../_icons/gui/KLCodeIcons.xaml', merged)
         tokens = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeFoundationTokens.xaml').read_text(encoding='utf-8')
         self.assertNotIn('KLCodeIcons.xaml', tokens, 'icons are merged by the foundation, not by the tokens')
-
-    def test_foundation_block_is_repaired_after_a_formatter_pads_or_rewraps_its_markers(self):
-        foundation = icons.FOUNDATION.read_text(encoding='utf-8')
-        reformatted = foundation.replace(icons.END, '    <!--  generated-icons:end  -->').replace(
-            icons.BEGIN, '    <!--\n        generated-icons:begin — rewrapped by a formatter\n    -->')
-        self.assertNotEqual(foundation, reformatted)
-        self.assertEqual(foundation, icons.apply_foundation_block(reformatted, icons.generate_images()))
-        with self.assertRaises(ValueError):
-            icons.apply_foundation_block(foundation.replace('generated-icons:end', 'gone'), icons.generate_images())
+        self.assertFalse(hasattr(icons, 'generate_images'))
 
     def test_wordmark_keeps_svg_geometry_separate_from_the_drawing_offset(self):
         self.assertEqual(icons.generate_wordmark(), icons.WORDMARK_XAML.read_text(encoding='utf-8'))

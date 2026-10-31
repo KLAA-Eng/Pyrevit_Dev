@@ -10,23 +10,18 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
   `klgeo<Role>` per role) — a leaf with no brushes. Windows need no SVG
   renderer or added runtime package.
 - `scripts/generate_gui_icons.py` owns semantic role mappings and generation. It
-  also writes the `klicon<Role>` ImageSources into the `generated-icons` block
-  of `lib/GUI/Resources/KLCodeFoundation.xaml` (drawn with the foundation's
-  `KlaGuiIconPen` and `KlaTextBrush`) and the wordmark geometry in
-  `lib/_logos/KLCodeWordmark.xaml`. Run it after changing sources; `--check`
-  detects stale generated resources.
+  also writes the wordmark geometry in `lib/_logos/KLCodeWordmark.xaml`. Run it
+  after changing sources; `--check` detects stale generated resources.
 
-`KLCodeFoundation.xaml` merges the geometry and owns the presenter, pen and
-ImageSources, bound to tokens (`KlaIconSize`, `KlaIconCanvas`, `KlaIconStroke`,
-`KlaTextBrush`, `KlaDisabledTextBrush`). Choose the rendering method deliberately:
-`KlaIconSearch` as an Image.Source uses a fixed `KlaTextBrush` pen and does not
-inherit foreground or automatically recolor when disabled. For an interactive
-icon that follows its parent control's foreground and disabled state, use the
-foreground-aware presenter:
+`KLCodeFoundation.xaml` merges the geometry and owns the presenter, bound to
+tokens (`KlaIconSize`, `KlaIconCanvas`, `KlaIconStroke`, `KlaDisabledTextBrush`).
+The presenter is the only way to draw a GUI icon: it follows its parent's
+foreground and turns gray when disabled. There are no fixed-color ImageSources
+(removed 2026-10-31).
 
 ```xml
 <ContentControl Style="{StaticResource KlaGuiIcon}"
-                Content="{StaticResource KlaSearchGeometry}"/>
+                Content="{StaticResource klgeoSearch}"/>
 ```
 
 The presenter uses 16-unit dimensions and a 24-unit source canvas, with a 1.5
@@ -36,27 +31,27 @@ Do not create per-window copies or replace source SVGs with screenshots.
 See the [design-system usage examples](../../../docs/DESIGNSYSTEM.md#in-window-gui-icons)
 for icon-only and icon/text actions, fixed-color images and accessible naming.
 
-| Semantic role | Geometry | ImageSource | Status |
-| --- | --- | --- | --- |
-| Search | klgeoSearch | kliconSearch | Shared dialogs and live windows |
-| Group / sheet set | klgeoGroup | kliconGroup | Shared dialogs |
-| Information | klgeoInfoAlert | kliconInfoAlert | Shared dialogs, CustomAlert, compiled alert |
-| Warning | klgeoWarnAlert | kliconWarnAlert | Shared dialogs, CustomAlert, compiled alert |
-| Error | klgeoErrorAlert | kliconErrorAlert | Shared dialogs, compiled alert, Startup Importer blocking issues |
-| Success | klgeoSuccessAlert | kliconSuccessAlert | Shared dialogs; the recall window's current-selection action |
-| Collapsed Details | klgeoChevRight | kliconChevRight | Shared dialogs |
-| Expanded Details | klgeoChevDown | kliconChevDown | Shared dialogs |
-| List view | klgeoList | kliconList | Compiled Family Studio |
-| Grid view | klgeoGrid | kliconGrid | Compiled Family Studio |
-| Favorite | klgeoFav | kliconFav | Compiled Family Studio |
-| Text/filter mode | klgeoFutureFilterList | kliconFutureFilterList | Future |
-| Regex | klgeoFutureRegex | kliconFutureRegex | Future |
-| Clear search | klgeoFutureClearSearch | kliconFutureClearSearch | Future |
-| Read element (tags) | klgeoFutureTags | kliconFutureTags | Future |
-| Read view filters | klgeoFutureRead | kliconFutureRead | Future |
-| Filter plus element | klgeoFutureFilterFunnel | kliconFutureFilterFunnel | Future |
-| Pick element | klgeoFuturePointer | kliconFuturePointer | Future |
-| Rectangle selection | klgeoFutureRectSelect | kliconFutureRectSelect | Future |
+| Semantic role | Geometry | Status |
+| --- | --- | --- |
+| Search | klgeoSearch | Shared dialogs and live windows |
+| Group / sheet set | klgeoGroup | Shared dialogs |
+| Information | klgeoInfoAlert | Shared dialogs, CustomAlert, compiled alert |
+| Warning | klgeoWarnAlert | Shared dialogs, CustomAlert, compiled alert |
+| Error | klgeoErrorAlert | Shared dialogs, compiled alert, Startup Importer blocking issues |
+| Success | klgeoSuccessAlert | Shared dialogs; the recall window's current-selection action |
+| Collapsed Details | klgeoChevRight | Shared dialogs |
+| Expanded Details | klgeoChevDown | Shared dialogs |
+| List view | klgeoList | Compiled Family Studio |
+| Grid view | klgeoGrid | Compiled Family Studio |
+| Favorite | klgeoFav | Compiled Family Studio |
+| Text/filter mode | klgeoFutureFilterList | Future |
+| Regex | klgeoFutureRegex | Future |
+| Clear search | klgeoFutureClearSearch | Future |
+| Read element (tags) | klgeoFutureTags | Future |
+| Read view filters | klgeoFutureRead | Future |
+| Filter plus element | klgeoFutureFilterFunnel | Future |
+| Pick element | klgeoFuturePointer | Future |
+| Rectangle selection | klgeoFutureRectSelect | Future |
 
 The **Future** prefix marks roles used only by the Match recall window in
 `lib/GUI/_future/match`, which no tool opens. Give a role its plain name again

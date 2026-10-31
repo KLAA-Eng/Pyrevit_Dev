@@ -18,14 +18,12 @@
                     <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Image
+                <ContentControl
                     x:Name="filter_icon"
-                    Width="{StaticResource KlaIconSize}"
-                    Height="{StaticResource KlaIconSize}"
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search"
-                    IsHitTestVisible="False"
-                    Source="{StaticResource kliconSearch}" />
+                    Content="{StaticResource klgeoSearch}"
+                    Style="{StaticResource KlaGuiIcon}" />
                 <TextBox
                     x:Name="textbox_filter"
                     Grid.Column="2"

@@ -159,10 +159,10 @@ instead of per-window file paths or copied geometry.
 
 | Need | Choose | Behavior |
 | --- | --- | --- |
-| Icon inside a button, toggle or stateful control | `KlaGuiIcon` + a `klgeo<Role>` resource | Inherits foreground; the style uses `KlaDisabledTextBrush` when disabled |
-| Fixed-color artwork required as an `Image.Source` | `klicon<Role>` DrawingImage | Uses the shared `KlaGuiIconPen` with `KlaTextBrush`; does not inherit the Image/parent foreground or automatically recolor when disabled |
+| Any GUI icon, decorative or inside a button, toggle or stateful control | `KlaGuiIcon` + a `klgeo<Role>` resource | Inherits foreground; the style uses `KlaDisabledTextBrush` when disabled |
 
-Use the presenter for an interactive icon that must follow control state:
+This presenter is the only way to draw a GUI icon; the generator no longer
+writes fixed-color ImageSources (2026-10-31). Use it inside an action:
 
 ```xml
 <Button Style="{StaticResource KlaIconButton}"
@@ -188,13 +188,14 @@ For an icon/text action, let both children follow the button's foreground:
 
 Avoid a local `Foreground` on the presenter when its disabled style should
 choose the color. Decorative presenters do not take focus or intercept clicks;
-the containing action needs an accessible name. A fixed-color search image is
-also available:
+the containing action needs an accessible name. A decorative icon beside a
+field, such as the search mark before a filter box, uses the same presenter and
+takes the surrounding foreground:
 
 ```xml
-<Image Source="{StaticResource kliconSearch}"
-       Width="{StaticResource KlaIconSize}" Height="{StaticResource KlaIconSize}"
-       Focusable="False" IsHitTestVisible="False"/>
+<ContentControl Style="{StaticResource KlaGuiIcon}"
+                Content="{StaticResource klgeoSearch}"
+                VerticalAlignment="Center" AutomationProperties.Name="Search"/>
 ```
 
 Shared Message uses 32-unit severity icons: Lucide octagon-alert, triangle-alert,
@@ -209,21 +210,19 @@ An icon does not change the tool's behavior or classification.
 
 ### Generating artwork and the wordmark
 
-[generate_gui_icons.py](../scripts/generate_gui_icons.py) generates three outputs:
+[generate_gui_icons.py](../scripts/generate_gui_icons.py) generates two outputs:
 
-- [KLCodeIcons.xaml](../lib/_icons/gui/KLCodeIcons.xaml): geometry-only resources.
-- The `generated-icons` block in [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml): DrawingImage resources.
+- [KLCodeIcons.xaml](../lib/_icons/gui/KLCodeIcons.xaml): geometry-only `klgeo<Role>` resources.
 - [KLCodeWordmark.xaml](../lib/_logos/KLCodeWordmark.xaml): wordmark geometry and drawing offset from the repository SVG.
 
 Edit attributed SVG sources and the generator's role mappings, then run
 `python -B scripts/generate_gui_icons.py`. Use `--check` to detect stale outputs.
 Do not hand-edit generated XAML, and keep XAML formatters (XAML Styler and the
 like) off it: the generator's contract is byte equality, so a formatting pass over
-`KLCodeIcons.xaml`, `KLCodeWordmark.xaml` or the `generated-icons` block fails
-`--check` and the `gui_icons` tests. When formatting the hand-written resources,
-pass the formatter an explicit file list that leaves the two generated files out,
-then run `python -B scripts/generate_gui_icons.py` to restore the Foundation
-block and `--check` to confirm. `scripts/release_check.py` runs the check.
+`KLCodeIcons.xaml` or `KLCodeWordmark.xaml` fails `--check` and the `gui_icons`
+tests. When formatting the hand-written resources, pass the formatter an
+explicit file list that leaves the two generated files out, then run `--check`
+to confirm. `scripts/release_check.py` runs the check.
 The shared wordmark template uses the generated
 geometry at 70 x 12; its Path drawing transform preserves the former rendering.
 No runtime SVG renderer is required.

@@ -15,7 +15,7 @@ from System.Windows.Automation import AutomationProperties
 from System.Windows.Controls import (Border, Button, ContentControl, Image, Label,
                                      ScrollBarVisibility, ScrollViewer, StackPanel, TextBlock,
                                      TextBox, WrapPanel)
-from System.Windows.Media import Brushes, DrawingImage, Geometry
+from System.Windows.Media import Brushes, Geometry
 from System.Windows.Media.Imaging import BitmapSource
 from System.Windows.Shapes import Path
 
@@ -209,10 +209,8 @@ def validate_gui_icons():
     try:
         for role in ICON_ROLES:
             geometry = resources['klgeo' + role]
-            image = resources['klicon' + role]
             assert isinstance(geometry, Geometry) and not geometry.Bounds.IsEmpty, role
-            assert isinstance(image, DrawingImage), role
-            assert image.Width == image.Height == 24, (role, image.Width, image.Height)
+            assert not resources.Contains('klicon' + role), 'geometry is the only icon form: ' + role
             block = StackPanel()
             icon = ContentControl()
             icon.Style = resources['KlaGuiIcon']
@@ -241,7 +239,7 @@ def validate_gui_icons():
         settle_layout(panel)
         if output_directory:
             render_content(owner, os.path.join(output_directory, 'gui-icons-%d-native.png' % len(ICON_ROLES)), 700, 280)
-        print('GUI icons: all %d geometry/DrawingImage resources load at 24-unit bounds; 16-unit presenters inherit foreground and show disabled stroke at 1.5 thickness.' % len(ICON_ROLES))
+        print('GUI icons: all %d geometry resources load at 24-unit bounds; 16-unit presenters inherit foreground and show disabled stroke at 1.5 thickness.' % len(ICON_ROLES))
     finally:
         owner.Close()
 

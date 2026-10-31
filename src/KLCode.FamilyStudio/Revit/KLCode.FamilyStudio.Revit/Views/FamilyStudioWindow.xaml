@@ -31,7 +31,7 @@
                             <ColumnDefinition Width="24" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Image Source="{StaticResource kliconSearch}" AutomationProperties.Name="Search" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False" />
+                        <ContentControl Content="{StaticResource klgeoSearch}" Style="{StaticResource KlaGuiIcon}" AutomationProperties.Name="Search" VerticalAlignment="Center" HorizontalAlignment="Center" />
                         <TextBox x:Name="SearchBox" Grid.Column="1" BorderThickness="0" Background="Transparent" ToolTip="{StaticResource SearchPlaceholderLabel}" KeyDown="OnSearchBoxKeyDown" />
                     </Grid>
                 </Border>

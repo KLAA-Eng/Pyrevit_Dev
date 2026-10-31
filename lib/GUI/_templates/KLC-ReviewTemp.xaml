@@ -26,13 +26,11 @@
                     <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Image
-                    Width="16"
-                    Height="16"
+                <ContentControl
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search"
-                    IsHitTestVisible="False"
-                    Source="{StaticResource kliconSearch}" />
+                    Content="{StaticResource klgeoSearch}"
+                    Style="{StaticResource KlaGuiIcon}" />
                 <TextBox
                     x:Name="review_search"
                     Grid.Column="2"

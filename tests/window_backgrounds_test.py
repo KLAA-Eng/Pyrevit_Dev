@@ -154,7 +154,9 @@ class WindowBackgroundTests(unittest.TestCase):
             with open(xaml_path, 'r', encoding='utf-8') as xaml_file:
                 xaml = xaml_file.read()
 
-            self.assertIn('Source="{StaticResource kliconSearch}"', xaml, relative_path)
+            self.assertIn('Content="{StaticResource klgeoSearch}"', xaml, relative_path)
+            self.assertIn('Style="{StaticResource KlaGuiIcon}"', xaml, relative_path)
+            self.assertNotIn('kliconSearch', xaml, relative_path)
             self.assertIn('Style="{StaticResource KlaFoundationFilter}"', xaml,
                           relative_path)
             self.assertNotIn('search_16px_light.png', xaml, relative_path)
