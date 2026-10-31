@@ -98,6 +98,12 @@ def validate_rename_dialogs():
                     assert control.ActualWidth == 240 and control.ActualHeight == 24
                     assert point.X + control.ActualWidth <= width - 16
                     assert AutomationProperties.GetAutomationId(control) == 'rename_{0}_{1}'.format(index, name)
+                input_right = controls.find_text.TranslatePoint(Point(controls.find_text.ActualWidth, 0), controls.naming_group).X
+                assert abs(controls.naming_group.ActualWidth - input_right - 9) < 0.1, 'Section hugs the input with an 8-unit inset plus its border'
+                assert controls.find_text.TranslatePoint(Point(0, 0), controls.naming_group).X == 65, 'Compact labels use a 52-unit column'
+                if controls.case_actions.Visibility == Visibility.Visible:
+                    gap = controls.lower_button.TranslatePoint(Point(0, 0), controls.case_actions).X - controls.upper_button.TranslatePoint(Point(controls.upper_button.ActualWidth, 0), controls.case_actions).X
+                    assert abs(gap - 8) < 0.1, 'Case actions use the standard 8-unit pair gap'
             footer_y = window._kla_chrome.footer.TranslatePoint(Point(0, 0), window.Content).Y
             button_bottom = window.accept_button.TranslatePoint(Point(0, window.accept_button.ActualHeight), window.Content).Y
             assert button_bottom <= footer_y, (count, state, window.Height, button_bottom, footer_y)

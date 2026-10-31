@@ -25,14 +25,14 @@ for DrawingImages. No SVG runtime dependency or network access is required.
 | Python window | Source | Normal render |
 | --- | --- | --- |
 | KL&A List Selection | [SelectFromDict.xaml](../../../../lib/GUI/SelectFromDict.xaml) | [Render](2026-10-28-production-migration-evidence/production-kla-select-from-dict-normal.png) |
-| Create From Rooms | [CreateFromRooms.xaml](../../../../lib/GUI/Tools/CreateFromRooms.xaml) | [Render](2026-10-28-production-migration-evidence/production-kla-create-from-rooms-normal.png) |
+| Create From Rooms | [CreateFromRooms.xaml](../../../../lib/GUI/_future/KLC-CreateFromRooms.xaml) | [Render](2026-10-28-production-migration-evidence/production-kla-create-from-rooms-normal.png) |
 | Duplicate Sheets | [DuplicateSheets.xaml](../../../../lib/GUI/DuplicateSheets.xaml) | [Render](2026-10-28-production-migration-evidence/production-kla-duplicate-sheets-normal.png) |
 | Custom Alert | [CustomAlert.xaml](../../../../lib/GUI/CustomAlert.xaml) | [Render](2026-10-28-production-migration-evidence/production-kla-custom-alert-normal.png) |
 | Find/Replace Views | Bundled `FindReplace - Views.pushbutton/Script.xaml` | [Render](2026-10-28-production-migration-evidence/production-kla-find-replace-views-normal.png) |
 | Find/Replace Sheets | Bundled `FindReplace_Sheets.pushbutton/Script.xaml` | [Render](2026-10-28-production-migration-evidence/production-kla-find-replace-sheets-normal.png) |
 | Steel PSF | Bundled `Steel PSF.pushbutton/SteelPsfDialog.xaml` | [Render](2026-10-28-production-migration-evidence/production-kla-steel-psf-normal.png) |
 | View Range | Bundled `ViewRange.pushbutton/MainWindow.xaml` | [Render](2026-10-28-production-migration-evidence/production-kla-view-range-normal.png) |
-| Standalone Recall | [Shell](../../../../lib/match/clipboard_window.xaml), [body](../../../../lib/match/clipboard_recall_content.xaml) | [Render](2026-10-28-production-migration-evidence/production-kla-match-properties-recall-normal.png) |
+| Standalone Recall | [Shell](../../../../lib/GUI/_future/match/clipboard_window.xaml), [body](../../../../lib/GUI/_future/match/clipboard_recall_content.xaml) | [Render](2026-10-28-production-migration-evidence/production-kla-match-properties-recall-normal.png) |
 
 | Compiled class | Normal render |
 | --- | --- |

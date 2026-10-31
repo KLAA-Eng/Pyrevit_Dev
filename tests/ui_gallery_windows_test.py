@@ -129,7 +129,7 @@ class GalleryWindowTests(unittest.TestCase):
         self.assertEqual('dialog-list-single', factory.call_args[0][1]['id'])
 
     def test_message_severity_states_do_not_open_other_window_families(self):
-        for identity in ('template-form', 'dialog-list-single'):
+        for identity in ('template-options', 'dialog-list-single'):
             for state in ('Warning', 'Success'):
                 with self.assertRaises(ValueError):
                     windows.create_custom(ROOT, {'id': identity}, state)
@@ -164,8 +164,8 @@ class GalleryWindowTests(unittest.TestCase):
         events = {'Click', 'Checked', 'Unchecked', 'MouseDown', 'TextChanged',
                   'PreviewTextInput', 'RequestNavigate', 'Expanded', 'Collapsed', 'SizeChanged'}
         for relative in list(windows.SOURCES.values()) + [
-                'lib/match/clipboard_content.xaml',
-                'lib/match/clipboard_recall_content.xaml']:
+                'lib/GUI/_future/match/clipboard_content.xaml',
+                'lib/GUI/_future/match/clipboard_recall_content.xaml']:
             path = windows.source_path(ROOT, relative)
             if not os.path.isfile(path):
                 continue
@@ -185,6 +185,7 @@ class GalleryWindowTests(unittest.TestCase):
             elif isinstance(node, ast.ImportFrom):
                 imports.append(node.module or '')
         self.assertNotIn('match.clipboard', imports)
+        self.assertNotIn('GUI._future.match.clipboard', imports)
         self.assertNotIn('GUI.SelectFromDict', imports)
         self.assertFalse(any('steel_weight' in name or 'revit_batch' in name
                              for name in imports))
@@ -262,7 +263,6 @@ class GalleryWindowTests(unittest.TestCase):
 
     def test_rename_family_states_seed_visible_empty_invalid_and_long_fields(self):
         groups = {
-            'template-form': 'input_',
             'kla-find-replace-views': 'input_',
             'kla-find-replace-sheets': 'input_sheet_name_',
             'kla-duplicate-sheets': 'UI_sheet_name_',

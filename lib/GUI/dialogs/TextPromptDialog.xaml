@@ -7,10 +7,20 @@
             <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
             <ScrollViewer x:Name="prompt_scroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel x:Name="prompt_fields">
-                    <Label x:Name="prompt_label" Target="{Binding ElementName=input_text}" Style="{StaticResource KlaPromptLabel}" HorizontalContentAlignment="Stretch" Margin="0,0,0,8">
-                        <Label.ContentTemplate><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap"/></DataTemplate></Label.ContentTemplate>
-                    </Label>
-                    <TextBox x:Name="input_text" Style="{StaticResource KlaTextPromptInput}" TextChanged="text_changed" AcceptsReturn="False" AcceptsTab="False" AutomationProperties.Name="Text value"/>
+                    <Grid>
+                        <TextBox x:Name="input_text" Style="{StaticResource KlaTextPromptInput}" TextChanged="text_changed" AcceptsReturn="False" AcceptsTab="False" AutomationProperties.Name="Text value"/>
+                        <TextBlock x:Name="input_placeholder" Text="[ENTER TEXT]" IsHitTestVisible="False"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   FontSize="{StaticResource KlaTextPromptInputFontSize}" FontWeight="Bold"
+                                   Foreground="{StaticResource KlaMutedBrush}">
+                            <TextBlock.Style><Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers><DataTrigger Binding="{Binding Text, ElementName=input_text}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger></Style.Triggers>
+                            </Style></TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
                     <TextBlock x:Name="validation_text" TextWrapping="Wrap" Foreground="{StaticResource KlaErrorBrush}" Visibility="Collapsed" Margin="0,8,0,0" AutomationProperties.LiveSetting="Polite"/>
                 </StackPanel>
             </ScrollViewer>

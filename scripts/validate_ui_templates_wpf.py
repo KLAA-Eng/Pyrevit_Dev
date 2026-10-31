@@ -42,21 +42,6 @@ def validate_template_family():
             assert window._kla_chrome.header.ActualHeight == window._kla_chrome.footer.ActualHeight == token('KlaChromeRow').Value
             assert window._kla_chrome.title.ToolTip is None
             assert window.window_body.IsEnabled == (state != 'Disabled')
-            if identity == 'template-form':
-                assert window.form_prompt.Style == window.Resources['KlaFoundationPromptLabel']
-                assert window.form_prompt.FontSize == token('KlaTitleFontSize') and str(window.form_prompt.FontWeight) == 'Normal'
-                fields = [getattr(window, 'input_' + name) for name in ('find', 'replace', 'prefix', 'suffix')]
-                assert not hasattr(window, 'preview_lines')
-                assert window.naming_group.Padding == token('KlaSectionPadding')
-                for field in fields:
-                    assert field.ActualWidth == token('KlaCompactFieldInputColumn').Value and field.ActualHeight == token('KlaCompactFieldHeight'), (state, field.Name, field.ActualWidth, field.ActualHeight)
-                    label = next(control for control in descendants(window.naming_group)
-                                 if isinstance(control, Label) and control.Target == field)
-                    assert label.ActualWidth == token('KlaCompactFieldLabelColumn').Value and str(label.VerticalContentAlignment) == 'Center'
-                    assert label.Content.endswith(':')
-                for previous, following in zip(fields, fields[1:]):
-                    gap = following.TranslatePoint(Point(0, 0), shell).Y - previous.TranslatePoint(Point(0, previous.ActualHeight), shell).Y
-                    assert gap == token('KlaGridSpace8').Value, gap
             if identity == 'template-options':
                 assert window.options_fields.ColumnDefinitions[0].ActualWidth == token('KlaCompactFieldLabelColumn').Value
                 assert isinstance(window.option_include_existing, CheckBox)
@@ -81,17 +66,7 @@ def validate_template_family():
             if output_directory:
                 render_content(window, os.path.join(output_directory, identity + '-' + state.lower().replace(' ', '-') + '.png'), width, height)
             if state == 'Normal':
-                if identity == 'template-form':
-                    window.input_find.Text = ''
-                    window.input_replace.Text = 'Invalid'
-                    window.apply_form(None, None)
-                    assert 'Find' in window.form_feedback.Text
-                    window.reset_form(None, None)
-                    window.input_prefix.Text = 'QA-'
-                    window.apply_form(None, None)
-                    assert window.input_prefix.Text == 'QA-'
-                    assert window.form_feedback.Text == 'Rules accepted for 4 sample names. No elements were renamed.'
-                elif identity == 'template-options':
+                if identity == 'template-options':
                     window.option_offset.Text = 'invalid'
                     window.apply_options(None, None)
                     assert 'offset' in window.options_feedback.Text.lower()

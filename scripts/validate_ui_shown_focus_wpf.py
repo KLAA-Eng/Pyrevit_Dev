@@ -1,5 +1,6 @@
 """Opt-in owned-window focus acceptance, without Revit or injected user input."""
-from GUI.dialogs import create_command_switch, create_selection, ActionChoice, SelectionItem
+from GUI.dialogs import (create_command_switch, create_selection, ActionChoice, SelectionItem,
+                         create_rename, RenameField)
 from System.Windows.Input import FocusManager
 from System.Windows.Automation.Peers import UIElementAutomationPeer
 from System.Windows.Controls import CheckBox
@@ -42,7 +43,23 @@ def validate_shown_focus():
         print('Shown selector: neutral initial focus, no search selection, and focused checkbox without adorner passed.')
     finally:
         window.Close()
-    print('Two owned fictional windows closed. No Revit, user documents or system-wide input injection used.')
+    window = create_rename('KLCode Rename focus fixture', [RenameField('name', 'Name')])
+    try:
+        window.Show()
+        window.Activate()
+        settle_layout(window.Content)
+        assert FocusManager.GetFocusedElement(window) == window.window_body
+        for controls in window.field_controls:
+            for name in ('find', 'replace', 'prefix', 'suffix'):
+                field = getattr(controls, name + '_text')
+                assert not field.IsKeyboardFocusWithin and field.SelectionLength == 0
+                assert field.Text == ''
+        if output_directory:
+            render_content(window, os.path.join(output_directory, 'rename-shown-neutral.png'), window.Width, window.Height)
+        print('Shown Rename: neutral initial focus, four empty unselected fields and no initial input caret passed.')
+    finally:
+        window.Close()
+    print('Three owned fictional windows closed. No Revit, user documents or system-wide input injection used.')
 
 
 validate_shown_focus()

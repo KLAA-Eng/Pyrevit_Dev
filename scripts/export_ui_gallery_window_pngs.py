@@ -85,7 +85,7 @@ def _profile_for(launcher, window_path):
         return _profile((440, 520), PALETTE['background'], _draw_selection)
     if launcher_id == 'kla-create-from-rooms':
         return _profile((440, 520), PALETTE['background'], _draw_create_from_rooms)
-    if launcher_id in ('template-form', 'kla-find-replace-views'):
+    if launcher_id == 'kla-find-replace-views':
         return _profile((520, 420), PALETTE['background'], _draw_find_replace)
     if launcher_id == 'kla-find-replace-sheets':
         return _profile((620, 560), PALETTE['background'], _draw_find_replace_sheets)

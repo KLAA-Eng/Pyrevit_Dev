@@ -52,21 +52,25 @@ def validate_message_variants():
                 assert window._kla_chrome.footer.Visibility == Visibility.Collapsed
                 assert window._kla_chrome.footer.ActualHeight == 0
                 assert window.window_shell.Template.FindName('PART_FooterRow', window.window_shell).Height.Value == 0
-                assert window.message_heading.FontSize == 18
+                assert window.Title == 'Message variants'
+                assert window._kla_chrome.title.Visibility == Visibility.Collapsed
+                assert window.message_heading.FontSize == 22
                 assert str(window.message_heading.FontWeight) == 'SemiBold'
                 assert str(window.message_heading.FontFamily) == 'Segoe UI'
-                assert window.message_icon.ActualWidth == window.message_icon.ActualHeight == 24
+                assert window.message_icon.ActualWidth == window.message_icon.ActualHeight == 32
                 assert window.message_icon.Content == window.FindResource(geometry)
                 expected_brush = window.FindResource(brush)
                 assert window.message_banner.BorderBrush == expected_brush
                 assert window.message_icon.Foreground == window.message_heading.Foreground == expected_brush
                 assert window.message_body.FontSize == window.message_details.FontSize == 12
+                assert window.message_details.Foreground == window.message_expander.Foreground == window.message_body.Foreground
                 assert window.message_expander.Visibility == (Visibility.Visible if with_details else Visibility.Collapsed)
                 assert not window.message_expander.IsExpanded
                 assert window.action_one.Content == 'OK' and window.action_one.IsDefault
                 initial_height, initial_body = window.Height, window.message_banner.ActualHeight
                 if with_details:
                     header = window.message_expander.Template.FindName('DetailsToggle', window.message_expander)
+                    assert header.Foreground == window.message_body.Foreground
                     icon = header.Template.FindName('DetailsChevron', header)
                     assert icon.ActualWidth == icon.ActualHeight == 16
                     assert icon.Content == window.FindResource('KlaChevronRightGeometry')

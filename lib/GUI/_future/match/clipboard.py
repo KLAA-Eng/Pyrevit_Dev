@@ -10,12 +10,12 @@ from pyrevit.compat import get_elementid_value_func
 from GUI.forms import my_WPF
 from GUI.window_chrome import load_window, shared_resources
 
-from match.match_utils import (
+from .match_utils import (
     PropKeyValue,
     get_source_properties,
     paste_props,
 )
-from match.filter_utils import (
+from .filter_utils import (
     dissect_parameter_filter,
     get_color_source_parameter,
     get_most_common_ogs_brush,

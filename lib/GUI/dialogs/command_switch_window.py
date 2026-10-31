@@ -19,13 +19,13 @@ def _window_type():
         from pyrevit.framework import wpf
     from System import Action, IntPtr
     from System.Windows import (Window, Visibility, Size, WindowStartupLocation,
-                                FrameworkElement, DependencyObject)
+                                SystemParameters)
     from System.Windows.Automation import AutomationProperties
-    from System.Windows.Controls import Button, TextBox
+    from System.Windows.Controls import Button, ContextMenu
     from System.Windows.Controls.Primitives import ToggleButton
-    from System.Windows.Input import Key, MouseButtonState
+    from System.Windows.Input import (Key, Mouse, MouseButton, MouseButtonState,
+                                      CaptureMode, MouseEventHandler)
     from System.Windows.Interop import WindowInteropHelper
-    from System.Windows.Media import VisualTreeHelper
     from System.Windows.Threading import DispatcherPriority
     from GUI.window_chrome import shared_resources
     from GUI.window_metadata import WindowMetadata
@@ -38,6 +38,12 @@ def _window_type():
             self._ready = False
             self._closed = False
             self._fit_scheduled = False
+            self._drag_origin = None
+            self._dragged = False
+            self._moving = False
+            self._capture_pending = False
+            self._context_menu_open = False
+            self._context_menu = None
             self._command_buttons = {}
             self._toggle_buttons = {}
             resource_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
@@ -82,7 +88,13 @@ def _window_type():
             self._ready = True
             self.refresh()
             self.Loaded += self.loaded
+            self.Closing += self.closing
             self.Closed += self.closed
+            self.Deactivated += self.deactivated
+            self.Activated += self.activated
+            self.ContextMenuClosing += self.context_closed
+            self.AddHandler(Mouse.LostMouseCaptureEvent,
+                            MouseEventHandler(self.capture_lost), True)
 
         def loaded(self, sender, args):
             # Start on the neutral panel. Typing routes into search explicitly,
@@ -90,9 +102,59 @@ def _window_type():
             if not self.window_body.Focus():
                 self.Focus()
             self.fit_height()
+            self.capture_pointer()
+
+        def closing(self, sender, args):
+            # Closing a modal window deactivates it before Closed is raised.
+            # Guard that event against a recursive cancel/Close call.
+            self._closed = True
 
         def closed(self, sender, args):
             self._closed = True
+            if self._context_menu is not None:
+                self._context_menu.IsOpen = False
+            if self.IsMouseCaptureWithin:
+                Mouse.Capture(None)
+
+        def deactivated(self, sender, args):
+            if self.IsVisible and not self._closed:
+                self.cancel()
+
+        def activated(self, sender, args):
+            self.capture_pointer()
+
+        def context_closed(self, sender, args):
+            if self._context_menu is not None:
+                self._context_menu.Closed -= self.context_closed
+                self._context_menu = None
+            self._context_menu_open = False
+            self.capture_lost(sender, args)
+
+        def capture_pointer(self):
+            """Popup-like outside clicks also work against a disabled modal owner."""
+            self._capture_pending = False
+            captured = Mouse.Captured
+            if (isinstance(captured, ContextMenu) and captured.PlacementTarget is not None
+                    and Window.GetWindow(captured.PlacementTarget) == self):
+                # Context menus live in a separate popup tree. Let that popup
+                # own capture until it closes, including programmatic menus.
+                if self._context_menu != captured:
+                    self._context_menu = captured
+                    captured.Closed += self.context_closed
+                self._context_menu_open = True
+                return
+            if (self.IsVisible and self.IsActive and not self._closed
+                    and not self._moving and not self._context_menu_open
+                    and not self.IsMouseCaptureWithin):
+                Mouse.Capture(self, CaptureMode.SubTree)
+
+        def capture_lost(self, sender, args):
+            # Buttons and text editing temporarily capture their own mouse.
+            # Re-arm after their release, without stealing a descendant capture.
+            if not self._capture_pending and not self._closed and not self._moving:
+                self._capture_pending = True
+                self.Dispatcher.BeginInvoke(DispatcherPriority.Input,
+                                            Action(self.capture_pointer))
 
         def fit_height(self):
             """The fixed-width floating panel fits content, with bounded overflow."""
@@ -137,13 +199,18 @@ def _window_type():
                 self.refresh()
 
         def switch_clicked(self, sender, args):
+            if self._dragged:
+                sender.IsChecked = next(row.IsChecked for row in self.state.switches
+                                        if row.Key == sender.Tag)
+                return
             if sender.IsEnabled:
                 sender.IsChecked = self.state.set_switch(sender.Tag, sender.IsChecked == True)
 
         def command_clicked(self, sender, args):
             # Eligibility and visibility are checked even for programmatic dispatch.
             key = sender.Tag
-            if sender.IsEnabled and self.state.enter_choice(focused_key=key) is not None:
+            if (not self._dragged and sender.IsEnabled
+                    and self.state.enter_choice(focused_key=key) is not None):
                 self.result = self.state.result_for(key)
                 self.Close()
 
@@ -152,6 +219,7 @@ def _window_type():
             self.Close()
 
         def on_key_down(self, sender, args):
+            self._dragged = False
             if args.Key == Key.Escape:
                 args.Handled = True
                 if self.search_text.Text:
@@ -181,21 +249,47 @@ def _window_type():
             self.search_text.SelectionLength = 0
             args.Handled = True
 
-        def drag_window(self, sender, args):
-            if args.LeftButton != MouseButtonState.Pressed:
+        def pointer_down(self, sender, args):
+            if self._context_menu_open:
                 return
-            current = args.OriginalSource
-            while isinstance(current, DependencyObject):
-                if isinstance(current, (Button, ToggleButton, TextBox)):
-                    return
-                if current == sender:
-                    self.DragMove()
-                    args.Handled = True
-                    return
-                if isinstance(current, FrameworkElement) and current.Parent is not None:
-                    current = current.Parent
-                else:
-                    current = VisualTreeHelper.GetParent(current)
+            point = args.GetPosition(self)
+            if not (0 <= point.X <= self.ActualWidth and 0 <= point.Y <= self.ActualHeight):
+                args.Handled = True
+                self.cancel()
+                return
+            if args.ChangedButton != MouseButton.Left:
+                return
+            self._drag_origin = point
+            self._dragged = False
+
+        def pointer_move(self, sender, args):
+            if self._drag_origin is None or self._moving:
+                return
+            if args.LeftButton != MouseButtonState.Pressed:
+                self._drag_origin = None
+                return
+            point = args.GetPosition(self)
+            if (abs(point.X - self._drag_origin.X) < SystemParameters.MinimumHorizontalDragDistance
+                    and abs(point.Y - self._drag_origin.Y) < SystemParameters.MinimumVerticalDragDistance):
+                return
+            self._dragged = True
+            self._moving = True
+            self._drag_origin = None
+            args.Handled = True
+            try:
+                # Release a button/text selection capture before the native move
+                # loop, so finishing a drag never invokes the underlying action.
+                Mouse.Capture(None)
+                self.DragMove()
+            finally:
+                self._moving = False
+                self.capture_pointer()
+
+        def pointer_up(self, sender, args):
+            self._drag_origin = None
+            if self._dragged:
+                args.Handled = True
+            self.capture_lost(sender, args)
 
     _WINDOW_TYPE = CommandSwitchWindow
     return _WINDOW_TYPE

@@ -71,7 +71,7 @@ Active-consumer anchors: [Find/Replace Views](<../../../../KL&A Tools_dev.tab/03
 
 ### SUP-02 — P3: Recall persistence silently preserves old selections and can truncate its existing file
 
-**Confidence: confirmed source behavior; dormant component.** Evidence: [close/save path](../../../../lib/match/clipboard.py#L478), lines 478–506.
+**Confidence: confirmed source behavior; dormant component.** Evidence: [close/save path](../../../../lib/GUI/_future/match/clipboard.py#L478), lines 478–506.
 
 `_save_recall()` returns immediately when no items are selected. If the memory file previously held selections, clearing every checkbox and closing leaves those selections on disk. Non-empty saves open the existing path with `wb` before serialization; a serialization or write failure can truncate that file, and the catch suppresses the failure entirely.
 

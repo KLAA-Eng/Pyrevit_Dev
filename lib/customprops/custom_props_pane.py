@@ -18,8 +18,8 @@ from pyrevit.compat import get_elementid_value_func
 from pyrevit.coreutils import applocales
 from pyrevit.framework import SolidColorBrush, Color, Media
 
-from match.match_utils import PropKeyValue
-from match import filter_utils
+from GUI._future.match.match_utils import PropKeyValue
+from GUI._future.match import filter_utils
 
 get_elementid_value = get_elementid_value_func()
 

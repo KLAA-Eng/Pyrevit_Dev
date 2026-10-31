@@ -25,12 +25,12 @@ DEFERRED_IDS = frozenset((
     'kla-startup-importer-blocking-issues'))
 
 SOURCES = {
-    'kla-create-from-rooms': 'lib/GUI/Tools/CreateFromRooms.xaml',
+    'kla-create-from-rooms': 'lib/GUI/_future/KLC-CreateFromRooms.xaml',
     'kla-custom-alert': 'lib/GUI/CustomAlert.xaml',
     'kla-duplicate-sheets': 'lib/GUI/DuplicateSheets.xaml',
     'kla-find-replace-views': 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml',
     'kla-find-replace-sheets': 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml',
-    'kla-match-properties-recall': 'lib/match/clipboard_window.xaml',
+    'kla-match-properties-recall': 'lib/GUI/_future/match/clipboard_window.xaml',
     'kla-select-from-dict': 'lib/GUI/SelectFromDict.xaml',
     'kla-steel-psf': 'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
     'kla-view-range': 'KL&A Tools.tab/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
@@ -125,9 +125,9 @@ def _window_type():
             self._items = recall_items(owner.preview_state)
             self._visible = list(self._items)
             merge(self, os.path.join(owner.preview_root, 'lib', 'GUI', 'Resources', 'KLCodeComponents.xaml'))
-            merge(self, os.path.join(owner.preview_root, 'lib', 'match',
+            merge(self, os.path.join(owner.preview_root, 'lib', 'GUI', '_future', 'match',
                                     'clipboard_ui.ResourceDictionary.en_us.xaml'))
-            wpf.LoadComponent(self, os.path.join(owner.preview_root, 'lib', 'match',
+            wpf.LoadComponent(self, os.path.join(owner.preview_root, 'lib', 'GUI', '_future', 'match',
                                                'clipboard_recall_content.xaml'))
             self.loadViewFiltersBtn.Visibility = Visibility.Collapsed
             self.loadFilterElemBtn.Visibility = Visibility.Collapsed

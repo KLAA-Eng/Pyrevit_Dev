@@ -12,8 +12,8 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WINDOW_XAML_PATHS = (
     'lib/GUI/SelectFromDict.xaml',
     'lib/GUI/CustomAlert.xaml',
-    'lib/GUI/Tools/CreateFromRooms.xaml',
-    'lib/match/clipboard_window.xaml',
+    'lib/GUI/_future/KLC-CreateFromRooms.xaml',
+    'lib/GUI/_future/match/clipboard_window.xaml',
     TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
 )
 
@@ -32,8 +32,8 @@ KL_A_TEMPLATE_WINDOW_XAML_PATHS = (
     'lib/GUI/SelectFromDict.xaml',
     'lib/GUI/CustomAlert.xaml',
     'lib/GUI/DuplicateSheets.xaml',
-    'lib/GUI/Tools/CreateFromRooms.xaml',
-    'lib/match/clipboard_window.xaml',
+    'lib/GUI/_future/KLC-CreateFromRooms.xaml',
+    'lib/GUI/_future/match/clipboard_window.xaml',
     TAB_NAME + '/03 Core Tools.panel/ViewRange.pushbutton/MainWindow.xaml',
     TAB_NAME + '/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml',
     TAB_NAME + '/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml',
@@ -145,7 +145,7 @@ class WindowBackgroundTests(unittest.TestCase):
     def test_search_windows_use_the_template_icon_and_filter_shell(self):
         search_windows = (
             'lib/GUI/SelectFromDict.xaml',
-            'lib/GUI/Tools/CreateFromRooms.xaml',
+            'lib/GUI/_future/KLC-CreateFromRooms.xaml',
             TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
         )
         for relative_path in search_windows:

@@ -6,7 +6,7 @@ initial work was performed directly there under the earlier authorization.
 This file owns task status. [DESIGNSYSTEM.md](../DESIGNSYSTEM.md) owns the
 shared design rules; the [shared dialog guide](../../lib/GUI/dialogs/README.md)
 owns reusable Message/Selection usage, while the [remaining templates](../../lib/GUI/_templates/README.md)
-own Form/Options/Review reference compositions.
+own Options/Review reference compositions. Form was subsequently retired by the owner.
 
 ## Delivery boundaries
 
@@ -149,7 +149,7 @@ existing authorization:
    issues. First make resource packaging compatible with CLR/localization
    adapters; build supported targets and retain honest matching-host limits.
 
-Current inventory is 25 Window sources: three references, nine Python tool
+Current inventory is 24 Window sources: two references, nine Python tool
 windows, six opt-in dialog bodies, five compiled windows, the shared-shell
 Gallery and the PreviewFixture tooling exception.
 The nine Python and five compiled windows are the production/tool migration
@@ -440,3 +440,5 @@ settled. No further interview approval gate applies to routine implementation.
 | GUI-34 | Integrated review, documentation and local milestone | GUI-31/32/33; owning SPEC/API/design references | Locally verified; 399 Python tests (one existing skip), 135 WPF constructions, 17 compiled source tests and both runtime smokes pass. Independent findings fixed and rechecked. [Evidence](../knowledge/reviews/design-system/2026-10-30-shared-window-variants.md). Existing production calls and packaged DLLs remain untouched; live Revit acceptance stays owner-owned. |
 | GUI-35 | Remove Message and Custom Alert footers | Owner's direct presentation request; existing per-instance shell opt-out | Implemented; locally verified. Both Message variants, legacy CustomAlert and its Gallery adapter collapse the footer and row. 25 focused tests and 135 actual WPF constructions pass, retaining resize/Details/scroll checks and other windows' footers. [Evidence](../knowledge/reviews/design-system/2026-10-30-footerless-alerts.md). |
 | GUI-36 | Input alignment, Selection initial focus and common OK actions | Owner's direct request; foundation TextBox and shared dialog consumers | Implemented; locally verified. Search/Group/Rename text origins match at 8, Selection opens neutrally, and Message/Text share 104 x 28 OK with 8-unit action gaps. 399 Python tests (one skip), 135 WPF constructions, shown focus fixtures, 17 compiled source tests and both runtimes pass. [Evidence](../knowledge/reviews/design-system/2026-10-30-input-alignment.md). |
+| GUI-37 | Floating Switch interaction and shared dialog presentation | Owner's direct request; Switch drag/outside dismissal, Message details/colors/title, Rename focus/compact groups, Text watermark | Implemented; locally verified. 399 Python tests (one skip), 130 WPF constructions and shown focus/capture/context-menu/modal checks pass. Native dragging and live Revit acceptance remain owner checks. [Evidence](../knowledge/reviews/design-system/2026-10-30-dialog-interaction-polish.md). |
+| GUI-38 | Reconcile owner window moves and Form removal | `_future` moves, Options/Review source names, Gallery inventory, imports, links and checks | Implemented; locally verified. 39 Gallery rows, 24 Window sources, 10 template state layouts; imports/resource paths, tests and current links updated. [Evidence](../knowledge/reviews/design-system/2026-10-30-dialog-interaction-polish.md). |

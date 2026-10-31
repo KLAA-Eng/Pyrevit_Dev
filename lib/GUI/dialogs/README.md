@@ -61,8 +61,10 @@ if text.action == 'accept':
 
 Message options are `severity='information'`, `details=''`, plus shared metadata.
 Severity accepts information/warning/error/success. It is an OK-only notice.
-the 24-unit icon and 18-unit Segoe UI SemiBold heading match the outline
-severity color; body and details text stay 12. Message uses octagon-alert,
+The 32-unit icon and 22-unit Segoe UI SemiBold heading match the outline
+severity color; body and details text stay 12. The Details header and text match
+the main body foreground. The center chrome title is blank, while the caller
+title remains in Window.Title for accessibility/task switching. Message uses octagon-alert,
 triangle-alert, info and check-check for error, warning, information and success
 without changing global roles. Its 16-unit Details chevron points right/down
 when collapsed/expanded; expanded text aligns with the body and the severity
@@ -76,10 +78,12 @@ message/action area from being squeezed away. OK uses `KlaButton` (104 x 28),
 with an 8-unit gap below the message or Details content.
 
 Text options are `default=''`, `required=False`, `validator=None`. The field is
-36 high, FontSize 24, centered Segoe UI Bold. Compact height fits prompt/error;
-long prompts scroll at the cap. Title/Close remain; `WindowChrome.hide_footer()`
+36 high, FontSize 24, centered Segoe UI Bold. No visible prompt header is shown;
+an empty field displays `[ENTER TEXT]` as a watermark. It is never returned as
+input. The caller prompt still labels the input for accessibility. Compact
+height fits input/error. Title/Close remain; `WindowChrome.hide_footer()`
 collapses only this template instance's footer row. It does not alter other shell instances.
-Prompt/input and input-or-validation/OK gaps are 8 units. OK uses the same
+Input-or-validation/OK gaps are 8 units. OK uses the same
 104 x 28 `KlaButton` as Message and is the only visible
 action; title Close or Escape cancels. Natural minimum height keeps these gaps
 instead of stretching blank space above the action.
@@ -178,7 +182,10 @@ on open. Typing moves to search and filters command labels/descriptions; optiona
 stay visible and keep cloned state. Tab traverses, Space toggles. Enter chooses
 the focused enabled command or sole enabled match while search is focused;
 Enter on a toggle never chooses a command. Escape clears search first, then
-cancels when empty. Blank panel clicks do not dismiss. Height
+cancels when empty. Drag from any surface beyond the Windows drag threshold
+to move the panel; a drag does not activate commands or toggles. Ordinary clicks
+and text editing remain available. An outside click cancels, including over the
+disabled modal owner. Blank panel clicks stay open. Height
 fits content up to 500, then scrolls. Button descriptions are tooltips/help text.
 The result is `{'command': key, 'switches': {key: bool}}`; caller commands never run.
 
@@ -190,6 +197,8 @@ version=None, owner=None, navigate=None)` constructs the window; `rename(...)`
 shows it. One to three groups are arranged horizontally, with minimum widths
 384, 712 and 1040 respectively. Each has one Find/Replace pair and Prefix/Suffix.
 Optional Uppercase/Lowercase buttons are separate actions for their own field.
+Initial focus rests on the neutral body; no field is selected. Compact labels
+and fitted section borders keep the inputs close, with standard 8-unit action gaps.
 
 Rename validates and returns action `accept` with value `{'operation': 'rename',
 'fields': {key: {'find': ..., 'replace': ..., 'prefix': ..., 'suffix': ...}}}`.
@@ -208,8 +217,8 @@ Error, Success, Disabled and Long content; With Details keeps diagnostics in
 Empty. Command Switch offers Commands only and Commands with toggles. KLC-Rename
 offers Single field, Two fields and Multiple fields (three groups). Other shared
 variants retain five standard states.
-The duplicate Message/Selection templates are retired; Form, Options and Review
-remain. Confirmation/Parameter previews remain removed. Action choice retains its
+The duplicate Message/Selection templates and Form are retired; Options and
+Review remain. Confirmation/Parameter previews remain removed. Action choice retains its
 current highlighted-row/Continue and default-key behavior pending future work.
 
 Run the Python suite and Windows probe in
@@ -219,10 +228,12 @@ Direct keyboard-handler dispatch does not prove live input/focus. Revit data,
 owner/modal lifetime, pointer-driven resize flicker, keyboard traversal and DPI
 remain explicitly identified host acceptance checks.
 
-The opt-in `-ShowFocusProbe` Windows run briefly opens two owned fictional
+The opt-in `-ShowFocusProbe` Windows run briefly opens three owned fictional
 windows: UIA identifies the search field, initial Command Switch focus stays on
 the neutral panel, and programmatically focused buttons/checks retain their
-normal borders. This does not establish physical keyboard/pointer routing or
+normal borders. Rename also opens with neutral body focus and no field selected.
+An additional owned Switch fixture checks capture, context-menu preservation,
+outside routed clicks and modal dismissal. This does not establish physical keyboard/pointer routing or
 Revit ownership. Shared button/check/radio/toggle styles use no focus adorner;
 there is no light-green frame around the focused control/checkbox text and no
 white underline/square-border override. Keyboard operation is retained.

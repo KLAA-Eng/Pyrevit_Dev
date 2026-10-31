@@ -19,7 +19,7 @@
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
 | v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
-| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, three reference templates and shared-dialog family previews. | Gallery source and dated verification records; pending next main delivery. |
+| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, reference templates and shared-dialog family previews. | Gallery source and dated verification records; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -45,8 +45,14 @@ files are version inputs for this same unreleased v0.5 delivery.
 These adapters use the real opt-in dialog factories and explicit result
 contracts, with simulated footer navigation. No production tool class, query,
 transaction or workflow is invoked. The existing pyRevit previews remain
-available for comparison. The catalog contains 40 entries and 25 Window
+available for comparison. The catalog contains 39 entries and 24 Window
 sources, with five compiled previews still deferred.
+
+The Form reference was removed by the owner. Options and Review now load
+`KLC-OptionsTemp.xaml` and `KLC-ReviewTemp.xaml`; their stable preview IDs remain.
+Create From Rooms and Match Recall keep their reviewed adapters while their
+sources live under `lib/GUI/_future/`. Relocation does not adopt these dormant
+windows into production commands.
 
 The [dialog contract](../../../../lib/GUI/dialogs/SPEC.md) and
 [API guide](../../../../lib/GUI/dialogs/README.md) own the reusable behavior;

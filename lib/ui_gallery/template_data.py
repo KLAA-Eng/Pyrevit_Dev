@@ -3,14 +3,10 @@ from __future__ import unicode_literals
 
 from .scenarios import parse_offset, selection_items, validate_state
 
-TEMPLATE_FILES = dict((('template-' + name.lower()), 'KLCode' + name + 'Template.xaml')
-                      for name in ('Form', 'Options', 'Review'))
-
-
-def form_names(state):
-    validate_state(state)
-    return [row.Name.replace('Floor Plan', 'Office Plan').replace('Building Section', 'Office Section')
-            for row in selection_items(state)]
+TEMPLATE_FILES = {
+    'template-options': 'KLC-OptionsTemp.xaml',
+    'template-review': 'KLC-ReviewTemp.xaml',
+}
 
 
 def option_data(state):

@@ -2,8 +2,7 @@
 """Interactive reference-window presenters; all data and outcomes are fictional."""
 from __future__ import unicode_literals
 
-from .scenarios import naming_values, rename_samples
-from .template_data import TEMPLATE_FILES, form_names, option_data, review_rows, review_outcome, validate_options
+from .template_data import TEMPLATE_FILES, option_data, review_rows, review_outcome, validate_options
 
 TEMPLATE_IDS = frozenset(TEMPLATE_FILES)
 
@@ -30,10 +29,7 @@ def create_template(launcher, state, path):
                 self.window_body.IsEnabled = False
 
         def _initialize(self):
-            if self.preview_id == 'template-form':
-                self._set_form(naming_values(self.preview_state))
-                self.apply_form(None, None)
-            elif self.preview_id == 'template-options':
+            if self.preview_id == 'template-options':
                 data = option_data(self.preview_state)
                 self.option_category.ItemsSource = ['Structural', 'Architectural', 'Coordination']
                 self.option_category.SelectedItem = data['category'] or None
@@ -47,23 +43,6 @@ def create_template(launcher, state, path):
 
         def _navigation(self, uri):
             self.preview_result = 'Footer navigation simulated; no external page opened.'
-
-        def _set_form(self, values):
-            for name in ('find', 'replace', 'prefix', 'suffix'):
-                getattr(self, 'input_' + name).Text = values[name]
-
-        def reset_form(self, sender, args):
-            self._set_form(naming_values('Normal'))
-            self.apply_form(None, None)
-
-        def apply_form(self, sender, args):
-            names = form_names(self.preview_state)
-            values = [getattr(self, 'input_' + name).Text for name in ('find', 'replace', 'prefix', 'suffix')]
-            targets, error = rename_samples(names, *values)
-            self.form_feedback.Text = error or ('Rules accepted for {} sample names. No elements were renamed.'.format(len(targets))
-                                               if names else 'No Sample Names Available.')
-            self.form_feedback.Foreground = self.Resources['KlaErrorBrush' if error else 'KlaMutedBrush']
-            self.preview_result = self.form_feedback.Text
 
         def browse_sample(self, sender, args):
             self.option_path.Text = 'C:\\Sample Library\\Alternate Example.rfa'

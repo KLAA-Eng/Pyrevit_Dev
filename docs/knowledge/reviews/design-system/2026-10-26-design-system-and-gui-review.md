@@ -95,8 +95,8 @@ entered offset, resulting model value, and reset behavior.
 
 ### GUI26-02 — P2: Match Recall mixes a white surface with inherited light text
 
-**Evidence:** [clipboard_content.xaml:3](../../../../lib/match/clipboard_content.xaml)
-sets `Background="White"`. [clipboard.py:457](../../../../lib/match/clipboard.py)
+**Evidence:** [clipboard_content.xaml:3](../../../../lib/GUI/_future/match/clipboard_content.xaml)
+sets `Background="White"`. [clipboard.py:457](../../../../lib/GUI/_future/match/clipboard.py)
 loads shared dark resources for Recall and inserts this UserControl into
 `content_host`. An isolated WPF composition reproduced `#E5E4E2` text inherited
 from the outer resources on white, approximately **1.27:1 contrast**.
@@ -330,7 +330,7 @@ the C# source-contract suite, and representative host windows.
 
 ### GUI26-15 — P3: Create From Rooms silently discards invalid input
 
-**Evidence:** [CreateFromRooms.py:148](../../../../lib/GUI/Tools/CreateFromRooms.py)
+**Evidence:** [CreateFromRooms.py:148](../../../../lib/GUI/_future/CreateFromRooms.py)
 filters typed characters without validating a complete numeric value. Submission
 closes the window before converting the offset or confirming selection; a broad
 exception path sets `offset = 0`. Malformed decimal strings can pass the filter.

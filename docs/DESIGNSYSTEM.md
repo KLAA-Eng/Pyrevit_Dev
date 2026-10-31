@@ -5,15 +5,16 @@ window construction. Use it to choose a resource, understand its appearance and
 assemble a window. The linked XAML files own executable values and templates;
 this guide explains their intended use and the shared design rules.
 
-The nine Python tool windows, five standard opt-in dialog bodies, three reference templates, Gallery and five
+The nine Python tool windows, five standard opt-in dialog bodies, two reference templates, Gallery and five
 compiled window classes use `KlaWindowShell`. PreviewFixture retains its
 standalone test chrome. Native/pyRevit dialogs and Recall's docked panel have
 separate host presentation; the standalone Recall body uses the shared system.
 The sixth opt-in body is a floating Command Switch using shared colors/styles
 with its own compact layout. Message, Text and KL&A Custom Alert omit the standard
-footer and its reserved row by design, retaining their title/Close controls.
-The current inventory has 25 standalone Window sources: nine Python tool
-windows, six opt-in bodies, three reference templates, five compiled windows,
+footer and its reserved row by design. Message retains Close with a blank center
+title; Text and Custom Alert retain their title/Close controls.
+The current inventory has 24 standalone Window sources: nine Python tool
+windows, six opt-in bodies, two reference templates, five compiled windows,
 Gallery and PreviewFixture.
 
 - [Master design colors](#master-design-colors)
@@ -29,7 +30,7 @@ Gallery and PreviewFixture.
 
 The [consolidation plan](plans/custom-window-consolidation.md) owns tasks and
 acceptance status. The [template guide](../lib/GUI/_templates/README.md) owns
-the three reference implementations: Form, Options and Review. The actual shared
+the two reference implementations: Options and Review. Form is retired. The actual shared
 Message and Selection dialogs are their own canonical references. Dated checks and renders live in
 [design-system reviews](knowledge/reviews/design-system/README.md), including
 the [Windows verification and Revit checklist](knowledge/reviews/design-system/2026-10-29-gui-architecture-windows.md).
@@ -189,10 +190,11 @@ also available:
        Focusable="False" IsHitTestVisible="False"/>
 ```
 
-Shared Message uses 24-unit severity icons: Lucide octagon-alert, triangle-alert,
-info and check-check for error, warning, information and success. Its 18-unit
+Shared Message uses 32-unit severity icons: Lucide octagon-alert, triangle-alert,
+info and check-check for error, warning, information and success. Its 22-unit
 Segoe UI SemiBold heading and icon match the outline severity color; body and
-details remain 12-unit text. A 16-unit right/down chevron reflects collapsed or
+details remain 12-unit text, including a Details header matching the body foreground.
+A 16-unit right/down chevron reflects collapsed or
 expanded Details. This exception is local to Message; global semantic icon roles
 remain unchanged. Status chips keep their words
 and borders. Larger Browse, Reset, Copy and Open Folder actions remain text-only.
@@ -323,7 +325,7 @@ namescope and controller access.
 
 | Composition | Direct-item placement | Existing uses |
 | --- | --- | --- |
-| `KlaFieldRows` | Labels in column 0, inputs in column 1; four rows at 0/2/4/6, separated by 8-unit gaps | Form, Find/Replace Views and Sheets, Duplicate Sheets |
+| `KlaFieldRows` | Labels in column 0, inputs in column 1; four rows at 0/2/4/6, separated by 8-unit gaps | Find/Replace Views and Sheets, Duplicate Sheets |
 | `KlaFilteredCheckList` | Filter 0, prompt 2, expanding list 4, secondary content 6, main action 8 | SelectFromDict, Create From Rooms, Steel PSF |
 
 Naming columns are 60/240; each field row is 24 high. Wrap the naming group in
@@ -331,8 +333,8 @@ Naming columns are 60/240; each field row is 24 high. Wrap the naming group in
 several action/settings rows, as Steel PSF does. These recipes share layout,
 not selection, filtering, validation or confirmation behavior.
 
-The [three reference templates](../lib/GUI/_templates/README.md) provide Form,
-Options and Review examples. For selection and message composition, use the
+The [two reference templates](../lib/GUI/_templates/README.md) provide Options
+and Review examples. Form is retired. For selection and message composition, use the
 actual shared [Selection](../lib/GUI/dialogs/SelectionDialog.xaml) and
 [Message](../lib/GUI/dialogs/MessageDialog.xaml) bodies with their
 [API guide](../lib/GUI/dialogs/README.md). The separate Selection/Message
@@ -560,14 +562,19 @@ KLC-Rename arranges one to three caller-defined property groups horizontally,
 each with Find/Replace and Prefix/Suffix. Optional case buttons are separate
 actions for their group; Rename validates and returns the entered rules. The
 dialog does not preview or perform model changes.
+It opens with neutral body focus and no field selected. Its compact label column
+and fitted section border remove excess gaps around the inputs; action gaps are 8.
 
 Message/details overflow is bounded and scrollable. Initial Message height fits
 content; manual width changes no longer force a new height. Deferred Details
 measurement grows the bottom and protects the message viewport until capped.
-Text removes only its footer row and uses the larger Segoe UI Bold field,
-content-fitting prompt/error height and single-line entry. Its only visible
+Message leaves its center chrome title blank while retaining caller Window.Title
+metadata and Close. Text removes its footer row and visible prompt header and
+uses the larger Segoe UI Bold single-line field, with an empty-field `[ENTER TEXT]`
+watermark that is never input data. The caller prompt remains an accessible name.
+Its compact height fits input/error. Its only visible
 action is the same 104 x 28 `KlaButton` OK used by Message; both use an 8-unit
-content-to-action gap through `KlaActionTopGap`. Prompt/input spacing is also 8. Close/Escape
+content-to-action gap through `KlaActionTopGap`. Close/Escape
 still cancels. Shared selectors open at 432 x 576, retaining the established
 Selection geometry after retirement of the duplicate template.
 Search sits above optional Group; both fields are 24 high and align after their
@@ -583,7 +590,9 @@ compact, fixed-width, content-height floating panel without header/footer. Its
 buttons choose immediately and toggles remain visible during filtering. It has
 no corner x and starts with neutral panel focus rather than selected search;
 typing or Tab can enter search. Escape clears search then cancels; blank panel
-clicks leave it open.
+clicks leave it open. Dragging beyond the system threshold moves it from any
+surface without activating controls; outside clicks cancel, including over a
+disabled modal owner.
 
 Gallery presents one row per shared family: Message, Selection, Action choice,
 Text, Command Switch and KLC-Rename. Variant labels are searchable and a
@@ -593,8 +602,8 @@ Single and List Multiple; Command Switch offers Commands only and Commands with
 toggles; KLC-Rename offers Single field, Two fields and Multiple fields. Both
 Message variants, Without Details and With Details, offer Normal, Empty, Warning,
 Error, Success, Disabled and Long content; With Details retains diagnostics in
-Empty. The other shared variants and three reference templates offer five
-states. Gallery has 40 entries. The collectors are never called by Gallery. See
+Empty. The other shared variants and two reference templates offer five
+states. Gallery has 39 entries. The collectors are never called by Gallery. See
 [API examples](../lib/GUI/dialogs/README.md) and
 [refinement verification](knowledge/reviews/design-system/2026-10-29-dialog-refinement.md).
 

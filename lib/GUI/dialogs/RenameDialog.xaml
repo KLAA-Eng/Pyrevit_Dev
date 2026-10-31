@@ -2,15 +2,31 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Rename" Width="384" Height="313" MinWidth="384" MinHeight="313" MaxHeight="640"
         WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Style="{StaticResource KlaWindow}">
+    <Window.Resources>
+        <!-- Rename uses a tighter label column without changing tool form rows. -->
+        <Style x:Key="KlaRenameFieldRows" TargetType="ItemsControl" BasedOn="{StaticResource KlaFieldRows}">
+            <Setter Property="ItemsPanel"><Setter.Value><ItemsPanelTemplate>
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="52"/><ColumnDefinition Width="240"/></Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="24"/><RowDefinition Height="8"/>
+                        <RowDefinition Height="24"/><RowDefinition Height="8"/>
+                        <RowDefinition Height="24"/><RowDefinition Height="8"/>
+                        <RowDefinition Height="24"/>
+                    </Grid.RowDefinitions>
+                </Grid>
+            </ItemsPanelTemplate></Setter.Value></Setter>
+        </Style>
+    </Window.Resources>
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
-        <Grid x:Name="window_body">
+        <Grid x:Name="window_body" Focusable="True" KeyboardNavigation.IsTabStop="False" FocusVisualStyle="{x:Null}">
             <ScrollViewer x:Name="rename_scroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel>
                     <Grid x:Name="fields_panel"/>
                     <TextBlock x:Name="validation_text" TextWrapping="Wrap" Foreground="{StaticResource KlaErrorBrush}"
                                Visibility="Collapsed" Margin="0,8,0,0" AutomationProperties.LiveSetting="Polite"/>
                     <Button x:Name="accept_button" Content="Rename" Click="accept_rename" IsDefault="True"
-                            Style="{StaticResource KlaButtonPrimary}" Margin="0,8,0,0" AutomationProperties.Name="Rename"/>
+                            Style="{StaticResource KlaButtonPrimary}" Margin="{StaticResource KlaActionTopGap}" AutomationProperties.Name="Rename"/>
                 </StackPanel>
             </ScrollViewer>
         </Grid>

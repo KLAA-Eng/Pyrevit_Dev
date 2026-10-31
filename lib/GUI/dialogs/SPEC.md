@@ -10,13 +10,16 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   them modally and return `DialogResult`. No automatic script exit occurs.
 - AC-002: Message is an OK-only notice with information/warning/error/success
   and optional collapsed Details. Both Message variants omit the shared footer
-  and its reserved row; title/Close and OK remain. Initial height fits content up to the cap.
+  and its reserved row; Close and OK remain. The center chrome title is blank;
+  the caller title remains Window.Title for accessibility/task switching.
+  Initial height fits content up to the cap.
   Width changes do not force height changes during manual resizing. Expanding
   Details grows the bottom, preserving the message viewport until capped;
   content remains scrollable. Repeated expansion/collapse does not drift size.
-  Close/Escape cancels; OK returns action `ok`. The 24-unit severity icon and
-  18-unit Segoe UI SemiBold heading match the outline severity color; body and
-  details text remain 12. Message-only icons are octagon-alert, triangle-alert,
+  Close/Escape cancels; OK returns action `ok`. The 32-unit severity icon and
+  22-unit Segoe UI SemiBold heading match the outline severity color; body and
+  details text remain 12. Details header and text use the main body foreground.
+  Message-only icons are octagon-alert, triangle-alert,
   info and check-check for error, warning, information and success. Details uses
   a 16-unit right/down chevron; expanded text aligns with the body and the icon
   centers vertically beside the heading. Global icon roles remain unchanged.
@@ -42,9 +45,12 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   Its existing layout/keyboard behavior stays unchanged; redesign is deferred.
 - AC-005: Text prompts preserve raw input. Accepted empty text differs from
   cancellation. Required and optional caller validation show inline feedback.
-  Compact height fits prompt/validation. Input is 36 high, FontSize 24, centered
+  Compact height fits input/validation; no separate visible prompt header.
+  The empty input displays `[ENTER TEXT]` as a watermark, never a field value
+  or accepted result. Caller defaults remain actual editable input.
+  Input is 36 high, FontSize 24, centered
   Segoe UI Bold with KLCode colors. Retain title/Close; remove footer and its
-  reserved row. Prompt/input and input-or-validation/OK gaps are 8. The only
+  reserved row. Input-or-validation/OK gaps are 8. The only
   visible action is the same 104 x 28 `KlaButton` OK used by Message; no Cancel button.
   Both use the standard 8-unit content-to-action gap. Content-driven minimum height avoids
   extra blank space. Enter accepts valid text; title Close/Escape cancels.
@@ -82,7 +88,11 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   Typing filters commands only; toggles retain state/visibility. Tab traverses,
   Space toggles; Enter chooses a focused command or sole enabled match while
   search is focused, never a toggle. Escape clears search then cancels when
-  empty. Blank panel clicks do not dismiss. Confirm returns action `accept`,
+  empty. Dragging beyond the system threshold moves the window from any
+  surface, including controls, without activating a command/toggle. Ordinary
+  clicks and text editing remain available. Clicking outside dismisses with
+  cancel, including over the disabled modal owner; blank inside clicks stay open.
+  Confirm returns action `accept`,
   value `{'command': key, 'switches': {key: bool}}`; cancel returns None.
 - AC-010: Shared buttons/checks/radios/toggles have no FocusVisualStyle adorner,
   white underline or focus-square override. No light-green frame surrounds a
@@ -95,6 +105,8 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   Enter activates it. Invalid rules stay open with inline feedback. Close/Escape
   cancels. Case actions close without applying model changes. No live preview,
   Revit mutation or existing tool migration is part of this shared dialog.
+  Initial focus is neutral, with no field selected. Compact label/input spacing
+  and a fitted section border remove unused trailing space; action gaps are 8.
 
 Prepared-row factories are host-independent; optional modal convenience helpers
 invoke collectors in a valid Revit API context before showing UI. Callers own

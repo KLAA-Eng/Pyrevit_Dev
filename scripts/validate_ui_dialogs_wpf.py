@@ -134,8 +134,8 @@ def validate_shared_dialogs():
                 assert window.message_banner.BorderBrush == window.FindResource(expected[1])
                 assert window.message_heading.Foreground == window.message_banner.BorderBrush
                 assert window.message_icon.Foreground == window.message_banner.BorderBrush
-                assert window.message_icon.Width == window.message_icon.Height == 24
-                assert window.message_heading.FontSize == 18
+                assert window.message_icon.Width == window.message_icon.Height == 32
+                assert window.message_heading.FontSize == 22
             if hasattr(window, 'toggles_panel'):
                 import GUI.dialogs as shared_api
                 assert callable(shared_api.command_switch), 'Lazy loading must preserve the public modal helper'
@@ -147,9 +147,9 @@ def validate_shared_dialogs():
                 buttons = [control for control in descendants(window.window_body) if isinstance(control, Button)]
                 assert len(buttons) == 1 and buttons[0] == window.accept_button
                 if state in ('Normal', 'Empty', 'Error'):
-                    label_bottom = window.prompt_label.TranslatePoint(Point(0, window.prompt_label.ActualHeight), window.Content).Y
-                    field_top = window.input_text.TranslatePoint(Point(0, 0), window.Content).Y
-                    assert abs(field_top - label_bottom - 8) < 1
+                    assert window.FindName('prompt_label') is None, 'Text Entry has no visible prompt header'
+                    assert window.input_placeholder.Text == '[ENTER TEXT]'
+                    assert window.input_placeholder.Visibility == (Visibility.Visible if not window.input_text.Text else Visibility.Collapsed)
                     last = window.validation_text if state == 'Error' else window.input_text
                     field_bottom = last.TranslatePoint(Point(0, last.ActualHeight), window.Content).Y
                     button_top = window.accept_button.TranslatePoint(Point(0, 0), window.Content).Y
@@ -302,8 +302,21 @@ def validate_shared_dialogs():
     assert window.result.value == 'a'
 
     window = create_text_prompt('Blank', 'Optional value')
+    dialog_layout(window)
+    assert window.input_text.Text == '' and window.input_placeholder.Visibility == Visibility.Visible
+    window.input_text.Text = 'Caller text'
+    dialog_layout(window)
+    assert window.input_placeholder.Visibility == Visibility.Collapsed
+    window.input_text.Clear()
+    dialog_layout(window)
+    assert window.input_placeholder.Visibility == Visibility.Visible
     click(window.accept_button)
     assert window.result.action == 'accept' and window.result.value == ''
+    window = create_text_prompt('Initial value', 'Optional value', default='Caller initial value')
+    dialog_layout(window)
+    assert window.input_placeholder.Visibility == Visibility.Collapsed
+    click(window.accept_button)
+    assert window.result.value == 'Caller initial value'
     window = create_text_prompt('Validated', 'Required value', required=True,
         validator=lambda value: 'Use at least three characters.' if len(value.strip()) < 3 else None)
     click(window.accept_button)

@@ -13,20 +13,6 @@ class TemplateInteractionTests(unittest.TestCase):
     def preview(self, kind, state='Normal'):
         return create_custom(ROOT, dict(id='template-' + kind, title='Template - ' + kind), state)
 
-    def test_form_validation_and_reset_preserve_edited_rules(self):
-        with patch.dict(sys.modules, host_modules([])):
-            window = self.preview('form')
-            window.input_find.Text = ''
-            window.input_replace.Text = 'Replacement'
-            window.apply_form(None, None)
-            self.assertIn('Find', window.preview_result)
-            window.reset_form(None, None)
-            window.input_prefix.Text = 'Reviewed-'
-            window.apply_form(None, None)
-            self.assertFalse(hasattr(window, 'preview_lines'))
-            self.assertEqual('Reviewed-', window.input_prefix.Text)
-            self.assertEqual('Rules accepted for 4 sample names. No elements were renamed.', window.preview_result)
-
     def test_options_validate_and_browse_only_changes_fictional_path(self):
         alerts = []
         with patch.dict(sys.modules, host_modules(alerts)):
@@ -86,6 +72,6 @@ class TemplateInteractionTests(unittest.TestCase):
             self.assertFalse(any(row.IsChecked for row in rows if not row.CanUse))
 
     def test_retired_templates_fail_before_loading_host_modules(self):
-        for kind in ('message', 'selection'):
+        for kind in ('message', 'selection', 'form'):
             with self.assertRaises(ValueError):
                 self.preview(kind)

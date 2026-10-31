@@ -100,7 +100,7 @@ class SelectFromDictSelectionTests(unittest.TestCase):
         self.assertEqual([True, False], [item.IsChecked for item in items])
 
     def test_room_filter_retains_its_existing_hidden_item_uncheck_policy(self):
-        path = os.path.join(PROJECT_ROOT, 'lib', 'GUI', 'Tools', 'CreateFromRooms.py')
+        path = os.path.join(PROJECT_ROOT, 'lib', 'GUI', '_future', 'CreateFromRooms.py')
         methods = _dialog_methods(path, 'CreateFromRooms')
         items = [_Item('Concrete', 'concrete', True), _Item('Wood', 'wood')]
         dialog = _Dialog(items)
@@ -114,7 +114,7 @@ class SelectFromDictSelectionTests(unittest.TestCase):
         self.assertTrue(items[1].IsChecked)
 
     def test_room_cancel_closes_and_records_cancellation_without_exiting_the_host(self):
-        path = os.path.join(PROJECT_ROOT, 'lib', 'GUI', 'Tools', 'CreateFromRooms.py')
+        path = os.path.join(PROJECT_ROOT, 'lib', 'GUI', '_future', 'CreateFromRooms.py')
         methods = _dialog_methods(path, 'CreateFromRooms')
         self.assertNotIn('sys', methods['button_close'].__code__.co_names)
         dialog = _Dialog([])

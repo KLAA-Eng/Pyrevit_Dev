@@ -24,7 +24,7 @@ def _window_type():
         from pyrevit.framework import wpf
     from System import IntPtr
     from System.Windows import (Window, WindowStartupLocation, Visibility, Size,
-                                Thickness, GridLength, GridUnitType)
+                                Thickness, GridLength, GridUnitType, HorizontalAlignment)
     from System.Windows.Automation import AutomationProperties
     from System.Windows.Controls import (Grid, StackPanel, Label, TextBox,
                                          Border, Button, ItemsControl,
@@ -75,8 +75,10 @@ def _window_type():
             controls.container.Children.Add(controls.label)
             controls.naming_group = Border()
             controls.naming_group.Style = self.FindResource('KlaSection')
+            controls.naming_group.HorizontalAlignment = HorizontalAlignment.Left
+            controls.naming_group.Padding = Thickness(12, 12, 8, 12)
             rows = ItemsControl()
-            rows.Style = self.FindResource('KlaFieldRows')
+            rows.Style = self.FindResource('KlaRenameFieldRows')
             for row, name in enumerate(('find', 'replace', 'prefix', 'suffix')):
                 text = TextBox()
                 text.Style = self.FindResource('KlaInputCompact')
@@ -99,9 +101,8 @@ def _window_type():
             controls.container.Children.Add(controls.naming_group)
             controls.case_actions = StackPanel()
             controls.case_actions.Orientation = Orientation.Horizontal
-            from System.Windows import HorizontalAlignment
             controls.case_actions.HorizontalAlignment = HorizontalAlignment.Center
-            controls.case_actions.Margin = Thickness(0, 8, 0, 0)
+            controls.case_actions.Margin = self.FindResource('KlaActionTopGap')
             controls.case_actions.Visibility = Visibility.Visible if field.AllowCase else Visibility.Collapsed
             for operation, caption in (('upper', 'Uppercase'), ('lower', 'Lowercase')):
                 button = Button()
@@ -123,7 +124,8 @@ def _window_type():
 
         def focus_input(self, sender, args):
             self.fit_height()
-            self.field_controls[0].find_text.Focus()
+            if not self.window_body.Focus():
+                self.Focus()
 
         def fit_height(self):
             from math import ceil

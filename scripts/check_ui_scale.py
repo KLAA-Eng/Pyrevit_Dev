@@ -48,7 +48,7 @@ def off_scale(text):
 
 
 def consumer_files(root):
-    for base in ('lib/GUI', 'lib/match', 'KL&A Tools_dev.tab', 'src'):
+    for base in ('lib/GUI', 'KL&A Tools_dev.tab', 'src'):
         for directory, folders, files in os.walk(os.path.join(root, base)):
             folders[:] = [f for f in folders if f not in ('bin', 'obj', '_Templates', '__pycache__')]
             for name in files:

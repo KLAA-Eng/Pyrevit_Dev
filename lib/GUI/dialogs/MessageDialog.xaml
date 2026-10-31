@@ -7,7 +7,7 @@
              heading, severity geometries and readout styles unchanged. -->
         <Style x:Key="MessageDetailsToggle" TargetType="ToggleButton">
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
+            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Expander}}"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ToggleButton">
                 <Border Background="Transparent">
@@ -51,15 +51,15 @@
                 <Grid>
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <ContentControl x:Name="message_icon" Style="{StaticResource KlaGuiIcon}" Width="24" Height="24" Margin="0,0,8,0"/>
-                        <TextBlock x:Name="message_heading" Style="{StaticResource KlaSectionHeading}" FontSize="18" VerticalAlignment="Center"/>
+                        <ContentControl x:Name="message_icon" Style="{StaticResource KlaGuiIcon}" Width="32" Height="32" Margin="0,0,8,0"/>
+                        <TextBlock x:Name="message_heading" Style="{StaticResource KlaSectionHeading}" FontSize="22" VerticalAlignment="Center"/>
                     </StackPanel>
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="True" AutomationProperties.Name="Message content">
                         <TextBlock x:Name="message_body" Style="{StaticResource KlaInfoText}" TextWrapping="Wrap"/>
                     </ScrollViewer>
                 </Grid>
             </Border>
-            <Expander x:Name="message_expander" Grid.Row="1" Header="Details" IsExpanded="False" Foreground="{StaticResource text_white}" Margin="0,8,0,0" Expanded="details_changed" Collapsed="details_changed">
+            <Expander x:Name="message_expander" Grid.Row="1" Header="Details" IsExpanded="False" Foreground="{Binding Foreground, ElementName=message_body}" Margin="0,8,0,0" Expanded="details_changed" Collapsed="details_changed">
                 <Expander.Template><ControlTemplate TargetType="Expander">
                     <StackPanel>
                         <ToggleButton x:Name="DetailsToggle" Style="{StaticResource MessageDetailsToggle}" Content="{TemplateBinding Header}"
@@ -71,7 +71,7 @@
                         <Trigger Property="IsExpanded" Value="True"><Setter TargetName="DetailsContent" Property="Visibility" Value="Visible"/></Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate></Expander.Template>
-                <TextBox x:Name="message_details" Style="{StaticResource MessageDetailsReadout}" Height="128" Margin="0,8,0,0" AutomationProperties.Name="Detailed message"/>
+                <TextBox x:Name="message_details" Style="{StaticResource MessageDetailsReadout}" Foreground="{Binding Foreground, ElementName=message_body}" Height="128" Margin="0,8,0,0" AutomationProperties.Name="Detailed message"/>
             </Expander>
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="{StaticResource KlaActionTopGap}">
                 <Button x:Name="action_one" Click="accept_message" Style="{StaticResource KlaButton}"/>

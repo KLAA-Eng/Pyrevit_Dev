@@ -58,7 +58,7 @@ class CreateFromRooms(my_WPF):
         self.version     = version      #type: str
 
         #>>>>>>>>>> SET RESOURCES AND LOAD WPF
-        path_xaml_file = os.path.join(PATH_SCRIPT, 'CreateFromRooms.xaml')
+        path_xaml_file = os.path.join(PATH_SCRIPT, 'KLC-CreateFromRooms.xaml')
         load_window(self, path_xaml_file, title, version,
                     close_handler=self.button_close)
 

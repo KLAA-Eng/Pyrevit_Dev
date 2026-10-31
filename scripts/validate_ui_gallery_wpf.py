@@ -219,5 +219,6 @@ execfile(os.path.join(repo_root, 'scripts', 'validate_ui_focus_wpf.py'))
 print('IronPython {}: {} catalog entries; {} real-WPF custom/state constructions; Gallery filters/deferred selection passed.'.format(sys.version.split()[0], len(entries), count))
 if show_focus_probe:
     execfile(os.path.join(repo_root, 'scripts', 'validate_ui_shown_focus_wpf.py'))
+    execfile(os.path.join(repo_root, 'scripts', 'validate_ui_command_switch_pointer_wpf.py'))
 else:
     print('No window was shown. Native dialogs and pyRevit/Revit integration remain host checks.')

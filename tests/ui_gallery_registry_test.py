@@ -44,6 +44,19 @@ class GalleryRegistryTests(unittest.TestCase):
         self.assertEqual('Revit/Windows native', rows['pyrevit-alert']['origin'])
         self.assertEqual('Revit/Windows native', rows['pyrevit-pick-file']['origin'])
 
+    def test_future_windows_keep_reviewed_adapters_after_relocation(self):
+        rows = gallery_entries(ROOT, {})
+        expected = {
+            'kla-create-from-rooms': 'lib/GUI/_future/KLC-CreateFromRooms.xaml',
+            'kla-match-properties-recall': 'lib/GUI/_future/match/clipboard_window.xaml',
+        }
+        for identity, path in expected.items():
+            row = next(item for item in rows if item['id'] == identity)
+            self.assertEqual(path, row['relative_path'])
+            self.assertTrue(row['can_launch'])
+            self.assertTrue(os.path.isfile(row['source_path']))
+            self.assertEqual([row], [item for item in rows if item['relative_path'] == path])
+
     def test_compiled_windows_remain_explicitly_deferred_without_states(self):
         rows = [row for row in gallery_entries(ROOT, {})
                 if row['category'] == 'Compiled add-in']
@@ -98,17 +111,20 @@ class GalleryRegistryTests(unittest.TestCase):
         self.assertEqual([], matching_entries(rows, 'shared', preview='Deferred'))
         self.assertEqual(rows, matching_entries(rows, preview='All previews'))
 
-    def test_only_form_options_review_remain_as_templates(self):
+    def test_only_renamed_options_review_remain_as_templates(self):
         rows = gallery_entries(ROOT, {})
         templates = [row for row in rows if row['category'] == 'Template']
-        self.assertEqual(3, len(templates))
-        self.assertEqual({'Template - ' + name for name in ('Form', 'Options', 'Review')},
+        self.assertEqual(2, len(templates))
+        self.assertEqual({'Template - ' + name for name in ('Options', 'Review')},
                          {row['title'] for row in templates})
         for row in templates:
             self.assertTrue(row['can_launch'])
             self.assertTrue(os.path.isfile(row['source_path']))
             self.assertEqual(5, len(row['states']))
-        for old in ('lib/GUI/FindReplace.xaml', 'lib/GUI/FindReplace.py',
+        for old in ('lib/GUI/_templates/KLCodeFormTemplate.xaml',
+                    'lib/GUI/_templates/KLCodeOptionsTemplate.xaml',
+                    'lib/GUI/_templates/KLCodeReviewTemplate.xaml',
+                    'lib/GUI/FindReplace.xaml', 'lib/GUI/FindReplace.py',
                     'lib/GUI/_templates/KLCodeMainTemplate.xaml',
                     'lib/GUI/_templates/KLCodeSelectionTemplate.xaml',
                     'lib/GUI/_templates/KLCodeMessageTemplate.xaml'):

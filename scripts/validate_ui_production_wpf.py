@@ -169,7 +169,7 @@ def validate_production_windows():
                 if identity == 'kla-match-properties-recall' and state == 'Normal':
                     for locale in ('de_de', 'ko', 'en_us'):
                         strings = ResourceDictionary()
-                        strings.Source = Uri(os.path.join(repo_root, 'lib', 'match', 'clipboard_ui.ResourceDictionary.' + locale + '.xaml'))
+                        strings.Source = Uri(os.path.join(repo_root, 'lib', 'GUI', '_future', 'match', 'clipboard_ui.ResourceDictionary.' + locale + '.xaml'))
                         recall.Resources.MergedDictionaries.Add(strings)
                         production_layout(window)
                         assert_recall_captions(window, locale)

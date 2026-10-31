@@ -59,6 +59,9 @@ def _window_types():
                      version, owner, navigate):
             self.initialize('MessageDialog.xaml', title, version, owner, navigate)
             self._kla_chrome.hide_footer()
+            # Keep the caller title for task switching/accessibility; the
+            # message chrome intentionally has an empty center title area.
+            self._kla_chrome.title.Visibility = Visibility.Collapsed
             roles = {'information': ('Information', 'KlaInformationGeometry', 'KlaInfoBrush'),
                      'warning': ('Warning', 'KlaWarningGeometry', 'KlaWarningBrush'),
                      'error': ('Error', 'KlaMessageErrorGeometry', 'KlaErrorBrush'),
@@ -228,7 +231,8 @@ def _window_types():
             self.validator = validator
             self.initialize('TextPromptDialog.xaml', title, version, owner, navigate)
             self._kla_chrome.hide_footer()
-            self.prompt_label.Content = prompt
+            from System.Windows.Automation import AutomationProperties
+            AutomationProperties.SetName(self.input_text, prompt or 'Text value')
             self.input_text.Text = default
             self._ready = True
             self.Loaded += self.focus_input
