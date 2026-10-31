@@ -5,9 +5,9 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'lib'))
 
-from ui_gallery.scenarios import (STATES, alert_message, filtered_items,
-                                  parse_offset, recall_items, rename_samples,
-                                  selection_items, set_checked)
+from ui_gallery.scenarios import (SAMPLE_PREFIX, STATES, alert_message, filtered_items,
+                                  naming_values, parse_offset, recall_items, rename_samples,
+                                  sample, selection_items, set_checked)
 
 
 class GalleryScenarioTests(unittest.TestCase):
@@ -21,11 +21,22 @@ class GalleryScenarioTests(unittest.TestCase):
         for state in STATES:
             self.assertIsInstance(alert_message(state), str)
 
+    def test_gallery_text_carries_the_sample_marker_once(self):
+        self.assertEqual('**', SAMPLE_PREFIX)
+        self.assertEqual('', sample(''))
+        self.assertEqual('**Text', sample(sample('Text')))
+        for row in selection_items() + recall_items():
+            self.assertTrue(row.Name.startswith(SAMPLE_PREFIX), row.Name)
+        for state in STATES:
+            for value in naming_values(state).values():
+                self.assertTrue(not value or value.startswith(SAMPLE_PREFIX), value)
+            self.assertTrue(not alert_message(state) or alert_message(state).startswith(SAMPLE_PREFIX))
+
     def test_filter_and_selection_keep_hidden_rows_intact(self):
         rows = selection_items()
         visible, error = filtered_items(rows, 'Foundation')
         self.assertFalse(error)
-        self.assertEqual(['S101 - Foundation Plan'], [row.Name for row in visible])
+        self.assertEqual(['**S101 - Foundation Plan'], [row.Name for row in visible])
         set_checked(visible, True)
         self.assertTrue(rows[0].IsChecked)
         self.assertTrue(rows[2].IsChecked)
@@ -33,7 +44,7 @@ class GalleryScenarioTests(unittest.TestCase):
     def test_recall_search_checks_values_and_reports_invalid_regex(self):
         rows = recall_items()
         visible, error = filtered_items(rows, 'Existing')
-        self.assertEqual('Phase Created', visible[0].Name)
+        self.assertEqual('**Phase Created', visible[0].Name)
         self.assertFalse(error)
         visible, error = filtered_items(rows, '[', regex=True)
         self.assertEqual(rows, visible)

@@ -1,7 +1,7 @@
 """Host-independent fictional states and validation for reference windows."""
 from __future__ import unicode_literals
 
-from .scenarios import parse_offset, selection_items, validate_state
+from .scenarios import parse_offset, sample, selection_items, validate_state
 
 TEMPLATE_FILES = {
     'template-options': 'KLC-OptionsTemp.xaml',
@@ -11,19 +11,20 @@ TEMPLATE_FILES = {
 
 def option_data(state):
     validate_state(state)
-    return dict(category='' if state == 'Empty' else 'Structural',
-                offset={'Empty': '', 'Error': 'not a number', 'Long content': '123456789.5'}.get(state, '150'),
-                path='' if state == 'Empty' else 'C:\\Sample Library\\' +
-                ('Coordination\\' * 12 if state == 'Long content' else '') + 'Example.rfa')
+    # The offset is parsed by validate_options, so only its invalid sample is marked.
+    return dict(category='' if state == 'Empty' else sample('Structural'),
+                offset={'Empty': '', 'Error': sample('not a number'), 'Long content': '123456789.5'}.get(state, '150'),
+                path='' if state == 'Empty' else sample('C:\\Sample Library\\' +
+                ('Coordination\\' * 12 if state == 'Long content' else '') + 'Example.rfa'))
 
 
 def validate_options(category, offset):
     if not category:
-        return 'Choose a sample category.'
+        return sample('Choose a sample category.')
     try:
         parse_offset(offset)
     except ValueError as error:
-        return str(error)
+        return sample(str(error))
     return ''
 
 
@@ -39,8 +40,8 @@ class ReviewRow(object):
 def review_rows(state):
     validate_state(state)
     rows = [ReviewRow(item.Name, ('Ready', 'Warning', 'Blocked')[index % 3],
-                      'Fictional item. ' + ('Review the naming and destination. ' * 12 if state == 'Long content'
-                                           else 'No production operation will run.'), index == 0)
+                      sample('Fictional item. ' + ('Review the naming and destination. ' * 12 if state == 'Long content'
+                                                  else 'No production operation will run.')), index == 0)
             for index, item in enumerate(selection_items(state))]
     if state == 'Error' and rows:
         rows[0].Status = 'Blocked'
@@ -51,8 +52,8 @@ def review_rows(state):
 def review_outcome(rows):
     chosen = [row for row in rows if row.IsChecked]
     if not chosen:
-        return 'Select at least one sample item.'
+        return sample('Select at least one sample item.')
     if any(row.Status == 'Blocked' for row in chosen):
-        return 'Cannot apply: a checked sample item is blocked. Clear the filter and use Check All to select eligible items only.'
-    return '{} checked sample item(s); {} warning(s). No import or model change was performed.'.format(
-        len(chosen), sum(row.Status == 'Warning' for row in chosen))
+        return sample('Cannot apply: a checked sample item is blocked. Clear the filter and use Check All to select eligible items only.')
+    return sample('{} checked sample item(s); {} warning(s). No import or model change was performed.'.format(
+        len(chosen), sum(row.Status == 'Warning' for row in chosen)))

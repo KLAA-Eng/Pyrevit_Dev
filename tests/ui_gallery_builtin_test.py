@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from lib.ui_gallery.builtin import launch_builtin, picker_names
+from lib.ui_gallery.scenarios import sample
 
 
 class BuiltinPreviewTests(unittest.TestCase):
@@ -41,9 +42,9 @@ class BuiltinPreviewTests(unittest.TestCase):
         self.assertTrue(windows[0].shown)
         self.assertFalse(windows[0].select_b.IsEnabled)
         self.assertFalse(windows[0].list_lb.IsEnabled)
-        self.assertEqual('Mark [Instance]', windows[0].options['All Parameters'][0].item.name)
-        self.assertEqual(2, len(windows[0].options['Instance Parameters']))
-        self.assertEqual(1, len(windows[0].options['Type Parameters']))
+        self.assertEqual('**Mark [Instance]', windows[0].options[sample('All Parameters')][0].item.name)
+        self.assertEqual(2, len(windows[0].options[sample('Instance Parameters')]))
+        self.assertEqual(1, len(windows[0].options[sample('Type Parameters')]))
         self.assertEqual('installed parameter template', windows[0].kwargs['item_template'])
         self.assertIn('discarded', result)
 

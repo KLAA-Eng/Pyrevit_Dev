@@ -9,6 +9,17 @@ import re
 STATES = ('Normal', 'Empty', 'Error', 'Disabled', 'Long content')
 LONG_NAME = ('S101 - Coordination plan for the north and south structural '
              'framing areas, transfer levels, and equipment supports')
+# Every piece of text the Gallery supplies starts with this marker, so a
+# reviewer can tell it apart from text that the window's own XAML or dialog
+# code provides. Numbers, keys and status values that code compares stay bare.
+SAMPLE_PREFIX = '**'
+
+
+def sample(text):
+    """Mark Gallery-supplied text; empty text and already-marked text pass through."""
+    if not text or text.startswith(SAMPLE_PREFIX):
+        return text
+    return SAMPLE_PREFIX + text
 
 
 def validate_state(state, supported=STATES):
@@ -35,7 +46,7 @@ def selection_items(state='Normal'):
              'S101 - Foundation Plan', 'M101 - HVAC Plan']
     if state == 'Long content':
         names = ['{} - {:02d}'.format(LONG_NAME, i) for i in range(1, 31)]
-    return [PreviewItem(name, i == 0 and state != 'Error')
+    return [PreviewItem(sample(name), i == 0 and state != 'Error')
             for i, name in enumerate(names)]
 
 
@@ -48,7 +59,7 @@ def recall_items(state='Normal'):
     if state == 'Long content':
         rows = [('Parameter {:02d} - {}'.format(i, LONG_NAME), LONG_NAME)
                 for i in range(1, 31)]
-    return [PreviewItem(name, state != 'Error', value)
+    return [PreviewItem(sample(name), state != 'Error', sample(value))
             for name, value in rows]
 
 
@@ -106,7 +117,7 @@ def naming_values(state='Normal', numbers=False):
     elif state == 'Long content':
         values = {'find': LONG_NAME, 'replace': 'Revised - ' + LONG_NAME,
                   'prefix': LONG_NAME + ' - ', 'suffix': ' - ' + LONG_NAME}
-    return values
+    return dict((key, sample(value)) for key, value in values.items())
 
 
 def parse_offset(text):
@@ -125,8 +136,8 @@ def alert_message(state='Normal'):
     if state == 'Empty':
         return ''
     if state == 'Error':
-        return 'Sample validation failed. Correct the fictional input and try again.'
+        return sample('Sample validation failed. Correct the fictional input and try again.')
     if state == 'Long content':
-        return '\n\n'.join('Sample issue {}: {}'.format(i, LONG_NAME)
-                            for i in range(1, 9))
-    return 'Fictional preview data. Actions affect this preview only.'
+        return sample('\n\n'.join('Sample issue {}: {}'.format(i, LONG_NAME)
+                                   for i in range(1, 9)))
+    return sample('Fictional preview data. Actions affect this preview only.')

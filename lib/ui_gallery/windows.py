@@ -15,7 +15,7 @@ from .variants import preview_launcher
 from find_replace.layout import results_height  # host-free constants shared with the production dialog
 
 from ui_gallery.scenarios import (PreviewItem, alert_message, filtered_items, naming_values,
-                                  parse_offset, recall_items, rename_samples,
+                                  parse_offset, recall_items, rename_samples, sample,
                                   selection_items, set_checked, validate_state)
 
 
@@ -221,12 +221,12 @@ def _window_type():
 
     class ViewRangeData(object):
         def __init__(self, state):
-            self.message = 'Fictional plan view. Changes affect the preview only.'
-            self.unit_label = 'ft'
-            self.available_levels = [Level('Level 01 - Lobby', 1),
-                                     Level('Level 02 - Office', 2), Level('Roof', 3)]
+            self.message = sample('Fictional plan view. Changes affect the preview only.')
+            self.unit_label = sample('ft')
+            self.available_levels = [Level(sample('Level 01 - Lobby'), 1),
+                                     Level(sample('Level 02 - Office'), 2), Level(sample('Roof'), 3)]
             self.can_modify_view = state not in ('Empty', 'Disabled')
-            self.warning_message = ('Sample: Top must be above the cut plane.'
+            self.warning_message = (sample('Sample: Top must be above the cut plane.')
                                     if state == 'Error' else '')
             if state == 'Long content':
                 self.message = alert_message('Long content')
@@ -242,7 +242,7 @@ def _window_type():
                 setattr(self, prefix + '_new_value', '' if state == 'Empty' else value)
                 setattr(self, prefix + '_level_id', 1)
             if state == 'Error':
-                self.topplane_new_value = 'not a number'
+                self.topplane_new_value = sample('not a number')
 
     class PreviewWindow(Window):
         """One safe handler surface shared by explicitly allowlisted source windows."""
@@ -256,7 +256,7 @@ def _window_type():
             self._items = selection_items(state)
             self._visible = list(self._items)
             self._sample_names = [row.Name for row in selection_items(state)]
-            self._sample_numbers = ['A{:03d}'.format(i + 101)
+            self._sample_numbers = [sample('A{:03d}'.format(i + 101))
                                     for i in range(len(self._sample_names))]
             self._duplicate_option = 'Duplicate'
             title = '{} [Gallery: {}]'.format(launcher.get('title', 'Preview'), state)
@@ -282,7 +282,8 @@ def _window_type():
 
         def _initialize(self):
             if hasattr(self, 'UI_offset'):
-                self.UI_offset.Text = {'Error': 'not a number', 'Empty': '',
+                # The offset is parsed on Create, so only the invalid sample carries the marker.
+                self.UI_offset.Text = {'Error': sample('not a number'), 'Empty': '',
                                        'Long content': '12345678901234567890.125'}.get(self.preview_state, '15')
             for group in ('input_', 'input_sheet_name_', 'input_sheet_number_',
                           'UI_view_', 'UI_sheet_name_', 'UI_sheet_number_'):
@@ -303,12 +304,12 @@ def _window_type():
                 self.DataContext = ViewRangeData(self.preview_state)
             if hasattr(self, 'result_panel'):
                 if self.preview_state == 'Error':
-                    self._show_result('Sample: 1 skipped; 1 failed.',
-                                      'A101: requested name already exists.\nA201: sample read-only item.')
+                    self._show_result(sample('Sample: 1 skipped; 1 failed.'),
+                                      sample('A101: requested name already exists.\nA201: sample read-only item.'))
                 elif self.preview_state == 'Empty':
-                    self._show_result('Sample: no items selected.', '')
+                    self._show_result(sample('Sample: no items selected.'), '')
                 elif self.preview_state == 'Long content':
-                    self._show_result('Sample: multiple items need attention.', alert_message('Long content'))
+                    self._show_result(sample('Sample: multiple items need attention.'), alert_message('Long content'))
 
         def _disable_body(self):
             if hasattr(self, 'window_body'):
@@ -336,8 +337,8 @@ def _window_type():
                 self._feedback(self.preview_result, bool(details))
                 return
             self.result_panel.Visibility = Visibility.Visible
-            self.result_summary.Text = summary
-            self.result_details.Text = details
+            self.result_summary.Text = sample(summary)
+            self.result_details.Text = sample(details)
             self.result_details.Visibility = Visibility.Visible if details else Visibility.Collapsed
             self.Height = results_height(1, bool(details))
 
@@ -488,9 +489,9 @@ def _window_type():
                     setattr(updated, prefix + '_level_id', level or 1)
                     setattr(updated, prefix + '_elevation', str(elevation))
                 self.DataContext = updated
-                self.warning.Text = 'Preview: changes applied to fictional values only.'
+                self.warning.Text = sample('Preview: changes applied to fictional values only.')
             except ValueError as error:
-                self.warning.Text = 'Preview: ' + str(error)
+                self.warning.Text = sample('Preview: ' + str(error))
             self.preview_result = self.warning.Text
 
         def reset_values_click(self, sender, args):

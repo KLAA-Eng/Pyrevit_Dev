@@ -262,7 +262,7 @@ class GalleryWindowTests(unittest.TestCase):
             preview.UI_checkbox_views.IsChecked = True
             preview.button_run(None, None)
             self.assertIn('Changed - ', preview.preview_result)
-            self.assertIn('New-S101', preview.preview_result)
+            self.assertIn('New-**S101', preview.preview_result)
             self.assertIn('Included: views', preview.preview_result)
 
     def test_rename_family_states_seed_visible_empty_invalid_and_long_fields(self):

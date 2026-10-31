@@ -19,7 +19,7 @@
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
 | v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
-| v0.5 | Unreleased | 10.31.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, the Options and Review references and shared-dialog family previews with variants. | Gallery source and dated verification records; pending next main delivery. |
+| v0.5 | Unreleased | 10.31.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, the Options and Review references, shared-dialog family previews with variants, and the `**` marker on Gallery-supplied text. | Gallery source and dated verification records; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -140,6 +140,14 @@ retired forms, and orphaned library windows may have no current tool caller.
 
 Choose a supported variant and state and **Open preview**. Custom previews load actual
 repository XAML and resources with Gallery-owned handlers and fictional data.
+Every piece of text the Gallery supplies starts with the `**` marker
+(`ui_gallery.scenarios.SAMPLE_PREFIX`): list rows, messages, field values,
+prompts, dialog choices and simulated results. Text without the marker comes
+from the window's own XAML or from the shared dialog code. Window titles,
+numeric inputs that the preview parses, keys and status values that code
+compares stay unmarked. Simulated rename results concatenate marked values,
+so they may show the marker more than once. The same marked data seeds the
+KLCode Python Window Studio designer samples.
 Standard custom states are Normal, Empty, Error, Disabled, and Long content;
 the shared Message dialog additionally offers Warning and Success.
 The static fixture and Gallery shell offer Normal only. Controls support

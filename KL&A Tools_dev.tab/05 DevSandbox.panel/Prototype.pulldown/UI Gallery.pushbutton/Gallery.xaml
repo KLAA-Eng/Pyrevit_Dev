@@ -5,7 +5,7 @@
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="40"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="200"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-            <TextBlock Text="Review actual window layouts with fictional data. Production tool commands are never run. Five compiled previews are deferred; docked panels and overlays are outside this Gallery."
+            <TextBlock Text="Review actual window layouts with fictional data; text starting with ** is supplied by the Gallery, everything else comes from the window. Production tool commands are never run. Five compiled previews are deferred; docked panels and overlays are outside this Gallery."
                        TextWrapping="Wrap" Margin="0,0,0,8" Foreground="{StaticResource KlaTextMutedBrush}"/>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="180"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="190"/></Grid.ColumnDefinitions>
