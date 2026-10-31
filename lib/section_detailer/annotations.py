@@ -30,6 +30,14 @@ _OUTWARD = {LEFT: (-1.0, 0.0), RIGHT: (1.0, 0.0), BOTTOM: (0.0, -1.0), TOP: (0.0
 STEEL_LABEL = 'T/STEEL'
 SHEATHING_FAMILY = '6_Sheathing_Ply_Section'
 
+GRID_FAMILY = '00_Grid'
+GRID_TYPE = 'Vertical'
+SOIL_FAMILY = '31_Soil'
+EARTH_FOLDER = 'Div 31 - Earthwork'
+CONCRETE_REGION = 'Concrete'
+
+_CONCRETE = re.compile(r'CONC')
+
 # Wall plates: 2x lumber laid flat, a double top plate and a single bottom plate.
 PLATE_THICKNESS = 1.5 / 12.0
 TOP_PLATES = 2
@@ -203,6 +211,35 @@ def stud_layer(type_name, layers):
     if found is None and len(layers) == 1:
         found = thickest(lambda layer: True)
     return found
+
+
+def is_concrete(type_name, layers):
+    """Return True for a concrete wall or footing type.
+
+    ``layers`` are ``(material_name, thickness, is_structure)``; structure
+    layers decide when there are any, otherwise any layer or the type name.
+    """
+    structure = [layer for layer in layers if layer[2]]
+    names = [layer[0] for layer in (structure or layers)]
+    if not structure:
+        names.append(type_name)
+    return any(_CONCRETE.search((name or '').upper()) for name in names)
+
+
+def lowest_bottoms(outlines, tolerance):
+    """Return ``(min_u, max_u, bottom_v)`` for the outlines at the lowest bottom.
+
+    Footings whose bottoms are within ``tolerance`` of the lowest all count.
+    """
+    spans = []
+    for outline in outlines:
+        if outline:
+            us = [point[0] for point in outline]
+            spans.append((min(us), max(us), min(point[1] for point in outline)))
+    if not spans:
+        return []
+    lowest = min(span[2] for span in spans)
+    return [span for span in spans if span[2] - lowest <= tolerance]
 
 
 def plate_centers(bottom, top, u, rect, plate=PLATE_THICKNESS,

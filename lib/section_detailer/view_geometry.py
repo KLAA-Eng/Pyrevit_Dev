@@ -178,6 +178,45 @@ def offset_down(segment, distance):
     return (u0 + nu, v0 + nv), (u1 + nu, v1 + nv)
 
 
+def clip_polygon(loop, rect):
+    """Clip a closed 2D loop to ``(min_u, min_v, max_u, max_v)``.
+
+    Sutherland-Hodgman clipping; returns the clipped loop, or an empty list
+    when nothing is left. A None rect leaves the loop unchanged.
+    """
+    if rect is None:
+        return list(loop)
+    edges = ((0, rect[0], 1.0), (0, rect[2], -1.0), (1, rect[1], 1.0), (1, rect[3], -1.0))
+    points = list(loop)
+    for axis, limit, side in edges:
+        if not points:
+            break
+
+        def inside(point):
+            return (point[axis] - limit) * side >= 0
+
+        clipped = []
+        for current, following in zip(points, points[1:] + points[:1]):
+            if inside(current):
+                clipped.append(current)
+            if inside(current) != inside(following):
+                t = (limit - current[axis]) / float(following[axis] - current[axis])
+                clipped.append((current[0] + t * (following[0] - current[0]),
+                                current[1] + t * (following[1] - current[1])))
+        points = clipped
+    return points if len(points) >= 3 else []
+
+
+def line_plane_point(start, end, origin, normal, tolerance=1e-6):
+    """Return where the infinite line through start-end meets the plane, else None."""
+    direction = [e - s for s, e in zip(start, end)]
+    rate = dot(direction, normal)
+    if abs(rate) < tolerance:
+        return None
+    t = dot([o - s for s, o in zip(start, origin)], normal) / rate
+    return tuple(s + t * d for s, d in zip(start, direction))
+
+
 def clip_segment(start, end, rect):
     """Clip a 2D segment to ``(min_u, min_v, max_u, max_v)``; None if outside.
 

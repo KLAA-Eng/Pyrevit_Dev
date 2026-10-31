@@ -20,6 +20,8 @@ from lib.section_detailer.annotations import (
     crop_crossings,
     floor_label,
     inset_rect,
+    is_concrete,
+    lowest_bottoms,
     merge_crossings,
     plate_centers,
     sheathing_layer,
@@ -61,6 +63,8 @@ from lib.section_detailer.view_geometry import (
     OBLIQUE,
     bounds_center,
     classify_member,
+    clip_polygon,
+    line_plane_point,
     clip_segment,
     crosses_plane,
     extent_along,
@@ -308,6 +312,22 @@ class ElevationAndSheathingTests(unittest.TestCase):
         self.assertIsNone(stud_layer('8" CMU', [('Masonry - CMU', 0.6667, True)]))
         self.assertIsNone(stud_layer('Generic - 8"', generic))
 
+    def test_concrete_walls_by_structure_material_or_name(self):
+        wall = [('Concrete, Cast-in-Place', 0.6667, True), ('Gypsum Wall Board', 0.05, False)]
+        self.assertTrue(is_concrete('Basic Wall 8"', wall))
+        self.assertTrue(is_concrete('8" Concrete', [('Default', 0.6667, False)]))
+        stud = [('Concrete Board', 0.05, False), ('Wood Stud Layer', 0.4583, True)]
+        self.assertFalse(is_concrete('Exterior Stud Wall', stud))
+        self.assertFalse(is_concrete('8" CMU', [('Masonry - CMU', 0.6667, True)]))
+
+    def test_soil_goes_under_the_lowest_footings(self):
+        upper = [(0.0, -1.0), (2.0, 0.0)]
+        lower = [(5.0, -3.0), (7.0, -2.0)]
+        level = [(9.0, -2.99), (10.0, -2.0)]
+        self.assertEqual(lowest_bottoms([upper, lower, level, []], 0.05),
+                         [(5.0, 7.0, -3.0), (9.0, 10.0, -2.99)])
+        self.assertEqual(lowest_bottoms([], 0.05), [])
+
     def test_plates_stack_down_from_the_top_and_up_from_the_bottom(self):
         plate = 1.5 / 12
         centers = plate_centers(0.0, 9.0, 2.0, None)
@@ -447,6 +467,20 @@ class ViewGeometryTests(unittest.TestCase):
         self.assertEqual(classify_member((0, 0, 12), self.VIEW), IN_PLANE)
         self.assertEqual(classify_member((1, 1, 0), self.VIEW), OBLIQUE)
         self.assertEqual(classify_member((0, 0, 0), self.VIEW), OBLIQUE)
+
+    def test_regions_clip_to_the_crop(self):
+        wall = [(0.0, -2.0), (1.0, -2.0), (1.0, 20.0), (0.0, 20.0)]
+        clipped = clip_polygon(wall, (-5.0, 0.0, 5.0, 10.0))
+        self.assertEqual(sorted(clipped), [(0.0, 0.0), (0.0, 10.0), (1.0, 0.0), (1.0, 10.0)])
+        self.assertEqual(clip_polygon(wall, (2.0, 0.0, 5.0, 10.0)), [])
+        self.assertEqual(clip_polygon(wall, None), wall)
+
+    def test_grid_meets_the_section_plane(self):
+        point = line_plane_point((10.0, -50.0, 0.0), (10.0, 50.0, 0.0), (0.0, 3.0, 0.0),
+                                 (0.0, 1.0, 0.0))
+        self.assertEqual(point, (10.0, 3.0, 0.0))
+        self.assertIsNone(line_plane_point((0.0, 3.0, 0.0), (10.0, 3.0, 0.0), (0.0, 0.0, 0.0),
+                                           (0.0, 1.0, 0.0)))
 
     def test_roof_top_edges_follow_the_slope(self):
         # A 6:12 roof cut face with plumb ends, wound either way.

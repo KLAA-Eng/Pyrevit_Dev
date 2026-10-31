@@ -15,16 +15,23 @@ from System.IO import File
 from section_detailer.annotations import (
     BREAK_FAMILY,
     BREAK_TYPE,
+    CONCRETE_REGION,
+    EARTH_FOLDER,
     ELEVATION_FAMILY,
     ELEVATION_PATH,
     ELEVATION_TYPE,
+    GRID_FAMILY,
+    GRID_TYPE,
     PLATE_THICKNESS,
     SHEATHING_FAMILY,
+    SOIL_FAMILY,
     STEEL_LABEL,
     break_segment,
     crop_crossings,
     floor_label,
     inset_rect,
+    is_concrete,
+    lowest_bottoms,
     merge_crossings,
     plate_centers,
     sheathing_layer,
@@ -63,9 +70,11 @@ from section_detailer.view_geometry import (
     OBLIQUE,
     bounds_center,
     classify_member,
+    clip_polygon,
     clip_segment,
     crosses_plane,
     extent_along,
+    line_plane_point,
     member_size,
     offset_down,
     ply_offsets,
@@ -84,9 +93,13 @@ OVERLAY_MARKER = 'Section Detailer'
 MINIMUM_REVIT_VERSION = 2023
 MEMBER_CATEGORIES = ('OST_StructuralFraming', 'OST_StructuralColumns')
 OVERLAY_CATEGORIES = ('OST_DetailComponents', 'OST_GenericAnnotation', 'OST_Lines')
-ELEVATION_TEXT_PARAMETERS = ('Description', 'Text', 'Label', 'Elevation Text')
-# Text parameters on the elevation symbol that are left blank.
-ELEVATION_BLANK_PARAMETERS = ('Elevation',)
+# Elevation_KLAA labels: the description sits above the line ("Text Top"),
+# the elevation below it ("Text Bottom"), with per-side copies for each type.
+ELEVATION_TEXT_PARAMETERS = ('Description', 'Text Top', 'text right top', 'text left top')
+ELEVATION_BLANK_PARAMETERS = ('Elevation', 'Text Bottom', 'text right bottom',
+                              'text left bottom')
+GRID_LABEL_PARAMETERS = ('Grid', 'Grid Label', 'Grid Number', 'Label', 'Text', 'Name')
+SOIL_TYPE = '4" SOIL'
 SHEATHING_THICKNESS_PARAMETERS = ('Thickness', 'Sheathing Thickness', 'Depth')
 FACE_TOLERANCE = 1e-4
 SHOW_WIDTH_ALIGNMENT = 0.7
@@ -203,6 +216,16 @@ def _visible_floors():
                 .OfCategory(DB.BuiltInCategory.OST_Floors)
                 .WhereElementIsNotElementType()
                 .OfClass(DB.Floor))
+
+
+def _visible_foundations():
+    return list(DB.FilteredElementCollector(doc, view.Id)
+                .OfCategory(DB.BuiltInCategory.OST_StructuralFoundation)
+                .WhereElementIsNotElementType())
+
+
+def _visible_grids():
+    return list(DB.FilteredElementCollector(doc, view.Id).OfClass(DB.Grid))
 
 
 def _visible_roofs():
@@ -496,6 +519,56 @@ def _survey_roofs(roofs, frame):
     return sheathing
 
 
+def _clipped_region(loops, frame):
+    """Return the region's loops clipped to the crop, without loops left empty."""
+    return [loop for loop in (clip_polygon(loop, frame.trim) for loop in loops) if loop]
+
+
+def _survey_concrete(foundations, walls, frame):
+    """Return clipped cut regions of footings and concrete walls, and footing outlines."""
+    regions = []
+    footings = []
+    for foundation in foundations:
+        for loops in _cut_regions(foundation, frame):
+            footings.append([point for loop in loops for point in loop])
+            regions.append(_clipped_region(loops, frame))
+    for wall in walls:
+        wall_type = wall.WallType
+        if wall_type.Kind != DB.WallKind.Basic \
+                or not is_concrete(_type_name(wall_type), _type_layers(wall_type)):
+            continue
+        for loops in _cut_regions(wall, frame):
+            regions.append(_clipped_region(loops, frame))
+    return [region for region in regions if region], footings
+
+
+def _soil_lines(footings, frame):
+    """Return view-plane segments along the bottom of the lowest footings."""
+    lines = []
+    for low, high, bottom in lowest_bottoms(footings, FLOOR_TOP_TOLERANCE):
+        segment = clip_segment((low, bottom), (high, bottom), frame.trim)
+        if segment:
+            lines.append(segment)
+    return lines
+
+
+def _grid_positions(grids, frame):
+    """Return ``(u, label)`` where straight grids cross the section plane in the crop."""
+    positions = []
+    for grid in grids:
+        curve = grid.Curve
+        if not isinstance(curve, DB.Line):
+            continue
+        point = line_plane_point(_xyz(curve.GetEndPoint(0)), _xyz(curve.GetEndPoint(1)),
+                                 frame.origin, frame.direction)
+        if point is None:
+            continue
+        u = to_view(point, frame.origin, frame.right, frame.up)[0]
+        if frame.trim is None or frame.trim[0] <= u <= frame.trim[2]:
+            positions.append((u, grid.Name))
+    return positions
+
+
 def _plate_spec(stud_width):
     """Return the wood spec for a 2x plate laid flat across ``stud_width`` feet."""
     return {
@@ -671,6 +744,31 @@ def _elevation_symbol():
     return _find_symbol(DB.BuiltInCategory.OST_GenericAnnotation,
                         lambda name: name.lower().startswith(ELEVATION_FAMILY.lower()),
                         ELEVATION_TYPE)
+
+
+def _soil_symbol():
+    return _find_symbol(DB.BuiltInCategory.OST_DetailComponents,
+                        lambda name: family_matches_base(name, SOIL_FAMILY), SOIL_TYPE)
+
+
+def _grid_symbol():
+    return _find_symbol(DB.BuiltInCategory.OST_DetailComponents,
+                        lambda name: family_matches_base(name, GRID_FAMILY), GRID_TYPE)
+
+
+def _concrete_region_type():
+    """Return the concrete filled region type, asking when none is named concrete."""
+    types = list(DB.FilteredElementCollector(doc).OfClass(DB.FilledRegionType))
+    named = dict((DB.Element.Name.GetValue(item), item) for item in types)
+    for name in sorted(named, key=len):
+        if CONCRETE_REGION.lower() in name.lower():
+            return named[name]
+    if not named:
+        return None
+    picked = forms.SelectFromList.show(
+        sorted(named), title='No "{}" filled region type; pick one for concrete'.format(
+            CONCRETE_REGION), button_name='Use type')
+    return named.get(picked) if picked else None
 
 
 def _sheathing_symbol(thickness):
@@ -1050,53 +1148,122 @@ def _place_breaks(crossings, symbol, frame):
     return placed
 
 
-def _set_label(instance, text):
-    """Write the elevation text; return the parameter name used, else None.
-
-    The ``T/`` text goes in the description and the elevation is left blank.
-    """
-    for name in ELEVATION_BLANK_PARAMETERS:
-        parameter = instance.LookupParameter(name)
-        if parameter and parameter.StorageType == DB.StorageType.String \
-                and not parameter.IsReadOnly:
-            parameter.Set('')
-    for name in ELEVATION_TEXT_PARAMETERS:
+def _set_text(instance, names, text):
+    """Set each writable text parameter in ``names``; return the names set."""
+    written = []
+    for name in names:
         parameter = instance.LookupParameter(name)
         if parameter and parameter.StorageType == DB.StorageType.String \
                 and not parameter.IsReadOnly:
             parameter.Set(text)
-            return name
-    for parameter in instance.Parameters:
-        definition = parameter.Definition
-        if parameter.StorageType != DB.StorageType.String or parameter.IsReadOnly \
-                or definition.Name in ELEVATION_BLANK_PARAMETERS:
-            continue
-        if isinstance(definition, DB.InternalDefinition) and \
-                definition.BuiltInParameter != DB.BuiltInParameter.INVALID:
-            continue
-        parameter.Set(text)
-        return definition.Name
-    return None
+            written.append(name)
+    return written
+
+
+def _set_label(instance, text):
+    """Write the ``T/`` text in the description and blank the elevation.
+
+    Returns the description parameters written; empty when none was found.
+    There is no fallback to other text parameters, which once put the
+    description in the elevation slot.
+    """
+    _set_text(instance, ELEVATION_BLANK_PARAMETERS, '')
+    return _set_text(instance, ELEVATION_TEXT_PARAMETERS, text)
 
 
 def _place_elevations(tops, symbol, frame):
-    """Place an elevation symbol at each top, just past the element's end."""
+    """Place an elevation symbol at each top, outside the break lines.
+
+    With a crop the symbols line up just past its right edge, beyond the
+    break lines; without one each starts just past its element's end.
+    """
     gap = ELEVATION_GAP * view.Scale
     placed = []
     unlabeled = []
     for top, right, label in tops:
-        instance = doc.Create.NewFamilyInstance(frame.to_model((right + gap, top)), symbol, view)
-        if _set_label(instance, label) is None:
+        start = (frame.crop[2] if frame.crop else right) + gap
+        instance = doc.Create.NewFamilyInstance(frame.to_model((start, top)), symbol, view)
+        if not _set_label(instance, label):
             unlabeled.append(label)
         bounds = _view_bounds(instance, frame)
         if bounds:
-            shift = right + gap - min(point[0] for point in bounds)
-            overflow = max(point[0] for point in bounds) + shift - (
-                frame.trim[2] if frame.trim else float('inf'))
-            _move(instance, shift - max(overflow, 0.0), 0.0, frame)
+            _move(instance, start - min(point[0] for point in bounds), 0.0, frame)
         _set_comments(instance, OVERLAY_MARKER)
         placed.append(instance)
     return placed, unlabeled
+
+
+def _curve_loop(points):
+    """Return a CurveLoop through view-plane points, dropping too-short edges."""
+    shortest = doc.Application.ShortCurveTolerance
+    corners = []
+    for point in points:
+        if not corners or corners[-1].DistanceTo(point) >= shortest:
+            corners.append(point)
+    if len(corners) > 1 and corners[-1].DistanceTo(corners[0]) < shortest:
+        corners.pop()
+    if len(corners) < 3:
+        return None
+    loop = DB.CurveLoop()
+    for start, end in zip(corners, corners[1:] + corners[:1]):
+        loop.Append(DB.Line.CreateBound(start, end))
+    return loop
+
+
+def _place_regions(regions, region_type, frame, notes):
+    """Fill each concrete cut region with the filled region type."""
+    placed = []
+    failed = 0
+    for region in regions:
+        loops = List[DB.CurveLoop]()
+        for loop in region:
+            curve_loop = _curve_loop([frame.to_model(point) for point in loop])
+            if curve_loop is not None:
+                loops.Add(curve_loop)
+        if loops.Count == 0:
+            continue
+        try:
+            placed.append(_finish(DB.FilledRegion.Create(doc, region_type.Id, view.Id, loops)))
+        except Exception:
+            failed += 1
+    if failed:
+        notes.append('{} concrete region(s) had an invalid outline and were not filled.'.format(
+            failed))
+    return placed
+
+
+def _place_soil(lines, symbol, frame):
+    """Place soil components just below each lowest footing bottom."""
+    parameter = symbol.LookupParameter('Width')
+    depth = parameter.AsDouble() if parameter and \
+        parameter.StorageType == DB.StorageType.Double else 4.0 / 12.0
+    placed = []
+    for (u0, v0), (u1, v1) in lines:
+        instance = _place_on_segment(symbol, ((u0, v0 - depth / 2.0), (u1, v1 - depth / 2.0)),
+                                     frame)
+        if instance:
+            placed.append(instance)
+    return placed
+
+
+def _place_grids(positions, symbol, frame, notes):
+    """Place a vertical grid component at each grid, labeled with its name."""
+    placed = []
+    unlabeled = []
+    low, high = frame.trim[1], frame.trim[3]
+    for u, name in positions:
+        if symbol.Family.FamilyPlacementType == DB.FamilyPlacementType.CurveBasedDetail:
+            line = DB.Line.CreateBound(frame.to_model((u, low)), frame.to_model((u, high)))
+            instance = doc.Create.NewFamilyInstance(line, symbol, view)
+        else:
+            instance = doc.Create.NewFamilyInstance(frame.to_model((u, high)), symbol, view)
+        if not any(_set_text(instance, (label,), name) for label in GRID_LABEL_PARAMETERS):
+            unlabeled.append(name)
+        placed.append(_finish(instance))
+    if unlabeled:
+        notes.append('Could not find a label parameter on the grid component for: {}.'.format(
+            ', '.join(unlabeled)))
+    return placed
 
 
 def _draw_outline(segments, style, frame):
@@ -1125,6 +1292,9 @@ def _report(placed, skipped, notes):
                                              (ALONG, 'along the section'),
                                              (PLATE, 'wall plates'),
                                              ('sheathing', 'sheathing'),
+                                             ('concrete', 'concrete regions'),
+                                             ('soil', 'soil'),
+                                             ('grid', 'grids'),
                                              ('break', 'break lines'),
                                              ('elevation', 'elevation symbols'),
                                              ('outline', 'outline lines')))
@@ -1156,8 +1326,12 @@ def main():
 
     frame = ViewFrame(view)
     jobs, skipped = _survey(_visible_members(), frame)
-    plate_jobs, wall_skipped = _survey_walls(_visible_walls(), frame)
+    walls = _visible_walls()
+    plate_jobs, wall_skipped = _survey_walls(walls, frame)
     skipped.extend(wall_skipped)
+    concrete, footings = _survey_concrete(_visible_foundations(), walls, frame)
+    soil = _soil_lines(footings, frame)
+    grids = _grid_positions(_visible_grids(), frame)
     floor_outlines, floor_tops, sheathing = _survey_floors(_visible_floors(), frame)
     sheathing.extend(_survey_roofs(_visible_roofs(), frame))
     tops = floor_tops + _steel_tops(jobs, frame)
@@ -1169,11 +1343,17 @@ def main():
     style = _outline_style() if segments else None
     placed = {}
     notes = []
-    if not (jobs or plate_jobs or tops or sheathing or segments):
+    if grids and frame.trim is None:
+        notes.append('The view has no crop region; grid components were not placed.')
+        grids = []
+    if not (jobs or plate_jobs or tops or sheathing or segments or concrete or soil or grids):
         _report(placed, skipped, notes)
         return
     if segments and style is None:
         notes.append('No line style chosen; the linked model outline was not drawn.')
+    region_type = _concrete_region_type() if concrete else None
+    if concrete and region_type is None:
+        notes.append('No filled region type chosen; concrete was not filled.')
 
     families = []
     library = Library()
@@ -1184,6 +1364,11 @@ def main():
     if sheathing and _sheathing_symbol(0.0) is None:
         families.append(('{} family'.format(SHEATHING_FAMILY),
                          library.family_path(SHEATHING_FAMILY, WOOD_FOLDER)))
+    if soil and _soil_symbol() is None:
+        families.append(('{} family'.format(SOIL_FAMILY),
+                         library.family_path(SOIL_FAMILY, EARTH_FOLDER)))
+    if grids and _grid_symbol() is None:
+        families.append(('{} family'.format(GRID_FAMILY), library.family_path(GRID_FAMILY)))
 
     group = DB.TransactionGroup(doc, COMMAND_TITLE)
     group.Start()
@@ -1215,6 +1400,22 @@ def main():
 
             if sheathing:
                 placed['sheathing'] = _place_sheathing(sheathing, frame, notes)
+            if concrete and region_type is not None:
+                placed['concrete'] = _place_regions(concrete, region_type, frame, notes)
+            if soil:
+                symbol = _soil_symbol()
+                if symbol is None:
+                    notes.append('No {} family; soil was not placed.'.format(SOIL_FAMILY))
+                else:
+                    _activate(symbol)
+                    placed['soil'] = _place_soil(soil, symbol, frame)
+            if grids:
+                symbol = _grid_symbol()
+                if symbol is None:
+                    notes.append('No {} family; grids were not placed.'.format(GRID_FAMILY))
+                else:
+                    _activate(symbol)
+                    placed['grid'] = _place_grids(grids, symbol, frame, notes)
             if crossings:
                 symbol = _break_symbol()
                 if symbol is None:
@@ -1231,8 +1432,10 @@ def main():
                     _activate(symbol)
                     placed['elevation'], unlabeled = _place_elevations(tops, symbol, frame)
                     if unlabeled:
-                        notes.append('Could not find a text parameter for elevation labels: '
-                                     '{}.'.format(', '.join(sorted(set(unlabeled)))))
+                        notes.append('Could not find a description parameter ({}) for '
+                                     'elevation labels: {}.'.format(
+                                         ', '.join(ELEVATION_TEXT_PARAMETERS),
+                                         ', '.join(sorted(set(unlabeled)))))
             if segments and style is not None:
                 placed['outline'] = _draw_outline(segments, style, frame)
         group.Assimilate()

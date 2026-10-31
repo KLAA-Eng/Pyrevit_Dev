@@ -92,7 +92,11 @@ Decided 2026-10-30 from the library on the office share.
   member, square to its axis. Wood walls cut by the section get a 2x double
   top plate and single bottom plate laid flat, sized to the stud layer.
   Roof sheathing layers get the sheathing component along the roof's cut
-  top surface, sloped or flat.
+  top surface, sloped or flat. Elevation symbols go in a column outside the
+  break lines, with the `T/` text in `Text Top` and `Text Bottom` blank.
+  Footings and concrete walls get a `Concrete` filled region, the lowest
+  footing gets `31_Soil_KLAA_18DC` below it, and grids get the `Vertical`
+  `00_Grid_KLAA_20DC` type at their plan location (decided 2026-10-30).
   A visible linked architectural model is outlined with halftoned `S-OBJ4`
   detail lines, and no components are placed on linked elements (decided
   2026-10-30).
@@ -121,6 +125,6 @@ Decided 2026-10-30 from the library on the office share.
 | SD-1 | Resolve open decisions | Library conventions and outline scope (linked model) decided; others open | This plan, KL&A detail component library section |
 | SD-2 | Scaffold DevSandbox command, `SPEC.md`, `lib/` module with tests | Implementation complete | `lib/section_detailer/`, `tests/section_detailer_test.py` |
 | SD-3 | Deliver P1 (steel and wood; cut, beyond, and along) | Implementation complete; live Revit acceptance pending | Command `SPEC.md` validation evidence |
-| SD-4 | Deliver P2 | Break lines, floor and steel elevations, sheathing, and alignment implemented; grids and browsing not started; live acceptance pending | Command `SPEC.md` |
-| SD-5 | Deliver P3 | Not started | |
+| SD-4 | Deliver P2 | Break lines, floor and steel elevations, sheathing, alignment, and grids implemented; browsing not started; live acceptance pending | Command `SPEC.md` |
+| SD-5 | Deliver P3 | Concrete footing and wall filled regions with soil implemented; CMU and reference detail not started | Command `SPEC.md` |
 | SD-6 | Deliver P4 | Linked model outline (halftoned `S-OBJ4`) implemented; re-run update not started; live acceptance pending | Command `SPEC.md` |

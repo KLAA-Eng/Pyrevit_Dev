@@ -60,6 +60,9 @@ is placed over the linked model.
 - Floors visible in the view and cut by the section. A layer whose material
   says plywood, OSB, sheathing, or subfloor (or a one-layer floor whose type
   says so) is the sheathing. Roofs cut by the section are read the same way.
+- Structural foundations and concrete walls cut by the section, a
+  `Concrete` filled region type, and grids crossing the section plane (the
+  grid component needs a crop region).
 - Wood walls cut square by the section: basic walls with a layer whose
   material says stud, wood, or lumber (not sheathing), or whose type name
   says so (then the thickest structure layer, or a one-layer wall's width).
@@ -116,16 +119,31 @@ is placed over the linked model.
   right, the side the family is assumed to mask.
 - **Elevation symbols:** each distinct floor top cut by the section, and
   each distinct top of steel cut by or along the section, gets a
-  `Right Elevation` `Elevation_KLAA_17SY` symbol with its line at the top,
-  starting 1/2 in (paper) past the element's right end (or the crop edge)
-  and kept inside the crop. Tops outside the crop, or elements that do not
+  `Right Elevation` `Elevation_KLAA_17SY` symbol with its line at the top.
+  With a crop, the symbols line up 1/2 in (paper) past the crop's right
+  edge, outside the break lines; without one, each starts 1/2 in past its
+  element's right end. Tops outside the crop, or elements that do not
   reach into it, get none. Floor text is `T/SHEATHING` for wood floors,
   `T/SLAB` for concrete, and `T/FLOOR` otherwise, from the floor type and
-  layer material names; steel text is `T/STEEL`. It is written to
-  `Description` (else the first of `Text`, `Label`, `Elevation Text`, or
-  the first other writable user text parameter), and the `Elevation` text
-  is left blank for the drafter; the report says when no text parameter is
-  found.
+  layer material names; steel text is `T/STEEL`. The text goes in the
+  description above the line (`Text Top`, `text right top`, `text left top`,
+  or `Description`), and the elevation below the line (`Text Bottom`,
+  `text right bottom`, `text left bottom`, or `Elevation`) is left blank for
+  the drafter. No other parameter is used; the report says when no
+  description parameter is found.
+- **Concrete:** structural foundations and concrete walls (a structure
+  layer, or with no structure layer any layer or the type name, says
+  concrete) cut by the section get a filled region of their cut face,
+  clipped to the crop. The filled region type is the shortest-named one
+  containing `Concrete`; with none, the user picks one or skips.
+- **Soil:** the lowest cut footing (and any within 1/8 in of it) gets a
+  `31_Soil_KLAA_18DC` (`4" SOIL`) component along its bottom, just below
+  it, for the footing's width.
+- **Grids:** each straight grid that crosses the section plane inside the
+  crop gets a `Vertical` `00_Grid_KLAA_20DC` component at that point, from
+  the crop's top (point-based) or spanning the crop (line-based), labeled
+  with the grid name in the first of `Grid`, `Grid Label`, `Grid Number`,
+  `Label`, `Text`, or `Name`.
 - **Linked model outline:** model elements of the chosen links that are cut
   by the section inside the crop are merged, and their outer boundary is
   drawn as detail lines in the `S-OBJ4` line style, halftoned in the view
@@ -200,8 +218,10 @@ used.
   crop first; with no crop, every linked element is checked.
 - Unconfirmed until live testing: which side the break family masks
   (`BREAK_MASKS_RIGHT` in `script.py`), that the elevation symbol inserts on
-  its datum line, its `Description` and `Elevation` parameter names,
-  rotation for rotated members,
+  its datum line, that `Text Top` is its description and `Text Bottom` its
+  elevation (read from the family file, not seen in Revit), the grid
+  component's insertion point and label parameter name, where the soil
+  family draws relative to its line, rotation for rotated members,
   mirroring of asymmetric shapes (L, C, WT), the column depth axis (taken
   as the instance Y axis), and whether detail lines keep Comments for
   **Replace**.
@@ -227,10 +247,11 @@ or the user workflow; live acceptance is pending.
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| `v0.0` | Unreleased | 10.30.2026 | Prototype: steel and wood section components on members cut by or beyond the active section, side components along it, oblique cut members sized from the member, wood matched by modeled size and stacked as plies, 2x wall plates, floor and roof sheathing, center alignment, break lines, floor and steel elevation symbols, and a halftoned linked model outline. | `dev.section-detailer` development commits |
+| `v0.0` | Unreleased | 10.30.2026 | Prototype: steel and wood section components on members cut by or beyond the active section, side components along it, oblique cut members sized from the member, wood matched by modeled size and stacked as plies, 2x wall plates, floor and roof sheathing, concrete filled regions with soil below the lowest footing, vertical grid components, center alignment, break lines, floor and steel elevation symbols, and a halftoned linked model outline. | `dev.section-detailer` development commits |
 
 ## Backlog
 
-- Phase 2: grid components, browse for families outside the library.
-- Phase 3: concrete, CMU, and a reference detail that ranks families first.
+- Phase 2: browse for families outside the library.
+- Phase 3: CMU, concrete beams and slabs, and a reference detail that ranks
+  families first.
 - Phase 4: re-run update of an existing overlay.
