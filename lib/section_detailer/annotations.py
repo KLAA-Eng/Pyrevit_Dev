@@ -38,6 +38,10 @@ CONCRETE_REGION = 'Concrete'
 
 _CONCRETE = re.compile(r'CONC')
 
+# Linked architectural veneer gets a halftoned hatch.
+VENEER_FILL = 'Diagonal Down'
+_VENEER = re.compile(r'VENEER|STONE|BRICK')
+
 # Wall plates: 2x lumber laid flat, a double top plate and a single bottom plate.
 PLATE_THICKNESS = 1.5 / 12.0
 TOP_PLATES = 2
@@ -224,6 +228,25 @@ def is_concrete(type_name, layers):
     if not structure:
         names.append(type_name)
     return any(_CONCRETE.search((name or '').upper()) for name in names)
+
+
+def is_veneer(material_name):
+    """Return True for a stone, brick, or veneer material name."""
+    return bool(_VENEER.search((material_name or '').upper()))
+
+
+def veneer_layers(layers):
+    """Return ``(depth_from_exterior, thickness)`` for each veneer layer.
+
+    ``layers`` are ``(material_name, thickness, ...)`` from the exterior in.
+    """
+    found = []
+    offset = 0.0
+    for layer in layers:
+        if layer[1] > 0 and is_veneer(layer[0]):
+            found.append((offset, layer[1]))
+        offset += layer[1]
+    return found
 
 
 def lowest_bottoms(outlines, tolerance):

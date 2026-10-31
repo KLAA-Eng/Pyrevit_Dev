@@ -97,6 +97,9 @@ Decided 2026-10-30 from the library on the office share.
   Footings and concrete walls get a `Concrete` filled region, the lowest
   footing gets `31_Soil_KLAA_18DC` below it, and grids get the `Vertical`
   `00_Grid_KLAA_20DC` type at their plan location (decided 2026-10-30).
+  Linked stone and brick veneer gets a halftoned `Diagonal Down` filled
+  region with `S-OBJ4` lines, and elevation symbols start between the break
+  lines and the crop edge so the annotation crop keeps them.
   A visible linked architectural model is outlined with halftoned `S-OBJ4`
   detail lines, and no components are placed on linked elements (decided
   2026-10-30).

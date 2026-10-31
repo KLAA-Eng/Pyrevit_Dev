@@ -21,12 +21,14 @@ from lib.section_detailer.annotations import (
     floor_label,
     inset_rect,
     is_concrete,
+    is_veneer,
     lowest_bottoms,
     merge_crossings,
     plate_centers,
     sheathing_layer,
     stud_layer,
     unique_tops,
+    veneer_layers,
     visible_top,
 )
 from lib.section_detailer.matching import (
@@ -319,6 +321,16 @@ class ElevationAndSheathingTests(unittest.TestCase):
         stud = [('Concrete Board', 0.05, False), ('Wood Stud Layer', 0.4583, True)]
         self.assertFalse(is_concrete('Exterior Stud Wall', stud))
         self.assertFalse(is_concrete('8" CMU', [('Masonry - CMU', 0.6667, True)]))
+
+    def test_veneer_layers_from_the_exterior(self):
+        self.assertTrue(is_veneer('Masonry - Stone Veneer'))
+        self.assertTrue(is_veneer('Brick, Common'))
+        self.assertFalse(is_veneer('Air'))
+        wall = [('Stone, Cultured', 0.25), ('Air', 0.0833), ('Plywood, Sheathing', 0.05),
+                ('Wood Stud Layer', 0.4583)]
+        self.assertEqual(veneer_layers(wall), [(0.0, 0.25)])
+        self.assertEqual(veneer_layers([('Gypsum', 0.05), ('Brick', 0.3)]), [(0.05, 0.3)])
+        self.assertEqual(veneer_layers([('Stucco', 0.07)]), [])
 
     def test_soil_goes_under_the_lowest_footings(self):
         upper = [(0.0, -1.0), (2.0, 0.0)]

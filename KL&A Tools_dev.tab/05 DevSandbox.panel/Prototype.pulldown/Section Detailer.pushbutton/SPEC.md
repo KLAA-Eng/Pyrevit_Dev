@@ -120,9 +120,11 @@ is placed over the linked model.
 - **Elevation symbols:** each distinct floor top cut by the section, and
   each distinct top of steel cut by or along the section, gets a
   `Right Elevation` `Elevation_KLAA_17SY` symbol with its line at the top.
-  With a crop, the symbols line up 1/2 in (paper) past the crop's right
-  edge, outside the break lines; without one, each starts 1/2 in past its
-  element's right end. Tops outside the crop, or elements that do not
+  With a crop, the symbols line up starting midway between the right break
+  lines and the crop edge: outside the break lines but inside the crop, so
+  the annotation crop does not hide them. Without a crop, each starts 1/2 in
+  (paper) past its element's right end. The report lists the first
+  symbol's text parameters and values. Tops outside the crop, or elements that do not
   reach into it, get none. Floor text is `T/SHEATHING` for wood floors,
   `T/SLAB` for concrete, and `T/FLOOR` otherwise, from the floor type and
   layer material names; steel text is `T/STEEL`. The text goes in the
@@ -149,6 +151,14 @@ is placed over the linked model.
   drawn as detail lines in the `S-OBJ4` line style, halftoned in the view
   and clipped to the crop. Edges where two linked elements meet, or inside
   another element, are not drawn. Linked elements get no components.
+- **Linked veneer:** each linked wall layer whose material says stone,
+  brick, or veneer gets a filled region of its cut face, clipped to the
+  crop, with `S-OBJ4` (the outline line style) boundary lines and halftoned
+  in the view. Layers are found as the wall's per-layer solids by face
+  material, or, for a wall that comes as one solid, by layer offsets from
+  its exterior face. The fill is a filled region type whose foreground is
+  the `Diagonal Down` drafting pattern; with none, one is made by
+  duplicating the first filled region type.
 - Each placed item's Comments is set to `Section Detailer` where the family
   has a Comments parameter.
 - **Replace** deletes the earlier `Section Detailer` items in this view
@@ -247,7 +257,7 @@ or the user workflow; live acceptance is pending.
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| `v0.0` | Unreleased | 10.30.2026 | Prototype: steel and wood section components on members cut by or beyond the active section, side components along it, oblique cut members sized from the member, wood matched by modeled size and stacked as plies, 2x wall plates, floor and roof sheathing, concrete filled regions with soil below the lowest footing, vertical grid components, center alignment, break lines, floor and steel elevation symbols, and a halftoned linked model outline. | `dev.section-detailer` development commits |
+| `v0.0` | Unreleased | 10.30.2026 | Prototype: steel and wood section components on members cut by or beyond the active section, side components along it, oblique cut members sized from the member, wood matched by modeled size and stacked as plies, 2x wall plates, floor and roof sheathing, concrete filled regions with soil below the lowest footing, vertical grid components, halftoned linked veneer regions, center alignment, break lines, floor and steel elevation symbols, and a halftoned linked model outline. | `dev.section-detailer` development commits |
 
 ## Backlog
 

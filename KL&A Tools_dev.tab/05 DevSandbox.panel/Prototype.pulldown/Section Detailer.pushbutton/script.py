@@ -17,6 +17,7 @@ from section_detailer.annotations import (
     BREAK_TYPE,
     CONCRETE_REGION,
     EARTH_FOLDER,
+    VENEER_FILL,
     ELEVATION_FAMILY,
     ELEVATION_PATH,
     ELEVATION_TYPE,
@@ -31,12 +32,14 @@ from section_detailer.annotations import (
     floor_label,
     inset_rect,
     is_concrete,
+    is_veneer,
     lowest_bottoms,
     merge_crossings,
     plate_centers,
     sheathing_layer,
     stud_layer,
     unique_tops,
+    veneer_layers,
     visible_top,
 )
 from section_detailer.matching import (
@@ -297,13 +300,14 @@ def _edge_points(edges, frame):
     return points
 
 
-def _cut_faces(element, frame, transform=None):
+def _cut_faces(element, frame, transform=None, solids=None):
     """Yield the element's faces on the section plane.
 
-    ``transform`` places a linked element in host coordinates.
+    ``transform`` places a linked element in host coordinates; ``solids``
+    limits the cut to some of the element's solids (one wall layer).
     """
     plane = frame.plane
-    for solid in _solids(element):
+    for solid in solids if solids is not None else _solids(element):
         try:
             if transform is not None:
                 solid = DB.SolidUtils.CreateTransformed(solid, transform)
@@ -331,10 +335,10 @@ def _cut_outline(element, frame):
     return points
 
 
-def _cut_regions(element, frame, transform=None):
+def _cut_regions(element, frame, transform=None, solids=None):
     """Return one region of ordered view-plane loops per cut face."""
     regions = []
-    for face in _cut_faces(element, frame, transform):
+    for face in _cut_faces(element, frame, transform, solids):
         loops = []
         for loop in face.EdgeLoops:
             points = []
@@ -681,20 +685,74 @@ def _link_filter(transform, frame):
     return DB.BoundingBoxIntersectsFilter(DB.Outline(low, high))
 
 
+def _solid_material(solid, link_doc):
+    """Return the material name most of a solid's faces carry, else ''."""
+    counts = {}
+    for face in solid.Faces:
+        material = link_doc.GetElement(face.MaterialElementId)
+        if material is not None:
+            counts[material.Name] = counts.get(material.Name, 0) + 1
+    return max(counts, key=counts.get) if counts else ''
+
+
+def _layer_strip(wall, regions, layers, transform, frame):
+    """Cut the veneer layers out of a single-solid wall's cut regions by offset."""
+    orientation = transform.OfVector(wall.Orientation)
+    sign = 1.0 if frame.in_view(_xyz(orientation))[0] >= 0 else -1.0
+    us = [point[0] for loops in regions for loop in loops for point in loop]
+    if not us:
+        return []
+    exterior = max(us) if sign > 0 else min(us)
+    strips = []
+    for offset, thickness in layers:
+        edges = (exterior - sign * offset, exterior - sign * (offset + thickness))
+        rect = (min(edges), float('-inf'), max(edges), float('inf'))
+        for loops in regions:
+            clipped = [loop for loop in (clip_polygon(loop, rect) for loop in loops) if loop]
+            if clipped:
+                strips.append(clipped)
+    return strips
+
+
+def _link_veneer(wall, link_doc, transform, frame):
+    """Return the cut regions of a linked wall's veneer layers."""
+    solids = list(_solids(wall))
+    veneer = [solid for solid in solids if is_veneer(_solid_material(solid, link_doc))]
+    if veneer:
+        return _cut_regions(wall, frame, transform, veneer)
+    wall_type = wall.WallType
+    if len(solids) != 1 or wall_type.Kind != DB.WallKind.Basic:
+        return []
+    layers = []
+    structure = wall_type.GetCompoundStructure()
+    for layer in structure.GetLayers() if structure else []:
+        material = link_doc.GetElement(layer.MaterialId)
+        layers.append((material.Name if material is not None else '', layer.Width))
+    found = veneer_layers(layers)
+    if not found:
+        return []
+    return _layer_strip(wall, _cut_regions(wall, frame, transform, solids), found,
+                        transform, frame)
+
+
 def _link_regions(link, frame):
-    """Return the cut regions of a linked model's elements on the section plane."""
+    """Return a linked model's cut regions on the section plane, and its veneer."""
     transform = link.GetTotalTransform()
-    collector = DB.FilteredElementCollector(link.GetLinkDocument()).WhereElementIsNotElementType()
+    link_doc = link.GetLinkDocument()
+    collector = DB.FilteredElementCollector(link_doc).WhereElementIsNotElementType()
     box_filter = _link_filter(transform, frame)
     if box_filter is not None:
         collector = collector.WherePasses(box_filter)
     regions = []
+    veneer = []
     for element in collector:
         category = element.Category
         if category is None or category.CategoryType != DB.CategoryType.Model:
             continue
         regions.extend(_cut_regions(element, frame, transform))
-    return regions
+        if isinstance(element, DB.Wall):
+            veneer.extend(_link_veneer(element, link_doc, transform, frame))
+    return regions, veneer
 
 
 def _outline_style():
@@ -769,6 +827,40 @@ def _concrete_region_type():
         sorted(named), title='No "{}" filled region type; pick one for concrete'.format(
             CONCRETE_REGION), button_name='Use type')
     return named.get(picked) if picked else None
+
+
+def _veneer_region_type(notes):
+    """Return a filled region type drawing the Diagonal Down pattern.
+
+    An existing type whose foreground is that pattern is used (one named
+    for it first); otherwise one is duplicated from the first type, so this
+    must run inside a transaction.
+    """
+    pattern = DB.FillPatternElement.GetFillPatternElementByName(
+        doc, DB.FillPatternTarget.Drafting, VENEER_FILL)
+    if pattern is None:
+        notes.append('No "{}" drafting fill pattern; veneer was not filled.'.format(VENEER_FILL))
+        return None
+    types = list(DB.FilteredElementCollector(doc).OfClass(DB.FilledRegionType))
+    matching = [item for item in types if item.ForegroundPatternId == pattern.Id]
+    matching.sort(key=lambda item: (VENEER_FILL.lower() not in
+                                    DB.Element.Name.GetValue(item).lower(),
+                                    len(DB.Element.Name.GetValue(item))))
+    if matching:
+        return matching[0]
+    if not types:
+        notes.append('No filled region types in the project; veneer was not filled.')
+        return None
+    names = set(DB.Element.Name.GetValue(item) for item in types)
+    name = VENEER_FILL
+    while name in names:
+        name = 'Veneer - ' + name
+    region_type = types[0].Duplicate(name)
+    region_type.ForegroundPatternId = pattern.Id
+    region_type.ForegroundPatternColor = DB.Color(0, 0, 0)
+    region_type.BackgroundPatternId = DB.ElementId.InvalidElementId
+    region_type.IsMasking = False
+    return region_type
 
 
 def _sheathing_symbol(thickness):
@@ -1171,17 +1263,32 @@ def _set_label(instance, text):
     return _set_text(instance, ELEVATION_TEXT_PARAMETERS, text)
 
 
+def _text_parameters(instance):
+    """Return ``name="value"`` for each of the instance's user text parameters."""
+    found = []
+    for parameter in instance.Parameters:
+        definition = parameter.Definition
+        if parameter.StorageType != DB.StorageType.String:
+            continue
+        if isinstance(definition, DB.InternalDefinition) and \
+                definition.BuiltInParameter != DB.BuiltInParameter.INVALID:
+            continue
+        found.append('{}="{}"'.format(definition.Name, parameter.AsString() or ''))
+    return sorted(found)
+
+
 def _place_elevations(tops, symbol, frame):
     """Place an elevation symbol at each top, outside the break lines.
 
-    With a crop the symbols line up just past its right edge, beyond the
-    break lines; without one each starts just past its element's end.
+    With a crop the symbols line up between the right break lines and the
+    crop edge, so they start inside the crop and are not hidden by the
+    annotation crop; without one each starts just past its element's end.
     """
     gap = ELEVATION_GAP * view.Scale
     placed = []
     unlabeled = []
     for top, right, label in tops:
-        start = (frame.crop[2] if frame.crop else right) + gap
+        start = (frame.trim[2] + frame.crop[2]) / 2.0 if frame.crop else right + gap
         instance = doc.Create.NewFamilyInstance(frame.to_model((start, top)), symbol, view)
         if not _set_label(instance, label):
             unlabeled.append(label)
@@ -1210,8 +1317,15 @@ def _curve_loop(points):
     return loop
 
 
-def _place_regions(regions, region_type, frame, notes):
-    """Fill each concrete cut region with the filled region type."""
+def _place_regions(regions, region_type, frame, notes, label='concrete', style=None,
+                   halftone=False):
+    """Fill each cut region with the filled region type.
+
+    ``style`` sets the region's boundary line style; ``halftone`` greys the
+    region in this view, as for the linked model's veneer.
+    """
+    overrides = DB.OverrideGraphicSettings()
+    overrides.SetHalftone(True)
     placed = []
     failed = 0
     for region in regions:
@@ -1223,12 +1337,23 @@ def _place_regions(regions, region_type, frame, notes):
         if loops.Count == 0:
             continue
         try:
-            placed.append(_finish(DB.FilledRegion.Create(doc, region_type.Id, view.Id, loops)))
+            region = DB.FilledRegion.Create(doc, region_type.Id, view.Id, loops)
         except Exception:
             failed += 1
+            continue
+        if style is not None:
+            try:
+                region.SetLineStyleId(style.Id)
+            except Exception:
+                notes.append('Could not set the {} region line style to {}.'.format(
+                    label, style.Name))
+                style = None
+        if halftone:
+            view.SetElementOverrides(region.Id, overrides)
+        placed.append(_finish(region))
     if failed:
-        notes.append('{} concrete region(s) had an invalid outline and were not filled.'.format(
-            failed))
+        notes.append('{} {} region(s) had an invalid outline and were not filled.'.format(
+            failed, label))
     return placed
 
 
@@ -1293,6 +1418,7 @@ def _report(placed, skipped, notes):
                                              (PLATE, 'wall plates'),
                                              ('sheathing', 'sheathing'),
                                              ('concrete', 'concrete regions'),
+                                             ('veneer', 'veneer regions'),
                                              ('soil', 'soil'),
                                              ('grid', 'grids'),
                                              ('break', 'break lines'),
@@ -1337,16 +1463,21 @@ def main():
     tops = floor_tops + _steel_tops(jobs, frame)
     crossings = _break_crossings(jobs, floor_outlines, frame)
     regions = []
+    veneer = []
     for link in _outline_links():
-        regions.extend(_link_regions(link, frame))
+        link_regions, link_veneer = _link_regions(link, frame)
+        regions.extend(link_regions)
+        veneer.extend(_clipped_region(loops, frame) for loops in link_veneer)
+    veneer = [region for region in veneer if region]
     segments = join_collinear(boundary_segments(regions)) if regions else []
-    style = _outline_style() if segments else None
+    style = _outline_style() if segments or veneer else None
     placed = {}
     notes = []
     if grids and frame.trim is None:
         notes.append('The view has no crop region; grid components were not placed.')
         grids = []
-    if not (jobs or plate_jobs or tops or sheathing or segments or concrete or soil or grids):
+    if not (jobs or plate_jobs or tops or sheathing or segments or veneer or concrete or soil
+            or grids):
         _report(placed, skipped, notes)
         return
     if segments and style is None:
@@ -1431,6 +1562,9 @@ def main():
                 else:
                     _activate(symbol)
                     placed['elevation'], unlabeled = _place_elevations(tops, symbol, frame)
+                    if placed['elevation']:
+                        notes.append('Elevation symbol text parameters: {}.'.format(
+                            ', '.join(_text_parameters(placed['elevation'][0])) or 'none'))
                     if unlabeled:
                         notes.append('Could not find a description parameter ({}) for '
                                      'elevation labels: {}.'.format(
@@ -1438,6 +1572,11 @@ def main():
                                          ', '.join(sorted(set(unlabeled)))))
             if segments and style is not None:
                 placed['outline'] = _draw_outline(segments, style, frame)
+            if veneer:
+                veneer_type = _veneer_region_type(notes)
+                if veneer_type is not None:
+                    placed['veneer'] = _place_regions(veneer, veneer_type, frame, notes,
+                                                      'veneer', style, halftone=True)
         group.Assimilate()
     except Exception:
         if group.HasStarted():
