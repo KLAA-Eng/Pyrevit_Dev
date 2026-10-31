@@ -128,9 +128,17 @@ def generate_images():
     return BEGIN + '\n' + inner + '\n' + END + '\n'
 
 
+# The markers as a formatter may leave them (comment padding, re-wrapped text), so the generator can repair a
+# reformatted block instead of crashing; the canonical BEGIN/END lines are always written back.
+_BEGIN = re.compile(r'^[ \t]*<!--\s*generated-icons:begin\b.*?-->[ \t]*\n', re.M | re.S)
+_END = re.compile(r'^[ \t]*<!--\s*generated-icons:end\s*-->[ \t]*\n', re.M)
+
+
 def apply_foundation_block(text, block):
-    start, end = text.index(BEGIN), text.index(END) + len(END) + 1
-    return text[:start] + block + text[end:]
+    begin, end = _BEGIN.search(text), _END.search(text)
+    if not begin or not end or end.start() < begin.end():
+        raise ValueError('KLCodeFoundation.xaml has no generated-icons:begin … generated-icons:end block to replace.')
+    return text[:begin.start()] + block + text[end.end():]
 
 
 _NUM = re.compile(r'-?\d*\.?\d+(?:e-?\d+)?')

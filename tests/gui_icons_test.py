@@ -47,10 +47,25 @@ class GuiIconTests(unittest.TestCase):
             for part in image.findall('.//' + P + 'GeometryDrawing')[1:]:
                 self.assertEqual('{StaticResource KlaGuiIconPen}', part.attrib['Pen'])
                 self.assertIn(part.attrib.get('Brush', '{StaticResource KlaTextBrush}'), ('{StaticResource KlaTextBrush}',))
-        self.assertIn('x:Key="KlaGuiIconPen" Brush="{StaticResource KlaTextBrush}" Thickness="{StaticResource KlaIconStroke}"', foundation)
-        self.assertIn('<ResourceDictionary Source="../../_icons/gui/KLCodeIcons.xaml"/>', foundation)
+        # Parsed, not matched as text: the hand-written part of the foundation may be reformatted.
+        shell = ET.fromstring(foundation)
+        pens = [node for node in shell.iter(P + 'Pen') if node.attrib.get(X + 'Key') == 'KlaGuiIconPen']
+        self.assertEqual(1, len(pens))
+        self.assertEqual('{StaticResource KlaTextBrush}', pens[0].attrib.get('Brush'))
+        self.assertEqual('{StaticResource KlaIconStroke}', pens[0].attrib.get('Thickness'))
+        merged = [node.attrib.get('Source') for node in shell.iter(P + 'ResourceDictionary')]
+        self.assertIn('../../_icons/gui/KLCodeIcons.xaml', merged)
         tokens = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeFoundationTokens.xaml').read_text(encoding='utf-8')
         self.assertNotIn('KLCodeIcons.xaml', tokens, 'icons are merged by the foundation, not by the tokens')
+
+    def test_foundation_block_is_repaired_after_a_formatter_pads_or_rewraps_its_markers(self):
+        foundation = icons.FOUNDATION.read_text(encoding='utf-8')
+        reformatted = foundation.replace(icons.END, '    <!--  generated-icons:end  -->').replace(
+            icons.BEGIN, '    <!--\n        generated-icons:begin — rewrapped by a formatter\n    -->')
+        self.assertNotEqual(foundation, reformatted)
+        self.assertEqual(foundation, icons.apply_foundation_block(reformatted, icons.generate_images()))
+        with self.assertRaises(ValueError):
+            icons.apply_foundation_block(foundation.replace('generated-icons:end', 'gone'), icons.generate_images())
 
     def test_wordmark_keeps_svg_geometry_separate_from_the_drawing_offset(self):
         self.assertEqual(icons.generate_wordmark(), icons.WORDMARK_XAML.read_text(encoding='utf-8'))

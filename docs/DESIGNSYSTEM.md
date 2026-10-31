@@ -210,7 +210,14 @@ An icon does not change the tool's behavior or classification.
 
 Edit attributed SVG sources and the generator's role mappings, then run
 `python -B scripts/generate_gui_icons.py`. Use `--check` to detect stale outputs.
-Do not hand-edit generated XAML. The shared wordmark template uses the generated
+Do not hand-edit generated XAML, and keep XAML formatters (XAML Styler and the
+like) off it: the generator's contract is byte equality, so a formatting pass over
+`KLCodeIcons.xaml`, `KLCodeWordmark.xaml` or the `generated-icons` block fails
+`--check` and the `gui_icons` tests. When formatting the hand-written resources,
+pass the formatter an explicit file list that leaves the two generated files out,
+then run `python -B scripts/generate_gui_icons.py` to restore the Foundation
+block and `--check` to confirm. `scripts/release_check.py` runs the check.
+The shared wordmark template uses the generated
 geometry at 70 x 12; its Path drawing transform preserves the former rendering.
 No runtime SVG renderer is required.
 

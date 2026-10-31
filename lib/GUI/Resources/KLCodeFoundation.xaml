@@ -132,10 +132,7 @@
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
                     <GeometryDrawing.Geometry>
-                        <EllipseGeometry
-                            Center="12,12"
-                            RadiusX="10"
-                            RadiusY="10" />
+                        <EllipseGeometry Center="12,12" RadiusX="10" RadiusY="10" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
@@ -193,34 +190,22 @@
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
                     <GeometryDrawing.Geometry>
-                        <RectangleGeometry
-                            RadiusX="1"
-                            RadiusY="1"
-                            Rect="3,3,7,7" />
+                        <RectangleGeometry Rect="3,3,7,7" RadiusX="1" RadiusY="1" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
                     <GeometryDrawing.Geometry>
-                        <RectangleGeometry
-                            RadiusX="1"
-                            RadiusY="1"
-                            Rect="14,3,7,7" />
+                        <RectangleGeometry Rect="14,3,7,7" RadiusX="1" RadiusY="1" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
                     <GeometryDrawing.Geometry>
-                        <RectangleGeometry
-                            RadiusX="1"
-                            RadiusY="1"
-                            Rect="14,14,7,7" />
+                        <RectangleGeometry Rect="14,14,7,7" RadiusX="1" RadiusY="1" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
                     <GeometryDrawing.Geometry>
-                        <RectangleGeometry
-                            RadiusX="1"
-                            RadiusY="1"
-                            Rect="3,14,7,7" />
+                        <RectangleGeometry Rect="3,14,7,7" RadiusX="1" RadiusY="1" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
             </DrawingGroup>
@@ -257,10 +242,7 @@
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
                     <GeometryDrawing.Geometry>
-                        <EllipseGeometry
-                            Center="12,12"
-                            RadiusX="10"
-                            RadiusY="10" />
+                        <EllipseGeometry Center="12,12" RadiusX="10" RadiusY="10" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
@@ -398,12 +380,9 @@
                         <PathGeometry Figures="M2 7v6.172a2 2 0 0 0 .586 1.414l6.71 6.71a2.4 2.4 0 0 0 3.191.193" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
-                <GeometryDrawing Brush="{StaticResource KlaTextBrush}" Pen="{StaticResource KlaGuiIconPen}">
+                <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}" Brush="{StaticResource KlaTextBrush}">
                     <GeometryDrawing.Geometry>
-                        <EllipseGeometry
-                            Center="10.5,6.5"
-                            RadiusX=".5"
-                            RadiusY=".5" />
+                        <EllipseGeometry Center="10.5,6.5" RadiusX=".5" RadiusY=".5" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
             </DrawingGroup>
@@ -424,10 +403,7 @@
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
                     <GeometryDrawing.Geometry>
-                        <EllipseGeometry
-                            Center="12,12"
-                            RadiusX="3"
-                            RadiusY="3" />
+                        <EllipseGeometry Center="12,12" RadiusX="3" RadiusY="3" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
             </DrawingGroup>
@@ -510,10 +486,7 @@
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
                     <GeometryDrawing.Geometry>
-                        <EllipseGeometry
-                            Center="11,11"
-                            RadiusX="8"
-                            RadiusY="8" />
+                        <EllipseGeometry Center="11,11" RadiusX="8" RadiusY="8" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
             </DrawingGroup>
@@ -529,10 +502,7 @@
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
                     <GeometryDrawing.Geometry>
-                        <EllipseGeometry
-                            Center="12,12"
-                            RadiusX="10"
-                            RadiusY="10" />
+                        <EllipseGeometry Center="12,12" RadiusX="10" RadiusY="10" />
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>
                 <GeometryDrawing Pen="{StaticResource KlaGuiIconPen}">
@@ -595,7 +565,7 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
-    <!--  generated-icons:end  -->
+    <!-- generated-icons:end -->
 
     <Style x:Key="KlaFoundationWindow" TargetType="Window">
         <Setter Property="Background" Value="{StaticResource KlaWindowBrush}" />

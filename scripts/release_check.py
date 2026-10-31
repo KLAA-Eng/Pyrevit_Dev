@@ -213,7 +213,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
     results = [run_command('Full test discovery', [sys.executable, '-m', 'unittest', 'discover',
                                                  '-s', 'tests', '-p', '*_test.py']),
-               run_command('Visible-command metadata audit', [sys.executable, 'scripts/check_tool_metadata.py'])]
+               run_command('Visible-command metadata audit', [sys.executable, 'scripts/check_tool_metadata.py']),
+               run_command('Generated GUI artwork is current', [sys.executable, '-B', 'scripts/generate_gui_icons.py', '--check'])]
     for label, arguments in [('Working-tree whitespace', ['diff', '--check']),
                              ('Staged whitespace', ['diff', '--cached', '--check']),
                              ('Release-delta whitespace (fetch origin first)', ['diff', '--check', 'origin/main...HEAD'])]:
