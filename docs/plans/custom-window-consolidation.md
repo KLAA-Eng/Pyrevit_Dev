@@ -218,7 +218,7 @@ initial delivery; this phase changes the current catalog.
 | --- | --- | --- | --- |
 | GUI-20 | Remove two Gallery variants | Implemented; locally verified | Confirmation/parameter entries and sample branches removed. 65 Gallery tests (one existing skip), 20 remaining dialog state layouts at normal/minimum sizes, and 91 custom/state WPF constructions pass; current catalog is 40 entries. Four bodies and message/selection APIs retained. |
 | GUI-21 | Refine remaining dialog/selector/switch design | Confirmed by owner | Owner explicitly said "confirmed, implement" after the final design summary. No further design approval gate for this scope. |
-| GUI-22 | Rework Action choice independently | Future; explicitly deferred by owner | Preserve the existing Action choice window/API. No layout or interaction changes in the current selector/message/text/command-switch delivery. Revisit as its own design effort. |
+| GUI-22 | Rework Action choice independently | Owner design interview opened 2026-10-30 | Inspect current behavior and Autodesk TaskDialog before grilling. Preserve the existing Action choice window/API until the interview settles its replacement design. |
 | GUI-23 | Refine Message, Text and shared selector interactions | Implemented; locally verified | Details growth/manual-height regression, repeated expansion, footer isolation, exact 36/24 Segoe UI Bold field, unclipped validation and explicit Select pass in actual WPF. [Evidence](../knowledge/reviews/design-system/2026-10-29-dialog-refinement.md). |
 | GUI-24 | Read-only collectors and five selector presets | Implemented; boundary tested | Eleven collector tests, SDK/API checks, host-free imports and prepared-row/modal helpers pass. Five fictional Gallery presets verified. Actual Revit model collection remains owner acceptance. |
 | GUI-25 | Separate floating Command Switch | Implemented; locally verified | Seven model tests plus real-WPF construction, minimum/long layouts, filtering/toggle clones/results/Close/Escape handler checks pass. Actual focus/keyboard/owner remains live acceptance. |
@@ -442,3 +442,27 @@ settled. No further interview approval gate applies to routine implementation.
 | GUI-36 | Input alignment, Selection initial focus and common OK actions | Owner's direct request; foundation TextBox and shared dialog consumers | Implemented; locally verified. Search/Group/Rename text origins match at 8, Selection opens neutrally, and Message/Text share 104 x 28 OK with 8-unit action gaps. 399 Python tests (one skip), 135 WPF constructions, shown focus fixtures, 17 compiled source tests and both runtimes pass. [Evidence](../knowledge/reviews/design-system/2026-10-30-input-alignment.md). |
 | GUI-37 | Floating Switch interaction and shared dialog presentation | Owner's direct request; Switch drag/outside dismissal, Message details/colors/title, Rename focus/compact groups, Text watermark | Implemented; locally verified. 399 Python tests (one skip), 130 WPF constructions and shown focus/capture/context-menu/modal checks pass. Native dragging and live Revit acceptance remain owner checks. [Evidence](../knowledge/reviews/design-system/2026-10-30-dialog-interaction-polish.md). |
 | GUI-38 | Reconcile owner window moves and Form removal | `_future` moves, Options/Review source names, Gallery inventory, imports, links and checks | Implemented; locally verified. 39 Gallery rows, 24 Window sources, 10 template state layouts; imports/resource paths, tests and current links updated. [Evidence](../knowledge/reviews/design-system/2026-10-30-dialog-interaction-polish.md). |
+| GUI-39 | Switch prompt, fitted Rename and neutral Text Entry | Owner's direct request; dialog-local presentation and focus | Implemented; locally verified. Visible glyph centering, 346/668/990 Rename widths and 12-unit vertical insets, wrapped long headings, hidden Text title, gray focus-aware watermark and four shown focus fixtures pass. [Evidence](../knowledge/reviews/design-system/2026-10-30-dialog-sizing-focus.md). |
+
+## Action Choice interview opened — 2026-10-30
+
+The owner requested GUI-39 completion before using KLCode grilling for Action
+Choice. No Action Choice implementation changes are authorized by interview
+recommendations alone. Existing production callers remain outside this delivery.
+
+Read-only inspection found a select-row/Continue API used only by Gallery and
+probes. Existing native TaskDialog tool callers use immediate Hide/Unhide command
+links with separate instruction/body and Cancel. Installed RevitAPIUI versions
+2024–2027 were inspected; official Autodesk 2026 TaskDialog documentation was
+checked. The decision tree begins with these independent questions:
+
+- Immediate command-link activation versus select/Continue.
+- Native content hierarchy with KLCode visual roles.
+- Small action limit and optional standard-button scope.
+- Optional severity/details/checkbox/help content.
+- Chrome title and whether the standard navigation/version footer remains.
+
+Once those choices settle, resolve keyboard defaults/Enter, cancellation policy,
+button/result contracts, checkbox meaning and Gallery variants. No first-round
+choices have been settled yet. Automatic decision persistence/Revit.ini writes,
+progress, and production migrations are proposed exclusions for this effort.

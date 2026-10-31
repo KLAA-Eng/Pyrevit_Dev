@@ -1,6 +1,6 @@
 """Opt-in owned-window focus acceptance, without Revit or injected user input."""
 from GUI.dialogs import (create_command_switch, create_selection, ActionChoice, SelectionItem,
-                         create_rename, RenameField)
+                         create_rename, RenameField, create_text_prompt)
 from System.Windows.Input import FocusManager
 from System.Windows.Automation.Peers import UIElementAutomationPeer
 from System.Windows.Controls import CheckBox
@@ -59,7 +59,33 @@ def validate_shown_focus():
         print('Shown Rename: neutral initial focus, four empty unselected fields and no initial input caret passed.')
     finally:
         window.Close()
-    print('Three owned fictional windows closed. No Revit, user documents or system-wide input injection used.')
+    window = create_text_prompt('KLCode Text focus fixture', 'Optional text')
+    try:
+        window.Show()
+        window.Activate()
+        settle_layout(window.Content)
+        assert FocusManager.GetFocusedElement(window) == window.window_body
+        assert not window.input_text.IsKeyboardFocusWithin and window.input_text.SelectionLength == 0
+        assert window.input_placeholder.Visibility == Visibility.Visible
+        assert window._kla_chrome.title.Visibility == Visibility.Collapsed
+        assert window.input_placeholder.Foreground == window.FindResource('KlaFooterVersionBrush')
+        window.input_text.Focus()
+        settle_layout(window.Content)
+        assert window.input_placeholder.Visibility == Visibility.Collapsed, 'Focus hides the empty watermark'
+        window.input_text.Text = 'Caller text'
+        window.input_text.SelectAll()
+        window.window_body.Focus()
+        settle_layout(window.Content)
+        assert window.input_placeholder.Visibility == Visibility.Collapsed, 'Nonempty text never shows the watermark'
+        window.input_text.Clear()
+        settle_layout(window.Content)
+        assert window.input_placeholder.Visibility == Visibility.Visible, 'Empty unfocused field restores the watermark'
+        if output_directory:
+            render_content(window, os.path.join(output_directory, 'text-entry-shown-neutral.png'), window.Width, window.Height)
+        print('Shown Text Entry: neutral initial focus, blank center title, gray watermark hidden on focus and restored on empty blur passed.')
+    finally:
+        window.Close()
+    print('Four owned fictional windows closed. No Revit, user documents or system-wide input injection used.')
 
 
 validate_shown_focus()

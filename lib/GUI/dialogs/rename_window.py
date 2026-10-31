@@ -24,7 +24,7 @@ def _window_type():
         from pyrevit.framework import wpf
     from System import IntPtr
     from System.Windows import (Window, WindowStartupLocation, Visibility, Size,
-                                Thickness, GridLength, GridUnitType, HorizontalAlignment)
+                                Thickness, GridLength, HorizontalAlignment)
     from System.Windows.Automation import AutomationProperties
     from System.Windows.Controls import (Grid, StackPanel, Label, TextBox,
                                          Border, Button, ItemsControl,
@@ -42,8 +42,8 @@ def _window_type():
             self.field_containers = []
             load_window(self, os.path.join(os.path.dirname(__file__), 'RenameDialog.xaml'),
                         title, version=version, navigate=navigate, close_handler=self.cancel)
-            self._baseline_min_height = self.MinHeight
-            self.Width = self.MinWidth = 384 + 328 * (len(state.fields) - 1)
+            inset = self.FindResource('KlaBodyInset')
+            self._kla_chrome.body.Margin = Thickness(inset.Left, 12, inset.Right, 12)
             if owner is not None:
                 if isinstance(owner, Window):
                     self.Owner = owner
@@ -52,6 +52,15 @@ def _window_type():
                 self.WindowStartupLocation = WindowStartupLocation.CenterOwner
             for index, field in enumerate(state.fields):
                 self.add_field(index, field)
+            # Fit the actual section widths rather than the retired template.
+            width = self._kla_chrome.body.Margin.Left + self._kla_chrome.body.Margin.Right
+            for controls in self.field_controls:
+                controls.naming_group.Measure(Size(float('inf'), float('inf')))
+                # Wrap caller headings within their section instead of letting
+                # an Auto column push subsequent groups outside the window.
+                controls.container.Width = controls.naming_group.DesiredSize.Width
+                width += controls.naming_group.DesiredSize.Width + controls.container.Margin.Right
+            self.Width = self.MinWidth = width
             self._ready = True
             self.fit_height()
             self.Loaded += self.focus_input
@@ -59,7 +68,7 @@ def _window_type():
 
         def add_field(self, index, field):
             column = ColumnDefinition()
-            column.Width = GridLength(1, GridUnitType.Star)
+            column.Width = GridLength.Auto
             self.fields_panel.ColumnDefinitions.Add(column)
             controls = FieldControls()
             controls.field = field
@@ -69,7 +78,7 @@ def _window_type():
             controls.container.Name = 'rename_field_{0}'.format(index)
             AutomationProperties.SetAutomationId(controls.container, controls.container.Name)
             controls.label = Label()
-            controls.label.Style = self.FindResource('KlaPromptLabel')
+            controls.label.Style = self.FindResource('KlaRenamePromptLabel')
             controls.label.Content = field.Label
             controls.label.Margin = Thickness(0, 0, 0, 8)
             controls.container.Children.Add(controls.label)
@@ -129,13 +138,13 @@ def _window_type():
 
         def fit_height(self):
             from math import ceil
-            inset = self.FindResource('KlaBodyInset')
+            inset = self._kla_chrome.body.Margin
             bounds = Size(max(1, self.Width - inset.Left - inset.Right), float('inf'))
             height = 2 * self.FindResource('KlaChromeRow').Value + inset.Top + inset.Bottom
             for control in (self.fields_panel, self.validation_text, self.accept_button):
                 control.Measure(bounds)
                 height += control.DesiredSize.Height
-            self.MinHeight = min(self.MaxHeight, max(self._baseline_min_height, ceil(height)))
+            self.MinHeight = min(self.MaxHeight, ceil(height))
             self.Height = self.MinHeight
 
         def feedback(self, text):

@@ -79,9 +79,12 @@ with an 8-unit gap below the message or Details content.
 
 Text options are `default=''`, `required=False`, `validator=None`. The field is
 36 high, FontSize 24, centered Segoe UI Bold. No visible prompt header is shown;
-an empty field displays `[ENTER TEXT]` as a watermark. It is never returned as
+an empty, unfocused field displays `[ENTER TEXT]` as a vertically centered
+watermark in `KlaFooterVersionBrush` gray (#808080). Focusing the input hides it.
+It is never returned as
 input. The caller prompt still labels the input for accessibility. Compact
-height fits input/error. Title/Close remain; `WindowChrome.hide_footer()`
+height fits input/error. The center chrome title is blank; caller Window.Title
+and Close remain. `WindowChrome.hide_footer()`
 collapses only this template instance's footer row. It does not alter other shell instances.
 Input-or-validation/OK gaps are 8 units. OK uses the same
 104 x 28 `KlaButton` as Message and is the only visible
@@ -89,7 +92,8 @@ action; title Close or Escape cancels. Natural minimum height keeps these gaps
 instead of stretching blank space above the action.
 Required checks whitespace without changing the returned string. A pure, quick
 validator returns an error string or None; unexpected exceptions propagate as
-programming errors. Editing clears feedback. Initial focus selects default text.
+programming errors. Editing clears feedback. Initial focus is the neutral body;
+the input and any caller default are not selected automatically.
 Enter accepts valid text; Escape cancels. Message Enter acknowledges OK.
 
 ## Selection and collectors
@@ -176,6 +180,8 @@ wrapping immediate command buttons and optional toggle pills. No corner x,
 standard header/footer or Continue action. KLCode colors/roles come from
 [KLCodeCommandSwitch.xaml](../Resources/KLCodeCommandSwitch.xaml), which merges
 Components and defines opt-in styles. No upstream XAML/assets are copied.
+The outer panel has no outline. Its 16-unit SemiBold prompt centers vertically
+beside the search input.
 
 Initial focus rests on the neutral panel; search is neither focused nor selected
 on open. Typing moves to search and filters command labels/descriptions; optional toggles
@@ -195,7 +201,9 @@ The result is `{'command': key, 'switches': {key: bool}}`; caller commands never
 allow_case=True)` describes a property group. `create_rename(title, fields,
 version=None, owner=None, navigate=None)` constructs the window; `rename(...)`
 shows it. One to three groups are arranged horizontally, with minimum widths
-384, 712 and 1040 respectively. Each has one Find/Replace pair and Prefix/Suffix.
+346, 668 and 990 respectively, fitted to their sections with 16-unit horizontal
+outer insets. Height fits the actual content, with 12-unit header-to-label and
+action-to-footer gaps. Each has one Find/Replace pair and Prefix/Suffix.
 Optional Uppercase/Lowercase buttons are separate actions for their own field.
 Initial focus rests on the neutral body; no field is selected. Compact labels
 and fitted section borders keep the inputs close, with standard 8-unit action gaps.
@@ -228,10 +236,11 @@ Direct keyboard-handler dispatch does not prove live input/focus. Revit data,
 owner/modal lifetime, pointer-driven resize flicker, keyboard traversal and DPI
 remain explicitly identified host acceptance checks.
 
-The opt-in `-ShowFocusProbe` Windows run briefly opens three owned fictional
+The opt-in `-ShowFocusProbe` Windows run briefly opens four owned fictional
 windows: UIA identifies the search field, initial Command Switch focus stays on
 the neutral panel, and programmatically focused buttons/checks retain their
 normal borders. Rename also opens with neutral body focus and no field selected.
+Text opens neutrally, with a blank center title and watermark focus/blur checks.
 An additional owned Switch fixture checks capture, context-menu preservation,
 outside routed clicks and modal dismissal. This does not establish physical keyboard/pointer routing or
 Revit ownership. Shared button/check/radio/toggle styles use no focus adorner;

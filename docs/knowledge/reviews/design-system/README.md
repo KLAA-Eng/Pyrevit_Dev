@@ -5,6 +5,7 @@ implementation guide is [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
 
 | Review | Scope |
 | --- | --- |
+| [2026-10-30 dialog sizing and focus](2026-10-30-dialog-sizing-focus.md) | Centered Switch prompt, fitted Rename bounds/long headings, neutral Text Entry and focus-aware gray watermark. |
 | [2026-10-30 dialog interaction polish](2026-10-30-dialog-interaction-polish.md) | Switch drag/outside dismissal and context-menu capture, Message presentation, neutral compact Rename, Text watermark, owner file moves and Form retirement. |
 | [2026-10-30 input alignment and actions](2026-10-30-input-alignment.md) | Correct doubled foundation TextBox padding, neutral Selection focus, shared compact OK buttons and standard action spacing. |
 | [2026-10-30 footerless alerts](2026-10-30-footerless-alerts.md) | Remove footer and reserved row from shared Message variants and legacy CustomAlert; preserve other shells and verify Details/overflow. |

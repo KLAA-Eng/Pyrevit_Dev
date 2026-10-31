@@ -564,6 +564,9 @@ actions for their group; Rename validates and returns the entered rules. The
 dialog does not preview or perform model changes.
 It opens with neutral body focus and no field selected. Its compact label column
 and fitted section border remove excess gaps around the inputs; action gaps are 8.
+The initial window fits those sections at 346/668/990 units for one/two/three
+groups, with 16-unit horizontal outer insets and 12-unit header-to-label and
+action-to-footer gaps. Height fits current content and validation.
 
 Message/details overflow is bounded and scrollable. Initial Message height fits
 content; manual width changes no longer force a new height. Deferred Details
@@ -571,7 +574,10 @@ measurement grows the bottom and protects the message viewport until capped.
 Message leaves its center chrome title blank while retaining caller Window.Title
 metadata and Close. Text removes its footer row and visible prompt header and
 uses the larger Segoe UI Bold single-line field, with an empty-field `[ENTER TEXT]`
-watermark that is never input data. The caller prompt remains an accessible name.
+watermark that is never input data. It uses footer version gray (#808080), centers
+vertically, and disappears whenever the input has keyboard focus. Text opens
+with neutral body focus and a blank center chrome title, retaining caller
+Window.Title metadata and Close. The caller prompt remains an accessible name.
 Its compact height fits input/error. Its only visible
 action is the same 104 x 28 `KlaButton` OK used by Message; both use an 8-unit
 content-to-action gap through `KlaActionTopGap`. Close/Escape
@@ -587,6 +593,7 @@ centered gray Select All/None pair above green Select replace the former action
 row; Close/Escape cancels. The selected/visible summary below selector lists is
 removed; inline validation stays, with no empty summary gap. Command Switch is a
 compact, fixed-width, content-height floating panel without header/footer. Its
+outer panel has no outline; its 16-unit SemiBold prompt centers beside search. Its
 buttons choose immediately and toggles remain visible during filtering. It has
 no corner x and starts with neutral panel focus rather than selected search;
 typing or Tab can enter search. Escape clears search then cancels; blank panel
@@ -703,9 +710,10 @@ dotnet run --project src/KLCode.Wpf/Tests/KLCode.Wpf.Desktop.Smoke --framework n
 dotnet run --project src/KLCode.Wpf/Tests/KLCode.Wpf.Desktop.Smoke --framework net8.0-windows --no-restore -- <tmp>
 ```
 
-Add `-ShowFocusProbe` to the WPF command to briefly show and close two owned
+Add `-ShowFocusProbe` to the WPF command to briefly show and close four owned
 fictional windows. It checks neutral Command Switch initial focus through UIA
-and verifies retained programmatic button/checkbox focus without an adorner.
+and verifies retained programmatic button/checkbox focus without an adorner,
+neutral Rename fields, and Text Entry's initial focus and watermark transitions.
 No Revit session or user document is used. Default probe execution stays offscreen.
 
 Replace `<tmp>` with a writable evidence directory. The probes default to the

@@ -61,7 +61,7 @@ def validate_rename_dialogs():
     output = globals().get('output_directory', '')
     if output and not os.path.isdir(output):
         os.makedirs(output)
-    for count, width in ((1, 384), (2, 712), (3, 1040)):
+    for count, width in ((1, 346), (2, 668), (3, 990)):
         for state in ('Normal', 'Empty', 'Error', 'Disabled', 'Long content'):
             fields = [RenameField('field-{0}'.format(i), 'Naming Group {0}'.format(i + 1),
                        find='A' if state != 'Empty' else '',
@@ -92,6 +92,8 @@ def validate_rename_dialogs():
                 if previous is not None:
                     assert position.Y == previous.Y and position.X > previous.X, 'Groups must remain horizontal'
                 previous = position
+                header_bottom = window._kla_chrome.header.TranslatePoint(Point(0, window._kla_chrome.header.ActualHeight), window.Content).Y
+                assert abs(controls.label.TranslatePoint(Point(0, 0), window.Content).Y - header_bottom - 12) < 0.1
                 for name in ('find', 'replace', 'prefix', 'suffix'):
                     control = getattr(controls, name + '_text')
                     point = control.TranslatePoint(Point(0, 0), window.Content)
@@ -101,24 +103,47 @@ def validate_rename_dialogs():
                 input_right = controls.find_text.TranslatePoint(Point(controls.find_text.ActualWidth, 0), controls.naming_group).X
                 assert abs(controls.naming_group.ActualWidth - input_right - 9) < 0.1, 'Section hugs the input with an 8-unit inset plus its border'
                 assert controls.find_text.TranslatePoint(Point(0, 0), controls.naming_group).X == 65, 'Compact labels use a 52-unit column'
+                if index == count - 1:
+                    group_right = controls.naming_group.TranslatePoint(Point(controls.naming_group.ActualWidth, 0), window.Content).X
+                    assert abs(window.Width - group_right - 16) < 0.1, 'No unused trailing column remains'
                 if controls.case_actions.Visibility == Visibility.Visible:
                     gap = controls.lower_button.TranslatePoint(Point(0, 0), controls.case_actions).X - controls.upper_button.TranslatePoint(Point(controls.upper_button.ActualWidth, 0), controls.case_actions).X
                     assert abs(gap - 8) < 0.1, 'Case actions use the standard 8-unit pair gap'
             footer_y = window._kla_chrome.footer.TranslatePoint(Point(0, 0), window.Content).Y
             button_bottom = window.accept_button.TranslatePoint(Point(0, window.accept_button.ActualHeight), window.Content).Y
-            assert button_bottom <= footer_y, (count, state, window.Height, button_bottom, footer_y)
+            assert abs(footer_y - button_bottom - 12) < 0.1, (count, state, window.Height, button_bottom, footer_y)
             if output:
                 rename_capture(window, os.path.join(output, 'rename-{0}-{1}.png'.format(count, state.lower().replace(' ', '-'))))
             window.Close()
 
     originals = [RenameField('number', 'Sheet Number', allow_case=False), RenameField('name', 'Sheet Name')]
+    window = create_rename('Long headings', [
+        RenameField('first', 'Very long caller supplied property name for a Revit family parameter'),
+        RenameField('second', 'Second property', allow_case=False)])
+    rename_layout(window)
+    assert window.field_controls[0].label.ActualHeight > 24, 'Long caller headings wrap within their section'
+    for controls in window.field_controls:
+        assert controls.container.ActualWidth == controls.naming_group.ActualWidth == 314
+        right = controls.naming_group.TranslatePoint(Point(controls.naming_group.ActualWidth, 0), window.Content).X
+        assert right <= window.Width - 16, 'Long headings cannot push later fields offscreen'
+    assert window.rename_scroll.ScrollableWidth == window.rename_scroll.ScrollableHeight == 0
+    window.Close()
+    window = create_rename('No case actions', [RenameField('name', 'Name', allow_case=False)])
+    rename_layout(window)
+    no_case_height = window.Height
+    window.Close()
+    window = create_rename('Case actions', [RenameField('name', 'Name')])
+    rename_layout(window)
+    assert window.Height - no_case_height == 36, 'Omitted case actions must not reserve their old height'
+    window.Close()
     window = create_rename('Rules', originals)
+    baseline_height = window.MinHeight
     window.field_controls[1].replace_text.Text = 'invalid without find'
     rename_click(window.accept_button)
     assert window.result.is_cancelled and window.validation_text.Text.startswith('Sheet Name:')
-    assert window.MinHeight > 313
+    assert window.MinHeight > baseline_height
     window.field_controls[1].find_text.Text = 'A'
-    assert window.MinHeight == 313, 'Clearing feedback must restore the original minimum without growth drift'
+    assert window.MinHeight == baseline_height, 'Clearing feedback must restore the fitted minimum without growth drift'
     window.field_controls[1].prefix_text.Text = 'PRE-'
     class EnterArgs(object):
         Key = Key.Enter

@@ -140,6 +140,15 @@ def validate_shared_dialogs():
                 import GUI.dialogs as shared_api
                 assert callable(shared_api.command_switch), 'Lazy loading must preserve the public modal helper'
                 assert window.toggles_panel.Children.Count == (2 if identity == 'dialog-command-switch' else 0)
+                assert window.switch_panel.BorderThickness.Left == window.switch_panel.BorderThickness.Top == 0
+                assert window.prompt_label.FontSize == 16 and str(window.prompt_label.FontWeight) == 'SemiBold'
+                prompt_y = window.prompt_label.TranslatePoint(Point(0, window.prompt_label.ActualHeight / 2), window.Content).Y
+                search_y = window.search_text.TranslatePoint(Point(0, window.search_text.ActualHeight / 2), window.Content).Y
+                assert abs(prompt_y - search_y) < 0.1, 'Switch prompt and input share their vertical center'
+                prompt_text = next(part for part in descendants(window.prompt_label) if isinstance(part, TextBlock))
+                prompt_ink = VisualTreeHelper.GetDrawing(prompt_text).Bounds
+                prompt_center = prompt_text.TranslatePoint(Point(0, prompt_ink.Y + prompt_ink.Height / 2), window.Content).Y
+                assert abs(prompt_center - search_y) < 0.5, 'Switch prompt ink center: {} vs {}'.format(prompt_center, search_y)
             if hasattr(window, 'input_text'):
                 assert window.input_text.ActualHeight == 36 and window.input_text.FontSize == 24
                 assert str(window.input_text.FontWeight) == 'Bold' and str(window.input_text.FontFamily) == 'Segoe UI'
@@ -304,6 +313,9 @@ def validate_shared_dialogs():
     window = create_text_prompt('Blank', 'Optional value')
     dialog_layout(window)
     assert window.input_text.Text == '' and window.input_placeholder.Visibility == Visibility.Visible
+    watermark_ink = VisualTreeHelper.GetDrawing(window.input_placeholder).Bounds
+    watermark_y = window.input_placeholder.TranslatePoint(Point(0, watermark_ink.Y + watermark_ink.Height / 2), window.input_text).Y
+    assert abs(watermark_y - window.input_text.ActualHeight / 2) < 0.5, 'Watermark ink center: {}'.format(watermark_y)
     window.input_text.Text = 'Caller text'
     dialog_layout(window)
     assert window.input_placeholder.Visibility == Visibility.Collapsed

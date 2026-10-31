@@ -3,21 +3,27 @@
         Title="Enter Text" Width="560" Height="180" MinWidth="480" MinHeight="0" MaxHeight="560" WindowStartupLocation="CenterScreen"
         ResizeMode="CanResizeWithGrip" Style="{StaticResource KlaWindow}" >
     <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
-        <Grid x:Name="window_body">
+        <Grid x:Name="window_body" Focusable="True" KeyboardNavigation.IsTabStop="False" FocusVisualStyle="{x:Null}">
             <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
             <ScrollViewer x:Name="prompt_scroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel x:Name="prompt_fields">
                     <Grid>
                         <TextBox x:Name="input_text" Style="{StaticResource KlaTextPromptInput}" TextChanged="text_changed" AcceptsReturn="False" AcceptsTab="False" AutomationProperties.Name="Text value"/>
+                        <!-- Compact line height plus the optical inset centers the visible capital glyphs. -->
                         <TextBlock x:Name="input_placeholder" Text="[ENTER TEXT]" IsHitTestVisible="False"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Margin="0,0,0,2"
                                    FontSize="{StaticResource KlaTextPromptInputFontSize}" FontWeight="Bold"
-                                   Foreground="{StaticResource KlaMutedBrush}">
+                                   LineHeight="24" LineStackingStrategy="BlockLineHeight"
+                                   Foreground="{StaticResource KlaFooterVersionBrush}">
                             <TextBlock.Style><Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed"/>
-                                <Style.Triggers><DataTrigger Binding="{Binding Text, ElementName=input_text}" Value="">
+                                <Style.Triggers><MultiDataTrigger><MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding Text, ElementName=input_text}" Value=""/>
+                                    <Condition Binding="{Binding IsKeyboardFocusWithin, ElementName=input_text}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
                                     <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger></Style.Triggers>
+                                </MultiDataTrigger></Style.Triggers>
                             </Style></TextBlock.Style>
                         </TextBlock>
                     </Grid>

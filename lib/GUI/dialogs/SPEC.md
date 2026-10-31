@@ -46,10 +46,13 @@ owns implementation status. The [API guide](README.md) owns usage examples.
 - AC-005: Text prompts preserve raw input. Accepted empty text differs from
   cancellation. Required and optional caller validation show inline feedback.
   Compact height fits input/validation; no separate visible prompt header.
-  The empty input displays `[ENTER TEXT]` as a watermark, never a field value
+  The empty, unfocused input displays `[ENTER TEXT]` as a watermark in footer
+  version gray (#808080); focusing the input hides it even before typing.
+  Initial focus is neutral, with no input selection. The watermark is never a field value
   or accepted result. Caller defaults remain actual editable input.
   Input is 36 high, FontSize 24, centered
-  Segoe UI Bold with KLCode colors. Retain title/Close; remove footer and its
+  Segoe UI Bold with KLCode colors. The center chrome title is blank, retaining
+  caller Window.Title metadata and Close; remove footer and its
   reserved row. Input-or-validation/OK gaps are 8. The only
   visible action is the same 104 x 28 `KlaButton` OK used by Message; no Cancel button.
   Both use the standard 8-unit content-to-action gap. Content-driven minimum height avoids
@@ -83,6 +86,8 @@ owns implementation status. The [API guide](README.md) owns usage examples.
 - AC-009: Separate Command Switch matches the compact floating pyRevit layout
   with KLCode colors: prompt/search, wrapping immediate command buttons,
   optional toggles; no corner x, shared header/footer or Continue button.
+  The panel has no outline. Its 16-unit SemiBold prompt centers vertically
+  beside the search input.
   Initial focus is the neutral panel, not the search field. Typing or Tab can
   enter search; it is not selected automatically on open.
   Typing filters commands only; toggles retain state/visibility. Tab traverses,
@@ -106,7 +111,10 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   cancels. Case actions close without applying model changes. No live preview,
   Revit mutation or existing tool migration is part of this shared dialog.
   Initial focus is neutral, with no field selected. Compact label/input spacing
-  and a fitted section border remove unused trailing space; action gaps are 8.
+  and fitted section/window bounds remove unused trailing space; action gaps are 8.
+  Initial widths are 346/668/990 for one/two/three groups, with a 16-unit outer
+  horizontal inset. Header-to-label and action-to-footer gaps are 12; initial
+  height fits the current controls and any validation, without a legacy floor.
 
 Prepared-row factories are host-independent; optional modal convenience helpers
 invoke collectors in a valid Revit API context before showing UI. Callers own

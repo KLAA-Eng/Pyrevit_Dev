@@ -231,6 +231,7 @@ def _window_types():
             self.validator = validator
             self.initialize('TextPromptDialog.xaml', title, version, owner, navigate)
             self._kla_chrome.hide_footer()
+            self._kla_chrome.title.Visibility = Visibility.Collapsed
             from System.Windows.Automation import AutomationProperties
             AutomationProperties.SetName(self.input_text, prompt or 'Text value')
             self.input_text.Text = default
@@ -265,8 +266,8 @@ def _window_types():
 
         def focus_input(self, sender, args):
             self.fit_prompt()
-            self.input_text.Focus()
-            self.input_text.SelectAll()
+            if not self.window_body.Focus():
+                self.Focus()
 
         def text_changed(self, sender, args):
             if self._ready:

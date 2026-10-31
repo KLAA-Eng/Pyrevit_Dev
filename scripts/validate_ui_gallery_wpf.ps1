@@ -4,7 +4,7 @@ param(
     [switch]$ShowFocusProbe
 )
 # Isolated .NET Framework WPF validation, without a Revit process or model.
-# Default is offscreen; ShowFocusProbe briefly opens/closes two owned fixtures.
+# Default is offscreen; ShowFocusProbe briefly opens/closes owned fictional fixtures.
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase,System.IO.Compression
 $galleryEngineAssembly = [Reflection.Assembly]::LoadFrom((Join-Path $EngineDirectory 'pyRevitLabs.IronPython.dll'))
