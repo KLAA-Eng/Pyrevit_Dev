@@ -3,7 +3,7 @@
 """Scale lint for KLCode XAML.
 
 Strict files (the shared foundation dictionaries) may not carry numeric layout literals at all: every
-size, gap, radius and border weight is a typed token in KLCodeFoundationTokens.xaml. Consumer windows are
+size, gap, radius and border weight is a typed token in KLCodeTokens.xaml. Consumer windows are
 reported: any Margin / Padding component that is not on the 4 / 8 / 12 / 16 / 24 spacing scale (or 0)
 is listed with its file and line, so the drift is visible without failing the build until the owner
 decides to make it fail (``--fail-on-report``).
@@ -18,9 +18,8 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STRICT = ('lib/GUI/Resources/KLCodeFoundation.xaml', 'lib/GUI/Resources/KLCodeComponents.xaml',
-          'lib/GUI/Resources/KLCodeCommandSwitch.xaml')
-EXEMPT = ('lib/GUI/Resources/KLCodeSharedPrimitives.xaml',)  # merges only the palette and generated geometry, so it cannot name tokens
+STRICT = ('lib/GUI/Resources/KLCodeFoundation.xaml', 'lib/GUI/Resources/KLCodeComponents.xaml')
+EXEMPT = ()  # Every shared dictionary now merges the tokens, so none is exempt.
 SCALE = (0, 4, 8, 12, 16, 24)
 LAYOUT = ('Margin', 'Padding', 'Width', 'Height', 'MinWidth', 'MinHeight', 'MaxWidth', 'MaxHeight',
           'CornerRadius', 'BorderThickness', 'FontSize', 'StrokeThickness', 'KeyboardIncrement')

@@ -28,7 +28,7 @@ public sealed class WindowChrome
         Hyperlink outreach = Part<Hyperlink>(shell, "PART_Outreach");
         prototype.RequestNavigate += OnNavigate;
         outreach.RequestNavigate += OnNavigate;
-        // Labels and destinations come from KLCodeChrome.xaml through the template (DynamicResource), so the
+        // Labels and destinations come from KLCodeTokens.xaml through the template (DynamicResource), so the
         // locale dictionary ThemeBootstrapper merges after the controls overrides them without adapter code.
     }
 

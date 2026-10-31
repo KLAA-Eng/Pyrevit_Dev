@@ -46,9 +46,8 @@ def _window_type():
             self._context_menu = None
             self._command_buttons = {}
             self._toggle_buttons = {}
-            resource_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                                         'Resources', 'KLCodeCommandSwitch.xaml')
-            self.Resources.MergedDictionaries.Add(shared_resources(resource_path))
+            # The pill styles live in KLCodeComponents.xaml with every other shared style.
+            self.Resources.MergedDictionaries.Add(shared_resources())
             wpf.LoadComponent(self, os.path.join(os.path.dirname(__file__), 'CommandSwitchDialog.xaml'))
             self.Title = self.metadata.Title
             self.prompt_label.Content = prompt

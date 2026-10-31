@@ -12,7 +12,7 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
 - `scripts/generate_gui_icons.py` owns semantic role mappings and generation.
   Run it after changing sources; `--check` detects stale generated resources.
 
-`KLCodeSharedPrimitives.xaml` merges the geometry; `KLCodeFoundation.xaml` owns the presenter, bound to
+`KLCodeFoundation.xaml` merges the geometry and owns the presenter, bound to
 tokens (`KlaIconSize`, `KlaIconCanvas`, `KlaIconStroke`, `KlaDisabledTextBrush`).
 The presenter is the only way to draw a GUI icon: it follows its parent's
 foreground and turns gray when disabled. There are no fixed-color ImageSources

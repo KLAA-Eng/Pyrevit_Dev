@@ -68,7 +68,7 @@ public sealed class DesignSystemResourceContractTests
     [TestMethod]
     public void CanonicalPalette_DefinesRequiredKeysWithoutEventHandlers()
     {
-        XDocument palette = LoadXaml("lib/GUI/Resources/KLCode_palette.xaml");
+        XDocument palette = LoadXaml("lib/GUI/Resources/KLCodeTokens.xaml");
         HashSet<string> keys = palette
             .Descendants()
             .Select(element => (string?)element.Attribute(Xaml + "Key"))
@@ -93,7 +93,7 @@ public sealed class DesignSystemResourceContractTests
         }
         Assert.IsFalse(
             palette.Descendants().Attributes().Any(IsEventAttribute),
-            "The canonical palette must remain data-only so compiled WPF can load it.");
+            "The token dictionary must remain data-only so compiled WPF can load it.");
     }
 
     [TestMethod]
@@ -106,19 +106,20 @@ public sealed class DesignSystemResourceContractTests
             .Select(attribute => attribute.Value)
             .ToArray();
 
-        CollectionAssert.Contains(mergedSources, "KLCodeSharedPrimitives.xaml");
+        CollectionAssert.AreEqual(new[] { "KLCodeTokens.xaml", "klIcons.xaml" }, mergedSources);
         CollectionAssert.DoesNotContain(mergedSources, "WPF_styles.xaml");
-        XDocument primitives = LoadXaml("lib/GUI/Resources/KLCodeSharedPrimitives.xaml");
-        Assert.IsTrue(primitives.Descendants(Presentation + "ResourceDictionary")
-            .Any(element => (string?)element.Attribute("Source") == "KLCode_palette.xaml"));
-        Assert.IsFalse(primitives.Descendants().Attributes().Any(IsEventAttribute));
-        Assert.AreEqual(0, primitives.Descendants(Presentation + "EventSetter").Count());
+        foreach (string file in new[] { "KLCodeTokens.xaml", "KLCodeFoundation.xaml", "KLCodeComponents.xaml" })
+        {
+            XDocument dictionary = LoadXaml("lib/GUI/Resources/" + file);
+            Assert.IsFalse(dictionary.Descendants().Attributes().Any(IsEventAttribute), file);
+            Assert.AreEqual(0, dictionary.Descendants(Presentation + "EventSetter").Count(), file);
+        }
     }
 
     [TestMethod]
     public void ChromeData_HoldsBothFooterDestinationsAndTheDefaultLabels()
     {
-        XDocument chrome = LoadXaml("lib/GUI/Resources/KLCodeChrome.xaml");
+        XDocument chrome = LoadXaml("lib/GUI/Resources/KLCodeTokens.xaml");
         XNamespace sys = "clr-namespace:System;assembly=System";
         Dictionary<string, string> entries = chrome.Root!.Elements()
             .ToDictionary(e => (string)e.Attribute(Xaml + "Key")!, e => e.Value.Trim());
@@ -145,8 +146,8 @@ public sealed class DesignSystemResourceContractTests
     [TestMethod]
     public void SharedDictionaries_ReferenceBrushesInsteadOfColorLiterals()
     {
-        // Only the palette and the token dictionary may spell a colour; everything above them names a brush.
-        foreach (string file in new[] { "KLCodeSharedPrimitives.xaml", "KLCodeChrome.xaml", "KLCodeFoundation.xaml", "KLCodeComponents.xaml" })
+        // Only the token dictionary may spell a colour; the style dictionaries name a brush.
+        foreach (string file in new[] { "KLCodeFoundation.xaml", "KLCodeComponents.xaml" })
         {
             AssertNoColorLiterals(LoadXaml("lib/GUI/Resources/" + file), file);
         }
@@ -175,8 +176,7 @@ public sealed class DesignSystemResourceContractTests
             "Compiled aliases must not fork shared control templates.");
 
         XDocument project = XDocument.Load(Path.Combine(FindRepositoryRoot(), "src/KLCode.Wpf/KLCode.Wpf.csproj"));
-        foreach (string file in new[] { "KLCode_palette.xaml", "KLCodeSharedPrimitives.xaml",
-                     "KLCodeFoundationTokens.xaml", "KLCodeChrome.xaml", "KLCodeFoundation.xaml", "KLCodeComponents.xaml" })
+        foreach (string file in new[] { "KLCodeTokens.xaml", "KLCodeFoundation.xaml", "KLCodeComponents.xaml" })
         {
             XElement? page = project.Descendants("Page")
                 .FirstOrDefault(element => (string?)element.Attribute("Include") == "../../lib/GUI/Resources/" + file);

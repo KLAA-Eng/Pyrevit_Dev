@@ -243,8 +243,8 @@ if result.action == 'accept':
 non-None keys within each collection. The floating panel has prompt/search,
 wrapping immediate command buttons and optional toggle pills. No corner x,
 standard header/footer or Continue action. KLCode colors/roles come from
-[KLCodeCommandSwitch.xaml](../Resources/KLCodeCommandSwitch.xaml), which merges
-Components and defines opt-in styles. No upstream XAML/assets are copied.
+the `KlaCommandButton` and `KlaCommandToggle` styles in
+[KLCodeComponents.xaml](../Resources/KLCodeComponents.xaml). No upstream XAML/assets are copied.
 The outer panel has no outline. Its 16-unit SemiBold prompt centers vertically
 beside the search input.
 

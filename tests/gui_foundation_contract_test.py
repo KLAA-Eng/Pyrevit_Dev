@@ -34,13 +34,14 @@ def _style(root, key):
 
 class FoundationTemplateContracts(unittest.TestCase):
     def test_scrollbar_style_has_a_horizontal_template_with_an_unreversed_track(self):
-        root = _root('KLCodeSharedPrimitives.xaml')
+        root = _root('KLCodeFoundation.xaml')
         bar = next(s for s in root.iter(P + 'Style') if s.attrib.get('TargetType') == 'ScrollBar')
         tracks = {t.attrib.get('IsDirectionReversed') for t in bar.iter(P + 'Track')}
         self.assertEqual({'true', 'false'}, tracks)
         triggers = [t for t in bar.iter(P + 'Trigger') if t.attrib.get('Property') == 'Orientation']
         self.assertEqual(['Horizontal'], [t.attrib.get('Value') for t in triggers])
-        self.assertNotIn('Grid.Row="1"', _read('KLCodeSharedPrimitives.xaml').split('<Style TargetType="ScrollBar">')[1])
+        # Inspect the scrollbar style alone: the shell template later in the file uses Grid.Row legitimately.
+        self.assertEqual([], [node for node in bar.iter() if 'Grid.Row' in node.attrib])
 
     def test_close_button_centers_its_glyphs_in_layout_not_with_a_render_transform(self):
         foundation = _read('KLCodeFoundation.xaml')

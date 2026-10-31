@@ -66,8 +66,9 @@ Use the footer roles for footer text.
 
 ### Palette brushes
 
-[KLCode_palette.xaml](../lib/GUI/Resources/KLCode_palette.xaml) owns these
-brushes. The same dictionary is used by Python and compiled WPF.
+[KLCodeTokens.xaml](../lib/GUI/Resources/KLCodeTokens.xaml) owns these
+brushes, in its Palette section. The same dictionary is used by Python and
+compiled WPF.
 
 | Resource key | Hex | Intended use |
 | --- | --- | --- |
@@ -85,8 +86,8 @@ brushes. The same dictionary is used by Python and compiled WPF.
 
 ### State and component brushes
 
-[KLCodeFoundationTokens.xaml](../lib/GUI/Resources/KLCodeFoundationTokens.xaml)
-owns these semantic brushes. Choose the role appropriate to the state or
+[KLCodeTokens.xaml](../lib/GUI/Resources/KLCodeTokens.xaml) also owns these
+semantic brushes. Choose the role appropriate to the state or
 component, even when two roles currently have the same color.
 
 | Resource key | Hex | Intended use |
@@ -433,20 +434,16 @@ showing/dismissal semantics and Revit operations.
 
 | Source | Responsibility / dependencies |
 | --- | --- |
-| [Palette](../lib/GUI/Resources/KLCode_palette.xaml) | Brand role brushes |
-| [Foundation tokens](../lib/GUI/Resources/KLCodeFoundationTokens.xaml) | Typed dimensions/fonts/insets and semantic component/state brushes |
-| [Shared primitives](../lib/GUI/Resources/KLCodeSharedPrimitives.xaml) | Merges Palette and the generated `klIcons.xaml`; defines footer-link/scrollbar presentation |
-| [Chrome data](../lib/GUI/Resources/KLCodeChrome.xaml) | Footer URIs and default English labels |
-| [Generated GUI geometry](../lib/GUI/Resources/klIcons.xaml) | Generated leaf: icon geometry, the KLCode logo and its `klcLogo` template; defines no brushes |
-| [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Primitives (and through them the geometry), Tokens and Chrome; owns shell/basic styles and the icon presenter |
-| [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; adds field groups, compositions, options, states, tables, aliases and implicit-style policy |
-| [Command Switch styles](../lib/GUI/Resources/KLCodeCommandSwitch.xaml) | Merges Components; opt-in floating command/toggle pills using existing semantic colors |
+| [Tokens](../lib/GUI/Resources/KLCodeTokens.xaml) | Every shared value: brand palette, state and component brushes, typed dimensions/fonts/insets/radii, and the chrome data (footer URIs and default English labels) |
+| [Generated GUI geometry](../lib/GUI/Resources/klIcons.xaml) | Generated leaf: icon geometry and the self-contained `klcLogo` template; defines no brushes |
+| [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Tokens and the generated geometry; owns the window shell, basic styles, scrollbars, footer links and the icon presenter |
+| [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; adds field groups, compositions, options, states, tables, the Command Switch pills and implicit-style policy. Every window loads this file |
 | [Compiled controls](../src/KLCode.Wpf/Resources/KLCodeControls.xaml) | Merges Components and supplies existing C# style names through BasedOn |
 | Window body XAML | Named controls, bindings, events and tool-specific arrangement |
 | Host/tool controller | Ownership, workflow, validation, lifetime and model/application actions |
 
-Palette and FoundationTokens own concrete brand, state and component colors.
-Other shared dictionaries reference those brushes; templates also use Transparent
+KLCodeTokens owns every concrete brand, state and component color. Foundation
+and Components reference those brushes; templates also use Transparent
 for intentionally empty fills/borders. Generated geometry supplies artwork.
 The resource graph follows the dependencies above, rather than a rule that each
 file merges the immediately preceding row. Compiled projects link the canonical

@@ -2,7 +2,7 @@
 
 The version vectors are shared with the C# adapter's tests through
 lib/GUI/window_metadata_vectors.json; the footer destinations and labels are
-data in lib/GUI/Resources/KLCodeChrome.xaml, read by the shell in both hosts.
+data in lib/GUI/Resources/KLCodeTokens.xaml, read by the shell in both hosts.
 """
 import json
 import os
@@ -40,8 +40,8 @@ class WindowMetadataTests(unittest.TestCase):
         self.assertEqual({'Title', 'VersionText'}, set(vars(metadata)))
 
     def test_chrome_data_holds_both_footer_destinations_and_the_default_labels(self):
-        chrome = ElementTree.parse(os.path.join(ROOT, 'lib', 'GUI', 'Resources', 'KLCodeChrome.xaml')).getroot()
-        entries = {node.attrib[X + 'Key']: (node.tag, (node.text or '').strip()) for node in chrome}
+        chrome = ElementTree.parse(os.path.join(ROOT, 'lib', 'GUI', 'Resources', 'KLCodeTokens.xaml')).getroot()
+        entries = {node.attrib[X + 'Key']: (node.tag, (node.text or '').strip()) for node in chrome if X + 'Key' in node.attrib}
         self.assertEqual(SYS + 'Uri', entries['KlaPrototypeUri'][0])
         self.assertEqual(SYS + 'Uri', entries['KlaOutreachUri'][0])
         self.assertEqual('https://forms.cloud.microsoft/r/HjuggSZqyU', entries['KlaPrototypeUri'][1])
@@ -50,7 +50,7 @@ class WindowMetadataTests(unittest.TestCase):
         with open(os.path.join(ROOT, 'lib', 'GUI', 'Resources', 'KLCodeFoundation.xaml'), encoding='utf-8') as stream:
             foundation = stream.read()
         for reference in ('{DynamicResource CloseLabel}', '{DynamicResource PrototypeLabel}', '{DynamicResource OutreachLabel}',
-                          '{StaticResource KlaPrototypeUri}', '{StaticResource KlaOutreachUri}', 'Source="KLCodeChrome.xaml"'):
+                          '{StaticResource KlaPrototypeUri}', '{StaticResource KlaOutreachUri}', 'Source="KLCodeTokens.xaml"'):
             self.assertIn(reference, foundation, reference)
 
 

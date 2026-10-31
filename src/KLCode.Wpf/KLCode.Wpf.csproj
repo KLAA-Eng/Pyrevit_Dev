@@ -29,10 +29,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)' != 'net8.0'">
     <!-- Preserve relative resource paths in both loose XAML and assembly pack URIs. -->
-    <Page Include="../../lib/GUI/Resources/KLCode_palette.xaml" Link="GUI/Resources/KLCode_palette.xaml" />
-    <Page Include="../../lib/GUI/Resources/KLCodeSharedPrimitives.xaml" Link="GUI/Resources/KLCodeSharedPrimitives.xaml" />
-    <Page Include="../../lib/GUI/Resources/KLCodeFoundationTokens.xaml" Link="GUI/Resources/KLCodeFoundationTokens.xaml" />
-    <Page Include="../../lib/GUI/Resources/KLCodeChrome.xaml" Link="GUI/Resources/KLCodeChrome.xaml" />
+    <Page Include="../../lib/GUI/Resources/KLCodeTokens.xaml" Link="GUI/Resources/KLCodeTokens.xaml" />
     <Page Include="../../lib/GUI/Resources/KLCodeFoundation.xaml" Link="GUI/Resources/KLCodeFoundation.xaml" />
     <Page Include="../../lib/GUI/Resources/KLCodeComponents.xaml" Link="GUI/Resources/KLCodeComponents.xaml" />
     <Page Include="../../lib/GUI/Resources/klIcons.xaml" Link="GUI/Resources/klIcons.xaml" />

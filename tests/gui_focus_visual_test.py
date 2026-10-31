@@ -12,7 +12,7 @@ class FocusVisualTests(unittest.TestCase):
     def setUp(self):
         self.styles = {}
         self.button_styles = []
-        for name in ('KLCodeFoundation.xaml', 'KLCodeComponents.xaml', 'KLCodeCommandSwitch.xaml'):
+        for name in ('KLCodeFoundation.xaml', 'KLCodeComponents.xaml'):
             root = ElementTree.parse(os.path.join(ROOT, 'lib', 'GUI', 'Resources', name))
             for style in root.findall(NS + 'Style'):
                 identity = style.get(KEY)

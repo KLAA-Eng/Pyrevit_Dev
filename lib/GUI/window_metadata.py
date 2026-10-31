@@ -1,7 +1,7 @@
 """Host-independent caller identity for the shared shell.
 
 The footer destinations and chrome labels are data in
-``lib/GUI/Resources/KLCodeChrome.xaml`` (read by the shell template in both
+``lib/GUI/Resources/KLCodeTokens.xaml`` (read by the shell template in both
 hosts); this class carries only what the caller supplies. The normalisation
 vectors in ``window_metadata_vectors.json`` are shared with the C# adapter's tests.
 """

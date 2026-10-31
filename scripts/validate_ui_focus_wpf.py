@@ -11,12 +11,8 @@ from GUI.window_chrome import shared_resources
 
 
 def validate_keyboard_focus_resources():
-    import os
-
     host = Window()
     host.Resources.MergedDictionaries.Add(shared_resources())
-    host.Resources.MergedDictionaries.Add(shared_resources(os.path.join(
-        repo_root, 'lib', 'GUI', 'Resources', 'KLCodeCommandSwitch.xaml')))
     roles = [(Button, name) for name in ('KlaButton', 'KlaButtonPrimary',
              'KlaButtonSecondary', 'KlaLinkButton', 'KlaGhostButton',
              'KlaIconButton', 'KlaIconTextButton', 'KlaButtonClose', 'KlaCommandButton')]

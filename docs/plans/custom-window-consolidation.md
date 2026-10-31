@@ -167,8 +167,10 @@ publication is part of this request.
 
 ## Implementation boundaries and recovery
 
-`KLCodeFoundation.xaml` merges event-free `KLCodeSharedPrimitives.xaml` for the
-canonical palette, vector wordmark, footer links and scrollbars. Explicit
+`KLCodeFoundation.xaml` merges the event-free `KLCodeTokens.xaml` (palette,
+tokens and chrome data) and the generated `klIcons.xaml` (icons and the
+`klcLogo` template), and owns the footer-link and scrollbar styles
+(consolidated 2026-10-31). Explicit
 control styles are shared by Python windows and compiled resource aliases.
 Recall's docked body/resources remain unchanged for excluded consumers. The
 unused legacy `WPF_styles.xaml` was retired in the architecture pass. Gallery

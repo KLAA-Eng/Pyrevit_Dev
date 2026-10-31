@@ -21,7 +21,7 @@ class CommandSwitchLookTests(unittest.TestCase):
 
     def test_toggle_pill_has_no_hover_trigger_but_command_pill_keeps_one(self):
         styles = dict((node.attrib.get(X + 'Key'), node)
-                      for node in parse('lib/GUI/Resources/KLCodeCommandSwitch.xaml').iter(P + 'Style'))
+                      for node in parse('lib/GUI/Resources/KLCodeComponents.xaml').iter(P + 'Style'))
 
         def hover(style):
             return [node for node in style.iter(P + 'Trigger') if node.attrib.get('Property') == 'IsMouseOver']

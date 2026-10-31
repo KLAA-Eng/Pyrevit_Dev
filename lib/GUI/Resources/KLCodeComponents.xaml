@@ -933,4 +933,122 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!--  Command Switch pills (formerly KLCodeCommandSwitch.xaml): command buttons and toggles for the floating switch.  -->
+    <Style x:Key="KlaCommandButton" TargetType="Button">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
+        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
+        <Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}" />
+        <Setter Property="Background" Value="{StaticResource KlaAccentBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource KlaAccentBrush}" />
+        <Setter Property="BorderThickness" Value="{StaticResource KlaHairline}" />
+        <Setter Property="Padding" Value="{StaticResource KlaCommandPillInset}" />
+        <Setter Property="Margin" Value="{StaticResource KlaCommandPillGap}" />
+        <Setter Property="MinHeight" Value="{StaticResource KlaCompactHeight}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock
+                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                        Text="{Binding}"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{StaticResource KlaCommandPillRadius}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{StaticResource KlaPressedBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
+                            <Setter Property="BorderBrush" Value="{StaticResource KlaDisabledFillBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="KlaCommandToggle" TargetType="ToggleButton">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
+        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
+        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
+        <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{StaticResource KlaHairline}" />
+        <Setter Property="Padding" Value="{StaticResource KlaCommandPillInset}" />
+        <Setter Property="Margin" Value="{StaticResource KlaCommandPillGap}" />
+        <Setter Property="MinHeight" Value="{StaticResource KlaCompactHeight}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{StaticResource KlaCommandPillRadius}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="{StaticResource KlaSwitchToggleColumn}" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border
+                                x:Name="SwitchTrack"
+                                Width="{StaticResource KlaSwitchTrackWidth}"
+                                Height="{StaticResource KlaSwitchTrackHeight}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Background="{StaticResource KlaMutedBrush}"
+                                CornerRadius="{StaticResource KlaSwitchTrackRadius}">
+                                <Ellipse
+                                    x:Name="SwitchThumb"
+                                    Width="{StaticResource KlaSwitchThumbSize}"
+                                    Height="{StaticResource KlaSwitchThumbSize}"
+                                    HorizontalAlignment="Left"
+                                    Fill="{StaticResource KlaTextBrush}" />
+                            </Border>
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}"
+                                Text="{TemplateBinding Content}"
+                                TextWrapping="Wrap" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource KlaBorderBrush}" />
+                            <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Right" />
+                        </Trigger>
+                        <!--  No hover change on toggles (owner, 2026-10-31): the pill keeps its surface under the pointer.  -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
+                            <Setter TargetName="SwitchThumb" Property="Fill" Value="{StaticResource KlaDisabledTextBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

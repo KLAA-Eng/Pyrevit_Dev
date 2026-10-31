@@ -8,7 +8,7 @@
 | Status/origin | Prototype; KL&A custom tool. |
 | Main delivery | Unreleased |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototypes.pulldown/UI Gallery.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/`; `lib/GUI/_templates/`; `lib/GUI/dialogs/`; `lib/GUI/Resources/KLCodeFoundation.xaml`; `lib/GUI/Resources/KLCodeFoundationTokens.xaml`; `lib/GUI/Resources/KLCodeComponents.xaml`; `lib/GUI/Resources/KLCodeCommandSwitch.xaml`; `lib/GUI/window_chrome.py`; `lib/GUI/window_metadata.py` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/fixtures/PreviewFixture.xaml`; `lib/ui_gallery/`; `lib/GUI/_templates/`; `lib/GUI/dialogs/`; `lib/GUI/Resources/KLCodeFoundation.xaml`; `lib/GUI/Resources/KLCodeTokens.xaml`; `lib/GUI/Resources/KLCodeComponents.xaml`; `lib/GUI/window_chrome.py`; `lib/GUI/window_metadata.py` |
 
 ## Tool version history
 
@@ -76,8 +76,8 @@ Action Choice now follows the separately confirmed TaskDialog-style contract
 above. Read-only Revit collectors exist for future caller adoption but are not
 run by Gallery.
 [Refinement evidence](../../../../docs/knowledge/reviews/design-system/2026-10-29-dialog-refinement.md)
-owns the new regression/render checks. The shared Command Switch dictionary
-`lib/GUI/Resources/KLCodeCommandSwitch.xaml` is also a v0.5 version input.
+owns the new regression/render checks. The Command Switch pill styles, now in
+`lib/GUI/Resources/KLCodeComponents.xaml`, are also a v0.5 version input.
 
 The owner's subsequent polish uses template-sized 432 x 576 shared selectors,
 Search above the aligned 24-high Group dropdown with Lucide Layers-2, centered

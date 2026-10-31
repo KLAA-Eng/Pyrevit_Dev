@@ -50,10 +50,8 @@ class GuiIconTests(unittest.TestCase):
         self.assertNotIn('generated-icons', foundation)
         self.assertIn('KlaGuiIcon', {node.attrib.get(X + 'Key') for node in shell.iter(P + 'Style')})
         merged = [node.attrib.get('Source') for node in shell.iter(P + 'ResourceDictionary')]
-        self.assertNotIn('klIcons.xaml', merged, 'merged once, through the shared primitives')
-        primitives = ET.fromstring((ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeSharedPrimitives.xaml').read_text(encoding='utf-8'))
-        self.assertIn('klIcons.xaml', [node.attrib.get('Source') for node in primitives.iter(P + 'ResourceDictionary')])
-        tokens = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeFoundationTokens.xaml').read_text(encoding='utf-8')
+        self.assertIn('klIcons.xaml', merged, 'the foundation merges the generated icons')
+        tokens = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeTokens.xaml').read_text(encoding='utf-8')
         self.assertNotIn('klIcons.xaml', tokens, 'icons are merged by the foundation, not by the tokens')
         self.assertFalse(hasattr(icons, 'generate_images'))
 
@@ -79,8 +77,9 @@ class GuiIconTests(unittest.TestCase):
         # The SVG group's scale and offset, unrounded, on each outline.
         self.assertEqual({'1.0666642,0,0,1.0681867,-34.133255,-69.02212'}, {path.attrib['RenderTransform'] for path in paths})
         self.assertNotIn('#33714F', icons.generate_icons())
-        primitives = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeSharedPrimitives.xaml').read_text(encoding='utf-8')
-        self.assertNotIn('<DataTemplate x:Key="klcLogo">', primitives, 'the template is generated into klIcons.xaml')
+        for name in ('KLCodeTokens.xaml', 'KLCodeFoundation.xaml', 'KLCodeComponents.xaml'):
+            hand_written = (ROOT / 'lib' / 'GUI' / 'Resources' / name).read_text(encoding='utf-8')
+            self.assertNotIn('x:Key="klcLogo"', hand_written, 'the template is generated into klIcons.xaml')
 
     def test_path_points_tracks_relative_commands(self):
         points = icons.path_points('M 10,10 h 5 v -2 l 1,1 c 1,1 2,2 3,3 Z')
