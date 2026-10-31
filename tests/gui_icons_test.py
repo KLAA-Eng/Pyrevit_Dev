@@ -69,8 +69,9 @@ class GuiIconTests(unittest.TestCase):
         # The SVG group's scale and offset, unrounded; the canvas is the SVG view box.
         self.assertEqual('1.0666642,0,0,1.0681867,-34.133255,-69.02212', dictionary.find(P + 'MatrixTransform').attrib['Matrix'])
         self.assertEqual(['1024', '146'], [node.text for node in dictionary if node.attrib.get(X + 'Key', '').startswith('klcLogoCanvas')])
-        with self.assertRaises(ValueError):
-            icons._matrix('matrix(1,0.2,0,1,0,0)')
+        for transform in ('matrix(1,0.2,0,1,0,0)', 'scale(-1,1)', 'scale(0)'):
+            with self.assertRaises(ValueError, msg=transform):
+                icons._matrix(transform)
         template = dictionary.find(P + 'DataTemplate')
         self.assertEqual('klcLogo', template.attrib.get(X + 'Key'))
         box = template.find(P + 'Viewbox')
@@ -88,6 +89,28 @@ class GuiIconTests(unittest.TestCase):
         points = icons.path_points('M 10,10 h 5 v -2 l 1,1 c 1,1 2,2 3,3 Z')
         self.assertEqual((10.0, 10.0), points[0])
         self.assertEqual((19.0, 12.0), points[-1])
+
+    def test_path_points_reads_exponents_and_compact_numbers(self):
+        # Inkscape may write exponents; SVG's compact form lets "1.5.5" mean 1.5 and .5.
+        points = icons.path_points('M 1e1,2E+1 l 1.5.5')
+        self.assertEqual([(10.0, 20.0), (11.5, 20.5)], points)
+
+    def test_path_points_rejects_numbers_without_a_command(self):
+        for data in ('10,10 L 1,1', 'M 0,0 Z 5,5', 'M 0,0 L 1', 'M 0,0 H'):
+            with self.assertRaises(ValueError, msg=data):
+                icons.path_points(data)
+
+    def test_regeneration_writes_lf_line_endings(self):
+        import sys
+        import tempfile
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / 'klIcons.xaml'
+            with patch.object(icons, 'ICONS_XAML', target), patch.object(sys, 'argv', ['generate_gui_icons.py']):
+                icons.main()
+            written = target.read_bytes()
+        self.assertNotIn(b'\r\n', written)
+        self.assertEqual(icons.generate_icons().encode('utf-8'), written)
 
     def test_conversion_preserves_circle_and_rounded_rectangle_geometry(self):
         name, attrs = icons.geometry(ET.fromstring('<circle cx="11" cy="11" r="8"/>'))
