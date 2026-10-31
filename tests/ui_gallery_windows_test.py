@@ -164,7 +164,9 @@ class GalleryWindowTests(unittest.TestCase):
         methods = {node.name for node in ast.walk(tree)
                    if isinstance(node, ast.FunctionDef)}
         events = {'Click', 'Checked', 'Unchecked', 'MouseDown', 'TextChanged',
-                  'PreviewTextInput', 'RequestNavigate', 'Expanded', 'Collapsed', 'SizeChanged'}
+                  'PreviewTextInput', 'RequestNavigate', 'Expanded', 'Collapsed', 'SizeChanged',
+                  'PreviewKeyDown', 'KeyDown', 'SelectionChanged', 'PreviewMouseDown',
+                  'PreviewMouseLeftButtonUp', 'PreviewMouseMove', 'MouseDoubleClick'}
         for relative in list(windows.SOURCES.values()) + [
                 'lib/GUI/_future/match/clipboard_content.xaml',
                 'lib/GUI/_future/match/clipboard_recall_content.xaml']:

@@ -106,6 +106,10 @@ class WindowChrome(object):
         self.footer.Visibility = Visibility.Collapsed
         self.shell.Template.FindName('PART_FooterRow', self.shell).Height = GridLength(0)
 
+    def detach_escape(self):
+        """Let the window route Escape itself (Action Choice keeps Cancel and Close distinct)."""
+        self.window.PreviewKeyDown -= self._key
+
     def _key(self, sender, args):
         """Escape follows the same close policy as the header Close button."""
         from System.Windows.Input import Key

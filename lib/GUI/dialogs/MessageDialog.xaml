@@ -164,6 +164,7 @@
                 <Button
                     x:Name="action_one"
                     Click="accept_message"
+                    IsDefault="True"
                     Style="{StaticResource KlaButton}" />
             </StackPanel>
         </Grid>

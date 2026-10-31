@@ -17,6 +17,10 @@ class Event:
         self.handlers.append(handler)
         return self
 
+    def __isub__(self, handler):
+        self.handlers.remove(handler)
+        return self
+
     def emit(self, sender, args):
         for handler in self.handlers:
             handler(sender, args)
@@ -135,6 +139,15 @@ class WindowChromeTests(unittest.TestCase):
             self.window.PreviewKeyDown.emit(None, escape)
         self.assertTrue(self.window.closed)
         self.assertTrue(escape.Handled)
+
+    def test_a_window_can_detach_escape_and_route_it_itself(self):
+        chrome = self.load()
+        chrome.detach_escape()
+        with patch.dict(sys.modules, self.host):
+            escape = types.SimpleNamespace(Key='escape', Handled=False)
+            self.window.PreviewKeyDown.emit(None, escape)
+        self.assertFalse(self.window.closed)
+        self.assertFalse(escape.Handled)
 
     def test_escape_honours_a_caller_close_policy(self):
         closes = []

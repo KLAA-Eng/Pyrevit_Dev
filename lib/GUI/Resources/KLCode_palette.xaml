@@ -10,6 +10,8 @@
     <!--  original Prototype/Outreach green  -->
     <SolidColorBrush x:Key="KlaFooterVersionBrush" Color="#808080" />  
     <!--  original footer version gray  -->
+    <SolidColorBrush x:Key="KlaPlaceholderBrush" Color="#808080" />
+    <!--  placeholder text (Text entry watermark, Command Switch search hint); the same gray as the footer version by owner decision, test-enforced  -->
     <SolidColorBrush x:Key="KlaTextOnAccentBrush" Color="White" />      
     <!--  labels on accent fills  -->
     <SolidColorBrush x:Key="KlaAccentBrush" Color="#286048" />          

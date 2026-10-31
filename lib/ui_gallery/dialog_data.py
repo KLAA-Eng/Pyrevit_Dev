@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 
 MESSAGE_STATES = ('Normal', 'Empty', 'Warning', 'Error', 'Success', 'Disabled', 'Long content')
 ACTION_STATES = MESSAGE_STATES
+# The Command Switch has no validation or status line, so it has no Error state.
+SWITCH_STATES = ('Normal', 'Empty', 'Disabled', 'Long content')
 ACTION_VARIANTS = (
     ('dialog-actions', 'Commands'), ('dialog-actions-details', 'Commands + Details'),
     ('dialog-actions-checkbox', 'Commands + Checkbox'), ('dialog-actions-full', 'Full Content'),

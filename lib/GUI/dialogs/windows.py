@@ -80,7 +80,6 @@ def _window_types():
             self.message_details.Text = details
             self.message_expander.Visibility = Visibility.Visible if details else Visibility.Collapsed
             self.action_one.Content = 'OK'
-            self.action_one.IsDefault = True
             self._details_open = False
             self._details_growth = 0
             self._details_pending = False

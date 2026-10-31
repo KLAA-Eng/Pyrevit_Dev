@@ -248,14 +248,19 @@ def validate_action_choice_shown():
         action_settle(window)
         assert window._kla_chrome.close_button.Visibility == Visibility.Collapsed
         assert action_routed_key(window, window.command_buttons['first'], Key.Escape).Handled
-        assert window.IsVisible and window.result.is_cancelled
-        window.Close()
-        assert window.IsVisible, 'Native Close/Alt+F4 path obeys cancellation policy'
+        assert window.IsVisible and window.result.action == 'cancel'
+        window.close_action()
+        assert window.IsVisible, 'Chrome Close obeys the cancellation policy'
         action_click(window.command_buttons['first'])
         assert not window.IsVisible and window.result.action == 'accept'
     finally:
         window._finishing = True
         window.Close()
+    window = create_choice('Host close fixture', rows, buttons=(), allow_cancel=False)
+    window.Show()
+    action_settle(window)
+    window.Close()
+    assert not window.IsVisible and window.result.action == 'close', 'A close from code, the owner or Revit always proceeds'
     window = create_choice('Explicit Cancel fixture', rows, buttons=('cancel',), allow_cancel=False)
     window.Show()
     action_settle(window)

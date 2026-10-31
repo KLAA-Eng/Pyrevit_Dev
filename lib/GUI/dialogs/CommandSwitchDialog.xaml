@@ -42,7 +42,6 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid x:Name="drag_region" Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
@@ -81,7 +80,7 @@
                         x:Name="search_hint"
                         Margin="8,0"
                         VerticalAlignment="Center"
-                        Foreground="{StaticResource KlaMutedBrush}"
+                        Foreground="{StaticResource KlaPlaceholderBrush}"
                         IsHitTestVisible="False"
                         Text="Type to filter" />
                 </Grid>
@@ -109,13 +108,6 @@
                         Visibility="Collapsed" />
                 </StackPanel>
             </ScrollViewer>
-            <TextBlock
-                x:Name="status_text"
-                Grid.Row="2"
-                AutomationProperties.LiveSetting="Polite"
-                Foreground="{StaticResource KlaErrorBrush}"
-                TextWrapping="Wrap"
-                Visibility="Collapsed" />
         </Grid>
     </Border>
 </Window>

@@ -5,6 +5,7 @@ implementation guide is [DESIGNSYSTEM.md](../../../DESIGNSYSTEM.md).
 
 | Review | Scope |
 | --- | --- |
+| [2026-10-31 Review II decisions and behaviour batch](2026-10-31-review-ii-decisions.md) | Owner decisions on the remaining items; close and default policy, blank Rename, Gallery-owned previews, switch status line removed, colon rule, placeholder token, lint scope. |
 | [2026-10-31 Review II open items, first batch](2026-10-31-review-ii-open-items.md) | Numeric sheet sort, `all_label` and `None` descriptions, selector and Rename Enter routing, Text height, Switch guards and bounds, dead focus tokens, Gallery tooltip, record supersession, keyboard table and accepted deviations. |
 | [2026-10-31 generated XAML after formatting](2026-10-31-generated-xaml-formatting.md) | Regenerate the three generator-owned outputs after the formatting commit, marker-tolerant generator, formatting-independent tests, release-check gate and the formatter rule. |
 | [2026-10-30 Action Choice](2026-10-30-action-choice.md) | Confirmed TaskDialog-style actions, Enter-only keyboard behavior, explicit results/cancellation, optional content and five seven-state Gallery variants. |

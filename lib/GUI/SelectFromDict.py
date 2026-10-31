@@ -40,7 +40,7 @@ active_view_level   = active_view.GenLevel
 class SelectFromDict(my_WPF):
     def __init__(self, items,
                  title,
-                 label = "Select Elements:" ,
+                 label = "Select Elements" ,
                  button_name = 'Select',
                  version = None,
                  SelectMultiple = True,
@@ -60,7 +60,8 @@ class SelectFromDict(my_WPF):
         load_window(self, path_xaml_file, title, version)
 
         # UPDATE GUI ELEMENTS
-        self.text_label.Content     = label
+        # Prompts carry no trailing colon (design system rule); existing callers keep theirs in code.
+        self.text_label.Content     = label.rstrip().rstrip(':')
         self.button_main.Content    = button_name
         if not SelectMultiple:
             self.UI_Buttons_all_none.Visibility = Visibility.Collapsed
@@ -172,7 +173,7 @@ class SelectFromDict(my_WPF):
 #====================================================================================================
 def select_from_dict(elements_dict,
                      title,
-                     label          = "Select Elements:" ,
+                     label          = "Select Elements" ,
                      button_name    = 'Select',
                      version        = None,
                      SelectMultiple = True,

@@ -60,7 +60,7 @@ def _window_type():
                         title, version=version, navigate=navigate, close_handler=self.close_action)
             self._kla_chrome.hide_footer()
             # Escape/Cancel and chrome Close have distinct results here.
-            self.PreviewKeyDown -= self._kla_chrome._key
+            self._kla_chrome.detach_escape()
             self.PreviewKeyDown += self.key_down
             self.Closing += self.closing
             self.Closed += self.closed
@@ -203,11 +203,10 @@ def _window_type():
             if self._finishing:
                 return
             self.sync_checkbox()
-            result = self.state.dismiss('close')
-            if result is None:
-                args.Cancel = True
-            else:
-                self.result = result
+            # The X, Escape and Alt+F4 apply the cancellation policy before this
+            # point and never call Close. Any close that still arrives comes from
+            # code, the owner or the system, and always proceeds as close.
+            self.result = self.state.dismiss('close') or self.state.forced_close()
 
         def closed(self, sender, args):
             self._ready = False
@@ -217,6 +216,10 @@ def _window_type():
             if key == Key.Escape:
                 args.Handled = True
                 self.cancel()
+            elif key == Key.F4 and args.Key == Key.System:
+                # Alt+F4 is a user dismissal, so it obeys the cancellation policy.
+                if not self.state.can_cancel:
+                    args.Handled = True
             elif key == Key.Space:
                 # Preserve checkbox toggling and text scrolling, but never let
                 # WPF ButtonBase turn Space into a command or common-button Click.

@@ -157,6 +157,9 @@ def validate_rename_dialogs():
     assert originals[1].Find == originals[1].Replace == originals[1].Prefix == ''
     window = create_rename('Accept click', [RenameField('name', 'Name')])
     rename_click(window.accept_button)
+    assert window.result.is_cancelled and window.validation_text.Text == 'Enter at least one rename rule.'
+    window.field_controls[0].suffix_text.Text = '-A'
+    rename_click(window.accept_button)
     assert window.result.value['operation'] == 'rename'
     window = create_rename('Disabled actions', [RenameField('name', 'Name')])
     window.window_body.IsEnabled = False

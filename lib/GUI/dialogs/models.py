@@ -3,14 +3,18 @@ from __future__ import unicode_literals
 
 
 class DialogResult(object):
-    """Inspect action explicitly; cancellation and accepted empty values differ."""
+    """Inspect action explicitly; cancellation and accepted empty values differ.
+
+    ``is_cancelled`` is true for ``cancel`` and for Action Choice's ``close``:
+    either way the user did not choose. ``action`` still tells them apart.
+    """
     def __init__(self, action='cancel', value=None):
         self.action = action
         self.value = value
 
     @property
     def is_cancelled(self):
-        return self.action == 'cancel'
+        return self.action in ('cancel', 'close')
 
 
 class SelectionItem(object):

@@ -32,7 +32,10 @@ class GalleryRegistryTests(unittest.TestCase):
         self.assertEqual(6, len(set(row['source_path'] for row in rows)))
         for row in rows:
             self.assertTrue(row['can_launch'])
-            self.assertEqual(7 if row['id'] in ('dialog-message', 'dialog-actions') else 5, len(row['states']))
+            expected = {'dialog-message': 7, 'dialog-actions': 7, 'dialog-command-switch': 4}.get(row['id'], 5)
+            self.assertEqual(expected, len(row['states']))
+            if row['id'] == 'dialog-command-switch':
+                self.assertNotIn('Error', row['states'], 'The switch has no status line to show an error')
             self.assertTrue(os.path.isfile(row['source_path']))
             self.assertIn('Existing tools retain', row['description'])
 

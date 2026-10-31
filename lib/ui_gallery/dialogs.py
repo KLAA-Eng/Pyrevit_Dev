@@ -29,8 +29,6 @@ def _selection_rows(identity):
 
 
 def create_dialog(launcher, state):
-    from System.Windows import Visibility
-
     identity = launcher['id']
     options = dict(version=launcher.get('tool_version'), navigate=lambda uri: None)
     title = launcher.get('title', 'Shared dialog')
@@ -95,10 +93,6 @@ def create_dialog(launcher, state):
         switches = [CommandSwitch('details', 'Include Details'), CommandSwitch('preview', 'Preview Only', checked=True)]
         window = create_command_switch(title, [] if state == 'Empty' else rows,
                                         switches=switches if identity == 'dialog-command-switch' else (), **options)
-        if state == 'Error':
-            window.status_text.Text = 'Fictional feedback: choose an available command.'
-            window.status_text.Visibility = Visibility.Visible
-            window.fit_height()
     elif identity in ('dialog-rename', 'dialog-rename-two', 'dialog-rename-three'):
         count = {'dialog-rename': 1, 'dialog-rename-two': 2, 'dialog-rename-three': 3}[identity]
         names = ['Name'] if count == 1 else ['Number', 'Name', 'Description'][:count]

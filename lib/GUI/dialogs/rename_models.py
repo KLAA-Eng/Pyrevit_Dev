@@ -42,6 +42,8 @@ class RenameState(object):
         self._by_key = dict((field.Key, field) for field in self.fields)
 
     def rename_result(self):
+        if not any(field.Find or field.Replace or field.Prefix or field.Suffix for field in self.fields):
+            raise ValueError('Enter at least one rename rule.')
         for field in self.fields:
             try:
                 # Reuse the existing literal-rule validator; no current names

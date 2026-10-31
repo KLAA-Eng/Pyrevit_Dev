@@ -1,6 +1,8 @@
 # GUI architecture review — Windows handoff
 
-This is the original handoff snapshot. The Windows follow-up is recorded in
+This is the original handoff snapshot, superseded: its counts and open items
+are as of `7e01901`. The consolidation plan and the dated design-system reviews
+hold the current state. The Windows follow-up is recorded in
 [2026-10-29 Windows verification](reviews/design-system/2026-10-29-gui-architecture-windows.md);
 the [consolidation plan](../plans/custom-window-consolidation.md) owns current
 status. The owner will perform the actual Revit review.

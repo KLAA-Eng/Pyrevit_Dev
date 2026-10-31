@@ -87,11 +87,18 @@ def create_custom(extension_root, launcher, state='Normal'):
     return window_type(extension_root, launcher, state, path)
 
 
-def launch_custom(extension_root, launcher, state='Normal'):
-    """Show a real-XAML preview; all action results are local simulations."""
+def launch_custom(extension_root, launcher, state='Normal', owner=None):
+    """Show a real-XAML preview; all action results are local simulations.
+
+    ``owner`` (the Gallery window) owns the preview, as a tool window would own its dialog.
+    """
     if launcher.get('variants'):
         launcher = preview_launcher(launcher, launcher.get('variant_id'))
     window = create_custom(extension_root, launcher, state)
+    if owner is not None:
+        from System.Windows import WindowStartupLocation
+        window.Owner = owner
+        window.WindowStartupLocation = WindowStartupLocation.CenterOwner
     window.ShowDialog()
     if launcher['id'] in DIALOG_FILES:
         return 'Fictional dialog result: {}.'.format(window.result.action)

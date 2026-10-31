@@ -41,7 +41,7 @@
                             VerticalAlignment="Center"
                             FontSize="{StaticResource KlaTextPromptInputFontSize}"
                             FontWeight="Bold"
-                            Foreground="{StaticResource KlaFooterVersionBrush}"
+                            Foreground="{StaticResource KlaPlaceholderBrush}"
                             IsHitTestVisible="False"
                             LineHeight="24"
                             LineStackingStrategy="BlockLineHeight"

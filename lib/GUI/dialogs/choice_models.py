@@ -73,8 +73,21 @@ class ChoiceState(object):
             return key in self.buttons
         return False
 
+    def _known(self, kind, key):
+        if kind == 'command':
+            try:
+                return key in self._by_key
+            except TypeError:
+                return False
+        return kind == 'button' and key in self.buttons
+
     def _resolve_default(self, default):
-        if isinstance(default, (tuple, list)) and len(default) == 2:
+        # An unknown target is a caller error and fails here; a known but
+        # disabled command falls back to the first enabled action.
+        if default is not None:
+            if not (isinstance(default, (tuple, list)) and len(default) == 2
+                    and self._known(default[0], default[1])):
+                raise ValueError('Unknown default action: {0!r}.'.format(default))
             kind, key = default
             if self._available(kind, key):
                 return (kind, self._by_key[key].Key if kind == 'command' else key)
@@ -95,6 +108,10 @@ class ChoiceState(object):
         if self._available(kind, key):
             return self._result(kind, key)
         return None
+
+    def forced_close(self):
+        """A close from code, the owner or the system always ends the dialog, as ``close``."""
+        return self._result('button', 'close')
 
     def dismiss(self, reason='cancel'):
         """Escape/Close obey cancellation policy even without a matching button."""

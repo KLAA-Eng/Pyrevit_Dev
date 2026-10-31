@@ -68,7 +68,7 @@ def validate_shown_focus():
         assert not window.input_text.IsKeyboardFocusWithin and window.input_text.SelectionLength == 0
         assert window.input_placeholder.Visibility == Visibility.Visible
         assert window._kla_chrome.title.Visibility == Visibility.Collapsed
-        assert window.input_placeholder.Foreground == window.FindResource('KlaFooterVersionBrush')
+        assert window.input_placeholder.Foreground == window.FindResource('KlaPlaceholderBrush')
         window.input_text.Focus()
         settle_layout(window.Content)
         assert window.input_placeholder.Visibility == Visibility.Collapsed, 'Focus hides the empty watermark'

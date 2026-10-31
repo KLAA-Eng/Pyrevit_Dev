@@ -36,7 +36,7 @@
             <Label
                 x:Name="text_label"
                 Grid.Row="2"
-                Content="Select Elements:"
+                Content="Select Elements"
                 Style="{StaticResource KlaFoundationPromptLabel}"
                 Target="{Binding ElementName=main_ListBox}" />
             <ListBox

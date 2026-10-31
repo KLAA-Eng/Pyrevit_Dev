@@ -45,6 +45,16 @@ class RenameTests(unittest.TestCase):
         state.fields[1].Find = ' '
         self.assertEqual(' ', state.rename_result().value['fields']['bad']['find'])
 
+    def test_an_entirely_blank_rename_is_rejected(self):
+        from GUI.dialogs import RenameField
+        from GUI.dialogs.rename_models import RenameState
+        state = RenameState([RenameField('number', 'Number'), RenameField('name', 'Name')])
+        with self.assertRaises(ValueError) as caught:
+            state.rename_result()
+        self.assertEqual('Enter at least one rename rule.', caught.exception.args[0])
+        state = RenameState([RenameField('number', 'Number'), RenameField('name', 'Name', suffix='-A')])
+        self.assertEqual('accept', state.rename_result().action)
+
     def test_case_actions_ignore_rule_text_and_only_target_the_requested_field(self):
         from GUI.dialogs.rename_models import RenameField, RenameState
         state = RenameState([RenameField('name', 'Name', replace='invalid'),

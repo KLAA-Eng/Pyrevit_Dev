@@ -75,6 +75,7 @@ brushes. The same dictionary is used by Python and compiled WPF.
 | `KlaTextMutedBrush` | `#B5C2BD` | Secondary captions |
 | `KlaFooterLinkBrush` | `#407058` | Prototype and Outreach footer links at rest |
 | `KlaFooterVersionBrush` | `#808080` | Centered caller-version footer text |
+| `KlaPlaceholderBrush` | `#808080` | Placeholder text: the Text entry watermark and the Command Switch search hint. The same gray as the footer version by owner decision; a test keeps them equal |
 | `KlaTextOnAccentBrush` | `#FFFFFF` | Text on accent-filled actions and selected segments |
 | `KlaAccentBrush` | `#286048` | Standard buttons, checked boxes and selected segments |
 | `KlaAccentHoverBrush` | `#407058` | Standard action/dropdown hover background |
@@ -116,7 +117,11 @@ Disabled controls use explicit brushes rather than stacked opacity reductions.
 
 Existing windows can retain these names. New markup should prefer the role
 keys above. Brush aliases bind their color to the canonical brush; they are
-separate brush instances rather than a promise of object identity.
+separate brush instances rather than a promise of object identity. Some role
+brushes share a value by design and stay separate roles: `KlaTextMutedBrush`
+and `KlaMutedBrush`, `KlaFooterLinkBrush` and `KlaAccentHoverBrush`,
+`KlaAccentBrush` and `KlaBorderStrongBrush`, `KlaFooterVersionBrush` and
+`KlaPlaceholderBrush`. Change a role's value only for that role.
 
 | Existing key | Canonical role |
 | --- | --- |
@@ -267,7 +272,7 @@ windows; compiled consumers can also use their existing adapter aliases.
 | `KlaButtonPrimary` | Button | 216 x 32 | Main action; font size 14 |
 | `KlaButtonSecondary` | Button | 104 x 28 | Secondary action on component surface |
 | `KlaLinkButton` | Button | 104 x 28 | Text action, transparent at rest; Favorites/Recent/Clear Filters |
-| `KlaGhostButton` | Button | 104 x 28 | Outlined action, such as Cancel beside the main action |
+| `KlaGhostButton` | Button | 104 x 28 | Outlined secondary action. Shared dialogs give Cancel the standard `KlaButton` |
 | `KlaIconTextButton` | Button | 128 x 28 | Approved icon plus caption |
 | `KlaIconButton` | Button | 28 x 28 | Icon-only action with an accessible name |
 | `KlaButtonClose` | Button | 60 x 18 | Header Close; the shell supplies it |
@@ -514,10 +519,10 @@ source behavior, so an inconsistency is visible here before it reaches a user:
 
 | Dialog | Enter | Space | Escape | Close (X) | `IsDefault` |
 | --- | --- | --- | --- | --- | --- |
-| Message | OK | Activates the focused button | Cancel (chrome policy) | Cancel | Set in code on OK |
+| Message | OK | Activates the focused button | Cancel (chrome policy) | Cancel | XAML on OK |
 | Selection | Ignored from the list and filter; a focused button, the group dropdown and footer links keep it | Toggles the focused checkbox; activates a focused button | Cancel | Cancel | None (Select has no default) |
 | Text entry | OK | Activates the focused button | Cancel | Cancel | XAML on OK |
-| Action Choice | Activates the focused action, Close, Details or help; otherwise the default action | Checkbox only; suppressed on every button (owner decision AC-004) | Cancel | `close`, a result distinct from `cancel` | Code (`default_button`) |
+| Action Choice | Activates the focused action, Close, Details or help; otherwise the default action | Checkbox only; suppressed on every button (owner decision AC-004) | Cancel | `close`: distinct from `cancel` but also `is_cancelled`; a close from code, the owner or Revit always proceeds | Code (`default_button`) |
 | Command Switch | The focused pill, or the sole visible match while the search has focus | Toggles a focused toggle; activates a focused pill | Clears the search, then cancels | No chrome; an outside click or deactivation cancels | None |
 | KLC-Rename | Submits from the fields; a focused button keeps its own Enter (Uppercase/Lowercase act) | Activates the focused button | Cancel | Cancel | XAML on OK |
 
@@ -536,6 +541,12 @@ what the user gives up, with the WCAG 2.1 criterion each touches:
 - AC-005 and GUI-39: Text entry shows neither the caller's prompt nor the
   window title on screen (the prompt is the input's accessible name; 2.4.6
   Headings and Labels, 3.3.2 Labels or Instructions). Message hides the title.
+- Placeholder gray: `KlaPlaceholderBrush` #808080 is 3.96:1 on the window.
+  That passes for the 24-unit bold Text watermark and is below 4.5:1 for the
+  12-unit Command Switch hint (1.4.3). Owner decision, 2026-10-31.
+- Disabled controls are signalled by #A6B0AD text (7.0:1) and their disabled
+  automation state; WCAG exempts inactive components from contrast, and the
+  text change is not the only cue to assistive technology (1.4.1, 1.4.3).
 
 These are source contracts and known implementation limits. They do not mark
 the owner's live Revit review complete.
@@ -579,7 +590,9 @@ acknowledges OK. Action Choice uses Enter-only action activation, with caller
 default or first enabled action; Space only toggles its checkbox. Command
 Switch Enter chooses a focused command or sole enabled search match while search
 is focused; Escape clears search before cancelling. Other dialogs Escape cancel.
-Action Choice may explicitly disable cancellation when Cancel is absent. These bare windows do not inherit
+Action Choice may explicitly disable cancellation when Cancel is absent; the
+X, Escape and Alt+F4 then do nothing, but a close from code, the owner or Revit
+still ends the dialog with `close`. These bare windows do not inherit
 pyRevit WPFWindow's competing Escape handler. The earlier host boundary and
 missing defaults in existing tools remain separate. Actual keyboard, owner/modal
 lifetime and DPI still require live acceptance.

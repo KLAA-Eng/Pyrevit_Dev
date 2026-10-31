@@ -51,15 +51,18 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   collapsed Details, one checkbox with initial state, and help text/link. Empty
   sections reserve no space. Severity icons reuse Message's roles. Checkbox
   state never gates actions and is not persisted automatically.
-  The caller may identify a default command/button; invalid or disabled defaults
-  fall back to the first enabled command, then the first standard button. Initial
+  The caller may identify a default command/button. An unknown default raises
+  an error when the dialog is built; a disabled default falls back to the first
+  enabled command, then the first standard button. Initial
   keyboard focus follows that default. Tab/Shift+Tab navigate; Enter activates
   the focused/default action. Space only toggles the checkbox and never
   activates command links or bottom buttons. Mouse clicks activate normally.
   Cancellation is enabled by default. When disabled, hide chrome Close and block
-  Escape/Alt+F4/native dismissal; an explicit Cancel always enables dismissal.
+  Escape and Alt+F4; an explicit Cancel always enables dismissal. A close from
+  code, the owner or the system always proceeds and returns `close`.
   Command/OK/Yes/No/Retry return action `accept`, Cancel/Escape return `cancel`,
-  and Close/chrome Close/native close return `close`. All results carry
+  and Close/chrome Close/native close return `close`. `is_cancelled` is true for
+  both `cancel` and `close`. All results carry
   `{'kind': 'command' or 'button', 'key': caller key or button name,
   'checked': bool or None}`; No, Cancel and Close remain distinct.
   Initial height fits content up to 640. Details expands the bottom while
@@ -131,7 +134,8 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   out horizontally. Each group has one Find/Replace pair and Prefix/Suffix;
   optional Uppercase/Lowercase buttons act separately for that field and return
   the operation and field. Rename validates and returns all entered rules;
-  Enter activates it. Invalid rules stay open with inline feedback. Close/Escape
+  an entirely blank request stays open with "Enter at least one rename rule.".
+  Enter activates it from the fields; a focused button keeps its own Enter. Invalid rules stay open with inline feedback. Close/Escape
   cancels. Case actions close without applying model changes. No live preview,
   Revit mutation or existing tool migration is part of this shared dialog.
   Initial focus is neutral, with no field selected. Compact label/input spacing

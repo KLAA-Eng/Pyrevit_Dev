@@ -21,7 +21,7 @@ two-group reproduction now ends at x=652 in a 668-unit window, preserving the
 
 Text Entry retains caller Window.Title metadata but has no center chrome title.
 Initial focus is the neutral body, with no selected input. Empty unfocused input
-shows `[ENTER TEXT]` in `KlaFooterVersionBrush` (#808080); focus hides it before
+shows `[ENTER TEXT]` in `KlaFooterVersionBrush` (#808080; `KlaPlaceholderBrush` since 2026-10-31); focus hides it before
 typing, and leaving an empty input restores it. The watermark remains an overlay,
 never caller data. Its compact line box and optical inset center visible glyphs.
 

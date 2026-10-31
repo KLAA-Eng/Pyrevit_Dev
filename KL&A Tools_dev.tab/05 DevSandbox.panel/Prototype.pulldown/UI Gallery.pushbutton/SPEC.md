@@ -19,7 +19,7 @@
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
 | v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
-| v0.5 | Unreleased | 10.30.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, the Options and Review references and shared-dialog family previews with variants. | Gallery source and dated verification records; pending next main delivery. |
+| v0.5 | Unreleased | 10.31.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, the Options and Review references and shared-dialog family previews with variants. | Gallery source and dated verification records; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -36,7 +36,9 @@ each family's variant and state are remembered for the session. Selection has
 Sheets, Revisions, Open Documents, List Single and List Multiple. Message has
 Without Details and With Details, each offering Normal, Empty, Warning, Error,
 Success, Disabled and Long content; With Details retains diagnostics in Empty.
-Command Switch has Commands only and Commands with toggles; KLC-Rename has
+Each custom preview opens owned by the Gallery window, as a tool's dialog is
+owned by its caller. The Command Switch has no Error state: it has no
+validation or status line. Command Switch has Commands only and Commands with toggles; KLC-Rename has
 Single field, Two fields and Multiple fields (three groups).
 Action Choice variants are Commands, Commands + Details, Commands + Checkbox,
 Full Content and Standard Buttons, each with all seven Message states. They

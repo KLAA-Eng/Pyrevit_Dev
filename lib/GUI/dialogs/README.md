@@ -74,11 +74,13 @@ Severity uses Message's information/warning/error/success icon roles. Help text
 may be plain text; a supplied web link uses the navigation callback when given.
 
 `default=('command', key)` or `('button', name)` sets the initial focus and Enter
-default. Invalid/disabled defaults fall back to the first enabled command, then
-the first standard button. Tab/Shift+Tab navigate. Enter activates the focused
+default. An unknown default raises `ValueError` when the dialog is built; a
+disabled default falls back to the first enabled command, then the first
+standard button. Tab/Shift+Tab navigate. Enter activates the focused
 action or the default; Space only toggles the checkbox. Buttons remain clickable.
-`allow_cancel=False` hides chrome Close and blocks Escape/Alt+F4/native dismissal;
-including Cancel always enables cancellation. Explicit bottom buttons remain
+`allow_cancel=False` hides chrome Close and blocks Escape and Alt+F4. A close from
+code, the owner or Revit still ends the dialog with action `close`. Including
+Cancel always enables cancellation. Explicit bottom buttons remain
 actions. Checkbox state never gates actions and is never persisted by this API.
 
 Every result has value `{'kind': 'command' or 'button', 'key': key,
@@ -97,7 +99,8 @@ Factories return an unshown window. Modal helpers call ShowDialog and return
 explicitly; the object is not a Boolean pyRevit result. Other than Action Choice,
 Close/Escape/Cancel or unaccepted window closure returns action `cancel`, value
 None. Action Choice retains its checkbox snapshot and distinct Close/Cancel
-results as described above. Accepted empty
+results as described above; `is_cancelled` is true for both, so a caller that
+only needs "did the user choose" can use it. Accepted empty
 text and optional empty selection remain distinct from cancellation. No API
 exits the script, runs a chosen command, writes settings or changes a model.
 
@@ -141,7 +144,7 @@ with an 8-unit gap below the message or Details content.
 Text options are `default=''`, `required=False`, `validator=None`. The field is
 36 high, FontSize 24, centered Segoe UI Bold. No visible prompt header is shown;
 an empty, unfocused field displays `[ENTER TEXT]` as a vertically centered
-watermark in `KlaFooterVersionBrush` gray (#808080). Focusing the input hides it.
+watermark in `KlaPlaceholderBrush` gray (#808080), the footer version gray. Focusing the input hides it.
 It is never returned as
 input. The caller prompt still labels the input for accessibility. Compact
 height fits input/error. The center chrome title is blank; caller Window.Title
@@ -272,7 +275,9 @@ and fitted section borders keep the inputs close, with standard 8-unit action ga
 
 Rename validates and returns action `accept` with value `{'operation': 'rename',
 'fields': {key: {'find': ..., 'replace': ..., 'prefix': ..., 'suffix': ...}}}`.
-Enter activates Rename. Case buttons close with action `accept` and value
+An entirely blank request stays open with "Enter at least one rename rule.".
+Enter activates Rename from the fields; a focused case button keeps its own
+Enter. Case buttons close with action `accept` and value
 `{'operation': 'upper' or 'lower', 'field': key}`. Invalid rules stay open with
 inline feedback. Close/Escape cancels with value None. The dialog performs no
 model mutation or live before/after preview; the caller owns any later action.

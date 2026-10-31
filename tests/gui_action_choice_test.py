@@ -100,10 +100,23 @@ class ChoiceStateTests(unittest.TestCase):
         rows = [ActionChoice('first', 'First'), ActionChoice('blocked', 'Blocked', enabled=False)]
         state = ChoiceState(rows, buttons=('yes', 'no'), default=('button', 'no'))
         self.assertEqual(('button', 'no'), state.default)
-        for target in (('command', 'missing'), ('command', 'blocked'), ('button', 'retry'),
-                       ('unknown', 'first'), ('command', []), ('command',), 'first', None):
+        for target in (('command', 'blocked'), None):
             state = ChoiceState(rows, buttons=('yes',), default=target)
             self.assertEqual(('command', 'first'), state.default)
+
+    def test_unknown_default_targets_fail_at_construction(self):
+        rows = [ActionChoice('first', 'First')]
+        for target in (('command', 'missing'), ('button', 'retry'), ('unknown', 'first'),
+                       ('command', []), ('command',), 'first'):
+            with self.assertRaises(ValueError):
+                ChoiceState(rows, buttons=('yes',), default=target)
+
+    def test_forced_close_always_returns_close_even_when_cancellation_is_disabled(self):
+        state = ChoiceState([ActionChoice('first', 'First')], buttons=(), allow_cancel=False)
+        self.assertIsNone(state.dismiss('close'))
+        forced = state.forced_close()
+        self.assertEqual('close', forced.action)
+        self.assertTrue(forced.is_cancelled)
 
     def test_command_key_cannot_be_confused_with_a_standard_button(self):
         state = ChoiceState([ActionChoice('cancel', 'Perform action')],
@@ -127,7 +140,7 @@ class ChoiceStateTests(unittest.TestCase):
         self.assertEqual(('accept', 'cancel', 'close'), (no.action, cancel.action, close.action))
         self.assertFalse(no.is_cancelled)
         self.assertTrue(cancel.is_cancelled)
-        self.assertFalse(close.is_cancelled)
+        self.assertTrue(close.is_cancelled, 'Close is not a choice; action still distinguishes it')
         for result, key in ((no, 'no'), (cancel, 'cancel'), (close, 'close')):
             self.assertEqual({'kind': 'button', 'key': key, 'checked': True}, result.value)
         state.checked = False
