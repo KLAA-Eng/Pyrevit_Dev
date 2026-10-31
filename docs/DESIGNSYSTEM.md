@@ -201,9 +201,9 @@ An icon does not change the tool's behavior or classification.
 
 [generate_gui_icons.py](../scripts/generate_gui_icons.py) generates one file,
 [klIcons.xaml](../lib/GUI/Resources/klIcons.xaml): the geometry-only `klicon<Role>`
-icon resources and the KLCode logo from [klcLogo.svg](../lib/_logos/klcLogo.svg):
-`klcLogoSlash`, `klcLogoLetters`, the SVG group's scale and offset as one
-`klcLogoTransform`, and the view-box canvas (`klcLogoCanvasWidth`/`Height`, 1024 x 146).
+icon resources and the KLCode logo from [klcLogo.svg](../lib/_logos/klcLogo.svg)
+as one self-contained `klcLogo` DataTemplate: both outlines with the SVG's own
+coordinates and its group transform, on a 1024 x 146 canvas (the view box).
 
 Edit attributed SVG sources and the generator's role mappings, then run
 `python -B scripts/generate_gui_icons.py`. Use `--check` to detect stale outputs.

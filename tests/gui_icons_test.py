@@ -32,10 +32,9 @@ class GuiIconTests(unittest.TestCase):
         dictionary = ET.fromstring(icons.generate_icons())
         groups = dictionary.findall(P + 'GeometryGroup')
         self.assertEqual({'klicon' + role for role in icons.ROLES}, {node.attrib.get(X + 'Key') for node in groups})
-        self.assertEqual(len(icons.ROLES) + 6, len(dictionary), 'icon groups, five klcLogo resources and the template')
+        self.assertEqual(len(icons.ROLES) + 1, len(dictionary), 'icon groups and the one klcLogo template')
         text = icons.generate_icons()
-        keys = set(re.findall(r'x:Key="([^"]+)"', text))
-        self.assertTrue(set(re.findall(r'\{StaticResource ([^}]+)\}', text)) <= keys, 'static references stay inside the file')
+        self.assertNotIn('StaticResource', text, 'every resource is self-contained')
         self.assertEqual({'KlaBorderBrush', 'KlaTextBrush'}, set(re.findall(r'\{DynamicResource ([^}]+)\}', text)))
         self.assertEqual([], [node for node in dictionary.iter() if node.tag.endswith('Brush')], 'defines no brushes')
         self.assertFalse((ROOT / 'lib' / '_logos' / 'KLCodeWordmark.xaml').exists(), 'the logo lives in klIcons.xaml')
@@ -58,17 +57,12 @@ class GuiIconTests(unittest.TestCase):
         self.assertNotIn('klIcons.xaml', tokens, 'icons are merged by the foundation, not by the tokens')
         self.assertFalse(hasattr(icons, 'generate_images'))
 
-    def test_logo_keeps_svg_geometry_separate_from_the_drawing_transform(self):
+    def test_logo_is_one_self_contained_template_that_keeps_the_svg_geometry(self):
         self.assertEqual('klcLogo.svg', icons.LOGO_SVG.name)
         dictionary = ET.fromstring(icons.generate_icons())
         keys = [node.attrib.get(X + 'Key') for node in dictionary if not node.tag.endswith('GeometryGroup')]
-        self.assertEqual(['klcLogoSlash', 'klcLogoLetters', 'klcLogoTransform', 'klcLogoCanvasWidth', 'klcLogoCanvasHeight', 'klcLogo'], keys,
-                         'the template follows the resources it references')
-        for geo in dictionary.findall(P + 'PathGeometry'):
-            self.assertIsNone(geo.find(P + 'PathGeometry.Transform'))
-        # The SVG group's scale and offset, unrounded; the canvas is the SVG view box.
-        self.assertEqual('1.0666642,0,0,1.0681867,-34.133255,-69.02212', dictionary.find(P + 'MatrixTransform').attrib['Matrix'])
-        self.assertEqual(['1024', '146'], [node.text for node in dictionary if node.attrib.get(X + 'Key', '').startswith('klcLogoCanvas')])
+        self.assertEqual(['klcLogo'], keys, 'the logo is one resource')
+        svg_paths = [path.attrib['d'] for path in ET.parse(icons.LOGO_SVG).getroot().iter('{%s}path' % icons.SVG)]
         for transform in ('matrix(1,0.2,0,1,0,0)', 'scale(-1,1)', 'scale(0)'):
             with self.assertRaises(ValueError, msg=transform):
                 icons._matrix(transform)
@@ -77,10 +71,13 @@ class GuiIconTests(unittest.TestCase):
         box = template.find(P + 'Viewbox')
         self.assertNotIn('Width', box.attrib, 'unsized: the header slot sets 128 x 18')
         self.assertNotIn('Height', box.attrib)
-        paths = box.findall('.//' + P + 'Path')
-        self.assertEqual(['{StaticResource klcLogoSlash}', '{StaticResource klcLogoLetters}'], [path.attrib['Data'] for path in paths])
+        canvas = box.find(P + 'Canvas')
+        self.assertEqual(('1024', '146'), (canvas.attrib['Width'], canvas.attrib['Height']), 'the SVG view box')
+        paths = canvas.findall(P + 'Path')
+        self.assertEqual(svg_paths, [path.attrib['Data'] for path in paths], 'outlines keep the SVG coordinates')
         self.assertEqual(['{DynamicResource KlaBorderBrush}', '{DynamicResource KlaTextBrush}'], [path.attrib['Fill'] for path in paths])
-        self.assertEqual({'{StaticResource klcLogoTransform}'}, {path.attrib['RenderTransform'] for path in paths})
+        # The SVG group's scale and offset, unrounded, on each outline.
+        self.assertEqual({'1.0666642,0,0,1.0681867,-34.133255,-69.02212'}, {path.attrib['RenderTransform'] for path in paths})
         self.assertNotIn('#33714F', icons.generate_icons())
         primitives = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeSharedPrimitives.xaml').read_text(encoding='utf-8')
         self.assertNotIn('<DataTemplate x:Key="klcLogo">', primitives, 'the template is generated into klIcons.xaml')

@@ -106,3 +106,15 @@ static references stay inside the file (both tested). Verification: 432 Python
 tests with the one existing macOS failure; C# source contracts 17 of 17; smoke
 project builds. The production probe's pixel comparison at 128 x 18 covers the
 generated template on Windows; not yet run.
+
+## The logo is one resource
+
+The generator now writes the logo as one self-contained `klcLogo`
+DataTemplate. The two outlines' path data, the SVG's combined transform (as a
+six-number RenderTransform on each Path) and the 1024 x 146 canvas are inline,
+so the separate `klcLogoSlash`, `klcLogoLetters`, `klcLogoTransform` and
+canvas-size resources are gone and the file has no StaticResource references.
+The outlines stay two Paths because they have two fills. The shapes are now
+built per use instead of shared, which is negligible for two outlines. The
+drawing is unchanged; the production probe's pixel comparison covers it on
+Windows (not yet run).
