@@ -6,7 +6,7 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
 [LICENSE.lucide.txt](LICENSE.lucide.txt) retains the upstream attribution/notices.
 
 - `svg/` contains the original approved SVG sources.
-- `klIcons.xaml` is generated framework-native WPF geometry only — one
+- [`lib/GUI/Resources/klIcons.xaml`](../../GUI/Resources/klIcons.xaml) is generated framework-native WPF geometry only — one
   `klicon<Role>` per role plus the KLCode logo (`klcLogo*`) — a leaf with no
   brushes. Windows need no SVG renderer or added runtime package.
 - `scripts/generate_gui_icons.py` owns semantic role mappings and generation.

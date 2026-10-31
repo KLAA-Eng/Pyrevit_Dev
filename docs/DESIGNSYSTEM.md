@@ -211,9 +211,10 @@ An icon does not change the tool's behavior or classification.
 ### Generating artwork and the KLCode logo
 
 [generate_gui_icons.py](../scripts/generate_gui_icons.py) generates one file,
-[klIcons.xaml](../lib/_icons/gui/klIcons.xaml): the geometry-only `klicon<Role>`
-icon resources and the KLCode logo (`klcLogoSlash`, `klcLogoLetters`, its
-`klcLogoOrigin` drawing offset and canvas size) from the repository SVG.
+[klIcons.xaml](../lib/GUI/Resources/klIcons.xaml): the geometry-only `klicon<Role>`
+icon resources and the KLCode logo from [klcLogo.svg](../lib/_logos/klcLogo.svg):
+`klcLogoSlash`, `klcLogoLetters`, the SVG group's scale and offset as one
+`klcLogoTransform`, and the view-box canvas (`klcLogoCanvasWidth`/`Height`, 1024 x 146).
 
 Edit attributed SVG sources and the generator's role mappings, then run
 `python -B scripts/generate_gui_icons.py`. Use `--check` to detect stale outputs.
@@ -223,8 +224,8 @@ like) off it: the generator's contract is byte equality, so a formatting pass ov
 hand-written resources, pass the formatter an explicit file list that leaves the
 generated file out, then run `--check`
 to confirm. `scripts/release_check.py` runs the check.
-The shared wordmark template uses the generated
-geometry at 70 x 12; its Path drawing transform preserves the former rendering.
+The shared `klcLogo` template draws the generated
+geometry at 128 x 18 (`klcLogoWidth` / `klcLogoHeight`); its Path transform is the SVG's own.
 No runtime SVG renderer is required.
 
 ### Ribbon assets
@@ -367,8 +368,8 @@ repeated control dimensions belong to shared roles/tokens.
 | --- | --- |
 | Window | Segoe UI 12; charcoal background; borderless transparent style |
 | Header/footer | Each 24 high, `KlaChromeRow` |
-| Header columns | 86 / flexible / 86, `KlaHeaderSideColumn` |
-| Header artwork/title | 70 x 12 wordmark; centered 14-unit title, ellipsis without tooltip |
+| Header columns | 136 / flexible / 136, `KlaHeaderSideColumn` (8 brand inset + 128 logo) |
+| Header artwork/title | 128 x 18 `klcLogo`; centered 14-unit title, ellipsis without tooltip |
 | Header Close | 60 x 18, font size 10; glyph placement through `KlaCloseGlyphLift` |
 | Footer columns | 100 / flexible / 100, `KlaFooterSideColumn` |
 | Footer content | Prototype/Outreach links green (`KlaFooterLinkBrush`), caller's pure version gray (`KlaFooterVersionBrush`); links turn white on hover/focus |
@@ -445,7 +446,7 @@ showing/dismissal semantics and Revit operations.
 | [Foundation tokens](../lib/GUI/Resources/KLCodeFoundationTokens.xaml) | Typed dimensions/fonts/insets and semantic component/state brushes |
 | [Shared primitives](../lib/GUI/Resources/KLCodeSharedPrimitives.xaml) | Merges Palette and the generated `klIcons.xaml`; defines the `klcLogo` template and footer-link/scrollbar presentation |
 | [Chrome data](../lib/GUI/Resources/KLCodeChrome.xaml) | Footer URIs and default English labels |
-| [Generated GUI geometry](../lib/_icons/gui/klIcons.xaml) | Geometry-only leaf dictionary: icons and the KLCode logo |
+| [Generated GUI geometry](../lib/GUI/Resources/klIcons.xaml) | Geometry-only leaf dictionary: icons and the KLCode logo |
 | [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Primitives (and through them the geometry), Tokens and Chrome; owns shell/basic styles and the icon presenter |
 | [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; adds field groups, compositions, options, states, tables, aliases and implicit-style policy |
 | [Command Switch styles](../lib/GUI/Resources/KLCodeCommandSwitch.xaml) | Merges Components; opt-in floating command/toggle pills using existing semantic colors |

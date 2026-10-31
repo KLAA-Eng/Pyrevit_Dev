@@ -27,13 +27,14 @@ class GuiIconTests(unittest.TestCase):
 
     def test_generated_geometry_dictionary_is_a_leaf_that_matches_the_sources(self):
         self.assertEqual(19, len(icons.ROLES))
-        self.assertEqual(icons.generate_icons(), (icons.ASSETS / 'klIcons.xaml').read_text(encoding='utf-8'))
+        self.assertEqual(icons.generate_icons(), icons.ICONS_XAML.read_text(encoding='utf-8'))
         dictionary = ET.fromstring(icons.generate_icons())
         groups = dictionary.findall(P + 'GeometryGroup')
         self.assertEqual({'klicon' + role for role in icons.ROLES}, {node.attrib.get(X + 'Key') for node in groups})
         self.assertEqual(len(icons.ROLES) + 5, len(dictionary), 'icon groups plus the five klcLogo resources')
         self.assertNotIn('StaticResource', icons.generate_icons())
         self.assertFalse((ROOT / 'lib' / '_logos' / 'KLCodeWordmark.xaml').exists(), 'the logo lives in klIcons.xaml')
+        self.assertFalse((icons.ASSETS / 'klIcons.xaml').exists(), 'klIcons.xaml lives in lib/GUI/Resources')
 
     def test_geometry_is_the_only_icon_form(self):
         foundation_path = ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeFoundation.xaml'
@@ -45,26 +46,30 @@ class GuiIconTests(unittest.TestCase):
         self.assertNotIn('generated-icons', foundation)
         self.assertIn('KlaGuiIcon', {node.attrib.get(X + 'Key') for node in shell.iter(P + 'Style')})
         merged = [node.attrib.get('Source') for node in shell.iter(P + 'ResourceDictionary')]
-        self.assertNotIn('../../_icons/gui/klIcons.xaml', merged, 'merged once, through the shared primitives')
+        self.assertNotIn('klIcons.xaml', merged, 'merged once, through the shared primitives')
         primitives = ET.fromstring((ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeSharedPrimitives.xaml').read_text(encoding='utf-8'))
-        self.assertIn('../../_icons/gui/klIcons.xaml', [node.attrib.get('Source') for node in primitives.iter(P + 'ResourceDictionary')])
+        self.assertIn('klIcons.xaml', [node.attrib.get('Source') for node in primitives.iter(P + 'ResourceDictionary')])
         tokens = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeFoundationTokens.xaml').read_text(encoding='utf-8')
         self.assertNotIn('klIcons.xaml', tokens, 'icons are merged by the foundation, not by the tokens')
         self.assertFalse(hasattr(icons, 'generate_images'))
 
-    def test_logo_keeps_svg_geometry_separate_from_the_drawing_offset(self):
+    def test_logo_keeps_svg_geometry_separate_from_the_drawing_transform(self):
+        self.assertEqual('klcLogo.svg', icons.LOGO_SVG.name)
         dictionary = ET.fromstring(icons.generate_icons())
         keys = [node.attrib.get(X + 'Key') for node in dictionary if not node.tag.endswith('GeometryGroup')]
-        self.assertEqual(['klcLogoSlash', 'klcLogoLetters', 'klcLogoOrigin', 'klcLogoCanvasWidth', 'klcLogoCanvasHeight'], keys)
+        self.assertEqual(['klcLogoSlash', 'klcLogoLetters', 'klcLogoTransform', 'klcLogoCanvasWidth', 'klcLogoCanvasHeight'], keys)
         for geo in dictionary.findall(P + 'PathGeometry'):
             self.assertIsNone(geo.find(P + 'PathGeometry.Transform'))
-        shift = dictionary.find(P + 'TranslateTransform')
-        self.assertEqual(('-32', '-64'), (shift.attrib['X'], shift.attrib['Y']))
+        # The SVG group's scale and offset, unrounded; the canvas is the SVG view box.
+        self.assertEqual('1.0666642,0,0,1.0681867,-34.133255,-69.02212', dictionary.find(P + 'MatrixTransform').attrib['Matrix'])
+        self.assertEqual(['1024', '146'], [node.text for node in dictionary if node.attrib.get(X + 'Key', '').startswith('klcLogoCanvas')])
+        with self.assertRaises(ValueError):
+            icons._matrix('matrix(1,0.2,0,1,0,0)')
         primitives = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeSharedPrimitives.xaml').read_text(encoding='utf-8')
         self.assertIn('<DataTemplate x:Key="klcLogo">', primitives)
         self.assertIn('Data="{StaticResource klcLogoSlash}"', primitives)
         self.assertIn('Fill="{StaticResource KlaBorderBrush}"', primitives)
-        self.assertEqual(2, primitives.count('RenderTransform="{StaticResource klcLogoOrigin}"'))
+        self.assertEqual(2, primitives.count('RenderTransform="{StaticResource klcLogoTransform}"'))
         self.assertNotIn('#33714F', primitives)
 
     def test_path_points_tracks_relative_commands(self):

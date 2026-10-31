@@ -74,3 +74,21 @@ compiled page link and the generator's second output are gone. The header's
 layout tokens are renamed to match: `klcLogoWidth` / `klcLogoHeight` (70 x 12). Verification: 25 generated keys, every reference resolves; 432
 Python tests with the one existing macOS failure; C# source contracts 17 of 17;
 the Windows smoke project builds. Not rendered.
+
+## klcLogo.svg at 128 x 18
+
+The logo source is now `lib/_logos/klcLogo.svg` (1024 x 146 view box; the
+outlines sit in one group with a slight non-uniform scale and offset). The
+generator takes the canvas from the view box and writes the group transform,
+unrounded, as `klcLogoTransform` (a MatrixTransform replacing `klcLogoOrigin`);
+it refuses rotation or skew and checks the transformed outlines stay inside the
+view box. `klIcons.xaml` now lives in `lib/GUI/Resources` (owner move); the
+compiled page link and source contract follow. The `klcLogo` template and the
+`klcLogoWidth` / `klcLogoHeight` tokens are 128 x 18; at that size the 1024 x 146
+artwork fits 126.2 x 18, centred. `KlaHeaderSideColumn` widens from 86 to 136
+(8 inset + 128) so the logo is not clipped and the title stays centred; the
+centred title area of every shell window shrinks by 100, to 74 in the 346-wide
+KLC-Rename. The production probe now compares the template with a direct render
+of klcLogo.svg at 128 x 18. Verification as before: 24 generated keys resolve;
+432 Python tests with the one existing macOS failure; C# source contracts 17 of
+17; smoke project builds. Not rendered.

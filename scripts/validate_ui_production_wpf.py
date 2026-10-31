@@ -285,7 +285,7 @@ def validate_wordmark():
     from xml.etree import ElementTree
     from System import Array, Byte
     from System.Windows.Controls import Canvas, Viewbox
-    from System.Windows.Media import TranslateTransform
+    from System.Windows.Media import Matrix, MatrixTransform
     from GUI.window_chrome import shared_resources
 
     owner = Window()
@@ -294,31 +294,33 @@ def validate_wordmark():
     actual.Content = 'wordmark'
     actual.ContentTemplate = owner.FindResource('klcLogo')
     expected = Viewbox()
-    expected.Width, expected.Height, expected.SnapsToDevicePixels = 70, 12, True
+    expected.Width, expected.Height, expected.SnapsToDevicePixels = 128, 18, True
     canvas = Canvas()
-    canvas.Width, canvas.Height, canvas.ClipToBounds = 961, 138, True
+    canvas.Width, canvas.Height, canvas.ClipToBounds = 1024, 146, True
     expected.Child = canvas
-    svg = ElementTree.parse(os.path.join(repo_root, 'lib', '_logos', 'KLCode_text_1024x256px.svg'))
+    svg = ElementTree.parse(os.path.join(repo_root, 'lib', '_logos', 'klcLogo.svg'))
+    group = next(svg.iter('{http://www.w3.org/2000/svg}g'))
+    a, b, c, d, e, f = [float(v) for v in group.attrib['transform'][7:-1].split(',')]
     for source, role in zip(svg.iter('{http://www.w3.org/2000/svg}path'), ('KlaBorderBrush', 'KlaTextBrush')):
         path = Path()
         path.Data = Geometry.Parse(source.attrib['d'])
         path.Fill = owner.FindResource(role)
-        path.RenderTransform = TranslateTransform(-32, -64)
+        path.RenderTransform = MatrixTransform(Matrix(a, b, c, d, e, f))
         canvas.Children.Add(path)
     buffers = []
     try:
         for control in (expected, actual):
             owner.Content = control
-            control.Measure(Size(70, 12))
-            control.Arrange(Rect(0, 0, 70, 12))
+            control.Measure(Size(128, 18))
+            control.Arrange(Rect(0, 0, 128, 18))
             settle_layout(control)
-            bitmap = RenderTargetBitmap(70, 12, 96, 96, PixelFormats.Pbgra32)
+            bitmap = RenderTargetBitmap(128, 18, 96, 96, PixelFormats.Pbgra32)
             bitmap.Render(control)
-            pixels = Array.CreateInstance(Byte, 70 * 12 * 4)
-            bitmap.CopyPixels(pixels, 70 * 4, 0)
+            pixels = Array.CreateInstance(Byte, 128 * 18 * 4)
+            bitmap.CopyPixels(pixels, 128 * 4, 0)
             buffers.append(list(pixels))
-        assert buffers[0] == buffers[1], 'Generated wordmark differs from the former inline renderer.'
-        print('Wordmark: all 840 pixels match the former inline SVG-path renderer.')
+        assert buffers[0] == buffers[1], 'Generated klcLogo differs from rendering klcLogo.svg directly.'
+        print('klcLogo: all 2304 pixels at 128 x 18 match rendering klcLogo.svg directly.')
     finally:
         owner.Close()
 

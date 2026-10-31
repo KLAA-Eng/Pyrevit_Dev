@@ -154,7 +154,7 @@ public sealed class DesignSystemResourceContractTests
             Assert.AreEqual("GUI/Resources/" + file, (string?)page.Attribute("Link"));
         }
         Assert.IsTrue(project.Descendants("Page").Any(element =>
-            (string?)element.Attribute("Link") == "_icons/gui/klIcons.xaml"));
+            (string?)element.Attribute("Link") == "GUI/Resources/klIcons.xaml"));
         Assert.IsFalse(project.Descendants("Page").Any(element =>
             ((string?)element.Attribute("Link") ?? string.Empty).StartsWith("_logos/")),
             "The KLCode logo geometry is generated into klIcons.xaml.");

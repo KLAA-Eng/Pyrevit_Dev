@@ -71,10 +71,11 @@
      <CornerRadius x:Key="KlaRadiusChip">4</CornerRadius>
      <CornerRadius x:Key="KlaRadiusCheck">2</CornerRadius>
      <CornerRadius x:Key="KlaRadiusRadio">8</CornerRadius>
-     <GridLength x:Key="KlaHeaderSideColumn">86</GridLength>
+     <!--  8 brand inset + the 128-wide logo; both side columns match so the title stays centred.  -->
+     <GridLength x:Key="KlaHeaderSideColumn">136</GridLength>
      <GridLength x:Key="KlaFooterSideColumn">100</GridLength>
-     <sys:Double x:Key="klcLogoWidth">70</sys:Double>
-     <sys:Double x:Key="klcLogoHeight">12</sys:Double>
+     <sys:Double x:Key="klcLogoWidth">128</sys:Double>
+     <sys:Double x:Key="klcLogoHeight">18</sys:Double>
      <sys:Double x:Key="KlaCloseWidth">60</sys:Double>
      <sys:Double x:Key="KlaCloseHeight">18</sys:Double>
      <sys:Double x:Key="KlaCloseFontSize">10</sys:Double>

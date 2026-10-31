@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="KLCode_palette.xaml" />
-        <ResourceDictionary Source="../../_icons/gui/klIcons.xaml" />
+        <ResourceDictionary Source="klIcons.xaml" />
     </ResourceDictionary.MergedDictionaries>
     <Style x:Key="ScrollBarThumbVertical" TargetType="{x:Type Thumb}">
         <Setter Property="OverridesDefaultStyle" Value="true" />
@@ -33,11 +33,11 @@
         <Setter Property="FontWeight" Value="Medium" />
         <Setter Property="Foreground" Value="{StaticResource KlaFooterLinkBrush}" />
     </Style>
-    <!--  The KLCode logo geometry (klcLogo*) is generated from lib/_logos/KLCode_text_1024x256px.svg into klIcons.xaml; the fills are palette roles.  -->
+    <!--  The KLCode logo geometry (klcLogo*) is generated from lib/_logos/klcLogo.svg into klIcons.xaml; the fills are palette roles. 128 x 18 matches klcLogoWidth / klcLogoHeight.  -->
     <DataTemplate x:Key="klcLogo">
         <Viewbox
-            Width="70"
-            Height="12"
+            Width="128"
+            Height="18"
             SnapsToDevicePixels="True"
             Stretch="Uniform">
             <Canvas
@@ -47,11 +47,11 @@
                 <Path
                     Data="{StaticResource klcLogoSlash}"
                     Fill="{StaticResource KlaBorderBrush}"
-                    RenderTransform="{StaticResource klcLogoOrigin}" />
+                    RenderTransform="{StaticResource klcLogoTransform}" />
                 <Path
                     Data="{StaticResource klcLogoLetters}"
                     Fill="{StaticResource KlaTextBrush}"
-                    RenderTransform="{StaticResource klcLogoOrigin}" />
+                    RenderTransform="{StaticResource klcLogoTransform}" />
             </Canvas>
         </Viewbox>
     </DataTemplate>
