@@ -48,6 +48,10 @@ Changes in this batch:
 - SelectFromDict's default prompt is "Select Elements" and it strips a trailing
   colon from any caller's prompt, so ten existing tool prompts lose their colon
   without a tool script change.
+- KLC-Rename's field labels read Find, Replace, Prefix and Suffix without a
+  colon (added after the XAML cleanup). Four shipped tool windows still write
+  colon labels: Core Find and Replace Views and Sheets, Duplicate Sheets and
+  Steel PSF. Changing them is a user-visible tool change left to the owner.
 - Message's OK sets `IsDefault` in XAML instead of code.
 - `KlaPlaceholderBrush` (#808080) is added to the palette; the Text watermark
   and the switch search hint use it, and a test keeps it equal to

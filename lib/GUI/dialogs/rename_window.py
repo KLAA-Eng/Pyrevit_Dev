@@ -100,7 +100,7 @@ def _window_type():
                 text.TextChanged += self.text_changed
                 label = Label()
                 label.Style = self.FindResource('KlaCompactFieldLabel')
-                label.Content = name.capitalize() + ':'
+                label.Content = name.capitalize()  # field labels carry no trailing colon
                 label.Target = text
                 Grid.SetRow(label, row * 2)
                 rows.Items.Add(label)
