@@ -9,6 +9,22 @@ public sealed class DesignSystemResourceContractTests
 {
     private static readonly string[] RequiredPaletteKeys =
     {
+        "KlaWindowBrush",
+        "KlaTextBrush",
+        "KlaTextMutedBrush",
+        "KlaFooterLinkBrush",
+        "KlaFooterVersionBrush",
+        "KlaPlaceholderBrush",
+        "KlaTextOnAccentBrush",
+        "KlaAccentBrush",
+        "KlaAccentHoverBrush",
+        "KlaBorderBrush",
+        "KlaBorderStrongBrush",
+    };
+
+    // The 2019 palette aliases were removed on 2026-10-31; consumers name the role brushes.
+    private static readonly string[] RemovedPaletteAliases =
+    {
         "header_background",
         "text_white",
         "text_gray",
@@ -61,6 +77,10 @@ public sealed class DesignSystemResourceContractTests
             .ToHashSet(StringComparer.Ordinal);
 
         CollectionAssert.IsSubsetOf(RequiredPaletteKeys, keys.ToArray());
+        foreach (string alias in RemovedPaletteAliases)
+        {
+            Assert.IsFalse(keys.Contains(alias), "Removed palette alias returned: " + alias);
+        }
         Assert.IsFalse(
             palette.Descendants().Attributes().Any(IsEventAttribute),
             "The canonical palette must remain data-only so compiled WPF can load it.");

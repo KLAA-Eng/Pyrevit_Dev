@@ -59,8 +59,8 @@ palette does not define an orange brush.
 | KLOrange | `#FF8000` | Orange ribbon artwork and default DevSandbox prototype icon |
 
 The footer restores its original green links and gray version text through
-dedicated roles. Other muted GUI text uses `#B5C2BD`; the compatibility key
-`text_gray` also resolves to that color. Use the footer roles for footer text.
+dedicated roles. Other muted GUI text uses `#B5C2BD` (`KlaTextMutedBrush`).
+Use the footer roles for footer text.
 
 ## GUI colors and resource keys
 
@@ -116,9 +116,13 @@ Disabled controls use explicit brushes rather than stacked opacity reductions.
 
 ### Compatibility keys
 
-Existing windows can retain these names. New markup should prefer the role
-keys above. Brush aliases bind their color to the canonical brush; they are
-separate brush instances rather than a promise of object identity. Some role
+The palette's 2019 aliases (`header_background`, `text_white`, `text_gray`,
+`text_green`, `border_green`, `border_green_dark`, `button_fg_normal`,
+`button_bg_normal`, `button_bg_hover`) were removed on 2026-10-31; every window
+names the role brushes above. The token aliases below remain for existing
+windows; new markup should prefer the role keys. Brush aliases bind their color
+to the canonical brush; they are separate brush instances rather than a promise
+of object identity. Some role
 brushes share a value by design and stay separate roles: `KlaTextMutedBrush`
 and `KlaMutedBrush`, `KlaFooterLinkBrush` and `KlaAccentHoverBrush`,
 `KlaAccentBrush` and `KlaBorderStrongBrush`, `KlaFooterVersionBrush` and
@@ -126,14 +130,6 @@ and `KlaMutedBrush`, `KlaFooterLinkBrush` and `KlaAccentHoverBrush`,
 
 | Existing key | Canonical role |
 | --- | --- |
-| `header_background` | `KlaWindowBrush` |
-| `text_white` | `KlaTextBrush` |
-| `text_gray` | `KlaTextMutedBrush` |
-| `text_green`, `border_green` | `KlaBorderBrush` |
-| `button_fg_normal` | `KlaTextOnAccentBrush` |
-| `button_bg_normal` | `KlaAccentBrush` |
-| `button_bg_hover` | `KlaAccentHoverBrush` |
-| `border_green_dark` | `KlaBorderStrongBrush` |
 | `KlaPanelBrush` | `KlaComponentSurfaceBrush` |
 | `KlaMutedTextBrush`, `KlaSubtleTextBrush` | `KlaMutedBrush` |
 | `KlaBlockingBrush` | `KlaErrorBrush` |
@@ -442,7 +438,7 @@ showing/dismissal semantics and Revit operations.
 
 | Source | Responsibility / dependencies |
 | --- | --- |
-| [Palette](../lib/GUI/Resources/KLCode_palette.xaml) | Brand role brushes and legacy color aliases |
+| [Palette](../lib/GUI/Resources/KLCode_palette.xaml) | Brand role brushes |
 | [Foundation tokens](../lib/GUI/Resources/KLCodeFoundationTokens.xaml) | Typed dimensions/fonts/insets and semantic component/state brushes |
 | [Shared primitives](../lib/GUI/Resources/KLCodeSharedPrimitives.xaml) | Merges Palette and the generated `klIcons.xaml`; defines the `klcLogo` template and footer-link/scrollbar presentation |
 | [Chrome data](../lib/GUI/Resources/KLCodeChrome.xaml) | Footer URIs and default English labels |

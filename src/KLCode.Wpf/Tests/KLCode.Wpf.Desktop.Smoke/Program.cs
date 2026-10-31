@@ -76,8 +76,6 @@ internal static class Program
         Require(window.FindResource("kliconSearch") is Geometry, identity + " canonical vector search geometry");
         foreach (string[] pair in new[]
         {
-            new[] { "header_background", "KlaWindowBrush" },
-            new[] { "border_green", "KlaBorderBrush" },
             new[] { "KlaPanelBrush", "KlaComponentSurfaceBrush" },
             new[] { "KlaSubtleTextBrush", "KlaMutedBrush" },
             new[] { "KlaBlockingBrush", "KlaErrorBrush" },

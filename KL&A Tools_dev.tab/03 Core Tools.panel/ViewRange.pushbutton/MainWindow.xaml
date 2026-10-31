@@ -10,7 +10,7 @@
             <Setter Property="TextAlignment" Value="Center"/>
         </Style>
         <Style x:Key="ViewRangeTableCell" TargetType="TextBlock" BasedOn="{StaticResource KlaInfoText}">
-            <Setter Property="Foreground" Value="{StaticResource text_white}"/>
+            <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
             <Setter Property="TextWrapping" Value="NoWrap"/>
             <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -35,7 +35,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="32"/><RowDefinition Height="32"/><RowDefinition Height="32"/><RowDefinition Height="32"/><RowDefinition Height="32"/>
                         </Grid.RowDefinitions>
-                        <Rectangle Grid.Row="0" Grid.ColumnSpan="5" Fill="{StaticResource border_green_dark}" RadiusX="5" RadiusY="5"/>
+                        <Rectangle Grid.Row="0" Grid.ColumnSpan="5" Fill="{StaticResource KlaBorderStrongBrush}" RadiusX="5" RadiusY="5"/>
                         <TextBlock Grid.Column="1" Text="Plane" Style="{StaticResource ViewRangeTableHeader}"/>
                         <TextBlock Grid.Column="2" Text="Elevation - ft" Style="{StaticResource ViewRangeTableHeader}"/>
                         <TextBlock Grid.Column="3" Text="Level Offset" Style="{StaticResource ViewRangeTableHeader}"/>

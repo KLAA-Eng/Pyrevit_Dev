@@ -28,7 +28,7 @@
                     <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="300" />
                 </Grid.ColumnDefinitions>
-                <Border Grid.Column="0" BorderBrush="{StaticResource border_green_dark}" BorderThickness="1" CornerRadius="10" ClipToBounds="True">
+                <Border Grid.Column="0" BorderBrush="{StaticResource KlaBorderStrongBrush}" BorderThickness="1" CornerRadius="10" ClipToBounds="True">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="28" />
@@ -93,13 +93,13 @@
                         <Grid Margin="0,4,0,10">
                             <Border Style="{StaticResource KlaGroupBorderStyle}">
                                 <StackPanel Margin="0,2,0,0">
-                                    <Border BorderBrush="{StaticResource border_green_dark}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+                                    <Border BorderBrush="{StaticResource KlaBorderStrongBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
-                                            <Border Background="{StaticResource button_bg_normal}" Padding="4">
+                                            <Border Background="{StaticResource KlaAccentBrush}" Padding="4">
                                                 <TextBlock Text="{Binding SelectedRow.TargetKind}" FontSize="11" HorizontalAlignment="Center" />
                                             </Border>
                                             <TextBlock Grid.Column="1" Text="{StaticResource SheetTargetLabel}" Foreground="{StaticResource KlaSubtleTextBrush}" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" />

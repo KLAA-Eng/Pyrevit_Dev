@@ -203,7 +203,7 @@ def validate_gui_icons():
     owner.Foreground = Brushes.Orange
     panel = WrapPanel()
     panel.ItemWidth, panel.ItemHeight = 140, 56
-    panel.Background = resources['header_background']
+    panel.Background = resources['KlaWindowBrush']
     owner.Content = panel
     presenters = []
     try:
@@ -218,7 +218,7 @@ def validate_gui_icons():
             label = TextBlock()
             label.Text, label.Width = role, 132
             label.TextWrapping = TextWrapping.Wrap
-            label.Foreground = resources['text_white']
+            label.Foreground = resources['KlaTextBrush']
             block.Children.Add(label)
             panel.Children.Add(block)
             presenters.append(icon)
@@ -234,7 +234,7 @@ def validate_gui_icons():
             settle_layout(panel)
             assert str(path.Stroke) == str(resources['KlaDisabledTextBrush'])
             icon.IsEnabled = True
-        owner.Foreground = resources['text_white']
+        owner.Foreground = resources['KlaTextBrush']
         settle_layout(panel)
         if output_directory:
             render_content(owner, os.path.join(output_directory, 'gui-icons-%d-native.png' % len(ICON_ROLES)), 700, 280)
