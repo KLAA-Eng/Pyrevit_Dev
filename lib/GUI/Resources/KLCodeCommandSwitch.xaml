@@ -120,9 +120,7 @@
                             <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource KlaBorderBrush}" />
                             <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Right" />
                         </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
-                        </Trigger>
+                        <!--  No hover change on toggles (owner, 2026-10-31): the pill keeps its surface under the pointer.  -->
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
                             <Setter Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />

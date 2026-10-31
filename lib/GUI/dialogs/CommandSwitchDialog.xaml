@@ -20,13 +20,6 @@
         Background="{StaticResource KlaWindowBrush}"
         BorderThickness="0"
         CornerRadius="{StaticResource KlaRadiusFloating}">
-        <Border.Effect>
-            <DropShadowEffect
-                BlurRadius="12"
-                Opacity="0.4"
-                ShadowDepth="0"
-                Color="{Binding Color, Source={StaticResource KlaWindowBrush}}" />
-        </Border.Effect>
         <Grid
             x:Name="window_body"
             FocusVisualStyle="{x:Null}"

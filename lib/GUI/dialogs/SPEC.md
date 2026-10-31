@@ -113,7 +113,8 @@ owns implementation status. The [API guide](README.md) owns usage examples.
 - AC-009: Separate Command Switch matches the compact floating pyRevit layout
   with KLCode colors: prompt/search, wrapping immediate command buttons,
   optional toggles; no corner x, shared header/footer or Continue button.
-  The panel has no outline. Its 16-unit SemiBold prompt centers vertically
+  The panel has no outline and no shadow. Toggle pills do not change on hover;
+  command pills keep their hover fill. Its 16-unit SemiBold prompt centers vertically
   beside the search input.
   Initial focus is the neutral panel, not the search field. Typing or Tab can
   enter search; it is not selected automatically on open.

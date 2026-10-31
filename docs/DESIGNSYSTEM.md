@@ -10,7 +10,8 @@ compiled window classes use `KlaWindowShell`. PreviewFixture retains its
 standalone test chrome. Native/pyRevit dialogs and Recall's docked panel have
 separate host presentation; the standalone Recall body uses the shared system.
 The sixth opt-in body is a floating Command Switch using shared colors/styles
-with its own compact layout. Message, Text, Action Choice and KL&A Custom Alert
+with its own compact layout: no outline, no shadow, and toggle pills that keep
+their surface on hover. Message, Text, Action Choice and KL&A Custom Alert
 omit the standard footer and its reserved row by design. Message and Text retain
 Close with a blank center title; Action Choice and Custom Alert retain their
 title/Close controls.
@@ -560,6 +561,13 @@ what the user gives up, with the WCAG 2.1 criterion each touches:
 - Placeholder gray: `KlaPlaceholderBrush` #808080 is 3.96:1 on the window.
   That passes for the 24-unit bold Text watermark and is below 4.5:1 for the
   12-unit Command Switch hint (1.4.3). Owner decision, 2026-10-31.
+- Command Switch toggle pill: the KLWhite thumb on the #B5C2BD track is 1.45:1
+  and the checked #33714F track is 2.33:1 on the pill, under the 3:1 for control
+  states (1.4.11). The thumb's side also shows the state. Owner kept the current
+  colours on 2026-10-31 and removed the hover fill instead.
+- Command Switch panel edge: no outline and no shadow, so on a dark Revit
+  surround the charcoal panel is separated only by its own fill. Owner decision,
+  2026-10-31.
 - Disabled controls are signalled by #A6B0AD text (7.0:1) and their disabled
   automation state; WCAG exempts inactive components from contrast, and the
   text change is not the only cue to assistive technology (1.4.1, 1.4.3).

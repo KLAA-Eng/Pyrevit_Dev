@@ -85,3 +85,23 @@ updated for the new behaviour and must be run before relying on it:
 `validate_ui_shown_focus_wpf.py` (placeholder token), `validate_ui_dialogs_wpf.py`
 and `validate_ui_gallery_wpf.py` (switch states, owned previews). Alt+F4 cannot
 be simulated by the probes; check it by hand on a trapped Action Choice.
+
+## Command Switch look, picked after the candidates
+
+The owner reviewed the candidates card in the design system and chose neither
+drawn edge nor a new pill [A6, A8]:
+
+- The panel has no shadow and no outline. The `DropShadowEffect` in the window
+  colour is removed; the transparent 16-unit margin stays, so geometry and
+  outside-click bounds are unchanged.
+- The toggle pill keeps its current colours and loses its hover fill: the
+  `IsMouseOver` trigger on `KlaCommandToggle` is removed. Command pills keep
+  theirs.
+- Both are accepted deviations in the guide: the pill's 1.45:1 thumb and 2.33:1
+  checked track (1.4.11), and a panel separated from a dark surround only by
+  its own fill.
+
+`tests/gui_command_switch_look_test.py` pins both. Verification: 433 tests,
+the one existing macOS path-case failure; scale lint 0 strict, 62 advisory.
+Not rendered; `validate_ui_command_switch_pointer_wpf.py` and the Gallery
+probe should be run with the rest.
