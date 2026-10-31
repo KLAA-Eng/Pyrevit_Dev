@@ -239,7 +239,7 @@ def _overlay_document(uiapp, overlay):
     """Return the active document, refusing an overlay listed from another model."""
     doc = uiapp.ActiveUIDocument.Document
     if not overlay.image_type.IsValidObject or not overlay.image_type.Document.Equals(doc):
-        raise UserError('The overlay list is out of date for this model; click Refresh.')
+        raise UserError('The overlay list is out of date for this model; click the PDF image in this view again.')
     return doc
 
 

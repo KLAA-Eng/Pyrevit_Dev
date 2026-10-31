@@ -1,34 +1,30 @@
 # PDF Overlay
 
+## Identity
+
 | Field | Value |
 | --- | --- |
+| Bundle path | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton` |
 | Tool ID | `devsandbox.pdf-overlay` |
-| Tool version | `v0.0` |
-| Status | Unreleased prototype; live acceptance pending |
-| Status/origin | Prototype; KL&A custom tool. |
-| Main delivery | Unreleased |
 | Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton` |
 | Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton/script.py`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/PDF Overlay.pushbutton/PdfOverlayPalette.xaml`; `lib/pdf_overlay/`; shared `lib/error_reports.py` and `lib/error_reports_revit.py` |
+| Maturity | Prototype |
+| Tool version | `v0.0` |
+| Status/origin | KL&A DevSandbox prototype; KL&A custom tool. Unreleased (main delivery: Unreleased); live acceptance pending. |
+| Maintainer | KL&A |
+| Revit versions live-tested | None yet |
 
-## Tool version history
-
-| Version | Main delivery | Date | Meaningful change | Git evidence |
-| --- | --- | --- | --- | --- |
-| v0.0 | Unreleased | 10.28.2026 | First DevSandbox PDF overlay: PDF page import with transparent paper and tinted linework, two-point alignment, an opacity, color, and visibility palette, and a member size check against the PDF's text labels. | Pending commit on `dev.pdf-overlay`; pending next main delivery. |
-
-Versions reconstruct meaningful main-release deliveries. Intermediate dev work
-is grouped into its delivered snapshot; meaningful changes absent from current
-main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
-
-## Purpose
+## Purpose and workflow
 
 Engineers review member sizes by comparing an analysis or drawing PDF (for
 example a RAM member-size map or a printed framing plan) with the Revit
 framing. This prototype places one PDF page in the active view as a
 see-through, tinted image, fits it to the framing with two picked points, and
-lets the user blend or blink the two for review.
+lets the user blend or blink the two for review. It can then check the
+framing sizes, studs, and camber in the view against the PDF's text labels
+and revise selected members to match.
 
-## Workflow
+### Workflow
 
 1. **Import PDF.** The palette's Page and DPI (100, 150, 200, 300, 400, or 600;
    default 150) choose what to import. A rendered page above 160 million pixels
@@ -64,13 +60,11 @@ lets the user blend or blink the two for review.
    (Red, Magenta, Blue, Green, or Original) re-render the PNG and reload it into
    the same ImageType. Its instances are re-placed, so alignment is kept. Show
    overlay hides or unhides the overlay in the active view only.
-
 4. **Check Members.** Compares framing sizes, studs, and camber in the active
    view with the labels printed in the PDF (see Member check). Members to
    review are selected in Revit and listed in the pyRevit output window.
    **Revise Selected to PDF** changes the selected members to match their
    labels (see Revise to PDF).
-
 5. **Reuse.** The palette has no overlay list; it works on the overlay
    whose PDF image is selected in Revit. It follows
    `UIApplication.SelectionChanged` (Revit 2023+): selecting an overlay image
@@ -92,9 +86,10 @@ lets the user blend or blink the two for review.
    Revit Undo restores it, and its local files are kept.
 
 The palette is modeless and stays open beside Revit. Actions run through an
-`ExternalEvent`, one at a time.
+`ExternalEvent`, one at a time; an action requested while another is queued
+is refused with a "Busy" status.
 
-## Member check
+### Member check
 
 The labels come from the PDF's text, not the image. `lib/pdf_overlay/pdftext.py`
 is a small standard-library PDF reader that runs under IronPython and CPython.
@@ -147,7 +142,7 @@ style are cleared too. Marking and clearing are one undoable transaction. The ch
 from its original path at check time. A warning is printed if the PDF page
 shape and the imported image differ by more than 2%.
 
-### Studs and camber in labels
+#### Studs and camber in labels
 
 Text after a size, in the same word or in up to three following words on its
 baseline (each within 1.5 text heights, stopping at the next size), is read
@@ -158,7 +153,7 @@ inches: `3/4"`, `1"`, `1 1/4"`, `1-1/4"`, or `.75`. Other notes such as
 framing plan) prints studs or camber, so the formats follow RAM and plan
 conventions. Confirm them with a floor PDF before relying on them.
 
-## Revise to PDF
+### Revise to PDF
 
 **Revise Selected to PDF** works on the Revit selection, from one member to
 many. Check Members selects every member to review, so it can follow a check
@@ -181,7 +176,92 @@ transaction, with each member in its own sub-transaction, so one failure
 leaves that member unchanged and the rest still apply. The report lists each
 member as it was and as it is now, and the revised members are selected.
 
-## Rendering
+## Inputs and prerequisites
+
+- Active view: a view that accepts images (`ImageInstance.IsValidView`), such
+  as a plan, ceiling, elevation, section, or drafting view. Actions that need
+  the overlay in the view (Align, Check Members, Show overlay) refuse an
+  overlay that is not placed in the active view; Align also refuses a hidden
+  overlay.
+- Revit with PDF import support
+  (`OptionalFunctionalityUtils.IsPDFImportAvailable`). `bundle.yaml` sets
+  `min_revit_version: 2023`; following the selection uses
+  `UIApplication.SelectionChanged` (Revit 2023+).
+- A PDF file chosen in a file dialog, a page number (a whole number of 1 or
+  more), and a DPI from the palette list.
+- For Check Members and Revise to PDF: the PDF still at the path it was
+  imported from, with its size labels as text; structural framing in the
+  active view with a location curve (members seen end-on are left out); and
+  Match within values greater than zero (feet and degrees).
+- For Revise to PDF: the members to revise selected in Revit, and the target
+  framing types already loaded in the project. Studs and camber are written
+  to the built-in Number of studs and Camber Size parameters, which must be
+  editable on the member.
+- The overlay's local cache files on this computer (see Storage and sharing).
+  An overlay imported on another computer must be imported again here before
+  it can be re-styled, aligned, checked, or replaced.
+- pyRevit with its WPF support (see Diagnostics).
+
+## Outputs and effects
+
+- **Palette and dialogs:** a modeless palette with a status line for
+  progress, results, and problems the user can fix. Remove and Revise
+  Selected to PDF ask for confirmation in an alert; Place in View offers a
+  list of overlays to choose from.
+- **pyRevit output window:** the member check report (counts, tolerance,
+  crop and page-shape notes, members to review, labels with no member, and
+  members with no label) and the revision report (each member as it was and
+  as it is now, plus skipped items with reasons). Element ids are clickable.
+- **Selection:** Check Members selects the members to review; Revise
+  Selected to PDF selects the revised members.
+- **Model changes**, each in its own named, undoable transaction that is
+  rolled back on failure:
+  - `PDF Overlay - Place`: one imported ImageType (the rendered overlay PNG)
+    and an ImageInstance on the Foreground draw layer in the active view.
+    `PDF Overlay - Read Page` creates a page-only ImageType and is always
+    rolled back.
+  - `PDF Overlay - Update`: reloads the ImageType from the re-rendered PNG and
+    re-places every instance (opacity, color, Align, Replace PDF).
+  - `PDF Overlay - Place in View`: one more ImageInstance in the active view.
+  - `PDF Overlay - Show` / `PDF Overlay - Hide`: hides or unhides the
+    overlay's instances in the active view.
+  - `PDF Overlay - Remove`: deletes the ImageType and so all its placements.
+  - `PDF Overlay - Pick Marker` / `PDF Overlay - Clear Pick Markers`:
+    temporary Align circles (detail lines with per-view overrides), removed
+    when Align ends.
+  - `PDF Overlay - Review Marks`: creates the `PDF Overlay Marks` line style
+    once, and replaces or clears the review-mark detail lines in the active
+    view.
+  - `PDF Overlay - Revise to PDF`: changes member types and the Number of
+    studs and Camber Size parameters, one sub-transaction per member.
+- **Not changed:** the PDF file, loaded families and types (a missing size is
+  reported, not loaded or created), and framing that is not selected for
+  revision. Check Members changes the model only through the review marks.
+- **Cancellation:** Esc during Align stops picking, removes the pick circles,
+  and leaves the overlay where it was; the palette reports "Cancelled;
+  nothing changed." Cancelling a file dialog, the Place in View list, or a
+  confirmation makes no change. A failure inside a transaction rolls that
+  transaction back; in Revise to PDF a member that fails is rolled back
+  alone and the others still apply. Import writes its local cache files
+  before the Place transaction, so a failed placement can leave those files
+  behind.
+- **Local files:** the overlay cache (see Storage and sharing), the
+  diagnostic log `%LOCALAPPDATA%\KLA Tools\PDF Overlay\pdf_overlay.log`, and
+  error reports (see Diagnostics).
+- **Error reports:** an unexpected failure writes one JSON file,
+  `<report id>.json` (for example `PDFO-20261029-1432-7F3A`), to
+  `%LOCALAPPDATA%\KLA Tools\Error Reports\` (the temp folder if `LOCALAPPDATA`
+  is not set). A copy also goes to `SHARED_REPORTS_FOLDER` in
+  `lib/error_reports.py` when that is set and reachable; it is empty, so
+  reports stay on the computer. The report holds the tool id, name, and
+  version; the action name; the error type, message, and traceback; the
+  extension, Revit (version, build, user name), and pyRevit versions, the
+  Windows user name, and the model file name without its folder; the last 40
+  lines of `pdf_overlay.log`; and a grouping signature. The report id is
+  copied to the clipboard and shown in the palette status or startup alert.
+  Problems the user can fix are status messages, not reports.
+
+### Rendering
 
 Rendering uses one GDI+ `ColorMatrix` pass: output alpha is
 `opacity × (1 − luminance)`, so white paper is fully clear and dark linework is
@@ -190,7 +270,7 @@ source colors. Rotation is applied in the same pass on a canvas sized to the
 rotated page, so the Revit image always stays axis-aligned and the tool does
 not rely on rotating image instances.
 
-## Diagnostics
+### Diagnostics
 
 Startup steps and failures are appended to
 `%LOCALAPPDATA%\KLA Tools\PDF Overlay\pdf_overlay.log`, because the pyRevit
@@ -208,7 +288,7 @@ Feedback. Reports include the last 40 lines of the log above. See
 [Error reports](../../../../docs/knowledge/error-reports.md) for contents,
 collection, and `scripts/summarize_error_reports.py`.
 
-## Coordinates
+### Coordinates
 
 View 2D coordinates are measured from the model origin along the view's
 right and up directions, not from the view origin. Every view facing the same
@@ -217,7 +297,7 @@ on. State files from before this change (version 1) used the view origin;
 every action re-reads the placed image's center before use, so they keep
 working.
 
-## Storage and sharing
+### Storage and sharing
 
 For each overlay, three files with the same stem are kept in
 `%LOCALAPPDATA%\KLA Tools\PDF Overlay\`: `<stem>_source.png` (page raster),
@@ -228,7 +308,7 @@ re-style or re-align it. Elsewhere the palette lists it as "no local files" and
 asks for a re-import. Deleting the image in Revit (Manage Images) leaves the
 local cache files.
 
-## Limits
+## Limits and compatibility
 
 - Works only in views that accept images (`ImageInstance.IsValidView`): plan,
   ceiling, elevation, section, drafting, and similar 2D views. 3D views are not
@@ -238,13 +318,50 @@ local cache files.
 - The pose is stored in the active view's right/up coordinates. Copies of the
   overlay placed in views with a different orientation are not supported.
 - Requires Revit PDF import support (`OptionalFunctionalityUtils.IsPDFImportAvailable`).
+- A page above 160 million rendered pixels is refused with the highest DPI
+  that fits.
+- Member labels must be PDF text: encrypted PDFs, scanned pages, and text
+  exported as outlines give no labels. Only the steel shapes listed under
+  Member check are recognized, and the studs and camber formats are not yet
+  confirmed with a floor PDF.
+- Re-styling, aligning, checking, and replacing need the overlay's local
+  cache files, so they work only on the computer that imported it.
+- `bundle.yaml` allows Revit 2023 and later. Revit 2024 and later is the
+  repository's design target; no Revit version has live evidence yet, so
+  none is claimed as supported.
 
-## Validation
+## Validation evidence
+
+| Date | Extension release | Revit version | Scenario | Result | Evidence link or location |
+| --- | --- | --- | --- | --- | --- |
+| 10.30.2026 | `0.0.14-dev` | None (CPython) | `tests/pdf_overlay_test.py` and `tests/pdf_overlay_members_test.py` (44 tests) and `tests/error_reports_test.py` (9 tests) | Pass | Local run on `dev.pdf-overlay` |
 
 `tests/pdf_overlay_test.py` covers the pose math (pixel/view round trip,
 two-point fit with and without the orthogonal snap, coincident-pick
 rejection, rotated canvas size), the color matrix (paper drop-out, opacity,
-tint, Original), and the cache stem and JSON state round trip. Revit-side
-behavior (PDF rasterization, ImageType reload, picking, visibility) needs live
-acceptance in Revit 2023–2026 using a RAM member map and a partial printed
-roof plan before promotion.
+tint, Original), and the cache stem and JSON state round trip.
+`tests/pdf_overlay_members_test.py` covers the member label and matching
+rules in `lib/pdf_overlay/members.py`. Revit-side behavior (PDF rasterization,
+ImageType reload, picking, visibility) needs live acceptance in Revit
+2023–2026 using a RAM member map and a partial printed roof plan before
+promotion.
+
+Automated checks do not prove Revit transactions or the user workflow; live
+acceptance is pending.
+
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | Unreleased | 10.28.2026 | First DevSandbox PDF overlay: PDF page import with transparent paper and tinted linework, two-point alignment, an opacity, color, and visibility palette, and a member size check against the PDF's text labels. | Pending commit on `dev.pdf-overlay`; pending next main delivery. |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
+## Backlog
+
+- Live Revit acceptance in Revit 2023–2026 with a RAM member map and a
+  partial printed roof plan (PDF rasterization, ImageType reload, picking,
+  visibility, member check, and Revise to PDF).
+- Confirm the studs and camber label formats with a floor PDF.

@@ -36,7 +36,9 @@ view") are messages, not reports.
   the message, which often holds element ids or paths.
 
 Including the user name and model file name was the owner's decision on
-10.29.2026. Reports do not include model paths, element data, or PDF content.
+10.29.2026. Reports do not include model folder paths or PDF content, but the
+error message, traceback, and log lines can name files, element ids, or the
+overlay name taken from the PDF file name.
 
 ## Collecting reports and handing them off
 
