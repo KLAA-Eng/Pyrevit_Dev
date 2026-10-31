@@ -1,26 +1,22 @@
 # Check Section References
 
+## Identity
+
 | Field | Value |
 | --- | --- |
+| Bundle path | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Check Section References.pushbutton` |
 | Tool ID | `devsandbox.check-section-references` |
+| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Check Section References.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Check Section References.pushbutton` |
+| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Check Section References.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Check Section References.pushbutton/script.py`; `lib/section_check/` |
+| Maturity | Prototype |
 | Tool version | `v0.0` |
 | Status | Unreleased prototype; live acceptance pending |
 | Status/origin | Prototype; KL&A custom tool. Standalone: depends only on `lib/section_check/`. |
 | Main delivery | Unreleased |
-| Path aliases | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Check Section References.pushbutton`; `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Check Section References.pushbutton` |
-| Version inputs | `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Check Section References.pushbutton/bundle.yaml`; `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/Check Section References.pushbutton/script.py`; `lib/section_check/` |
+| Maintainer | KL&A |
+| Revit versions live-tested | None yet |
 
-## Tool version history
-
-| Version | Main delivery | Date | Meaningful change | Git evidence |
-| --- | --- | --- | --- | --- |
-| v0.0 | Unreleased | 10.28.2026 | First DevSandbox section reference check: approximate match percentage per reference section against a live referenced section or a drafting view, with SIM and OH notes. | Pending commit on `dev.section-references`; pending next main delivery. |
-
-Versions reconstruct meaningful main-release deliveries. Intermediate dev work
-is grouped into its delivered snapshot; meaningful changes absent from current
-main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
-
-## Purpose
+## Purpose and workflow
 
 Plans often place a section marker that references a detail drawn somewhere
 else (a section cut at another location, or a typical drafting detail). This
@@ -29,7 +25,13 @@ approximate percentage of how well the modeled condition at the marker
 matches the referenced detail, so reviewers can look at the lowest matches
 first. It does not check sections that show their own location.
 
-## Scope and detection
+1. Open the plan view that shows the section markers and run the command.
+2. Review the lowest matches first; the percentage is a guide, not a
+   pass/fail.
+3. Click a marker Id to select it and show it in the view, or use the link
+   that selects every marker to review.
+
+### Scope and detection
 
 - Markers: the active plan view's reference sections
   (`View.GetReferenceSections`), each with its referenced view from
@@ -64,7 +66,7 @@ first. It does not check sections that show their own location.
   the view direction, else `skew`; columns `vertical`), and side (`L`, `C`
   within 1'-0" of the window center, `R`) from its location line or point.
 
-## Scoring
+### Scoring
 
 The percentage is a review guide, not a pass/fail.
 
@@ -93,7 +95,22 @@ The percentage is a review guide, not a pass/fail.
 - Rating: `Likely match` at 80% or more, `Review` from 50%, `Likely mismatch`
   below 50%, `Can't tell` when nothing could be compared.
 
-## Output and model effects
+## Inputs and prerequisites
+
+- A project model; the command stops in a family document.
+- Active view: a plan view (`ViewPlan`) with at least one reference section
+  (a section set to "Reference Other View"); otherwise the command stops with
+  a message.
+- Referenced views: a vertical section or detail view (live section) or a
+  drafting view. A marker whose referenced view is missing, not vertical,
+  or of another kind is listed as `Not compared` with `Can't tell`; a marker
+  whose cut line cannot be found is listed the same way.
+- Host-model walls, floors, structural framing, structural and architectural
+  columns, structural foundations, and roofs at the marker and in the
+  referenced section; SIM / OH text notes beside the marker in the plan.
+- No external files, packages, or workstation software beyond pyRevit.
+
+## Outputs and effects
 
 Read only: no transaction, no model or view changes. The pyRevit output shows
 the view, number of reference sections, average match, and how many need
@@ -102,9 +119,10 @@ unknown and lowest matches first: Marker (select link), References (view name
 and detail/sheet), Compared with (Section, Drafting, Not compared), SIM/OH,
 Match, Rating, Cut at marker, Cut in reference (live sections), and Findings.
 Marker Ids are pyRevit element links, which select the marker and show it in
-the view.
+the view. The count of other section, callout, and elevation markers that
+were not checked is also reported.
 
-## Implementation inventory
+### Implementation inventory
 
 - Entry point: `script.py` (view checks and report).
 - `lib/section_check/revit_sections.py`: Revit collection, marker geometry,
@@ -117,7 +135,7 @@ the view.
   findings.
 - Host-independent modules are covered by `tests/section_check_test.py`.
 
-## Limits
+## Limits and compatibility
 
 - Linked models are not read, so conditions modeled in a linked architectural
   or structural model score as missing.
@@ -127,8 +145,18 @@ the view.
   wording.
 - A typical detail placed at many locations will legitimately score lower at
   some of them; the score only orders the review.
+- Revit 2024 and later is the design target; the script has no version gate,
+  and element Ids are read through `ElementId.Value` when available, else
+  `IntegerValue`. No Revit version has live evidence yet.
 
-## Validation boundary
+## Validation evidence
+
+| Date | Extension release | Revit version | Scenario | Result | Evidence link or location |
+| --- | --- | --- | --- | --- | --- |
+| 10.30.2026 | `0.0.14-dev` | None (CPython) | `tests/section_check_test.py` | Pass | Local run on `dev.section-references` |
+
+Automated checks do not prove Revit behavior or the user workflow; live
+acceptance is pending.
 
 Live Revit 2024+ acceptance must confirm that `GetReferenceSections` returns
 the plan's reference markers, that the marker geometry in the view gives the
@@ -138,8 +166,19 @@ on projects whose base point is moved, the crop-box window on rotated and
 detail-type sections, the SIM/OH note reach at common scales, and scores on
 representative wall-bearing, beam-to-wall, and footing details.
 
-## Future development
+## Tool version history
+
+| Version | Main delivery | Date | Meaningful change | Git evidence |
+| --- | --- | --- | --- | --- |
+| v0.0 | Unreleased | 10.28.2026 | First DevSandbox section reference check: approximate match percentage per reference section against a live referenced section or a drafting view, with SIM and OH notes. | Pending commit on `dev.section-references`; pending next main delivery. |
+
+Versions reconstruct meaningful main-release deliveries. Intermediate dev work
+is grouped into its delivered snapshot; meaningful changes absent from current
+main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
+
+## Backlog
 
 - Reference callouts, and markers in section and elevation views.
 - Linked model elements.
 - Optional color overrides of low-scoring markers in the view.
+- Live Revit acceptance (see Validation evidence).
