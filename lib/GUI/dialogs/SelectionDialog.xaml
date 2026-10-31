@@ -45,7 +45,7 @@
                         Style="{StaticResource KlaFilter}"
                         TextChanged="filter_changed" />
                 </Grid>
-                <Grid x:Name="group_row" Margin="0,8,0,0">
+                <Grid x:Name="group_row" Margin="{StaticResource KlaStackGap}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="{StaticResource KlaGridSpace16}" />
                         <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />

@@ -279,6 +279,8 @@ windows; compiled consumers can also use their existing adapter aliases.
 | `KlaRadioButton` | RadioButton | Minimum height 28 | Exclusive choices with circular indicators |
 | `KlaSegmentButton` | RadioButton | Height 28; width fits content | Exclusive toolbar segments inside a bordered group |
 | `KlaToggle` | ToggleButton | 104 x 28 | Persistent on/off option |
+| `KlaCommandLink` | Button | Full width, minimum height 40 | TaskDialog-style command link: arrow, 16 SemiBold label, optional description; Action Choice |
+| `KlaDetailsExpander` / `KlaDetailsToggle` | Expander / ToggleButton | Header row; content 8 below | Details disclosure with a right/down chevron in the Expander's foreground; Message and Action Choice |
 
 `KlaFoundationButton`, `KlaFoundationMainButton` and `KlaSecondaryButton` remain
 valid existing names. The role aliases above are preferred for new markup.
@@ -296,6 +298,7 @@ silently shrink fonts or invent a per-window button size.
 | `KlaFilter` | TextBox | 24-high search/filter; font size 14 |
 | `KlaReadOnlyField` / `KlaCompactReadOnlyField` | TextBox | Read-only field, standard 32 or compact 24 high |
 | `KlaMultilineReadout` | TextBox | Wrapped read-only output, minimum height 64, bounded by the caller with scrolling |
+| `KlaDetailsReadout` | TextBox | `KlaMultilineReadout` whose text aligns with the dialog body; Message Details |
 | `KlaComboBox` / `KlaCompactComboBox` | ComboBox | Standard 32 or compact 24 high; minimum width 104; popup maximum height 260 |
 | `KlaLabel` / `KlaCompactFieldLabel` | Label | Ordinary label / vertically centered compact field label |
 | `KlaPromptLabel` | Label | 14-unit, normal-weight section prompt with a label target |
@@ -381,7 +384,9 @@ The [current Python footer render](knowledge/reviews/design-system/2026-10-29-fo
 and [compiled footer render](knowledge/reviews/design-system/2026-10-29-footer-color-evidence/compiled-source-picker.png)
 show the owner-requested original green links and gray version text.
 
-Use `KlaFoundationWindow` or its `KlaWindow` alias for the window and
+Use `KlaFoundationWindow` or its `KlaWindow` alias for the window, or
+`KlaFloatingWindow` for a frameless floating panel with a transparent window
+and no taskbar entry, and
 `KlaWindowShell` for the named `window_shell` ContentControl. The shell supplies
 the header/footer and body inset. Do not copy chrome into a new body.
 The foundation defaults to NoResize; a resizable borderless window explicitly
@@ -406,12 +411,23 @@ control sizes require different resource types.
 | `KlaInputPadding` | Thickness | `8,0`, button/toggle content padding |
 | `KlaTextBoxPadding` | Thickness | `5,0`, native TextBox padding; border and native text inset yield 8 units of rendered horizontal inset, matching ComboBox text |
 | `KlaActionTopGap` | Thickness | `0,8,0,0`, standard content-to-action gap for Message and Text Entry |
+| `KlaStackGap`, `KlaStackGapBelow` | Thickness | `0,8,0,0` and `0,0,0,8`, between stacked sections of a dialog body |
+| `KlaIconTextGap` | Thickness | `0,0,4,0`, chevron or small icon before its text |
+| `KlaOpticalTextInset` | Thickness | `0,0,0,2`, deliberate optical lift for large text beside an input |
+| `KlaFloatingMargin`, `KlaRadiusFloating` | Thickness, CornerRadius | 16 and 12, the floating panel's transparent margin and corners |
+| `KlaCommandLinkPadding`, `KlaCommandArrowInset`, `KlaCommandLinkIconColumn` | Thickness, Thickness, GridLength | 8, `0,4,8,0` and 24 inside a command link |
+| `KlaDetailsReadoutPadding` | Thickness | `10,8`, body-aligned readout text |
+| `KlaRenameLabelColumn` | GridLength | 52, the KLC-Rename label column |
+| `KlaSeverityIconSize`, `KlaDialogHeadingFontSize`, `KlaSubheadingFontSize` | Double | 32, 22 and 16: dialog severity icon, severity heading, command link and switch prompt |
+| `KlaDetailsHeight`, `KlaOptionMaxHeight`, `KlaCommandLinkMinHeight`, `KlaSwitchPromptMaxWidth` | Double | 128, 80, 40 and 180 |
 | `KlaControlHeight`, `KlaCompactHeight`, `KlaCompactFieldHeight` | Double | Control heights of 32, 28 and 24 |
 
 `KlaGridSpace12` and `KlaGridSpace24` are not currently defined. If a new shared
 layout needs one, add a correctly typed token and verify its consumers. Do not
 pass a Thickness to a RowDefinition or assume a Double resource substitutes for
-a GridLength. Keep Foundation/Components free of numeric layout literals;
+a GridLength. Keep Foundation, Components and the Command Switch dictionary
+free of numeric layout literals (`check_ui_scale.STRICT`); the shared dialog
+bodies use tokens for everything but their window sizes;
 consumer Margin/Padding drift is reported separately by the scale checker.
 SharedPrimitives currently retains literal scrollbar/wordmark dimensions and
 is exempt from that numeric check. Changing a token still needs review against

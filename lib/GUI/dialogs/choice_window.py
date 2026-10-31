@@ -84,7 +84,7 @@ def _window_type():
                 self.instruction_text.Foreground = self.FindResource(brush)
             for row in state.choices:
                 button = Button()
-                button.Style = self.FindResource('ActionCommandLink')
+                button.Style = self.FindResource('KlaCommandLink')
                 button.Content = row
                 button.IsEnabled = row.CanSelect
                 button.Tag = ('command', row.Key)
@@ -99,18 +99,18 @@ def _window_type():
             columns = min(4, len(state.buttons))
             for index in range(columns):
                 column = ColumnDefinition()
-                column.Width = GridLength(104)
+                column.Width = self.FindResource('KlaActionColumn')
                 self.buttons_panel.ColumnDefinitions.Add(column)
                 if index < columns - 1:
                     gap = ColumnDefinition()
-                    gap.Width = GridLength(8)
+                    gap.Width = self.FindResource('KlaGridSpace8')
                     self.buttons_panel.ColumnDefinitions.Add(gap)
             rows = (len(state.buttons) + 3) // 4
             for index in range(rows):
                 self.buttons_panel.RowDefinitions.Add(RowDefinition())
                 if index < rows - 1:
                     gap = RowDefinition()
-                    gap.Height = GridLength(8)
+                    gap.Height = self.FindResource('KlaGridSpace8')
                     self.buttons_panel.RowDefinitions.Add(gap)
             for index, name in enumerate(state.buttons):
                 button = Button()

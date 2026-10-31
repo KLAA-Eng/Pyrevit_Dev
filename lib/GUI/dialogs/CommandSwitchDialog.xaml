@@ -6,27 +6,20 @@
     MinWidth="360"
     MinHeight="120"
     MaxHeight="500"
-    AllowsTransparency="True"
-    Background="Transparent"
-    FontFamily="{StaticResource KlaBodyFont}"
-    FontSize="{StaticResource KlaBodyFontSize}"
-    Foreground="{StaticResource KlaTextBrush}"
     PreviewKeyDown="on_key_down"
     PreviewMouseDown="pointer_down"
     PreviewMouseLeftButtonUp="pointer_up"
     PreviewMouseMove="pointer_move"
     PreviewTextInput="on_text_input"
-    ResizeMode="NoResize"
-    ShowInTaskbar="False"
-    WindowStartupLocation="CenterScreen"
-    WindowStyle="None">
+    Style="{StaticResource KlaFloatingWindow}"
+    WindowStartupLocation="CenterScreen">
     <Border
         x:Name="switch_panel"
-        Margin="16"
-        Padding="12"
+        Margin="{StaticResource KlaFloatingMargin}"
+        Padding="{StaticResource KlaSectionPadding}"
         Background="{StaticResource KlaWindowBrush}"
         BorderThickness="0"
-        CornerRadius="12">
+        CornerRadius="{StaticResource KlaRadiusFloating}">
         <Border.Effect>
             <DropShadowEffect
                 BlurRadius="12"
@@ -43,19 +36,19 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Grid x:Name="drag_region" Margin="0,0,0,8">
+            <Grid x:Name="drag_region" Margin="{StaticResource KlaStackGapBelow}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Label
                     x:Name="prompt_label"
-                    MinHeight="24"
-                    MaxWidth="180"
-                    Margin="0,0,8,0"
+                    MinHeight="{StaticResource KlaFilterHeight}"
+                    MaxWidth="{StaticResource KlaSwitchPromptMaxWidth}"
+                    Margin="{StaticResource KlaPairGap}"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    FontSize="16"
+                    FontSize="{StaticResource KlaSubheadingFontSize}"
                     FontWeight="SemiBold"
                     Style="{StaticResource KlaPromptLabel}"
                     Target="{Binding ElementName=search_text}">
@@ -63,7 +56,7 @@
                         <DataTemplate>
                             <!--  Optical centering of Segoe UI's visible glyphs within the input row.  -->
                             <TextBlock
-                                Margin="0,0,0,2"
+                                Margin="{StaticResource KlaOpticalTextInset}"
                                 Text="{Binding}"
                                 TextWrapping="Wrap" />
                         </DataTemplate>
@@ -78,7 +71,7 @@
                         TextChanged="filter_changed" />
                     <TextBlock
                         x:Name="search_hint"
-                        Margin="8,0"
+                        Margin="{StaticResource KlaInputPadding}"
                         VerticalAlignment="Center"
                         Foreground="{StaticResource KlaPlaceholderBrush}"
                         IsHitTestVisible="False"
@@ -102,7 +95,7 @@
                         SizeChanged="command_panel_size_changed" />
                     <TextBlock
                         x:Name="empty_text"
-                        Margin="0,0,0,8"
+                        Margin="{StaticResource KlaStackGapBelow}"
                         Style="{StaticResource KlaInfoText}"
                         Text="No commands available."
                         Visibility="Collapsed" />

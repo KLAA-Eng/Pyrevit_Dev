@@ -18,7 +18,8 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STRICT = ('lib/GUI/Resources/KLCodeFoundation.xaml', 'lib/GUI/Resources/KLCodeComponents.xaml')
+STRICT = ('lib/GUI/Resources/KLCodeFoundation.xaml', 'lib/GUI/Resources/KLCodeComponents.xaml',
+          'lib/GUI/Resources/KLCodeCommandSwitch.xaml')
 EXEMPT = ('lib/GUI/Resources/KLCodeSharedPrimitives.xaml',)  # merges only the palette, so it cannot name tokens
 SCALE = (0, 4, 8, 12, 16, 24)
 LAYOUT = ('Margin', 'Padding', 'Width', 'Height', 'MinWidth', 'MinHeight', 'MaxWidth', 'MaxHeight',

@@ -93,5 +93,26 @@
      <Thickness x:Key="KlaReadoutPadding">8</Thickness>
      <sys:Double x:Key="KlaReadoutMinHeight">64</sys:Double>
      <sys:Double x:Key="KlaSplitterSize">4</sys:Double>
+     <!--  Shared dialog values the dialog bodies used to write as literals (Review II cleanup, 2026-10-31).  -->
+     <Thickness x:Key="KlaStackGap">0,8,0,0</Thickness>
+     <Thickness x:Key="KlaStackGapBelow">0,0,0,8</Thickness>
+     <Thickness x:Key="KlaIconTextGap">0,0,4,0</Thickness>
+     <!--  Deliberate 2-unit optical lift for large single-line text beside an input.  -->
+     <Thickness x:Key="KlaOpticalTextInset">0,0,0,2</Thickness>
+     <Thickness x:Key="KlaFloatingMargin">16</Thickness>
+     <CornerRadius x:Key="KlaRadiusFloating">12</CornerRadius>
+     <sys:Double x:Key="KlaSeverityIconSize">32</sys:Double>
+     <sys:Double x:Key="KlaDialogHeadingFontSize">22</sys:Double>
+     <sys:Double x:Key="KlaSubheadingFontSize">16</sys:Double>
+     <sys:Double x:Key="KlaDetailsHeight">128</sys:Double>
+     <sys:Double x:Key="KlaOptionMaxHeight">80</sys:Double>
+     <sys:Double x:Key="KlaCommandLinkMinHeight">40</sys:Double>
+     <Thickness x:Key="KlaCommandLinkPadding">8</Thickness>
+     <Thickness x:Key="KlaCommandArrowInset">0,4,8,0</Thickness>
+     <GridLength x:Key="KlaCommandLinkIconColumn">24</GridLength>
+     <!--  Ten plus the TextBoxView's two-unit inset and the hairline aligns readout text with the body at 13.  -->
+     <Thickness x:Key="KlaDetailsReadoutPadding">10,8</Thickness>
+     <GridLength x:Key="KlaRenameLabelColumn">52</GridLength>
+     <sys:Double x:Key="KlaSwitchPromptMaxWidth">180</sys:Double>
 
 </ResourceDictionary>

@@ -1,4 +1,7 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="KLCodeComponents.xaml" />
     </ResourceDictionary.MergedDictionaries>
@@ -7,6 +10,11 @@
     <CornerRadius x:Key="KlaCommandPillRadius">12</CornerRadius>
     <Thickness x:Key="KlaCommandPillGap">0,0,8,8</Thickness>
     <Thickness x:Key="KlaCommandPillInset">12,4</Thickness>
+    <GridLength x:Key="KlaSwitchToggleColumn">28</GridLength>
+    <sys:Double x:Key="KlaSwitchTrackWidth">24</sys:Double>
+    <sys:Double x:Key="KlaSwitchTrackHeight">12</sys:Double>
+    <CornerRadius x:Key="KlaSwitchTrackRadius">6</CornerRadius>
+    <sys:Double x:Key="KlaSwitchThumbSize">12</sys:Double>
     <Style x:Key="KlaCommandButton" TargetType="Button">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
@@ -81,21 +89,21 @@
                         CornerRadius="{StaticResource KlaCommandPillRadius}">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="28" />
+                                <ColumnDefinition Width="{StaticResource KlaSwitchToggleColumn}" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Border
                                 x:Name="SwitchTrack"
-                                Width="24"
-                                Height="12"
+                                Width="{StaticResource KlaSwitchTrackWidth}"
+                                Height="{StaticResource KlaSwitchTrackHeight}"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
                                 Background="{StaticResource KlaMutedBrush}"
-                                CornerRadius="6">
+                                CornerRadius="{StaticResource KlaSwitchTrackRadius}">
                                 <Ellipse
                                     x:Name="SwitchThumb"
-                                    Width="12"
-                                    Height="12"
+                                    Width="{StaticResource KlaSwitchThumbSize}"
+                                    Height="{StaticResource KlaSwitchThumbSize}"
                                     HorizontalAlignment="Left"
                                     Fill="{StaticResource KlaTextBrush}" />
                             </Border>

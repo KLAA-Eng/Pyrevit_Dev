@@ -36,7 +36,7 @@
                         <!--  Compact line height plus the optical inset centers the visible capital glyphs.  -->
                         <TextBlock
                             x:Name="input_placeholder"
-                            Margin="0,0,0,2"
+                            Margin="{StaticResource KlaOpticalTextInset}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             FontSize="{StaticResource KlaTextPromptInputFontSize}"
@@ -64,7 +64,7 @@
                     </Grid>
                     <TextBlock
                         x:Name="validation_text"
-                        Margin="0,8,0,0"
+                        Margin="{StaticResource KlaStackGap}"
                         AutomationProperties.LiveSetting="Polite"
                         Foreground="{StaticResource KlaErrorBrush}"
                         TextWrapping="Wrap"

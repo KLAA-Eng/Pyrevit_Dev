@@ -32,17 +32,17 @@
                     <ItemsPanelTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="52" />
-                                <ColumnDefinition Width="240" />
+                                <ColumnDefinition Width="{StaticResource KlaRenameLabelColumn}" />
+                                <ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="24" />
-                                <RowDefinition Height="8" />
-                                <RowDefinition Height="24" />
-                                <RowDefinition Height="8" />
-                                <RowDefinition Height="24" />
-                                <RowDefinition Height="8" />
-                                <RowDefinition Height="24" />
+                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}" />
+                                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}" />
+                                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}" />
+                                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}" />
                             </Grid.RowDefinitions>
                         </Grid>
                     </ItemsPanelTemplate>
@@ -64,7 +64,7 @@
                     <Grid x:Name="fields_panel" />
                     <TextBlock
                         x:Name="validation_text"
-                        Margin="0,8,0,0"
+                        Margin="{StaticResource KlaStackGap}"
                         AutomationProperties.LiveSetting="Polite"
                         Foreground="{StaticResource KlaErrorBrush}"
                         TextWrapping="Wrap"

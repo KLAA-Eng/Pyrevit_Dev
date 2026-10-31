@@ -640,6 +640,14 @@
         x:Key="KlaWindow"
         BasedOn="{StaticResource KlaFoundationWindow}"
         TargetType="Window" />
+    <!--  A frameless floating panel such as the Command Switch: the window is transparent and its panel draws the surface.  -->
+    <Style
+        x:Key="KlaFloatingWindow"
+        BasedOn="{StaticResource KlaFoundationWindow}"
+        TargetType="Window">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="ShowInTaskbar" Value="False" />
+    </Style>
     <Style
         x:Key="KlaButton"
         BasedOn="{StaticResource KlaFoundationButton}"
@@ -761,5 +769,174 @@
                 <Setter Property="Background" Value="{StaticResource KlaFocusBrush}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <!--
+        Details disclosure shared by Message and Action Choice: a chevron that turns down when
+        expanded, the Expander's own foreground, no focus visual and no native circle.
+        Template part names (DetailsToggle, DetailsChevron, DetailsContent) are used by code and probes.
+    -->
+    <Style x:Key="KlaDetailsToggle" TargetType="ToggleButton">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Expander}}" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border Background="Transparent">
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl
+                                x:Name="DetailsChevron"
+                                Margin="{StaticResource KlaIconTextGap}"
+                                Content="{StaticResource KlaChevronRightGeometry}"
+                                Foreground="{TemplateBinding Foreground}"
+                                Style="{StaticResource KlaGuiIcon}" />
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="DetailsChevron" Property="Content" Value="{StaticResource KlaChevronDownGeometry}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="KlaDetailsExpander" TargetType="Expander">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Expander">
+                    <StackPanel>
+                        <ToggleButton
+                            x:Name="DetailsToggle"
+                            AutomationProperties.Name="Details"
+                            Content="{TemplateBinding Header}"
+                            IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                            Style="{StaticResource KlaDetailsToggle}" />
+                        <ContentPresenter x:Name="DetailsContent" Visibility="Collapsed" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter TargetName="DetailsContent" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--
+        A multiline readout whose text aligns with the dialog body (Message Details). TextBoxView already
+        consumes Padding; applying it again as the content-host margin would shift the first character.
+    -->
+    <Style
+        x:Key="KlaDetailsReadout"
+        BasedOn="{StaticResource KlaMultilineReadout}"
+        TargetType="TextBox">
+        <Setter Property="Padding" Value="{StaticResource KlaDetailsReadoutPadding}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border
+                        x:Name="InputBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{StaticResource KlaRadiusControl}">
+                        <ScrollViewer x:Name="PART_ContentHost" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="InputBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--  TaskDialog-style command link (Action Choice). A simple repo-native arrow; no upstream TaskDialog code or asset.  -->
+    <PathGeometry x:Key="KlaCommandArrowGeometry" Figures="M4,12 L20,12 M14,6 L20,12 L14,18" />
+    <Style
+        x:Key="KlaCommandLink"
+        BasedOn="{StaticResource KlaButton}"
+        TargetType="Button">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="MinHeight" Value="{StaticResource KlaCommandLinkMinHeight}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Padding" Value="{StaticResource KlaCommandLinkPadding}" />
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{StaticResource KlaCommandLinkIconColumn}" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ContentControl
+                            Margin="{StaticResource KlaCommandArrowInset}"
+                            VerticalAlignment="Top"
+                            Content="{StaticResource KlaCommandArrowGeometry}"
+                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                            Style="{StaticResource KlaGuiIcon}" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock
+                                FontSize="{StaticResource KlaSubheadingFontSize}"
+                                FontWeight="SemiBold"
+                                Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                                Text="{Binding Label}"
+                                TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Description}">
+                                <TextBlock.Style>
+                                    <Style BasedOn="{StaticResource KlaDialogDescription}" TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Description}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{StaticResource KlaRadiusControl}">
+                        <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+                            <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{StaticResource KlaPressedBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

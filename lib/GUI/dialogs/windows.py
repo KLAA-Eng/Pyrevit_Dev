@@ -160,8 +160,8 @@ def _window_types():
             from System.Windows import GridLength, Thickness
 
             DialogWindow.feedback(self, text)
-            self.batch_actions.Margin = Thickness(0, 8, 0, 0) if text else Thickness(0)
-            self.secondary_gap.Height = GridLength(8 if text or self.state.multiple else 0)
+            self.batch_actions.Margin = self.FindResource('KlaStackGap') if text else Thickness(0)
+            self.secondary_gap.Height = self.FindResource('KlaGridSpace8') if text or self.state.multiple else GridLength(0)
 
         def update_checks(self, parent=None):
             # Pull changed checks into realized controls without rebuilding the list:
