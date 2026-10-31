@@ -216,7 +216,7 @@ initial delivery; this phase changes the current catalog.
 
 | ID | Slice | Status | Decision / completion condition |
 | --- | --- | --- | --- |
-| GUI-20 | Remove two Gallery variants | Implemented; locally verified | Confirmation/parameter entries and sample branches removed. 65 Gallery tests (one existing skip), 20 remaining dialog state layouts at normal/minimum sizes, and 91 custom/state WPF constructions pass; current catalog is 40 entries. Four bodies and message/selection APIs retained. |
+| GUI-20 | Remove two Gallery variants | Implemented; locally verified | Confirmation/parameter entries and sample branches removed. 65 Gallery tests (one existing skip), 20 remaining dialog state layouts at normal/minimum sizes, and 91 custom/state WPF constructions pass; current catalog was 40 entries (39 since the family grouping). Four bodies and message/selection APIs retained. |
 | GUI-21 | Refine remaining dialog/selector/switch design | Confirmed by owner | Owner explicitly said "confirmed, implement" after the final design summary. No further design approval gate for this scope. |
 | GUI-22 | Rework Action Choice independently | Implemented; locally verified | Owner confirmed the complete TaskDialog-style design after three interview rounds. GUI-40/41 own delivery and verification. |
 | GUI-23 | Refine Message, Text and shared selector interactions | Implemented; locally verified | Details growth/manual-height regression, repeated expansion, footer isolation, exact 36/24 Segoe UI Bold field, unclipped validation and explicit Select pass in actual WPF. [Evidence](../knowledge/reviews/design-system/2026-10-29-dialog-refinement.md). |
@@ -403,7 +403,9 @@ Settled first-round choices:
   triangle-alert, info and check-check for error/warning/information/success;
   Details uses chevron-right when collapsed and chevron-down when expanded.
 - Severity icons increase from 16 to 24; severity headings increase from 14 to
-  18, Segoe UI SemiBold. Details chevrons retain the normal small 16-unit size.
+  18, Segoe UI SemiBold (raised again to 32 and 22 by the 2026-10-30
+  [interaction polish](../knowledge/reviews/design-system/2026-10-30-dialog-interaction-polish.md)).
+  Details chevrons retain the normal small 16-unit size.
   Body/details text remains 12. Align expanded Details text horizontally with
   the main body text and vertically center the severity icon beside its heading.
 - Gallery has one row per shared window family. Variant lists available labels;

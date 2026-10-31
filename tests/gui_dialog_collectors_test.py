@@ -63,6 +63,14 @@ class CollectorTests(unittest.TestCase):
         code = "import sys; sys.path.insert(0, 'lib'); import GUI.dialogs.collectors; assert 'Autodesk.Revit.DB' not in sys.modules; assert 'wpf' not in sys.modules; assert 'pyrevit' not in sys.modules"
         subprocess.check_call([sys.executable, '-B', '-c', code], cwd=ROOT)
 
+    def test_sheets_sort_by_number_not_text(self):
+        rows = [sheet('a', 'S10', 'Ten'), sheet('b', 'S2', 'Two'), sheet('c', 'A101', 'Plan'),
+                sheet('d', 'S2.1', 'Two one'), sheet('e', 's1', 'One')]
+        with patch.object(collectors, '_db', return_value=self.api):
+            sorted_rows, _ = collectors.sheet_items(self.document(rows))
+        self.assertEqual(['A101 - Plan', 's1 - One', 'S2 - Two', 'S2.1 - Two one', 'S10 - Ten'],
+                         [row.Label for row in sorted_rows])
+
     def test_sheets_share_one_state_across_sets_and_filter_placeholders_consistently(self):
         one, two = sheet('one', 'S101', 'Notes'), sheet('two', 'S201', 'Plan')
         placeholder = sheet('placeholder', 'S001', 'Future', True)

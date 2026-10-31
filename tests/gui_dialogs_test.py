@@ -38,6 +38,25 @@ class DialogModelTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             state.set_visible_checked(True)
 
+    def test_none_descriptions_do_not_break_filtering(self):
+        state = SelectionState([SelectionItem('a', 'Alpha', description=None), SelectionItem('b', 'Beta')])
+        state.query = 'alp'
+        self.assertEqual(['a'], [item.Key for item in state.visible_items])
+        self.assertEqual('', ActionChoice('x', 'X', description=None).Description)
+
+    def test_sheet_selector_accepts_an_all_label_override(self):
+        import GUI.dialogs as dialogs
+        calls = []
+        original = dialogs.create_selection
+        dialogs.create_selection = lambda title, items, **options: calls.append((title, options))
+        try:
+            dialogs.create_sheet_selector('Sheets', [])
+            dialogs.create_sheet_selector('Sheets', [], all_label='Every Sheet', prompt='Pick')
+        finally:
+            dialogs.create_selection = original
+        self.assertEqual(('All Sheets', 'Select Sheets'), (calls[0][1]['all_label'], calls[0][1]['prompt']))
+        self.assertEqual(('Every Sheet', 'Pick'), (calls[1][1]['all_label'], calls[1][1]['prompt']))
+
     def test_search_covers_description_without_reordering_rows(self):
         state = SelectionState([SelectionItem('b', 'Z', 2, 'Type parameter'),
                                 SelectionItem('a', 'A', 1, 'Instance parameter')])

@@ -219,6 +219,8 @@ def _window_type():
             self.Close()
 
         def on_key_down(self, sender, args):
+            if self._closed:
+                return
             self._dragged = False
             if args.Key == Key.Escape:
                 args.Handled = True
@@ -250,10 +252,14 @@ def _window_type():
             args.Handled = True
 
         def pointer_down(self, sender, args):
-            if self._context_menu_open:
+            if self._closed or self._context_menu_open:
                 return
             point = args.GetPosition(self)
-            if not (0 <= point.X <= self.ActualWidth and 0 <= point.Y <= self.ActualHeight):
+            # The Window is 16 larger than the visible panel on every side; a
+            # click in that transparent margin is outside.
+            panel = args.GetPosition(self.switch_panel)
+            if not (0 <= panel.X <= self.switch_panel.ActualWidth
+                    and 0 <= panel.Y <= self.switch_panel.ActualHeight):
                 args.Handled = True
                 self.cancel()
                 return

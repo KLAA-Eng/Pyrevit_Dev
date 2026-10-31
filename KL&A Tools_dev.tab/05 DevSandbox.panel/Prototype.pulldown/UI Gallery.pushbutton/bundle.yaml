@@ -3,7 +3,7 @@ title:
 tooltip:
   en_us: |-
     Version: v0.5
-    Date: 10.27.2026
+    Date: 10.30.2026
     Status: Unreleased
     _____________________________________________________________________
     Description:
@@ -13,18 +13,10 @@ tooltip:
     - Search by window or tool name, or filter Origin and Preview availability.
     - Select a row to see the calling tools and preview availability.
     - Choose a supported variant and preview state, then Open preview. All tool actions are simulated.
-    - Search Template - to review Form, Options, and Review references.
+    - Search Template - to review the Options and Review references.
     - Select Shared dialog - Message and choose Warning or Success to preview those message severities.
     - Search Shared dialog to review shared families, including Selection presets and KLC-Rename variants.
     _____________________________________________________________________
     Last update:
-    - [10.30.2026] - v0.5 (Unreleased): Group shared previews by family and variant; add KLC-Rename and Message presentation refinements.
-    - [10.30.2026] - v0.5 (Unreleased): Remove duplicate Message/Selection templates; add Warning and Success states to the shared Message preview.
-    - [10.30.2026] - v0.5 (Unreleased): Remove green button/checkbox focus frames and selector selected/visible summaries.
-    - [10.30.2026] - v0.5 (Unreleased): Polish Text/selector spacing and actions, add Group icon, and remove switch x/autofocus plus persistent white click-focus marks.
-    - [10.29.2026] - v0.5 (Unreleased): Restore Window source header sorting in both directions.
-    - [10.29.2026] - v0.5 (Unreleased): Refine Message/Text, add selector presets and floating Command Switch; Action choice redesign remains deferred.
-    - [10.29.2026] - v0.5 (Unreleased): Remove separate confirmation and parameter-selection previews before dialog refinement.
-    - [10.29.2026] - v0.5 (Unreleased): Add six previews of reusable shared dialogs; existing tools retain their current windows.
-    - [10.27.2026] - v0.5 (Unreleased): Add origins, source paths, tool callers, interactive states, faithful Recall, standalone coverage, and the shared main-template reference.
+    - [10.30.2026] - v0.5 (Unreleased): Standalone inventory with origins, callers and interactive states; shared dialog families with variants, including Action choice, Command Switch and KLC-Rename; Options and Review references.
 author: KL&A

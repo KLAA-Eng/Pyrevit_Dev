@@ -29,7 +29,7 @@ def _window_type():
     from System.Windows.Controls import (Grid, StackPanel, Label, TextBox,
                                          Border, Button, ItemsControl,
                                          ColumnDefinition, Orientation)
-    from System.Windows.Input import Key
+    from System.Windows.Input import Key, Keyboard
     from System.Windows.Interop import WindowInteropHelper
     from GUI.window_chrome import load_window
 
@@ -181,7 +181,9 @@ def _window_type():
             self.Close()
 
         def key_down(self, sender, args):
-            if args.Key == Key.Enter:
+            # Enter submits from the fields. A focused button keeps its own Enter
+            # (Uppercase/Lowercase act; OK is IsDefault), so one key never does two things.
+            if args.Key == Key.Enter and not isinstance(Keyboard.FocusedElement, Button):
                 args.Handled = True
                 self.accept_rename()
 

@@ -10,9 +10,10 @@ compiled window classes use `KlaWindowShell`. PreviewFixture retains its
 standalone test chrome. Native/pyRevit dialogs and Recall's docked panel have
 separate host presentation; the standalone Recall body uses the shared system.
 The sixth opt-in body is a floating Command Switch using shared colors/styles
-with its own compact layout. Message, Text and KL&A Custom Alert omit the standard
-footer and its reserved row by design. Message retains Close with a blank center
-title; Text and Custom Alert retain their title/Close controls.
+with its own compact layout. Message, Text, Action Choice and KL&A Custom Alert
+omit the standard footer and its reserved row by design. Message and Text retain
+Close with a blank center title; Action Choice and Custom Alert retain their
+title/Close controls.
 The current inventory has 24 standalone Window sources: nine Python tool
 windows, six opt-in bodies, two reference templates, five compiled windows,
 Gallery and PreviewFixture.
@@ -507,6 +508,34 @@ the deployed DLLs.
 | Disabled body | Disable the body so header Close remains usable. Use semantic disabled brushes; verify both text and interactive icons. |
 | Names and labels | Give inputs/actions meaningful AutomationProperties.Name values; connect Label.Target to its field. Name the containing action when its icon is decorative. |
 | Long content | Bound and scroll long text/lists, retain readable labels and check minimum sizes, DPI/work-area placement and keyboard reachability in Revit. |
+
+Each shared dialog routes the same keys differently. The table is the current
+source behavior, so an inconsistency is visible here before it reaches a user:
+
+| Dialog | Enter | Space | Escape | Close (X) | `IsDefault` |
+| --- | --- | --- | --- | --- | --- |
+| Message | OK | Activates the focused button | Cancel (chrome policy) | Cancel | Set in code on OK |
+| Selection | Ignored from the list and filter; a focused button, the group dropdown and footer links keep it | Toggles the focused checkbox; activates a focused button | Cancel | Cancel | None (Select has no default) |
+| Text entry | OK | Activates the focused button | Cancel | Cancel | XAML on OK |
+| Action Choice | Activates the focused action, Close, Details or help; otherwise the default action | Checkbox only; suppressed on every button (owner decision AC-004) | Cancel | `close`, a result distinct from `cancel` | Code (`default_button`) |
+| Command Switch | The focused pill, or the sole visible match while the search has focus | Toggles a focused toggle; activates a focused pill | Clears the search, then cancels | No chrome; an outside click or deactivation cancels | None |
+| KLC-Rename | Submits from the fields; a focused button keeps its own Enter (Uppercase/Lowercase act) | Activates the focused button | Cancel | Cancel | XAML on OK |
+
+Accepted deviations. These are owner decisions recorded in the consolidation
+plan and the shared SPEC; they are listed here so a reader of the contract knows
+what the user gives up, with the WCAG 2.1 criterion each touches:
+
+- GUI-29: no focus indicator on buttons, checks, radios, toggles, pills, command
+  links and Details toggles (2.4.7 Focus Visible). Fields keep their outline.
+- GUI-15: footer link #407058 and version #808080 on the charcoal window, 2.74:1
+  and 3.96:1 (1.4.3 Contrast, minimum 4.5:1 for small text). Four shared
+  dialogs hide the footer; Selection, Rename and the tool windows keep it.
+- AC-004: Space does nothing on Action Choice buttons, command links, Close and
+  the Details toggle; only Enter activates them (platform convention; not a
+  WCAG failure while Enter works, but a deviation from WPF and TaskDialog).
+- AC-005 and GUI-39: Text entry shows neither the caller's prompt nor the
+  window title on screen (the prompt is the input's accessible name; 2.4.6
+  Headings and Labels, 3.3.2 Labels or Instructions). Message hides the title.
 
 These are source contracts and known implementation limits. They do not mark
 the owner's live Revit review complete.

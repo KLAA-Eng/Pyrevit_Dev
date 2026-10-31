@@ -19,7 +19,7 @@
 | v0.2 | 0.0.5.beta | 08.20.2026 | Deliver additional prototype/room/recall previews and safe catalog launch permissions. | 8cd45f8 |
 | v0.3 | 0.0.6beta | 09.15.2026 | Deliver expanded host picker and themed previews with repaired launcher/resource paths. | 300f8d4 |
 | v0.4 | 0.0.11 | 10.12.2026 | Point rename previews to the promoted Core windows; retain the previous shared forms as labeled legacy previews. | Development promotion; pending owner merge to main. |
-| v0.5 | Unreleased | 10.27.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, reference templates and shared-dialog family previews. | Gallery source and dated verification records; pending next main delivery. |
+| v0.5 | Unreleased | 10.30.2026 | Add standalone inventory, origin labels, source column, tool callers, interactive states, faithful Recall, deferred compiled status, the Options and Review references and shared-dialog family previews with variants. | Gallery source and dated verification records; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current
@@ -149,10 +149,10 @@ branches are removed. The actual shared Message and Selection dialogs are the
 canonical references and Gallery previews. Shared layout/component resources
 used by production windows remain; no tool caller migrates in this cleanup.
 
-The retained reference family is **Template - Form**, **Template - Options**
-and **Template - Review**, each with five fictional states. They share the
-shell, tokens and component styles. The generic FindReplace visual was adapted
-into Form; actual Core rename commands retain their own windows.
+The retained reference family is **Template - Options** and
+**Template - Review**, each with five fictional states. They share the
+shell, tokens and component styles. Form was removed by the owner (see above);
+actual Core rename commands retain their own windows.
 See the [template family guide](../../../../lib/GUI/_templates/README.md) for
 composition, interactions and source ownership. Browse uses fictional paths;
 Form validates compact naming-rule fields without a Sample Preview, and Review
@@ -239,7 +239,7 @@ build the correct runtime assemblies, and validate in the matching Revit hosts.
   interactions, generated checkbox bindings and minimum-size evidence.
 - `scripts/validate_ui_production_wpf.py`: 45 production-window state layouts,
   compact naming fields, caller identity, localized Recall captions, overflow
-  scrolling and the 18 vector icon roles.
+  scrolling and the 22 vector icon roles.
 
 ## Model and external effects
 

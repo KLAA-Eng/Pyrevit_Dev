@@ -36,7 +36,11 @@ def load_window(window, xaml_path, title, version=None, navigate=None, close_han
     ``navigate`` receives an absolute URI; Gallery supplies a local simulation.
     Ordinary callers omit it to use the same OS navigation as legacy windows.
     """
-    import wpf
+    try:
+        import wpf
+    except ImportError:
+        # The same engine fallback the dialog adapters use; a bare import made it dead for them.
+        from pyrevit.framework import wpf
 
     window.Resources.MergedDictionaries.Add(shared_resources())
     host_loader = getattr(window, 'load_xaml', None)

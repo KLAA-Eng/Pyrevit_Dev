@@ -73,7 +73,8 @@ def create_list_multiple(title, items, **options):
 
 def create_sheet_selector(title, items, groups=None, **options):
     options.setdefault('prompt', 'Select Sheets')
-    return create_selection(title, items, groups=groups, all_label='All Sheets', **options)
+    options.setdefault('all_label', 'All Sheets')
+    return create_selection(title, items, groups=groups, **options)
 
 
 def create_revision_selector(title, items, **options):

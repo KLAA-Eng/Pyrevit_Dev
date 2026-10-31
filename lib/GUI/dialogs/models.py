@@ -21,7 +21,7 @@ class SelectionItem(object):
         self.Key = key
         self.Label = label
         self.Value = value
-        self.Description = description
+        self.Description = description or ''
         self.Groups = tuple(groups)
         self.CanSelect = bool(enabled)
         self.IsChecked = bool(checked and enabled)
@@ -95,7 +95,7 @@ class ActionChoice(object):
             raise ValueError('Action keys cannot be None.')
         self.Key = key
         self.Label = label
-        self.Description = description
+        self.Description = description or ''
         self.CanSelect = bool(enabled)
 
 

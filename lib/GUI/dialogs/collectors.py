@@ -6,6 +6,8 @@ never from WPF layout events. Callers retain responsibility for document lifetim
 """
 from __future__ import unicode_literals
 
+import re
+
 from .models import SelectionGroup, SelectionItem
 
 try:
@@ -38,6 +40,15 @@ def _project_document(document):
     return not document.IsFamilyDocument
 
 
+_DIGITS = re.compile(r'(\d+)')
+
+
+def _natural(text):
+    """Sort key that puts S2 before S10: digit runs compare as numbers, the rest as text."""
+    return tuple((0, int(part)) if part.isdigit() else (1, part.lower())
+                 for part in _DIGITS.split(text) if part)
+
+
 def sheet_items(document, include_placeholders=False, filterfunc=None):
     """Return (rows, sheet-set groups), with one shared row per sheet.
 
@@ -59,7 +70,7 @@ def sheet_items(document, include_placeholders=False, filterfunc=None):
             continue
         if filterfunc is None or filterfunc(sheet):
             sheets.append(sheet)
-    sheets.sort(key=lambda item: (_text(item.SheetNumber), _text(item.Name)))
+    sheets.sort(key=lambda item: (_natural(_text(item.SheetNumber)), _text(item.Name)))
     memberships = dict((_text(sheet.UniqueId), []) for sheet in sheets)
     groups = []
     seen_sets = set()

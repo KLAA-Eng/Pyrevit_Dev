@@ -1,6 +1,10 @@
 # Shared window variants — 2026-10-30
 
 The owner confirmed the design after KLCode grilling. Baseline: `16c1863`.
+Superseded in part the same day: Message icons and headings are 32 and 22 (see
+[dialog interaction polish](2026-10-30-dialog-interaction-polish.md)) and
+KLC-Rename is 346/668/990 wide (see
+[dialog sizing and focus](2026-10-30-dialog-sizing-focus.md)).
 The [consolidation plan](../../../plans/custom-window-consolidation.md) owns
 GUI-31 through GUI-34; [shared-dialog SPEC](../../../../lib/GUI/dialogs/SPEC.md)
 and the adjacent Gallery SPEC own behavior. Production tool calls and packaged

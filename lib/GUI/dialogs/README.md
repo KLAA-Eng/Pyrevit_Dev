@@ -174,8 +174,9 @@ enabled=True)` uses unique hashable non-None keys; labels may repeat. Cloned
 checks preserve caller rows and original payload identity. No first row is
 checked implicitly. Single mode uses the same checkbox style, with exclusive
 checking even when the previous check is hidden. Both modes require **Select**:
-Enter and double-click do not accept. Space toggles a focused checkbox; keyboard
-activation of the focused Select button remains possible with Space.
+Enter and double-click do not accept from the list or the filter. Space toggles
+a focused checkbox; a focused button (including Select), the group dropdown and
+the footer links keep their own Enter and Space.
 
 Options: `groups=None`, `prompt='Select Items'`, `required=True`,
 `all_label='All Items'`. Group names derive in input order unless supplied as

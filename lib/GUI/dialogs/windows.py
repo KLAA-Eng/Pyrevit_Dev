@@ -22,10 +22,12 @@ def _window_types():
     from System import Action
     from System.Windows import Window, Visibility
     from System.Windows.Interop import WindowInteropHelper
-    from System.Windows.Controls import CheckBox
+    from System.Windows.Automation import AutomationProperties
+    from System.Windows.Controls import Button, CheckBox, ComboBox
     from System.Windows.Controls.Primitives import ToggleButton
+    from System.Windows.Documents import Hyperlink
     from System.Windows.Media import VisualTreeHelper
-    from System.Windows.Input import Key
+    from System.Windows.Input import Key, Keyboard
     from System.Windows.Threading import DispatcherPriority
     from GUI.window_chrome import load_window, fit_window_height
 
@@ -69,6 +71,7 @@ def _window_types():
             heading, icon, brush = roles[severity]
             self.message_heading.Text = heading
             self.message_icon.Content = self.FindResource(icon)
+            AutomationProperties.SetName(self.message_icon, heading)
             severity_brush = self.FindResource(brush)
             self.message_banner.BorderBrush = severity_brush
             self.message_icon.Foreground = severity_brush
@@ -140,7 +143,9 @@ def _window_types():
             self.PreviewKeyDown += self.block_enter
 
         def block_enter(self, sender, args):
-            if args.Key == Key.Enter:
+            # The list and filter accept only through Select; a focused button,
+            # the group dropdown and the footer links keep their own Enter.
+            if args.Key == Key.Enter and not isinstance(Keyboard.FocusedElement, (Button, ComboBox, Hyperlink)):
                 args.Handled = True
 
         def focus_filter(self, sender, args):
@@ -211,15 +216,16 @@ def _window_types():
             from System.Windows.Automation import AutomationProperties
             AutomationProperties.SetName(self.input_text, prompt or 'Text value')
             self.input_text.Text = default
+            self._fitted_height = None
             self._ready = True
             self.Loaded += self.focus_input
             self.Closed += self.stop_layout
-            self.fit_prompt()
+            self.fit_prompt(initial=True)
 
         def stop_layout(self, sender, args):
             self._ready = False
 
-        def fit_prompt(self):
+        def fit_prompt(self, initial=False):
             from math import ceil
             from System.Windows import Size
 
@@ -231,8 +237,14 @@ def _window_types():
             self.prompt_actions.Measure(bounds)
             desired = (self.FindResource('KlaChromeRow').Value + inset.Top + inset.Bottom
                        + self.prompt_fields.DesiredSize.Height + self.prompt_actions.DesiredSize.Height)
-            self.MinHeight = min(self.MaxHeight, ceil(desired))
-            self.Height = self.MinHeight
+            minimum = min(self.MaxHeight, ceil(desired))
+            self.MinHeight = minimum
+            # Follow the content until the user resizes with the grip; a resized
+            # window keeps its height unless the content no longer fits.
+            if (initial or self._fitted_height is None or self.Height < minimum
+                    or abs(self.Height - self._fitted_height) < 0.5):
+                self.Height = minimum
+                self._fitted_height = minimum
 
         def feedback(self, text):
             DialogWindow.feedback(self, text)
@@ -241,7 +253,7 @@ def _window_types():
             self.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, Action(self.fit_prompt))
 
         def focus_input(self, sender, args):
-            self.fit_prompt()
+            self.fit_prompt(initial=True)
             if not self.window_body.Focus():
                 self.Focus()
 

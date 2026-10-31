@@ -79,9 +79,6 @@
      <sys:Double x:Key="KlaCloseHeight">18</sys:Double>
      <sys:Double x:Key="KlaCloseFontSize">10</sys:Double>
      <Thickness x:Key="KlaCloseGlyphLift">0,0,0,0.3</Thickness>
-     <!--  Retained resource compatibility; current button focus uses the keyboard-only adorner.  -->
-     <sys:Double x:Key="KlaFocusMarkHeight">2</sys:Double>
-     <Thickness x:Key="KlaFocusMarkInset">8,0,8,0</Thickness>
      <sys:Double x:Key="KlaCheckSize">16</sys:Double>
      <sys:Double x:Key="KlaCheckStroke">2</sys:Double>
      <sys:Double x:Key="KlaRadioDotSize">6</sys:Double>
