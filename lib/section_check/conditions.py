@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Describe what a section cuts as comparable conditions.
 
 A condition is one modeled element: its group (Wall, Floor, Framing, Column,

@@ -129,14 +129,15 @@ def run_export(doc, ids, template, out_path, sys_override='auto',
             curve = members[0].Location.Curve
             p0, p1 = curve.GetEndPoint(0), curve.GetEndPoint(1)
             length = math.hypot(p1.X - p0.X, p1.Y - p0.Y)
-            nx, ny = -(p1.Y - p0.Y) / length, (p1.X - p0.X) / length    # plan normal
-            offsets = []
-            for member in members:
-                mid = member.Location.Curve.Evaluate(0.5, True)
-                offsets.append(mid.X * nx + mid.Y * ny)
-            spacing = median_spacing_in(offsets)
-            if spacing is not None:
-                return spacing, members
+            if length > 1e-9:                  # a vertical first member has no plan normal
+                nx, ny = -(p1.Y - p0.Y) / length, (p1.X - p0.X) / length    # plan normal
+                offsets = []
+                for member in members:
+                    mid = member.Location.Curve.Evaluate(0.5, True)
+                    offsets.append(mid.X * nx + mid.Y * ny)
+                spacing = median_spacing_in(offsets)
+                if spacing is not None:
+                    return spacing, members
         try:                                   # 0-1 joists: fall back to the layout rule
             return round(beam_system.LayoutRule.Spacing * 12.0, 2), members
         except Exception:
