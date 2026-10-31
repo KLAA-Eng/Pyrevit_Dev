@@ -67,6 +67,12 @@ branch; validate the Gallery bundle separately and preserve that unrelated work.
 
 ## Recovery and continuation
 
+The subsequent Action Choice delivery adds five variants and seven states to
+its existing single Gallery row. The [consolidation ledger](custom-window-consolidation.md)
+owns GUI-40/41 and their current status; [verification](../knowledge/reviews/design-system/2026-10-30-action-choice.md)
+records that delivery's actual WPF and keyboard evidence. This supersedes
+GAL-10's historical statement that only Message has Warning/Success states.
+
 Revert the Gallery command, its new helper/test files, and this delivery's
 documentation together if rollback is needed. No model/data migration exists.
 Do not replace production GUI assets to repair a preview. Revalidate the current

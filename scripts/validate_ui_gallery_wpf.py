@@ -96,6 +96,19 @@ assert gallery.StateSelector.SelectedItem == 'Success'
 gallery.EntriesGrid.SelectedItem = next(row for row in gallery.EntriesGrid.Items if row.Entry['id'] == 'dialog-selection')
 assert gallery.VariantSelector.SelectedItem.Label == 'Open Documents'
 assert gallery.StateSelector.SelectedItem == 'Long content'
+gallery.EntriesGrid.SelectedItem = next(row for row in gallery.EntriesGrid.Items if row.Entry['id'] == 'dialog-actions')
+assert [item.Label for item in gallery.VariantSelector.Items] == [
+    'Commands', 'Commands + Details', 'Commands + Checkbox', 'Full Content', 'Standard Buttons']
+assert list(gallery.StateSelector.Items) == ['Normal', 'Empty', 'Warning', 'Error', 'Success', 'Disabled', 'Long content']
+gallery.VariantSelector.SelectedIndex = 3
+gallery.StateSelector.SelectedItem = 'Warning'
+gallery.FilterBox.Text = 'Commands + Checkbox'
+assert gallery.EntriesGrid.Items.Count == 1
+assert gallery.EntriesGrid.Items[0].Entry['id'] == 'dialog-actions'
+gallery.FilterBox.Text = ''
+gallery.EntriesGrid.SelectedItem = next(row for row in gallery.EntriesGrid.Items if row.Entry['id'] == 'dialog-actions')
+assert gallery.VariantSelector.SelectedItem.Label == 'Full Content'
+assert gallery.StateSelector.SelectedItem == 'Warning'
 source_column = next(column for column in gallery.EntriesGrid.Columns if column.Header == 'Window source')
 assert source_column.CanUserSort, 'Window source must support header sorting'
 gallery.Content.Measure(Size(gallery.Width, gallery.Height))
@@ -214,6 +227,7 @@ execfile(os.path.join(repo_root, 'scripts', 'validate_ui_templates_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_production_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_dialogs_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_message_variants_wpf.py'))
+execfile(os.path.join(repo_root, 'scripts', 'validate_ui_action_choice_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_rename_wpf.py'))
 execfile(os.path.join(repo_root, 'scripts', 'validate_ui_focus_wpf.py'))
 print('IronPython {}: {} catalog entries; {} real-WPF custom/state constructions; Gallery filters/deferred selection passed.'.format(sys.version.split()[0], len(entries), count))

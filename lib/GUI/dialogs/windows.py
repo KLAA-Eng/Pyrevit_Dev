@@ -201,30 +201,6 @@ def _window_types():
                 return
             self.finish('accept', values if self.state.multiple else (values[0] if values else None))
 
-    class ChoiceWindow(DialogWindow):
-        def __init__(self, title, choices, prompt, version, owner, navigate):
-            self.initialize('ActionChoiceDialog.xaml', title, version, owner, navigate)
-            self.prompt_label.Content = prompt
-            self.choices_list.ItemsSource = choices
-            self.accept_button.IsEnabled = False
-            self._ready = True
-            self.Loaded += self.focus_choices
-
-        def focus_choices(self, sender, args):
-            self.choices_list.Focus()
-
-        def choice_changed(self, sender, args):
-            if self._ready:
-                choice = self.choices_list.SelectedItem
-                self.accept_button.IsEnabled = choice is not None and choice.CanSelect
-
-        def accept_choice(self, sender=None, args=None):
-            choice = self.choices_list.SelectedItem
-            if choice is None or not choice.CanSelect:
-                self.feedback('Choose an available action.')
-                return
-            self.finish('accept', choice.Key)
-
     class TextWindow(DialogWindow):
         def __init__(self, title, prompt, default, required, validator, version, owner, navigate):
             self.required = required
@@ -282,7 +258,7 @@ def _window_types():
                 return
             self.finish('accept', value)
 
-    _TYPES = (MessageWindow, SelectionWindow, ChoiceWindow, TextWindow)
+    _TYPES = (MessageWindow, SelectionWindow, TextWindow)
     return _TYPES
 
 
@@ -299,13 +275,11 @@ def create_selection(title, items, multiple=True, groups=None, prompt='Select It
     return _window_types()[1](title, items, multiple, groups, prompt, required, all_label, version, owner, navigate)
 
 
-def create_choice(title, choices, prompt='Choose an Action', version=None, owner=None, navigate=None):
-    choices = list(choices)
-    if len(set(choice.Key for choice in choices)) != len(choices):
-        raise ValueError('Action keys must be unique.')
-    return _window_types()[2](title, choices, prompt, version, owner, navigate)
+def create_choice(title, choices, **options):
+    from .choice_window import create_choice as factory
+    return factory(title, choices, **options)
 
 
 def create_text_prompt(title, prompt, default='', required=False, validator=None,
                        version=None, owner=None, navigate=None):
-    return _window_types()[3](title, prompt, default, required, validator, version, owner, navigate)
+    return _window_types()[2](title, prompt, default, required, validator, version, owner, navigate)

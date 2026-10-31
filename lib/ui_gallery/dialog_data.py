@@ -2,6 +2,12 @@
 from __future__ import unicode_literals
 
 MESSAGE_STATES = ('Normal', 'Empty', 'Warning', 'Error', 'Success', 'Disabled', 'Long content')
+ACTION_STATES = MESSAGE_STATES
+ACTION_VARIANTS = (
+    ('dialog-actions', 'Commands'), ('dialog-actions-details', 'Commands + Details'),
+    ('dialog-actions-checkbox', 'Commands + Checkbox'), ('dialog-actions-full', 'Full Content'),
+    ('dialog-actions-buttons', 'Standard Buttons'))
+ACTION_IDS = tuple(identity for identity, unused in ACTION_VARIANTS)
 
 DIALOG_FILES = {
     'dialog-message': 'MessageDialog.xaml',
@@ -19,6 +25,7 @@ DIALOG_FILES = {
     'dialog-rename-two': 'RenameDialog.xaml',
     'dialog-rename-three': 'RenameDialog.xaml',
 }
+DIALOG_FILES.update((identity, 'ActionChoiceDialog.xaml') for identity in ACTION_IDS)
 
 # Family rows are explicit; sharing a XAML source alone never groups callers.
 DIALOG_FAMILIES = (
@@ -28,7 +35,7 @@ DIALOG_FAMILIES = (
         ('dialog-sheets', 'Sheets'), ('dialog-revisions', 'Revisions'),
         ('dialog-documents', 'Open Documents'), ('dialog-list-single', 'List Single'),
         ('dialog-list-multiple', 'List Multiple'))),
-    ('dialog-actions', 'Shared dialog - Action choice', (('dialog-actions', 'Default'),)),
+    ('dialog-actions', 'Shared dialog - Action choice', ACTION_VARIANTS),
     ('dialog-text', 'Shared dialog - Text entry', (('dialog-text', 'Default'),)),
     ('dialog-command-switch', 'Shared dialog - Command Switch', (
         ('dialog-command-switch-plain', 'Commands only'),

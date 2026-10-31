@@ -13,6 +13,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class GalleryRegistryTests(unittest.TestCase):
+    def test_action_choice_has_five_variants_and_seven_states_in_one_row(self):
+        rows = gallery_entries(ROOT, {})
+        action = next(row for row in rows if row['id'] == 'dialog-actions')
+        self.assertEqual(['Commands', 'Commands + Details', 'Commands + Checkbox',
+                          'Full Content', 'Standard Buttons'],
+                         [variant['label'] for variant in action['variants']])
+        self.assertEqual(['Normal', 'Empty', 'Warning', 'Error', 'Success', 'Disabled', 'Long content'],
+                         action['states'])
+        matches = matching_entries(rows, 'Commands + Checkbox')
+        self.assertEqual(['dialog-actions'], [row['id'] for row in matches])
+
     def test_shared_dialog_family_has_explicit_sources_and_supported_states(self):
         rows = [row for row in gallery_entries(ROOT, {}) if row['category'] == 'Shared dialog']
         self.assertEqual(6, len(rows))
@@ -21,7 +32,7 @@ class GalleryRegistryTests(unittest.TestCase):
         self.assertEqual(6, len(set(row['source_path'] for row in rows)))
         for row in rows:
             self.assertTrue(row['can_launch'])
-            self.assertEqual(7 if row['id'] == 'dialog-message' else 5, len(row['states']))
+            self.assertEqual(7 if row['id'] in ('dialog-message', 'dialog-actions') else 5, len(row['states']))
             self.assertTrue(os.path.isfile(row['source_path']))
             self.assertIn('Existing tools retain', row['description'])
 
@@ -130,12 +141,12 @@ class GalleryRegistryTests(unittest.TestCase):
                     'lib/GUI/_templates/KLCodeMessageTemplate.xaml'):
             self.assertFalse(os.path.exists(os.path.join(ROOT, old)))
 
-    def test_only_shared_message_adds_warning_and_success_states(self):
+    def test_only_message_and_action_choice_add_warning_and_success_states(self):
         rows = dict((row['id'], row) for row in gallery_entries(ROOT, {}))
         self.assertEqual(['Normal', 'Empty', 'Warning', 'Error', 'Success', 'Disabled', 'Long content'],
                          rows['dialog-message']['states'])
         for row in rows.values():
-            if row['id'] != 'dialog-message':
+            if row['id'] not in ('dialog-message', 'dialog-actions'):
                 self.assertNotIn('Warning', row['states'])
                 self.assertNotIn('Success', row['states'])
 

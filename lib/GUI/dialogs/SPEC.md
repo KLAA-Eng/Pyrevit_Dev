@@ -40,9 +40,31 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   inline, and removing the summary does not leave an empty spacing row.
   Initial focus is the neutral body, with no search selection/autofocus.
   Search text aligns with Group text at an 8-unit rendered input inset.
-- AC-004: Action choices return a stable key after explicit selection and
-  confirmation. Disabled choices cannot be accepted; no initial choice exists.
-  Its existing layout/keyboard behavior stays unchanged; redesign is deferred.
+- AC-004: Action Choice follows Revit TaskDialog's instruction/body/command-link/
+  standard-button hierarchy using KLCode colors and typography. Up to four
+  caller-defined command links activate immediately; no list selection or
+  Continue step remains. Disabled links cannot activate. Standard buttons are
+  OK, Yes, No, Retry, Cancel and Close in that order when supplied; with no
+  links/buttons the window supplies Close. Caller title remains in the chrome;
+  the shared navigation/version footer and row are omitted.
+  Optional caller content includes severity (information/warning/error/success),
+  collapsed Details, one checkbox with initial state, and help text/link. Empty
+  sections reserve no space. Severity icons reuse Message's roles. Checkbox
+  state never gates actions and is not persisted automatically.
+  The caller may identify a default command/button; invalid or disabled defaults
+  fall back to the first enabled command, then the first standard button. Initial
+  keyboard focus follows that default. Tab/Shift+Tab navigate; Enter activates
+  the focused/default action. Space only toggles the checkbox and never
+  activates command links or bottom buttons. Mouse clicks activate normally.
+  Cancellation is enabled by default. When disabled, hide chrome Close and block
+  Escape/Alt+F4/native dismissal; an explicit Cancel always enables dismissal.
+  Command/OK/Yes/No/Retry return action `accept`, Cancel/Escape return `cancel`,
+  and Close/chrome Close/native close return `close`. All results carry
+  `{'kind': 'command' or 'button', 'key': caller key or button name,
+  'checked': bool or None}`; No, Cancel and Close remain distinct.
+  Initial height fits content up to 640. Details expands the bottom while
+  retaining instruction/actions; collapse reverses that growth without drift.
+  Width changes preserve manual height; capped content wraps and scrolls.
 - AC-005: Text prompts preserve raw input. Accepted empty text differs from
   cancellation. Required and optional caller validation show inline feedback.
   Compact height fits input/validation; no separate visible prompt header.
@@ -59,7 +81,7 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   extra blank space. Enter accepts valid text; title Close/Escape cancels.
 - AC-006: Existing shared palette, typography, controls and icons remain the
   presentation authority. Standard bodies use the shell/green-gray footer;
-  Message and Text omit the footer; floating Command Switch has its own compact
+  Message, Text and Action Choice omit the footer; floating Command Switch has its own compact
   panel. Owner is an explicit WPF window/native handle. No import queries the
   current document. All factories construct without showing; modal helpers
   show and return explicit results without running model operations.
@@ -68,7 +90,9 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   persist per family for the session. Selection has Sheets, Revisions, Open
   Documents, List Single and List Multiple; Message has Without Details and With
   Details; Command Switch has Commands only and Commands with toggles; Rename
-  has Single field, Two fields and Multiple fields. Both Message variants offer
+  has Single field, Two fields and Multiple fields. Action Choice has Commands,
+  Commands + Details, Commands + Checkbox, Full Content and Standard Buttons.
+  All Action Choice and both Message variants offer
   Normal, Empty, Warning, Error, Success, Disabled and Long content; With Details
   retains diagnostics in Empty. Other shared variants retain five standard
   states. Other catalog rows remain available. Previews use fictional data and

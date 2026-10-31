@@ -5,7 +5,7 @@ import os
 
 from .catalog import catalog_xaml_sources
 from .launchers import gallery_launchers
-from .dialog_data import MESSAGE_STATES
+from .dialog_data import MESSAGE_STATES, ACTION_STATES
 from .variants import variant_labels
 
 
@@ -78,6 +78,8 @@ def _prepare(row, extension_root):
     row['states'] = list(STATES)
     if identity == 'dialog-message':
         row['states'] = list(MESSAGE_STATES)
+    elif identity == 'dialog-actions':
+        row['states'] = list(ACTION_STATES)
     row['preview_status'] = 'Interactive preview'
     row['unavailable_reason'] = ''
     row['callers'] = []

@@ -4,7 +4,7 @@ Opt-in Python/IronPython WPF dialogs using KLCode resources. Existing tools keep
 their current calls. The [SPEC](SPEC.md) owns behavior, the
 [design system](../../../docs/DESIGNSYSTEM.md) owns visual rules, and the
 [consolidation plan](../../../docs/plans/custom-window-consolidation.md) owns
-delivery status. Action choice redesign is explicitly deferred.
+delivery status.
 
 ## APIs and results
 
@@ -19,7 +19,7 @@ delivery status. Action choice redesign is explicitly deferred.
 | `create_text_prompt(title, prompt, ...)` | `ask_text(...)` | action `accept`, raw string |
 | `create_command_switch(title, choices, ...)` | `command_switch(...)` | action `accept`, command key and switch states |
 | `create_rename(title, fields, ...)` | `rename(...)` | action `accept`, rules or a separate case action |
-| `create_choice(title, choices, ...)` | `choose_action(...)` | Existing action key contract; redesign deferred |
+| `create_choice(title, choices, ...)` | `choose_action(...)` | Exact command/button key and checkbox state; `accept`, `cancel` or `close` |
 
 `create_selection(title, items, multiple=True, ...)` and `select_items(...)`
 remain the generic APIs. Named sheet/revision/document factories default to
@@ -29,14 +29,75 @@ mode; do not also supply a `multiple` argument.
 All factories take `version=None`, `owner=None`, `navigate=None`. Owner may be a
 shown WPF Window, `System.IntPtr`, or integer native handle. Supply the host
 owner explicitly. Pure caller version, such as `v1.2`, is metadata; no extension
-version is inferred. Message, Text and Command Switch intentionally display no version
+version is inferred. Message, Text, Action Choice and Command Switch intentionally display no version
 footer. Gallery supplies simulated navigation; ordinary shared footers use the
-established destinations. Command Switch has no navigation links.
+established destinations. Action Choice only shows caller-supplied help content;
+Command Switch has no navigation links.
+
+## Action Choice
+
+```python
+from GUI.dialogs import ActionChoice, choose_action
+
+result = choose_action(__title__, [
+    ActionChoice('hide', 'Hide in selected views', 'Hide the supplied elements.'),
+    ActionChoice('unhide', 'Unhide in selected views', 'Restore element visibility.')],
+    prompt='How should these elements be displayed?',
+    content='Choose an action for the selected views.', buttons=('cancel',),
+    default=('command', 'hide'), severity='information',
+    details='Optional diagnostics supplied by the caller.',
+    checkbox_text='Include dependent views', checkbox_checked=False,
+    help_text='Workflow guide', help_uri='https://example.com/help',
+    owner=owner_handle)
+if result.action == 'accept':
+    chosen_key = result.value['key']
+    include_dependents = result.value['checked']
+```
+
+This is a KLCode WPF equivalent of TaskDialog's action layout; it requires no
+Revit import. One click immediately chooses a command. Supply at most four
+`ActionChoice` rows with unique hashable non-None keys and nonblank single-line
+labels; supporting descriptions wrap. Rows are cloned and caller data remains
+unchanged. The optional standard `buttons` names are `ok`, `yes`, `no`, `retry`,
+`cancel`, `close`, displayed in that order. Default is `('cancel',)`; passing
+empty links and empty buttons supplies Close. Duplicate/unknown button names
+and invalid links fail before WPF loads.
+Configurations with no enabled action and cancellation disabled are rejected,
+so callers cannot construct an undismissable window.
+
+Options are `prompt='Choose an Action'`, `content=''`, `buttons=('cancel',)`,
+`default=None`, `allow_cancel=True`, `severity=None`, `details=''`,
+`checkbox_text=''`, `checkbox_checked=False`, `help_text=''`, `help_uri=None`,
+plus shared metadata. The caller's tool title stays in the header. Optional
+sections disappear completely when unused; the standard KLCode footer is absent.
+Severity uses Message's information/warning/error/success icon roles. Help text
+may be plain text; a supplied web link uses the navigation callback when given.
+
+`default=('command', key)` or `('button', name)` sets the initial focus and Enter
+default. Invalid/disabled defaults fall back to the first enabled command, then
+the first standard button. Tab/Shift+Tab navigate. Enter activates the focused
+action or the default; Space only toggles the checkbox. Buttons remain clickable.
+`allow_cancel=False` hides chrome Close and blocks Escape/Alt+F4/native dismissal;
+including Cancel always enables cancellation. Explicit bottom buttons remain
+actions. Checkbox state never gates actions and is never persisted by this API.
+
+Every result has value `{'kind': 'command' or 'button', 'key': key,
+'checked': bool or None}`. Checkbox state is None when the checkbox is absent.
+Commands and OK/Yes/No/Retry return action `accept`; Cancel/Escape return `cancel`;
+Close/chrome Close/native close return `close`. Inspect the action and key rather
+than treating No or Close as Cancel. Each returned value is a snapshot.
+
+Initial width is 560 with minimum 480; height fits up to 640. Details starts
+collapsed, expands the bottom and restores its growth on collapse. Content wraps
+and scrolls at the cap; actions remain available. Manual width changes retain
+the selected height. Callers own model operations and any saved preferences.
 
 Factories return an unshown window. Modal helpers call ShowDialog and return
 `DialogResult`. Inspect `result.action`, `result.value`, `result.is_cancelled`
-explicitly; the object is not a Boolean pyRevit result. Close/Escape/Cancel or
-unaccepted window closure returns action `cancel`, value None. Accepted empty
+explicitly; the object is not a Boolean pyRevit result. Other than Action Choice,
+Close/Escape/Cancel or unaccepted window closure returns action `cancel`, value
+None. Action Choice retains its checkbox snapshot and distinct Close/Cancel
+results as described above. Accepted empty
 text and optional empty selection remain distinct from cancellation. No API
 exits the script, runs a chosen command, writes settings or changes a model.
 
@@ -226,8 +287,9 @@ Empty. Command Switch offers Commands only and Commands with toggles. KLC-Rename
 offers Single field, Two fields and Multiple fields (three groups). Other shared
 variants retain five standard states.
 The duplicate Message/Selection templates and Form are retired; Options and
-Review remain. Confirmation/Parameter previews remain removed. Action choice retains its
-current highlighted-row/Continue and default-key behavior pending future work.
+Review remain. Confirmation/Parameter previews remain removed. Action Choice has
+Commands, Commands + Details, Commands + Checkbox, Full Content and Standard
+Buttons variants, each with the same seven preview states as Message.
 
 Run the Python suite and Windows probe in
 [DESIGNSYSTEM.md](../../../docs/DESIGNSYSTEM.md#validation). Probes check actual
@@ -236,11 +298,13 @@ Direct keyboard-handler dispatch does not prove live input/focus. Revit data,
 owner/modal lifetime, pointer-driven resize flicker, keyboard traversal and DPI
 remain explicitly identified host acceptance checks.
 
-The opt-in `-ShowFocusProbe` Windows run briefly opens four owned fictional
+The opt-in `-ShowFocusProbe` Windows run briefly opens owned fictional
 windows: UIA identifies the search field, initial Command Switch focus stays on
 the neutral panel, and programmatically focused buttons/checks retain their
 normal borders. Rename also opens with neutral body focus and no field selected.
 Text opens neutrally, with a blank center title and watermark focus/blur checks.
+Action Choice fixtures verify default focus, Enter-only action activation,
+checkbox Space behavior and permitted/blocked cancellation.
 An additional owned Switch fixture checks capture, context-menu preservation,
 outside routed clicks and modal dismissal. This does not establish physical keyboard/pointer routing or
 Revit ownership. Shared button/check/radio/toggle styles use no focus adorner;

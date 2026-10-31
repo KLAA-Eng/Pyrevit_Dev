@@ -5,7 +5,7 @@ import unittest
 import subprocess
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'lib'))
-from GUI.dialogs.models import DialogResult, SelectionItem, SelectionGroup, SelectionState, validate_text
+from GUI.dialogs.models import ActionChoice, DialogResult, SelectionItem, SelectionGroup, SelectionState, validate_text
 
 
 class DialogModelTests(unittest.TestCase):
@@ -86,6 +86,17 @@ class DialogModelTests(unittest.TestCase):
         for options in ({'severity': 'mystery'},):
             with self.assertRaises(ValueError):
                 create_message('Title', 'Message', **options)
+
+    def test_invalid_action_configuration_fails_before_loading_wpf(self):
+        from GUI.dialogs import create_choice
+        for options in ({'severity': 'mystery'}, {'buttons': ('unknown',)},
+                        {'help_uri': 'file:///local'}, {'help_uri': 'https://'},
+                        {'help_uri': 'https://example.com:invalid'},
+                        {'help_uri': 'https://exam ple.com'}, {'help_uri': object()},
+                        {'buttons': (), 'allow_cancel': False}):
+            with self.subTest(options=options):
+                with self.assertRaises(ValueError):
+                    create_choice('Title', [ActionChoice('blocked', 'Unavailable', enabled=False)], **options)
 
 
 if __name__ == '__main__':

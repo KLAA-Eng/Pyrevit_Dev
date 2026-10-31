@@ -6,6 +6,7 @@ from GUI.dialogs import (ActionChoice, CommandSwitch, SelectionItem, create_mess
                          create_revision_selector, create_document_selector,
                          create_choice, create_text_prompt, create_command_switch,
                          RenameField, create_rename)
+from .dialog_data import ACTION_IDS
 
 
 def _selection_rows(identity):
@@ -54,28 +55,50 @@ def create_dialog(launcher, state):
         window = factory(title, [] if state == 'Empty' else rows, **options)
         if state == 'Error':
             window.accept_selection()
-    elif identity in ('dialog-actions', 'dialog-command-switch', 'dialog-command-switch-plain'):
+    elif identity in ACTION_IDS:
+        with_details = identity in ('dialog-actions-details', 'dialog-actions-full')
+        with_checkbox = identity in ('dialog-actions-checkbox', 'dialog-actions-full')
+        rows = [ActionChoice('hide', 'Hide in the selected views', 'Hide the supplied elements in the chosen views.'),
+                ActionChoice('unhide', 'Unhide in the selected views', 'Restore visibility for the supplied elements.'),
+                ActionChoice('unavailable', 'Unavailable action', 'This fictional action is disabled.', enabled=False)]
+        instruction = 'How should the selected elements be displayed?'
+        body = 'Choose an action. This preview uses fictional data and changes no model.'
+        details = 'Fictional diagnostic detail.\nNo production command is invoked.' if with_details else ''
+        if is_long:
+            instruction += ' Review the supplied project context before continuing.'
+            body = '\n\n'.join([body + ' Additional review context. ' * 8] * 18)
+            rows = [ActionChoice(row.Key, row.Label, row.Description + ' Supporting explanation. ' * 14,
+                                 enabled=row.CanSelect) for row in rows]
+            if with_details:
+                details = 'Long diagnostic detail.\n' * 48
+        if state == 'Empty':
+            rows, instruction, body = [], '', ''
+        buttons = ('yes', 'no', 'cancel') if identity == 'dialog-actions-buttons' else ('cancel',)
+        if identity == 'dialog-actions-buttons' or state == 'Empty':
+            rows = []
+        if state == 'Empty':
+            buttons = ()  # An empty task dialog supplies Close as its fallback.
+        severity = {'Warning': 'warning', 'Error': 'error', 'Success': 'success'}.get(state, 'information')
+        window = create_choice(title, rows, prompt=instruction, content=body, buttons=buttons,
+            severity=severity if state != 'Empty' else None, details=details,
+            checkbox_text='Apply this option to the selected views' if with_checkbox else '',
+            help_text='Read the fictional workflow guide' if identity == 'dialog-actions-full' else '',
+            help_uri='https://example.com/klcode/action-choice' if identity == 'dialog-actions-full' else None,
+            **options)
+    elif identity in ('dialog-command-switch', 'dialog-command-switch-plain'):
         rows = [ActionChoice('active', 'Use Active View', 'Continue with the current view.'),
                 ActionChoice('selected', 'Choose Views', 'Open a selection workflow in a future caller.'),
                 ActionChoice('unavailable', 'Unavailable Action', 'This action is disabled.', enabled=False)]
         if is_long:
-            if identity != 'dialog-actions':
-                rows += [ActionChoice('extra-' + str(index), 'Additional command ' + str(index) + ' - detailed context ' * 6,
-                                      'Long explanation ' * 24) for index in range(30)]
-            else:
-                rows += [ActionChoice('extra-' + str(index), 'Additional action ' + str(index), 'Long explanation ' * 24) for index in range(20)]
-        if identity != 'dialog-actions':
-            switches = [CommandSwitch('details', 'Include Details'), CommandSwitch('preview', 'Preview Only', checked=True)]
-            window = create_command_switch(title, [] if state == 'Empty' else rows,
-                                            switches=switches if identity == 'dialog-command-switch' else (), **options)
-            if state == 'Error':
-                window.status_text.Text = 'Fictional feedback: choose an available command.'
-                window.status_text.Visibility = Visibility.Visible
-                window.fit_height()
-        else:
-            window = create_choice(title, [] if state == 'Empty' else rows, **options)
-            if state == 'Error':
-                window.accept_choice()
+            rows += [ActionChoice('extra-' + str(index), 'Additional command ' + str(index) + ' - detailed context ' * 6,
+                                  'Long explanation ' * 24) for index in range(30)]
+        switches = [CommandSwitch('details', 'Include Details'), CommandSwitch('preview', 'Preview Only', checked=True)]
+        window = create_command_switch(title, [] if state == 'Empty' else rows,
+                                        switches=switches if identity == 'dialog-command-switch' else (), **options)
+        if state == 'Error':
+            window.status_text.Text = 'Fictional feedback: choose an available command.'
+            window.status_text.Visibility = Visibility.Visible
+            window.fit_height()
     elif identity in ('dialog-rename', 'dialog-rename-two', 'dialog-rename-three'):
         count = {'dialog-rename': 1, 'dialog-rename-two': 2, 'dialog-rename-three': 3}[identity]
         names = ['Name'] if count == 1 else ['Number', 'Name', 'Description'][:count]

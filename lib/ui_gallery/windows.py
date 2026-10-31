@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 import os
 
 from .template_data import TEMPLATE_FILES
-from .dialog_data import DIALOG_FILES, DIALOG_FAMILIES, MESSAGE_STATES
+from .dialog_data import DIALOG_FILES, DIALOG_FAMILIES, MESSAGE_STATES, ACTION_IDS, ACTION_STATES
 from .variants import preview_launcher
 from find_replace.layout import results_height  # host-free constants shared with the production dialog
 
@@ -70,6 +70,8 @@ def create_custom(extension_root, launcher, state='Normal'):
         raise ValueError('No reviewed custom preview adapter: {}'.format(identifier))
     if identifier in ('dialog-message', 'dialog-message-plain'):
         validate_state(state, MESSAGE_STATES)
+    elif identifier in ACTION_IDS:
+        validate_state(state, ACTION_STATES)
     else:
         validate_state(state)
     path = source_path(extension_root, SOURCES[identifier])

@@ -29,7 +29,7 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 
 The owner authorized reusable GUI windows and Gallery integration without
 migrating actual tools. Six **Shared dialog** family rows exercise the actual
-`lib/GUI/dialogs/` XAML bodies: Message, Selection, existing Action choice,
+`lib/GUI/dialogs/` XAML bodies: Message, Selection, Action Choice,
 Text, Command Switch and KLC-Rename. Variant lists the available labels; a
 dropdown beside State selects the preview. Search includes variant names, and
 each family's variant and state are remembered for the session. Selection has
@@ -37,7 +37,11 @@ Sheets, Revisions, Open Documents, List Single and List Multiple. Message has
 Without Details and With Details, each offering Normal, Empty, Warning, Error,
 Success, Disabled and Long content; With Details retains diagnostics in Empty.
 Command Switch has Commands only and Commands with toggles; KLC-Rename has
-Single field, Two fields and Multiple fields (three groups). Other shared
+Single field, Two fields and Multiple fields (three groups).
+Action Choice variants are Commands, Commands + Details, Commands + Checkbox,
+Full Content and Standard Buttons, each with all seven Message states. They
+exercise immediate command links, common buttons, caller help, checkbox state,
+severity and expandable diagnostics using fictional input. Other shared
 variants retain Normal, Empty, Error, Disabled and Long content. Separate
 confirmation and parameter-selection previews remain removed. These source
 files are version inputs for this same unreleased v0.5 delivery.
@@ -66,8 +70,9 @@ prompt with 36/24 Segoe UI Bold input, and a separate floating pyRevit-shaped
 KLCode Command Switch with search, persistent toggles and neutral initial focus.
 It has no corner x; Escape clears search and then cancels. The latter
 returns fictional outcomes immediately; it never invokes a chosen command.
-Action choice redesign is deferred and its window is unchanged. Read-only
-Revit collectors exist for future caller adoption but are not run by Gallery.
+Action Choice now follows the separately confirmed TaskDialog-style contract
+above. Read-only Revit collectors exist for future caller adoption but are not
+run by Gallery.
 [Refinement evidence](../../../../docs/knowledge/reviews/design-system/2026-10-29-dialog-refinement.md)
 owns the new regression/render checks. The shared Command Switch dictionary
 `lib/GUI/Resources/KLCodeCommandSwitch.xaml` is also a v0.5 version input.

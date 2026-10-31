@@ -218,7 +218,7 @@ initial delivery; this phase changes the current catalog.
 | --- | --- | --- | --- |
 | GUI-20 | Remove two Gallery variants | Implemented; locally verified | Confirmation/parameter entries and sample branches removed. 65 Gallery tests (one existing skip), 20 remaining dialog state layouts at normal/minimum sizes, and 91 custom/state WPF constructions pass; current catalog is 40 entries. Four bodies and message/selection APIs retained. |
 | GUI-21 | Refine remaining dialog/selector/switch design | Confirmed by owner | Owner explicitly said "confirmed, implement" after the final design summary. No further design approval gate for this scope. |
-| GUI-22 | Rework Action choice independently | Owner design interview opened 2026-10-30 | Inspect current behavior and Autodesk TaskDialog before grilling. Preserve the existing Action choice window/API until the interview settles its replacement design. |
+| GUI-22 | Rework Action Choice independently | Implemented; locally verified | Owner confirmed the complete TaskDialog-style design after three interview rounds. GUI-40/41 own delivery and verification. |
 | GUI-23 | Refine Message, Text and shared selector interactions | Implemented; locally verified | Details growth/manual-height regression, repeated expansion, footer isolation, exact 36/24 Segoe UI Bold field, unclipped validation and explicit Select pass in actual WPF. [Evidence](../knowledge/reviews/design-system/2026-10-29-dialog-refinement.md). |
 | GUI-24 | Read-only collectors and five selector presets | Implemented; boundary tested | Eleven collector tests, SDK/API checks, host-free imports and prepared-row/modal helpers pass. Five fictional Gallery presets verified. Actual Revit model collection remains owner acceptance. |
 | GUI-25 | Separate floating Command Switch | Implemented; locally verified | Seven model tests plus real-WPF construction, minimum/long layouts, filtering/toggle clones/results/Close/Escape handler checks pass. Actual focus/keyboard/owner remains live acceptance. |
@@ -462,7 +462,50 @@ checked. The decision tree begins with these independent questions:
 - Optional severity/details/checkbox/help content.
 - Chrome title and whether the standard navigation/version footer remains.
 
-Once those choices settle, resolve keyboard defaults/Enter, cancellation policy,
-button/result contracts, checkbox meaning and Gallery variants. No first-round
-choices have been settled yet. Automatic decision persistence/Revit.ini writes,
-progress, and production migrations are proposed exclusions for this effort.
+Round one is settled by the owner:
+
+- Replace row selection/Continue with immediate command links returning the
+  selected action.
+- Follow Revit's large instruction, smaller explanation, arrow-led command
+  links and bottom buttons, using KLCode colors and typography.
+- Support up to four command links and optional standard bottom buttons.
+- Support optional caller-supplied severity, expandable details, one checkbox
+  and help link; hide unused sections. Demonstrate these through Gallery
+  variants and preview states.
+- Retain the caller tool title in the header. Remove the standard
+  Prototype/version/Outreach footer; reserve help content for the caller.
+
+The next decision frontier is keyboard defaults/Enter, cancellation policy,
+button/result contracts, checkbox semantics and exact Gallery variant/state
+coverage. Automatic decision persistence/Revit.ini writes, progress, and
+production migrations remain proposed exclusions for this effort.
+
+Round two answers:
+
+- Keyboard: owner confirmed Enter-only action activation. Tab/Shift+Tab still
+  navigate; Enter activates the focused/default action. Space toggles only the
+  optional checkbox and never activates command links or bottom buttons. Mouse
+  clicks activate actions normally. Caller-selected default or first enabled
+  action remains the default policy.
+- Cancellation is allowed by default. Callers may disable dismissal when no
+  Cancel button is present; hide Close and block dismissal in that mode. An
+  explicit Cancel always enables cancellation.
+- Return the exact command key or standard-button result with checkbox state;
+  distinguish No, Cancel and Close.
+- The optional checkbox has caller-supplied text and initial state, never gates
+  actions, and returns its state without automatic preference persistence or
+  suppression of future dialogs.
+- Fit initial height to content. Details starts collapsed and grows the bottom
+  without hiding instruction/actions. Long content wraps and scrolls at the cap.
+- Gallery retains one family row with Commands, Commands + Details, Commands +
+  Checkbox, Full Content and Standard Buttons variants. Each offers Normal,
+  Empty, Warning, Error, Success, Disabled and Long Content states.
+
+All interview branches are settled. The owner confirmed the complete design and
+explicitly requested implementation. No further approval gate applies to routine
+implementation of this confirmed scope.
+
+| ID | Delivery | Status | Acceptance |
+| --- | --- | --- | --- |
+| GUI-40 | TaskDialog-style Action Choice base and results | Implemented; locally verified | Pure state (20 tests, 100% statement/branch coverage), immediate links/buttons, optional content, Enter-only keyboard contract, cancellation and fitted layout. No production tool migration. [Evidence](../knowledge/reviews/design-system/2026-10-30-action-choice.md). |
+| GUI-41 | Action Choice Gallery coverage and verification | Implemented; locally verified | Five variants x seven states in one row; 421 Python tests (one existing skip), 160 WPF constructions/104 shared layouts, shown routed keyboard/cancellation proof, bounded long-content/button checks and independent review. [Evidence](../knowledge/reviews/design-system/2026-10-30-action-choice.md). |

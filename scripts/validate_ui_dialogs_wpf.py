@@ -4,7 +4,7 @@ from __future__ import print_function
 
 from GUI.dialogs import (SelectionItem, ActionChoice, create_message, create_selection,
                          create_choice, create_text_prompt)
-from ui_gallery.dialog_data import DIALOG_FILES
+from ui_gallery.dialog_data import DIALOG_FILES, ACTION_IDS
 from System.Windows import Visibility
 from System.Windows.Controls import Button
 from System.Windows.Controls.Primitives import ToggleButton
@@ -33,7 +33,7 @@ def dialog_layout(window, width=None, height=None):
         return window
     chrome = window._kla_chrome
     assert chrome.header.ActualHeight == 24
-    footerless = hasattr(window, 'input_text') or hasattr(window, 'message_banner')
+    footerless = hasattr(window, 'input_text') or hasattr(window, 'message_banner') or getattr(window, 'is_action_choice', False)
     assert chrome.footer.ActualHeight == (0 if footerless else 24)
     if footerless:
         assert chrome.footer.Visibility == Visibility.Collapsed
@@ -44,6 +44,10 @@ def dialog_layout(window, width=None, height=None):
                if isinstance(control, Button) and control.Visibility == Visibility.Visible
                and control.ActualHeight > 0]
     for button in actions:
+        if getattr(window, 'is_action_choice', False) and button in window.command_buttons.values():
+            # Command links are scroll content; the dedicated Action Choice
+            # probe checks the bounded viewport and always-visible common buttons.
+            continue
         position = button.TranslatePoint(Point(0, 0), window.Content)
         assert position.X >= 0 and position.X + button.ActualWidth <= width, (window.Title, button.Content, position.X, width)
         bottom = height if footerless else chrome.footer.TranslatePoint(Point(0, 0), window.Content).Y
@@ -85,7 +89,7 @@ def validate_shared_dialogs():
     count = 0
     for identity in sorted(DIALOG_FILES):
         entry = next(row for row in adapter_entries if row['id'] == identity)
-        assert len(entry['states']) == (7 if identity in ('dialog-message', 'dialog-message-plain') else 5) and entry['can_launch']
+        assert len(entry['states']) == (7 if identity in ('dialog-message', 'dialog-message-plain') + ACTION_IDS else 5) and entry['can_launch']
         for state in entry['states']:
             window = create_custom(repo_root, dict(entry, tool_version=namespace['__version__']), state)
             dialog_layout(window)
@@ -243,7 +247,6 @@ def validate_shared_dialogs():
 
     for factory in (lambda: create_message('Cancel', 'Text'),
                     lambda: create_selection('Cancel', rows),
-                    lambda: create_choice('Cancel', [ActionChoice('x', 'X')]),
                     lambda: create_text_prompt('Cancel', 'Text')):
         window = factory()
         class EscapeArgs(object):
@@ -300,15 +303,11 @@ def validate_shared_dialogs():
 
     window = create_choice('Actions', [ActionChoice('a', 'A'), ActionChoice('b', 'B', enabled=False)])
     dialog_layout(window)
-    assert window.choices_list.SelectedItem is None and not window.accept_button.IsEnabled
-    window.choices_list.SelectedIndex = 1
-    assert not window.accept_button.IsEnabled
-    window.accept_choice()
+    assert not window.command_buttons['b'].IsEnabled
+    click(window.command_buttons['b'])
     assert window.result.is_cancelled
-    window.choices_list.SelectedIndex = 0
-    assert window.accept_button.IsEnabled
-    click(window.accept_button)
-    assert window.result.value == 'a'
+    click(window.command_buttons['a'])
+    assert window.result.value == {'kind': 'command', 'key': 'a', 'checked': None}
 
     window = create_text_prompt('Blank', 'Optional value')
     dialog_layout(window)
@@ -339,7 +338,7 @@ def validate_shared_dialogs():
     window.input_text.Text = ' raw '
     click(window.accept_button)
     assert window.result.value == ' raw '
-    print('Shared dialogs: {} normal/minimum state layouts; Message expansion/manual-size regression, large footerless Text, explicit Select, five presets, command/toggle/filter/result contracts and deferred Action choice regression passed.'.format(count))
+    print('Shared dialogs: {} normal/minimum state layouts; Message expansion/manual-size regression, large footerless Text, explicit Select, five presets, command/toggle/filter and immediate Action Choice results passed.'.format(count))
 
 
 validate_shared_dialogs()

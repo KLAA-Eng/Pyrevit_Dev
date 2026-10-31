@@ -516,7 +516,7 @@ The six opt-in bodies do not migrate existing commands or their pyRevit calls.
 | Sheets, revisions, open documents | `select_sheets`, `select_revisions`, `select_open_documents` | Read-only collection followed by selection; explicit document/context required |
 | Floating Command Switch | `command_switch(title, choices, switches=..., ...)` | `accept` with command key/switch states, or `cancel` |
 | Rename property rules | `rename(title, fields, ...)` | Accepted rules or a separate case action, or `cancel` |
-| Existing Action choice (future redesign) | `choose_action(title, choices, ...)` | Existing highlighted-row/Continue contract retained |
+| TaskDialog-style Action Choice | `choose_action(title, choices, ...)` | Immediate command/button key and checkbox state; distinct `accept`/`cancel`/`close` |
 | Text with optional validation | `ask_text(title, prompt, ...)` | `accept` with raw text, including blank, or `cancel` |
 
 ```python
@@ -536,12 +536,14 @@ current document. Specialized modal helpers explicitly call separate read-only
 collectors before showing UI. Existing CustomAlert/SelectFromDict retain their
 calling contracts; CustomAlert now omits its footer.
 
-Close/Cancel cancel. Selection requires Select, with Enter/double-click acceptance
+Close/Cancel normally cancel; Action Choice distinguishes Close from Cancel.
+Selection requires Select, with Enter/double-click acceptance
 disabled in both checkbox modes. Text Enter validates/accepts; Message Enter
-acknowledges OK. The existing Action choice default remains deferred. Command
+acknowledges OK. Action Choice uses Enter-only action activation, with caller
+default or first enabled action; Space only toggles its checkbox. Command
 Switch Enter chooses a focused command or sole enabled search match while search
 is focused; Escape clears search before cancelling. Other dialogs Escape cancel.
-These bare windows do not inherit
+Action Choice may explicitly disable cancellation when Cancel is absent. These bare windows do not inherit
 pyRevit WPFWindow's competing Escape handler. The earlier host boundary and
 missing defaults in existing tools remain separate. Actual keyboard, owner/modal
 lifetime and DPI still require live acceptance.
@@ -558,6 +560,11 @@ Bodies reuse the shared shell, buttons/fields/lists, status brushes, icon
 geometry and green/gray footer roles. Opt-in `KlaDialogCheck` presents a label
 and description using the existing checkbox template; `KlaDialogDescription`
 handles secondary/disabled text; `KlaDialogListItem` disables unavailable rows.
+Action Choice uses a large instruction, smaller body and up to four arrow-led
+immediate command links, with standard buttons below. It retains the caller
+chrome title but omits the standard footer; optional caller help replaces that
+content. Severity uses Message's icon roles. Details expands the bottom; a
+caller-defined checkbox returns its state without gating actions or persistence.
 KLC-Rename arranges one to three caller-defined property groups horizontally,
 each with Find/Replace and Prefix/Suffix. Optional case buttons are separate
 actions for their group; Rename validates and returns the entered rules. The
@@ -610,7 +617,9 @@ toggles; KLC-Rename offers Single field, Two fields and Multiple fields. Both
 Message variants, Without Details and With Details, offer Normal, Empty, Warning,
 Error, Success, Disabled and Long content; With Details retains diagnostics in
 Empty. The other shared variants and two reference templates offer five
-states. Gallery has 39 entries. The collectors are never called by Gallery. See
+states, except Action Choice's Commands, Commands + Details, Commands + Checkbox,
+Full Content and Standard Buttons variants, which each offer the same seven
+states as Message. Gallery has 39 entries. The collectors are never called by Gallery. See
 [API examples](../lib/GUI/dialogs/README.md) and
 [refinement verification](knowledge/reviews/design-system/2026-10-29-dialog-refinement.md).
 
@@ -714,6 +723,8 @@ Add `-ShowFocusProbe` to the WPF command to briefly show and close four owned
 fictional windows. It checks neutral Command Switch initial focus through UIA
 and verifies retained programmatic button/checkbox focus without an adorner,
 neutral Rename fields, and Text Entry's initial focus and watermark transitions.
+Additional owned Action Choice fixtures check default focus, routed keyboard
+activation and cancellation; the Switch fixture checks pointer capture policy.
 No Revit session or user document is used. Default probe execution stays offscreen.
 
 Replace `<tmp>` with a writable evidence directory. The probes default to the
