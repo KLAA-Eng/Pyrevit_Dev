@@ -6,7 +6,7 @@ assemble a window. The linked XAML files own executable values and templates;
 this guide explains their intended use and the shared design rules.
 
 The nine Python tool windows, five standard opt-in dialog bodies, two reference templates, Gallery and five
-compiled window classes use `KlaWindowShell`. PreviewFixture retains its
+compiled window classes use `klcWindowShell`. PreviewFixture retains its
 standalone test chrome. Native/pyRevit dialogs and Recall's docked panel have
 separate host presentation; the standalone Recall body uses the shared system.
 The sixth opt-in body is a floating Command Switch using shared colors/styles
@@ -377,10 +377,10 @@ The [current Python footer render](knowledge/reviews/design-system/2026-10-29-fo
 and [compiled footer render](knowledge/reviews/design-system/2026-10-29-footer-color-evidence/compiled-source-picker.png)
 show the owner-requested original green links and gray version text.
 
-Use `KlaFoundationWindow` or its `KlaWindow` alias for the window, or
+Use `klcFdnWindow` or its `klcWindow` alias for the window, or
 `KlaFloatingWindow` for a frameless floating panel with a transparent window
 and no taskbar entry, and
-`KlaWindowShell` for the named `window_shell` ContentControl. The shell supplies
+`klcWindowShell` for the named `window_shell` ContentControl. The shell supplies
 the header/footer and body inset. Do not copy chrome into a new body.
 The foundation defaults to NoResize; a resizable borderless window explicitly
 uses `ResizeMode="CanResizeWithGrip"` and needs minimum-size/overflow review.
@@ -699,15 +699,15 @@ states as Message. Gallery has 39 entries. The collectors are never called by Ga
 ## Creating a window
 
 Start from the [reference templates](../lib/GUI/_templates/README.md). Keep
-`window_shell` as a ContentControl using `KlaWindowShell`; put only workflow
+`window_shell` as a ContentControl using `klcWindowShell`; put only workflow
 content inside it. The following body illustrates the loading contract; the
 handler is supplied by the Python example below.
 
 ```xml
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Width="360" Height="240" Style="{StaticResource KlaWindow}">
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+        Width="360" Height="240" Style="{StaticResource klcWindow}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>

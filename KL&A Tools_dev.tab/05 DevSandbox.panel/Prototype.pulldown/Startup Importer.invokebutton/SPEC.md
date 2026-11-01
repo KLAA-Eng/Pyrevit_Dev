@@ -103,7 +103,7 @@ transaction group starts rolls the full import back.
 ## Shared custom-window presentation
 
 Source Picker, Review, Blocking Issues and their shared alert use the canonical
-`KlaWindowShell`, Foundation, Components, tokens and vector icons also loaded by
+`klcWindowShell`, Foundation, Components, tokens and vector icons also loaded by
 Python custom windows. The compiled adapter links those sources and derives
 compatibility names from shared styles. Header and footer are both 24 units;
 normal actions are 104 x 28 and primary actions 216 x 32. Read-only inline

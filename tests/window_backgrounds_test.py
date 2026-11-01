@@ -48,7 +48,7 @@ class WindowBackgroundTests(unittest.TestCase):
             root = ElementTree.parse(xaml_path).getroot()
 
             if relative_path in KL_A_TEMPLATE_WINDOW_XAML_PATHS:
-                self.assertEqual('{StaticResource KlaFoundationWindow}', root.attrib.get('Style'), relative_path)
+                self.assertEqual('{StaticResource klcFdnWindow}', root.attrib.get('Style'), relative_path)
             else:
                 self.assertEqual('#1A252B', root.attrib.get('Background'), relative_path)
 
@@ -59,7 +59,7 @@ class WindowBackgroundTests(unittest.TestCase):
                 xaml = xaml_file.read()
 
             self.assertIn('x:Name="window_body"', xaml, relative_path)
-            self.assertIn('Style="{StaticResource KlaWindowShell}"', xaml, relative_path)
+            self.assertIn('Style="{StaticResource klcWindowShell}"', xaml, relative_path)
             self.assertNotIn('<LinearGradientBrush', xaml, relative_path)
 
     def test_editor_and_gallery_use_branded_chrome(self):
@@ -74,8 +74,8 @@ class WindowBackgroundTests(unittest.TestCase):
             with open(xaml_path, 'r', encoding='utf-8') as xaml_file:
                 xaml = xaml_file.read()
 
-            self.assertEqual('{StaticResource KlaFoundationWindow}', root.attrib.get('Style'), relative_path)
-            self.assertIn('Style="{StaticResource KlaWindowShell}"', xaml)
+            self.assertEqual('{StaticResource klcFdnWindow}', root.attrib.get('Style'), relative_path)
+            self.assertIn('Style="{StaticResource klcWindowShell}"', xaml)
             self.assertNotIn('#F5F5F5', xaml, relative_path)
             self.assertNotIn('#E8E8E8', xaml, relative_path)
             self.assertNotIn('Foreground="Red"', xaml, relative_path)
@@ -117,9 +117,9 @@ class WindowBackgroundTests(unittest.TestCase):
                 xaml = xaml_file.read()
 
             root = ElementTree.parse(xaml_path).getroot()
-            self.assertEqual('{StaticResource KlaFoundationWindow}', root.attrib.get('Style'), relative_path)
+            self.assertEqual('{StaticResource klcFdnWindow}', root.attrib.get('Style'), relative_path)
             self.assertIn('x:Name="window_shell"', xaml, relative_path)
-            self.assertIn('Style="{StaticResource KlaWindowShell}"', xaml, relative_path)
+            self.assertIn('Style="{StaticResource klcWindowShell}"', xaml, relative_path)
             self.assertNotIn('x:Name="main_title"', xaml, relative_path)
         with open(os.path.join(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeFoundation.xaml'), encoding='utf-8') as stream:
             shell = stream.read()

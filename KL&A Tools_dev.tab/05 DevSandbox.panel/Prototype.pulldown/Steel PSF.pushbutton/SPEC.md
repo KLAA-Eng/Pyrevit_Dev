@@ -74,7 +74,7 @@ append to the Steel PSF raw CSV set in a selected folder after the report runs.
 Folder selection is prompted only after the report has been generated and only
 for initialize/append modes.
 
-The story-selection body uses `KlaWindowShell` through
+The story-selection body uses `klcWindowShell` through
 `GUI.window_chrome.load_window`, passing the command title and `__version__`.
 Shared resources own chrome, search artwork, list/checkbox states, spacing and
 button dimensions. The 432 x 576 window retains the search/list, Select All /

@@ -29,7 +29,7 @@ workflow, make the required selection and review the result before confirming.
 The View Range window shows the four planes in a table headed **Plane**,
 **Elevation - ft**, **Level Offset**, and **Level**. These headings are static;
 the displayed elevation and offset values follow the model's length units.
-The window opts into `KlaWindowShell`: its header and footer are both 24 units
+The window opts into `klcWindowShell`: its header and footer are both 24 units
 high, body padding is 16 horizontally and 8 vertically, and the centered footer
 receives the calling command's pure version. Typography is Segoe UI: shared
 14-unit section/table headings and 12-unit values/status text. The plane names

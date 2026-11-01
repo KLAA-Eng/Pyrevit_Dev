@@ -342,7 +342,7 @@ public sealed class DesignSystemResourceContractTests
         XDocument window = LoadXaml(relativePath);
         Assert.AreEqual(expectedWidth, (string?)window.Root?.Attribute("Width"), relativePath + " width");
         Assert.AreEqual(expectedHeight, (string?)window.Root?.Attribute("Height"), relativePath + " height");
-        CollectionAssert.Contains(new[] { "{StaticResource KlaWindowStyle}", "{StaticResource KlaFoundationWindow}" },
+        CollectionAssert.Contains(new[] { "{StaticResource KlaWindowStyle}", "{StaticResource klcFdnWindow}" },
             (string?)window.Root?.Attribute("Style"));
 
         HashSet<string> names = window.Descendants()
@@ -354,7 +354,7 @@ public sealed class DesignSystemResourceContractTests
 
         string source = window.ToString(SaveOptions.DisableFormatting);
         CollectionAssert.IsSubsetOf(new[] { "window_shell", "window_body" }, names.ToArray(), relativePath);
-        StringAssert.Contains(source, "KlaWindowShell", relativePath);
+        StringAssert.Contains(source, "klcWindowShell", relativePath);
         Assert.IsFalse(source.Contains("OnHeaderMouseLeftButtonDown", StringComparison.Ordinal));
         Assert.IsFalse(source.Contains("VersionLabel", StringComparison.Ordinal));
     }

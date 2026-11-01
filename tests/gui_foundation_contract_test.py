@@ -69,13 +69,13 @@ class FoundationTemplateContracts(unittest.TestCase):
         self.assertEqual({'CheckMark', 'IndeterminateMark'}, names)
 
     def test_link_focus_changes_colour_only(self):
-        link = _style(_root('KLCodeFoundation.xaml'), 'klcFoundationLink')
+        link = _style(_root('KLCodeFoundation.xaml'), 'klcFdnLink')
         for trigger in link.iter(P + 'Trigger'):
             for setter in trigger.iter(P + 'Setter'):
                 self.assertNotEqual('FontWeight', setter.attrib.get('Property'), 'focus must not reflow the footer')
 
     def test_shell_declares_the_body_before_the_chrome_so_keyboard_order_starts_in_the_body(self):
-        shell = _style(_root('KLCodeFoundation.xaml'), 'KlaWindowShell')
+        shell = _style(_root('KLCodeFoundation.xaml'), 'klcWindowShell')
         bands = ('klcShell_Body', 'klcShell_Header', 'klcShell_Footer')
         order = [e.attrib.get(X + 'Name') for e in shell.iter() if e.attrib.get(X + 'Name') in bands]
         self.assertEqual(list(bands), order)
@@ -85,7 +85,7 @@ class FoundationTemplateContracts(unittest.TestCase):
 
     def test_shell_names_every_part_the_python_and_csharp_chrome_binders_look_up(self):
         # GUI/window_chrome.py and src/KLCode.Wpf/WindowChrome.cs bind these by name through the template.
-        shell = _style(_root('KLCodeFoundation.xaml'), 'KlaWindowShell')
+        shell = _style(_root('KLCodeFoundation.xaml'), 'klcWindowShell')
         names = {e.attrib.get(X + 'Name') for e in shell.iter() if X + 'Name' in e.attrib}
         self.assertEqual({'klcShell_Body', 'klcShell_Header', 'klcShell_Footer',
                           'klcHeader_logo', 'klcHeader_title', 'klcHeader_close',

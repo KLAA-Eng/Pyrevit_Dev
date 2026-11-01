@@ -2,7 +2,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="../GUI/Resources/KLCodeComponents.xaml" />
     </ResourceDictionary.MergedDictionaries>
-    <Style x:Key="KlaWindowStyle" TargetType="Window" BasedOn="{StaticResource KlaFoundationWindow}" />
+    <Style x:Key="KlaWindowStyle" TargetType="Window" BasedOn="{StaticResource klcFdnWindow}" />
     <Style x:Key="KlaButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}" />
     <Style x:Key="KlaCloseButtonStyle" TargetType="Button" BasedOn="{StaticResource klcCloseButton}" />
     <Style x:Key="KlaGhostButtonStyle" TargetType="Button" BasedOn="{StaticResource xGhostButton}" />

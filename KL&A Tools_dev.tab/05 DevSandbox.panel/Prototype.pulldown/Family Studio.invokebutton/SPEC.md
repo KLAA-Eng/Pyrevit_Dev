@@ -100,7 +100,7 @@ not accepted as live behavior until it passes the Windows/Revit gates below.
 
 ## Shared custom-window presentation
 
-The compiled browser uses the same `KlaWindowShell`, Foundation, Components,
+The compiled browser uses the same `klcWindowShell`, Foundation, Components,
 tokens and vector wordmark as the Python custom windows. The compiled adapter
 links these canonical XAML sources; compatibility style names derive from
 shared roles instead of carrying separate control templates. Both chrome rows

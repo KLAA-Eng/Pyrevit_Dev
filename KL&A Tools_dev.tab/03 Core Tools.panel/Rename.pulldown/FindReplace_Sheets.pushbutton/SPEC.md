@@ -73,7 +73,7 @@ quiet success, and Project Browser display.
 
 ## GUI and interaction
 
-The local body uses the shared `KlaWindowShell`, loaded through
+The local body uses the shared `klcWindowShell`, loaded through
 `GUI.window_chrome.load_window` with the caller title and `__version__`. Header,
 footer, close/drag/navigation behavior, and control styles are shared rather
 than copied into the command. Sheet Number and Sheet Name retain their two

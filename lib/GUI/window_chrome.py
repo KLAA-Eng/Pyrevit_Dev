@@ -69,7 +69,7 @@ def fit_window_height(window):
 
 
 class WindowChrome(object):
-    """Bind KlaWindowShell named parts without workflow inheritance."""
+    """Bind klcWindowShell named parts without workflow inheritance."""
     def __init__(self, window, metadata, navigate, close_handler=None):
         self.window = window
         self.navigate = navigate
