@@ -99,7 +99,7 @@ def _window_type():
                 Grid.SetColumn(text, 1)
                 text.TextChanged += self.text_changed
                 label = Label()
-                label.Style = self.FindResource('KlaCompactFieldLabel')
+                label.Style = self.FindResource('klcLabelCentered')
                 label.Content = name.capitalize()  # field labels carry no trailing colon
                 label.Target = text
                 Grid.SetRow(label, row * 2)
@@ -121,7 +121,7 @@ def _window_type():
                 button.Name = 'rename_{0}_{1}'.format(index, operation)
                 AutomationProperties.SetAutomationId(button, button.Name)
                 AutomationProperties.SetName(button, '{0} {1}'.format(field.Label, caption))
-                if operation == 'upper':
+                if operation == 'lower':
                     button.Margin = self.FindResource('KlaPairGap')
                 button.Click += self.case_clicked
                 controls.case_actions.Children.Add(button)

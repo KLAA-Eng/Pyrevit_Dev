@@ -35,7 +35,7 @@
                 x:Name="text_label"
                 Grid.Row="2"
                 Content="Select Elements"
-                Style="{StaticResource KlaFoundationPromptLabel}"
+                Style="{StaticResource klcLabelPrompt}"
                 Target="{Binding ElementName=main_ListBox}" />
             <ListBox
                 x:Name="main_ListBox"
@@ -59,11 +59,11 @@
                 HorizontalAlignment="Center"
                 Orientation="Horizontal">
                 <Button
-                    Margin="{StaticResource KlaPairGap}"
                     Click="button_select_all"
                     Content="Select All"
                     Style="{StaticResource klcFdnButton}" />
                 <Button
+                    Margin="{StaticResource KlaPairGap}"
                     Click="button_select_none"
                     Content="Select None"
                     Style="{StaticResource klcFdnButton}" />

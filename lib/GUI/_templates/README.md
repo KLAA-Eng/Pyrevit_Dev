@@ -38,7 +38,7 @@ reference action opens external links, modifies a model or accesses sample files
 Both templates offer Normal, Empty, Error, Disabled and Long content. Close stays
 available when the body is disabled. Options validates category and finite offset;
 its 24-high category/offset/path fields use the compact component roles and its
-section prompts use `KlaFoundationPromptLabel`. The offset unit remains beside
+section prompts use `klcLabelPrompt`. The offset unit remains beside
 its input. Include Existing uses the standard self-labelled checkbox.
 
 Review keeps selected detail separate from checked rows. Checks survive filtering;

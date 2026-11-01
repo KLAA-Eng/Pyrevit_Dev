@@ -2,7 +2,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Command Switch"
-    Width="600"
+    Width="480"
     MinWidth="360"
     MinHeight="120"
     MaxHeight="500"
@@ -11,15 +11,16 @@
     PreviewMouseLeftButtonUp="pointer_up"
     PreviewMouseMove="pointer_move"
     PreviewTextInput="on_text_input"
-    Style="{StaticResource KlaFloatingWindow}"
+    Style="{StaticResource klcWindowFloating}"
     WindowStartupLocation="CenterScreen">
+    <!--  NTS: Reviw Padding  -->
     <Border
         x:Name="switch_panel"
         Margin="{StaticResource KlaFloatingMargin}"
         Padding="{StaticResource KlaSectionPadding}"
         Background="{StaticResource klcWindowColor}"
         BorderThickness="0"
-        CornerRadius="{StaticResource KlaRadiusFloating}">
+        CornerRadius="{StaticResource KlaWindowFloatingRad}">
         <Grid
             x:Name="window_body"
             FocusVisualStyle="{x:Null}"
@@ -27,23 +28,23 @@
             KeyboardNavigation.IsTabStop="False">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Grid x:Name="drag_region" Margin="{StaticResource KlaStackGapBelow}">
+            <Grid x:Name="drag_region">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Label
                     x:Name="prompt_label"
-                    MinHeight="{StaticResource KlaCompactFieldHeight}"
-                    MaxWidth="{StaticResource KlaSwitchPromptMaxWidth}"
-                    Margin="{StaticResource KlaPairGap}"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    FontSize="{StaticResource KlaSubheadingFontSize}"
+                    Content="xxSearch here:"
+                    FontSize="{StaticResource klcWindowPromptFontSize}"
                     FontWeight="SemiBold"
-                    Style="{StaticResource KlaPromptLabel}"
+                    Style="{StaticResource klcLabelPrompt}"
                     Target="{Binding ElementName=search_text}">
                     <Label.ContentTemplate>
                         <DataTemplate>
@@ -55,7 +56,7 @@
                         </DataTemplate>
                     </Label.ContentTemplate>
                 </Label>
-                <Grid Grid.Column="1" VerticalAlignment="Center">
+                <Grid Grid.Column="2" VerticalAlignment="Center">
                     <TextBox
                         x:Name="search_text"
                         AutomationProperties.HelpText="Type to filter commands. Tab moves between controls. Escape clears the search, then closes."
@@ -64,16 +65,16 @@
                         TextChanged="filter_changed" />
                     <TextBlock
                         x:Name="search_hint"
-                        Margin="{StaticResource KlaInputPadding}"
+                        Margin="{StaticResource KlaItemPadding}"
                         VerticalAlignment="Center"
-                        Foreground="{StaticResource KlaPlaceholderBrush}"
+                        Foreground="{StaticResource klcTextWatermarkColor}"
                         IsHitTestVisible="False"
                         Text="Type to filter" />
                 </Grid>
             </Grid>
             <ScrollViewer
                 x:Name="commands_scroll"
-                Grid.Row="1"
+                Grid.Row="2"
                 Focusable="False"
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">

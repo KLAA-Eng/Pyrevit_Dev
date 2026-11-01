@@ -14,7 +14,7 @@ public sealed class DesignSystemResourceContractTests
         "KlaMutedBrush",
         "klcFooterLinkColor",
         "klcFooterVersionColor",
-        "KlaPlaceholderBrush",
+        "klcTextWatermarkColor",
         "KlaTextOnAccentBrush",
         "KlaAccentBrush",
         "KlaAccentHoverBrush",

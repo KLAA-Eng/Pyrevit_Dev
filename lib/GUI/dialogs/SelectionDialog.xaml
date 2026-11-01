@@ -15,6 +15,7 @@
             FocusVisualStyle="{x:Null}"
             Focusable="True"
             KeyboardNavigation.IsTabStop="False">
+            <!--  Grid.RowDefinitions: Good  -->
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
@@ -26,10 +27,12 @@
                 <RowDefinition x:Name="secondary_gap" Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            <!--  StackPanel: Need to work on icons and inputs  -->
             <StackPanel>
                 <Grid x:Name="search_row">
+                    <!--  Grid.ColDefinitions: Good  -->
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{StaticResource klcBodySpaceLarge}" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
@@ -46,8 +49,9 @@
                         TextChanged="filter_changed" />
                 </Grid>
                 <Grid x:Name="group_row" Margin="{StaticResource KlaStackGapAbove}">
+                    <!--  Grid.ColDefinitions: Good  -->
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{StaticResource klcBodySpaceLarge}" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
@@ -65,11 +69,14 @@
                         Style="{StaticResource KlaCompactComboBox}" />
                 </Grid>
             </StackPanel>
+            <!--  Label: Is label the right tool? Fix spacing and gaps  -->
             <Label
                 x:Name="prompt_label"
                 Grid.Row="2"
-                Style="{StaticResource KlaPromptLabel}"
+                Content="xxTitle"
+                Style="{StaticResource klcLabelPrompt}"
                 Target="{Binding ElementName=items_list}" />
+            <!--  ListBox: Need to do a list clean  -->
             <ListBox
                 x:Name="items_list"
                 Grid.Row="4"
@@ -90,6 +97,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+            <!--  StackPanel: Is the text blocl necessary  -->
             <StackPanel Grid.Row="6">
                 <TextBlock
                     x:Name="validation_text"
@@ -102,16 +110,17 @@
                     HorizontalAlignment="Center"
                     Orientation="Horizontal">
                     <Button
-                        Margin="{StaticResource KlaPairGap}"
                         Click="check_all"
                         Content="Select All"
                         Style="{StaticResource KlaButtonSecondary}" />
                     <Button
+                        Margin="{StaticResource KlaPairGap}"
                         Click="check_none"
                         Content="Select None"
                         Style="{StaticResource KlaButtonSecondary}" />
                 </StackPanel>
             </StackPanel>
+            <!--  Button: include this in the button stackpanel?  -->
             <Button
                 x:Name="accept_button"
                 Grid.Row="8"

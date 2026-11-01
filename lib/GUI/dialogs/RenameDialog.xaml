@@ -12,7 +12,7 @@
     <Window.Resources>
         <Style
             x:Key="KlaRenamePromptLabel"
-            BasedOn="{StaticResource KlaPromptLabel}"
+            BasedOn="{StaticResource klcLabelPrompt}"
             TargetType="Label">
             <Setter Property="ContentTemplate">
                 <Setter.Value>

@@ -30,7 +30,7 @@
     <!--  labels on accent fills  -->
     <SolidColorBrush x:Key="KlaTextOnAccentBrush" Color="White" />
     <!--  placeholder text (Text entry watermark, Command Switch search hint); the same gray as the footer version by owner decision, test-enforced  -->
-    <SolidColorBrush x:Key="KlaPlaceholderBrush" Color="#808080" />
+    <SolidColorBrush x:Key="klcTextWatermarkColor" Color="#808080" />
     <!--  KLGreen-dark: sections, lists, grid lines  -->
     <SolidColorBrush x:Key="KlaBorderStrongBrush" Color="#286048" />
     <!--  KLGreen-dark: action and checked fills  -->
@@ -65,13 +65,13 @@
     <FontFamily x:Key="klcFont">Segoe UI</FontFamily>
     <sys:Double x:Key="klcBodyFontSize">12</sys:Double>
     <sys:Double x:Key="klcButtonFontSize">14</sys:Double>
+    <sys:Double x:Key="klcButtonFontSizeLarge">16</sys:Double>
     <sys:Double x:Key="klcGroupSearchFontSize">14</sys:Double>
     <sys:Double x:Key="klcDetailsFontSize">14</sys:Double>
     <sys:Double x:Key="klcFooterVersionFontSize">14</sys:Double>
     <sys:Double x:Key="klcHeaderTitleFontSize">16</sys:Double>
     <sys:Double x:Key="klcSectionTitleFontSize">16</sys:Double>
-    <sys:Double x:Key="klcButtonFontSizeMain">16</sys:Double>
-    <sys:Double x:Key="KlaSubheadingFontSize">16</sys:Double>
+    <sys:Double x:Key="klcWindowPromptFontSize">16</sys:Double>
     <sys:Double x:Key="klcMessageHeaderFontSize">22</sys:Double>
     <sys:Double x:Key="klcTextDialogFontSize">24</sys:Double>
 
@@ -80,10 +80,11 @@
     <CornerRadius x:Key="KlaRadiusCheck">2</CornerRadius>
     <CornerRadius x:Key="KlaRadiusControl">6</CornerRadius>
     <CornerRadius x:Key="KlaSwitchTrackRadius">6</CornerRadius>
-    <CornerRadius x:Key="KlaRadiusCard">8</CornerRadius>
+    <CornerRadius x:Key="KlaRadiusButton">8</CornerRadius>
     <CornerRadius x:Key="klcScrollThumbRadius">4</CornerRadius>
     <CornerRadius x:Key="KlaScrollBarRadius">10</CornerRadius>
-    <CornerRadius x:Key="KlaRadiusFloating">12</CornerRadius>
+    <CornerRadius x:Key="KlaWindowFloatingRad">16</CornerRadius>
+    <CornerRadius x:Key="KlaWindowRad">8</CornerRadius>
     <CornerRadius x:Key="KlaCommandPillRadius">12</CornerRadius>
 
     <!--  Rhythm: row heights and the 4 / 8 / 16 body spacing. GridLength is required for row/column definitions; WPF does not coerce Double.  -->
@@ -101,11 +102,12 @@
     <Thickness x:Key="klaDetailTextMargin">0,0,0,0</Thickness>
     <Thickness x:Key="KlaStackGapAbove">0,4,0,0</Thickness>
     <Thickness x:Key="KlaStackGapBelow">0,0,0,8</Thickness>
-    <Thickness x:Key="KlaPairGap">0,0,8,0</Thickness>
+    <Thickness x:Key="KlaPairGap">8,0,0,0</Thickness>
     <Thickness x:Key="KlaIconTextGap">0,0,4,0</Thickness>
     <Thickness x:Key="KlaActionTopGap">0,8,0,0</Thickness>
     <!--  Deliberate 2-unit optical lift for large single-line text beside an input.  -->
     <Thickness x:Key="KlaOpticalTextInset">0,0,0,2</Thickness>
+    <!-- Note to self: Consider merging with klcBodyMargin, would reduce footer to 20, and make the klcBodyMargin 16  -->
     <Thickness x:Key="KlaFloatingMargin">16</Thickness>
     <Thickness x:Key="KlaCommandPillGap">0,0,8,8</Thickness>
     <Thickness x:Key="KlaScrollBarMargin">3</Thickness>
@@ -138,8 +140,6 @@
     <sys:Double x:Key="klcIconSizeMessage">32</sys:Double>
 
     <!--  Insets and padding  -->
-    <Thickness x:Key="KlaLabelPadding">0</Thickness>
-    <Thickness x:Key="KlaInputPadding">0,0,0,0</Thickness>
     <!--
         Native TextBoxView adds two units and the border one: five yields
         the same eight-unit rendered text inset as ComboBox selection text.

@@ -37,7 +37,6 @@
                             x:Name="severity_icon"
                             Width="{StaticResource klcIconSizeMessage}"
                             Height="{StaticResource klcIconSizeMessage}"
-                            Margin="{StaticResource KlaPairGap}"
                             VerticalAlignment="Top"
                             Style="{StaticResource KlaGuiIcon}"
                             Visibility="Collapsed" />
@@ -107,7 +106,7 @@
                     <TextBlock x:Name="help_link_text" TextWrapping="Wrap"><Hyperlink
                             x:Name="help_link"
                             RequestNavigate="help_requested"
-                            Style="{StaticResource KlaLink}">
+                            Style="{StaticResource klcLink}">
                             <Run x:Name="help_caption" />
                         </Hyperlink></TextBlock>
                 </StackPanel>

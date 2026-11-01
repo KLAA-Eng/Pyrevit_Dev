@@ -35,7 +35,7 @@
                 x:Name="text_label"
                 Grid.Row="2"
                 Content="Select Type:"
-                Style="{StaticResource KlaFoundationPromptLabel}"
+                Style="{StaticResource klcLabelPrompt}"
                 Target="{Binding ElementName=main_ListBox}" />
             <ListBox
                 x:Name="main_ListBox"
@@ -57,7 +57,7 @@
                 <Label
                     Margin="0,0,0,8"
                     Content="Additional Settings:"
-                    Style="{StaticResource KlaFoundationPromptLabel}"
+                    Style="{StaticResource klcLabelPrompt}"
                     Target="{Binding ElementName=UI_offset}" />
                 <Border Style="{StaticResource KlaSection}">
                     <Grid HorizontalAlignment="Left">
@@ -69,7 +69,7 @@
                         </Grid.ColumnDefinitions>
                         <Label
                             Content="Offset:"
-                            Style="{StaticResource KlaCompactFieldLabel}"
+                            Style="{StaticResource klcLabelCentered}"
                             Target="{Binding ElementName=UI_offset}" />
                         <TextBox
                             x:Name="UI_offset"

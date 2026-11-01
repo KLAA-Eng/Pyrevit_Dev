@@ -77,7 +77,7 @@ compiled WPF.
 | `KlaMutedBrush` | `#B5C2BD` | Secondary captions |
 | `klcFooterLinkColor` | `#407058` | Prototype and Outreach footer links at rest |
 | `klcFooterVersionColor` | `#808080` | Centered caller-version footer text |
-| `KlaPlaceholderBrush` | `#808080` | Placeholder text: the Text entry watermark and the Command Switch search hint. The same gray as the footer version by owner decision; a test keeps them equal |
+| `klcTextWatermarkColor` | `#808080` | Placeholder text: the Text entry watermark and the Command Switch search hint. The same gray as the footer version by owner decision; a test keeps them equal |
 | `KlaTextOnAccentBrush` | `#FFFFFF` | Text on accent-filled actions and selected segments |
 | `KlaAccentBrush` | `#286048` | Standard buttons, checked boxes and selected segments |
 | `KlaAccentHoverBrush` | `#407058` | Standard action/dropdown hover background |
@@ -125,7 +125,7 @@ aliases in Components (`KlaPanelBrush`, `KlaMutedTextBrush`, `KlaSubtleTextBrush
 brushes above, and the C# contract and smoke tests keep them gone. Some role
 brushes share a value by design and stay separate roles: `klcFooterLinkColor`
 and `KlaAccentHoverBrush`, `KlaAccentBrush` and `KlaBorderStrongBrush`,
-`klcFooterVersionColor` and `KlaPlaceholderBrush`. Change a role's value only for that role.
+`klcFooterVersionColor` and `klcTextWatermarkColor`. Change a role's value only for that role.
 
 `Kla*Style` names in the [compiled adapter](../src/KLCode.Wpf/Resources/KLCodeControls.xaml)
 are compatibility styles based on the same shared controls. They do not define
@@ -167,9 +167,9 @@ For an icon/text action, let both children follow the button's foreground:
 <Button Style="{StaticResource xxIconTextButton}">
     <StackPanel Orientation="Horizontal">
         <ContentControl Style="{StaticResource KlaGuiIcon}"
-                        Content="{StaticResource kliconGroup}"
-                        Margin="{StaticResource KlaPairGap}"/>
+                        Content="{StaticResource kliconGroup}"/>
         <TextBlock Text="Sheet Sets" VerticalAlignment="Center"
+                   Margin="{StaticResource KlaPairGap}"
                    Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
     </StackPanel>
 </Button>
@@ -297,8 +297,8 @@ silently shrink fonts or invent a per-window button size.
 | `KlaMultilineReadout` | TextBox | Wrapped read-only output, minimum height 64, bounded by the caller with scrolling |
 | `KlaDetailsReadout` | TextBox | `KlaMultilineReadout` whose text aligns with the dialog body; Message Details |
 | `KlaComboBox` / `KlaCompactComboBox` | ComboBox | Standard 32 or compact 24 high; minimum width 104; popup maximum height 260 |
-| `xxxLabel` / `KlaCompactFieldLabel` | Label | Ordinary label / vertically centered compact field label |
-| `KlaPromptLabel` | Label | 14-unit, normal-weight section prompt with a label target |
+| `klcLabel` / `klcLabelCentered` | Label | Ordinary label / vertically centered compact field label |
+| `klcLabelPrompt` | Label | 16-unit, normal-weight section prompt with a label target |
 | `KlaSectionHeading` / `xPromptText` | TextBlock | Wrapped 14-unit heading / normal-weight prompt text |
 | `KlaInfoText` | TextBlock | Muted wrapped information |
 | `KlaCheck` | CheckBox | Checked/unchecked/indeterminate indicator with wrapped caption |
@@ -308,7 +308,7 @@ silently shrink fonts or invent a per-window button size.
 | `KlaSection` / `KlaBanner` | Border | Bordered field group / information banner |
 | `xStatusChip`, `xStatusReady`, `xStatusWarning`, `xStatusError` | Border | Neutral/ready/warning/error chip; use `xStatusText` for its caption |
 | `xSplitter` | GridSplitter | Review-pane divider; minimum size and keyboard increment 4 |
-| `KlaLink` | Hyperlink | Footer-like link styling; the caller/adapter owns navigation |
+| `klcLink` / `klcLinkFooter` | Hyperlink | Footer-like link styling / the bold green shell footer link; the caller/adapter owns navigation |
 
 A bare TextBox or ComboBox takes the compact 24-high implicit style. A bare
 CheckBox takes the shared checkbox style. Other controls require an explicit
@@ -320,7 +320,7 @@ For a labeled compact field, use a Label target and an automation name:
 
 ```xml
 <Label Content="Prefix:" Target="{Binding ElementName=input_prefix}"
-       Style="{StaticResource KlaCompactFieldLabel}"/>
+       Style="{StaticResource klcLabelCentered}"/>
 <TextBox x:Name="input_prefix" Style="{StaticResource KlaInputCompact}"
          AutomationProperties.Name="Name prefix"/>
 ```
@@ -382,7 +382,7 @@ and [compiled footer render](knowledge/reviews/design-system/2026-10-29-footer-c
 show the owner-requested original green links and gray version text.
 
 Use `klcFdnWindow` or its `klcWindow` alias for the window, or
-`KlaFloatingWindow` for a frameless floating panel with a transparent window
+`klcWindowFloating` for a frameless floating panel with a transparent window
 and no taskbar entry, and
 `klcWindowShell` for the named `window_shell` ContentControl. The shell supplies
 the header/footer and body inset. Do not copy chrome into a new body.
@@ -401,21 +401,20 @@ control sizes require different resource types.
 | `klcChromeHeight`, `klcBodyRowLarge`, `xCompactRow`, `klcBodyRowNormal` | GridLength | Rows of 24, 32, 28 and 24 respectively |
 | `klcBodyRowNormal` | GridLength | Compact naming row, 24 |
 | `KlaCompactFieldLabelColumn`, `KlaCompactFieldInputColumn` | GridLength | Naming columns, 60 and 240 |
-| `KlaPairGap` | Thickness | `0,0,8,0`, between related horizontal controls |
+| `KlaPairGap` | Thickness | `8,0,0,0`, on the second of two related horizontal controls |
 | `klcBodyMargin` | Thickness | `16,8,16,8`, shell body padding |
 | `KlaSectionPadding` | Thickness | 12, field-group inset |
 | `KlaCompactInset` | Thickness | `8,4`, compact component/cell padding |
-| `KlaInputPadding` | Thickness | `8,0`, button/toggle content padding |
 | `KlaTextBoxPadding` | Thickness | `5,0`, native TextBox padding; border and native text inset yield 8 units of rendered horizontal inset, matching ComboBox text |
 | `KlaActionTopGap` | Thickness | `0,8,0,0`, standard content-to-action gap for Message and Text Entry |
 | `KlaStackGapAbove`, `KlaStackGapBelow` | Thickness | `0,8,0,0` and `0,0,0,8`, between stacked sections of a dialog body |
 | `KlaIconTextGap` | Thickness | `0,0,4,0`, chevron or small icon before its text |
 | `KlaOpticalTextInset` | Thickness | `0,0,0,2`, deliberate optical lift for large text beside an input |
-| `KlaFloatingMargin`, `KlaRadiusFloating` | Thickness, CornerRadius | 16 and 12, the floating panel's transparent margin and corners |
+| `KlaFloatingMargin`, `KlaWindowFloatingRad` | Thickness, CornerRadius | 16 and 16, the floating panel's transparent margin and corners |
 | `KlaCommandLinkPadding`, `KlaCommandArrowInset`, `KlaCommandLinkIconColumn` | Thickness, Thickness, GridLength | 8, `0,4,8,0` and 24 inside a command link |
 | `KlaDetailsReadoutPadding` | Thickness | `10,8`, body-aligned readout text |
 | `KlaRenameLabelColumn` | GridLength | 52, the KLC-Rename label column |
-| `klcIconSizeMessage`, `klcMessageHeaderFontSize`, `KlaSubheadingFontSize` | Double | 32, 22 and 16: dialog severity icon, severity heading, command link and switch prompt |
+| `klcIconSizeMessage`, `klcMessageHeaderFontSize`, `klcWindowPromptFontSize` | Double | 32, 22 and 16: dialog severity icon, severity heading, command link and switch prompt |
 | `KlaDetailsHeight`, `KlaOptionMaxHeight`, `KlaCommandLinkMinHeight`, `KlaSwitchPromptMaxWidth` | Double | 128, 80, 40 and 180 |
 | `KlaControlHeight`, `klcButtonHeight`, `KlaCompactFieldHeight` | Double | Control heights of 32, 28 and 24 |
 
@@ -562,7 +561,7 @@ what the user gives up, with the WCAG 2.1 criterion each touches:
 - AC-005 and GUI-39: Text entry shows neither the caller's prompt nor the
   window title on screen (the prompt is the input's accessible name; 2.4.6
   Headings and Labels, 3.3.2 Labels or Instructions). Message hides the title.
-- Placeholder gray: `KlaPlaceholderBrush` #808080 is 3.96:1 on the window.
+- Placeholder gray: `klcTextWatermarkColor` #808080 is 3.96:1 on the window.
   That passes for the 24-unit bold Text watermark and is below 4.5:1 for the
   12-unit Command Switch hint (1.4.3). Owner decision, 2026-10-31.
 - Command Switch toggle pill: the KLWhite thumb on the #B5C2BD track is 1.45:1

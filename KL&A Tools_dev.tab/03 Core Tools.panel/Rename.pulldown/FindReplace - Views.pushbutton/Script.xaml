@@ -15,12 +15,12 @@
                     <Label
                         Margin="0,0,0,8"
                         Content="Renaming Parameters"
-                        Style="{StaticResource KlaFoundationPromptLabel}" />
+                        Style="{StaticResource klcLabelPrompt}" />
                     <Border Style="{StaticResource KlaSection}">
                         <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label
                                 Content="Find:"
-                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Style="{StaticResource klcLabelCentered}"
                                 Target="{Binding ElementName=input_find}" />
                             <TextBox
                                 x:Name="input_find"
@@ -30,7 +30,7 @@
                             <Label
                                 Grid.Row="2"
                                 Content="Replace:"
-                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Style="{StaticResource klcLabelCentered}"
                                 Target="{Binding ElementName=input_replace}" />
                             <TextBox
                                 x:Name="input_replace"
@@ -41,7 +41,7 @@
                             <Label
                                 Grid.Row="4"
                                 Content="Prefix:"
-                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Style="{StaticResource klcLabelCentered}"
                                 Target="{Binding ElementName=input_prefix}" />
                             <TextBox
                                 x:Name="input_prefix"
@@ -52,7 +52,7 @@
                             <Label
                                 Grid.Row="6"
                                 Content="Suffix:"
-                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Style="{StaticResource klcLabelCentered}"
                                 Target="{Binding ElementName=input_suffix}" />
                             <TextBox
                                 x:Name="input_suffix"
@@ -67,11 +67,11 @@
                         HorizontalAlignment="Center"
                         Orientation="Horizontal">
                         <Button
-                            Margin="{StaticResource KlaPairGap}"
                             Click="button_uppercase"
                             Content="Uppercase"
                             Style="{StaticResource KlaButtonSecondary}" />
                         <Button
+                            Margin="{StaticResource KlaPairGap}"
                             Click="button_lowercase"
                             Content="Lowercase"
                             Style="{StaticResource KlaButtonSecondary}" />

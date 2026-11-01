@@ -115,7 +115,7 @@ def validate_production_windows():
                         if control.Name.startswith(('input_', 'UI_view_', 'UI_sheet_')):
                             assert abs(control.ActualWidth - token('KlaCompactFieldInputColumn').Value) < 0.1, (identity, state, control.Name, 'naming field width', control.ActualWidth)
                         assert AutomationProperties.GetName(control), (identity, control.Name, 'unnamed field')
-                    if isinstance(control, Label) and control.Style == window.Resources['KlaFoundationPromptLabel']:
+                    if isinstance(control, Label) and control.Style == window.Resources['klcLabelPrompt']:
                         assert control.FontSize == token('klcSectionTitleFontSize'), (identity, state, 'prompt')
 
                 if identity in FOOTER_ACTIONS:

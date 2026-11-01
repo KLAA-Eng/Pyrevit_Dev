@@ -144,7 +144,7 @@ with an 8-unit gap below the message or Details content.
 Text options are `default=''`, `required=False`, `validator=None`. The field is
 36 high, FontSize 24, centered Segoe UI Bold. No visible prompt header is shown;
 an empty, unfocused field displays `[ENTER TEXT]` as a vertically centered
-watermark in `KlaPlaceholderBrush` gray (#808080), the footer version gray. Focusing the input hides it.
+watermark in `klcTextWatermarkColor` gray (#808080), the footer version gray. Focusing the input hides it.
 It is never returned as
 input. The caller prompt still labels the input for accessibility. Compact
 height fits input/error. The center chrome title is blank; caller Window.Title

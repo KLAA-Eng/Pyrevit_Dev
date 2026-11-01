@@ -81,6 +81,8 @@ def _window_type():
                 self.severity_icon.Content = self.FindResource(geometry)
                 self.severity_icon.Foreground = self.FindResource(brush)
                 self.severity_icon.Visibility = Visibility.Visible
+                # The pair gap sits on the text so a collapsed icon leaves no indent.
+                self.instruction_text.Margin = self.FindResource('KlaPairGap')
                 self.instruction_text.Foreground = self.FindResource(brush)
             for row in state.choices:
                 button = Button()

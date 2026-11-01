@@ -12,6 +12,7 @@
     WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
+            <!--  Grid.RowDefinitions: Good  -->
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
@@ -19,6 +20,7 @@
                 <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+            <!--  Border: Needs Fdn work  -->
             <Border x:Name="message_banner" Style="{StaticResource KlaBanner}">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -30,10 +32,10 @@
                             x:Name="message_icon"
                             Width="{StaticResource klcIconSizeMessage}"
                             Height="{StaticResource klcIconSizeMessage}"
-                            Margin="{StaticResource KlaPairGap}"
                             Style="{StaticResource KlaGuiIcon}" />
                         <TextBlock
                             x:Name="message_heading"
+                            Margin="{StaticResource KlaPairGap}"
                             VerticalAlignment="Center"
                             FontSize="{StaticResource klcMessageHeaderFontSize}"
                             Style="{StaticResource KlaSectionHeading}" />
@@ -51,6 +53,7 @@
                     </ScrollViewer>
                 </Grid>
             </Border>
+            <!--  Expander: Need Fdn work  -->
             <Expander
                 x:Name="message_expander"
                 Grid.Row="2"

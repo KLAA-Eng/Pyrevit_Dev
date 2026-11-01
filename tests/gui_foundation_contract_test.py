@@ -50,12 +50,12 @@ class FoundationTemplateContracts(unittest.TestCase):
         self.assertEqual([], [node for node in bar.iter() if 'Grid.Row' in node.attrib])
 
     def test_close_button_centers_its_caption_with_alignment_not_a_margin_or_render_transform(self):
-        foundation = _read('KLCodeFoundation.xaml')
-        self.assertNotIn('TranslateTransform', foundation)
+        components = _read('KLCodeComponents.xaml')
+        self.assertNotIn('TranslateTransform', components)
         # The glyph-lift margin went with the 60 x 18 button on 2026-10-31; the 48 x 16 klcCloseButton
         # centres its caption in layout, so the token is the unused xxxCloseGlyphLift and nothing names it.
-        self.assertNotIn('CloseGlyphLift', foundation)
-        close = _style(_root('KLCodeFoundation.xaml'), 'klcCloseButton')
+        self.assertNotIn('CloseGlyphLift', components)
+        close = _style(_root('KLCodeComponents.xaml'), 'klcCloseButton')
         text = next(close.iter(P + 'TextBlock'))
         self.assertNotIn('Margin', text.attrib)
         self.assertEqual(('Center', 'Center', 'Center'), (text.attrib.get('HorizontalAlignment'),
@@ -79,7 +79,7 @@ class FoundationTemplateContracts(unittest.TestCase):
                 self.assertNotEqual('FontWeight', setter.attrib.get('Property'), 'focus must not reflow the footer')
 
     def test_shell_declares_the_body_before_the_chrome_so_keyboard_order_starts_in_the_body(self):
-        shell = _style(_root('KLCodeFoundation.xaml'), 'klcWindowShell')
+        shell = _style(_root('KLCodeComponents.xaml'), 'klcWindowShell')
         bands = ('klcShell_Body', 'klcShell_Header', 'klcShell_Footer')
         order = [e.attrib.get(X + 'Name') for e in shell.iter() if e.attrib.get(X + 'Name') in bands]
         self.assertEqual(list(bands), order)
@@ -89,7 +89,7 @@ class FoundationTemplateContracts(unittest.TestCase):
 
     def test_shell_names_every_part_the_python_and_csharp_chrome_binders_look_up(self):
         # GUI/window_chrome.py and src/KLCode.Wpf/WindowChrome.cs bind these by name through the template.
-        shell = _style(_root('KLCodeFoundation.xaml'), 'klcWindowShell')
+        shell = _style(_root('KLCodeComponents.xaml'), 'klcWindowShell')
         names = {e.attrib.get(X + 'Name') for e in shell.iter() if X + 'Name' in e.attrib}
         self.assertEqual({'klcShell_Body', 'klcShell_Header', 'klcShell_Footer',
                           'klcHeader_logo', 'klcHeader_title', 'klcHeader_close',

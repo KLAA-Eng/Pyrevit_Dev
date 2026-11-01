@@ -125,7 +125,7 @@
                         </Grid.RowDefinitions>
                         <Label
                             Content="Selected Item"
-                            Style="{StaticResource KlaFoundationPromptLabel}"
+                            Style="{StaticResource klcLabelPrompt}"
                             Target="{Binding ElementName=review_detail}" />
                         <TextBox
                             x:Name="review_detail"

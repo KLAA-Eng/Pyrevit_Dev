@@ -4,7 +4,6 @@
     Title="Enter Text"
     Width="480"
     Height="Auto"
-    ResizeMode="NoResize"
     Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
@@ -13,71 +12,69 @@
             FocusVisualStyle="{x:Null}"
             Focusable="True"
             KeyboardNavigation.IsTabStop="False">
+            <!--  Grid.RowDefinitions: Good  -->
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <ScrollViewer
-                x:Name="prompt_scroll"
-                HorizontalScrollBarVisibility="Disabled"
-                VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="prompt_fields">
-                    <Grid>
-                        <TextBox
-                            x:Name="input_text"
-                            AcceptsReturn="False"
-                            AcceptsTab="False"
-                            AutomationProperties.Name="Text value"
-                            Style="{StaticResource KlaTextPromptInput}"
-                            TextChanged="text_changed" />
-                        <!--  Compact line height plus the optical inset centers the visible capital glyphs.  -->
-                        <TextBlock
-                            x:Name="input_placeholder"
-                            Margin="{StaticResource KlaOpticalTextInset}"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            FontSize="{StaticResource klcTextDialogFontSize}"
-                            FontWeight="Bold"
-                            Foreground="{StaticResource KlaPlaceholderBrush}"
-                            IsHitTestVisible="False"
-                            LineHeight="24"
-                            LineStackingStrategy="BlockLineHeight"
-                            Text="[ENTER TEXT]">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding Text, ElementName=input_text}" Value="" />
-                                                <Condition Binding="{Binding IsKeyboardFocusWithin, ElementName=input_text}" Value="False" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </MultiDataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </Grid>
+            <!--  StackPanel: Needs Cleaning. There should be a way to incorporate the water mark into the text box in the components page. Need to Work on foundation for text inputs.   -->
+            <StackPanel x:Name="prompt_fields" Grid.Row="0">
+                <!--  Grid: Work on including the water mark into the textbox style   -->
+                <Grid>
+                    <TextBox
+                        x:Name="input_text"
+                        AcceptsReturn="False"
+                        AcceptsTab="False"
+                        AutomationProperties.Name="Text value"
+                        Style="{StaticResource KlaTextPromptInput}"
+                        TextChanged="text_changed" />
+                    <!--  Compact line height plus the optical inset centers the visible capital glyphs.  -->
                     <TextBlock
-                        x:Name="validation_text"
-                        Margin="{StaticResource KlaStackGapAbove}"
-                        AutomationProperties.LiveSetting="Polite"
-                        Foreground="{StaticResource klcErrorColor}"
-                        TextWrapping="Wrap"
-                        Visibility="Collapsed" />
-                </StackPanel>
-            </ScrollViewer>
-            <Grid x:Name="prompt_actions" Grid.Row="2">
-                <Button
-                    x:Name="accept_button"
+                        x:Name="input_placeholder"
+                        Margin="{StaticResource KlaOpticalTextInset}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="{StaticResource klcTextDialogFontSize}"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource klcTextWatermarkColor}"
+                        IsHitTestVisible="False"
+                        LineHeight="24"
+                        LineStackingStrategy="BlockLineHeight"
+                        Text="[ENTER TEXT]">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Text, ElementName=input_text}" Value="" />
+                                            <Condition Binding="{Binding IsKeyboardFocusWithin, ElementName=input_text}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+                <!--  TextBlock: is this textblock necessary   -->
+                <TextBlock
+                    x:Name="validation_text"
+                    Margin="{StaticResource KlaStackGapAbove}"
+                    AutomationProperties.LiveSetting="Polite"
+                    Foreground="{StaticResource klcErrorColor}"
+                    TextWrapping="Wrap"
+                    Visibility="Collapsed" />
+            </StackPanel>
+            <!--  Grid.RowDefinitions: Good  -->
+            <Button 
+                    x:Name="accept_button" Grid.Row="2"
                     Click="accept_text"
                     Content="OK"
                     IsDefault="True"
-                  
-                    Style="{StaticResource KlaButton}" />
-            </Grid>
+                    Style="{StaticResource KlaButton}" >
+            </Button>
         </Grid>
     </ContentControl>
 </Window>

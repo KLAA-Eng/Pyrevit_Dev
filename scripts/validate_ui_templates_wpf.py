@@ -50,7 +50,7 @@ def validate_template_family():
                 for field in (window.option_category, window.option_offset, window.option_path):
                     assert field.ActualHeight == token('KlaCompactFieldHeight'), (state, field.Name, field.ActualHeight)
                 for prompt in (window.options_prompt, window.output_prompt):
-                    assert prompt.Style == window.Resources['KlaFoundationPromptLabel']
+                    assert prompt.Style == window.Resources['klcLabelPrompt']
                     assert prompt.FontSize == token('klcSectionTitleFontSize') and str(prompt.FontWeight) == 'Normal'
             if identity == 'template-options' and state == 'Disabled':
                 for widget in (window.option_category, window.scope_selected, window.option_include_existing):

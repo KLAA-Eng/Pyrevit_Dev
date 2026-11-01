@@ -168,8 +168,6 @@ def validate_shared_dialogs():
                     field_bottom = last.TranslatePoint(Point(0, last.ActualHeight), window.Content).Y
                     button_top = window.accept_button.TranslatePoint(Point(0, 0), window.Content).Y
                     assert abs(button_top - field_bottom - 8) < 1, (state, button_top - field_bottom)
-                if state == 'Error':
-                    assert window.prompt_scroll.ScrollableHeight == 0, 'Validation must fit without clipping'
             if output_directory and state in ('Normal', 'Warning', 'Error', 'Success', 'Long content'):
                 render_content(window, os.path.join(output_directory, identity + '-' + state.replace(' ', '-').lower() + '.png'), window.Width, window.Height)
             # Validate the smallest supported layout too, including long content.

@@ -51,14 +51,17 @@ class WindowMetadataTests(unittest.TestCase):
         self.assertEqual('Close', entries['CloseLabel'][1])
         # 2026-10-31: only Close is still a DynamicResource label; the footer captions are literal in the shell.
         self.assertEqual(set(), {'PrototypeLabel', 'OutreachLabel'} & set(entries))
-        with open(os.path.join(ROOT, 'lib', 'GUI', 'Resources', 'KLCodeFoundation.xaml'), encoding='utf-8') as stream:
-            foundation = stream.read()
-        for reference in ('{DynamicResource CloseLabel}', '{StaticResource klcPrototypeUri}',
-                          '{StaticResource klcOutreachUri}', 'Source="KLCodeTokens.xaml"'):
-            self.assertIn(reference, foundation, reference)
+        resources = os.path.join(ROOT, 'lib', 'GUI', 'Resources')
+        with open(os.path.join(resources, 'KLCodeFoundation.xaml'), encoding='utf-8') as stream:
+            self.assertIn('Source="KLCodeTokens.xaml"', stream.read())
+        # The shell template lives in Components.
+        with open(os.path.join(resources, 'KLCodeComponents.xaml'), encoding='utf-8') as stream:
+            components = stream.read()
+        for reference in ('{DynamicResource CloseLabel}', '{StaticResource klcPrototypeUri}', '{StaticResource klcOutreachUri}'):
+            self.assertIn(reference, components, reference)
         for removed in ('PrototypeLabel', 'OutreachLabel'):
-            self.assertNotIn(removed, foundation, removed)
-        shell = ElementTree.fromstring(foundation)
+            self.assertNotIn(removed, components, removed)
+        shell = ElementTree.fromstring(components)
         links = {node.attrib[X + 'Name']: (node.attrib.get('NavigateUri'), node.find(P + 'Run').attrib.get('Text'))
                  for node in shell.iter(P + 'Hyperlink') if X + 'Name' in node.attrib}
         self.assertEqual({'klcFooter_prototype': ('{StaticResource klcPrototypeUri}', 'Prototype'),

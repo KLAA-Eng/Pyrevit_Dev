@@ -11,7 +11,7 @@
         live in KLCodeComponents.xaml.
     -->
 
-    <!--  Scrollbar: charcoal track, green thumb, both orientations  -->
+    <!--  ScrollBarThumb & ScrollBar: charcoal track, green thumb, both orientations  -->
     <Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="IsTabStop" Value="false" />
@@ -64,7 +64,7 @@
         </Setter>
     </Style>
 
-    <!--  Links  -->
+    <!--  HyperLink: [Enter Notes]  -->
     <!--  Footer links retain the original green and underline; hover/focus is supplied by the foundation link style.  -->
     <Style x:Key="klcFdnLink" TargetType="Hyperlink">
         <Style.Triggers>
@@ -77,17 +77,9 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    <!--  The shell template below applies this by StaticResource, so it must stay in this file, above the shell.  -->
-    <Style
-        x:Key="klcFooterLink"
-        BasedOn="{StaticResource klcFdnLink}"
-        TargetType="Hyperlink">
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{StaticResource klcFooterLinkColor}" />
-    </Style>
 
-    <!--  Icon presenter  -->
-    <!-- GUI icons: KlaGuiIcon presents a klicon<Role> geometry at klcIconSize on the KlaIconCanvas with the klcIconStroke pen,
+    <!--  ContentControl (GUI icons): [Enter Notes]  -->
+    <!-- KlaGuiIcon presents a klicon<Role> geometry at klcIconSize on the KlaIconCanvas with the klcIconStroke pen,
          inheriting the control's foreground; disabled icons take KlaDisabledTextBrush. It is the only way to draw a GUI icon.-->
     <Style x:Key="KlaGuiIcon" TargetType="ContentControl">
         <Setter Property="Width" Value="{StaticResource klcIconSize}" />
@@ -125,7 +117,7 @@
         </Style.Triggers>
     </Style>
 
-    <!--  Buttons  -->
+    <!--  ButtonBase: [Enter Notes]  -->
     <!--
         One template for every button variant, ToggleButton included (hence ButtonBase). A variant re-points the klcButton* keys in
         its own Style.Resources rather than copying the template: the state triggers read them by DynamicResource, which resolves
@@ -135,7 +127,7 @@
         <Style.Resources>
             <StaticResource x:Key="klcButtonHoverBrush" ResourceKey="KlaAccentHoverBrush" />
             <StaticResource x:Key="klcButtonDisabledBrush" ResourceKey="KlaDisabledFillBrush" />
-            <StaticResource x:Key="klcButtonRadius" ResourceKey="KlaRadiusCard" />
+            <StaticResource x:Key="klcButtonRadius" ResourceKey="KlaRadiusButton" />
         </Style.Resources>
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
@@ -146,7 +138,6 @@
         <Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="{StaticResource KlaInputPadding}" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -182,43 +173,15 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style
-        x:Key="klcCloseButton"
-        BasedOn="{StaticResource klcFdnButton}"
-        TargetType="Button">
-        <!--  Chrome is the deliberate compact exception to form control sizes.  -->
-        <Setter Property="Width" Value="{StaticResource klcCloseWidth}" />
-        <Setter Property="Height" Value="{StaticResource klcCloseHeight}" />
-        <Setter Property="FontSize" Value="{StaticResource klcCloseFontSize}" />
-        <Setter Property="ContentTemplate">
-            <Setter.Value>
-                <DataTemplate>
-                    <!--  FIXED: Added HorizontalAlignment, VerticalAlignment, and TextAlignment  -->
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Text="{Binding}"
-                        TextAlignment="Center" />
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 
-    <!--  Labels  -->
-    <Style x:Key="KlaFoundationLabel" TargetType="Label">
+    <!--  Label: [Enter Notes]  -->
+    <Style x:Key="klcFdnLabel" TargetType="Label">
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
-        <Setter Property="Padding" Value="{StaticResource KlaLabelPadding}" />
-    </Style>
-    <Style
-        x:Key="KlaFoundationPromptLabel"
-        BasedOn="{StaticResource KlaFoundationLabel}"
-        TargetType="Label">
-        <Setter Property="FontSize" Value="{StaticResource klcSectionTitleFontSize}" />
     </Style>
 
-    <!--  Inputs  -->
+    <!--  TextBox: [Enter Notes]  -->
     <Style x:Key="KlaFoundationInput" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
@@ -262,7 +225,7 @@
         <Setter Property="FontSize" Value="{StaticResource klcGroupSearchFontSize}" />
     </Style>
 
-    <!--  Check boxes  -->
+    <!--  CheckBox: [Enter Notes]  -->
     <Style x:Key="KlaFoundationCheckBox" TargetType="CheckBox">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
@@ -338,7 +301,7 @@
         </Setter>
     </Style>
 
-    <!--  Lists: item first, then the list that applies it  -->
+    <!--  ListBoxItem & ListBox: item first, then the list that applies it  -->
     <Style x:Key="KlaFoundationListItem" TargetType="ListBoxItem">
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Padding" Value="{StaticResource KlaItemPadding}" />
@@ -362,7 +325,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{StaticResource KlaBorderStrongBrush}"
                         BorderThickness="{StaticResource klcBorderHairline}"
-                        CornerRadius="{StaticResource KlaRadiusCard}">
+                        CornerRadius="{StaticResource KlaRadiusButton}">
                         <ScrollViewer
                             CanContentScroll="True"
                             Focusable="False"
@@ -375,7 +338,8 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <!--  Window and shell: the shell template uses the close button, footer link and logo above, so it comes last  -->
+    
+    <!--  Window: [Enter Notes]  -->
     <Style x:Key="klcFdnWindow" TargetType="Window">
         <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
@@ -389,118 +353,4 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
     <!--  Tag is presentation metadata; Content/DataContext remain workflow-owned.  -->
-    <Style x:Key="klcWindowShell" TargetType="ContentControl">
-        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="VerticalContentAlignment" Value="Stretch" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ContentControl">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="{StaticResource klcChromeHeight}" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="{StaticResource klcChromeHeight}" />
-                        </Grid.RowDefinitions>
-                        <!--
-                            The body is declared first so keyboard order and initial focus start in the body, then Close, then the footer links;
-                            Grid.Row places it visually between the two chrome bands.
-                        -->
-                        <ContentPresenter
-                            x:Name="klcShell_Body"
-                            Grid.Row="1"
-                            Margin="{StaticResource klcBodyMargin}"
-                            Content="{TemplateBinding Content}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}" />
-                        <Grid x:Name="klcShell_Header" Grid.Row="0">
-
-                            <!--
-                                1. Center Layer: Sits across the full width of the header.
-                                Symmetrical margins (150 on both sides) create a safe bounding box
-                                so a long title will truncate via CharacterEllipsis before colliding with your elements.
-                            -->
-                            <TextBlock
-                                x:Name="klcHeader_title"
-                                Margin="110,0,110,0"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Panel.ZIndex="0"
-                                FontSize="{StaticResource klcHeaderTitleFontSize}"
-                                Text="{Binding Tag.Title, RelativeSource={RelativeSource TemplatedParent}}"
-                                TextAlignment="Center"
-                                TextTrimming="CharacterEllipsis" />
-
-                            <!--  2. Left Overlay: Logo fixed to the left edge  -->
-                            <ContentControl
-                                x:Name="klcHeader_logo"
-                                Width="{StaticResource klcLogoWidth}"
-                                Height="{StaticResource klcLogoHeight}"
-                                Margin="{StaticResource klcHeadFootMargin}"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Panel.ZIndex="1"
-                                ContentTemplate="{StaticResource klcLogo}"
-                                Focusable="False"
-                                IsHitTestVisible="False" />
-
-                            <!--  3. Right Overlay: Close Button fixed to the right edge  -->
-                            <Button
-                                x:Name="klcHeader_close"
-                                Margin="{StaticResource klcHeadFootMargin}"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Center"
-                                Panel.ZIndex="1"
-                                AutomationProperties.Name="Close window"
-                                Content="{DynamicResource CloseLabel}"
-                                Style="{StaticResource klcCloseButton}" />
-                        </Grid>
-                        <Grid x:Name="klcShell_Footer" Grid.Row="2">
-                            <!--
-                                1. Center Layer: Spans the full width of the footer row.
-                                Symmetrical margins (120px) ensure the version string truncates
-                                before it can ever visually collide with your links on the edges.
-                            -->
-                            <TextBlock
-                                x:Name="klcFooter_version"
-                                Margin="110,0,110,0"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Panel.ZIndex="0"
-                                AutomationProperties.Name="Tool version"
-                                FontSize="{StaticResource klcFooterVersionFontSize}"
-                                Foreground="{StaticResource klcFooterVersionColor}"
-                                Text="{Binding Tag.VersionText, RelativeSource={RelativeSource TemplatedParent}}"
-                                TextAlignment="Center"
-                                TextTrimming="CharacterEllipsis" />
-                            <!--  2. Left Layer: Prototype Link floated to the left edge  -->
-                            <TextBlock
-                                Margin="{StaticResource klcHeadFootMargin}"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center"
-                                Panel.ZIndex="1">
-                                <Hyperlink
-                                    x:Name="klcFooter_prototype"
-                                    NavigateUri="{StaticResource klcPrototypeUri}"
-                                    Style="{StaticResource klcFooterLink}">
-                                    <Run Text="Prototype" />
-                                </Hyperlink>
-                            </TextBlock>
-                            <!--  3. Right Layer: Outreach Link floated to the right edge  -->
-                            <TextBlock
-                                Margin="{StaticResource klcHeadFootMargin}"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Center"
-                                Panel.ZIndex="1">
-                                <Hyperlink
-                                    x:Name="klcFooter_outreach"
-                                    NavigateUri="{StaticResource klcOutreachUri}"
-                                    Style="{StaticResource klcFooterLink}">
-                                    <Run Text="Outreach" />
-                                </Hyperlink>
-                            </TextBlock>
-                        </Grid>
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 </ResourceDictionary>

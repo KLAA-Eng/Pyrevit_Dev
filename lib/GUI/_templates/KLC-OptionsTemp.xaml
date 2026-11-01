@@ -22,7 +22,7 @@
                         x:Name="options_prompt"
                         Margin="0,0,0,8"
                         Content="Configure Sample Options"
-                        Style="{StaticResource KlaFoundationPromptLabel}"
+                        Style="{StaticResource klcLabelPrompt}"
                         Target="{Binding ElementName=option_category}" />
                     <Border Style="{StaticResource KlaSection}">
                         <Grid x:Name="options_fields">
@@ -43,7 +43,7 @@
                             </Grid.RowDefinitions>
                             <Label
                                 Content="Category"
-                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Style="{StaticResource klcLabelCentered}"
                                 Target="{Binding ElementName=option_category}" />
                             <ComboBox
                                 x:Name="option_category"
@@ -53,7 +53,7 @@
                             <Label
                                 Grid.Row="2"
                                 Content="Scope"
-                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Style="{StaticResource klcLabelCentered}"
                                 Target="{Binding ElementName=scope_selected}" />
                             <RadioButton
                                 x:Name="scope_selected"
@@ -82,7 +82,7 @@
                             <Label
                                 Grid.Row="8"
                                 Content="Offset"
-                                Style="{StaticResource KlaCompactFieldLabel}"
+                                Style="{StaticResource klcLabelCentered}"
                                 Target="{Binding ElementName=option_offset}" />
                             <Grid Grid.Row="8" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
@@ -108,7 +108,7 @@
                         x:Name="output_prompt"
                         Margin="0,16,0,8"
                         Content="Output Location"
-                        Style="{StaticResource KlaFoundationPromptLabel}"
+                        Style="{StaticResource klcLabelPrompt}"
                         Target="{Binding ElementName=option_path}" />
                     <Border Style="{StaticResource KlaSection}">
                         <Grid>

@@ -121,7 +121,7 @@ class WindowBackgroundTests(unittest.TestCase):
             self.assertIn('x:Name="window_shell"', xaml, relative_path)
             self.assertIn('Style="{StaticResource klcWindowShell}"', xaml, relative_path)
             self.assertNotIn('x:Name="main_title"', xaml, relative_path)
-        with open(os.path.join(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeFoundation.xaml'), encoding='utf-8') as stream:
+        with open(os.path.join(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeComponents.xaml'), encoding='utf-8') as stream:
             shell = stream.read()
         self.assertIn('Width="{StaticResource klcLogoWidth}"', shell)
         self.assertIn('Height="{StaticResource klcLogoHeight}"', shell)

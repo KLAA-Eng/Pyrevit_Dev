@@ -104,7 +104,7 @@ internal static class Program
                 FrameworkElement parent = (FrameworkElement)choices[0].Parent;
                 double first = choices[0].TranslatePoint(new Point(0, 0), parent).X;
                 double second = choices[1].TranslatePoint(new Point(0, 0), parent).X;
-                Require(Math.Abs(second - first - choices[0].ActualWidth - ((Thickness)window.FindResource("KlaPairGap")).Right) < 0.1,
+                Require(Math.Abs(second - first - choices[0].ActualWidth - ((Thickness)window.FindResource("KlaPairGap")).Left) < 0.1,
                     group + " related-choice gap");
             }
             Button favorite = (Button)window.FindName("FavoriteButton");
