@@ -7,18 +7,18 @@
     MinWidth="760"
     MinHeight="500"
     ResizeMode="CanResizeWithGrip"
-    Style="{StaticResource KlaFoundationWindow}"
+    Style="{StaticResource klcFdnWindow}"
     WindowStartupLocation="CenterScreen">
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
-                <RowDefinition Height="{StaticResource KlaFilterRow}" />
-                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
-                <RowDefinition Height="{StaticResource KlaControlRow}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                <RowDefinition Height="{StaticResource klcBodyRowLarge}" />
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -53,7 +53,7 @@
                     SelectionChanged="review_selection_changed"
                     SelectionMode="Single"
                     SelectionUnit="FullRow"
-                    Style="{StaticResource KlaDataGrid}">
+                    Style="{StaticResource xDataGrid}">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Width="40" Header="Use">
                             <DataGridTemplateColumn.CellTemplate>
@@ -72,29 +72,29 @@
                             Width="2*"
                             MinWidth="140"
                             Binding="{Binding Name}"
-                            ElementStyle="{StaticResource KlaDataGridText}"
+                            ElementStyle="{StaticResource xDataGridText}"
                             Header="Name"
                             IsReadOnly="True" />
                         <DataGridTemplateColumn
                             Width="100"
-                            CellStyle="{StaticResource KlaDataGridStatusCell}"
+                            CellStyle="{StaticResource xDataGridStatusCell}"
                             Header="Status">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Border>
                                         <Border.Style>
-                                            <Style BasedOn="{StaticResource KlaStatusReady}" TargetType="Border">
+                                            <Style BasedOn="{StaticResource xStatusReady}" TargetType="Border">
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Status}" Value="Warning">
-                                                        <Setter Property="BorderBrush" Value="{StaticResource KlaWarningBrush}" />
+                                                        <Setter Property="BorderBrush" Value="{StaticResource klcWarningColor}" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Status}" Value="Blocked">
-                                                        <Setter Property="BorderBrush" Value="{StaticResource KlaErrorBrush}" />
+                                                        <Setter Property="BorderBrush" Value="{StaticResource klcErrorColor}" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
-                                        <TextBlock Style="{StaticResource KlaStatusText}" Text="{Binding Status}" />
+                                        <TextBlock Style="{StaticResource xStatusText}" Text="{Binding Status}" />
                                     </Border>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -103,7 +103,7 @@
                             Width="3*"
                             MinWidth="180"
                             Binding="{Binding Detail}"
-                            ElementStyle="{StaticResource KlaDataGridText}"
+                            ElementStyle="{StaticResource xDataGridText}"
                             Header="Detail"
                             IsReadOnly="True" />
                     </DataGrid.Columns>
@@ -115,12 +115,12 @@
                     VerticalAlignment="Stretch"
                     ResizeBehavior="PreviousAndNext"
                     ResizeDirection="Columns"
-                    Style="{StaticResource KlaSplitter}" />
+                    Style="{StaticResource xSplitter}" />
                 <Border Grid.Column="2" Style="{StaticResource KlaSection}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Label
@@ -147,14 +147,14 @@
                     HorizontalAlignment="Left"
                     Click="review_check_all"
                     Content="Check All"
-                    Style="{StaticResource KlaSecondaryButton}" />
+                    Style="{StaticResource KlaButtonSecondary}" />
                 <Button
                     x:Name="primary_action"
                     HorizontalAlignment="Right"
                     Click="apply_review"
                     Content="Apply Checked"
                     IsDefault="True"
-                    Style="{StaticResource KlaFoundationMainButton}" />
+                    Style="{StaticResource klcButtonDouble}" />
             </Grid>
         </Grid>
     </ContentControl>

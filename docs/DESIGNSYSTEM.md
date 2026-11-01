@@ -59,7 +59,7 @@ palette does not define an orange brush.
 | KLOrange | `#FF8000` | Orange ribbon artwork and default DevSandbox prototype icon |
 
 The footer restores its original green links and gray version text through
-dedicated roles. Other muted GUI text uses `#B5C2BD` (`xTextMutedBrush`).
+dedicated roles. Other muted GUI text uses `#B5C2BD` (`KlaMutedBrush`).
 Use the footer roles for footer text.
 
 ## GUI colors and resource keys
@@ -74,7 +74,7 @@ compiled WPF.
 | --- | --- | --- |
 | `klcWindowColor` | `#1A252B` | Window/chrome surface, fields and lists |
 | `klcTextColor` | `#E5E4E2` | Body text, labels, ordinary icon stroke; footer hover |
-| `xTextMutedBrush` | `#B5C2BD` | Secondary captions |
+| `KlaMutedBrush` | `#B5C2BD` | Secondary captions |
 | `klcFooterLinkColor` | `#407058` | Prototype and Outreach footer links at rest |
 | `klcFooterVersionColor` | `#808080` | Centered caller-version footer text |
 | `KlaPlaceholderBrush` | `#808080` | Placeholder text: the Text entry watermark and the Command Switch search hint. The same gray as the footer version by owner decision; a test keeps them equal |
@@ -123,10 +123,9 @@ There are no brush aliases. The palette's 2019 aliases (`header_background`,
 aliases in Components (`KlaPanelBrush`, `KlaMutedTextBrush`, `KlaSubtleTextBrush`,
 `KlaBlockingBrush`) were removed on 2026-10-31; every window names the role
 brushes above, and the C# contract and smoke tests keep them gone. Some role
-brushes share a value by design and stay separate roles: `xTextMutedBrush`
-and `KlaMutedBrush`, `klcFooterLinkColor` and `KlaAccentHoverBrush`,
-`KlaAccentBrush` and `KlaBorderStrongBrush`, `klcFooterVersionColor` and
-`KlaPlaceholderBrush`. Change a role's value only for that role.
+brushes share a value by design and stay separate roles: `klcFooterLinkColor`
+and `KlaAccentHoverBrush`, `KlaAccentBrush` and `KlaBorderStrongBrush`,
+`klcFooterVersionColor` and `KlaPlaceholderBrush`. Change a role's value only for that role.
 
 `Kla*Style` names in the [compiled adapter](../src/KLCode.Wpf/Resources/KLCodeControls.xaml)
 are compatibility styles based on the same shared controls. They do not define
@@ -394,7 +393,7 @@ control sizes require different resource types.
 | Resource | Type | Value / use |
 | --- | --- | --- |
 | `klcBodySpaceSmall`, `klcBodySpaceNormal`, `klcBodySpaceLarge` | GridLength | Existing spacer rows/columns: 4, 8 and 16 |
-| `klcChromeHeight`, `klcBodyRowLarge`, `xCompactRow`, `KlaFilterRow` | GridLength | Rows of 24, 32, 28 and 24 respectively |
+| `klcChromeHeight`, `klcBodyRowLarge`, `xCompactRow`, `klcBodyRowNormal` | GridLength | Rows of 24, 32, 28 and 24 respectively |
 | `klcBodyRowNormal` | GridLength | Compact naming row, 24 |
 | `KlaCompactFieldLabelColumn`, `KlaCompactFieldInputColumn` | GridLength | Naming columns, 60 and 240 |
 | `KlaPairGap` | Thickness | `0,0,8,0`, between related horizontal controls |
@@ -413,7 +412,7 @@ control sizes require different resource types.
 | `KlaRenameLabelColumn` | GridLength | 52, the KLC-Rename label column |
 | `klcIconSizeMessage`, `klcMessageHeaderFontSize`, `KlaSubheadingFontSize` | Double | 32, 22 and 16: dialog severity icon, severity heading, command link and switch prompt |
 | `KlaDetailsHeight`, `KlaOptionMaxHeight`, `KlaCommandLinkMinHeight`, `KlaSwitchPromptMaxWidth` | Double | 128, 80, 40 and 180 |
-| `KlaControlHeight`, `KlaCompactHeight`, `KlaCompactFieldHeight` | Double | Control heights of 32, 28 and 24 |
+| `KlaControlHeight`, `klcButtonHeight`, `KlaCompactFieldHeight` | Double | Control heights of 32, 28 and 24 |
 
 `KlaGridSpace12` and `KlaGridSpace24` are not currently defined. If a new shared
 layout needs one, add a correctly typed token and verify its consumers. Do not

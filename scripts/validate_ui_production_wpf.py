@@ -69,7 +69,7 @@ def assert_recall_captions(window, locale):
         assert button.Content.DesiredSize.Width <= available + 0.1, (locale, button.Name, 'icon/text clipped', button.Content.DesiredSize.Width, available)
         position = button.TranslatePoint(Point(0, 0), window.window_body)
         assert position.X >= -0.1 and position.X + button.ActualWidth <= window.window_body.ActualWidth + 0.1, (locale, button.Name, 'button exceeds body')
-        assert button.ActualWidth == window.FindResource('xxIconTextButtonWidth') and button.ActualHeight == window.FindResource('KlaCompactHeight'), (locale, button.Name, 'icon/text role')
+        assert button.ActualWidth == window.FindResource('xxIconTextButtonWidth') and button.ActualHeight == window.FindResource('klcButtonHeight'), (locale, button.Name, 'icon/text role')
         count += 1
     assert count == 4, (locale, count)
     last = recall.pasteSelBtn.TranslatePoint(Point(0, recall.pasteSelBtn.ActualHeight), window.window_shell).Y

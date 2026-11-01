@@ -1,78 +1,308 @@
-﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="View Range Editor" Width="760" MinWidth="760" MinHeight="340" MaxHeight="600"
-        SizeToContent="Height" WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip"
-        Style="{StaticResource KlaFoundationWindow}">
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="View Range Editor"
+    Width="760"
+    MinWidth="760"
+    MinHeight="340"
+    MaxHeight="600"
+    ResizeMode="CanResizeWithGrip"
+    SizeToContent="Height"
+    Style="{StaticResource klcFdnWindow}"
+    WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <Style x:Key="ViewRangeTableHeader" TargetType="TextBlock" BasedOn="{StaticResource KlaSectionHeading}">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="TextAlignment" Value="Center"/>
+        <Style
+            x:Key="ViewRangeTableHeader"
+            BasedOn="{StaticResource KlaSectionHeading}"
+            TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="TextAlignment" Value="Center" />
         </Style>
-        <Style x:Key="ViewRangeTableCell" TargetType="TextBlock" BasedOn="{StaticResource KlaInfoText}">
-            <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}"/>
-            <Setter Property="TextWrapping" Value="NoWrap"/>
-            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="TextAlignment" Value="Center"/>
+        <Style
+            x:Key="ViewRangeTableCell"
+            BasedOn="{StaticResource KlaInfoText}"
+            TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+            <Setter Property="TextWrapping" Value="NoWrap" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="TextAlignment" Value="Center" />
         </Style>
     </Window.Resources>
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
-            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="8"/><RowDefinition Height="*"/><RowDefinition Height="8"/><RowDefinition Height="32"/></Grid.RowDefinitions>
-            <ScrollViewer x:Name="view_message_scroll" MinHeight="40" MaxHeight="96"
-                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                          Focusable="True" AutomationProperties.Name="View range instructions">
-                <TextBlock Text="{Binding message}" TextWrapping="Wrap" Style="{StaticResource KlaInfoText}"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="32" />
+            </Grid.RowDefinitions>
+            <ScrollViewer
+                x:Name="view_message_scroll"
+                MinHeight="40"
+                MaxHeight="96"
+                AutomationProperties.Name="View range instructions"
+                Focusable="True"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <TextBlock
+                    Style="{StaticResource KlaInfoText}"
+                    Text="{Binding message}"
+                    TextWrapping="Wrap" />
             </ScrollViewer>
-            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <ScrollViewer
+                Grid.Row="2"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
                 <StackPanel>
                     <Grid x:Name="grid_main" HorizontalAlignment="Center">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20"/><ColumnDefinition Width="110"/><ColumnDefinition Width="250"/><ColumnDefinition Width="130"/><ColumnDefinition Width="180"/>
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="250" />
+                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition Width="180" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="32"/><RowDefinition Height="32"/><RowDefinition Height="32"/><RowDefinition Height="32"/><RowDefinition Height="32"/>
+                            <RowDefinition Height="32" />
+                            <RowDefinition Height="32" />
+                            <RowDefinition Height="32" />
+                            <RowDefinition Height="32" />
+                            <RowDefinition Height="32" />
                         </Grid.RowDefinitions>
-                        <Rectangle Grid.Row="0" Grid.ColumnSpan="5" Fill="{StaticResource KlaBorderStrongBrush}" RadiusX="5" RadiusY="5"/>
-                        <TextBlock Grid.Column="1" Text="Plane" Style="{StaticResource ViewRangeTableHeader}"/>
-                        <TextBlock Grid.Column="2" Text="Elevation - ft" Style="{StaticResource ViewRangeTableHeader}"/>
-                        <TextBlock Grid.Column="3" Text="Level Offset" Style="{StaticResource ViewRangeTableHeader}"/>
-                        <TextBlock Grid.Column="4" Text="Level" Style="{StaticResource ViewRangeTableHeader}"/>
+                        <Rectangle
+                            Grid.Row="0"
+                            Grid.ColumnSpan="5"
+                            Fill="{StaticResource KlaBorderStrongBrush}"
+                            RadiusX="5"
+                            RadiusY="5" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource ViewRangeTableHeader}"
+                            Text="Plane" />
+                        <TextBlock
+                            Grid.Column="2"
+                            Style="{StaticResource ViewRangeTableHeader}"
+                            Text="Elevation - ft" />
+                        <TextBlock
+                            Grid.Column="3"
+                            Style="{StaticResource ViewRangeTableHeader}"
+                            Text="Level Offset" />
+                        <TextBlock
+                            Grid.Column="4"
+                            Style="{StaticResource ViewRangeTableHeader}"
+                            Text="Level" />
 
-                        <Rectangle Grid.Row="1" Width="5" Height="20" VerticalAlignment="Center" Fill="{Binding topplane_brush}" RadiusX="3" RadiusY="3"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="Top Plane" Style="{StaticResource ViewRangeTableCell}" HorizontalAlignment="Left" Margin="4,0"/>
-                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding topplane_elevation}" Style="{StaticResource ViewRangeTableCell}"/>
-                        <TextBox x:Name="topplane_input" Grid.Row="1" Grid.Column="3" Text="{Binding topplane_new_value, UpdateSourceTrigger=PropertyChanged}" Width="104" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Style="{StaticResource KlaCompactFieldInput}" IsEnabled="{Binding can_modify_view}" AutomationProperties.Name="Top plane level offset"/>
-                        <ComboBox x:Name="topplane_level_combo" Grid.Row="1" Grid.Column="4" ItemsSource="{Binding available_levels}" SelectedValue="{Binding topplane_level_id, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="IdValue" Width="170" HorizontalAlignment="Center" Style="{StaticResource KlaCompactComboBox}" IsEnabled="{Binding can_modify_view}" AutomationProperties.Name="Top plane level"/>
+                        <Rectangle
+                            Grid.Row="1"
+                            Width="5"
+                            Height="20"
+                            VerticalAlignment="Center"
+                            Fill="{Binding topplane_brush}"
+                            RadiusX="3"
+                            RadiusY="3" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="4,0"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource ViewRangeTableCell}"
+                            Text="Top Plane" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            Style="{StaticResource ViewRangeTableCell}"
+                            Text="{Binding topplane_elevation}" />
+                        <TextBox
+                            x:Name="topplane_input"
+                            Grid.Row="1"
+                            Grid.Column="3"
+                            Width="104"
+                            HorizontalAlignment="Center"
+                            HorizontalContentAlignment="Right"
+                            AutomationProperties.Name="Top plane level offset"
+                            IsEnabled="{Binding can_modify_view}"
+                            Style="{StaticResource KlaCompactFieldInput}"
+                            Text="{Binding topplane_new_value, UpdateSourceTrigger=PropertyChanged}" />
+                        <ComboBox
+                            x:Name="topplane_level_combo"
+                            Grid.Row="1"
+                            Grid.Column="4"
+                            Width="170"
+                            HorizontalAlignment="Center"
+                            AutomationProperties.Name="Top plane level"
+                            DisplayMemberPath="Name"
+                            IsEnabled="{Binding can_modify_view}"
+                            ItemsSource="{Binding available_levels}"
+                            SelectedValue="{Binding topplane_level_id, Mode=TwoWay}"
+                            SelectedValuePath="IdValue"
+                            Style="{StaticResource KlaCompactComboBox}" />
 
-                        <Rectangle Grid.Row="2" Width="5" Height="20" VerticalAlignment="Center" Fill="{Binding cutplane_brush}" RadiusX="3" RadiusY="3"/>
-                        <TextBlock Grid.Row="2" Grid.Column="1" Text="Cut Plane" Style="{StaticResource ViewRangeTableCell}" HorizontalAlignment="Left" Margin="4,0"/>
-                        <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding cutplane_elevation}" Style="{StaticResource ViewRangeTableCell}"/>
-                        <TextBox x:Name="cutplane_input" Grid.Row="2" Grid.Column="3" Text="{Binding cutplane_new_value, UpdateSourceTrigger=PropertyChanged}" Width="104" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Style="{StaticResource KlaCompactFieldInput}" IsEnabled="{Binding can_modify_view}" AutomationProperties.Name="Cut plane level offset"/>
-                        <TextBlock Grid.Row="2" Grid.Column="4" Text="{Binding cutplane_level_name}" Style="{StaticResource ViewRangeTableCell}" FontStyle="Italic"/>
+                        <Rectangle
+                            Grid.Row="2"
+                            Width="5"
+                            Height="20"
+                            VerticalAlignment="Center"
+                            Fill="{Binding cutplane_brush}"
+                            RadiusX="3"
+                            RadiusY="3" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Margin="4,0"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource ViewRangeTableCell}"
+                            Text="Cut Plane" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Style="{StaticResource ViewRangeTableCell}"
+                            Text="{Binding cutplane_elevation}" />
+                        <TextBox
+                            x:Name="cutplane_input"
+                            Grid.Row="2"
+                            Grid.Column="3"
+                            Width="104"
+                            HorizontalAlignment="Center"
+                            HorizontalContentAlignment="Right"
+                            AutomationProperties.Name="Cut plane level offset"
+                            IsEnabled="{Binding can_modify_view}"
+                            Style="{StaticResource KlaCompactFieldInput}"
+                            Text="{Binding cutplane_new_value, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="4"
+                            FontStyle="Italic"
+                            Style="{StaticResource ViewRangeTableCell}"
+                            Text="{Binding cutplane_level_name}" />
 
-                        <Rectangle Grid.Row="3" Width="5" Height="20" VerticalAlignment="Center" Fill="{Binding bottomplane_brush}" RadiusX="3" RadiusY="3"/>
-                        <TextBlock Grid.Row="3" Grid.Column="1" Text="Bottom Plane" Style="{StaticResource ViewRangeTableCell}" HorizontalAlignment="Left" Margin="4,0"/>
-                        <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding bottomplane_elevation}" Style="{StaticResource ViewRangeTableCell}"/>
-                        <TextBox x:Name="bottomplane_input" Grid.Row="3" Grid.Column="3" Text="{Binding bottomplane_new_value, UpdateSourceTrigger=PropertyChanged}" Width="104" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Style="{StaticResource KlaCompactFieldInput}" IsEnabled="{Binding can_modify_view}" AutomationProperties.Name="Bottom plane level offset"/>
-                        <ComboBox x:Name="bottomplane_level_combo" Grid.Row="3" Grid.Column="4" ItemsSource="{Binding available_levels}" SelectedValue="{Binding bottomplane_level_id, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="IdValue" Width="170" HorizontalAlignment="Center" Style="{StaticResource KlaCompactComboBox}" IsEnabled="{Binding can_modify_view}" AutomationProperties.Name="Bottom plane level"/>
+                        <Rectangle
+                            Grid.Row="3"
+                            Width="5"
+                            Height="20"
+                            VerticalAlignment="Center"
+                            Fill="{Binding bottomplane_brush}"
+                            RadiusX="3"
+                            RadiusY="3" />
+                        <TextBlock
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Margin="4,0"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource ViewRangeTableCell}"
+                            Text="Bottom Plane" />
+                        <TextBlock
+                            Grid.Row="3"
+                            Grid.Column="2"
+                            Style="{StaticResource ViewRangeTableCell}"
+                            Text="{Binding bottomplane_elevation}" />
+                        <TextBox
+                            x:Name="bottomplane_input"
+                            Grid.Row="3"
+                            Grid.Column="3"
+                            Width="104"
+                            HorizontalAlignment="Center"
+                            HorizontalContentAlignment="Right"
+                            AutomationProperties.Name="Bottom plane level offset"
+                            IsEnabled="{Binding can_modify_view}"
+                            Style="{StaticResource KlaCompactFieldInput}"
+                            Text="{Binding bottomplane_new_value, UpdateSourceTrigger=PropertyChanged}" />
+                        <ComboBox
+                            x:Name="bottomplane_level_combo"
+                            Grid.Row="3"
+                            Grid.Column="4"
+                            Width="170"
+                            HorizontalAlignment="Center"
+                            AutomationProperties.Name="Bottom plane level"
+                            DisplayMemberPath="Name"
+                            IsEnabled="{Binding can_modify_view}"
+                            ItemsSource="{Binding available_levels}"
+                            SelectedValue="{Binding bottomplane_level_id, Mode=TwoWay}"
+                            SelectedValuePath="IdValue"
+                            Style="{StaticResource KlaCompactComboBox}" />
 
-                        <Rectangle Grid.Row="4" Width="5" Height="20" VerticalAlignment="Center" Fill="{Binding viewdepth_brush}" RadiusX="3" RadiusY="3"/>
-                        <TextBlock Grid.Row="4" Grid.Column="1" Text="View Depth" Style="{StaticResource ViewRangeTableCell}" HorizontalAlignment="Left" Margin="4,0"/>
-                        <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding viewdepth_elevation}" Style="{StaticResource ViewRangeTableCell}"/>
-                        <TextBox x:Name="viewdepth_input" Grid.Row="4" Grid.Column="3" Text="{Binding viewdepth_new_value, UpdateSourceTrigger=PropertyChanged}" Width="104" HorizontalAlignment="Center" HorizontalContentAlignment="Right" Style="{StaticResource KlaCompactFieldInput}" IsEnabled="{Binding can_modify_view}" AutomationProperties.Name="View depth level offset"/>
-                        <ComboBox x:Name="viewdepth_level_combo" Grid.Row="4" Grid.Column="4" ItemsSource="{Binding available_levels}" SelectedValue="{Binding viewdepth_level_id, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="IdValue" Width="170" HorizontalAlignment="Center" Style="{StaticResource KlaCompactComboBox}" IsEnabled="{Binding can_modify_view}" AutomationProperties.Name="View depth level"/>
+                        <Rectangle
+                            Grid.Row="4"
+                            Width="5"
+                            Height="20"
+                            VerticalAlignment="Center"
+                            Fill="{Binding viewdepth_brush}"
+                            RadiusX="3"
+                            RadiusY="3" />
+                        <TextBlock
+                            Grid.Row="4"
+                            Grid.Column="1"
+                            Margin="4,0"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource ViewRangeTableCell}"
+                            Text="View Depth" />
+                        <TextBlock
+                            Grid.Row="4"
+                            Grid.Column="2"
+                            Style="{StaticResource ViewRangeTableCell}"
+                            Text="{Binding viewdepth_elevation}" />
+                        <TextBox
+                            x:Name="viewdepth_input"
+                            Grid.Row="4"
+                            Grid.Column="3"
+                            Width="104"
+                            HorizontalAlignment="Center"
+                            HorizontalContentAlignment="Right"
+                            AutomationProperties.Name="View depth level offset"
+                            IsEnabled="{Binding can_modify_view}"
+                            Style="{StaticResource KlaCompactFieldInput}"
+                            Text="{Binding viewdepth_new_value, UpdateSourceTrigger=PropertyChanged}" />
+                        <ComboBox
+                            x:Name="viewdepth_level_combo"
+                            Grid.Row="4"
+                            Grid.Column="4"
+                            Width="170"
+                            HorizontalAlignment="Center"
+                            AutomationProperties.Name="View depth level"
+                            DisplayMemberPath="Name"
+                            IsEnabled="{Binding can_modify_view}"
+                            ItemsSource="{Binding available_levels}"
+                            SelectedValue="{Binding viewdepth_level_id, Mode=TwoWay}"
+                            SelectedValuePath="IdValue"
+                            Style="{StaticResource KlaCompactComboBox}" />
                     </Grid>
-                    <TextBlock x:Name="warning" Text="{Binding warning_message}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{StaticResource KlaWarningBrush}" AutomationProperties.LiveSetting="Polite">
-                        <TextBlock.Style><Style TargetType="TextBlock"><Style.Triggers><DataTrigger Binding="{Binding warning_message}" Value=""><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></TextBlock.Style>
+                    <TextBlock
+                        x:Name="warning"
+                        Margin="0,8,0,0"
+                        AutomationProperties.LiveSetting="Polite"
+                        Foreground="{StaticResource klcWarningColor}"
+                        Text="{Binding warning_message}"
+                        TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding warning_message}" Value="">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
                     </TextBlock>
                 </StackPanel>
             </ScrollViewer>
-            <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Apply Changes" Click="apply_changes_click" Style="{StaticResource KlaFoundationMainButton}" Margin="0,0,8,0" IsEnabled="{Binding can_modify_view}"/>
-                <Button Content="Reset" Click="reset_values_click" Style="{StaticResource KlaSecondaryButton}" ToolTip="Reset to original values"/>
+            <StackPanel
+                Grid.Row="4"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal">
+                <Button
+                    Margin="0,0,8,0"
+                    Click="apply_changes_click"
+                    Content="Apply Changes"
+                    IsEnabled="{Binding can_modify_view}"
+                    Style="{StaticResource klcButtonDouble}" />
+                <Button
+                    Click="reset_values_click"
+                    Content="Reset"
+                    Style="{StaticResource KlaButtonSecondary}"
+                    ToolTip="Reset to original values" />
             </StackPanel>
         </Grid>
     </ContentControl>

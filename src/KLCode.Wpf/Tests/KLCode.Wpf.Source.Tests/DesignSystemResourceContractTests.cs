@@ -11,7 +11,7 @@ public sealed class DesignSystemResourceContractTests
     {
         "klcWindowColor",
         "klcTextColor",
-        "xTextMutedBrush",
+        "KlaMutedBrush",
         "klcFooterLinkColor",
         "klcFooterVersionColor",
         "KlaPlaceholderBrush",

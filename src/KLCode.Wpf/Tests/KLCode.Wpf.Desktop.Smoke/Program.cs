@@ -120,7 +120,7 @@ internal static class Program
             if (HasCollapsedAncestor(button)) continue;
             if ((string)button.Content == "Close") continue;
             double buttonWidth = (double)window.FindResource("klcButtonWidth"), mainWidth = (double)window.FindResource("klcDoubleButtonWidth");
-            double compactHeight = (double)window.FindResource("KlaCompactHeight"), controlHeight = (double)window.FindResource("KlaControlHeight");
+            double compactHeight = (double)window.FindResource("klcButtonHeight"), controlHeight = (double)window.FindResource("KlaControlHeight");
             Require(button.ActualWidth == buttonWidth || button.ActualWidth == mainWidth,
                 identity + " button width: " + button.Content + " = " + button.ActualWidth);
             Require(button.ActualHeight == compactHeight || button.ActualHeight == controlHeight,

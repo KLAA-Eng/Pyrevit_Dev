@@ -8,9 +8,9 @@
     MinHeight="0"
     MaxHeight="560"
     ResizeMode="CanResizeWithGrip"
-    Style="{StaticResource KlaWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid
             x:Name="window_body"
             FocusVisualStyle="{x:Null}"
@@ -39,7 +39,7 @@
                             Margin="{StaticResource KlaOpticalTextInset}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            FontSize="{StaticResource KlaTextPromptInputFontSize}"
+                            FontSize="{StaticResource klcTextDialogFontSize}"
                             FontWeight="Bold"
                             Foreground="{StaticResource KlaPlaceholderBrush}"
                             IsHitTestVisible="False"
@@ -64,9 +64,9 @@
                     </Grid>
                     <TextBlock
                         x:Name="validation_text"
-                        Margin="{StaticResource KlaStackGap}"
+                        Margin="{StaticResource KlaStackGapAbove}"
                         AutomationProperties.LiveSetting="Polite"
-                        Foreground="{StaticResource KlaErrorBrush}"
+                        Foreground="{StaticResource klcErrorColor}"
                         TextWrapping="Wrap"
                         Visibility="Collapsed" />
                 </StackPanel>

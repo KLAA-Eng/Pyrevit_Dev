@@ -146,7 +146,7 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
         assert window.FontSize == token('klcBodyFontSize') and chrome.title.FontSize == token('klcHeaderTitleFontSize')
         assert window.accept_button.ActualWidth == token('klcDoubleButtonWidth') and window.accept_button.ActualHeight == token('KlaControlHeight')
         buttons = list(window.batch_actions.Children)
-        assert all(button.ActualWidth == token('klcButtonWidth') and button.ActualHeight == token('KlaCompactHeight') for button in buttons)
+        assert all(button.ActualWidth == token('klcButtonWidth') and button.ActualHeight == token('klcButtonHeight') for button in buttons)
         assert all(button.Background == token('KlaComponentSurfaceBrush') for button in buttons)
         body_origin = window.window_body.TranslatePoint(Point(0, 0), shell)
         assert body_origin.X == inset.Left and body_origin.Y == chrome_row + inset.Top
@@ -154,7 +154,7 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
         second = buttons[1].TranslatePoint(Point(0, 0), shell)
         main = window.accept_button.TranslatePoint(Point(0, 0), shell)
         assert second.X - first.X - token('klcButtonWidth') == pair_gap
-        assert main.X == first.X and main.Y - first.Y - token('KlaCompactHeight') == token('klcBodySpaceNormal').Value
+        assert main.X == first.X and main.Y - first.Y - token('klcButtonHeight') == token('klcBodySpaceNormal').Value
         assert chrome.footer.TranslatePoint(Point(0, 0), shell).Y - main.Y - token('KlaControlHeight') == inset.Bottom
         assert window.window_body.IsEnabled == (state != 'Disabled') and chrome.close_button.IsEnabled
         if state == 'Long content':

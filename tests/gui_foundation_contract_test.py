@@ -35,13 +35,17 @@ def _style(root, key):
 
 
 class FoundationTemplateContracts(unittest.TestCase):
-    def test_scrollbar_style_has_a_horizontal_template_with_an_unreversed_track(self):
+    def test_scrollbar_template_unreverses_its_track_when_horizontal(self):
         root = _root('KLCodeFoundation.xaml')
         bar = next(s for s in root.iter(P + 'Style') if s.attrib.get('TargetType') == 'ScrollBar')
-        tracks = {t.attrib.get('IsDirectionReversed') for t in bar.iter(P + 'Track')}
-        self.assertEqual({'true', 'false'}, tracks)
+        # One template serves both orientations: the vertical Track is reversed, the Horizontal trigger flips it back.
+        tracks = [t.attrib.get('IsDirectionReversed') for t in bar.iter(P + 'Track')]
+        self.assertEqual(['true'], tracks)
         triggers = [t for t in bar.iter(P + 'Trigger') if t.attrib.get('Property') == 'Orientation']
         self.assertEqual(['Horizontal'], [t.attrib.get('Value') for t in triggers])
+        flips = [(s.attrib.get('TargetName'), s.attrib.get('Property'), s.attrib.get('Value'))
+                 for s in triggers[0].iter(P + 'Setter')]
+        self.assertEqual([('PART_Track', 'IsDirectionReversed', 'false')], flips)
         # Inspect the scrollbar style alone: the shell template later in the file uses Grid.Row legitimately.
         self.assertEqual([], [node for node in bar.iter() if 'Grid.Row' in node.attrib])
 

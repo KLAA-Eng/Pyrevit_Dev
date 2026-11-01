@@ -3,13 +3,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Select Items"
     Width="432"
-    Height="576"
+    Height="512"
     MinWidth="432"
     MinHeight="420"
     ResizeMode="CanResizeWithGrip"
-    Style="{StaticResource KlaWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid
             x:Name="window_body"
             FocusVisualStyle="{x:Null}"
@@ -17,20 +17,20 @@
             KeyboardNavigation.IsTabStop="False">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="{StaticResource KlaGridSpace4}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition x:Name="secondary_gap" Height="{StaticResource KlaGridSpace8}" />
-                <RowDefinition Height="{StaticResource KlaControlRow}" />
+                <RowDefinition x:Name="secondary_gap" Height="{StaticResource klcBodySpaceNormal}" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <StackPanel>
                 <Grid x:Name="search_row">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{StaticResource KlaGridSpace16}" />
-                        <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                        <ColumnDefinition Width="{StaticResource klcBodySpaceLarge}" />
+                        <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <ContentControl
@@ -45,10 +45,10 @@
                         Style="{StaticResource KlaFilter}"
                         TextChanged="filter_changed" />
                 </Grid>
-                <Grid x:Name="group_row" Margin="{StaticResource KlaStackGap}">
+                <Grid x:Name="group_row" Margin="{StaticResource KlaStackGapAbove}">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{StaticResource KlaGridSpace16}" />
-                        <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                        <ColumnDefinition Width="{StaticResource klcBodySpaceLarge}" />
+                        <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <ContentControl
@@ -94,7 +94,7 @@
                 <TextBlock
                     x:Name="validation_text"
                     AutomationProperties.LiveSetting="Polite"
-                    Foreground="{StaticResource KlaErrorBrush}"
+                    Foreground="{StaticResource klcErrorColor}"
                     TextWrapping="Wrap"
                     Visibility="Collapsed" />
                 <StackPanel
@@ -117,7 +117,7 @@
                 Grid.Row="8"
                 Click="accept_selection"
                 Content="Select"
-                Style="{StaticResource KlaButtonPrimary}" />
+                Style="{StaticResource klcButtonDouble}" />
         </Grid>
     </ContentControl>
 </Window>

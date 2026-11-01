@@ -3,27 +3,66 @@
         <ResourceDictionary Source="KLCodeFoundation.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <!--
+        Role-named styles the windows and dialogs apply, grouped by control family with each base before the styles that
+        derive from it. The KlaFoundation* keys in KLCodeFoundation.xaml stay for existing consumers; new XAML uses the
+        names here. The implicit TextBox / ComboBox / CheckBox styles apply in both hosts (Python and compiled C#).
+    -->
+
+    <!--  Window  -->
+    <Style
+        x:Key="klcWindow"
+        BasedOn="{StaticResource klcFdnWindow}"
+        TargetType="Window" />
+    <!--  A frameless floating panel such as the Command Switch: the window is transparent and its panel draws the surface.  -->
+    <Style
+        x:Key="KlaFloatingWindow"
+        BasedOn="{StaticResource klcFdnWindow}"
+        TargetType="Window">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="ShowInTaskbar" Value="False" />
+    </Style>
+
+    <!--  Section, banner and text  -->
     <Style x:Key="KlaSection" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource KlaWindowBrush}" />
+        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
         <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
-        <Setter Property="BorderThickness" Value="{StaticResource KlaHairline}" />
+        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
         <Setter Property="CornerRadius" Value="{StaticResource KlaRadiusCard}" />
         <Setter Property="Padding" Value="{StaticResource KlaSectionPadding}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
+    <Style
+        x:Key="KlaBanner"
+        BasedOn="{StaticResource KlaSection}"
+        TargetType="Border">
+        <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
+    </Style>
     <Style x:Key="KlaSectionHeading" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaTitleFontSize}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+        <Setter Property="FontSize" Value="{StaticResource klcSectionTitleFontSize}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
-    <Style
-        x:Key="KlaPromptText"
-        BasedOn="{StaticResource KlaSectionHeading}"
-        TargetType="TextBlock">
-        <Setter Property="FontWeight" Value="Normal" />
+    <Style x:Key="KlaInfoText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
+        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
+    <Style
+        x:Key="KlaDialogDescription"
+        BasedOn="{StaticResource KlaInfoText}"
+        TargetType="TextBlock">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  Labels  -->
     <Style
         x:Key="KlaFieldLabel"
         BasedOn="{StaticResource KlaFoundationLabel}"
@@ -35,73 +74,38 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     <Style
+        x:Key="KlaPromptLabel"
+        BasedOn="{StaticResource KlaFoundationPromptLabel}"
+        TargetType="Label" />
+
+    <!--  Inputs and readouts  -->
+    <Style
+        x:Key="KlaInput"
+        BasedOn="{StaticResource KlaFoundationInput}"
+        TargetType="TextBox" />
+    <Style
         x:Key="KlaCompactFieldInput"
         BasedOn="{StaticResource KlaFoundationInput}"
         TargetType="TextBox">
         <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}" />
     </Style>
-    <!--
-        UIElement items remain their own containers. Names and event handlers
-        stay in the window's namescope; only the repeated layout is shared.
-    -->
-    <Style x:Key="KlaFieldRows" TargetType="ItemsControl">
-        <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="ItemsPanel">
-            <Setter.Value>
-                <ItemsPanelTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}" />
-                            <ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="{StaticResource KlaCompactFieldRow}" />
-                            <RowDefinition Height="{StaticResource KlaGridSpace8}" />
-                            <RowDefinition Height="{StaticResource KlaCompactFieldRow}" />
-                            <RowDefinition Height="{StaticResource KlaGridSpace8}" />
-                            <RowDefinition Height="{StaticResource KlaCompactFieldRow}" />
-                            <RowDefinition Height="{StaticResource KlaGridSpace8}" />
-                            <RowDefinition Height="{StaticResource KlaCompactFieldRow}" />
-                        </Grid.RowDefinitions>
-                    </Grid>
-                </ItemsPanelTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <Style x:Key="KlaFilteredCheckList" TargetType="ItemsControl">
-        <Setter Property="ItemsPanel">
-            <Setter.Value>
-                <ItemsPanelTemplate>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="{StaticResource KlaFilterRow}" />
-                            <RowDefinition Height="{StaticResource KlaGridSpace8}" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="{StaticResource KlaGridSpace4}" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="{StaticResource KlaGridSpace8}" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="{StaticResource KlaGridSpace8}" />
-                            <RowDefinition Height="{StaticResource KlaControlRow}" />
-                        </Grid.RowDefinitions>
-                    </Grid>
-                </ItemsPanelTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <Style x:Key="KlaInfoText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-    </Style>
     <Style
-        x:Key="KlaReadOnlyField"
-        BasedOn="{StaticResource KlaFoundationInput}"
+        x:Key="KlaInputCompact"
+        BasedOn="{StaticResource KlaCompactFieldInput}"
+        TargetType="TextBox" />
+    <Style
+        x:Key="KlaFilter"
+        BasedOn="{StaticResource KlaFoundationFilter}"
+        TargetType="TextBox" />
+    <!--  Opt-in rows for the reusable dialogs; existing tool lists are unaffected.  -->
+    <Style
+        x:Key="KlaTextPromptInput"
+        BasedOn="{StaticResource KlaInput}"
         TargetType="TextBox">
-        <Setter Property="IsReadOnly" Value="True" />
-        <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
-        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Height" Value="{StaticResource KlaTextPromptInputHeight}" />
+        <Setter Property="FontSize" Value="{StaticResource klcTextDialogFontSize}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="TextAlignment" Value="Center" />
     </Style>
     <Style
         x:Key="KlaMultilineReadout"
@@ -120,16 +124,10 @@
         <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
     </Style>
 
-    <Style
-        x:Key="KlaCompactReadOnlyField"
-        BasedOn="{StaticResource KlaReadOnlyField}"
-        TargetType="TextBox">
-        <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}" />
-    </Style>
-
+    <!--  Dropdowns: item, dropdown, compact dropdown  -->
     <Style x:Key="KlaComboBoxItem" TargetType="ComboBoxItem">
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Setter Property="Background" Value="{StaticResource KlaWindowBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
         <Setter Property="Padding" Value="{StaticResource KlaCompactInset}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Template">
@@ -140,7 +138,7 @@
                         Padding="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
                         BorderBrush="Transparent"
-                        BorderThickness="{StaticResource KlaHairline}">
+                        BorderThickness="{StaticResource klcBorderHairline}">
                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -162,14 +160,14 @@
         </Setter>
     </Style>
     <Style x:Key="KlaComboBox" TargetType="ComboBox">
-        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
+        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
         <Setter Property="Height" Value="{StaticResource KlaControlHeight}" />
-        <Setter Property="MinWidth" Value="{StaticResource KlaButtonWidth}" />
+        <Setter Property="MinWidth" Value="{StaticResource klcButtonWidth}" />
         <Setter Property="MaxDropDownHeight" Value="{StaticResource KlaDropDownMaxHeight}" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Setter Property="Background" Value="{StaticResource KlaWindowBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource KlaBorderBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+        <Setter Property="BorderBrush" Value="{StaticResource klcBorderColor}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource KlaComboBoxItem}" />
         <Setter Property="Template">
@@ -190,7 +188,7 @@
                                         x:Name="DropDownBorder"
                                         Background="{TemplateBinding Background}"
                                         BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="{StaticResource KlaHairline}"
+                                        BorderThickness="{StaticResource klcBorderHairline}"
                                         CornerRadius="{StaticResource KlaRadiusControl}">
                                         <Path
                                             Margin="{StaticResource KlaComboArrowInset}"
@@ -224,7 +222,7 @@
                         <Border
                             x:Name="ComboFocus"
                             BorderBrush="Transparent"
-                            BorderThickness="{StaticResource KlaHairline}"
+                            BorderThickness="{StaticResource klcBorderHairline}"
                             CornerRadius="{StaticResource KlaRadiusControl}"
                             IsHitTestVisible="False" />
                         <Popup
@@ -236,9 +234,9 @@
                             <Border
                                 MinWidth="{TemplateBinding ActualWidth}"
                                 MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                                Background="{StaticResource KlaWindowBrush}"
-                                BorderBrush="{StaticResource KlaBorderBrush}"
-                                BorderThickness="{StaticResource KlaHairline}">
+                                Background="{StaticResource klcWindowColor}"
+                                BorderBrush="{StaticResource klcBorderColor}"
+                                BorderThickness="{StaticResource klcBorderHairline}">
                                 <ScrollViewer
                                     CanContentScroll="True"
                                     HorizontalScrollBarVisibility="Disabled"
@@ -261,7 +259,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-
     <Style
         x:Key="KlaCompactComboBox"
         BasedOn="{StaticResource KlaComboBox}"
@@ -269,452 +266,11 @@
         <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}" />
     </Style>
 
-    <Style x:Key="KlaRadioButton" TargetType="RadioButton">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
-        <Setter Property="MinHeight" Value="{StaticResource KlaCompactHeight}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="RadioButton">
-                    <Grid Background="Transparent">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{StaticResource KlaGridSpace16}" />
-                            <ColumnDefinition Width="{StaticResource KlaGridSpace4}" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Border
-                            x:Name="RadioBorder"
-                            Width="{StaticResource KlaCheckSize}"
-                            Height="{StaticResource KlaCheckSize}"
-                            VerticalAlignment="Center"
-                            Background="{StaticResource KlaWindowBrush}"
-                            BorderBrush="{StaticResource KlaBorderBrush}"
-                            BorderThickness="{StaticResource KlaHairline}"
-                            CornerRadius="{StaticResource KlaRadiusRadio}">
-                            <Ellipse
-                                x:Name="RadioMark"
-                                Width="{StaticResource KlaRadioDotSize}"
-                                Height="{StaticResource KlaRadioDotSize}"
-                                Fill="{StaticResource KlaTextBrush}"
-                                Visibility="Collapsed" />
-                        </Border>
-                        <ContentPresenter
-                            Grid.Column="2"
-                            VerticalAlignment="Center"
-                            RecognizesAccessKey="True" />
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="RadioMark" Property="Visibility" Value="Visible" />
-                            <Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaAccentBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaPressedBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <Style x:Key="KlaToggle" TargetType="ToggleButton">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="Width" Value="{StaticResource KlaButtonWidth}" />
-        <Setter Property="Height" Value="{StaticResource KlaCompactHeight}" />
-        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-        <Setter Property="Padding" Value="{StaticResource KlaInputPadding}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
-                    <Border
-                        x:Name="ToggleBorder"
-                        Padding="{TemplateBinding Padding}"
-                        Background="{TemplateBinding Background}"
-                        CornerRadius="{StaticResource KlaRadiusCard}">
-                        <Grid>
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                RecognizesAccessKey="True" />
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaAccentBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaPressedBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <Style
-        x:Key="KlaSecondaryButton"
-        BasedOn="{StaticResource KlaFoundationButton}"
-        TargetType="Button">
-        <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-    </Style>
-    <!--
-        Link: a text action on the surface (Clear filters, Favorites, Recent) — transparent at rest, surface on hover, the same
-        role width and keyboard-only focus adorner as every button. Ghost: the same with a hairline border (Cancel beside a main action).
-    -->
-    <Style
-        x:Key="KlaLinkButton"
-        BasedOn="{StaticResource KlaFoundationButton}"
-        TargetType="Button">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Setter Property="BorderBrush" Value="Transparent" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border
-                        x:Name="LinkBorder"
-                        Padding="{TemplateBinding Padding}"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{StaticResource KlaHairline}"
-                        CornerRadius="{StaticResource KlaRadiusCard}">
-                        <Grid>
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                RecognizesAccessKey="True" />
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="LinkBorder" Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="LinkBorder" Property="Background" Value="{StaticResource KlaPressedBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <Style
-        x:Key="KlaGhostButton"
-        BasedOn="{StaticResource KlaLinkButton}"
-        TargetType="Button">
-        <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
-    </Style>
-    <!--
-        Segment: an exclusive choice drawn as a filled pill segment, not a radio circle (Family Studio's Families / Views,
-        This Project / Library, List / Grid inside a KlaBorderStrongBrush pill).
-    -->
-    <Style x:Key="KlaSegmentButton" TargetType="RadioButton">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
-        <Setter Property="Height" Value="{StaticResource KlaCompactHeight}" />
-        <Setter Property="Padding" Value="{StaticResource KlaInputPadding}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="RadioButton">
-                    <Border
-                        x:Name="SegmentBorder"
-                        Padding="{TemplateBinding Padding}"
-                        Background="Transparent">
-                        <Grid>
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                RecognizesAccessKey="True" />
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource KlaAccentBrush}" />
-                            <Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <Style
-        x:Key="KlaIconTextButton"
-        BasedOn="{StaticResource KlaFoundationButton}"
-        TargetType="Button">
-        <Setter Property="Width" Value="{StaticResource KlaIconTextButtonWidth}" />
-    </Style>
-    <Style
-        x:Key="KlaIconButton"
-        BasedOn="{StaticResource KlaFoundationButton}"
-        TargetType="Button">
-        <Setter Property="Width" Value="{StaticResource KlaIconButtonWidth}" />
-        <Setter Property="Height" Value="{StaticResource KlaCompactHeight}" />
-        <Setter Property="Padding" Value="0" />
-    </Style>
-
-    <Style x:Key="KlaStatusChip" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-        <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
-        <Setter Property="BorderThickness" Value="{StaticResource KlaHairline}" />
-        <Setter Property="CornerRadius" Value="{StaticResource KlaRadiusChip}" />
-        <Setter Property="Padding" Value="{StaticResource KlaCompactInset}" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
-    </Style>
-    <Style
-        x:Key="KlaTableStatusChip"
-        BasedOn="{StaticResource KlaStatusChip}"
-        TargetType="Border">
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-    <Style
-        x:Key="KlaStatusReady"
-        BasedOn="{StaticResource KlaStatusChip}"
-        TargetType="Border">
-        <Setter Property="BorderBrush" Value="{StaticResource KlaReadyBrush}" />
-    </Style>
-    <Style
-        x:Key="KlaStatusWarning"
-        BasedOn="{StaticResource KlaStatusChip}"
-        TargetType="Border">
-        <Setter Property="BorderBrush" Value="{StaticResource KlaWarningBrush}" />
-    </Style>
-    <Style
-        x:Key="KlaStatusError"
-        BasedOn="{StaticResource KlaStatusChip}"
-        TargetType="Border">
-        <Setter Property="BorderBrush" Value="{StaticResource KlaErrorBrush}" />
-    </Style>
-    <Style x:Key="KlaStatusText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-    </Style>
-    <Style
-        x:Key="KlaBanner"
-        BasedOn="{StaticResource KlaSection}"
-        TargetType="Border">
-        <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
-    </Style>
-
-    <Style x:Key="KlaDataGridText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}" />
-        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-    <Style x:Key="KlaDataGridHeader" TargetType="DataGridColumnHeader">
-        <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Padding" Value="{StaticResource KlaHeaderCellInset}" />
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="KlaDataGridCell" TargetType="DataGridCell">
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderBrush" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="{StaticResource KlaHairline}" />
-        <Setter Property="Padding" Value="{StaticResource KlaCompactInset}" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="DataGridCell">
-                    <Border
-                        Padding="{TemplateBinding Padding}"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{StaticResource KlaPressedBrush}" />
-                <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-            </Trigger>
-            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                <Setter Property="BorderBrush" Value="{StaticResource KlaFocusBrush}" />
-            </Trigger>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="KlaDataGridStatusCell"
-        BasedOn="{StaticResource KlaDataGridCell}"
-        TargetType="DataGridCell">
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-    </Style>
-    <Style x:Key="KlaDataGridRow" TargetType="DataGridRow">
-        <Setter Property="Background" Value="{StaticResource KlaWindowBrush}" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-            </Trigger>
-            <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{StaticResource KlaPressedBrush}" />
-            </Trigger>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="KlaDataGrid" TargetType="DataGrid">
-        <Setter Property="Background" Value="{StaticResource KlaWindowBrush}" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
-        <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
-        <Setter Property="BorderThickness" Value="{StaticResource KlaHairline}" />
-        <Setter Property="AutoGenerateColumns" Value="False" />
-        <Setter Property="IsReadOnly" Value="True" />
-        <Setter Property="CanUserAddRows" Value="False" />
-        <Setter Property="CanUserDeleteRows" Value="False" />
-        <Setter Property="CanUserResizeRows" Value="False" />
-        <Setter Property="SelectionMode" Value="Single" />
-        <Setter Property="SelectionUnit" Value="FullRow" />
-        <Setter Property="HeadersVisibility" Value="Column" />
-        <Setter Property="GridLinesVisibility" Value="Horizontal" />
-        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource KlaBorderStrongBrush}" />
-        <Setter Property="ColumnHeaderStyle" Value="{StaticResource KlaDataGridHeader}" />
-        <Setter Property="CellStyle" Value="{StaticResource KlaDataGridCell}" />
-        <Setter Property="RowStyle" Value="{StaticResource KlaDataGridRow}" />
-        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
-        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
-    </Style>
-    <!--
-        Implicit-style policy (both hosts): a bare TextBox, ComboBox or CheckBox inside a shared-shell window takes the compact
-        input, the compact dropdown and the foundation checkbox, so no control falls back to the native look. Every other control
-        is opt-in by key.
-    -->
-    <Style BasedOn="{StaticResource KlaCompactFieldInput}" TargetType="TextBox" />
-    <Style BasedOn="{StaticResource KlaCompactComboBox}" TargetType="ComboBox" />
-    <Style BasedOn="{StaticResource KlaFoundationCheckBox}" TargetType="CheckBox" />
-
-    <!--  Role-named aliases (the names new XAML should use); the KlaFoundation* keys stay for existing consumers.  -->
-    <Style
-        x:Key="KlaWindow"
-        BasedOn="{StaticResource KlaFoundationWindow}"
-        TargetType="Window" />
-    <!--  A frameless floating panel such as the Command Switch: the window is transparent and its panel draws the surface.  -->
-    <Style
-        x:Key="KlaFloatingWindow"
-        BasedOn="{StaticResource KlaFoundationWindow}"
-        TargetType="Window">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="ShowInTaskbar" Value="False" />
-    </Style>
-    <Style
-        x:Key="KlaButton"
-        BasedOn="{StaticResource KlaFoundationButton}"
-        TargetType="Button" />
-    <Style
-        x:Key="KlaButtonPrimary"
-        BasedOn="{StaticResource KlaFoundationMainButton}"
-        TargetType="Button" />
-    <Style
-        x:Key="KlaButtonSecondary"
-        BasedOn="{StaticResource KlaSecondaryButton}"
-        TargetType="Button" />
-    <Style
-        x:Key="KlaButtonClose"
-        BasedOn="{StaticResource KlaFoundationCloseButton}"
-        TargetType="Button" />
-    <Style
-        x:Key="KlaLabel"
-        BasedOn="{StaticResource KlaFoundationLabel}"
-        TargetType="Label" />
-    <Style
-        x:Key="KlaPromptLabel"
-        BasedOn="{StaticResource KlaFoundationPromptLabel}"
-        TargetType="Label" />
-    <Style
-        x:Key="KlaInput"
-        BasedOn="{StaticResource KlaFoundationInput}"
-        TargetType="TextBox" />
-    <Style
-        x:Key="KlaInputCompact"
-        BasedOn="{StaticResource KlaCompactFieldInput}"
-        TargetType="TextBox" />
-    <Style
-        x:Key="KlaFilter"
-        BasedOn="{StaticResource KlaFoundationFilter}"
-        TargetType="TextBox" />
+    <!--  Check boxes  -->
     <Style
         x:Key="KlaCheck"
         BasedOn="{StaticResource KlaFoundationCheckBox}"
         TargetType="CheckBox" />
-    <Style
-        x:Key="KlaList"
-        BasedOn="{StaticResource KlaFoundationList}"
-        TargetType="ListBox" />
-    <Style
-        x:Key="KlaListItem"
-        BasedOn="{StaticResource KlaFoundationListItem}"
-        TargetType="ListBoxItem" />
-    <Style
-        x:Key="KlaLink"
-        BasedOn="{StaticResource KlaFoundationLink}"
-        TargetType="Hyperlink" />
-
-    <!--  Opt-in rows for the reusable dialogs; existing tool lists are unaffected.  -->
-    <Style
-        x:Key="KlaTextPromptInput"
-        BasedOn="{StaticResource KlaInput}"
-        TargetType="TextBox">
-        <Setter Property="Height" Value="{StaticResource KlaTextPromptInputHeight}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaTextPromptInputFontSize}" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="TextAlignment" Value="Center" />
-    </Style>
-    <Style
-        x:Key="KlaDialogDescription"
-        BasedOn="{StaticResource KlaInfoText}"
-        TargetType="TextBlock">
-        <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
     <Style
         x:Key="KlaDialogCheck"
         BasedOn="{StaticResource KlaCheck}"
@@ -725,7 +281,6 @@
                 <DataTemplate>
                     <StackPanel>
                         <TextBlock
-                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=CheckBox}}"
                             Text="{Binding Label}"
                             TextWrapping="Wrap" />
                         <TextBlock Style="{StaticResource KlaDialogDescription}" Text="{Binding Description}" />
@@ -734,6 +289,38 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!--  Buttons  -->
+    <Style
+        x:Key="KlaButton"
+        BasedOn="{StaticResource KlaFoundationButton}"
+        TargetType="Button" />
+    <Style
+        x:Key="klcButtonDouble"
+        BasedOn="{StaticResource KlaFoundationButton}"
+        TargetType="Button">
+        <Setter Property="Width" Value="{StaticResource klcDoubleButtonWidth}" />
+        <Setter Property="Height" Value="{StaticResource klcDoubleButtonHeight}" />
+        <Setter Property="FontSize" Value="{StaticResource klcButtonFontSizeMain}" />
+    </Style>
+    <Style
+        x:Key="KlaButtonSecondary"
+        BasedOn="{StaticResource KlaFoundationButton}"
+        TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+    </Style>
+
+    <!--  Links  -->
+    <Style
+        x:Key="KlaLink"
+        BasedOn="{StaticResource klcFdnLink}"
+        TargetType="Hyperlink" />
+
+    <!--  Lists and repeated rows  -->
+    <Style
+        x:Key="KlaListItem"
+        BasedOn="{StaticResource KlaFoundationListItem}"
+        TargetType="ListBoxItem" />
     <Style
         x:Key="KlaDialogListItem"
         BasedOn="{StaticResource KlaListItem}"
@@ -745,26 +332,61 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-
-    <Style x:Key="KlaSplitter" TargetType="GridSplitter">
-        <Setter Property="Background" Value="{StaticResource KlaComponentBorderBrush}" />
-        <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="MinWidth" Value="{StaticResource KlaSplitterSize}" />
-        <Setter Property="MinHeight" Value="{StaticResource KlaSplitterSize}" />
-        <Setter Property="ResizeBehavior" Value="PreviousAndNext" />
-        <Setter Property="KeyboardIncrement" Value="{StaticResource KlaSplitterSize}" />
-        <Setter Property="Focusable" Value="True" />
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
-            </Trigger>
-            <Trigger Property="IsKeyboardFocused" Value="True">
-                <Setter Property="Background" Value="{StaticResource KlaFocusBrush}" />
-            </Trigger>
-        </Style.Triggers>
+    <Style
+        x:Key="KlaList"
+        BasedOn="{StaticResource KlaFoundationList}"
+        TargetType="ListBox" />
+    <!--
+        UIElement items remain their own containers. Names and event handlers
+        stay in the window's namescope; only the repeated layout is shared.
+    -->
+    <Style x:Key="KlaFieldRows" TargetType="ItemsControl">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}" />
+                            <ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                        </Grid.RowDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="KlaFilteredCheckList" TargetType="ItemsControl">
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowLarge}" />
+                        </Grid.RowDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
+    <!--  Details disclosure (Message, Action Choice)  -->
     <!--
         Details disclosure shared by Message and Action Choice: a chevron that turns down when
         expanded, the Expander's own foreground, no focus visual and no native circle.
@@ -774,6 +396,7 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Expander}}" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
@@ -782,6 +405,7 @@
                             <ContentControl
                                 x:Name="DetailsChevron"
                                 Margin="{StaticResource KlaIconTextGap}"
+                                VerticalContentAlignment="Center"
                                 Content="{StaticResource kliconChevRight}"
                                 Foreground="{TemplateBinding Foreground}"
                                 Style="{StaticResource KlaGuiIcon}" />
@@ -854,6 +478,8 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!--  Command link (Action Choice)  -->
     <!--  TaskDialog-style command link (Action Choice). A simple repo-native arrow; no upstream TaskDialog code or asset.  -->
     <PathGeometry x:Key="KlaCommandArrowGeometry" Figures="M4,12 L20,12 M14,6 L20,12 L14,18" />
     <Style
@@ -865,7 +491,7 @@
         <Setter Property="MinHeight" Value="{StaticResource KlaCommandLinkMinHeight}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="Padding" Value="{StaticResource KlaCommandLinkPadding}" />
@@ -881,13 +507,11 @@
                             Margin="{StaticResource KlaCommandArrowInset}"
                             VerticalAlignment="Top"
                             Content="{StaticResource KlaCommandArrowGeometry}"
-                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                             Style="{StaticResource KlaGuiIcon}" />
                         <StackPanel Grid.Column="1">
                             <TextBlock
                                 FontSize="{StaticResource KlaSubheadingFontSize}"
                                 FontWeight="SemiBold"
-                                Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                 Text="{Binding Label}"
                                 TextWrapping="Wrap" />
                             <TextBlock Text="{Binding Description}">
@@ -934,25 +558,24 @@
         </Setter>
     </Style>
 
-    <!--  Command Switch pills (formerly KLCodeCommandSwitch.xaml): command buttons and toggles for the floating switch.  -->
+    <!--  Command Switch pills  -->
     <Style x:Key="KlaCommandButton" TargetType="Button">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
+        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
         <Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}" />
         <Setter Property="Background" Value="{StaticResource KlaAccentBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource KlaAccentBrush}" />
-        <Setter Property="BorderThickness" Value="{StaticResource KlaHairline}" />
+        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
         <Setter Property="Padding" Value="{StaticResource KlaCommandPillInset}" />
         <Setter Property="Margin" Value="{StaticResource KlaCommandPillGap}" />
-        <Setter Property="MinHeight" Value="{StaticResource KlaCompactHeight}" />
+        <Setter Property="MinHeight" Value="{StaticResource klcButtonHeight}" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="ContentTemplate">
             <Setter.Value>
                 <DataTemplate>
                     <TextBlock
-                        Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                         Text="{Binding}"
                         TextAlignment="Center"
                         TextWrapping="Wrap" />
@@ -989,15 +612,15 @@
     </Style>
     <Style x:Key="KlaCommandToggle" TargetType="ToggleButton">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-        <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
+        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
-        <Setter Property="BorderThickness" Value="{StaticResource KlaHairline}" />
+        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
         <Setter Property="Padding" Value="{StaticResource KlaCommandPillInset}" />
         <Setter Property="Margin" Value="{StaticResource KlaCommandPillGap}" />
-        <Setter Property="MinHeight" Value="{StaticResource KlaCompactHeight}" />
+        <Setter Property="MinHeight" Value="{StaticResource klcButtonHeight}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
@@ -1025,7 +648,7 @@
                                     Width="{StaticResource KlaSwitchThumbSize}"
                                     Height="{StaticResource KlaSwitchThumbSize}"
                                     HorizontalAlignment="Left"
-                                    Fill="{StaticResource KlaTextBrush}" />
+                                    Fill="{StaticResource klcTextColor}" />
                             </Border>
                             <TextBlock
                                 Grid.Column="1"
@@ -1037,7 +660,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource KlaBorderBrush}" />
+                            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource klcBorderColor}" />
                             <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Right" />
                         </Trigger>
                         <!--  No hover change on toggles (owner, 2026-10-31): the pill keeps its surface under the pointer.  -->
@@ -1051,4 +674,417 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!--  Implicit styles: a bare TextBox, ComboBox or CheckBox in a shared-shell window takes the compact roles above  -->
+    <Style BasedOn="{StaticResource KlaCompactFieldInput}" TargetType="TextBox" />
+    <Style BasedOn="{StaticResource KlaCompactComboBox}" TargetType="ComboBox" />
+    <Style BasedOn="{StaticResource KlaFoundationCheckBox}" TargetType="CheckBox" />
+
+    <!--  ======================================================================  -->
+    <!--  x  tier: used only by windows that are not shared dialogs (tool windows, templates, the Gallery, compiled C# hosts).  -->
+    <!--  ======================================================================  -->
+
+    <!--  x: text and readouts  -->
+    <Style
+        x:Key="xPromptText"
+        BasedOn="{StaticResource KlaSectionHeading}"
+        TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="Normal" />
+    </Style>
+    <Style
+        x:Key="xReadOnlyField"
+        BasedOn="{StaticResource KlaFoundationInput}"
+        TargetType="TextBox">
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+    <Style
+        x:Key="xCompactReadOnlyField"
+        BasedOn="{StaticResource xReadOnlyField}"
+        TargetType="TextBox">
+        <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}" />
+    </Style>
+
+    <!--  x: exclusive choices  -->
+    <Style x:Key="xRadioButton" TargetType="RadioButton">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="MinHeight" Value="{StaticResource klcButtonHeight}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Grid Background="Transparent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{StaticResource klcBodySpaceLarge}" />
+                            <ColumnDefinition Width="{StaticResource klcBodySpaceSmall}" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            x:Name="RadioBorder"
+                            Width="{StaticResource KlaCheckSize}"
+                            Height="{StaticResource KlaCheckSize}"
+                            VerticalAlignment="Center"
+                            Background="{StaticResource klcWindowColor}"
+                            BorderBrush="{StaticResource klcBorderColor}"
+                            BorderThickness="{StaticResource klcBorderHairline}"
+                            CornerRadius="{StaticResource xRadiusRadio}">
+                            <Ellipse
+                                x:Name="RadioMark"
+                                Width="{StaticResource xRadioDotSize}"
+                                Height="{StaticResource xRadioDotSize}"
+                                Fill="{StaticResource klcTextColor}"
+                                Visibility="Collapsed" />
+                        </Border>
+                        <ContentPresenter
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            RecognizesAccessKey="True" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="RadioMark" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaAccentBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaPressedBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!--
+        Segment: an exclusive choice drawn as a filled pill segment, not a radio circle (Family Studio's Families / Views,
+        This Project / Library, List / Grid inside a KlaBorderStrongBrush pill).
+    -->
+    <Style x:Key="xSegmentButton" TargetType="RadioButton">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="Height" Value="{StaticResource klcButtonHeight}" />
+        <Setter Property="Padding" Value="{StaticResource KlaInputPadding}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border
+                        x:Name="SegmentBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="Transparent">
+                        <Grid>
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="SegmentBorder" Property="Background" Value="{StaticResource KlaAccentBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  x: surface buttons  -->
+    <!--
+        Link: a text action on the surface (Clear filters, Favorites, Recent) — transparent at rest, surface on hover, the same
+        role width and keyboard-only focus adorner as every button. Ghost: the same with a hairline border (Cancel beside a main action).
+    -->
+    <Style
+        x:Key="xLinkButton"
+        BasedOn="{StaticResource KlaFoundationButton}"
+        TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="LinkBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{StaticResource klcBorderHairline}"
+                        CornerRadius="{StaticResource KlaRadiusCard}">
+                        <Grid>
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="LinkBorder" Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="LinkBorder" Property="Background" Value="{StaticResource KlaPressedBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style
+        x:Key="xGhostButton"
+        BasedOn="{StaticResource xLinkButton}"
+        TargetType="Button">
+        <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
+    </Style>
+
+    <!--  x: status chips  -->
+    <Style x:Key="xStatusChip" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
+        <Setter Property="CornerRadius" Value="{StaticResource xRadiusChip}" />
+        <Setter Property="Padding" Value="{StaticResource KlaCompactInset}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style
+        x:Key="xTableStatusChip"
+        BasedOn="{StaticResource xStatusChip}"
+        TargetType="Border">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style
+        x:Key="xStatusReady"
+        BasedOn="{StaticResource xStatusChip}"
+        TargetType="Border">
+        <Setter Property="BorderBrush" Value="{StaticResource klcSuccessColor}" />
+    </Style>
+    <Style
+        x:Key="xStatusWarning"
+        BasedOn="{StaticResource xStatusChip}"
+        TargetType="Border">
+        <Setter Property="BorderBrush" Value="{StaticResource klcWarningColor}" />
+    </Style>
+    <Style
+        x:Key="xStatusError"
+        BasedOn="{StaticResource xStatusChip}"
+        TargetType="Border">
+        <Setter Property="BorderBrush" Value="{StaticResource klcErrorColor}" />
+    </Style>
+    <Style x:Key="xStatusText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <!--  x: data grid  -->
+    <Style x:Key="xDataGridText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="xDataGridHeader" TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Padding" Value="{StaticResource xHeaderCellInset}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="xDataGridCell" TargetType="DataGridCell">
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
+        <Setter Property="Padding" Value="{StaticResource KlaCompactInset}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridCell">
+                    <Border
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource KlaPressedBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource KlaFocusBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="xDataGridStatusCell"
+        BasedOn="{StaticResource xDataGridCell}"
+        TargetType="DataGridCell">
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="xDataGridRow" TargetType="DataGridRow">
+        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource KlaPressedBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="xDataGrid" TargetType="DataGrid">
+        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
+        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
+        <Setter Property="AutoGenerateColumns" Value="False" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="CanUserAddRows" Value="False" />
+        <Setter Property="CanUserDeleteRows" Value="False" />
+        <Setter Property="CanUserResizeRows" Value="False" />
+        <Setter Property="SelectionMode" Value="Single" />
+        <Setter Property="SelectionUnit" Value="FullRow" />
+        <Setter Property="HeadersVisibility" Value="Column" />
+        <Setter Property="GridLinesVisibility" Value="Horizontal" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource KlaBorderStrongBrush}" />
+        <Setter Property="ColumnHeaderStyle" Value="{StaticResource xDataGridHeader}" />
+        <Setter Property="CellStyle" Value="{StaticResource xDataGridCell}" />
+        <Setter Property="RowStyle" Value="{StaticResource xDataGridRow}" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
+    </Style>
+
+    <!--  x: splitter  -->
+    <Style x:Key="xSplitter" TargetType="GridSplitter">
+        <Setter Property="Background" Value="{StaticResource KlaComponentBorderBrush}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="MinWidth" Value="{StaticResource xSplitterSize}" />
+        <Setter Property="MinHeight" Value="{StaticResource xSplitterSize}" />
+        <Setter Property="ResizeBehavior" Value="PreviousAndNext" />
+        <Setter Property="KeyboardIncrement" Value="{StaticResource xSplitterSize}" />
+        <Setter Property="Focusable" Value="True" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="Background" Value="{StaticResource KlaFocusBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--  ======================================================================  -->
+    <!--  xx tier: used only by lib/GUI/_future windows, which no tool opens yet.  -->
+    <!--  ======================================================================  -->
+    <Style x:Key="xxToggle" TargetType="ToggleButton">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Width" Value="{StaticResource klcButtonWidth}" />
+        <Setter Property="Height" Value="{StaticResource klcButtonHeight}" />
+        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+        <Setter Property="Padding" Value="{StaticResource KlaInputPadding}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border
+                        x:Name="ToggleBorder"
+                        Padding="{TemplateBinding Padding}"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{StaticResource KlaRadiusCard}">
+                        <Grid>
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaAccentBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaPressedBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style
+        x:Key="xxIconTextButton"
+        BasedOn="{StaticResource KlaFoundationButton}"
+        TargetType="Button">
+        <Setter Property="Width" Value="{StaticResource xxIconTextButtonWidth}" />
+    </Style>
+    <Style
+        x:Key="xxIconButton"
+        BasedOn="{StaticResource KlaFoundationButton}"
+        TargetType="Button">
+        <Setter Property="Width" Value="{StaticResource xxIconButtonWidth}" />
+        <Setter Property="Height" Value="{StaticResource klcButtonHeight}" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <!--  ======================================================================  -->
+    <!--  xxx tier: no consumer anywhere (Python, compiled C#, Gallery, future). Candidates for deletion.  -->
+    <!--  ======================================================================  -->
+    <Style
+        x:Key="xxxButtonClose"
+        BasedOn="{StaticResource klcCloseButton}"
+        TargetType="Button" />
+    <Style
+        x:Key="xxxLabel"
+        BasedOn="{StaticResource KlaFoundationLabel}"
+        TargetType="Label" />
+
 </ResourceDictionary>

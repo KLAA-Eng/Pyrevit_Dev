@@ -9,21 +9,21 @@
     MaxWidth="440"
     MaxHeight="640"
     ShowInTaskbar="True"
-    Style="{StaticResource KlaFoundationWindow}"
+    Style="{StaticResource klcFdnWindow}"
     WindowStartupLocation="CenterScreen">
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Border x:Name="alert_banner" Style="{StaticResource KlaBanner}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                        <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{StaticResource KlaGridSpace16}" />
-                            <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                            <ColumnDefinition Width="{StaticResource klcBodySpaceLarge}" />
+                            <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <ContentControl

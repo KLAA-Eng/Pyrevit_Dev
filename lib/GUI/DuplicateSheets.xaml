@@ -5,31 +5,31 @@
     Width="1050"
     Height="688"
     ShowInTaskbar="False"
-    Style="{StaticResource KlaFoundationWindow}"
+    Style="{StaticResource klcFdnWindow}"
     WindowStartupLocation="CenterScreen">
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" MinHeight="8" />
-                <RowDefinition Height="{StaticResource KlaControlRow}" />
+                <RowDefinition Height="{StaticResource klcBodyRowLarge}" />
             </Grid.RowDefinitions>
             <Label Content="Naming" Style="{StaticResource KlaFoundationPromptLabel}" />
             <Border Grid.Row="2" Style="{StaticResource KlaSection}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                        <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                        <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
@@ -198,67 +198,67 @@
                 <UniformGrid Columns="6" Rows="2">
                     <CheckBox
                         x:Name="UI_checkbox_views"
-                        MinHeight="{StaticResource KlaCompactHeight}"
+                        MinHeight="{StaticResource klcButtonHeight}"
                         Content="Views"
                         IsChecked="True"
                         Style="{StaticResource KlaFoundationCheckBox}" />
                     <CheckBox
                         x:Name="UI_checkbox_legends"
-                        MinHeight="{StaticResource KlaCompactHeight}"
+                        MinHeight="{StaticResource klcButtonHeight}"
                         Content="Legends"
                         IsChecked="True"
                         Style="{StaticResource KlaFoundationCheckBox}" />
                     <CheckBox
                         x:Name="UI_checkbox_schedules"
-                        MinHeight="{StaticResource KlaCompactHeight}"
+                        MinHeight="{StaticResource klcButtonHeight}"
                         Content="Schedules"
                         IsChecked="True"
                         Style="{StaticResource KlaFoundationCheckBox}" />
                     <CheckBox
                         x:Name="UI_checkbox_images"
-                        MinHeight="{StaticResource KlaCompactHeight}"
+                        MinHeight="{StaticResource klcButtonHeight}"
                         Content="Images"
                         IsChecked="True"
                         Style="{StaticResource KlaFoundationCheckBox}" />
                     <CheckBox
                         x:Name="UI_checkbox_lines"
-                        MinHeight="{StaticResource KlaCompactHeight}"
+                        MinHeight="{StaticResource klcButtonHeight}"
                         Content="Lines"
                         IsChecked="True"
                         Style="{StaticResource KlaFoundationCheckBox}" />
                     <CheckBox
                         x:Name="UI_checkbox_text"
-                        MinHeight="{StaticResource KlaCompactHeight}"
+                        MinHeight="{StaticResource klcButtonHeight}"
                         Content="Text"
                         IsChecked="True"
                         Style="{StaticResource KlaFoundationCheckBox}" />
                     <CheckBox
                         x:Name="UI_checkbox_clouds"
-                        MinHeight="{StaticResource KlaCompactHeight}"
+                        MinHeight="{StaticResource klcButtonHeight}"
                         Content="Clouds"
                         IsChecked="False"
                         Style="{StaticResource KlaFoundationCheckBox}" />
                     <CheckBox
                         x:Name="UI_checkbox_dwgs"
-                        MinHeight="{StaticResource KlaCompactHeight}"
+                        MinHeight="{StaticResource klcButtonHeight}"
                         Content="DWGs"
                         IsChecked="False"
                         Style="{StaticResource KlaFoundationCheckBox}" />
                     <CheckBox
                         x:Name="UI_checkbox_symbols"
-                        MinHeight="{StaticResource KlaCompactHeight}"
+                        MinHeight="{StaticResource klcButtonHeight}"
                         Content="Symbols"
                         IsChecked="False"
                         Style="{StaticResource KlaFoundationCheckBox}" />
                     <CheckBox
                         x:Name="UI_checkbox_dimensions"
-                        MinHeight="{StaticResource KlaCompactHeight}"
+                        MinHeight="{StaticResource klcButtonHeight}"
                         Content="Dimensions"
                         IsChecked="False"
                         Style="{StaticResource KlaFoundationCheckBox}" />
                     <CheckBox
                         x:Name="UI_checkbox_additional_revisions"
-                        MinHeight="{StaticResource KlaCompactHeight}"
+                        MinHeight="{StaticResource klcButtonHeight}"
                         Content="Additional Revisions"
                         IsChecked="False"
                         Style="{StaticResource KlaFoundationCheckBox}" />
@@ -267,13 +267,13 @@
             <Grid Grid.Row="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                    <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                        <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Label Content="Use Existing [True] / Duplicate [False]" Style="{StaticResource KlaFoundationPromptLabel}" />
@@ -281,13 +281,13 @@
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                             <CheckBox
                                 x:Name="UI_checkbox_use_existing_legend"
-                                MinHeight="{StaticResource KlaCompactHeight}"
+                                MinHeight="{StaticResource klcButtonHeight}"
                                 Content="Legends"
                                 IsChecked="True"
                                 Style="{StaticResource KlaFoundationCheckBox}" />
                             <CheckBox
                                 x:Name="UI_checkbox_use_existing_schedules"
-                                MinHeight="{StaticResource KlaCompactHeight}"
+                                MinHeight="{StaticResource klcButtonHeight}"
                                 Content="Schedules"
                                 IsChecked="True"
                                 Style="{StaticResource KlaFoundationCheckBox}" />
@@ -297,7 +297,7 @@
                 <Grid Grid.Column="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                        <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Label Content="View Duplicate Options" Style="{StaticResource KlaFoundationPromptLabel}" />
@@ -307,15 +307,15 @@
                                 Checked="radiobutton_duplicate_option"
                                 Content="Duplicate"
                                 IsChecked="True"
-                                Style="{StaticResource KlaRadioButton}" />
+                                Style="{StaticResource xRadioButton}" />
                             <RadioButton
                                 Checked="radiobutton_duplicate_option"
                                 Content="Duplicate detailing"
-                                Style="{StaticResource KlaRadioButton}" />
+                                Style="{StaticResource xRadioButton}" />
                             <RadioButton
                                 Checked="radiobutton_duplicate_option"
                                 Content="Duplicate Dependent"
-                                Style="{StaticResource KlaRadioButton}" />
+                                Style="{StaticResource xRadioButton}" />
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -326,7 +326,7 @@
                 Click="button_run"
                 Content="Duplicate Selected Sheets"
                 IsDefault="True"
-                Style="{StaticResource KlaFoundationMainButton}" />
+                Style="{StaticResource klcButtonDouble}" />
         </Grid>
     </ContentControl>
 </Window>

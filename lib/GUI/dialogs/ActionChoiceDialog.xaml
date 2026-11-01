@@ -7,9 +7,9 @@
     MinHeight="0"
     MaxHeight="640"
     ResizeMode="CanResizeWithGrip"
-    Style="{StaticResource KlaWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid
             x:Name="window_body"
             FocusVisualStyle="{x:Null}"
@@ -35,8 +35,8 @@
                         </Grid.ColumnDefinitions>
                         <ContentControl
                             x:Name="severity_icon"
-                            Width="{StaticResource KlaSeverityIconSize}"
-                            Height="{StaticResource KlaSeverityIconSize}"
+                            Width="{StaticResource klcIconSizeMessage}"
+                            Height="{StaticResource klcIconSizeMessage}"
                             Margin="{StaticResource KlaPairGap}"
                             VerticalAlignment="Top"
                             Style="{StaticResource KlaGuiIcon}"
@@ -45,21 +45,21 @@
                             x:Name="instruction_text"
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            FontSize="{StaticResource KlaDialogHeadingFontSize}"
+                            FontSize="{StaticResource klcMessageHeaderFontSize}"
                             Style="{StaticResource KlaSectionHeading}" />
                     </Grid>
                     <TextBlock
                         x:Name="body_text"
-                        Margin="{StaticResource KlaStackGap}"
+                        Margin="{StaticResource KlaStackGapAbove}"
                         Style="{StaticResource KlaInfoText}" />
-                    <StackPanel x:Name="commands_panel" Margin="{StaticResource KlaStackGap}" />
+                    <StackPanel x:Name="commands_panel" Margin="{StaticResource KlaStackGapAbove}" />
                 </StackPanel>
             </ScrollViewer>
             <ScrollViewer
                 x:Name="option_scroll"
                 Grid.Row="1"
                 MaxHeight="{StaticResource KlaOptionMaxHeight}"
-                Margin="{StaticResource KlaStackGap}"
+                Margin="{StaticResource KlaStackGapAbove}"
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto"
                 Visibility="Collapsed">
@@ -71,7 +71,7 @@
             <Expander
                 x:Name="details_expander"
                 Grid.Row="2"
-                Margin="{StaticResource KlaStackGap}"
+                Margin="{StaticResource KlaStackGapAbove}"
                 Collapsed="details_changed"
                 Expanded="details_changed"
                 Foreground="{StaticResource KlaMutedBrush}"
@@ -82,7 +82,7 @@
                 <TextBox
                     x:Name="details_text"
                     Height="{StaticResource KlaDetailsHeight}"
-                    Margin="{StaticResource KlaStackGap}"
+                    Margin="{StaticResource KlaStackGapAbove}"
                     AutomationProperties.Name="Detailed action information"
                     Style="{StaticResource KlaMultilineReadout}" />
             </Expander>
@@ -95,7 +95,7 @@
                 x:Name="help_panel"
                 Grid.Row="4"
                 MaxHeight="{StaticResource KlaOptionMaxHeight}"
-                Margin="{StaticResource KlaStackGap}"
+                Margin="{StaticResource KlaStackGapAbove}"
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto"
                 Visibility="Collapsed">

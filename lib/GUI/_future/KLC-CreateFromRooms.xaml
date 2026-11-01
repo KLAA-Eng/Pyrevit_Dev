@@ -8,14 +8,14 @@
     MinHeight="406"
     MaxHeight="406"
     ShowInTaskbar="True"
-    Style="{StaticResource KlaFoundationWindow}"
+    Style="{StaticResource klcFdnWindow}"
     WindowStartupLocation="CenterScreen">
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <ItemsControl x:Name="window_body" Style="{StaticResource KlaFilteredCheckList}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{StaticResource KlaGridSpace16}" />
-                    <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                    <ColumnDefinition Width="{StaticResource klcBodySpaceLarge}" />
+                    <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <ContentControl
@@ -64,7 +64,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}" />
                             <ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}" />
-                            <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                            <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <Label
@@ -92,7 +92,7 @@
                 Click="button_run"
                 Content="Create"
                 IsDefault="True"
-                Style="{StaticResource KlaFoundationMainButton}" />
+                Style="{StaticResource klcButtonDouble}" />
         </ItemsControl>
     </ContentControl>
 </Window>

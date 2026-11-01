@@ -1,23 +1,23 @@
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="DevSandbox UI Gallery" Width="1060" Height="760" MinWidth="900" MinHeight="640"
-        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Style="{StaticResource KlaFoundationWindow}">
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" Style="{StaticResource klcFdnWindow}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="40"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="200"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
             <TextBlock Text="Review actual window layouts with fictional data; text starting with ** is supplied by the Gallery, everything else comes from the window. Production tool commands are never run. Five compiled previews are deferred; docked panels and overlays are outside this Gallery."
-                       TextWrapping="Wrap" Margin="0,0,0,8" Foreground="{StaticResource KlaTextMutedBrush}"/>
+                       TextWrapping="Wrap" Margin="0,0,0,8" Foreground="{StaticResource KlaMutedBrush}"/>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="180"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="190"/></Grid.ColumnDefinitions>
-                <Label Content="_Search" Target="{Binding ElementName=FilterBox}" Foreground="{StaticResource KlaTextBrush}" VerticalAlignment="Center"/>
+                <Label Content="_Search" Target="{Binding ElementName=FilterBox}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
                 <TextBox x:Name="FilterBox" Grid.Column="1" Style="{StaticResource KlaFoundationFilter}" TextChanged="filter_changed" AutomationProperties.Name="Search windows and calling tools"/>
-                <Label Grid.Column="3" Content="_Origin" Target="{Binding ElementName=OriginFilter}" Foreground="{StaticResource KlaTextBrush}" VerticalAlignment="Center"/>
+                <Label Grid.Column="3" Content="_Origin" Target="{Binding ElementName=OriginFilter}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
                 <ComboBox x:Name="OriginFilter" Grid.Column="4" Style="{StaticResource KlaCompactComboBox}" SelectionChanged="origin_changed" AutomationProperties.Name="Window origin"/>
-                <Label Grid.Column="6" Content="_Preview" Target="{Binding ElementName=PreviewFilter}" Foreground="{StaticResource KlaTextBrush}" VerticalAlignment="Center"/>
+                <Label Grid.Column="6" Content="_Preview" Target="{Binding ElementName=PreviewFilter}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
                 <ComboBox x:Name="PreviewFilter" Grid.Column="7" Style="{StaticResource KlaCompactComboBox}" SelectionChanged="preview_changed" AutomationProperties.Name="Preview availability"/>
             </Grid>
             <DataGrid x:Name="EntriesGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" SelectionChanged="selection_changed"
-                      Style="{StaticResource KlaDataGrid}" ScrollViewer.HorizontalScrollBarVisibility="Auto" AutomationProperties.Name="Standalone window catalog">
+                      Style="{StaticResource xDataGrid}" ScrollViewer.HorizontalScrollBarVisibility="Auto" AutomationProperties.Name="Standalone window catalog">
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Origin" Binding="{Binding Origin}" Width="150"/>
@@ -44,7 +44,7 @@
                     <DataGridTextColumn Header="Used by tools" Binding="{Binding UsedBy}" Width="*" MinWidth="180"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <TextBlock x:Name="CountText" Grid.Row="3" Foreground="{StaticResource KlaTextMutedBrush}" Margin="0,8"/>
+            <TextBlock x:Name="CountText" Grid.Row="3" Foreground="{StaticResource KlaMutedBrush}" Margin="0,8"/>
             <Border Grid.Row="4" Style="{StaticResource KlaSection}">
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -52,8 +52,8 @@
                         <StackPanel>
                             <TextBlock x:Name="DetailTitle" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap"/>
                             <TextBlock x:Name="DetailDescription" TextWrapping="Wrap" Margin="0,8"/>
-                            <TextBlock x:Name="SourceText" TextWrapping="Wrap" Foreground="{StaticResource KlaTextMutedBrush}"/>
-                            <TextBlock x:Name="AvailabilityText" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{StaticResource KlaWarningBrush}"/>
+                            <TextBlock x:Name="SourceText" TextWrapping="Wrap" Foreground="{StaticResource KlaMutedBrush}"/>
+                            <TextBlock x:Name="AvailabilityText" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{StaticResource klcWarningColor}"/>
                         </StackPanel>
                     </ScrollViewer>
                     <Grid Grid.Column="2">
@@ -63,7 +63,7 @@
                             <ListBox.ItemTemplate><DataTemplate>
                                 <StackPanel Margin="0,4" ToolTip="{Binding Evidence}">
                                     <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding Path}" Foreground="{StaticResource KlaTextMutedBrush}" FontSize="11" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Path}" Foreground="{StaticResource KlaMutedBrush}" FontSize="11" TextWrapping="Wrap"/>
                                 </StackPanel>
                             </DataTemplate></ListBox.ItemTemplate>
                         </ListBox>
@@ -72,12 +72,12 @@
             </Border>
             <Grid Grid.Row="5" Margin="0,8,0,0">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="180"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="140"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <Label Content="_Variant" Target="{Binding ElementName=VariantSelector}" Foreground="{StaticResource KlaTextBrush}" VerticalAlignment="Center"/>
+                <Label Content="_Variant" Target="{Binding ElementName=VariantSelector}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
                 <ComboBox x:Name="VariantSelector" Grid.Column="1" Style="{StaticResource KlaCompactComboBox}" DisplayMemberPath="Label" SelectionChanged="preview_choice_changed" AutomationProperties.Name="Preview variant"/>
-                <Label Grid.Column="3" Content="Preview _state" Target="{Binding ElementName=StateSelector}" Foreground="{StaticResource KlaTextBrush}" VerticalAlignment="Center"/>
+                <Label Grid.Column="3" Content="Preview _state" Target="{Binding ElementName=StateSelector}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
                 <ComboBox x:Name="StateSelector" Grid.Column="4" Style="{StaticResource KlaCompactComboBox}" SelectionChanged="preview_choice_changed" AutomationProperties.Name="Preview state"/>
                 <Button x:Name="LaunchButton" Grid.Column="6" Content="_Open preview" Click="launch_selected" Style="{StaticResource KlaFoundationButton}"/>
-                <TextBlock x:Name="LastResult" Grid.Column="7" Margin="12,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{StaticResource KlaTextMutedBrush}"/>
+                <TextBlock x:Name="LastResult" Grid.Column="7" Margin="12,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{StaticResource KlaMutedBrush}"/>
             </Grid>
         </Grid>
     </ContentControl>

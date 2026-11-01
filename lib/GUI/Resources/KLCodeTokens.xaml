@@ -3,177 +3,211 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:system="clr-namespace:System;assembly=System">
+
     <!--
-        Every shared design value in one place: brand colours, sizes, spacing, radii, state colours and the window
-        chrome data. Order matters: WPF resolves StaticResource only against keys already defined, so values come
-        before anything that refers to them. Styles live in KLCodeFoundation.xaml and KLCodeComponents.xaml.
+        Every shared design value: palette, typography, shape, rhythm, sizes, insets, columns and the window chrome data.
+        
+        Styles live in KLCodeFoundation.xaml and KLCodeComponents.xaml.
+        
+        Prefix convention: by window use
+        Klc - shared dialog (updated)
+        kla - shared dialog
+        x   - non-dialog windows
+        xx  - only lib/GUI/_future
+        xxx - nothing
     -->
 
-    <!--  Palette  -->
-    <!--  Role brushes: the names the foundation and components use. Each value is a KL&A brand colour.  -->
+    <!--  Palette: brand roles (each value is a KL&A brand colour)  -->
+
     <!--  KLCharcoal: window, chrome, fields, lists  -->
-    <SolidColorBrush x:Key="KlaWindowBrush" Color="#1A252B" />
+    <SolidColorBrush x:Key="klcWindowColor" Color="#1A252B" />
     <!--  KLWhite: body text, labels, icons  -->
-    <SolidColorBrush x:Key="KlaTextBrush" Color="#E5E4E2" />
-    <!--  muted text: captions and secondary information  -->
-    <SolidColorBrush x:Key="KlaTextMutedBrush" Color="#B5C2BD" />
-    <!--  original Prototype/Outreach green  -->
-    <SolidColorBrush x:Key="KlaFooterLinkBrush" Color="#407058" />
-    <!--  original footer version gray  -->
-    <SolidColorBrush x:Key="KlaFooterVersionBrush" Color="#808080" />
-    <!--  placeholder text (Text entry watermark, Command Switch search hint); the same gray as the footer version by owner decision, test-enforced  -->
-    <SolidColorBrush x:Key="KlaPlaceholderBrush" Color="#808080" />
+    <SolidColorBrush x:Key="klcTextColor" Color="#E5E4E2" />
+    <!--  KLGreen: input and dropdown borders, wordmark slash, scrollbar thumb  -->
+    <SolidColorBrush x:Key="klcBorderColor" Color="#33714F" />
+
+
     <!--  labels on accent fills  -->
     <SolidColorBrush x:Key="KlaTextOnAccentBrush" Color="White" />
+    <!--  placeholder text (Text entry watermark, Command Switch search hint); the same gray as the footer version by owner decision, test-enforced  -->
+    <SolidColorBrush x:Key="KlaPlaceholderBrush" Color="#808080" />
+    <!--  KLGreen-dark: sections, lists, grid lines  -->
+    <SolidColorBrush x:Key="KlaBorderStrongBrush" Color="#286048" />
     <!--  KLGreen-dark: action and checked fills  -->
     <SolidColorBrush x:Key="KlaAccentBrush" Color="#286048" />
     <!--  KLGreen-secondary: hover fills  -->
     <SolidColorBrush x:Key="KlaAccentHoverBrush" Color="#407058" />
-    <!--  KLGreen: input and dropdown borders, wordmark slash, scrollbar thumb  -->
-    <SolidColorBrush x:Key="KlaBorderBrush" Color="#33714F" />
-    <!--  KLGreen-dark: sections, lists, grid lines  -->
-    <SolidColorBrush x:Key="KlaBorderStrongBrush" Color="#286048" />
 
-    <!--  Foundation tokens  -->
-    <!--
-         Shared WPF values; no Python, Revit, or compiled-add-in dependency. The spacing scale is 4 / 8 / 12 / 16 / 24; XAML
-         consumes it through the typed GridLength / Thickness keys below, so no Double spacing tokens exist.
-    -->
-    <!--  GridLength is required for row/column definitions; WPF does not coerce Double resources.  -->
-    <GridLength x:Key="KlaChromeRow">24</GridLength>
-    <GridLength x:Key="KlaControlRow">32</GridLength>
-    <GridLength x:Key="KlaCompactRow">28</GridLength>
-    <GridLength x:Key="KlaFilterRow">24</GridLength>
-    <GridLength x:Key="KlaGridSpace4">4</GridLength>
-    <GridLength x:Key="KlaGridSpace8">8</GridLength>
-    <GridLength x:Key="KlaGridSpace16">16</GridLength>
-    <Thickness x:Key="KlaBodyInset">16,8,16,8</Thickness>
-    <Thickness x:Key="KlaLabelPadding">0</Thickness>
-    <Thickness x:Key="KlaPairGap">0,0,8,0</Thickness>
-    <Thickness x:Key="KlaInputPadding">8,0</Thickness>
-    <!--
-         Native TextBoxView adds two units and the border one: five yields
-         the same eight-unit rendered text inset as ComboBox selection text.
-    -->
-    <Thickness x:Key="KlaTextBoxPadding">5,0</Thickness>
-    <Thickness x:Key="KlaActionTopGap">0,8,0,0</Thickness>
-    <Thickness x:Key="KlaListPadding">1</Thickness>
-    <Thickness x:Key="KlaItemPadding">4,1</Thickness>
-    <Thickness x:Key="KlaBrandInset">8,0,0,0</Thickness>
-    <Thickness x:Key="KlaFooterInset">12,0</Thickness>
-    <sys:Double x:Key="KlaControlHeight">32</sys:Double>
-    <sys:Double x:Key="KlaCompactHeight">28</sys:Double>
-    <sys:Double x:Key="KlaFilterHeight">24</sys:Double>
-    <sys:Double x:Key="KlaButtonWidth">104</sys:Double>
-    <sys:Double x:Key="KlaMainButtonWidth">216</sys:Double>
-    <sys:Double x:Key="KlaIconSize">16</sys:Double>
-    <sys:Double x:Key="KlaIconCanvas">24</sys:Double>
-    <sys:Double x:Key="KlaIconStroke">1.5</sys:Double>
-    <sys:Double x:Key="KlaBodyFontSize">12</sys:Double>
-    <sys:Double x:Key="KlaTextPromptInputHeight">36</sys:Double>
-    <sys:Double x:Key="KlaTextPromptInputFontSize">24</sys:Double>
-    <sys:Double x:Key="KlaTitleFontSize">14</sys:Double>
-    <FontFamily x:Key="KlaBodyFont">Segoe UI</FontFamily>
+    <!--  Palette: control states  -->
     <SolidColorBrush x:Key="KlaFocusBrush" Color="#E5E4E2" />
     <SolidColorBrush x:Key="KlaPressedBrush" Color="#204D3A" />
     <SolidColorBrush x:Key="KlaDisabledFillBrush" Color="#303C40" />
-    <SolidColorBrush x:Key="KlaDisabledTextBrush" Color="#A6B0AD" />
-    <!--  Component roles supplement the shared brand palette; all styles are opt-in.  -->
-    <GridLength x:Key="KlaFieldLabelColumn">112</GridLength>
-    <GridLength x:Key="KlaCompactFieldLabelColumn">60</GridLength>
-    <GridLength x:Key="KlaCompactFieldInputColumn">240</GridLength>
-    <GridLength x:Key="KlaCompactFieldRow">24</GridLength>
-    <sys:Double x:Key="KlaCompactFieldHeight">24</sys:Double>
-    <GridLength x:Key="KlaActionColumn">104</GridLength>
+    <SolidColorBrush x:Key="KlaDisabledTextBrush" Color="#808080" />
+
+    <!--  Palette: component surfaces and severity???  -->
     <SolidColorBrush x:Key="KlaComponentSurfaceBrush" Color="#22303A" />
     <SolidColorBrush x:Key="KlaComponentBorderBrush" Color="#52675D" />
+    <!--  muted text: captions and secondary information  -->
     <SolidColorBrush x:Key="KlaMutedBrush" Color="#B5C2BD" />
-    <SolidColorBrush x:Key="KlaInfoBrush" Color="#A3C3E8" />
-    <SolidColorBrush x:Key="KlaReadyBrush" Color="#91C8A6" />
-    <SolidColorBrush x:Key="KlaWarningBrush" Color="#E8C66A" />
-    <SolidColorBrush x:Key="KlaErrorBrush" Color="#E89E96" />
-    <SolidColorBrush x:Key="KlaPreviewSurfaceBrush" Color="#10171B" />
 
-    <!--
-         Typed layout tokens for the values the design rules name. WPF resolves CornerRadius / Thickness / GridLength resources
-         directly, so the foundation and components reference these instead of literals (scripts/check_ui_scale.py keeps it so).
-    -->
-    <Thickness x:Key="KlaHairline">1</Thickness>
-    <CornerRadius x:Key="KlaRadiusCard">8</CornerRadius>
-    <CornerRadius x:Key="KlaRadiusControl">6</CornerRadius>
-    <CornerRadius x:Key="KlaRadiusChip">4</CornerRadius>
+    <!--  Palette: message states  -->
+    <SolidColorBrush x:Key="klcInfo" Color="#A3C3E8" />
+    <SolidColorBrush x:Key="klcSuccessColor" Color="#91C8A6" />
+    <SolidColorBrush x:Key="klcWarningColor" Color="#E8C66A" />
+    <SolidColorBrush x:Key="klcErrorColor" Color="#E89E96" />
+
+    <!--  Palette: footer  -->
+    <SolidColorBrush x:Key="klcFooterLinkColor" Color="#407058" />
+    <SolidColorBrush x:Key="klcFooterVersionColor" Color="#808080" />
+
+
+    <!--  Typography: the one family, then sizes smallest to largest  -->
+    <FontFamily x:Key="klcFont">Segoe UI</FontFamily>
+    <sys:Double x:Key="klcBodyFontSize">12</sys:Double>
+    <sys:Double x:Key="klcButtonFontSize">14</sys:Double>
+    <sys:Double x:Key="klcGroupSearchFontSize">14</sys:Double>
+    <sys:Double x:Key="klcDetailsFontSize">14</sys:Double>
+    <sys:Double x:Key="klcFooterVersionFontSize">14</sys:Double>
+    <sys:Double x:Key="klcHeaderTitleFontSize">16</sys:Double>
+    <sys:Double x:Key="klcSectionTitleFontSize">16</sys:Double>
+    <sys:Double x:Key="klcButtonFontSizeMain">16</sys:Double>
+    <sys:Double x:Key="KlaSubheadingFontSize">16</sys:Double>
+    <sys:Double x:Key="klcMessageHeaderFontSize">22</sys:Double>
+    <sys:Double x:Key="klcTextDialogFontSize">24</sys:Double>
+
+    <!--  Shape: hairline and radii, tightest to roundest  -->
+    <Thickness x:Key="klcBorderHairline">1</Thickness>
     <CornerRadius x:Key="KlaRadiusCheck">2</CornerRadius>
-    <CornerRadius x:Key="KlaRadiusRadio">8</CornerRadius>
-    <!--  8 brand inset + the 128-wide logo; both side columns match so the title stays centred.  -->
-    <GridLength x:Key="KlaHeaderSideColumn">136</GridLength>
-    <GridLength x:Key="KlaFooterSideColumn">100</GridLength>
-    <sys:Double x:Key="klcLogoWidth">128</sys:Double>
-    <sys:Double x:Key="klcLogoHeight">18</sys:Double>
-    <sys:Double x:Key="KlaCloseWidth">60</sys:Double>
-    <sys:Double x:Key="KlaCloseHeight">18</sys:Double>
-    <sys:Double x:Key="KlaCloseFontSize">10</sys:Double>
-    <Thickness x:Key="KlaCloseGlyphLift">0,0,0,0.3</Thickness>
-    <sys:Double x:Key="KlaCheckSize">16</sys:Double>
-    <sys:Double x:Key="KlaCheckStroke">2</sys:Double>
-    <sys:Double x:Key="KlaRadioDotSize">6</sys:Double>
-    <sys:Double x:Key="KlaIconTextButtonWidth">128</sys:Double>
-    <sys:Double x:Key="KlaIconButtonWidth">28</sys:Double>
-    <sys:Double x:Key="KlaDropDownMaxHeight">260</sys:Double>
-    <Thickness x:Key="KlaComboTextInset">8,0,28,0</Thickness>
-    <Thickness x:Key="KlaComboArrowInset">0,0,8,0</Thickness>
-    <Thickness x:Key="KlaSectionPadding">12</Thickness>
-    <Thickness x:Key="KlaCompactInset">8,4</Thickness>
-    <Thickness x:Key="KlaHeaderCellInset">8,6</Thickness>
-    <Thickness x:Key="KlaReadoutPadding">8</Thickness>
-    <sys:Double x:Key="KlaReadoutMinHeight">64</sys:Double>
-    <sys:Double x:Key="KlaSplitterSize">4</sys:Double>
-    <!--  Shared dialog values the dialog bodies used to write as literals (Review II cleanup, 2026-10-31).  -->
-    <Thickness x:Key="KlaStackGap">0,8,0,0</Thickness>
+    <CornerRadius x:Key="KlaRadiusControl">6</CornerRadius>
+    <CornerRadius x:Key="KlaSwitchTrackRadius">6</CornerRadius>
+    <CornerRadius x:Key="KlaRadiusCard">8</CornerRadius>
+    <CornerRadius x:Key="KlaScrollThumbRadius">8</CornerRadius>
+    <CornerRadius x:Key="KlaScrollBarRadius">10</CornerRadius>
+    <CornerRadius x:Key="KlaRadiusFloating">12</CornerRadius>
+    <CornerRadius x:Key="KlaCommandPillRadius">12</CornerRadius>
+
+    <!--  Rhythm: row heights and the 4 / 8 / 16 body spacing. GridLength is required for row/column definitions; WPF does not coerce Double.  -->
+    <GridLength x:Key="klcChromeHeight">24</GridLength>
+    <GridLength x:Key="klcBodyRowSmall">16</GridLength>
+    <GridLength x:Key="klcBodyRowNormal">24</GridLength>
+    <GridLength x:Key="klcBodyRowLarge">32</GridLength>
+    <GridLength x:Key="klcBodySpaceSmall">4</GridLength>
+    <GridLength x:Key="klcBodySpaceNormal">8</GridLength>
+    <GridLength x:Key="klcBodySpaceLarge">16</GridLength>
+
+    <!--  Rhythm: margins and gaps  -->
+    <Thickness x:Key="klcBodyMargin">16,16,16,8</Thickness>
+    <Thickness x:Key="klcHeadFootMargin">4,0,4,0</Thickness>
+    <Thickness x:Key="klaDetailTextMargin">0,0,0,0</Thickness>
+    <Thickness x:Key="KlaStackGapAbove">0,4,0,0</Thickness>
     <Thickness x:Key="KlaStackGapBelow">0,0,0,8</Thickness>
+    <Thickness x:Key="KlaPairGap">0,0,8,0</Thickness>
     <Thickness x:Key="KlaIconTextGap">0,0,4,0</Thickness>
+    <Thickness x:Key="KlaActionTopGap">0,8,0,0</Thickness>
     <!--  Deliberate 2-unit optical lift for large single-line text beside an input.  -->
     <Thickness x:Key="KlaOpticalTextInset">0,0,0,2</Thickness>
     <Thickness x:Key="KlaFloatingMargin">16</Thickness>
-    <CornerRadius x:Key="KlaRadiusFloating">12</CornerRadius>
-    <sys:Double x:Key="KlaSeverityIconSize">32</sys:Double>
-    <sys:Double x:Key="KlaDialogHeadingFontSize">22</sys:Double>
-    <sys:Double x:Key="KlaSubheadingFontSize">16</sys:Double>
+    <Thickness x:Key="KlaCommandPillGap">0,0,8,8</Thickness>
+    <Thickness x:Key="KlaScrollBarMargin">3</Thickness>
+    <Thickness x:Key="KlaScrollThumbMargin">2</Thickness>
+
+    <!--  Control sizes: heights and widths  -->
+    <sys:Double x:Key="KlaControlHeight">32</sys:Double>
+    <sys:Double x:Key="KlaCompactFieldHeight">24</sys:Double>
+    <sys:Double x:Key="klcButtonHeight">28</sys:Double>
+    <sys:Double x:Key="klcButtonWidth">104</sys:Double>
+    <sys:Double x:Key="klcDoubleButtonHeight">36</sys:Double>
+    <sys:Double x:Key="klcDoubleButtonWidth">216</sys:Double>
+    <sys:Double x:Key="KlaTextPromptInputHeight">36</sys:Double>
+    <sys:Double x:Key="KlaDropDownMaxHeight">260</sys:Double>
+    <sys:Double x:Key="KlaReadoutMinHeight">64</sys:Double>
     <sys:Double x:Key="KlaDetailsHeight">128</sys:Double>
     <sys:Double x:Key="KlaOptionMaxHeight">80</sys:Double>
     <sys:Double x:Key="KlaCommandLinkMinHeight">40</sys:Double>
-    <Thickness x:Key="KlaCommandLinkPadding">8</Thickness>
-    <Thickness x:Key="KlaCommandArrowInset">0,4,8,0</Thickness>
-    <GridLength x:Key="KlaCommandLinkIconColumn">24</GridLength>
-    <!--  Ten plus the TextBoxView's two-unit inset and the hairline aligns readout text with the body at 13.  -->
-    <Thickness x:Key="KlaDetailsReadoutPadding">10,8</Thickness>
-    <GridLength x:Key="KlaRenameLabelColumn">52</GridLength>
     <sys:Double x:Key="KlaSwitchPromptMaxWidth">180</sys:Double>
-
-    <!--  Command Switch pills (KlaCommandButton / KlaCommandToggle in KLCodeComponents.xaml).  -->
-    <CornerRadius x:Key="KlaCommandPillRadius">12</CornerRadius>
-    <Thickness x:Key="KlaCommandPillGap">0,0,8,8</Thickness>
-    <Thickness x:Key="KlaCommandPillInset">12,4</Thickness>
-    <GridLength x:Key="KlaSwitchToggleColumn">28</GridLength>
     <sys:Double x:Key="KlaSwitchTrackWidth">24</sys:Double>
     <sys:Double x:Key="KlaSwitchTrackHeight">12</sys:Double>
-    <CornerRadius x:Key="KlaSwitchTrackRadius">6</CornerRadius>
     <sys:Double x:Key="KlaSwitchThumbSize">12</sys:Double>
 
-    <!--  Scrollbar (implicit ScrollBar style in KLCodeFoundation.xaml): track inset and corners, thumb inset and corners.  -->
-    <Thickness x:Key="KlaScrollBarMargin">3</Thickness>
-    <CornerRadius x:Key="KlaScrollBarRadius">10</CornerRadius>
-    <Thickness x:Key="KlaScrollThumbMargin">2</Thickness>
-    <CornerRadius x:Key="KlaScrollThumbRadius">8</CornerRadius>
+    <!--  Control sizes: icon, check and severity glyph geometry  -->
+    <sys:Double x:Key="klcIconSize">16</sys:Double>
+    <sys:Double x:Key="KlaIconCanvas">24</sys:Double>
+    <sys:Double x:Key="klcIconStroke">2</sys:Double>
+    <sys:Double x:Key="KlaCheckSize">16</sys:Double>
+    <sys:Double x:Key="KlaCheckStroke">2</sys:Double>
+    <sys:Double x:Key="klcIconSizeMessage">32</sys:Double>
 
-    <!--  Window chrome data  -->
+    <!--  Insets and padding  -->
+    <Thickness x:Key="KlaLabelPadding">0</Thickness>
+    <Thickness x:Key="KlaInputPadding">0,0,0,0</Thickness>
     <!--
-        Shared by the Python and C# adapters: the two footer destinations and the default (en_us) labels. The shell
-        reads the labels with DynamicResource, so a dictionary merged after this one (the compiled
-        Strings/ResourceDictionary.<locale>.xaml, or a Python window's own locale dictionary) overrides them.
+        Native TextBoxView adds two units and the border one: five yields
+        the same eight-unit rendered text inset as ComboBox selection text.
     -->
-    <system:Uri x:Key="KlaPrototypeUri">https://forms.cloud.microsoft/r/HjuggSZqyU</system:Uri>
-    <system:Uri x:Key="KlaOutreachUri">https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u</system:Uri>
+    <Thickness x:Key="KlaTextBoxPadding">5,0</Thickness>
+    <Thickness x:Key="KlaListPadding">1</Thickness>
+    <Thickness x:Key="KlaItemPadding">4,1</Thickness>
+    <Thickness x:Key="KlaSectionPadding">12</Thickness>
+    <Thickness x:Key="KlaCompactInset">8,4</Thickness>
+    <Thickness x:Key="KlaComboTextInset">8,0,28,0</Thickness>
+    <Thickness x:Key="KlaComboArrowInset">0,0,8,0</Thickness>
+    <Thickness x:Key="KlaReadoutPadding">8</Thickness>
+    <!--  Ten plus the TextBoxView's two-unit inset and the hairline aligns readout text with the body at 13.  -->
+    <Thickness x:Key="KlaDetailsReadoutPadding">10,8</Thickness>
+    <Thickness x:Key="KlaCommandLinkPadding">8</Thickness>
+    <Thickness x:Key="KlaCommandArrowInset">0,4,8,0</Thickness>
+    <Thickness x:Key="KlaCommandPillInset">12,4</Thickness>
+
+    <!--  Column widths  -->
+    <GridLength x:Key="KlaCompactFieldLabelColumn">60</GridLength>
+    <GridLength x:Key="KlaCompactFieldInputColumn">240</GridLength>
+    <GridLength x:Key="KlaActionColumn">104</GridLength>
+    <GridLength x:Key="KlaRenameLabelColumn">52</GridLength>
+    <GridLength x:Key="KlaCommandLinkIconColumn">24</GridLength>
+    <GridLength x:Key="KlaSwitchToggleColumn">28</GridLength>
+
+    <!--
+        Window chrome: logo and close geometry, the two footer destinations and the default (en_us) label. The shell reads
+        the label with DynamicResource, so a dictionary merged after this one (the compiled Strings dictionary or a Python
+        window's locale dictionary) overrides it.
+    -->
+    <sys:Double x:Key="klcLogoWidth">98</sys:Double>
+    <sys:Double x:Key="klcLogoHeight">14</sys:Double>
+    <sys:Double x:Key="klcCloseWidth">48</sys:Double>
+    <sys:Double x:Key="klcCloseHeight">16</sys:Double>
+    <sys:Double x:Key="klcCloseFontSize">12</sys:Double>
     <sys:String x:Key="CloseLabel">Close</sys:String>
-    <sys:String x:Key="PrototypeLabel">Prototype</sys:String>
-    <sys:String x:Key="OutreachLabel">Outreach</sys:String>
+    <system:Uri x:Key="klcPrototypeUri">https://forms.cloud.microsoft/r/HjuggSZqyU</system:Uri>
+    <system:Uri x:Key="klcOutreachUri">https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u</system:Uri>
+    
+
+    <!--  ======================================================================  -->
+    <!--  x  tier: used only by windows that are not shared dialogs (tool windows, templates, the Gallery, compiled C# hosts).  -->
+    <!--  ======================================================================  -->
+    <SolidColorBrush x:Key="xPreviewSurfaceBrush" Color="#10171B" />
+    <CornerRadius x:Key="xRadiusChip">4</CornerRadius>
+    <CornerRadius x:Key="xRadiusRadio">8</CornerRadius>
+    <sys:Double x:Key="xRadioDotSize">6</sys:Double>
+    <GridLength x:Key="xCompactRow">28</GridLength>
+    <Thickness x:Key="xHeaderCellInset">8,6</Thickness>
+    <sys:Double x:Key="xSplitterSize">4</sys:Double>
+
+    <!--  ======================================================================  -->
+    <!--  xx tier: used only by lib/GUI/_future windows, which no tool opens yet.  -->
+    <!--  ======================================================================  -->
+    <sys:Double x:Key="xxIconTextButtonWidth">128</sys:Double>
+    <sys:Double x:Key="xxIconButtonWidth">28</sys:Double>
+
+    <!--  ======================================================================  -->
+    <!--  xxx tier: no consumer anywhere (Python, compiled C#, Gallery, future). Candidates for deletion.  -->
+    <!--  ======================================================================  -->
+    <GridLength x:Key="xxxFieldLabelColumn">112</GridLength>
+    <!--  8 brand inset + the 128-wide logo; both side columns match so the title stays centred.  -->
+    <GridLength x:Key="xxxHeaderSideColumn">136</GridLength>
+    <GridLength x:Key="xxxFooterSideColumn">100</GridLength>
+    <CornerRadius x:Key="xxxCloseRadius">8</CornerRadius>
+    <Thickness x:Key="xxxCloseGlyphLift">
+        0,0,0,0
+    </Thickness>
+
 </ResourceDictionary>

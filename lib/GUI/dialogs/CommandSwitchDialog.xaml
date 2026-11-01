@@ -17,7 +17,7 @@
         x:Name="switch_panel"
         Margin="{StaticResource KlaFloatingMargin}"
         Padding="{StaticResource KlaSectionPadding}"
-        Background="{StaticResource KlaWindowBrush}"
+        Background="{StaticResource klcWindowColor}"
         BorderThickness="0"
         CornerRadius="{StaticResource KlaRadiusFloating}">
         <Grid
@@ -36,7 +36,7 @@
                 </Grid.ColumnDefinitions>
                 <Label
                     x:Name="prompt_label"
-                    MinHeight="{StaticResource KlaFilterHeight}"
+                    MinHeight="{StaticResource KlaCompactFieldHeight}"
                     MaxWidth="{StaticResource KlaSwitchPromptMaxWidth}"
                     Margin="{StaticResource KlaPairGap}"
                     VerticalAlignment="Center"

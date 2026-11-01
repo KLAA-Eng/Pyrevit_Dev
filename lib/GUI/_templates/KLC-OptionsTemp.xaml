@@ -7,14 +7,14 @@
     MinWidth="600"
     MinHeight="540"
     ResizeMode="CanResizeWithGrip"
-    Style="{StaticResource KlaFoundationWindow}"
+    Style="{StaticResource klcFdnWindow}"
     WindowStartupLocation="CenterScreen">
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
-                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
-                <RowDefinition Height="{StaticResource KlaControlRow}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                <RowDefinition Height="{StaticResource klcBodyRowLarge}" />
             </Grid.RowDefinitions>
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
@@ -31,15 +31,15 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}" />
-                                <RowDefinition Height="{StaticResource KlaGridSpace16}" />
+                                <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                                <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="{StaticResource KlaGridSpace8}" />
+                                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="{StaticResource KlaGridSpace16}" />
-                                <RowDefinition Height="{StaticResource KlaCompactRow}" />
-                                <RowDefinition Height="{StaticResource KlaGridSpace16}" />
-                                <RowDefinition Height="{StaticResource KlaCompactFieldRow}" />
+                                <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
+                                <RowDefinition Height="{StaticResource xCompactRow}" />
+                                <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
+                                <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
                             </Grid.RowDefinitions>
                             <Label
                                 Content="Category"
@@ -62,14 +62,14 @@
                                 Content="Selected Items"
                                 GroupName="Scope"
                                 IsChecked="True"
-                                Style="{StaticResource KlaRadioButton}" />
+                                Style="{StaticResource xRadioButton}" />
                             <RadioButton
                                 x:Name="scope_all"
                                 Grid.Row="4"
                                 Grid.Column="1"
                                 Content="All Available Items"
                                 GroupName="Scope"
-                                Style="{StaticResource KlaRadioButton}" />
+                                Style="{StaticResource xRadioButton}" />
                             <CheckBox
                                 x:Name="option_include_existing"
                                 Grid.Row="6"
@@ -87,7 +87,7 @@
                             <Grid Grid.Row="8" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="{StaticResource KlaGridSpace8}" />
+                                    <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <TextBox
@@ -120,13 +120,13 @@
                             <TextBox
                                 x:Name="option_path"
                                 AutomationProperties.Name="Fictional output location"
-                                Style="{StaticResource KlaCompactReadOnlyField}" />
+                                Style="{StaticResource xCompactReadOnlyField}" />
                             <Button
                                 Grid.Column="2"
                                 AutomationProperties.Name="Choose a fictional sample location"
                                 Click="browse_sample"
                                 Content="Browse"
-                                Style="{StaticResource KlaSecondaryButton}" />
+                                Style="{StaticResource KlaButtonSecondary}" />
                         </Grid>
                     </Border>
                     <Border Margin="0,16,0,0" Style="{StaticResource KlaBanner}">
@@ -144,7 +144,7 @@
                 Click="apply_options"
                 Content="Apply Options"
                 IsDefault="True"
-                Style="{StaticResource KlaFoundationMainButton}" />
+                Style="{StaticResource klcButtonDouble}" />
         </Grid>
     </ContentControl>
 </Window>

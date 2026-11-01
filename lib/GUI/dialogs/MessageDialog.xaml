@@ -8,13 +8,15 @@
     MinHeight="240"
     MaxHeight="640"
     ResizeMode="CanResizeWithGrip"
-    Style="{StaticResource KlaWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
-    <ContentControl x:Name="window_shell" Style="{StaticResource KlaWindowShell}">
+    <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Border x:Name="message_banner" Style="{StaticResource KlaBanner}">
@@ -26,14 +28,14 @@
                     <StackPanel Margin="{StaticResource KlaStackGapBelow}" Orientation="Horizontal">
                         <ContentControl
                             x:Name="message_icon"
-                            Width="{StaticResource KlaSeverityIconSize}"
-                            Height="{StaticResource KlaSeverityIconSize}"
+                            Width="{StaticResource klcIconSizeMessage}"
+                            Height="{StaticResource klcIconSizeMessage}"
                             Margin="{StaticResource KlaPairGap}"
                             Style="{StaticResource KlaGuiIcon}" />
                         <TextBlock
                             x:Name="message_heading"
                             VerticalAlignment="Center"
-                            FontSize="{StaticResource KlaDialogHeadingFontSize}"
+                            FontSize="{StaticResource klcMessageHeaderFontSize}"
                             Style="{StaticResource KlaSectionHeading}" />
                     </StackPanel>
                     <ScrollViewer
@@ -51,33 +53,32 @@
             </Border>
             <Expander
                 x:Name="message_expander"
-                Grid.Row="1"
-                Margin="{StaticResource KlaStackGap}"
+                Grid.Row="2"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                HorizontalContentAlignment="Stretch"
+                VerticalContentAlignment="Center"
                 Collapsed="details_changed"
                 Expanded="details_changed"
+                FontSize="{StaticResource klcDetailsFontSize}"
                 Foreground="{Binding Foreground, ElementName=message_body}"
                 Header="Details"
-                IsExpanded="False"
                 Style="{StaticResource KlaDetailsExpander}">
                 <TextBox
                     x:Name="message_details"
                     Height="{StaticResource KlaDetailsHeight}"
-                    Margin="{StaticResource KlaStackGap}"
+                    Margin="{StaticResource klaDetailTextMargin}"
                     AutomationProperties.Name="Detailed message"
                     Foreground="{Binding Foreground, ElementName=message_body}"
                     Style="{StaticResource KlaDetailsReadout}" />
             </Expander>
-            <StackPanel
-                Grid.Row="2"
-                Margin="{StaticResource KlaActionTopGap}"
+            <Button
+                x:Name="action_one"
+                Grid.Row="4"
                 HorizontalAlignment="Center"
-                Orientation="Horizontal">
-                <Button
-                    x:Name="action_one"
-                    Click="accept_message"
-                    IsDefault="True"
-                    Style="{StaticResource KlaButton}" />
-            </StackPanel>
+                Click="accept_message"
+                IsDefault="True"
+                Style="{StaticResource KlaButton}" />
         </Grid>
     </ContentControl>
 </Window>

@@ -1,7 +1,7 @@
-﻿<UserControl
+<UserControl
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Background="{StaticResource KlaWindowBrush}">
+    Background="{StaticResource klcWindowColor}">
     <!--  Standalone Recall only. The docked panel retains clipboard_content.xaml.  -->
     <UserControl.Resources>
         <ContentControl
@@ -13,12 +13,12 @@
             Content="{StaticResource kliconFutureRegex}"
             Style="{StaticResource KlaGuiIcon}" />
         <Style x:Key="RecallParameterList" TargetType="ListView">
-            <Setter Property="Background" Value="{StaticResource KlaWindowBrush}" />
-            <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
+            <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+            <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
             <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-            <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
+            <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+            <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
         </Style>
@@ -28,11 +28,11 @@
             TargetType="ListViewItem" />
         <Style x:Key="RecallColumnHeader" TargetType="GridViewColumnHeader">
             <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-            <Setter Property="Foreground" Value="{StaticResource KlaTextBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
             <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
-            <Setter Property="FontFamily" Value="{StaticResource KlaBodyFont}" />
-            <Setter Property="FontSize" Value="{StaticResource KlaBodyFontSize}" />
+            <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+            <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
             <Setter Property="Padding" Value="4" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -65,7 +65,7 @@
                 AutomationProperties.Name="Use regular expression search"
                 Click="toggle_regex"
                 Content="{DynamicResource filterIcon}"
-                Style="{StaticResource KlaToggle}"
+                Style="{StaticResource xxToggle}"
                 ToolTip="{DynamicResource TooltipToggleRegex}" />
             <Grid Grid.Column="2">
                 <TextBox
@@ -84,7 +84,7 @@
                     AutomationProperties.Name="Clear parameter search"
                     Background="Transparent"
                     Click="clear_search"
-                    Style="{StaticResource KlaIconButton}"
+                    Style="{StaticResource xxIconButton}"
                     Visibility="Collapsed">
                     <ContentControl Content="{StaticResource kliconFutureClearSearch}" Style="{StaticResource KlaGuiIcon}" />
                 </Button>
@@ -163,7 +163,7 @@
             Rows="1">
             <Button
                 Click="load_from_element"
-                Style="{StaticResource KlaIconTextButton}"
+                Style="{StaticResource xxIconTextButton}"
                 ToolTip="{DynamicResource TooltipElemParams}">
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
@@ -179,7 +179,7 @@
             <Button
                 x:Name="loadViewFiltersBtn"
                 Click="load_from_view_filters"
-                Style="{StaticResource KlaIconTextButton}"
+                Style="{StaticResource xxIconTextButton}"
                 ToolTip="{DynamicResource TooltipViewFilters}">
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
@@ -195,7 +195,7 @@
             <Button
                 x:Name="loadFilterElemBtn"
                 Click="load_from_filter_and_element"
-                Style="{StaticResource KlaIconTextButton}"
+                Style="{StaticResource xxIconTextButton}"
                 ToolTip="{DynamicResource TooltipFilterElem}">
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
@@ -218,7 +218,7 @@
                 Margin="0,0,8,0"
                 Click="paste_single"
                 IsEnabled="False"
-                Style="{StaticResource KlaIconTextButton}"
+                Style="{StaticResource xxIconTextButton}"
                 ToolTip="{DynamicResource TooltipPasteOne}">
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
@@ -236,7 +236,7 @@
                 Margin="0,0,8,0"
                 Click="paste_rectangle"
                 IsEnabled="False"
-                Style="{StaticResource KlaIconTextButton}"
+                Style="{StaticResource xxIconTextButton}"
                 ToolTip="{DynamicResource TooltipPasteBox}">
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
@@ -253,7 +253,7 @@
                 x:Name="pasteSelBtn"
                 Click="paste_selection"
                 IsEnabled="False"
-                Style="{StaticResource KlaIconTextButton}"
+                Style="{StaticResource xxIconTextButton}"
                 ToolTip="{DynamicResource TooltipPasteSel}">
                 <StackPanel Orientation="Horizontal">
                     <ContentControl
