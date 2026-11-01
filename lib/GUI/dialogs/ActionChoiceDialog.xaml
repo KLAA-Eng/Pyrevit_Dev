@@ -38,7 +38,7 @@
                             Width="{StaticResource klcIconSizeMessage}"
                             Height="{StaticResource klcIconSizeMessage}"
                             VerticalAlignment="Top"
-                            Style="{StaticResource KlaGuiIcon}"
+                            Style="{StaticResource KlaIcon}"
                             Visibility="Collapsed" />
                         <TextBlock
                             x:Name="instruction_text"

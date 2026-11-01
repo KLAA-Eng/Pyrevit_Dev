@@ -25,7 +25,7 @@ The body owns layout and declared events; the controller owns data and actions.
 Approved icons and attribution live in the [GUI icon catalog](../../_icons/gui/README.md).
 
 `KlaFieldRows` retains the four-row naming composition used by KLC-Rename.
-`KlaFilteredCheckList` provides filter, prompt, expanding list and action rows.
+`xFilteredCheckList` provides filter, prompt, expanding list and action rows.
 Both accept direct named items with `Grid.Row`/`Grid.Column` assignments.
 
 [template_data.py](../../ui_gallery/template_data.py) owns the two explicit source

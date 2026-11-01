@@ -7,11 +7,11 @@
         <ContentControl
             x:Key="filterIcon"
             Content="{StaticResource kliconFutureFilterList}"
-            Style="{StaticResource KlaGuiIcon}" />
+            Style="{StaticResource KlaIcon}" />
         <ContentControl
             x:Key="regexIcon"
             Content="{StaticResource kliconFutureRegex}"
-            Style="{StaticResource KlaGuiIcon}" />
+            Style="{StaticResource KlaIcon}" />
         <Style x:Key="RecallParameterList" TargetType="ListView">
             <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
             <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
@@ -24,7 +24,7 @@
         </Style>
         <Style
             x:Key="RecallParameterRow"
-            BasedOn="{StaticResource KlaFoundationListItem}"
+            BasedOn="{StaticResource KlaListItem}"
             TargetType="ListViewItem" />
         <Style x:Key="RecallColumnHeader" TargetType="GridViewColumnHeader">
             <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
@@ -73,7 +73,7 @@
                     Padding="8,0,28,0"
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search recalled parameters"
-                    Style="{StaticResource KlaFoundationFilter}"
+                    Style="{StaticResource KlaFilter}"
                     TextChanged="search_changed" />
                 <Button
                     x:Name="clrsearch_b"
@@ -86,7 +86,7 @@
                     Click="clear_search"
                     Style="{StaticResource xxIconButton}"
                     Visibility="Collapsed">
-                    <ContentControl Content="{StaticResource kliconFutureClearSearch}" Style="{StaticResource KlaGuiIcon}" />
+                    <ContentControl Content="{StaticResource kliconFutureClearSearch}" Style="{StaticResource KlaIcon}" />
                 </Button>
             </Grid>
         </Grid>
@@ -98,16 +98,16 @@
                 Margin="0,0,8,0"
                 Click="check_all"
                 Content="{DynamicResource BtnCheckAll}"
-                Style="{StaticResource klcFdnButton}" />
+                Style="{StaticResource KlaButton}" />
             <Button
                 Margin="0,0,8,0"
                 Click="uncheck_all"
                 Content="{DynamicResource BtnUncheckAll}"
-                Style="{StaticResource klcFdnButton}" />
+                Style="{StaticResource KlaButton}" />
             <Button
                 Click="toggle_all"
                 Content="{DynamicResource BtnToggleAll}"
-                Style="{StaticResource klcFdnButton}" />
+                Style="{StaticResource KlaButton}" />
         </StackPanel>
         <ListView
             x:Name="paramListView"
@@ -125,7 +125,7 @@
                                     AutomationProperties.Name="Include recalled parameter"
                                     Click="checkbox_click"
                                     IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                    Style="{StaticResource KlaFoundationCheckBox}" />
+                                    Style="{StaticResource KlaCheck}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -155,7 +155,7 @@
             Grid.Row="6"
             Margin="0,0,0,8"
             Content="{DynamicResource ChkRestrictCategories}"
-            Style="{StaticResource KlaFoundationCheckBox}"
+            Style="{StaticResource KlaCheck}"
             ToolTip="{DynamicResource TooltipRestrictCategories}" />
         <UniformGrid
             Grid.Row="7"
@@ -169,7 +169,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconFutureTags}"
-                        Style="{StaticResource KlaGuiIcon}" />
+                        Style="{StaticResource KlaIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -185,7 +185,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconFutureRead}"
-                        Style="{StaticResource KlaGuiIcon}" />
+                        Style="{StaticResource KlaIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -201,7 +201,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconFutureFilterFunnel}"
-                        Style="{StaticResource KlaGuiIcon}" />
+                        Style="{StaticResource KlaIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -224,7 +224,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconFuturePointer}"
-                        Style="{StaticResource KlaGuiIcon}" />
+                        Style="{StaticResource KlaIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -242,7 +242,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconFutureRectSelect}"
-                        Style="{StaticResource KlaGuiIcon}" />
+                        Style="{StaticResource KlaIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -259,7 +259,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconSuccessAlert}"
-                        Style="{StaticResource KlaGuiIcon}" />
+                        Style="{StaticResource KlaIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"

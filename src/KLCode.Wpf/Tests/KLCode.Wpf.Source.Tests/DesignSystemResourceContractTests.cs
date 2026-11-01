@@ -131,13 +131,14 @@ public sealed class DesignSystemResourceContractTests
         CollectionAssert.DoesNotContain(entries.Keys.ToArray(), "PrototypeLabel");
         CollectionAssert.DoesNotContain(entries.Keys.ToArray(), "OutreachLabel");
         Assert.AreEqual(2, chrome.Root.Elements(sys + "Uri").Count());
-        XDocument foundation = LoadXaml("lib/GUI/Resources/KLCodeFoundation.xaml");
-        string shell = foundation.ToString();
+        // The shell template lives in Components.
+        XDocument components = LoadXaml("lib/GUI/Resources/KLCodeComponents.xaml");
+        string shell = components.ToString();
         StringAssert.Contains(shell, "{DynamicResource CloseLabel}");
         StringAssert.Contains(shell, "{StaticResource klcPrototypeUri}");
         StringAssert.Contains(shell, "{StaticResource klcOutreachUri}");
         Assert.IsFalse(shell.Contains("PrototypeLabel") || shell.Contains("OutreachLabel"), "footer captions are literal Runs");
-        Dictionary<string, string?> captions = foundation.Descendants(Presentation + "Hyperlink")
+        Dictionary<string, string?> captions = components.Descendants(Presentation + "Hyperlink")
             .Where(link => ((string?)link.Attribute(Xaml + "Name"))?.StartsWith("klcFooter_", StringComparison.Ordinal) == true)
             .ToDictionary(link => (string)link.Attribute(Xaml + "Name")!, link => (string?)link.Element(Presentation + "Run")?.Attribute("Text"));
         Assert.AreEqual("Prototype", captions["klcFooter_prototype"]);
@@ -342,7 +343,7 @@ public sealed class DesignSystemResourceContractTests
         XDocument window = LoadXaml(relativePath);
         Assert.AreEqual(expectedWidth, (string?)window.Root?.Attribute("Width"), relativePath + " width");
         Assert.AreEqual(expectedHeight, (string?)window.Root?.Attribute("Height"), relativePath + " height");
-        CollectionAssert.Contains(new[] { "{StaticResource KlaWindowStyle}", "{StaticResource klcFdnWindow}" },
+        CollectionAssert.Contains(new[] { "{StaticResource KlaWindowStyle}", "{StaticResource klcWindow}" },
             (string?)window.Root?.Attribute("Style"));
 
         HashSet<string> names = window.Descendants()

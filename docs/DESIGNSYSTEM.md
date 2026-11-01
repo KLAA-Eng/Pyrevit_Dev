@@ -148,7 +148,7 @@ instead of per-window file paths or copied geometry.
 
 | Need | Choose | Behavior |
 | --- | --- | --- |
-| Any GUI icon, decorative or inside a button, toggle or stateful control | `KlaGuiIcon` + a `klicon<Role>` resource | Inherits foreground; the style uses `KlaDisabledTextBrush` when disabled |
+| Any GUI icon, decorative or inside a button, toggle or stateful control | `KlaIcon` (the Components alias of the Foundation `KlaGuiIcon` presenter) + a `klicon<Role>` resource | Inherits foreground; the style uses `KlaDisabledTextBrush` when disabled |
 
 This presenter is the only way to draw a GUI icon; the generator no longer
 writes fixed-color ImageSources (2026-10-31). Use it inside an action:
@@ -156,7 +156,7 @@ writes fixed-color ImageSources (2026-10-31). Use it inside an action:
 ```xml
 <Button Style="{StaticResource xxIconButton}"
         AutomationProperties.Name="Search">
-    <ContentControl Style="{StaticResource KlaGuiIcon}"
+    <ContentControl Style="{StaticResource KlaIcon}"
                     Content="{StaticResource kliconSearch}"/>
 </Button>
 ```
@@ -166,7 +166,7 @@ For an icon/text action, let both children follow the button's foreground:
 ```xml
 <Button Style="{StaticResource xxIconTextButton}">
     <StackPanel Orientation="Horizontal">
-        <ContentControl Style="{StaticResource KlaGuiIcon}"
+        <ContentControl Style="{StaticResource KlaIcon}"
                         Content="{StaticResource kliconGroup}"/>
         <TextBlock Text="Sheet Sets" VerticalAlignment="Center"
                    Margin="{StaticResource KlaPairGap}"
@@ -182,7 +182,7 @@ field, such as the search mark before a filter box, uses the same presenter and
 takes the surrounding foreground:
 
 ```xml
-<ContentControl Style="{StaticResource KlaGuiIcon}"
+<ContentControl Style="{StaticResource KlaIcon}"
                 Content="{StaticResource kliconSearch}"
                 VerticalAlignment="Center" AutomationProperties.Name="Search"/>
 ```
@@ -272,10 +272,9 @@ windows; compiled consumers can also use their existing adapter aliases.
 | `xSegmentButton` | RadioButton | Height 28; width fits content | Exclusive toolbar segments inside a bordered group |
 | `xxToggle` | ToggleButton | 104 x 28 | Persistent on/off option |
 | `KlaCommandLink` | Button | Full width, minimum height 40 | TaskDialog-style command link: arrow, 16 SemiBold label, optional description; Action Choice |
-| `KlaDetailsExpander` / `KlaDetailsToggle` | Expander / ToggleButton | Header row; content 8 below | Details disclosure with a right/down chevron in the Expander's foreground; Message and Action Choice |
+| `KlaDetailsExpander` | Expander | Header row; content 8 below | Details disclosure with a right/down chevron in the Expander's foreground; Message and Action Choice |
 
-`klcFdnButton`, `klcButtonDouble` and `KlaButtonSecondary` remain
-valid existing names. The role aliases above are preferred for new markup.
+`KlaButton`, `klcButtonDouble` and `KlaButtonSecondary` are the button keys windows use; `klcFdnButton` is the Foundation base behind them.
 Every button variant, `xxToggle` included, inherits the `klcFdnButton`
 template. A variant changes its hover fill, disabled fill or corner radius
 by re-pointing `klcButtonHoverBrush`, `klcButtonDisabledBrush` or
@@ -297,7 +296,7 @@ silently shrink fonts or invent a per-window button size.
 | `KlaMultilineReadout` | TextBox | Wrapped read-only output, minimum height 64, bounded by the caller with scrolling |
 | `KlaDetailsReadout` | TextBox | `KlaMultilineReadout` whose text aligns with the dialog body; Message Details |
 | `KlaComboBox` / `KlaCompactComboBox` | ComboBox | Standard 32 or compact 24 high; minimum width 104; popup maximum height 260 |
-| `klcLabel` / `klcLabelCentered` | Label | Ordinary label / vertically centered compact field label |
+| `xLabel` / `klcLabelCentered` | Label | Ordinary label / vertically centered compact field label |
 | `klcLabelPrompt` | Label | 16-unit, normal-weight section prompt with a label target |
 | `KlaSectionHeading` / `xPromptText` | TextBlock | Wrapped 14-unit heading / normal-weight prompt text |
 | `KlaInfoText` | TextBlock | Muted wrapped information |
@@ -330,7 +329,7 @@ below supplies their aligned columns and rows.
 
 ### Shared body compositions
 
-`KlaFieldRows` and `KlaFilteredCheckList` are fixed layout recipes implemented
+`KlaFieldRows` and `xFilteredCheckList` are fixed layout recipes implemented
 as ItemsControl styles with Grid ItemsPanels. Their direct items remain the
 window's named controls. Keep event handlers, bindings and item templates in
 the window body; placing them inside a new ControlTemplate would change their
@@ -339,7 +338,7 @@ namescope and controller access.
 | Composition | Direct-item placement | Existing uses |
 | --- | --- | --- |
 | `KlaFieldRows` | Labels in column 0, inputs in column 1; four rows at 0/2/4/6, separated by 8-unit gaps | Find/Replace Views and Sheets, Duplicate Sheets |
-| `KlaFilteredCheckList` | Filter 0, prompt 2, expanding list 4, secondary content 6, main action 8 | SelectFromDict, Create From Rooms, Steel PSF |
+| `xFilteredCheckList` | Filter 0, prompt 2, expanding list 4, secondary content 6, main action 8 | SelectFromDict, Create From Rooms, Steel PSF |
 
 Naming columns are 60/240; each field row is 24 high. Wrap the naming group in
 `KlaSection` for its 12-unit inset. Secondary checklist content may contain
@@ -381,7 +380,7 @@ The [current Python footer render](knowledge/reviews/design-system/2026-10-29-fo
 and [compiled footer render](knowledge/reviews/design-system/2026-10-29-footer-color-evidence/compiled-source-picker.png)
 show the owner-requested original green links and gray version text.
 
-Use `klcFdnWindow` or its `klcWindow` alias for the window, or
+Use `klcWindow` for the window, or
 `klcWindowFloating` for a frameless floating panel with a transparent window
 and no taskbar entry, and
 `klcWindowShell` for the named `window_shell` ContentControl. The shell supplies
@@ -398,7 +397,7 @@ control sizes require different resource types.
 | Resource | Type | Value / use |
 | --- | --- | --- |
 | `klcBodySpaceSmall`, `klcBodySpaceNormal`, `klcBodySpaceLarge` | GridLength | Existing spacer rows/columns: 4, 8 and 16 |
-| `klcChromeHeight`, `klcBodyRowLarge`, `xCompactRow`, `klcBodyRowNormal` | GridLength | Rows of 24, 32, 28 and 24 respectively |
+| `klcChromeHeight`, `xBodyRowLarge`, `xCompactRow`, `klcBodyRowNormal` | GridLength | Rows of 24, 32, 28 and 24 respectively |
 | `klcBodyRowNormal` | GridLength | Compact naming row, 24 |
 | `KlaCompactFieldLabelColumn`, `KlaCompactFieldInputColumn` | GridLength | Naming columns, 60 and 240 |
 | `KlaPairGap` | Thickness | `8,0,0,0`, on the second of two related horizontal controls |
@@ -415,7 +414,7 @@ control sizes require different resource types.
 | `KlaDetailsReadoutPadding` | Thickness | `10,8`, body-aligned readout text |
 | `KlaRenameLabelColumn` | GridLength | 52, the KLC-Rename label column |
 | `klcIconSizeMessage`, `klcMessageHeaderFontSize`, `klcWindowPromptFontSize` | Double | 32, 22 and 16: dialog severity icon, severity heading, command link and switch prompt |
-| `KlaDetailsHeight`, `KlaOptionMaxHeight`, `KlaCommandLinkMinHeight`, `KlaSwitchPromptMaxWidth` | Double | 128, 80, 40 and 180 |
+| `KlaDetailsHeight`, `KlaOptionMaxHeight`, `KlaCommandLinkMinHeight`, `xxxSwitchPromptMaxWidth` | Double | 128, 80, 40 and 180 |
 | `KlaControlHeight`, `klcButtonHeight`, `KlaCompactFieldHeight` | Double | Control heights of 32, 28 and 24 |
 
 `KlaGridSpace12` and `KlaGridSpace24` are not currently defined. If a new shared
@@ -439,8 +438,8 @@ showing/dismissal semantics and Revit operations.
 | --- | --- |
 | [Tokens](../lib/GUI/Resources/KLCodeTokens.xaml) | Every shared value: brand palette, state and component brushes, typed dimensions/fonts/insets/radii, and the chrome data (footer URIs and default English labels) |
 | [Generated GUI geometry](../lib/GUI/Resources/klIcons.xaml) | Generated leaf: icon geometry and the self-contained `klcLogo` template; defines no brushes |
-| [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Tokens and the generated geometry; owns the window shell, basic styles, scrollbars, footer links and the icon presenter |
-| [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; adds field groups, compositions, options, states, tables, the Command Switch pills and implicit-style policy. Every window loads this file |
+| [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Tokens and the generated geometry; one base style per control family (button, label, input, combo box, check box, radio button, switch, list, border, text, expander, data grid, splitter, link, window), the scrollbars and the icon presenter. Windows never use these keys; new bases take the `klaFoundation` prefix |
+| [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; gives every Foundation base at least one alias that changes nothing (`KlaButton`, `KlaInput`, `KlaComboBox`, `KlaIcon`, `klcWindow` and so on), plus the variants, the window shell, the Command Switch pills and implicit-style policy. Every window loads this file and uses only its keys |
 | [Compiled controls](../src/KLCode.Wpf/Resources/KLCodeControls.xaml) | Merges Components and supplies existing C# style names through BasedOn |
 | Window body XAML | Named controls, bindings, events and tool-specific arrangement |
 | Host/tool controller | Ownership, workflow, validation, lifetime and model/application actions |
@@ -717,7 +716,7 @@ handler is supplied by the Python example below.
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}"/>
                 <RowDefinition Height="{StaticResource klcBodyRowNormal}"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="{StaticResource klcBodyRowLarge}"/>
+                <RowDefinition Height="{StaticResource xBodyRowLarge}"/>
             </Grid.RowDefinitions>
             <Label Content="Name:" Target="{Binding ElementName=name_input}"
                    Style="{StaticResource xxxLabel}"/>

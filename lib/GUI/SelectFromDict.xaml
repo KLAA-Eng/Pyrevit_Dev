@@ -8,10 +8,10 @@
     MinHeight="576"
     MaxHeight="576"
     ShowInTaskbar="True"
-    Style="{StaticResource klcFdnWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
-        <ItemsControl x:Name="window_body" Style="{StaticResource KlaFilteredCheckList}">
+        <ItemsControl x:Name="window_body" Style="{StaticResource xFilteredCheckList}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{StaticResource klcBodySpaceLarge}" />
@@ -23,12 +23,12 @@
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search"
                     Content="{StaticResource kliconSearch}"
-                    Style="{StaticResource KlaGuiIcon}" />
+                    Style="{StaticResource KlaIcon}" />
                 <TextBox
                     x:Name="textbox_filter"
                     Grid.Column="2"
                     AutomationProperties.Name="Filter available elements"
-                    Style="{StaticResource KlaFoundationFilter}"
+                    Style="{StaticResource KlaFilter}"
                     TextChanged="text_filter_updated" />
             </Grid>
             <Label
@@ -42,14 +42,14 @@
                 Grid.Row="4"
                 AutomationProperties.Name="Available elements"
                 SelectionMode="Single"
-                Style="{StaticResource KlaFoundationList}">
+                Style="{StaticResource KlaList}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <CheckBox
                             Checked="UIe_ItemChecked"
                             Content="{Binding Name}"
                             IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Style="{StaticResource KlaFoundationCheckBox}" />
+                            Style="{StaticResource KlaCheck}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -61,12 +61,12 @@
                 <Button
                     Click="button_select_all"
                     Content="Select All"
-                    Style="{StaticResource klcFdnButton}" />
+                    Style="{StaticResource KlaButton}" />
                 <Button
                     Margin="{StaticResource KlaPairGap}"
                     Click="button_select_none"
                     Content="Select None"
-                    Style="{StaticResource klcFdnButton}" />
+                    Style="{StaticResource KlaButton}" />
             </StackPanel>
             <Button
                 x:Name="button_main"

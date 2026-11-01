@@ -84,14 +84,11 @@
     <CornerRadius x:Key="klcScrollThumbRadius">4</CornerRadius>
     <CornerRadius x:Key="KlaScrollBarRadius">10</CornerRadius>
     <CornerRadius x:Key="KlaWindowFloatingRad">16</CornerRadius>
-    <CornerRadius x:Key="KlaWindowRad">8</CornerRadius>
     <CornerRadius x:Key="KlaCommandPillRadius">12</CornerRadius>
 
     <!--  Rhythm: row heights and the 4 / 8 / 16 body spacing. GridLength is required for row/column definitions; WPF does not coerce Double.  -->
     <GridLength x:Key="klcChromeHeight">24</GridLength>
-    <GridLength x:Key="klcBodyRowSmall">16</GridLength>
     <GridLength x:Key="klcBodyRowNormal">24</GridLength>
-    <GridLength x:Key="klcBodyRowLarge">32</GridLength>
     <GridLength x:Key="klcBodySpaceSmall">4</GridLength>
     <GridLength x:Key="klcBodySpaceNormal">8</GridLength>
     <GridLength x:Key="klcBodySpaceLarge">16</GridLength>
@@ -126,7 +123,6 @@
     <sys:Double x:Key="KlaDetailsHeight">128</sys:Double>
     <sys:Double x:Key="KlaOptionMaxHeight">80</sys:Double>
     <sys:Double x:Key="KlaCommandLinkMinHeight">40</sys:Double>
-    <sys:Double x:Key="KlaSwitchPromptMaxWidth">180</sys:Double>
     <sys:Double x:Key="KlaSwitchTrackWidth">24</sys:Double>
     <sys:Double x:Key="KlaSwitchTrackHeight">12</sys:Double>
     <sys:Double x:Key="KlaSwitchThumbSize">12</sys:Double>
@@ -189,6 +185,7 @@
     <CornerRadius x:Key="xRadiusRadio">8</CornerRadius>
     <sys:Double x:Key="xRadioDotSize">6</sys:Double>
     <GridLength x:Key="xCompactRow">28</GridLength>
+    <GridLength x:Key="xBodyRowLarge">32</GridLength>
     <Thickness x:Key="xHeaderCellInset">8,6</Thickness>
     <sys:Double x:Key="xSplitterSize">4</sys:Double>
 
@@ -201,6 +198,9 @@
     <!--  ======================================================================  -->
     <!--  xxx tier: no consumer anywhere (Python, compiled C#, Gallery, future). Candidates for deletion.  -->
     <!--  ======================================================================  -->
+    <GridLength x:Key="xxxBodyRowSmall">16</GridLength>
+    <CornerRadius x:Key="xxxWindowRad">8</CornerRadius>
+    <sys:Double x:Key="xxxSwitchPromptMaxWidth">180</sys:Double>
     <GridLength x:Key="xxxFieldLabelColumn">112</GridLength>
     <!--  8 brand inset + the 128-wide logo; both side columns match so the title stays centred.  -->
     <GridLength x:Key="xxxHeaderSideColumn">136</GridLength>

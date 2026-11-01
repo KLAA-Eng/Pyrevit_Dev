@@ -1,24 +1,24 @@
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Steel PSF" Width="432" Height="576" MinWidth="432" MinHeight="576" MaxHeight="576"
-        WindowStartupLocation="CenterScreen" ShowInTaskbar="True" Style="{StaticResource klcFdnWindow}">
+        WindowStartupLocation="CenterScreen" ShowInTaskbar="True" Style="{StaticResource klcWindow}">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
-        <ItemsControl x:Name="window_body" Style="{StaticResource KlaFilteredCheckList}">
+        <ItemsControl x:Name="window_body" Style="{StaticResource xFilteredCheckList}">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="16"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <ContentControl x:Name="filter_icon" Content="{StaticResource kliconSearch}" Style="{StaticResource KlaGuiIcon}" AutomationProperties.Name="Search" VerticalAlignment="Center"/>
-                <TextBox x:Name="textbox_filter" Grid.Column="2" TextChanged="text_filter_updated" Style="{StaticResource KlaFoundationFilter}" AutomationProperties.Name="Search stories"/>
+                <ContentControl x:Name="filter_icon" Content="{StaticResource kliconSearch}" Style="{StaticResource KlaIcon}" AutomationProperties.Name="Search" VerticalAlignment="Center"/>
+                <TextBox x:Name="textbox_filter" Grid.Column="2" TextChanged="text_filter_updated" Style="{StaticResource KlaFilter}" AutomationProperties.Name="Search stories"/>
             </Grid>
             <Label x:Name="text_label" Grid.Row="2" Content="Select Stories to Review:" Target="{Binding ElementName=main_ListBox}" Style="{StaticResource klcLabelPrompt}"/>
-            <ListBox x:Name="main_ListBox" Grid.Row="4" SelectionMode="Single" Style="{StaticResource KlaFoundationList}" AutomationProperties.Name="Stories to review">
+            <ListBox x:Name="main_ListBox" Grid.Row="4" SelectionMode="Single" Style="{StaticResource KlaList}" AutomationProperties.Name="Stories to review">
                 <ListBox.ItemTemplate><DataTemplate>
-                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}" Checked="UIe_ItemChecked" Style="{StaticResource KlaFoundationCheckBox}"/>
+                    <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}" Checked="UIe_ItemChecked" Style="{StaticResource KlaCheck}"/>
                 </DataTemplate></ListBox.ItemTemplate>
             </ListBox>
             <StackPanel Grid.Row="6">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Select All" Click="button_select_all" Style="{StaticResource klcFdnButton}"/>
-                    <Button Content="Select None" Click="button_select_none" Style="{StaticResource klcFdnButton}" Margin="{StaticResource KlaPairGap}"/>
+                    <Button Content="Select All" Click="button_select_all" Style="{StaticResource KlaButton}"/>
+                    <Button Content="Select None" Click="button_select_none" Style="{StaticResource KlaButton}" Margin="{StaticResource KlaPairGap}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
                     <Button Content="Initialize CSV" Click="button_initialize_csv" Style="{StaticResource KlaButtonSecondary}"/>

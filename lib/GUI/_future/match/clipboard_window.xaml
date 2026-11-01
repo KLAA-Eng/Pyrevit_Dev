@@ -8,7 +8,7 @@
     MinHeight="360"
     ResizeMode="CanResizeWithGrip"
     ShowInTaskbar="True"
-    Style="{StaticResource klcFdnWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">

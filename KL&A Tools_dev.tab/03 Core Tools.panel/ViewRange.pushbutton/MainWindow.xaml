@@ -8,7 +8,7 @@
     MaxHeight="600"
     ResizeMode="CanResizeWithGrip"
     SizeToContent="Height"
-    Style="{StaticResource klcFdnWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style

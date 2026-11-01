@@ -9,7 +9,7 @@
     MaxWidth="440"
     MaxHeight="640"
     ShowInTaskbar="True"
-    Style="{StaticResource klcFdnWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
@@ -30,7 +30,7 @@
                             x:Name="alert_icon"
                             VerticalAlignment="Center"
                             Content="{StaticResource kliconInfoAlert}"
-                            Style="{StaticResource KlaGuiIcon}" />
+                            Style="{StaticResource KlaIcon}" />
                         <TextBlock
                             x:Name="alert_heading"
                             Grid.Column="2"

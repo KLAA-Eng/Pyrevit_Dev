@@ -8,10 +8,10 @@
     MinHeight="406"
     MaxHeight="406"
     ShowInTaskbar="True"
-    Style="{StaticResource klcFdnWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
-        <ItemsControl x:Name="window_body" Style="{StaticResource KlaFilteredCheckList}">
+        <ItemsControl x:Name="window_body" Style="{StaticResource xFilteredCheckList}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{StaticResource klcBodySpaceLarge}" />
@@ -23,12 +23,12 @@
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search"
                     Content="{StaticResource kliconSearch}"
-                    Style="{StaticResource KlaGuiIcon}" />
+                    Style="{StaticResource KlaIcon}" />
                 <TextBox
                     x:Name="textbox_filter"
                     Grid.Column="2"
                     AutomationProperties.Name="Filter available types"
-                    Style="{StaticResource KlaFoundationFilter}"
+                    Style="{StaticResource KlaFilter}"
                     TextChanged="text_filter_updated" />
             </Grid>
             <Label
@@ -42,14 +42,14 @@
                 Grid.Row="4"
                 AutomationProperties.Name="Available types"
                 SelectionMode="Single"
-                Style="{StaticResource KlaFoundationList}">
+                Style="{StaticResource KlaList}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <CheckBox
                             Checked="UIe_ItemChecked"
                             Content="{Binding Name}"
                             IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Style="{StaticResource KlaFoundationCheckBox}" />
+                            Style="{StaticResource KlaCheck}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

@@ -14,12 +14,12 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
 
 `KLCodeFoundation.xaml` merges the geometry and owns the presenter, bound to
 tokens (`klcIconSize`, `KlaIconCanvas`, `klcIconStroke`, `KlaDisabledTextBrush`).
-The presenter is the only way to draw a GUI icon: it follows its parent's
+Windows apply it through the Components alias `KlaIcon`. The presenter is the only way to draw a GUI icon: it follows its parent's
 foreground and turns gray when disabled. There are no fixed-color ImageSources
 (removed 2026-10-31).
 
 ```xml
-<ContentControl Style="{StaticResource KlaGuiIcon}"
+<ContentControl Style="{StaticResource KlaIcon}"
                 Content="{StaticResource kliconSearch}"/>
 ```
 

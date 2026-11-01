@@ -44,7 +44,7 @@ class FocusVisualTests(unittest.TestCase):
             self.assertNotIn('ToggleFocus', names, name)
 
     def test_text_and_group_input_focus_remains_visible(self):
-        for name in ('KlaFoundationInput', 'KlaComboBox'):
+        for name in ('KlaFoundationInput', 'klaFoundationComboBox'):
             triggers = list(self.styles[name].iter(NS + 'Trigger'))
             self.assertTrue(any(trigger.get('Property') == 'IsKeyboardFocusWithin' for trigger in triggers), name)
 

@@ -7,14 +7,14 @@
     MinWidth="600"
     MinHeight="540"
     ResizeMode="CanResizeWithGrip"
-    Style="{StaticResource klcFdnWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                <RowDefinition Height="{StaticResource klcBodyRowLarge}" />
+                <RowDefinition Height="{StaticResource xBodyRowLarge}" />
             </Grid.RowDefinitions>
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
@@ -78,7 +78,7 @@
                                 VerticalAlignment="Center"
                                 AutomationProperties.Name="Include existing items"
                                 Content="Include Existing"
-                                Style="{StaticResource KlaFoundationCheckBox}" />
+                                Style="{StaticResource KlaCheck}" />
                             <Label
                                 Grid.Row="8"
                                 Content="Offset"

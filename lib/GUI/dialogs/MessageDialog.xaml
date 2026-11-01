@@ -32,7 +32,7 @@
                             x:Name="message_icon"
                             Width="{StaticResource klcIconSizeMessage}"
                             Height="{StaticResource klcIconSizeMessage}"
-                            Style="{StaticResource KlaGuiIcon}" />
+                            Style="{StaticResource KlaIcon}" />
                         <TextBlock
                             x:Name="message_heading"
                             Margin="{StaticResource KlaPairGap}"

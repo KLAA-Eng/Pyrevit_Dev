@@ -7,7 +7,7 @@
     MinWidth="760"
     MinHeight="500"
     ResizeMode="CanResizeWithGrip"
-    Style="{StaticResource klcFdnWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
@@ -18,7 +18,7 @@
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                <RowDefinition Height="{StaticResource klcBodyRowLarge}" />
+                <RowDefinition Height="{StaticResource xBodyRowLarge}" />
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -30,12 +30,12 @@
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search"
                     Content="{StaticResource kliconSearch}"
-                    Style="{StaticResource KlaGuiIcon}" />
+                    Style="{StaticResource KlaIcon}" />
                 <TextBox
                     x:Name="review_search"
                     Grid.Column="2"
                     AutomationProperties.Name="Search sample review items"
-                    Style="{StaticResource KlaFoundationFilter}"
+                    Style="{StaticResource KlaFilter}"
                     TextChanged="review_filter_changed" />
             </Grid>
             <Grid Grid.Row="2">
@@ -63,7 +63,7 @@
                                         Checked="review_checked_changed"
                                         IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                         IsEnabled="{Binding CanUse}"
-                                        Style="{StaticResource KlaFoundationCheckBox}"
+                                        Style="{StaticResource KlaCheck}"
                                         Unchecked="review_checked_changed" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

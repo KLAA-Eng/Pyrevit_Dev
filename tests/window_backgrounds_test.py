@@ -48,7 +48,7 @@ class WindowBackgroundTests(unittest.TestCase):
             root = ElementTree.parse(xaml_path).getroot()
 
             if relative_path in KL_A_TEMPLATE_WINDOW_XAML_PATHS:
-                self.assertEqual('{StaticResource klcFdnWindow}', root.attrib.get('Style'), relative_path)
+                self.assertEqual('{StaticResource klcWindow}', root.attrib.get('Style'), relative_path)
             else:
                 self.assertEqual('#1A252B', root.attrib.get('Background'), relative_path)
 
@@ -74,7 +74,7 @@ class WindowBackgroundTests(unittest.TestCase):
             with open(xaml_path, 'r', encoding='utf-8') as xaml_file:
                 xaml = xaml_file.read()
 
-            self.assertEqual('{StaticResource klcFdnWindow}', root.attrib.get('Style'), relative_path)
+            self.assertEqual('{StaticResource klcWindow}', root.attrib.get('Style'), relative_path)
             self.assertIn('Style="{StaticResource klcWindowShell}"', xaml)
             self.assertNotIn('#F5F5F5', xaml, relative_path)
             self.assertNotIn('#E8E8E8', xaml, relative_path)
@@ -105,6 +105,9 @@ class WindowBackgroundTests(unittest.TestCase):
             shared = stream.read()
         self.assertIn('x:Key="KlaCompactComboBox"', shared)
         self.assertIn('BasedOn="{StaticResource KlaComboBox}"', shared)
+        # The combo template is the Foundation base that KlaComboBox aliases.
+        with open(os.path.join(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeFoundation.xaml'), encoding='utf-8') as stream:
+            shared = stream.read()
         self.assertIn('ItemContainerStyle', shared)
         self.assertIn('DropDownBorder', shared)
         self.assertIn('SelectionBoxItem', shared)
@@ -117,7 +120,7 @@ class WindowBackgroundTests(unittest.TestCase):
                 xaml = xaml_file.read()
 
             root = ElementTree.parse(xaml_path).getroot()
-            self.assertEqual('{StaticResource klcFdnWindow}', root.attrib.get('Style'), relative_path)
+            self.assertEqual('{StaticResource klcWindow}', root.attrib.get('Style'), relative_path)
             self.assertIn('x:Name="window_shell"', xaml, relative_path)
             self.assertIn('Style="{StaticResource klcWindowShell}"', xaml, relative_path)
             self.assertNotIn('x:Name="main_title"', xaml, relative_path)
@@ -155,8 +158,8 @@ class WindowBackgroundTests(unittest.TestCase):
                 xaml = xaml_file.read()
 
             self.assertIn('Content="{StaticResource kliconSearch}"', xaml, relative_path)
-            self.assertIn('Style="{StaticResource KlaGuiIcon}"', xaml, relative_path)
-            self.assertIn('Style="{StaticResource KlaFoundationFilter}"', xaml,
+            self.assertIn('Style="{StaticResource KlaIcon}"', xaml, relative_path)
+            self.assertIn('Style="{StaticResource KlaFilter}"', xaml,
                           relative_path)
             self.assertNotIn('search_16px_light.png', xaml, relative_path)
 

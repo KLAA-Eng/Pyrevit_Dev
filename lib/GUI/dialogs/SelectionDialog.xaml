@@ -40,7 +40,7 @@
                         x:Name="search_icon"
                         VerticalAlignment="Center"
                         Content="{StaticResource kliconSearch}"
-                        Style="{StaticResource KlaGuiIcon}" />
+                        Style="{StaticResource KlaIcon}" />
                     <TextBox
                         x:Name="filter_text"
                         Grid.Column="2"
@@ -59,7 +59,7 @@
                         x:Name="group_icon"
                         VerticalAlignment="Center"
                         Content="{StaticResource kliconGroup}"
-                        Style="{StaticResource KlaGuiIcon}" />
+                        Style="{StaticResource KlaIcon}" />
                     <ComboBox
                         x:Name="group_filter"
                         Grid.Column="2"

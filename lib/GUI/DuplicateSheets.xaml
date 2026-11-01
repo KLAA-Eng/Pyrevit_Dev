@@ -5,7 +5,7 @@
     Width="1050"
     Height="688"
     ShowInTaskbar="False"
-    Style="{StaticResource klcFdnWindow}"
+    Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
@@ -20,7 +20,7 @@
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" MinHeight="8" />
-                <RowDefinition Height="{StaticResource klcBodyRowLarge}" />
+                <RowDefinition Height="{StaticResource xBodyRowLarge}" />
             </Grid.RowDefinitions>
             <Label Content="Naming" Style="{StaticResource klcLabelPrompt}" />
             <Border Grid.Row="2" Style="{StaticResource KlaSection}">
@@ -36,7 +36,7 @@
                         <Label
                             Margin="0,0,0,8"
                             Content="View Name"
-                            Style="{StaticResource klcLabel}" />
+                            Style="{StaticResource xLabel}" />
                         <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label
                                 Grid.Row="0"
@@ -88,7 +88,7 @@
                         <Label
                             Margin="0,0,0,8"
                             Content="Sheet Number"
-                            Style="{StaticResource klcLabel}" />
+                            Style="{StaticResource xLabel}" />
                         <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label
                                 Grid.Row="0"
@@ -140,7 +140,7 @@
                         <Label
                             Margin="0,0,0,8"
                             Content="Sheet Name"
-                            Style="{StaticResource klcLabel}" />
+                            Style="{StaticResource xLabel}" />
                         <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label
                                 Grid.Row="0"
@@ -201,67 +201,67 @@
                         MinHeight="{StaticResource klcButtonHeight}"
                         Content="Views"
                         IsChecked="True"
-                        Style="{StaticResource KlaFoundationCheckBox}" />
+                        Style="{StaticResource KlaCheck}" />
                     <CheckBox
                         x:Name="UI_checkbox_legends"
                         MinHeight="{StaticResource klcButtonHeight}"
                         Content="Legends"
                         IsChecked="True"
-                        Style="{StaticResource KlaFoundationCheckBox}" />
+                        Style="{StaticResource KlaCheck}" />
                     <CheckBox
                         x:Name="UI_checkbox_schedules"
                         MinHeight="{StaticResource klcButtonHeight}"
                         Content="Schedules"
                         IsChecked="True"
-                        Style="{StaticResource KlaFoundationCheckBox}" />
+                        Style="{StaticResource KlaCheck}" />
                     <CheckBox
                         x:Name="UI_checkbox_images"
                         MinHeight="{StaticResource klcButtonHeight}"
                         Content="Images"
                         IsChecked="True"
-                        Style="{StaticResource KlaFoundationCheckBox}" />
+                        Style="{StaticResource KlaCheck}" />
                     <CheckBox
                         x:Name="UI_checkbox_lines"
                         MinHeight="{StaticResource klcButtonHeight}"
                         Content="Lines"
                         IsChecked="True"
-                        Style="{StaticResource KlaFoundationCheckBox}" />
+                        Style="{StaticResource KlaCheck}" />
                     <CheckBox
                         x:Name="UI_checkbox_text"
                         MinHeight="{StaticResource klcButtonHeight}"
                         Content="Text"
                         IsChecked="True"
-                        Style="{StaticResource KlaFoundationCheckBox}" />
+                        Style="{StaticResource KlaCheck}" />
                     <CheckBox
                         x:Name="UI_checkbox_clouds"
                         MinHeight="{StaticResource klcButtonHeight}"
                         Content="Clouds"
                         IsChecked="False"
-                        Style="{StaticResource KlaFoundationCheckBox}" />
+                        Style="{StaticResource KlaCheck}" />
                     <CheckBox
                         x:Name="UI_checkbox_dwgs"
                         MinHeight="{StaticResource klcButtonHeight}"
                         Content="DWGs"
                         IsChecked="False"
-                        Style="{StaticResource KlaFoundationCheckBox}" />
+                        Style="{StaticResource KlaCheck}" />
                     <CheckBox
                         x:Name="UI_checkbox_symbols"
                         MinHeight="{StaticResource klcButtonHeight}"
                         Content="Symbols"
                         IsChecked="False"
-                        Style="{StaticResource KlaFoundationCheckBox}" />
+                        Style="{StaticResource KlaCheck}" />
                     <CheckBox
                         x:Name="UI_checkbox_dimensions"
                         MinHeight="{StaticResource klcButtonHeight}"
                         Content="Dimensions"
                         IsChecked="False"
-                        Style="{StaticResource KlaFoundationCheckBox}" />
+                        Style="{StaticResource KlaCheck}" />
                     <CheckBox
                         x:Name="UI_checkbox_additional_revisions"
                         MinHeight="{StaticResource klcButtonHeight}"
                         Content="Additional Revisions"
                         IsChecked="False"
-                        Style="{StaticResource KlaFoundationCheckBox}" />
+                        Style="{StaticResource KlaCheck}" />
                 </UniformGrid>
             </Border>
             <Grid Grid.Row="8">
@@ -284,13 +284,13 @@
                                 MinHeight="{StaticResource klcButtonHeight}"
                                 Content="Legends"
                                 IsChecked="True"
-                                Style="{StaticResource KlaFoundationCheckBox}" />
+                                Style="{StaticResource KlaCheck}" />
                             <CheckBox
                                 x:Name="UI_checkbox_use_existing_schedules"
                                 MinHeight="{StaticResource klcButtonHeight}"
                                 Content="Schedules"
                                 IsChecked="True"
-                                Style="{StaticResource KlaFoundationCheckBox}" />
+                                Style="{StaticResource KlaCheck}" />
                         </StackPanel>
                     </Border>
                 </Grid>
