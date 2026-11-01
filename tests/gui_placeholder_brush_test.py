@@ -21,7 +21,7 @@ class PlaceholderBrushTests(unittest.TestCase):
         brushes = dict((node.attrib.get(X + 'Key'), node.attrib.get('Color'))
                        for node in parse('lib/GUI/Resources/KLCodeTokens.xaml').iter(P + 'SolidColorBrush'))
         self.assertEqual('#808080', brushes['KlaPlaceholderBrush'])
-        self.assertEqual(brushes['KlaFooterVersionBrush'], brushes['KlaPlaceholderBrush'])
+        self.assertEqual(brushes['klcFooterVersionBrush'], brushes['KlaPlaceholderBrush'])
 
     def test_text_watermark_and_switch_hint_use_the_placeholder_token(self):
         expected = '{StaticResource KlaPlaceholderBrush}'

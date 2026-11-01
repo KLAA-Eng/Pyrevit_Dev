@@ -65,9 +65,9 @@ internal static class Program
         DispatcherFrame frame = new DispatcherFrame();
         Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => frame.Continue = false));
         Dispatcher.PushFrame(frame);
-        TextBlock footer = (TextBlock)shell.Template.FindName("PART_Version", shell);
-        FrameworkElement header = (FrameworkElement)shell.Template.FindName("PART_Header", shell);
-        FrameworkElement footerGrid = (FrameworkElement)shell.Template.FindName("PART_Footer", shell);
+        TextBlock footer = (TextBlock)shell.Template.FindName("klcFooter_version", shell);
+        FrameworkElement header = (FrameworkElement)shell.Template.FindName("klcShell_Header", shell);
+        FrameworkElement footerGrid = (FrameworkElement)shell.Template.FindName("klcShell_Footer", shell);
         Require(footer.Text == version, identity + " caller version");
         Require(((SolidColorBrush)footer.Foreground).Color == Color.FromRgb(128, 128, 128),
             identity + " original gray footer version");
@@ -78,16 +78,16 @@ internal static class Program
         {
             Require(window.TryFindResource(alias) == null, identity + " removed brush alias " + alias);
         }
-        Button close = (Button)shell.Template.FindName("PART_Close", shell);
+        Button close = (Button)shell.Template.FindName("klcHeader_close", shell);
         Require((string)close.Content == (string)window.FindResource("CloseLabel"), identity + " localized Close");
         foreach (string role in new[] { "Prototype", "Outreach" })
         {
-            Hyperlink link = (Hyperlink)shell.Template.FindName("PART_" + role, shell);
+            Hyperlink link = (Hyperlink)shell.Template.FindName("klcFooter_" + role.ToLowerInvariant(), shell);
             Require(((SolidColorBrush)link.Foreground).Color == Color.FromRgb(64, 112, 88),
                 identity + " original green footer " + role);
-            Require(link.NavigateUri == (Uri)window.FindResource("Kla" + role + "Uri"), identity + " footer URI " + role);
-            Require(new TextRange(link.ContentStart, link.ContentEnd).Text ==
-                (string)window.FindResource(role + "Label"), identity + " localized footer " + role);
+            Require(link.NavigateUri == (Uri)window.FindResource("klc" + role + "Uri"), identity + " footer URI " + role);
+            // 2026-10-31: the footer captions are literal Runs in the shell; only Close is a localized label.
+            Require(new TextRange(link.ContentStart, link.ContentEnd).Text == role, identity + " literal footer caption " + role);
         }
         Border infoChip = new Border { Style = (Style)window.FindResource("KlaInfoChipStyle") };
         Require(((SolidColorBrush)infoChip.BorderBrush).Color ==
@@ -119,7 +119,7 @@ internal static class Program
         {
             if (HasCollapsedAncestor(button)) continue;
             if ((string)button.Content == "Close") continue;
-            double buttonWidth = (double)window.FindResource("KlaButtonWidth"), mainWidth = (double)window.FindResource("KlaMainButtonWidth");
+            double buttonWidth = (double)window.FindResource("klcButtonWidth"), mainWidth = (double)window.FindResource("klcDoubleButtonWidth");
             double compactHeight = (double)window.FindResource("KlaCompactHeight"), controlHeight = (double)window.FindResource("KlaControlHeight");
             Require(button.ActualWidth == buttonWidth || button.ActualWidth == mainWidth,
                 identity + " button width: " + button.Content + " = " + button.ActualWidth);

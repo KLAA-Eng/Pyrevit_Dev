@@ -59,7 +59,7 @@ palette does not define an orange brush.
 | KLOrange | `#FF8000` | Orange ribbon artwork and default DevSandbox prototype icon |
 
 The footer restores its original green links and gray version text through
-dedicated roles. Other muted GUI text uses `#B5C2BD` (`KlaTextMutedBrush`).
+dedicated roles. Other muted GUI text uses `#B5C2BD` (`xTextMutedBrush`).
 Use the footer roles for footer text.
 
 ## GUI colors and resource keys
@@ -74,9 +74,9 @@ compiled WPF.
 | --- | --- | --- |
 | `KlaWindowBrush` | `#1A252B` | Window/chrome surface, fields and lists |
 | `KlaTextBrush` | `#E5E4E2` | Body text, labels, ordinary icon stroke; footer hover |
-| `KlaTextMutedBrush` | `#B5C2BD` | Secondary captions |
-| `KlaFooterLinkBrush` | `#407058` | Prototype and Outreach footer links at rest |
-| `KlaFooterVersionBrush` | `#808080` | Centered caller-version footer text |
+| `xTextMutedBrush` | `#B5C2BD` | Secondary captions |
+| `klcFooterLinkBrush` | `#407058` | Prototype and Outreach footer links at rest |
+| `klcFooterVersionBrush` | `#808080` | Centered caller-version footer text |
 | `KlaPlaceholderBrush` | `#808080` | Placeholder text: the Text entry watermark and the Command Switch search hint. The same gray as the footer version by owner decision; a test keeps them equal |
 | `KlaTextOnAccentBrush` | `#FFFFFF` | Text on accent-filled actions and selected segments |
 | `KlaAccentBrush` | `#286048` | Standard buttons, checked boxes and selected segments |
@@ -103,15 +103,15 @@ component, even when two roles currently have the same color.
 | `KlaReadyBrush` | `#91C8A6` | Ready/success borders/chips |
 | `KlaWarningBrush` | `#E8C66A` | Warning borders/chips |
 | `KlaErrorBrush` | `#E89E96` | Error/blocked borders/chips |
-| `KlaPreviewSurfaceBrush` | `#10171B` | Compiled Family Studio preview surface |
+| `xPreviewSurfaceBrush` | `#10171B` | Compiled Family Studio preview surface |
 
 Pair status colors with words such as Ready, Warning or Blocked. Message
 severity uses heading wording and a border; body/heading text remains readable.
 Disabled controls use explicit brushes rather than stacked opacity reductions.
 
 ```xml
-<Border Style="{StaticResource KlaStatusWarning}">
-    <TextBlock Text="Warning" Style="{StaticResource KlaStatusText}"/>
+<Border Style="{StaticResource xStatusWarning}">
+    <TextBlock Text="Warning" Style="{StaticResource xStatusText}"/>
 </Border>
 ```
 
@@ -123,9 +123,9 @@ There are no brush aliases. The palette's 2019 aliases (`header_background`,
 aliases in Components (`KlaPanelBrush`, `KlaMutedTextBrush`, `KlaSubtleTextBrush`,
 `KlaBlockingBrush`) were removed on 2026-10-31; every window names the role
 brushes above, and the C# contract and smoke tests keep them gone. Some role
-brushes share a value by design and stay separate roles: `KlaTextMutedBrush`
-and `KlaMutedBrush`, `KlaFooterLinkBrush` and `KlaAccentHoverBrush`,
-`KlaAccentBrush` and `KlaBorderStrongBrush`, `KlaFooterVersionBrush` and
+brushes share a value by design and stay separate roles: `xTextMutedBrush`
+and `KlaMutedBrush`, `klcFooterLinkBrush` and `KlaAccentHoverBrush`,
+`KlaAccentBrush` and `KlaBorderStrongBrush`, `klcFooterVersionBrush` and
 `KlaPlaceholderBrush`. Change a role's value only for that role.
 
 `Kla*Style` names in the [compiled adapter](../src/KLCode.Wpf/Resources/KLCodeControls.xaml)
@@ -155,7 +155,7 @@ This presenter is the only way to draw a GUI icon; the generator no longer
 writes fixed-color ImageSources (2026-10-31). Use it inside an action:
 
 ```xml
-<Button Style="{StaticResource KlaIconButton}"
+<Button Style="{StaticResource xxIconButton}"
         AutomationProperties.Name="Search">
     <ContentControl Style="{StaticResource KlaGuiIcon}"
                     Content="{StaticResource kliconSearch}"/>
@@ -165,7 +165,7 @@ writes fixed-color ImageSources (2026-10-31). Use it inside an action:
 For an icon/text action, let both children follow the button's foreground:
 
 ```xml
-<Button Style="{StaticResource KlaIconTextButton}">
+<Button Style="{StaticResource xxIconTextButton}">
     <StackPanel Orientation="Horizontal">
         <ContentControl Style="{StaticResource KlaGuiIcon}"
                         Content="{StaticResource kliconGroup}"
@@ -262,20 +262,20 @@ windows; compiled consumers can also use their existing adapter aliases.
 | Style | Control | Dimensions | Use |
 | --- | --- | --- | --- |
 | `KlaButton` | Button | 104 x 28 | Standard action |
-| `KlaButtonPrimary` | Button | 216 x 32 | Main action; font size 14 |
+| `klcButtonDouble` | Button | 216 x 32 | Main action; font size 14 |
 | `KlaButtonSecondary` | Button | 104 x 28 | Secondary action on component surface |
-| `KlaLinkButton` | Button | 104 x 28 | Text action, transparent at rest; Favorites/Recent/Clear Filters |
-| `KlaGhostButton` | Button | 104 x 28 | Outlined secondary action. Shared dialogs give Cancel the standard `KlaButton` |
-| `KlaIconTextButton` | Button | 128 x 28 | Approved icon plus caption |
-| `KlaIconButton` | Button | 28 x 28 | Icon-only action with an accessible name |
-| `KlaButtonClose` | Button | 60 x 18 | Header Close; the shell supplies it |
-| `KlaRadioButton` | RadioButton | Minimum height 28 | Exclusive choices with circular indicators |
-| `KlaSegmentButton` | RadioButton | Height 28; width fits content | Exclusive toolbar segments inside a bordered group |
-| `KlaToggle` | ToggleButton | 104 x 28 | Persistent on/off option |
+| `xLinkButton` | Button | 104 x 28 | Text action, transparent at rest; Favorites/Recent/Clear Filters |
+| `xGhostButton` | Button | 104 x 28 | Outlined secondary action. Shared dialogs give Cancel the standard `KlaButton` |
+| `xxIconTextButton` | Button | 128 x 28 | Approved icon plus caption |
+| `xxIconButton` | Button | 28 x 28 | Icon-only action with an accessible name |
+| `xxxButtonClose` | Button | 60 x 18 | Header Close; the shell supplies it |
+| `xRadioButton` | RadioButton | Minimum height 28 | Exclusive choices with circular indicators |
+| `xSegmentButton` | RadioButton | Height 28; width fits content | Exclusive toolbar segments inside a bordered group |
+| `xxToggle` | ToggleButton | 104 x 28 | Persistent on/off option |
 | `KlaCommandLink` | Button | Full width, minimum height 40 | TaskDialog-style command link: arrow, 16 SemiBold label, optional description; Action Choice |
 | `KlaDetailsExpander` / `KlaDetailsToggle` | Expander / ToggleButton | Header row; content 8 below | Details disclosure with a right/down chevron in the Expander's foreground; Message and Action Choice |
 
-`KlaFoundationButton`, `KlaFoundationMainButton` and `KlaSecondaryButton` remain
+`KlaFoundationButton`, `klcButtonDouble` and `KlaButtonSecondary` remain
 valid existing names. The role aliases above are preferred for new markup.
 Preserve workflow action placement when migrating a window. If a localized
 caption cannot fit its role, review a shared variant and render it; do not
@@ -289,27 +289,27 @@ silently shrink fonts or invent a per-window button size.
 | `KlaInputCompact` | TextBox | Compact 24-high form input |
 | `KlaTextPromptInput` | TextBox | 36-high input, FontSize 24, centered Segoe UI Bold; opt-in Text prompt only |
 | `KlaFilter` | TextBox | 24-high search/filter; font size 14 |
-| `KlaReadOnlyField` / `KlaCompactReadOnlyField` | TextBox | Read-only field, standard 32 or compact 24 high |
+| `xReadOnlyField` / `xCompactReadOnlyField` | TextBox | Read-only field, standard 32 or compact 24 high |
 | `KlaMultilineReadout` | TextBox | Wrapped read-only output, minimum height 64, bounded by the caller with scrolling |
 | `KlaDetailsReadout` | TextBox | `KlaMultilineReadout` whose text aligns with the dialog body; Message Details |
 | `KlaComboBox` / `KlaCompactComboBox` | ComboBox | Standard 32 or compact 24 high; minimum width 104; popup maximum height 260 |
-| `KlaLabel` / `KlaCompactFieldLabel` | Label | Ordinary label / vertically centered compact field label |
+| `xxxLabel` / `KlaCompactFieldLabel` | Label | Ordinary label / vertically centered compact field label |
 | `KlaPromptLabel` | Label | 14-unit, normal-weight section prompt with a label target |
-| `KlaSectionHeading` / `KlaPromptText` | TextBlock | Wrapped 14-unit heading / normal-weight prompt text |
+| `KlaSectionHeading` / `xPromptText` | TextBlock | Wrapped 14-unit heading / normal-weight prompt text |
 | `KlaInfoText` | TextBlock | Muted wrapped information |
 | `KlaCheck` | CheckBox | Checked/unchecked/indeterminate indicator with wrapped caption |
 | `KlaList` / `KlaListItem` | ListBox / ListBoxItem | Checked-list host and native WPF row behavior |
-| `KlaDataGrid` | DataGrid | Shared read-only review table with shared header, row and cell styles |
-| `KlaDataGridStatusCell` | DataGridCell | Centered status content |
+| `xDataGrid` | DataGrid | Shared read-only review table with shared header, row and cell styles |
+| `xDataGridStatusCell` | DataGridCell | Centered status content |
 | `KlaSection` / `KlaBanner` | Border | Bordered field group / information banner |
-| `KlaStatusChip`, `KlaStatusReady`, `KlaStatusWarning`, `KlaStatusError` | Border | Neutral/ready/warning/error chip; use `KlaStatusText` for its caption |
-| `KlaSplitter` | GridSplitter | Review-pane divider; minimum size and keyboard increment 4 |
+| `xStatusChip`, `xStatusReady`, `xStatusWarning`, `xStatusError` | Border | Neutral/ready/warning/error chip; use `xStatusText` for its caption |
+| `xSplitter` | GridSplitter | Review-pane divider; minimum size and keyboard increment 4 |
 | `KlaLink` | Hyperlink | Footer-like link styling; the caller/adapter owns navigation |
 
 A bare TextBox or ComboBox takes the compact 24-high implicit style. A bare
 CheckBox takes the shared checkbox style. Other controls require an explicit
 style. Prefer explicit keys in new bodies so the intended role is visible.
-The named `KlaDataGrid` is read-only; an editable table needs a deliberate
+The named `xDataGrid` is read-only; an editable table needs a deliberate
 workflow design rather than an assumption that this style supplies editing.
 
 For a labeled compact field, use a Label target and an automation name:
@@ -360,18 +360,18 @@ repeated control dimensions belong to shared roles/tokens.
 | --- | --- |
 | Window | Segoe UI 12; charcoal background; borderless transparent style |
 | Header/footer | Each 24 high, `KlaChromeRow` |
-| Header columns | 136 / flexible / 136, `KlaHeaderSideColumn` (8 brand inset + 128 logo) |
+| Header columns | 136 / flexible / 136, `xxxHeaderSideColumn` (8 brand inset + 128 logo) |
 | Header artwork/title | 128 x 18 `klcLogo`; centered 14-unit title, ellipsis without tooltip |
 | Header Close | 60 x 18, font size 10; glyph placement through `KlaCloseGlyphLift` |
-| Footer columns | 100 / flexible / 100, `KlaFooterSideColumn` |
-| Footer content | Prototype/Outreach links green (`KlaFooterLinkBrush`), caller's pure version gray (`KlaFooterVersionBrush`); links turn white on hover/focus |
-| Body inset | 16 horizontally and 8 below header/above footer, `KlaBodyInset` |
+| Footer columns | 100 / flexible / 100, `xxxFooterSideColumn` |
+| Footer content | Prototype/Outreach links green (`klcFooterLinkBrush`), caller's pure version gray (`klcFooterVersionBrush`); links turn white on hover/focus |
+| Body inset | 16 horizontally and 8 below header/above footer, `klcBodyMargin` |
 | Typography | Body 12, title/prompts/main action 14; constant labels use Title Case |
 | Corners/borders | Card 8, input 6, chip 4, checkbox 2; hairline 1 |
 | Checkbox list | Ordinary single-line rows measure 20 high with a 4-unit box/text gap; long captions wrap |
 | List selection | Native WPF ListBoxItem template retains its blue hover/selection; it is an intentional current exception to the green table styling |
-| Scrollbars | Shared vertical/horizontal templates; `KlaList` keeps its vertical bar visible, while `KlaDataGrid` and standalone Recall use Auto where specified |
-| Grid spacing | Header padding 8,6 (`KlaHeaderCellInset`); cell padding 8,4 (`KlaCompactInset`) |
+| Scrollbars | Shared vertical/horizontal templates; `KlaList` keeps its vertical bar visible, while `xDataGrid` and standalone Recall use Auto where specified |
+| Grid spacing | Header padding 8,6 (`xHeaderCellInset`); cell padding 8,4 (`KlaCompactInset`) |
 
 The [current Python footer render](knowledge/reviews/design-system/2026-10-29-footer-color-evidence/selection.png)
 and [compiled footer render](knowledge/reviews/design-system/2026-10-29-footer-color-evidence/compiled-source-picker.png)
@@ -393,12 +393,12 @@ control sizes require different resource types.
 
 | Resource | Type | Value / use |
 | --- | --- | --- |
-| `KlaGridSpace4`, `KlaGridSpace8`, `KlaGridSpace16` | GridLength | Existing spacer rows/columns: 4, 8 and 16 |
-| `KlaChromeRow`, `KlaControlRow`, `KlaCompactRow`, `KlaFilterRow` | GridLength | Rows of 24, 32, 28 and 24 respectively |
+| `klcBodySpaceSmall`, `klcBodySpaceNormal`, `klcBodySpaceLarge` | GridLength | Existing spacer rows/columns: 4, 8 and 16 |
+| `KlaChromeRow`, `KlaControlRow`, `xCompactRow`, `KlaFilterRow` | GridLength | Rows of 24, 32, 28 and 24 respectively |
 | `KlaCompactFieldRow` | GridLength | Compact naming row, 24 |
 | `KlaCompactFieldLabelColumn`, `KlaCompactFieldInputColumn` | GridLength | Naming columns, 60 and 240 |
 | `KlaPairGap` | Thickness | `0,0,8,0`, between related horizontal controls |
-| `KlaBodyInset` | Thickness | `16,8,16,8`, shell body padding |
+| `klcBodyMargin` | Thickness | `16,8,16,8`, shell body padding |
 | `KlaSectionPadding` | Thickness | 12, field-group inset |
 | `KlaCompactInset` | Thickness | `8,4`, compact component/cell padding |
 | `KlaInputPadding` | Thickness | `8,0`, button/toggle content padding |
@@ -448,6 +448,18 @@ for intentionally empty fills/borders. Generated geometry supplies artwork.
 The resource graph follows the dependencies above, rather than a rule that each
 file merges the immediately preceding row. Compiled projects link the canonical
 files as WPF Pages; they do not copy them into a separate theme implementation.
+
+### Key prefixes mark reach
+
+A key keeps its `Kla` / `klc` name while a shared dialog in `lib/GUI/dialogs`
+uses it, directly or through a style. Keys that only other windows use (tool
+windows, templates, the Gallery, compiled C# hosts) replace the prefix with
+`x` (`xDataGrid`, `xStatusChip`); keys only `lib/GUI/_future` uses take `xx`
+(`xxToggle`, `xxIconButton`); keys with no consumer at all take `xxx` and are
+deletion candidates. Tokens and Components list the shared tier first, grouped
+by kind or control family, then the `x`, `xx` and `xxx` tiers. The generated
+`klIcons.xaml` keeps `klicon<Role>` names; its `Future` role prefix is the `xx`
+mark there. When a shared dialog adopts a prefixed key, rename it back.
 
 ## Host and keyboard contracts
 
@@ -699,18 +711,18 @@ handler is supplied by the Python example below.
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="{StaticResource KlaGridSpace8}"/>
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}"/>
                 <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="{StaticResource KlaControlRow}"/>
             </Grid.RowDefinitions>
             <Label Content="Name:" Target="{Binding ElementName=name_input}"
-                   Style="{StaticResource KlaLabel}"/>
+                   Style="{StaticResource xxxLabel}"/>
             <TextBox x:Name="name_input" Grid.Row="2"
                      Style="{StaticResource KlaInputCompact}"
                      AutomationProperties.Name="Example name"/>
             <Button Grid.Row="4" Content="Apply" Click="apply_example"
-                    Style="{StaticResource KlaButtonPrimary}" IsDefault="True"/>
+                    Style="{StaticResource klcButtonDouble}" IsDefault="True"/>
         </Grid>
     </ContentControl>
 </Window>

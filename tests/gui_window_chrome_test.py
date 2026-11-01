@@ -47,8 +47,9 @@ class Resources:
 class Shell:
     def __init__(self):
         self.parts = {name: Parts() for name in (
-            'Header', 'Title', 'Close', 'Body', 'Footer', 'Version', 'Prototype', 'Outreach')}
-        self.Template = types.SimpleNamespace(FindName=lambda name, shell: self.parts[name[5:]])
+            'klcShell_Header', 'klcHeader_title', 'klcHeader_close', 'klcShell_Body',
+            'klcShell_Footer', 'klcFooter_version', 'klcFooter_prototype', 'klcFooter_outreach')}
+        self.Template = types.SimpleNamespace(FindName=lambda name, shell: self.parts[name])
 
     def ApplyTemplate(self):
         self.applied = True

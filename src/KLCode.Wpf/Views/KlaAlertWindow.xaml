@@ -8,7 +8,7 @@
             <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="8"/><RowDefinition Height="32"/></Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="48"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <Border x:Name="AlertIconBorder" Width="32" Height="32" Style="{StaticResource KlaStatusChip}" VerticalAlignment="Top">
+                <Border x:Name="AlertIconBorder" Width="32" Height="32" Style="{StaticResource xStatusChip}" VerticalAlignment="Top">
                     <ContentControl x:Name="AlertIcon" Style="{StaticResource KlaGuiIcon}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <Grid Grid.Column="1">
@@ -19,7 +19,7 @@
                     </ScrollViewer>
                 </Grid>
             </Grid>
-            <Button Grid.Row="2" Content="{StaticResource OkLabel}" Style="{StaticResource KlaFoundationMainButton}" IsDefault="True" IsCancel="True" Click="OnCloseClick"/>
+            <Button Grid.Row="2" Content="{StaticResource OkLabel}" Style="{StaticResource klcButtonDouble}" IsDefault="True" IsCancel="True" Click="OnCloseClick"/>
         </Grid>
     </ContentControl>
 </Window>

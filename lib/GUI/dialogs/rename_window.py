@@ -42,7 +42,7 @@ def _window_type():
             self.field_containers = []
             load_window(self, os.path.join(os.path.dirname(__file__), 'RenameDialog.xaml'),
                         title, version=version, navigate=navigate, close_handler=self.cancel)
-            inset = self.FindResource('KlaBodyInset')
+            inset = self.FindResource('klcBodyMargin')
             self._kla_chrome.body.Margin = Thickness(inset.Left, 12, inset.Right, 12)
             if owner is not None:
                 if isinstance(owner, Window):

@@ -56,7 +56,7 @@
                 <TextBlock Text="{StaticResource NothingCreatedUntilReviewLabel}" Style="{StaticResource KlaMutedTextStyle}" VerticalAlignment="Center" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="{StaticResource CancelLabel}" Style="{StaticResource KlaGhostButtonStyle}" Margin="0,0,8,0" IsCancel="True" Click="OnCancelClick" />
-                    <Button Content="{StaticResource ReviewImportLabel}" Style="{StaticResource KlaFoundationMainButton}" IsDefault="True" IsEnabled="{Binding CanReview}" Click="OnReviewClick" />
+                    <Button Content="{StaticResource ReviewImportLabel}" Style="{StaticResource klcButtonDouble}" IsDefault="True" IsEnabled="{Binding CanReview}" Click="OnReviewClick" />
                 </StackPanel>
             </Grid>
         </Grid>

@@ -28,7 +28,9 @@ class GuiIconTests(unittest.TestCase):
 
     def test_generated_geometry_dictionary_is_a_leaf_that_matches_the_sources(self):
         self.assertEqual(19, len(icons.ROLES))
-        self.assertEqual(icons.generate_icons(), icons.ICONS_XAML.read_text(encoding='utf-8'))
+        # The Visual Studio workspace reformats klIcons.xaml on save; compare the XML, not the text.
+        self.assertEqual(ET.canonicalize(icons.generate_icons(), with_comments=True, strip_text=True),
+                         ET.canonicalize(icons.ICONS_XAML.read_text(encoding='utf-8'), with_comments=True, strip_text=True))
         dictionary = ET.fromstring(icons.generate_icons())
         groups = dictionary.findall(P + 'GeometryGroup')
         self.assertEqual({'klicon' + role for role in icons.ROLES}, {node.attrib.get(X + 'Key') for node in groups})
@@ -51,8 +53,10 @@ class GuiIconTests(unittest.TestCase):
         self.assertIn('KlaGuiIcon', {node.attrib.get(X + 'Key') for node in shell.iter(P + 'Style')})
         merged = [node.attrib.get('Source') for node in shell.iter(P + 'ResourceDictionary')]
         self.assertIn('klIcons.xaml', merged, 'the foundation merges the generated icons')
-        tokens = (ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeTokens.xaml').read_text(encoding='utf-8')
-        self.assertNotIn('klIcons.xaml', tokens, 'icons are merged by the foundation, not by the tokens')
+        tokens = ET.parse(ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeTokens.xaml').getroot()
+        # Parsed, not matched as text: the tokens' header comment may name klIcons.xaml.
+        self.assertEqual([], [node.attrib.get('Source') for node in tokens.iter(P + 'ResourceDictionary') if node is not tokens],
+                         'icons are merged by the foundation, not by the tokens')
         self.assertFalse(hasattr(icons, 'generate_images'))
 
     def test_logo_is_one_self_contained_template_that_keeps_the_svg_geometry(self):

@@ -52,7 +52,7 @@
             </ScrollViewer>
             <Grid Grid.Row="2" Margin="0,8">
                 <Button Content="{StaticResource CopyIssueReportLabel}" Style="{StaticResource KlaButtonStyle}" HorizontalAlignment="Left" Click="OnCopyIssueReportClick" />
-                <Button Content="{StaticResource ImportBlockedLabel}" Style="{StaticResource KlaFoundationMainButton}" HorizontalAlignment="Right" IsEnabled="False" />
+                <Button Content="{StaticResource ImportBlockedLabel}" Style="{StaticResource klcButtonDouble}" HorizontalAlignment="Right" IsEnabled="False" />
             </Grid>
         </Grid>
     </ContentControl>

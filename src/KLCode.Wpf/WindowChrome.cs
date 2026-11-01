@@ -21,11 +21,11 @@ public sealed class WindowChrome
         shell.Tag = new WindowChromeMetadata(title, version);
         window.Title = ((WindowChromeMetadata)shell.Tag).Title;
         shell.ApplyTemplate();
-        Part<Button>(shell, "PART_Close").Click += OnClose;
+        Part<Button>(shell, "klcHeader_close").Click += OnClose;
         window.PreviewKeyDown += OnKey;
-        Part<Grid>(shell, "PART_Header").MouseLeftButtonDown += OnDrag;
-        Hyperlink prototype = Part<Hyperlink>(shell, "PART_Prototype");
-        Hyperlink outreach = Part<Hyperlink>(shell, "PART_Outreach");
+        Part<Grid>(shell, "klcShell_Header").MouseLeftButtonDown += OnDrag;
+        Hyperlink prototype = Part<Hyperlink>(shell, "klcFooter_prototype");
+        Hyperlink outreach = Part<Hyperlink>(shell, "klcFooter_outreach");
         prototype.RequestNavigate += OnNavigate;
         outreach.RequestNavigate += OnNavigate;
         // Labels and destinations come from KLCodeTokens.xaml through the template (DynamicResource), so the

@@ -26,11 +26,12 @@ def descendants(parent):
 
 def render_close_detail(button, filename):
     """Render the actual control at 4x density without changing its layout."""
+    width, height = button.ActualWidth, button.ActualHeight
     visual = DrawingVisual()
     context = visual.RenderOpen()
-    context.DrawRectangle(VisualBrush(button), None, Rect(0, 0, 60, 18))
+    context.DrawRectangle(VisualBrush(button), None, Rect(0, 0, width, height))
     context.Close()
-    bitmap = RenderTargetBitmap(240, 72, 384, 384, PixelFormats.Pbgra32)
+    bitmap = RenderTargetBitmap(int(width * 4), int(height * 4), 384, 384, PixelFormats.Pbgra32)
     bitmap.Render(visual)
     encoder = PngBitmapEncoder()
     encoder.Frames.Add(BitmapFrame.Create(bitmap))
@@ -68,7 +69,7 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
     reference.Content.UpdateLayout()
     native_row_template = reference.main_ListBox.ItemContainerGenerator.ContainerFromIndex(0).Template
     prompt_font_size = reference.text_label.FontSize
-    assert prompt_font_size == 14
+    assert prompt_font_size == reference.FindResource('klcSectionTitleFontSize')
     if output_directory:
         render(reference, os.path.join(output_directory, 'list-selection-reference.png'), 432, 576)
     reference.Close()
@@ -116,16 +117,17 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
             center_y = origin.Y + glyphs.Y + glyphs.Height / 2
             assert abs(center_x - chrome.close_button.ActualWidth / 2) < 0.25, 'Close horizontal center: {}'.format(center_x)
             assert abs(center_y - chrome.close_button.ActualHeight / 2) < 0.25, 'Close vertical center: {}'.format(center_y)
-            print('Close visible-text center: {:.2f}, {:.2f}; button center: 30, 9.'.format(center_x, center_y))
+            print('Close visible-text center: {:.2f}, {:.2f}; button center: {:g}, {:g}.'.format(
+                center_x, center_y, chrome.close_button.ActualWidth / 2, chrome.close_button.ActualHeight / 2))
             if output_directory:
                 render_close_detail(chrome.close_button, os.path.join(output_directory, 'close-control-4x.png'))
-            assert text.TranslatePoint(Point(0, 0), check).X - token('KlaGridSpace16').Value == room_text_gap
+            assert text.TranslatePoint(Point(0, 0), check).X - token('klcBodySpaceLarge').Value == room_text_gap
             print('Shared selector: search {} high at y={}; row {} high, padding {}; checkbox text gap {}; list {} x {}; text width {}; scrollbars {}.'.format(
                 window.filter_text.ActualHeight, window.filter_text.TranslatePoint(Point(0, 0), shell).Y,
                 row.ActualHeight, row.Padding, text.TranslatePoint(Point(0, 0), check).X - 16,
                 window.items_list.ActualWidth, window.items_list.ActualHeight, text.ActualWidth,
                 [(str(bar.Orientation), bar.ActualWidth) for bar in bars]))
-        chrome_row, inset, pair_gap = token('KlaChromeRow').Value, token('KlaBodyInset'), token('KlaPairGap').Right
+        chrome_row, inset, pair_gap = token('KlaChromeRow').Value, token('klcBodyMargin'), token('KlaPairGap').Right
         assert chrome.header.ActualHeight == chrome.footer.ActualHeight == chrome_row
         assert chrome.title.Text == shell.Tag.Title
         assert chrome.title.ToolTip is None and window.ToolTip is None
@@ -134,25 +136,25 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
         assert chrome.prototype.Foreground.Color == Color.FromRgb(64, 112, 88)
         assert chrome.outreach.Foreground.Color == Color.FromRgb(64, 112, 88)
         assert window.filter_text.ActualHeight == room_filter_height
-        assert window.filter_text.FontSize == token('KlaTitleFontSize')
+        assert window.filter_text.FontSize == token('klcGroupSearchFontSize')
         assert window.filter_text.TranslatePoint(Point(0, 0), shell).Y == chrome_row + inset.Top
         assert window.prompt_label.FontSize == prompt_font_size
         window.accept_button.ApplyTemplate()
         assert window.accept_button.Template.FindName('ButtonBorder', window.accept_button).BorderBrush.Color.A == 0
         assert not window.accept_button.IsDefault
         assert str(window.FontFamily) == 'Segoe UI'
-        assert window.FontSize == token('KlaBodyFontSize') and chrome.title.FontSize == token('KlaTitleFontSize')
-        assert window.accept_button.ActualWidth == token('KlaMainButtonWidth') and window.accept_button.ActualHeight == token('KlaControlHeight')
+        assert window.FontSize == token('KlaBodyFontSize') and chrome.title.FontSize == token('klcHeaderTitleFontSize')
+        assert window.accept_button.ActualWidth == token('klcDoubleButtonWidth') and window.accept_button.ActualHeight == token('KlaControlHeight')
         buttons = list(window.batch_actions.Children)
-        assert all(button.ActualWidth == token('KlaButtonWidth') and button.ActualHeight == token('KlaCompactHeight') for button in buttons)
+        assert all(button.ActualWidth == token('klcButtonWidth') and button.ActualHeight == token('KlaCompactHeight') for button in buttons)
         assert all(button.Background == token('KlaComponentSurfaceBrush') for button in buttons)
         body_origin = window.window_body.TranslatePoint(Point(0, 0), shell)
         assert body_origin.X == inset.Left and body_origin.Y == chrome_row + inset.Top
         first = buttons[0].TranslatePoint(Point(0, 0), shell)
         second = buttons[1].TranslatePoint(Point(0, 0), shell)
         main = window.accept_button.TranslatePoint(Point(0, 0), shell)
-        assert second.X - first.X - token('KlaButtonWidth') == pair_gap
-        assert main.X == first.X and main.Y - first.Y - token('KlaCompactHeight') == token('KlaGridSpace8').Value
+        assert second.X - first.X - token('klcButtonWidth') == pair_gap
+        assert main.X == first.X and main.Y - first.Y - token('KlaCompactHeight') == token('klcBodySpaceNormal').Value
         assert chrome.footer.TranslatePoint(Point(0, 0), shell).Y - main.Y - token('KlaControlHeight') == inset.Bottom
         assert window.window_body.IsEnabled == (state != 'Disabled') and chrome.close_button.IsEnabled
         if state == 'Long content':

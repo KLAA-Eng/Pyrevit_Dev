@@ -11,9 +11,9 @@ public sealed class DesignSystemResourceContractTests
     {
         "KlaWindowBrush",
         "KlaTextBrush",
-        "KlaTextMutedBrush",
-        "KlaFooterLinkBrush",
-        "KlaFooterVersionBrush",
+        "xTextMutedBrush",
+        "klcFooterLinkBrush",
+        "klcFooterVersionBrush",
         "KlaPlaceholderBrush",
         "KlaTextOnAccentBrush",
         "KlaAccentBrush",
@@ -117,22 +117,31 @@ public sealed class DesignSystemResourceContractTests
     }
 
     [TestMethod]
-    public void ChromeData_HoldsBothFooterDestinationsAndTheDefaultLabels()
+    public void ChromeData_HoldsBothFooterDestinationsAndTheCloseLabel()
     {
         XDocument chrome = LoadXaml("lib/GUI/Resources/KLCodeTokens.xaml");
         XNamespace sys = "clr-namespace:System;assembly=System";
         Dictionary<string, string> entries = chrome.Root!.Elements()
             .ToDictionary(e => (string)e.Attribute(Xaml + "Key")!, e => e.Value.Trim());
-        Assert.AreEqual("https", new Uri(entries["KlaPrototypeUri"]).Scheme);
-        Assert.AreEqual("https", new Uri(entries["KlaOutreachUri"]).Scheme);
-        Assert.AreNotEqual(entries["KlaPrototypeUri"], entries["KlaOutreachUri"]);
-        CollectionAssert.IsSubsetOf(new[] { "CloseLabel", "PrototypeLabel", "OutreachLabel" }, entries.Keys.ToArray());
+        Assert.AreEqual("https", new Uri(entries["klcPrototypeUri"]).Scheme);
+        Assert.AreEqual("https", new Uri(entries["klcOutreachUri"]).Scheme);
+        Assert.AreNotEqual(entries["klcPrototypeUri"], entries["klcOutreachUri"]);
+        Assert.AreEqual("Close", entries["CloseLabel"]);
+        // 2026-10-31: only Close is still a DynamicResource label; the footer captions are literal in the shell.
+        CollectionAssert.DoesNotContain(entries.Keys.ToArray(), "PrototypeLabel");
+        CollectionAssert.DoesNotContain(entries.Keys.ToArray(), "OutreachLabel");
         Assert.AreEqual(2, chrome.Root.Elements(sys + "Uri").Count());
         XDocument foundation = LoadXaml("lib/GUI/Resources/KLCodeFoundation.xaml");
         string shell = foundation.ToString();
         StringAssert.Contains(shell, "{DynamicResource CloseLabel}");
-        StringAssert.Contains(shell, "{StaticResource KlaPrototypeUri}");
-        StringAssert.Contains(shell, "{StaticResource KlaOutreachUri}");
+        StringAssert.Contains(shell, "{StaticResource klcPrototypeUri}");
+        StringAssert.Contains(shell, "{StaticResource klcOutreachUri}");
+        Assert.IsFalse(shell.Contains("PrototypeLabel") || shell.Contains("OutreachLabel"), "footer captions are literal Runs");
+        Dictionary<string, string?> captions = foundation.Descendants(Presentation + "Hyperlink")
+            .Where(link => ((string?)link.Attribute(Xaml + "Name"))?.StartsWith("klcFooter_", StringComparison.Ordinal) == true)
+            .ToDictionary(link => (string)link.Attribute(Xaml + "Name")!, link => (string?)link.Element(Presentation + "Run")?.Attribute("Text"));
+        Assert.AreEqual("Prototype", captions["klcFooter_prototype"]);
+        Assert.AreEqual("Outreach", captions["klcFooter_outreach"]);
     }
 
     [TestMethod]

@@ -4,27 +4,27 @@
     </ResourceDictionary.MergedDictionaries>
     <Style x:Key="KlaWindowStyle" TargetType="Window" BasedOn="{StaticResource KlaFoundationWindow}" />
     <Style x:Key="KlaButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaFoundationButton}" />
-    <Style x:Key="KlaCloseButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaFoundationCloseButton}" />
-    <Style x:Key="KlaGhostButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaGhostButton}" />
-    <Style x:Key="KlaLinkButtonStyle" TargetType="Button" BasedOn="{StaticResource KlaLinkButton}" />
-    <Style x:Key="KlaSegmentButtonStyle" TargetType="RadioButton" BasedOn="{StaticResource KlaSegmentButton}" />
+    <Style x:Key="KlaCloseButtonStyle" TargetType="Button" BasedOn="{StaticResource klcCloseButton}" />
+    <Style x:Key="KlaGhostButtonStyle" TargetType="Button" BasedOn="{StaticResource xGhostButton}" />
+    <Style x:Key="KlaLinkButtonStyle" TargetType="Button" BasedOn="{StaticResource xLinkButton}" />
+    <Style x:Key="KlaSegmentButtonStyle" TargetType="RadioButton" BasedOn="{StaticResource xSegmentButton}" />
     <Style x:Key="KlaTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource KlaCompactFieldInput}" />
     <Style x:Key="KlaComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource KlaCompactComboBox}" />
     <Style x:Key="KlaCheckBoxStyle" TargetType="CheckBox" BasedOn="{StaticResource KlaFoundationCheckBox}" />
     <Style x:Key="KlaListBoxStyle" TargetType="ListBox" BasedOn="{StaticResource KlaFoundationList}" />
     <Style x:Key="KlaListBoxItemStyle" TargetType="ListBoxItem" BasedOn="{StaticResource KlaFoundationListItem}" />
     <Style x:Key="KlaGroupBorderStyle" TargetType="Border" BasedOn="{StaticResource KlaSection}" />
-    <Style x:Key="KlaGroupCaptionStyle" TargetType="TextBlock" BasedOn="{StaticResource KlaPromptText}" />
-    <Style x:Key="KlaChipBorderStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusChip}" />
-    <Style x:Key="KlaInfoChipStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusChip}">
+    <Style x:Key="KlaGroupCaptionStyle" TargetType="TextBlock" BasedOn="{StaticResource xPromptText}" />
+    <Style x:Key="KlaChipBorderStyle" TargetType="Border" BasedOn="{StaticResource xStatusChip}" />
+    <Style x:Key="KlaInfoChipStyle" TargetType="Border" BasedOn="{StaticResource xStatusChip}">
         <Setter Property="BorderBrush" Value="{StaticResource KlaInfoBrush}" />
     </Style>
-    <Style x:Key="KlaWarningChipStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusWarning}" />
-    <Style x:Key="KlaBlockingChipStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusError}" />
-    <Style x:Key="KlaNeutralChipStyle" TargetType="Border" BasedOn="{StaticResource KlaStatusChip}" />
+    <Style x:Key="KlaWarningChipStyle" TargetType="Border" BasedOn="{StaticResource xStatusWarning}" />
+    <Style x:Key="KlaBlockingChipStyle" TargetType="Border" BasedOn="{StaticResource xStatusError}" />
+    <Style x:Key="KlaNeutralChipStyle" TargetType="Border" BasedOn="{StaticResource xStatusChip}" />
     <Style x:Key="KlaMutedTextStyle" TargetType="TextBlock" BasedOn="{StaticResource KlaInfoText}" />
     <Style x:Key="KlaPreviewBorderStyle" TargetType="Border" BasedOn="{StaticResource KlaSection}">
-        <Setter Property="Background" Value="{StaticResource KlaPreviewSurfaceBrush}" />
+        <Setter Property="Background" Value="{StaticResource xPreviewSurfaceBrush}" />
         <Setter Property="Padding" Value="0" />
     </Style>
     <!-- The implicit TextBox / ComboBox / CheckBox styles live in KLCodeComponents.xaml, shared with the Python host. -->

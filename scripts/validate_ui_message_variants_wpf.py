@@ -9,7 +9,7 @@ from __future__ import print_function
 import wpf
 from System import Action
 from System.Windows import Size, Rect, Point, Visibility, RoutedEventArgs
-from System.Windows.Controls import ScrollViewer
+from System.Windows.Controls import Grid, ScrollViewer
 from System.Windows.Controls.Primitives import ButtonBase
 from System.Windows.Automation.Peers import ToggleButtonAutomationPeer, PatternInterface
 from System.Windows.Media import VisualTreeHelper
@@ -51,7 +51,8 @@ def validate_message_variants():
                 message_layout(window)
                 assert window._kla_chrome.footer.Visibility == Visibility.Collapsed
                 assert window._kla_chrome.footer.ActualHeight == 0
-                assert window.window_shell.Template.FindName('PART_FooterRow', window.window_shell).Height.Value == 0
+                footer = window._kla_chrome.footer
+                assert footer.Parent.RowDefinitions[Grid.GetRow(footer)].Height.Value == 0
                 assert window.Title == 'Message variants'
                 assert window._kla_chrome.title.Visibility == Visibility.Collapsed
                 assert window.message_heading.FontSize == 22

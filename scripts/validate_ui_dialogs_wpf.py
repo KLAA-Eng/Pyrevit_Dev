@@ -6,7 +6,7 @@ from GUI.dialogs import (SelectionItem, ActionChoice, create_message, create_sel
                          create_choice, create_text_prompt)
 from ui_gallery.dialog_data import DIALOG_FILES, ACTION_IDS
 from System.Windows import Visibility
-from System.Windows.Controls import Button
+from System.Windows.Controls import Button, Grid
 from System.Windows.Controls.Primitives import ToggleButton
 from System.Windows.Input import Key
 
@@ -37,7 +37,8 @@ def dialog_layout(window, width=None, height=None):
     assert chrome.footer.ActualHeight == (0 if footerless else 24)
     if footerless:
         assert chrome.footer.Visibility == Visibility.Collapsed
-        assert window.window_shell.Template.FindName('PART_FooterRow', window.window_shell).Height.Value == 0
+        # The 2026-10-31 shell names no row; the footer's own row must be zero high, not just collapsed.
+        assert chrome.footer.Parent.RowDefinitions[Grid.GetRow(chrome.footer)].Height.Value == 0
     assert str(chrome.version.Foreground) == '#FF808080'
     assert str(chrome.prototype.Foreground) == '#FF407058'
     actions = [control for control in descendants(window.window_body)

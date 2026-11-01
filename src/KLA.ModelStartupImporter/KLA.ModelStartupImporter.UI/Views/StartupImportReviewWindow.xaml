@@ -62,7 +62,7 @@
                                         <TextBlock Grid.Column="1" Text="{Binding ItemId}" FontFamily="Consolas" FontSize="11" VerticalAlignment="Center" />
                                         <TextBlock Grid.Column="2" Text="{Binding Title}" FontSize="11" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,6,0" />
                                         <TextBlock Grid.Column="3" Text="{Binding Category}" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                        <Border Grid.Column="4" x:Name="StatusBorder" Style="{StaticResource KlaTableStatusChip}">
+                                        <Border Grid.Column="4" x:Name="StatusBorder" Style="{StaticResource xTableStatusChip}">
                                             <TextBlock x:Name="StatusText" Text="{Binding Status}" FontSize="10" Foreground="{StaticResource KlaMutedBrush}" />
                                         </Border>
                                     </Grid>
@@ -130,7 +130,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="{StaticResource CancelLabel}" Style="{StaticResource KlaGhostButtonStyle}" Margin="0,0,8,0" IsCancel="True" Click="OnCancelClick" />
-                    <Button Content="{Binding ImportButtonLabel}" Style="{StaticResource KlaFoundationMainButton}" IsDefault="True" IsEnabled="{Binding CanImport}" Click="OnImportClick" />
+                    <Button Content="{Binding ImportButtonLabel}" Style="{StaticResource klcButtonDouble}" IsDefault="True" IsEnabled="{Binding CanImport}" Click="OnImportClick" />
                 </StackPanel>
             </Grid>
         </Grid>

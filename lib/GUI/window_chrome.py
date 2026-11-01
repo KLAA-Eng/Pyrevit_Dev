@@ -79,14 +79,14 @@ class WindowChrome(object):
         window.Title = metadata.Title
         self.shell.ApplyTemplate()
         template = self.shell.Template
-        self.header = template.FindName('PART_Header', self.shell)
-        self.title = template.FindName('PART_Title', self.shell)
-        self.close_button = template.FindName('PART_Close', self.shell)
-        self.body = template.FindName('PART_Body', self.shell)
-        self.footer = template.FindName('PART_Footer', self.shell)
-        self.version = template.FindName('PART_Version', self.shell)
-        self.prototype = template.FindName('PART_Prototype', self.shell)
-        self.outreach = template.FindName('PART_Outreach', self.shell)
+        self.header = template.FindName('klcShell_Header', self.shell)
+        self.title = template.FindName('klcHeader_title', self.shell)
+        self.close_button = template.FindName('klcHeader_close', self.shell)
+        self.body = template.FindName('klcShell_Body', self.shell)
+        self.footer = template.FindName('klcShell_Footer', self.shell)
+        self.version = template.FindName('klcFooter_version', self.shell)
+        self.prototype = template.FindName('klcFooter_prototype', self.shell)
+        self.outreach = template.FindName('klcFooter_outreach', self.shell)
         self.close_button.Click += self._close
         window.PreviewKeyDown += self._key
         self.header.MouseLeftButtonDown += self._drag
@@ -102,9 +102,13 @@ class WindowChrome(object):
     def hide_footer(self):
         """Omit this window's footer and row without changing the shared template."""
         from System.Windows import GridLength, Visibility
+        from System.Windows.Controls import Grid
+        from System.Windows.Media import VisualTreeHelper
 
         self.footer.Visibility = Visibility.Collapsed
-        self.shell.Template.FindName('PART_FooterRow', self.shell).Height = GridLength(0)
+        # The footer row has no name; collapse the row the footer grid occupies.
+        grid = VisualTreeHelper.GetParent(self.footer)
+        grid.RowDefinitions[Grid.GetRow(self.footer)].Height = GridLength(0)
 
     def detach_escape(self):
         """Let the window route Escape itself (Action Choice keeps Cancel and Close distinct)."""

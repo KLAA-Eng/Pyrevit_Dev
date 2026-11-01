@@ -103,14 +103,14 @@ def _window_type():
                 self.buttons_panel.ColumnDefinitions.Add(column)
                 if index < columns - 1:
                     gap = ColumnDefinition()
-                    gap.Width = self.FindResource('KlaGridSpace8')
+                    gap.Width = self.FindResource('klcBodySpaceNormal')
                     self.buttons_panel.ColumnDefinitions.Add(gap)
             rows = (len(state.buttons) + 3) // 4
             for index in range(rows):
                 self.buttons_panel.RowDefinitions.Add(RowDefinition())
                 if index < rows - 1:
                     gap = RowDefinition()
-                    gap.Height = self.FindResource('KlaGridSpace8')
+                    gap.Height = self.FindResource('klcBodySpaceNormal')
                     self.buttons_panel.RowDefinitions.Add(gap)
             for index, name in enumerate(state.buttons):
                 button = Button()

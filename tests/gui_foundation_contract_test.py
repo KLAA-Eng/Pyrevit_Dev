@@ -1,8 +1,10 @@
 """Template contracts of the shared foundation that the WPF probes cannot see on a non-Windows host.
 
 Each check reads the XAML as XML; nothing is rendered. They guard the 2026-10-29 template
-correctness pass: orientation-aware scrollbars, layout-based Close centering, an indeterminate
-checkbox state, a non-reflowing link focus, body-first keyboard order and no stacked opacity.
+correctness pass (orientation-aware scrollbars, layout-based Close centering, an indeterminate
+checkbox state, a non-reflowing link focus, body-first keyboard order and no stacked opacity) as
+the 2026-10-31 shell rework left it: klcCloseButton centres its caption with alignment alone and
+the shell names its parts klcShell_*, klcHeader_* and klcFooter_*.
 """
 import os
 import re
@@ -43,12 +45,21 @@ class FoundationTemplateContracts(unittest.TestCase):
         # Inspect the scrollbar style alone: the shell template later in the file uses Grid.Row legitimately.
         self.assertEqual([], [node for node in bar.iter() if 'Grid.Row' in node.attrib])
 
-    def test_close_button_centers_its_glyphs_in_layout_not_with_a_render_transform(self):
+    def test_close_button_centers_its_caption_with_alignment_not_a_margin_or_render_transform(self):
         foundation = _read('KLCodeFoundation.xaml')
         self.assertNotIn('TranslateTransform', foundation)
-        close = _style(_root('KLCodeFoundation.xaml'), 'KlaFoundationCloseButton')
+        # The glyph-lift margin went with the 60 x 18 button on 2026-10-31; the 48 x 16 klcCloseButton
+        # centres its caption in layout, so the token is the unused xxxCloseGlyphLift and nothing names it.
+        self.assertNotIn('CloseGlyphLift', foundation)
+        close = _style(_root('KLCodeFoundation.xaml'), 'klcCloseButton')
         text = next(close.iter(P + 'TextBlock'))
-        self.assertEqual('{StaticResource KlaCloseGlyphLift}', text.attrib.get('Margin'))
+        self.assertNotIn('Margin', text.attrib)
+        self.assertEqual(('Center', 'Center', 'Center'), (text.attrib.get('HorizontalAlignment'),
+                         text.attrib.get('VerticalAlignment'), text.attrib.get('TextAlignment')))
+        sizes = {setter.attrib.get('Property'): setter.attrib.get('Value') for setter in close.findall(P + 'Setter')}
+        self.assertEqual({'Width': '{StaticResource klcCloseWidth}', 'Height': '{StaticResource klcCloseHeight}',
+                          'FontSize': '{StaticResource klcCloseFontSize}'},
+                         {key: sizes.get(key) for key in ('Width', 'Height', 'FontSize')})
 
     def test_checkbox_has_an_indeterminate_state(self):
         box = _style(_root('KLCodeFoundation.xaml'), 'KlaFoundationCheckBox')
@@ -58,18 +69,30 @@ class FoundationTemplateContracts(unittest.TestCase):
         self.assertEqual({'CheckMark', 'IndeterminateMark'}, names)
 
     def test_link_focus_changes_colour_only(self):
-        link = _style(_root('KLCodeFoundation.xaml'), 'KlaFoundationLink')
+        link = _style(_root('KLCodeFoundation.xaml'), 'klcFoundationLink')
         for trigger in link.iter(P + 'Trigger'):
             for setter in trigger.iter(P + 'Setter'):
                 self.assertNotEqual('FontWeight', setter.attrib.get('Property'), 'focus must not reflow the footer')
 
     def test_shell_declares_the_body_before_the_chrome_so_keyboard_order_starts_in_the_body(self):
         shell = _style(_root('KLCodeFoundation.xaml'), 'KlaWindowShell')
-        order = [e.attrib.get(X + 'Name') for e in shell.iter() if e.attrib.get(X + 'Name') in ('PART_Body', 'PART_Header', 'PART_Footer')]
-        self.assertEqual(['PART_Body', 'PART_Header', 'PART_Footer'], order)
-        version = next(e for e in shell.iter() if e.attrib.get(X + 'Name') == 'PART_Version')
-        self.assertEqual('Tool version', version.attrib.get('{http://schemas.microsoft.com/winfx/2006/xaml/presentation}AutomationProperties.Name')
+        bands = ('klcShell_Body', 'klcShell_Header', 'klcShell_Footer')
+        order = [e.attrib.get(X + 'Name') for e in shell.iter() if e.attrib.get(X + 'Name') in bands]
+        self.assertEqual(list(bands), order)
+        version = next(e for e in shell.iter() if e.attrib.get(X + 'Name') == 'klcFooter_version')
+        self.assertEqual('Tool version', version.attrib.get(P + 'AutomationProperties.Name')
                          or version.attrib.get('AutomationProperties.Name'))
+
+    def test_shell_names_every_part_the_python_and_csharp_chrome_binders_look_up(self):
+        # GUI/window_chrome.py and src/KLCode.Wpf/WindowChrome.cs bind these by name through the template.
+        shell = _style(_root('KLCodeFoundation.xaml'), 'KlaWindowShell')
+        names = {e.attrib.get(X + 'Name') for e in shell.iter() if X + 'Name' in e.attrib}
+        self.assertEqual({'klcShell_Body', 'klcShell_Header', 'klcShell_Footer',
+                          'klcHeader_logo', 'klcHeader_title', 'klcHeader_close',
+                          'klcFooter_version', 'klcFooter_prototype', 'klcFooter_outreach'}, names)
+        close = next(e for e in shell.iter(P + 'Button') if e.attrib.get(X + 'Name') == 'klcHeader_close')
+        self.assertEqual('{StaticResource klcCloseButton}', close.attrib.get('Style'))
+        self.assertEqual('{DynamicResource CloseLabel}', close.attrib.get('Content'))
 
     def test_disabled_states_use_the_disabled_brushes_without_stacking_opacity(self):
         for name in ('KLCodeFoundation.xaml', 'KLCodeComponents.xaml'):

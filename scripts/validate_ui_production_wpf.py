@@ -12,7 +12,7 @@ import math
 from System import Uri
 from System.Windows import Window, Size, Rect, Point, ResourceDictionary, ResizeMode, TextWrapping, Visibility
 from System.Windows.Automation import AutomationProperties
-from System.Windows.Controls import (Border, Button, ContentControl, Image, Label,
+from System.Windows.Controls import (Border, Button, ContentControl, Grid, Image, Label,
                                      ScrollBarVisibility, ScrollViewer, StackPanel, TextBlock,
                                      TextBox, WrapPanel)
 from System.Windows.Media import Brushes, Geometry
@@ -69,7 +69,7 @@ def assert_recall_captions(window, locale):
         assert button.Content.DesiredSize.Width <= available + 0.1, (locale, button.Name, 'icon/text clipped', button.Content.DesiredSize.Width, available)
         position = button.TranslatePoint(Point(0, 0), window.window_body)
         assert position.X >= -0.1 and position.X + button.ActualWidth <= window.window_body.ActualWidth + 0.1, (locale, button.Name, 'button exceeds body')
-        assert button.ActualWidth == window.FindResource('KlaIconTextButtonWidth') and button.ActualHeight == window.FindResource('KlaCompactHeight'), (locale, button.Name, 'icon/text role')
+        assert button.ActualWidth == window.FindResource('xxIconTextButtonWidth') and button.ActualHeight == window.FindResource('KlaCompactHeight'), (locale, button.Name, 'icon/text role')
         count += 1
     assert count == 4, (locale, count)
     last = recall.pasteSelBtn.TranslatePoint(Point(0, recall.pasteSelBtn.ActualHeight), window.window_shell).Y
@@ -88,12 +88,13 @@ def validate_production_windows():
                 width, height = production_layout(window)
                 shell, chrome = window.window_shell, window._kla_chrome
                 token = window.FindResource
-                chrome_row, inset = token('KlaChromeRow').Value, token('KlaBodyInset')
+                chrome_row, inset = token('KlaChromeRow').Value, token('klcBodyMargin')
                 assert chrome.header.ActualHeight == chrome_row, (identity, state)
                 assert chrome.footer.ActualHeight == (0 if identity == 'kla-custom-alert' else chrome_row), (identity, state)
                 if identity == 'kla-custom-alert':
                     assert chrome.footer.Visibility == Visibility.Collapsed
-                    assert shell.Template.FindName('PART_FooterRow', shell).Height.Value == 0
+                    # The 2026-10-31 shell names no row; the footer's own row must be zero high, not just collapsed.
+                    assert chrome.footer.Parent.RowDefinitions[Grid.GetRow(chrome.footer)].Height.Value == 0
                 origin = window.window_body.TranslatePoint(Point(0, 0), shell)
                 assert abs(origin.X - inset.Left) < 0.1 and abs(origin.Y - (chrome_row + inset.Top)) < 0.1, (identity, state, origin)
                 assert abs(window.window_body.ActualWidth - (width - inset.Left - inset.Right)) < 1, (identity, state)
@@ -115,7 +116,7 @@ def validate_production_windows():
                             assert abs(control.ActualWidth - token('KlaCompactFieldInputColumn').Value) < 0.1, (identity, state, control.Name, 'naming field width', control.ActualWidth)
                         assert AutomationProperties.GetName(control), (identity, control.Name, 'unnamed field')
                     if isinstance(control, Label) and control.Style == window.Resources['KlaFoundationPromptLabel']:
-                        assert control.FontSize == token('KlaTitleFontSize'), (identity, state, 'prompt')
+                        assert control.FontSize == token('klcSectionTitleFontSize'), (identity, state, 'prompt')
 
                 if identity in FOOTER_ACTIONS:
                     action = getattr(window, FOOTER_ACTIONS[identity])

@@ -161,7 +161,7 @@ def _window_types():
 
             DialogWindow.feedback(self, text)
             self.batch_actions.Margin = self.FindResource('KlaStackGap') if text else Thickness(0)
-            self.secondary_gap.Height = self.FindResource('KlaGridSpace8') if text or self.state.multiple else GridLength(0)
+            self.secondary_gap.Height = self.FindResource('klcBodySpaceNormal') if text or self.state.multiple else GridLength(0)
 
         def update_checks(self, parent=None):
             # Pull changed checks into realized controls without rebuilding the list:
@@ -230,7 +230,7 @@ def _window_types():
 
             if not self._ready:
                 return
-            inset = self.FindResource('KlaBodyInset')
+            inset = self.FindResource('klcBodyMargin')
             bounds = Size(max(1, self.Width - inset.Left - inset.Right), float('inf'))
             self.prompt_fields.Measure(bounds)
             self.prompt_actions.Measure(bounds)
