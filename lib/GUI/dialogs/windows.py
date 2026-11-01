@@ -234,8 +234,10 @@ def _window_types():
             bounds = Size(max(1, self.Width - inset.Left - inset.Right), float('inf'))
             self.prompt_fields.Measure(bounds)
             self.prompt_actions.Measure(bounds)
+            # The gap above the actions is a grid row, not a margin, so DesiredSize does not include it.
             desired = (self.FindResource('klcChromeHeight').Value + inset.Top + inset.Bottom
-                       + self.prompt_fields.DesiredSize.Height + self.prompt_actions.DesiredSize.Height)
+                       + self.prompt_fields.DesiredSize.Height + self.FindResource('klcBodySpaceNormal').Value
+                       + self.prompt_actions.DesiredSize.Height)
             minimum = min(self.MaxHeight, ceil(desired))
             self.MinHeight = minimum
             # Follow the content until the user resizes with the grip; a resized

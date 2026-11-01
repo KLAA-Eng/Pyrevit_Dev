@@ -17,8 +17,8 @@
             </ListBox>
             <StackPanel Grid.Row="6">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Select All" Click="button_select_all" Style="{StaticResource KlaFoundationButton}" Margin="{StaticResource KlaPairGap}"/>
-                    <Button Content="Select None" Click="button_select_none" Style="{StaticResource KlaFoundationButton}"/>
+                    <Button Content="Select All" Click="button_select_all" Style="{StaticResource klcFdnButton}" Margin="{StaticResource KlaPairGap}"/>
+                    <Button Content="Select None" Click="button_select_none" Style="{StaticResource klcFdnButton}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
                     <Button Content="Initialize CSV" Click="button_initialize_csv" Style="{StaticResource KlaButtonSecondary}" Margin="{StaticResource KlaPairGap}"/>

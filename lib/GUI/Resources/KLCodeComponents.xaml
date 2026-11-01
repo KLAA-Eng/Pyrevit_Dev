@@ -38,17 +38,14 @@
         TargetType="Border">
         <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
     </Style>
+    <!--  Text styles set only what differs from the window: klcFdnWindow already gives every TextBlock its font, body size and text colour.  -->
     <Style x:Key="KlaSectionHeading" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
-        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcSectionTitleFontSize}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     <Style x:Key="KlaInfoText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
-        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     <Style
@@ -280,9 +277,7 @@
             <Setter.Value>
                 <DataTemplate>
                     <StackPanel>
-                        <TextBlock
-                            Text="{Binding Label}"
-                            TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Label}" TextWrapping="Wrap" />
                         <TextBlock Style="{StaticResource KlaDialogDescription}" Text="{Binding Description}" />
                     </StackPanel>
                 </DataTemplate>
@@ -293,11 +288,11 @@
     <!--  Buttons  -->
     <Style
         x:Key="KlaButton"
-        BasedOn="{StaticResource KlaFoundationButton}"
+        BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button" />
     <Style
         x:Key="klcButtonDouble"
-        BasedOn="{StaticResource KlaFoundationButton}"
+        BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button">
         <Setter Property="Width" Value="{StaticResource klcDoubleButtonWidth}" />
         <Setter Property="Height" Value="{StaticResource klcDoubleButtonHeight}" />
@@ -305,11 +300,11 @@
     </Style>
     <Style
         x:Key="KlaButtonSecondary"
-        BasedOn="{StaticResource KlaFoundationButton}"
+        BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button">
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
     </Style>
-
+    
     <!--  Links  -->
     <Style
         x:Key="KlaLink"
@@ -446,37 +441,12 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <!--
-        A multiline readout whose text aligns with the dialog body (Message Details). TextBoxView already
-        consumes Padding; applying it again as the content-host margin would shift the first character.
-    -->
+    <!--  A multiline readout whose text aligns with the dialog body (Message Details); the input template comes from KlaFoundationInput.  -->
     <Style
         x:Key="KlaDetailsReadout"
         BasedOn="{StaticResource KlaMultilineReadout}"
         TargetType="TextBox">
         <Setter Property="Padding" Value="{StaticResource KlaDetailsReadoutPadding}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="TextBox">
-                    <Border
-                        x:Name="InputBorder"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{StaticResource KlaRadiusControl}">
-                        <ScrollViewer x:Name="PART_ContentHost" />
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter TargetName="InputBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
     </Style>
 
     <!--  Command link (Action Choice)  -->
@@ -484,16 +454,23 @@
     <PathGeometry x:Key="KlaCommandArrowGeometry" Figures="M4,12 L20,12 M14,6 L20,12 L14,18" />
     <Style
         x:Key="KlaCommandLink"
-        BasedOn="{StaticResource KlaButton}"
+        BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button">
+        <Style.Resources>
+            <StaticResource x:Key="klcButtonHoverBrush" ResourceKey="KlaComponentSurfaceBrush" />
+            <SolidColorBrush x:Key="klcButtonDisabledBrush" Color="Transparent" />
+            <StaticResource x:Key="klcButtonRadius" ResourceKey="KlaRadiusControl" />
+        </Style.Resources>
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Height" Value="Auto" />
         <Setter Property="MinHeight" Value="{StaticResource KlaCommandLinkMinHeight}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <!--  Body size for the description; the label sets its own.  -->
+        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
         <Setter Property="Padding" Value="{StaticResource KlaCommandLinkPadding}" />
         <Setter Property="ContentTemplate">
             <Setter.Value>
@@ -530,48 +507,31 @@
                 </DataTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border
-                        Padding="{TemplateBinding Padding}"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{StaticResource KlaRadiusControl}">
-                        <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-                            <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="{StaticResource KlaPressedBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!--  Command Switch pills  -->
-    <Style x:Key="KlaCommandButton" TargetType="Button">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+    <Style
+        x:Key="KlaCommandButton"
+        BasedOn="{StaticResource klcFdnButton}"
+        TargetType="Button">
+        <Style.Resources>
+            <StaticResource x:Key="klcButtonRadius" ResourceKey="KlaCommandPillRadius" />
+        </Style.Resources>
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="MinHeight" Value="{StaticResource klcButtonHeight}" />
+        <!--  Stretch: pills on one WrapPanel line share the tallest pill's height.  -->
+        <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
-        <Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}" />
-        <Setter Property="Background" Value="{StaticResource KlaAccentBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource KlaAccentBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
         <Setter Property="Padding" Value="{StaticResource KlaCommandPillInset}" />
         <Setter Property="Margin" Value="{StaticResource KlaCommandPillGap}" />
-        <Setter Property="MinHeight" Value="{StaticResource klcButtonHeight}" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="ContentTemplate">
             <Setter.Value>
                 <DataTemplate>
@@ -582,33 +542,11 @@
                 </DataTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border
-                        Padding="{TemplateBinding Padding}"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{StaticResource KlaCommandPillRadius}">
-                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="{StaticResource KlaPressedBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-                            <Setter Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
-                            <Setter Property="BorderBrush" Value="{StaticResource KlaDisabledFillBrush}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="BorderBrush" Value="{StaticResource KlaDisabledFillBrush}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
     <Style x:Key="KlaCommandToggle" TargetType="ToggleButton">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -707,12 +645,23 @@
     </Style>
 
     <!--  x: exclusive choices  -->
+    <!--
+        Mirrors KlaFoundationCheckBox with a round box and a dot. RadioButton is not a CheckBox, so it cannot be BasedOn it;
+        keep the column layout, wrapping caption and state fills in step with the check box when either changes.
+    -->
     <Style x:Key="xRadioButton" TargetType="RadioButton">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
         <Setter Property="MinHeight" Value="{StaticResource klcButtonHeight}" />
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
@@ -756,6 +705,7 @@
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -811,42 +761,15 @@
     -->
     <Style
         x:Key="xLinkButton"
-        BasedOn="{StaticResource KlaFoundationButton}"
+        BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button">
+        <Style.Resources>
+            <StaticResource x:Key="klcButtonHoverBrush" ResourceKey="KlaComponentSurfaceBrush" />
+            <SolidColorBrush x:Key="klcButtonDisabledBrush" Color="Transparent" />
+        </Style.Resources>
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
-        <Setter Property="BorderBrush" Value="Transparent" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border
-                        x:Name="LinkBorder"
-                        Padding="{TemplateBinding Padding}"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{StaticResource klcBorderHairline}"
-                        CornerRadius="{StaticResource KlaRadiusCard}">
-                        <Grid>
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                RecognizesAccessKey="True" />
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="LinkBorder" Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="LinkBorder" Property="Background" Value="{StaticResource KlaPressedBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
     </Style>
     <Style
         x:Key="xGhostButton"
@@ -890,9 +813,6 @@
         <Setter Property="BorderBrush" Value="{StaticResource klcErrorColor}" />
     </Style>
     <Style x:Key="xStatusText" TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
-        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
@@ -1017,58 +937,29 @@
     <!--  ======================================================================  -->
     <!--  xx tier: used only by lib/GUI/_future windows, which no tool opens yet.  -->
     <!--  ======================================================================  -->
-    <Style x:Key="xxToggle" TargetType="ToggleButton">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="Width" Value="{StaticResource klcButtonWidth}" />
-        <Setter Property="Height" Value="{StaticResource klcButtonHeight}" />
-        <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
+    <!--  Checked fills the button's own Background, so the template's hover, pressed and disabled fills still take precedence over it.  -->
+    <Style
+        x:Key="xxToggle"
+        BasedOn="{StaticResource klcFdnButton}"
+        TargetType="ToggleButton">
         <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-        <Setter Property="Padding" Value="{StaticResource KlaInputPadding}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
-                    <Border
-                        x:Name="ToggleBorder"
-                        Padding="{TemplateBinding Padding}"
-                        Background="{TemplateBinding Background}"
-                        CornerRadius="{StaticResource KlaRadiusCard}">
-                        <Grid>
-                            <ContentPresenter
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                RecognizesAccessKey="True" />
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaAccentBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaPressedBrush}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background" Value="{StaticResource KlaAccentBrush}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="xxIconTextButton"
-        BasedOn="{StaticResource KlaFoundationButton}"
+        BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button">
         <Setter Property="Width" Value="{StaticResource xxIconTextButtonWidth}" />
     </Style>
     <Style
         x:Key="xxIconButton"
-        BasedOn="{StaticResource KlaFoundationButton}"
+        BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button">
         <Setter Property="Width" Value="{StaticResource xxIconButtonWidth}" />
         <Setter Property="Height" Value="{StaticResource klcButtonHeight}" />

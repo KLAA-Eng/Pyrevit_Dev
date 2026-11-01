@@ -81,7 +81,7 @@
     <CornerRadius x:Key="KlaRadiusControl">6</CornerRadius>
     <CornerRadius x:Key="KlaSwitchTrackRadius">6</CornerRadius>
     <CornerRadius x:Key="KlaRadiusCard">8</CornerRadius>
-    <CornerRadius x:Key="KlaScrollThumbRadius">8</CornerRadius>
+    <CornerRadius x:Key="klcScrollThumbRadius">4</CornerRadius>
     <CornerRadius x:Key="KlaScrollBarRadius">10</CornerRadius>
     <CornerRadius x:Key="KlaRadiusFloating">12</CornerRadius>
     <CornerRadius x:Key="KlaCommandPillRadius">12</CornerRadius>

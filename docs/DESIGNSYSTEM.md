@@ -274,8 +274,13 @@ windows; compiled consumers can also use their existing adapter aliases.
 | `KlaCommandLink` | Button | Full width, minimum height 40 | TaskDialog-style command link: arrow, 16 SemiBold label, optional description; Action Choice |
 | `KlaDetailsExpander` / `KlaDetailsToggle` | Expander / ToggleButton | Header row; content 8 below | Details disclosure with a right/down chevron in the Expander's foreground; Message and Action Choice |
 
-`KlaFoundationButton`, `klcButtonDouble` and `KlaButtonSecondary` remain
+`klcFdnButton`, `klcButtonDouble` and `KlaButtonSecondary` remain
 valid existing names. The role aliases above are preferred for new markup.
+Every button variant, `xxToggle` included, inherits the `klcFdnButton`
+template. A variant changes its hover fill, disabled fill or corner radius
+by re-pointing `klcButtonHoverBrush`, `klcButtonDisabledBrush` or
+`klcButtonRadius` in its own `Style.Resources`, and its border through the
+`BorderBrush` and `BorderThickness` setters; never by copying the template.
 Preserve workflow action placement when migrating a window. If a localized
 caption cannot fit its role, review a shared variant and render it; do not
 silently shrink fonts or invent a per-window button size.

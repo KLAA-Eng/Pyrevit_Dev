@@ -62,11 +62,11 @@
                     Margin="{StaticResource KlaPairGap}"
                     Click="button_select_all"
                     Content="Select All"
-                    Style="{StaticResource KlaFoundationButton}" />
+                    Style="{StaticResource klcFdnButton}" />
                 <Button
                     Click="button_select_none"
                     Content="Select None"
-                    Style="{StaticResource KlaFoundationButton}" />
+                    Style="{StaticResource klcFdnButton}" />
             </StackPanel>
             <Button
                 x:Name="button_main"

@@ -8,10 +8,10 @@
 
     <!--
         Base styles: one per control family, each derived style directly under its base. Role-named aliases for new XAML
-        live in KLCodeComponents.xaml. No key in this file is x / xx / xxx: every style here is reached by the shared dialogs.
+        live in KLCodeComponents.xaml.
     -->
 
-    <!--  Scrollbar: charcoal track, green thumb, both orientations (formerly KLCodeSharedPrimitives.xaml)  -->
+    <!--  Scrollbar: charcoal track, green thumb, both orientations  -->
     <Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="IsTabStop" Value="false" />
@@ -23,7 +23,7 @@
                         Width="{TemplateBinding Width}"
                         Height="{TemplateBinding Height}"
                         Background="{StaticResource klcBorderColor}"
-                        CornerRadius="{StaticResource KlaScrollThumbRadius}"
+                        CornerRadius="{StaticResource klcScrollThumbRadius}"
                         SnapsToDevicePixels="True" />
                 </ControlTemplate>
             </Setter.Value>
@@ -126,7 +126,17 @@
     </Style>
 
     <!--  Buttons  -->
-    <Style x:Key="KlaFoundationButton" TargetType="Button">
+    <!--
+        One template for every button variant, ToggleButton included (hence ButtonBase). A variant re-points the klcButton* keys in
+        its own Style.Resources rather than copying the template: the state triggers read them by DynamicResource, which resolves
+        through the variant's resources before these defaults. Border brush and thickness are ordinary setters.
+    -->
+    <Style x:Key="klcFdnButton" TargetType="ButtonBase">
+        <Style.Resources>
+            <StaticResource x:Key="klcButtonHoverBrush" ResourceKey="KlaAccentHoverBrush" />
+            <StaticResource x:Key="klcButtonDisabledBrush" ResourceKey="KlaDisabledFillBrush" />
+            <StaticResource x:Key="klcButtonRadius" ResourceKey="KlaRadiusCard" />
+        </Style.Resources>
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcButtonFontSize}" />
@@ -134,6 +144,8 @@
         <Setter Property="Height" Value="{StaticResource klcButtonHeight}" />
         <Setter Property="Background" Value="{StaticResource KlaAccentBrush}" />
         <Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="{StaticResource KlaInputPadding}" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -141,14 +153,14 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="Button">
+                <ControlTemplate TargetType="ButtonBase">
                     <Border
                         x:Name="ButtonBorder"
                         Padding="{TemplateBinding Padding}"
                         Background="{TemplateBinding Background}"
-                        BorderBrush="Transparent"
-                        BorderThickness="0"
-                        CornerRadius="{StaticResource KlaRadiusCard}">
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{DynamicResource klcButtonRadius}">
                         <ContentPresenter
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -156,13 +168,13 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource KlaAccentHoverBrush}" />
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource klcButtonHoverBrush}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource KlaPressedBrush}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource klcButtonDisabledBrush}" />
                             <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -172,7 +184,7 @@
     </Style>
     <Style
         x:Key="klcCloseButton"
-        BasedOn="{StaticResource KlaFoundationButton}"
+        BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button">
         <!--  Chrome is the deliberate compact exception to form control sizes.  -->
         <Setter Property="Width" Value="{StaticResource klcCloseWidth}" />
@@ -259,9 +271,7 @@
         <Setter Property="ContentTemplate">
             <Setter.Value>
                 <DataTemplate>
-                    <TextBlock
-                        Text="{Binding}"
-                        TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap" />
                 </DataTemplate>
             </Setter.Value>
         </Setter>

@@ -76,7 +76,7 @@
                 <ComboBox x:Name="VariantSelector" Grid.Column="1" Style="{StaticResource KlaCompactComboBox}" DisplayMemberPath="Label" SelectionChanged="preview_choice_changed" AutomationProperties.Name="Preview variant"/>
                 <Label Grid.Column="3" Content="Preview _state" Target="{Binding ElementName=StateSelector}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
                 <ComboBox x:Name="StateSelector" Grid.Column="4" Style="{StaticResource KlaCompactComboBox}" SelectionChanged="preview_choice_changed" AutomationProperties.Name="Preview state"/>
-                <Button x:Name="LaunchButton" Grid.Column="6" Content="_Open preview" Click="launch_selected" Style="{StaticResource KlaFoundationButton}"/>
+                <Button x:Name="LaunchButton" Grid.Column="6" Content="_Open preview" Click="launch_selected" Style="{StaticResource klcFdnButton}"/>
                 <TextBlock x:Name="LastResult" Grid.Column="7" Margin="12,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{StaticResource KlaMutedBrush}"/>
             </Grid>
         </Grid>

@@ -19,12 +19,7 @@
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="TextAlignment" Value="Center" />
         </Style>
-        <Style
-            x:Key="ViewRangeTableCell"
-            BasedOn="{StaticResource KlaInfoText}"
-            TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
-            <Setter Property="TextWrapping" Value="NoWrap" />
+        <Style x:Key="ViewRangeTableCell" TargetType="TextBlock">
             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Center" />

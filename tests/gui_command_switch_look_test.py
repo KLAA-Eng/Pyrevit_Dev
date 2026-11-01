@@ -1,5 +1,6 @@
 """Owner decisions on the Command Switch look (2026-10-31): no panel shadow, no toggle hover fill."""
 import os
+import re
 import unittest
 import xml.etree.ElementTree as ET
 
@@ -20,11 +21,19 @@ class CommandSwitchLookTests(unittest.TestCase):
         self.assertEqual('0', panel.attrib.get('BorderThickness'))
 
     def test_toggle_pill_has_no_hover_trigger_but_command_pill_keeps_one(self):
-        styles = dict((node.attrib.get(X + 'Key'), node)
-                      for node in parse('lib/GUI/Resources/KLCodeComponents.xaml').iter(P + 'Style'))
+        styles = {}
+        for name in ('KLCodeFoundation.xaml', 'KLCodeComponents.xaml'):
+            styles.update((node.attrib.get(X + 'Key'), node)
+                          for node in parse('lib/GUI/Resources/' + name).iter(P + 'Style'))
 
         def hover(style):
-            return [node for node in style.iter(P + 'Trigger') if node.attrib.get('Property') == 'IsMouseOver']
+            # Follow BasedOn: the command pill takes its hover from the klcFdnButton template.
+            found = []
+            while style is not None:
+                found += [node for node in style.iter(P + 'Trigger') if node.attrib.get('Property') == 'IsMouseOver']
+                base = re.match(r'\{StaticResource (\S+)\}$', style.attrib.get('BasedOn', ''))
+                style = styles[base.group(1)] if base else None
+            return found
         self.assertEqual([], hover(styles['KlaCommandToggle']))
         self.assertEqual(1, len(hover(styles['KlaCommandButton'])))
 

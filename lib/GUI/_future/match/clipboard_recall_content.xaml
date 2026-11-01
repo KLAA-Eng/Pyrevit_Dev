@@ -98,16 +98,16 @@
                 Margin="0,0,8,0"
                 Click="check_all"
                 Content="{DynamicResource BtnCheckAll}"
-                Style="{StaticResource KlaFoundationButton}" />
+                Style="{StaticResource klcFdnButton}" />
             <Button
                 Margin="0,0,8,0"
                 Click="uncheck_all"
                 Content="{DynamicResource BtnUncheckAll}"
-                Style="{StaticResource KlaFoundationButton}" />
+                Style="{StaticResource klcFdnButton}" />
             <Button
                 Click="toggle_all"
                 Content="{DynamicResource BtnToggleAll}"
-                Style="{StaticResource KlaFoundationButton}" />
+                Style="{StaticResource klcFdnButton}" />
         </StackPanel>
         <ListView
             x:Name="paramListView"
