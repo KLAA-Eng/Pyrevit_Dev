@@ -9,7 +9,7 @@ resource dictionary that defines no brushes. It holds
   ``klcLogo`` DataTemplate: the slash and letter outlines with the SVG group's
   scale and offset, on a canvas the size of the view box. The template's
   Viewbox is unsized, so the window header sets the logo size, and its fills
-  reference the palette's ``KlaBorderBrush`` and ``KlaTextBrush``.
+  reference the palette's ``klcBorderColor`` and ``klcTextColor``.
 
 Usage::
 
@@ -75,7 +75,7 @@ LOGO_TOLERANCE = 2.0
 # paths: the slash, then the letters. The fills use DynamicResource because
 # klIcons.xaml does not merge the palette; they resolve from the window that
 # draws the logo, which always has the palette loaded.
-LOGO_FILLS = ('KlaBorderBrush', 'KlaTextBrush')
+LOGO_FILLS = ('klcBorderColor', 'klcTextColor')
 
 
 # XML helpers

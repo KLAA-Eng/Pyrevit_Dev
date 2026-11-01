@@ -6,21 +6,21 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="46" />
             </Grid.RowDefinitions>
-            <Border Grid.Row="0" BorderBrush="{StaticResource KlaWarningBrush}" BorderThickness="1" CornerRadius="8" Margin="0,8,0,4" Padding="10,7">
+            <Border Grid.Row="0" BorderBrush="{StaticResource klcWarningColor}" BorderThickness="1" CornerRadius="8" Margin="0,8,0,4" Padding="10,7">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="26" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <ContentControl Content="{StaticResource kliconErrorAlert}" Style="{StaticResource KlaGuiIcon}" Foreground="{StaticResource KlaErrorBrush}" />
+                    <ContentControl Content="{StaticResource kliconErrorAlert}" Style="{StaticResource KlaGuiIcon}" Foreground="{StaticResource klcErrorColor}" />
                     <TextBlock Grid.Column="1" Text="{StaticResource ResolveIssuesInstruction}" FontSize="12" TextWrapping="Wrap" />
                 </Grid>
             </Border>
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel Margin="12,4">
-                    <Border BorderBrush="{StaticResource KlaErrorBrush}" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,0,0,8">
+                    <Border BorderBrush="{StaticResource klcErrorColor}" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,0,0,8">
                         <StackPanel>
-                            <TextBlock Text="{Binding UnknownHeading}" Foreground="{StaticResource KlaErrorBrush}" FontWeight="SemiBold" Margin="0,0,0,6" />
+                            <TextBlock Text="{Binding UnknownHeading}" Foreground="{StaticResource klcErrorColor}" FontWeight="SemiBold" Margin="0,0,0,6" />
                             <ItemsControl ItemsSource="{Binding UnknownItems}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -30,9 +30,9 @@
                             </ItemsControl>
                         </StackPanel>
                     </Border>
-                    <Border BorderBrush="{StaticResource KlaWarningBrush}" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,0,0,8">
+                    <Border BorderBrush="{StaticResource klcWarningColor}" BorderThickness="1" CornerRadius="10" Padding="10" Margin="0,0,0,8">
                         <StackPanel>
-                            <TextBlock Text="{Binding DuplicateHeading}" Foreground="{StaticResource KlaWarningBrush}" FontWeight="SemiBold" Margin="0,0,0,6" />
+                            <TextBlock Text="{Binding DuplicateHeading}" Foreground="{StaticResource klcWarningColor}" FontWeight="SemiBold" Margin="0,0,0,6" />
                             <ItemsControl ItemsSource="{Binding DuplicateItems}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -44,7 +44,7 @@
                     </Border>
                     <Border Style="{StaticResource KlaGroupBorderStyle}">
                         <StackPanel>
-                            <TextBlock Text="{Binding ImportableHeading}" Foreground="{StaticResource KlaInfoBrush}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding ImportableHeading}" Foreground="{StaticResource klcInfo}" FontWeight="SemiBold" />
                             <TextBlock Text="{StaticResource CleanMatchesBlockedLabel}" Style="{StaticResource KlaMutedTextStyle}" Margin="0,4,0,0" TextWrapping="Wrap" />
                         </StackPanel>
                     </Border>

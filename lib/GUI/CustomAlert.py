@@ -27,12 +27,12 @@ class CustomAlert(my_WPF):
             self.alert_heading.Text = 'Warning'
             self.alert_icon.Content = self.Resources['kliconWarnAlert']
             AutomationProperties.SetName(self.alert_icon, 'Warning')
-            self.alert_banner.BorderBrush = self.Resources['KlaWarningBrush']
+            self.alert_banner.BorderBrush = self.Resources['klcWarningColor']
             return
         self.alert_heading.Text = 'Information'
         self.alert_icon.Content = self.Resources['kliconInfoAlert']
         AutomationProperties.SetName(self.alert_icon, 'Information')
-        self.alert_banner.BorderBrush = self.Resources['KlaInfoBrush']
+        self.alert_banner.BorderBrush = self.Resources['klcInfo']
 
 def show_alert(message, title='KL&A Tools', is_warning=False):
     """Show a modal custom alert and return after the user dismisses it."""

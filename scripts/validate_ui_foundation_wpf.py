@@ -127,7 +127,7 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
                 row.ActualHeight, row.Padding, text.TranslatePoint(Point(0, 0), check).X - 16,
                 window.items_list.ActualWidth, window.items_list.ActualHeight, text.ActualWidth,
                 [(str(bar.Orientation), bar.ActualWidth) for bar in bars]))
-        chrome_row, inset, pair_gap = token('KlaChromeRow').Value, token('klcBodyMargin'), token('KlaPairGap').Right
+        chrome_row, inset, pair_gap = token('klcChromeHeight').Value, token('klcBodyMargin'), token('KlaPairGap').Right
         assert chrome.header.ActualHeight == chrome.footer.ActualHeight == chrome_row
         assert chrome.title.Text == shell.Tag.Title
         assert chrome.title.ToolTip is None and window.ToolTip is None
@@ -143,7 +143,7 @@ def validate_foundation(root, entries, tool_version, output_directory, render):
         assert window.accept_button.Template.FindName('ButtonBorder', window.accept_button).BorderBrush.Color.A == 0
         assert not window.accept_button.IsDefault
         assert str(window.FontFamily) == 'Segoe UI'
-        assert window.FontSize == token('KlaBodyFontSize') and chrome.title.FontSize == token('klcHeaderTitleFontSize')
+        assert window.FontSize == token('klcBodyFontSize') and chrome.title.FontSize == token('klcHeaderTitleFontSize')
         assert window.accept_button.ActualWidth == token('klcDoubleButtonWidth') and window.accept_button.ActualHeight == token('KlaControlHeight')
         buttons = list(window.batch_actions.Children)
         assert all(button.ActualWidth == token('klcButtonWidth') and button.ActualHeight == token('KlaCompactHeight') for button in buttons)

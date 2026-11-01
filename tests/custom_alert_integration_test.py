@@ -48,7 +48,7 @@ class CustomAlertPresentationTests(unittest.TestCase):
             for name in ('main_title', 'message_text', 'alert_heading', 'alert_icon', 'alert_banner'):
                 setattr(window, name, types.SimpleNamespace())
             window.Resources = dict((key, key) for key in (
-                'kliconWarnAlert', 'kliconInfoAlert', 'KlaWarningBrush', 'KlaInfoBrush'))
+                'kliconWarnAlert', 'kliconInfoAlert', 'klcWarningColor', 'klcInfo'))
         def load(window, path, title, version=None):
             controls(window)
             window.Title = title
@@ -85,7 +85,7 @@ class CustomAlertPresentationTests(unittest.TestCase):
         self.assertEqual('Review this warning.', window.message_text.Text)
         self.assertEqual('Warning', window.alert_heading.Text)
         self.assertEqual('kliconWarnAlert', window.alert_icon.Content)
-        self.assertEqual('KlaWarningBrush', window.alert_banner.BorderBrush)
+        self.assertEqual('klcWarningColor', window.alert_banner.BorderBrush)
 
     def test_information_keeps_empty_input_fallback_and_public_wrapper(self):
         adapter, actions = self.load_adapter()
@@ -95,7 +95,7 @@ class CustomAlertPresentationTests(unittest.TestCase):
         self.assertEqual('', window.message_text.Text)
         self.assertEqual('Information', window.alert_heading.Text)
         self.assertEqual('kliconInfoAlert', window.alert_icon.Content)
-        self.assertEqual('KlaInfoBrush', window.alert_banner.BorderBrush)
+        self.assertEqual('klcInfo', window.alert_banner.BorderBrush)
         with patch.object(adapter, 'CustomAlert') as constructor:
             self.assertIsNone(adapter.show_alert('Message', 'Tool', True))
             constructor.assert_called_once_with('Message', title='Tool', is_warning=True)

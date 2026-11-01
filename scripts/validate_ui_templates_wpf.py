@@ -39,7 +39,7 @@ def validate_template_family():
             shell.UpdateLayout()
             settle_layout(shell)
             token = window.FindResource
-            assert window._kla_chrome.header.ActualHeight == window._kla_chrome.footer.ActualHeight == token('KlaChromeRow').Value
+            assert window._kla_chrome.header.ActualHeight == window._kla_chrome.footer.ActualHeight == token('klcChromeHeight').Value
             assert window._kla_chrome.title.ToolTip is None
             assert window.window_body.IsEnabled == (state != 'Disabled')
             if identity == 'template-options':

@@ -9,16 +9,16 @@ public sealed class DesignSystemResourceContractTests
 {
     private static readonly string[] RequiredPaletteKeys =
     {
-        "KlaWindowBrush",
-        "KlaTextBrush",
+        "klcWindowColor",
+        "klcTextColor",
         "xTextMutedBrush",
-        "klcFooterLinkBrush",
-        "klcFooterVersionBrush",
+        "klcFooterLinkColor",
+        "klcFooterVersionColor",
         "KlaPlaceholderBrush",
         "KlaTextOnAccentBrush",
         "KlaAccentBrush",
         "KlaAccentHoverBrush",
-        "KlaBorderBrush",
+        "klcBorderColor",
         "KlaBorderStrongBrush",
     };
 

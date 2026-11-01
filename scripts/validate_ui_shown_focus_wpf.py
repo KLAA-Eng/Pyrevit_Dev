@@ -39,7 +39,7 @@ def validate_shown_focus():
         settle_layout(window.Content)
         assert check.IsKeyboardFocused
         assert check.FocusVisualStyle is None
-        assert check.Template.FindName('CheckBorder', check).BorderBrush == window.FindResource('KlaBorderBrush')
+        assert check.Template.FindName('CheckBorder', check).BorderBrush == window.FindResource('klcBorderColor')
         print('Shown selector: neutral initial focus, no search selection, and focused checkbox without adorner passed.')
     finally:
         window.Close()

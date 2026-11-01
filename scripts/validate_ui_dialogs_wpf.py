@@ -133,8 +133,8 @@ def validate_shared_dialogs():
             if hasattr(window, 'message_expander'):
                 assert not window.message_expander.IsExpanded
                 assert window.message_expander.Visibility == (Visibility.Visible if identity == 'dialog-message' else Visibility.Collapsed)
-                expected = {'Warning': ('Warning', 'KlaWarningBrush'), 'Error': ('Error', 'KlaErrorBrush'),
-                            'Success': ('Success', 'KlaReadyBrush')}.get(state, ('Information', 'KlaInfoBrush'))
+                expected = {'Warning': ('Warning', 'klcWarningColor'), 'Error': ('Error', 'klcErrorColor'),
+                            'Success': ('Success', 'klcSuccessColor')}.get(state, ('Information', 'klcInfo'))
                 assert window.message_heading.Text == expected[0]
                 assert window.message_banner.BorderBrush == window.FindResource(expected[1])
                 assert window.message_heading.Foreground == window.message_banner.BorderBrush

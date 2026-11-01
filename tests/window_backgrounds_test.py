@@ -126,7 +126,7 @@ class WindowBackgroundTests(unittest.TestCase):
         self.assertIn('Width="{StaticResource klcLogoWidth}"', shell)
         self.assertIn('Height="{StaticResource klcLogoHeight}"', shell)
         self.assertIn('ContentTemplate="{StaticResource klcLogo}"', shell)
-        self.assertIn('Height="{StaticResource KlaChromeRow}"', shell)
+        self.assertIn('Height="{StaticResource klcChromeHeight}"', shell)
         self.assertIn('Style="{StaticResource klcCloseButton}"', shell)
 
     def test_view_range_loads_the_shared_wordmark_at_runtime(self):

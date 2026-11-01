@@ -72,16 +72,16 @@ compiled WPF.
 
 | Resource key | Hex | Intended use |
 | --- | --- | --- |
-| `KlaWindowBrush` | `#1A252B` | Window/chrome surface, fields and lists |
-| `KlaTextBrush` | `#E5E4E2` | Body text, labels, ordinary icon stroke; footer hover |
+| `klcWindowColor` | `#1A252B` | Window/chrome surface, fields and lists |
+| `klcTextColor` | `#E5E4E2` | Body text, labels, ordinary icon stroke; footer hover |
 | `xTextMutedBrush` | `#B5C2BD` | Secondary captions |
-| `klcFooterLinkBrush` | `#407058` | Prototype and Outreach footer links at rest |
-| `klcFooterVersionBrush` | `#808080` | Centered caller-version footer text |
+| `klcFooterLinkColor` | `#407058` | Prototype and Outreach footer links at rest |
+| `klcFooterVersionColor` | `#808080` | Centered caller-version footer text |
 | `KlaPlaceholderBrush` | `#808080` | Placeholder text: the Text entry watermark and the Command Switch search hint. The same gray as the footer version by owner decision; a test keeps them equal |
 | `KlaTextOnAccentBrush` | `#FFFFFF` | Text on accent-filled actions and selected segments |
 | `KlaAccentBrush` | `#286048` | Standard buttons, checked boxes and selected segments |
 | `KlaAccentHoverBrush` | `#407058` | Standard action/dropdown hover background |
-| `KlaBorderBrush` | `#33714F` | Input/dropdown outlines, wordmark slash, scrollbar thumbs |
+| `klcBorderColor` | `#33714F` | Input/dropdown outlines, wordmark slash, scrollbar thumbs |
 | `KlaBorderStrongBrush` | `#286048` | Section/list outlines, grid lines and segment groups |
 
 ### State and component brushes
@@ -99,10 +99,10 @@ component, even when two roles currently have the same color.
 | `KlaComponentSurfaceBrush` | `#22303A` | Secondary actions, grid headers and hover surfaces |
 | `KlaComponentBorderBrush` | `#52675D` | Banner/readout borders and splitter |
 | `KlaMutedBrush` | `#B5C2BD` | Component information text and read-only field text |
-| `KlaInfoBrush` | `#A3C3E8` | Information borders/chips |
-| `KlaReadyBrush` | `#91C8A6` | Ready/success borders/chips |
-| `KlaWarningBrush` | `#E8C66A` | Warning borders/chips |
-| `KlaErrorBrush` | `#E89E96` | Error/blocked borders/chips |
+| `klcInfo` | `#A3C3E8` | Information borders/chips |
+| `klcSuccessColor` | `#91C8A6` | Ready/success borders/chips |
+| `klcWarningColor` | `#E8C66A` | Warning borders/chips |
+| `klcErrorColor` | `#E89E96` | Error/blocked borders/chips |
 | `xPreviewSurfaceBrush` | `#10171B` | Compiled Family Studio preview surface |
 
 Pair status colors with words such as Ready, Warning or Blocked. Message
@@ -124,8 +124,8 @@ aliases in Components (`KlaPanelBrush`, `KlaMutedTextBrush`, `KlaSubtleTextBrush
 `KlaBlockingBrush`) were removed on 2026-10-31; every window names the role
 brushes above, and the C# contract and smoke tests keep them gone. Some role
 brushes share a value by design and stay separate roles: `xTextMutedBrush`
-and `KlaMutedBrush`, `klcFooterLinkBrush` and `KlaAccentHoverBrush`,
-`KlaAccentBrush` and `KlaBorderStrongBrush`, `klcFooterVersionBrush` and
+and `KlaMutedBrush`, `klcFooterLinkColor` and `KlaAccentHoverBrush`,
+`KlaAccentBrush` and `KlaBorderStrongBrush`, `klcFooterVersionColor` and
 `KlaPlaceholderBrush`. Change a role's value only for that role.
 
 `Kla*Style` names in the [compiled adapter](../src/KLCode.Wpf/Resources/KLCodeControls.xaml)
@@ -216,7 +216,7 @@ generated file out, then run `--check`
 to confirm. `scripts/release_check.py` runs the check.
 The generated `klcLogo` template draws it: an unsized Viewbox that fills the
 header's `klcLogoWidth` x `klcLogoHeight` slot (128 x 18), the SVG's own transform,
-and fills that reference `KlaBorderBrush` / `KlaTextBrush` dynamically, since
+and fills that reference `klcBorderColor` / `klcTextColor` dynamically, since
 `klIcons.xaml` does not load the palette. Resize the logo through the two tokens.
 No runtime SVG renderer is required.
 
@@ -359,12 +359,12 @@ repeated control dimensions belong to shared roles/tokens.
 | Part | Rule / resource |
 | --- | --- |
 | Window | Segoe UI 12; charcoal background; borderless transparent style |
-| Header/footer | Each 24 high, `KlaChromeRow` |
+| Header/footer | Each 24 high, `klcChromeHeight` |
 | Header columns | 136 / flexible / 136, `xxxHeaderSideColumn` (8 brand inset + 128 logo) |
 | Header artwork/title | 128 x 18 `klcLogo`; centered 14-unit title, ellipsis without tooltip |
 | Header Close | 60 x 18, font size 10; glyph placement through `KlaCloseGlyphLift` |
 | Footer columns | 100 / flexible / 100, `xxxFooterSideColumn` |
-| Footer content | Prototype/Outreach links green (`klcFooterLinkBrush`), caller's pure version gray (`klcFooterVersionBrush`); links turn white on hover/focus |
+| Footer content | Prototype/Outreach links green (`klcFooterLinkColor`), caller's pure version gray (`klcFooterVersionColor`); links turn white on hover/focus |
 | Body inset | 16 horizontally and 8 below header/above footer, `klcBodyMargin` |
 | Typography | Body 12, title/prompts/main action 14; constant labels use Title Case |
 | Corners/borders | Card 8, input 6, chip 4, checkbox 2; hairline 1 |
@@ -394,8 +394,8 @@ control sizes require different resource types.
 | Resource | Type | Value / use |
 | --- | --- | --- |
 | `klcBodySpaceSmall`, `klcBodySpaceNormal`, `klcBodySpaceLarge` | GridLength | Existing spacer rows/columns: 4, 8 and 16 |
-| `KlaChromeRow`, `KlaControlRow`, `xCompactRow`, `KlaFilterRow` | GridLength | Rows of 24, 32, 28 and 24 respectively |
-| `KlaCompactFieldRow` | GridLength | Compact naming row, 24 |
+| `klcChromeHeight`, `klcBodyRowLarge`, `xCompactRow`, `KlaFilterRow` | GridLength | Rows of 24, 32, 28 and 24 respectively |
+| `klcBodyRowNormal` | GridLength | Compact naming row, 24 |
 | `KlaCompactFieldLabelColumn`, `KlaCompactFieldInputColumn` | GridLength | Naming columns, 60 and 240 |
 | `KlaPairGap` | Thickness | `0,0,8,0`, between related horizontal controls |
 | `klcBodyMargin` | Thickness | `16,8,16,8`, shell body padding |
@@ -404,14 +404,14 @@ control sizes require different resource types.
 | `KlaInputPadding` | Thickness | `8,0`, button/toggle content padding |
 | `KlaTextBoxPadding` | Thickness | `5,0`, native TextBox padding; border and native text inset yield 8 units of rendered horizontal inset, matching ComboBox text |
 | `KlaActionTopGap` | Thickness | `0,8,0,0`, standard content-to-action gap for Message and Text Entry |
-| `KlaStackGap`, `KlaStackGapBelow` | Thickness | `0,8,0,0` and `0,0,0,8`, between stacked sections of a dialog body |
+| `KlaStackGapAbove`, `KlaStackGapBelow` | Thickness | `0,8,0,0` and `0,0,0,8`, between stacked sections of a dialog body |
 | `KlaIconTextGap` | Thickness | `0,0,4,0`, chevron or small icon before its text |
 | `KlaOpticalTextInset` | Thickness | `0,0,0,2`, deliberate optical lift for large text beside an input |
 | `KlaFloatingMargin`, `KlaRadiusFloating` | Thickness, CornerRadius | 16 and 12, the floating panel's transparent margin and corners |
 | `KlaCommandLinkPadding`, `KlaCommandArrowInset`, `KlaCommandLinkIconColumn` | Thickness, Thickness, GridLength | 8, `0,4,8,0` and 24 inside a command link |
 | `KlaDetailsReadoutPadding` | Thickness | `10,8`, body-aligned readout text |
 | `KlaRenameLabelColumn` | GridLength | 52, the KLC-Rename label column |
-| `KlaSeverityIconSize`, `KlaDialogHeadingFontSize`, `KlaSubheadingFontSize` | Double | 32, 22 and 16: dialog severity icon, severity heading, command link and switch prompt |
+| `klcIconSizeMessage`, `klcMessageHeaderFontSize`, `KlaSubheadingFontSize` | Double | 32, 22 and 16: dialog severity icon, severity heading, command link and switch prompt |
 | `KlaDetailsHeight`, `KlaOptionMaxHeight`, `KlaCommandLinkMinHeight`, `KlaSwitchPromptMaxWidth` | Double | 128, 80, 40 and 180 |
 | `KlaControlHeight`, `KlaCompactHeight`, `KlaCompactFieldHeight` | Double | Control heights of 32, 28 and 24 |
 
@@ -712,9 +712,9 @@ handler is supplied by the Python example below.
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}"/>
-                <RowDefinition Height="{StaticResource KlaCompactFieldRow}"/>
+                <RowDefinition Height="{StaticResource klcBodyRowNormal}"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="{StaticResource KlaControlRow}"/>
+                <RowDefinition Height="{StaticResource klcBodyRowLarge}"/>
             </Grid.RowDefinitions>
             <Label Content="Name:" Target="{Binding ElementName=name_input}"
                    Style="{StaticResource xxxLabel}"/>

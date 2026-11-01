@@ -9,7 +9,7 @@
             <Grid Grid.Row="0" Margin="0,8,0,4">
                 <WrapPanel>
                     <Border Style="{StaticResource KlaInfoChipStyle}" Margin="0,0,6,0">
-                        <TextBlock Text="{Binding MatchedSummary}" FontSize="11" Foreground="{StaticResource KlaInfoBrush}" />
+                        <TextBlock Text="{Binding MatchedSummary}" FontSize="11" Foreground="{StaticResource klcInfo}" />
                     </Border>
                     <Border Style="{StaticResource KlaNeutralChipStyle}" Margin="0,0,6,0">
                         <TextBlock Text="{Binding ExistingSummary}" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" />
@@ -68,8 +68,8 @@
                                     </Grid>
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding StatusTone}" Value="Matched">
-                                            <Setter TargetName="StatusBorder" Property="BorderBrush" Value="{StaticResource KlaInfoBrush}" />
-                                            <Setter TargetName="StatusText" Property="Foreground" Value="{StaticResource KlaInfoBrush}" />
+                                            <Setter TargetName="StatusBorder" Property="BorderBrush" Value="{StaticResource klcInfo}" />
+                                            <Setter TargetName="StatusText" Property="Foreground" Value="{StaticResource klcInfo}" />
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>
@@ -118,7 +118,7 @@
                             <Run Text="{StaticResource RequiresPrefix}" Foreground="{StaticResource KlaMutedBrush}" />
                         <Run Text="{Binding SelectedRow.Requirements, Mode=OneWay}" Foreground="{StaticResource KlaMutedBrush}" />
                         </TextBlock>
-                    <TextBlock Text="{StaticResource RequirementsPreflightLabel}" Foreground="{StaticResource KlaInfoBrush}" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap" />
+                    <TextBlock Text="{StaticResource RequirementsPreflightLabel}" Foreground="{StaticResource klcInfo}" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap" />
                     </StackPanel>
                 </ScrollViewer>
             </Grid>

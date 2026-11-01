@@ -88,7 +88,7 @@ def validate_production_windows():
                 width, height = production_layout(window)
                 shell, chrome = window.window_shell, window._kla_chrome
                 token = window.FindResource
-                chrome_row, inset = token('KlaChromeRow').Value, token('klcBodyMargin')
+                chrome_row, inset = token('klcChromeHeight').Value, token('klcBodyMargin')
                 assert chrome.header.ActualHeight == chrome_row, (identity, state)
                 assert chrome.footer.ActualHeight == (0 if identity == 'kla-custom-alert' else chrome_row), (identity, state)
                 if identity == 'kla-custom-alert':
@@ -204,7 +204,7 @@ def validate_gui_icons():
     owner.Foreground = Brushes.Orange
     panel = WrapPanel()
     panel.ItemWidth, panel.ItemHeight = 140, 56
-    panel.Background = resources['KlaWindowBrush']
+    panel.Background = resources['klcWindowColor']
     owner.Content = panel
     presenters = []
     try:
@@ -219,7 +219,7 @@ def validate_gui_icons():
             label = TextBlock()
             label.Text, label.Width = role, 132
             label.TextWrapping = TextWrapping.Wrap
-            label.Foreground = resources['KlaTextBrush']
+            label.Foreground = resources['klcTextColor']
             block.Children.Add(label)
             panel.Children.Add(block)
             presenters.append(icon)
@@ -235,7 +235,7 @@ def validate_gui_icons():
             settle_layout(panel)
             assert str(path.Stroke) == str(resources['KlaDisabledTextBrush'])
             icon.IsEnabled = True
-        owner.Foreground = resources['KlaTextBrush']
+        owner.Foreground = resources['klcTextColor']
         settle_layout(panel)
         if output_directory:
             render_content(owner, os.path.join(output_directory, 'gui-icons-%d-native.png' % len(ICON_ROLES)), 700, 280)
@@ -254,7 +254,7 @@ def validate_scrollbars():
     viewer.HorizontalScrollBarVisibility = viewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible
     content = Border()
     content.Width, content.Height = 1200, 600
-    content.Background = owner.FindResource('KlaWindowBrush')
+    content.Background = owner.FindResource('klcWindowColor')
     viewer.Content, owner.Content = content, viewer
     try:
         viewer.Measure(Size(320, 160))
@@ -302,7 +302,7 @@ def validate_wordmark():
     svg = ElementTree.parse(os.path.join(repo_root, 'lib', '_logos', 'klcLogo.svg'))
     group = next(svg.iter('{http://www.w3.org/2000/svg}g'))
     a, b, c, d, e, f = [float(v) for v in group.attrib['transform'][7:-1].split(',')]
-    for source, role in zip(svg.iter('{http://www.w3.org/2000/svg}path'), ('KlaBorderBrush', 'KlaTextBrush')):
+    for source, role in zip(svg.iter('{http://www.w3.org/2000/svg}path'), ('klcBorderColor', 'klcTextColor')):
         path = Path()
         path.Data = Geometry.Parse(source.attrib['d'])
         path.Fill = owner.FindResource(role)

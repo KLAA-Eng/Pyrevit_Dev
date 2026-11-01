@@ -296,7 +296,7 @@ def _window_type():
                 self.alert_heading.Text = 'Warning' if self.preview_state == 'Error' else 'Information'
                 severity = 'Warning' if self.preview_state == 'Error' else 'Information'
                 self.alert_icon.Content = self.Resources['kliconWarnAlert' if severity == 'Warning' else 'kliconInfoAlert']
-                self.alert_banner.BorderBrush = self.Resources['KlaWarningBrush' if severity == 'Warning' else 'KlaInfoBrush']
+                self.alert_banner.BorderBrush = self.Resources['klcWarningColor' if severity == 'Warning' else 'klcInfo']
                 self.message_text.Text = alert_message(self.preview_state)
             elif self.preview_id == 'kla-match-properties-recall':
                 self.content_host.Content = PreviewRecallContent(self)

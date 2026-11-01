@@ -38,10 +38,10 @@ def message_layout(window):
 
 
 def validate_message_variants():
-    roles = {'information': ('kliconInfoAlert', 'KlaInfoBrush'),
-             'warning': ('kliconWarnAlert', 'KlaWarningBrush'),
-             'error': ('kliconErrorAlert', 'KlaErrorBrush'),
-             'success': ('kliconSuccessAlert', 'KlaReadyBrush')}
+    roles = {'information': ('kliconInfoAlert', 'klcInfo'),
+             'warning': ('kliconWarnAlert', 'klcWarningColor'),
+             'error': ('kliconErrorAlert', 'klcErrorColor'),
+             'success': ('kliconSuccessAlert', 'klcSuccessColor')}
     count = 0
     for severity, (geometry, brush) in sorted(roles.items()):
         for with_details in (False, True):

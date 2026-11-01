@@ -13,7 +13,7 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
   Run it after changing sources; `--check` detects stale generated resources.
 
 `KLCodeFoundation.xaml` merges the geometry and owns the presenter, bound to
-tokens (`KlaIconSize`, `KlaIconCanvas`, `KlaIconStroke`, `KlaDisabledTextBrush`).
+tokens (`klcIconSize`, `KlaIconCanvas`, `klcIconStroke`, `KlaDisabledTextBrush`).
 The presenter is the only way to draw a GUI icon: it follows its parent's
 foreground and turns gray when disabled. There are no fixed-color ImageSources
 (removed 2026-10-31).

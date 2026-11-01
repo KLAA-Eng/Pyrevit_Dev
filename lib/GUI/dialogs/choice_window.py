@@ -15,10 +15,10 @@ from .choice_models import ChoiceState
 
 _WINDOW_TYPE = None
 _SEVERITY_ROLES = {
-    'information': ('kliconInfoAlert', 'KlaInfoBrush'),
-    'warning': ('kliconWarnAlert', 'KlaWarningBrush'),
-    'error': ('kliconErrorAlert', 'KlaErrorBrush'),
-    'success': ('kliconSuccessAlert', 'KlaReadyBrush')}
+    'information': ('kliconInfoAlert', 'klcInfo'),
+    'warning': ('kliconWarnAlert', 'klcWarningColor'),
+    'error': ('kliconErrorAlert', 'klcErrorColor'),
+    'success': ('kliconSuccessAlert', 'klcSuccessColor')}
 
 
 def _window_type():
@@ -156,7 +156,7 @@ def _window_type():
         def fit_initial(self):
             inset = self._kla_chrome.body.Margin
             bounds = Size(max(1, self.Width - inset.Left - inset.Right), float('inf'))
-            height = self.FindResource('KlaChromeRow').Value + inset.Top + inset.Bottom
+            height = self.FindResource('klcChromeHeight').Value + inset.Top + inset.Bottom
             for control in (self.main_content, self.option_scroll, self.details_expander,
                             self.buttons_panel, self.help_panel):
                 control.Measure(bounds)

@@ -71,7 +71,7 @@ internal static class Program
         Require(footer.Text == version, identity + " caller version");
         Require(((SolidColorBrush)footer.Foreground).Color == Color.FromRgb(128, 128, 128),
             identity + " original gray footer version");
-        double chromeRow = ((GridLength)window.FindResource("KlaChromeRow")).Value;
+        double chromeRow = ((GridLength)window.FindResource("klcChromeHeight")).Value;
         Require(header.ActualHeight == chromeRow && footerGrid.ActualHeight == chromeRow, identity + " chrome heights");
         Require(window.FindResource("kliconSearch") is Geometry, identity + " canonical vector search geometry");
         foreach (string alias in new[] { "KlaPanelBrush", "KlaMutedTextBrush", "KlaSubtleTextBrush", "KlaBlockingBrush" })
@@ -91,7 +91,7 @@ internal static class Program
         }
         Border infoChip = new Border { Style = (Style)window.FindResource("KlaInfoChipStyle") };
         Require(((SolidColorBrush)infoChip.BorderBrush).Color ==
-            ((SolidColorBrush)window.FindResource("KlaInfoBrush")).Color,
+            ((SolidColorBrush)window.FindResource("klcInfo")).Color,
             identity + " information-chip accent");
         if (identity == "family-studio")
         {

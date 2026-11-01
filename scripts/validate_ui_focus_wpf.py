@@ -30,9 +30,9 @@ def validate_keyboard_focus_resources():
         assert control.Template.FindName('ToggleFocus', control) is None, role
         if isinstance(control, CheckBox):
             square = control.Template.FindName('CheckBorder', control)
-            assert square.BorderBrush == host.FindResource('KlaBorderBrush'), role
+            assert square.BorderBrush == host.FindResource('klcBorderColor'), role
             control.IsChecked = True
-            assert square.BorderBrush == host.FindResource('KlaBorderBrush'), role
+            assert square.BorderBrush == host.FindResource('klcBorderColor'), role
             assert control.Template.FindName('CheckMark', control).Visibility.ToString() == 'Visible', role
 
     assert host.FindResource('KlaFocusBrush').Color.ToString() == '#FFE5E4E2', 'Input/dropdown focus stays unchanged'

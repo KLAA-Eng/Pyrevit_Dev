@@ -31,15 +31,15 @@ public partial class KlaAlertWindow : Window
         switch (kind)
         {
             case KlaAlertKind.Warning:
-                resourceKey = "KlaWarningBrush";
+                resourceKey = "klcWarningColor";
                 AlertIcon.Content = FindResource("kliconWarnAlert");
                 break;
             case KlaAlertKind.Blocking:
-                resourceKey = "KlaErrorBrush";
+                resourceKey = "klcErrorColor";
                 AlertIcon.Content = FindResource("kliconErrorAlert");
                 break;
             default:
-                resourceKey = "KlaInfoBrush";
+                resourceKey = "klcInfo";
                 AlertIcon.Content = FindResource("kliconInfoAlert");
                 break;
         }

@@ -64,10 +64,10 @@ def _window_types():
             # Keep the caller title for task switching/accessibility; the
             # message chrome intentionally has an empty center title area.
             self._kla_chrome.title.Visibility = Visibility.Collapsed
-            roles = {'information': ('Information', 'kliconInfoAlert', 'KlaInfoBrush'),
-                     'warning': ('Warning', 'kliconWarnAlert', 'KlaWarningBrush'),
-                     'error': ('Error', 'kliconErrorAlert', 'KlaErrorBrush'),
-                     'success': ('Success', 'kliconSuccessAlert', 'KlaReadyBrush')}
+            roles = {'information': ('Information', 'kliconInfoAlert', 'klcInfo'),
+                     'warning': ('Warning', 'kliconWarnAlert', 'klcWarningColor'),
+                     'error': ('Error', 'kliconErrorAlert', 'klcErrorColor'),
+                     'success': ('Success', 'kliconSuccessAlert', 'klcSuccessColor')}
             heading, icon, brush = roles[severity]
             self.message_heading.Text = heading
             self.message_icon.Content = self.FindResource(icon)
@@ -160,7 +160,7 @@ def _window_types():
             from System.Windows import GridLength, Thickness
 
             DialogWindow.feedback(self, text)
-            self.batch_actions.Margin = self.FindResource('KlaStackGap') if text else Thickness(0)
+            self.batch_actions.Margin = self.FindResource('KlaStackGapAbove') if text else Thickness(0)
             self.secondary_gap.Height = self.FindResource('klcBodySpaceNormal') if text or self.state.multiple else GridLength(0)
 
         def update_checks(self, parent=None):
@@ -234,7 +234,7 @@ def _window_types():
             bounds = Size(max(1, self.Width - inset.Left - inset.Right), float('inf'))
             self.prompt_fields.Measure(bounds)
             self.prompt_actions.Measure(bounds)
-            desired = (self.FindResource('KlaChromeRow').Value + inset.Top + inset.Bottom
+            desired = (self.FindResource('klcChromeHeight').Value + inset.Top + inset.Bottom
                        + self.prompt_fields.DesiredSize.Height + self.prompt_actions.DesiredSize.Height)
             minimum = min(self.MaxHeight, ceil(desired))
             self.MinHeight = minimum

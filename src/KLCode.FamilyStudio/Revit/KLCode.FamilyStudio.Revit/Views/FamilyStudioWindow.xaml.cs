@@ -304,7 +304,7 @@ public sealed partial class FamilyStudioWindow : Window
         StatusText.Text = detail.Summary.Status ?? unavailable;
         bool approved = string.Equals(detail.Summary.Status, "Approved", StringComparison.OrdinalIgnoreCase);
         StatusChip.Style = (Style)FindResource(approved ? "KlaInfoChipStyle" : "KlaWarningChipStyle");
-        StatusText.Foreground = (Brush)FindResource(approved ? "KlaInfoBrush" : "KlaWarningBrush");
+        StatusText.Foreground = (Brush)FindResource(approved ? "klcInfo" : "klcWarningColor");
         CategoryText.Text = detail.Summary.Category ?? unavailable;
         DisciplineText.Text = detail.Summary.Discipline ?? unavailable;
         Types.ItemsSource = detail.Types;

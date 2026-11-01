@@ -140,7 +140,7 @@ def _window_type():
             from math import ceil
             inset = self._kla_chrome.body.Margin
             bounds = Size(max(1, self.Width - inset.Left - inset.Right), float('inf'))
-            height = 2 * self.FindResource('KlaChromeRow').Value + inset.Top + inset.Bottom
+            height = 2 * self.FindResource('klcChromeHeight').Value + inset.Top + inset.Bottom
             for control in (self.fields_panel, self.validation_text, self.accept_button):
                 control.Measure(bounds)
                 height += control.DesiredSize.Height

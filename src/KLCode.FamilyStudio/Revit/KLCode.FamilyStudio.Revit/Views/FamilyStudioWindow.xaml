@@ -25,7 +25,7 @@
                         <RadioButton Content="{StaticResource ViewsModeLabel}" IsEnabled="False" GroupName="ContentMode" Style="{StaticResource KlaSegmentButtonStyle}" ToolTip="{StaticResource ViewsUnavailableLabel}" />
                     </StackPanel>
                 </Border>
-                <Border Grid.Column="2" BorderBrush="{StaticResource KlaBorderBrush}" BorderThickness="1" CornerRadius="5">
+                <Border Grid.Column="2" BorderBrush="{StaticResource klcBorderColor}" BorderThickness="1" CornerRadius="5">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="24" />
@@ -109,11 +109,11 @@
                                         </Grid.ColumnDefinitions>
                                         <CheckBox Grid.Column="0" IsChecked="{Binding IsChecked, Mode=TwoWay}" Tag="{Binding Id}" VerticalAlignment="Center" Checked="OnBatchChecked" Unchecked="OnBatchUnchecked" />
                                         <StackPanel Grid.Column="1">
-                                            <TextBlock Text="{Binding Name}" FontSize="12" Foreground="{StaticResource KlaTextBrush}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Name}" FontSize="12" Foreground="{StaticResource klcTextColor}" TextTrimming="CharacterEllipsis" />
                                             <TextBlock Text="{Binding Subtitle}" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" TextTrimming="CharacterEllipsis" />
                                         </StackPanel>
                                         <Border Grid.Column="2" Style="{StaticResource KlaBlockingChipStyle}" Margin="8,0,2,0" Visibility="{Binding FlagVisibility}">
-                                            <TextBlock Text="{Binding FlagText}" FontSize="10" Foreground="{StaticResource KlaErrorBrush}" />
+                                            <TextBlock Text="{Binding FlagText}" FontSize="10" Foreground="{StaticResource klcErrorColor}" />
                                         </Border>
                                     </Grid>
                                 </DataTemplate>
@@ -136,7 +136,7 @@
                                                     <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" Tag="{Binding Id}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,5,0" Checked="OnBatchChecked" Unchecked="OnBatchUnchecked" />
                                                 </Grid>
                                             </Border>
-                                            <TextBlock Text="{Binding Name}" FontSize="11" Foreground="{StaticResource KlaTextBrush}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Name}" FontSize="11" Foreground="{StaticResource klcTextColor}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis" />
                                             <TextBlock Text="{Binding Category}" FontSize="10" Foreground="{StaticResource KlaMutedBrush}" TextTrimming="CharacterEllipsis" />
                                         </StackPanel>
                                     </Border>
@@ -164,7 +164,7 @@
                         <TextBlock x:Name="FamilyNameText" FontSize="14" FontWeight="SemiBold" Margin="0,8,0,5" TextTrimming="CharacterEllipsis" />
                         <WrapPanel x:Name="DetailChips" Margin="0,0,0,8">
                             <Border x:Name="StatusChip" Style="{StaticResource KlaWarningChipStyle}" Margin="0,0,6,0">
-                                <TextBlock x:Name="StatusText" FontSize="11" Foreground="{StaticResource KlaWarningBrush}" />
+                                <TextBlock x:Name="StatusText" FontSize="11" Foreground="{StaticResource klcWarningColor}" />
                             </Border>
                             <Border Style="{StaticResource KlaChipBorderStyle}" Margin="0,0,6,0">
                                 <TextBlock x:Name="CategoryText" FontSize="11" Foreground="{StaticResource KlaMutedBrush}" />
