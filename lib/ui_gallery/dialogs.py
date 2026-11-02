@@ -20,6 +20,10 @@ def _action(key, label, description='', enabled=True):
 
 
 def _selection_rows(identity):
+    # Follow-up: KLCodeWPF's F5 Selection trial now reads its editable JSONC
+    # setups instead of these Gallery samples. Reconcile the pyRevit Gallery's
+    # Selection scenarios with a shared sample source if the trial is adopted;
+    # the Revit Gallery still uses this function and must remain functional.
     # Group keys double as the group dropdown labels, so they carry the marker too.
     if identity == 'dialog-sheets':
         return [_item('s101', 'S101 - General Notes', 's101', 'Sheet - Documentation', (sample('Issue Set A'),)),
