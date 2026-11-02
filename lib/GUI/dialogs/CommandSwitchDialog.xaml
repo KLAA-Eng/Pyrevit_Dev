@@ -44,23 +44,13 @@
                     Content="xxSearch here:"
                     FontSize="{StaticResource klcWindowPromptFontSize}"
                     FontWeight="SemiBold"
+                    Padding="{StaticResource KlaOpticalTextInset}"
                     Style="{StaticResource klcLabelPrompt}"
-                    Target="{Binding ElementName=search_text}">
-                    <Label.ContentTemplate>
-                        <DataTemplate>
-                            <!--  Optical centering of Segoe UI's visible glyphs within the input row.  -->
-                            <TextBlock
-                                Margin="{StaticResource KlaOpticalTextInset}"
-                                Text="{Binding}"
-                                TextWrapping="Wrap" />
-                        </DataTemplate>
-                    </Label.ContentTemplate>
-                </Label>
+                    Target="{Binding ElementName=search_text}" />
                 <Grid Grid.Column="2" VerticalAlignment="Center">
                     <TextBox
                         x:Name="search_text"
                         AutomationProperties.HelpText="Type to filter commands. Tab moves between controls. Escape clears the search, then closes."
-                        AutomationProperties.Name="Filter commands"
                         Style="{StaticResource KlaInputCompact}"
                         TextChanged="filter_changed" />
                     <TextBlock

@@ -19,10 +19,10 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <StackPanel>
-                            <Label
+                            <TextBlock
                                 Margin="0,0,0,8"
-                                Content="Sheet Number"
-                                Style="{StaticResource klcLabelPrompt}" />
+                                Style="{StaticResource klaPromptText}"
+                                Text="Sheet Number" />
                             <Border Style="{StaticResource KlaSection}">
                                 <ItemsControl Style="{StaticResource KlaFieldRows}">
                                     <Label
@@ -71,10 +71,10 @@
                             </Border>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
-                            <Label
+                            <TextBlock
                                 Margin="0,0,0,8"
-                                Content="Sheet Name"
-                                Style="{StaticResource klcLabelPrompt}" />
+                                Style="{StaticResource klaPromptText}"
+                                Text="Sheet Name" />
                             <Border Style="{StaticResource KlaSection}">
                                 <ItemsControl Style="{StaticResource KlaFieldRows}">
                                     <Label

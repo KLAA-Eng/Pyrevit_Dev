@@ -89,6 +89,19 @@
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <!--  Not a no-op: WPF's own Label style pads 5 on every side.  -->
+        <Setter Property="Padding" Value="0" />
+        <!--
+            AccessText is what WPF draws a text Label with; declaring it adds wrapping and keeps the Alt shortcut ("_Find").
+            Label content is therefore text only, and a tool-supplied caption escapes "_" as "__" (GUI.window_chrome.access_text).
+        -->
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <AccessText Text="{Binding}" TextWrapping="Wrap" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!--  HyperLink: [Enter Notes]  -->
@@ -192,7 +205,18 @@
                         <ContentPresenter
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                            RecognizesAccessKey="True" />
+                            RecognizesAccessKey="True">
+                            <!--
+                                A text caption becomes AccessText; this wraps and centres it for every variant. A ContentTemplate would
+                                also capture icon content, so the caption is styled here instead. Tool captions escape "_" as "__".
+                            -->
+                            <ContentPresenter.Resources>
+                                <Style TargetType="AccessText">
+                                    <Setter Property="TextWrapping" Value="Wrap" />
+                                    <Setter Property="TextAlignment" Value="Center" />
+                                </Style>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">

@@ -12,10 +12,10 @@
         <Grid x:Name="window_body">
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Label
+                    <TextBlock
                         Margin="0,0,0,8"
-                        Content="Renaming Parameters"
-                        Style="{StaticResource klcLabelPrompt}" />
+                        Style="{StaticResource klaPromptText}"
+                        Text="Renaming Parameters" />
                     <Border Style="{StaticResource KlaSection}">
                         <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label

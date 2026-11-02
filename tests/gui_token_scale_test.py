@@ -22,6 +22,16 @@ class TokenScaleTests(unittest.TestCase):
                          lint.strict_violations(text))
         self.assertEqual([(1, 'Margin', '0,0,0,7')], lint.off_scale(text))
 
+    def test_lint_allows_size_literals_only_in_the_sized_icon_styles(self):
+        text = ('<Style x:Key="klaIcon24" TargetType="ContentControl">\n'
+                '    <Setter Property="Width" Value="24" />\n'
+                '    <Setter Property="Margin" Value="4" />\n'
+                '</Style>\n'
+                '<Style x:Key="KlaIcon" TargetType="ContentControl">\n'
+                '    <Setter Property="Width" Value="24" />\n'
+                '</Style>\n')
+        self.assertEqual([(3, 'Margin', '4'), (6, 'Width', '24')], lint.strict_violations(text))
+
     def test_every_token_the_dictionaries_name_exists(self):
         import re
         tokens = lint.read(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeTokens.xaml')

@@ -13,7 +13,8 @@ def validate_shown_focus():
         window.Activate()
         settle_layout(window.Content)
         peer = UIElementAutomationPeer.CreatePeerForElement(window.search_text)
-        assert peer.GetName() == 'Filter commands' and str(peer.GetAutomationControlType()) == 'Edit'
+        # The visible prompt Label names the search box; it carries no AutomationProperties.Name of its own.
+        assert peer.GetName() == 'Choose a Command' and str(peer.GetAutomationControlType()) == 'Edit'
         assert FocusManager.GetFocusedElement(window) == window.window_body
         assert not window.search_text.IsKeyboardFocusWithin and window.search_text.SelectionLength == 0
         button = window._command_buttons['first']

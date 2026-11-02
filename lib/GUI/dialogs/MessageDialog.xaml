@@ -30,9 +30,7 @@
                     <StackPanel Margin="{StaticResource KlaStackGapBelow}" Orientation="Horizontal">
                         <ContentControl
                             x:Name="message_icon"
-                            Width="{StaticResource klcIconSizeMessage}"
-                            Height="{StaticResource klcIconSizeMessage}"
-                            Style="{StaticResource KlaIcon}" />
+                            Style="{StaticResource klaIcon32}" />
                         <TextBlock
                             x:Name="message_heading"
                             Margin="{StaticResource KlaPairGap}"

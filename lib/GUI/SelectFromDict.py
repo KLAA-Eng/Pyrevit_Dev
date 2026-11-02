@@ -11,7 +11,7 @@ from pyrevit import forms # Needed for wpf import to work.
 
 # Custom Imports
 from GUI.forms import my_WPF, ListItem
-from GUI.window_chrome import load_window
+from GUI.window_chrome import access_text, load_window
 
 #>>>>>>>>>> .NET IMPORTS
 import clr
@@ -61,8 +61,8 @@ class SelectFromDict(my_WPF):
 
         # UPDATE GUI ELEMENTS
         # Prompts carry no trailing colon (design system rule); existing callers keep theirs in code.
-        self.text_label.Content     = label.rstrip().rstrip(':')
-        self.button_main.Content    = button_name
+        self.text_label.Content     = access_text(label.rstrip().rstrip(':'))
+        self.button_main.Content    = access_text(button_name)
         if not SelectMultiple:
             self.UI_Buttons_all_none.Visibility = Visibility.Collapsed
 

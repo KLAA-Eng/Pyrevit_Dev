@@ -10,18 +10,6 @@
     Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <Style
-            x:Key="KlaRenamePromptLabel"
-            BasedOn="{StaticResource klcLabelPrompt}"
-            TargetType="Label">
-            <Setter Property="ContentTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" TextWrapping="Wrap" />
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
         <!--  Rename uses a tighter label column without changing tool form rows.  -->
         <Style
             x:Key="KlaRenameFieldRows"

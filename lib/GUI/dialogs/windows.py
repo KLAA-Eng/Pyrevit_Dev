@@ -29,7 +29,7 @@ def _window_types():
     from System.Windows.Media import VisualTreeHelper
     from System.Windows.Input import Key, Keyboard
     from System.Windows.Threading import DispatcherPriority
-    from GUI.window_chrome import load_window, fit_window_height
+    from GUI.window_chrome import access_text, load_window, fit_window_height
 
     class DialogWindow(Window):
         def initialize(self, filename, title, version, owner, navigate):
@@ -130,7 +130,7 @@ def _window_types():
             self.state = SelectionState(items, multiple, groups)
             self.required = required
             self.initialize('SelectionDialog.xaml', title, version, owner, navigate)
-            self.prompt_label.Content = prompt
+            self.prompt_label.Content = access_text(prompt)
             self.group_filter.ItemsSource = [SelectionGroup(None, all_label)] + self.state.groups
             self.group_filter.SelectedIndex = 0
             self.group_row.Visibility = Visibility.Visible if self.state.groups else Visibility.Collapsed

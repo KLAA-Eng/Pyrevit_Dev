@@ -130,7 +130,6 @@
                         <TextBox
                             x:Name="review_detail"
                             Grid.Row="2"
-                            AutomationProperties.Name="Selected review item details"
                             Style="{StaticResource KlaMultilineReadout}" />
                     </Grid>
                 </Border>

@@ -26,7 +26,7 @@ def _window_type():
     from System.Windows import (Window, WindowStartupLocation, Visibility, Size,
                                 Thickness, GridLength, HorizontalAlignment)
     from System.Windows.Automation import AutomationProperties
-    from System.Windows.Controls import (Grid, StackPanel, Label, TextBox,
+    from System.Windows.Controls import (Grid, StackPanel, Label, TextBlock, TextBox,
                                          Border, Button, ItemsControl,
                                          ColumnDefinition, Orientation)
     from System.Windows.Input import Key, Keyboard
@@ -77,9 +77,10 @@ def _window_type():
             Grid.SetColumn(controls.container, index)
             controls.container.Name = 'rename_field_{0}'.format(index)
             AutomationProperties.SetAutomationId(controls.container, controls.container.Name)
-            controls.label = Label()
-            controls.label.Style = self.FindResource('KlaRenamePromptLabel')
-            controls.label.Content = field.Label
+            # The field's heading names a group, not one input, so it is text rather than a Label.
+            controls.label = TextBlock()
+            controls.label.Style = self.FindResource('klaPromptText')
+            controls.label.Text = field.Label
             controls.label.Margin = Thickness(0, 0, 0, 8)
             controls.container.Children.Add(controls.label)
             controls.naming_group = Border()

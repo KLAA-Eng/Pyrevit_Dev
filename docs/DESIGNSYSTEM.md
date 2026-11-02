@@ -141,14 +141,28 @@ Information, Warning, Error and Success. Original SVGs, the pinned revision in
 [source.json](../lib/_icons/gui/source.json), and
 [license notices](../lib/_icons/gui/LICENSE.lucide.txt) stay together.
 
-Ordinary GUI icons render at 16 WPF units, using a 24-unit source canvas and
-1.5-unit source stroke. Keep the full source canvas; tightly cropped geometry
-would change the apparent size of different symbols. Use semantic resources
-instead of per-window file paths or copied geometry.
+Ordinary GUI icons render at 16 WPF units (1/96 inch: pixels at 100% Windows
+scaling, 24 pixels at 150%). Every icon is drawn on Lucide's 24-unit grid with a
+2-unit stroke (`klcIconStroke`). Keep the full source canvas; tightly cropped
+geometry would change the apparent size of different symbols. Use semantic
+resources instead of per-window file paths or copied geometry.
+
+The Foundation `KlaGuiIcon` presenter builds every icon: a Viewbox scales the
+24-unit `KlaIconCanvas` to the presenter's Width and Height. `KlaIconCanvas` is
+the artwork's grid, not a size, and must stay 24 (the generator rejects any SVG
+whose viewBox is not `0 0 24 24`); a different value shifts and rescales every
+icon. Size an icon only by choosing a sized presenter below. The stroke is in
+grid units, so it scales with the icon: 1 pixel at 12, 1.33 at 16, 2 at 24,
+2.67 at 32 and 4 at 48. The 12, 24 and 48 sizes map the grid onto whole pixels.
 
 | Need | Choose | Behavior |
 | --- | --- | --- |
-| Any GUI icon, decorative or inside a button, toggle or stateful control | `KlaIcon` (the Components alias of the Foundation `KlaGuiIcon` presenter) + a `klicon<Role>` resource | Inherits foreground; the style uses `KlaDisabledTextBrush` when disabled |
+| Any GUI icon at the default 16 units, decorative or inside a button, toggle or stateful control | `KlaIcon` (the Components alias of the Foundation `KlaGuiIcon` presenter) + a `klicon<Role>` resource | Inherits foreground; the style uses `KlaDisabledTextBrush` when disabled |
+| An icon at a set size | `klaIcon12`, `klaIcon16`, `klaIcon24`, `klaIcon32` or `klaIcon48` | The same presenter with that Width and Height written in the style; the dialog severity icons use `klaIcon32` |
+
+Do not set Width or Height on an icon in a window; choose the sized presenter.
+Keep any fixed slot (a grid column, a command-link icon column) at least as wide
+as the icon in it.
 
 This presenter is the only way to draw a GUI icon; the generator no longer
 writes fixed-color ImageSources (2026-10-31). Use it inside an action:
@@ -267,7 +281,7 @@ windows; compiled consumers can also use their existing adapter aliases.
 | `xGhostButton` | Button | 104 x 28 | Outlined secondary action. Shared dialogs give Cancel the standard `KlaButton` |
 | `xxIconTextButton` | Button | 128 x 28 | Approved icon plus caption |
 | `xxIconButton` | Button | 28 x 28 | Icon-only action with an accessible name |
-| `xxxButtonClose` | Button | 60 x 18 | Header Close; the shell supplies it |
+| `klcCloseButton` | Button | 48 x 16 | Header Close; the shell supplies it, with the `CloseLabel` caption as its default |
 | `xRadioButton` | RadioButton | Minimum height 28 | Exclusive choices with circular indicators |
 | `xSegmentButton` | RadioButton | Height 28; width fits content | Exclusive toolbar segments inside a bordered group |
 | `xxToggle` | ToggleButton | 104 x 28 | Persistent on/off option |
@@ -280,6 +294,26 @@ template. A variant changes its hover fill, disabled fill or corner radius
 by re-pointing `klcButtonHoverBrush`, `klcButtonDisabledBrush` or
 `klcButtonRadius` in its own `Style.Resources`, and its border through the
 `BorderBrush` and `BorderThickness` setters; never by copying the template.
+**Button captions.** A caption is the button's `Content`, never a TextBlock the
+window places inside it. The `klcFdnButton` template draws a text caption as
+AccessText that wraps and centres, so every variant lays text out the same way;
+icon content (a StackPanel with a `KlaIcon`) is drawn as given. Three sources:
+
+- A caption every window shares is a string resource the style sets as its
+  default, as `klcCloseButton` does: `<Setter Property="Content" Value="{DynamicResource CloseLabel}"/>`.
+  A value set on the button, `Content="…"` in XAML or `button.Content = …` in
+  code, replaces the default; `ClearValue(ContentControl.ContentProperty)`
+  restores it. A style's default caption is text only; an element cannot be
+  shared between buttons.
+- A caption one window owns is literal in its XAML (`Content="Select All"`).
+- A caption the tool supplies is set in code through `GUI.window_chrome.access_text`,
+  which escapes `_` as `__`; AccessText otherwise reads `_` as an Alt shortcut and hides it.
+  A tool caption can be any length, so give it a style with automatic width and
+  wrapping (`KlaCommandButton`, `KlaCommandLink`) rather than a fixed 104-wide role.
+
+The caption is also the button's accessible name; set
+`AutomationProperties.Name` only when the caption alone is unclear.
+
 Preserve workflow action placement when migrating a window. If a localized
 caption cannot fit its role, review a shared variant and render it; do not
 silently shrink fonts or invent a per-window button size.
@@ -292,13 +326,15 @@ silently shrink fonts or invent a per-window button size.
 | `KlaInputCompact` | TextBox | Compact 24-high form input |
 | `KlaTextPromptInput` | TextBox | 36-high input, FontSize 24, centered Segoe UI Bold; opt-in Text prompt only |
 | `KlaFilter` | TextBox | 24-high search/filter; font size 14 |
+| `klaReadout` | TextBox | Tool output the user may copy, drawn like body text: read-only, transparent, wrapped, Ctrl+C and right-click Copy |
 | `xReadOnlyField` / `xCompactReadOnlyField` | TextBox | Read-only field, standard 32 or compact 24 high |
 | `KlaMultilineReadout` | TextBox | Wrapped read-only output, minimum height 64, bounded by the caller with scrolling |
 | `KlaDetailsReadout` | TextBox | `KlaMultilineReadout` whose text aligns with the dialog body; Message Details |
 | `KlaComboBox` / `KlaCompactComboBox` | ComboBox | Standard 32 or compact 24 high; minimum width 104; popup maximum height 260 |
-| `xLabel` / `klcLabelCentered` | Label | Ordinary label / vertically centered compact field label |
-| `klcLabelPrompt` | Label | 16-unit, normal-weight section prompt with a label target |
-| `KlaSectionHeading` / `xPromptText` | TextBlock | Wrapped 14-unit heading / normal-weight prompt text |
+| `xxxLabel` / `klcLabelCentered` | Label | Ordinary field caption (the plain alias) / vertically centered compact field caption |
+| `klcLabelPrompt` | Label | 16-unit, normal-weight prompt that names one input |
+| `KlaSectionHeading` / `klaPromptText` | TextBlock | Wrapped 16-unit SemiBold heading / the same at normal weight, for section headings |
+| `xText` | TextBlock | Plain body text (the TextBlock alias) |
 | `KlaInfoText` | TextBlock | Muted wrapped information |
 | `KlaCheck` | CheckBox | Checked/unchecked/indeterminate indicator with wrapped caption |
 | `KlaList` / `KlaListItem` | ListBox / ListBoxItem | Checked-list host and native WPF row behavior |
@@ -315,13 +351,48 @@ style. Prefer explicit keys in new bodies so the intended role is visible.
 The named `xDataGrid` is read-only; an editable table needs a deliberate
 workflow design rather than an assumption that this style supplies editing.
 
-For a labeled compact field, use a Label target and an automation name:
+### Choosing TextBlock, Label or TextBox
+
+Choose the control by what the text does, not by who supplies it; the window's
+XAML and the tool's code can fill any of them.
+
+| Role | Control | Use for |
+| --- | --- | --- |
+| Display text | TextBlock | Headings, titles, section headings, prompts that name no single input, information and validation lines. The shell's title and version are TextBlocks bound to `Tag.Title` / `Tag.VersionText` |
+| Field caption | Label | Text that names exactly one focusable input, through `Target` |
+| User input | TextBox | Anything the user types |
+| Tool output | Read-only TextBox (`klaReadout`, `KlaMultilineReadout`, `KlaDetailsReadout`) | Text the user may copy: a message body, details, a path, a report |
+
+A TextBlock cannot be selected or copied; when the user may want the text, it is a readout.
+Button captions follow the button rules above.
+
+**Labels.** A Label is a caption tied to its `Target`: screen readers name the
+input by the Label's text, and an underscore in the caption (`_Find`) becomes the
+Alt shortcut that focuses it. Use one only when the text names one focusable
+input; a heading over a group, or a prompt whose input already has its own field
+caption, is a TextBlock (`klaPromptText`). Rules:
+
+- The Label is the input's name: do not also set `AutomationProperties.Name` on
+  the target, which would override it. Keep an explicit name only when the visible
+  caption is ambiguous on its own, such as Rename's repeated Find / Replace captions,
+  which are named per field ("Sheet Name find").
+- `klcFdnLabel` draws its caption as wrapping AccessText with no padding, so a
+  Label's content is text only.
+- A caption the tool supplies goes through `GUI.window_chrome.access_text`, as
+  for buttons.
+
+**Lists and tables.** List rows stay CheckBoxes and list items; a TextBox inside a
+row takes the click, focus and Tab stop, so checking, selecting and arrow keys stop
+working. A list whose rows the user may copy gets a Copy command instead: Ctrl+C
+and a right-click Copy that copy the selected rows. `xDataGrid` copies its selected
+rows with Ctrl+C natively.
+
+For a labeled compact field, the Label names its input:
 
 ```xml
 <Label Content="Prefix:" Target="{Binding ElementName=input_prefix}"
        Style="{StaticResource klcLabelCentered}"/>
-<TextBox x:Name="input_prefix" Style="{StaticResource KlaInputCompact}"
-         AutomationProperties.Name="Name prefix"/>
+<TextBox x:Name="input_prefix" Style="{StaticResource KlaInputCompact}"/>
 ```
 
 These two elements belong in the caller's layout; the full naming composition
@@ -413,7 +484,7 @@ control sizes require different resource types.
 | `KlaCommandLinkPadding`, `KlaCommandArrowInset`, `KlaCommandLinkIconColumn` | Thickness, Thickness, GridLength | 8, `0,4,8,0` and 24 inside a command link |
 | `KlaDetailsReadoutPadding` | Thickness | `10,8`, body-aligned readout text |
 | `KlaRenameLabelColumn` | GridLength | 52, the KLC-Rename label column |
-| `klcIconSizeMessage`, `klcMessageHeaderFontSize`, `klcWindowPromptFontSize` | Double | 32, 22 and 16: dialog severity icon, severity heading, command link and switch prompt |
+| `klcMessageHeaderFontSize`, `klcWindowPromptFontSize` | Double | 22 and 16: severity heading, command link and switch prompt |
 | `KlaDetailsHeight`, `KlaOptionMaxHeight`, `KlaCommandLinkMinHeight`, `xxxSwitchPromptMaxWidth` | Double | 128, 80, 40 and 180 |
 | `KlaControlHeight`, `klcButtonHeight`, `KlaCompactFieldHeight` | Double | Control heights of 32, 28 and 24 |
 
@@ -719,10 +790,9 @@ handler is supplied by the Python example below.
                 <RowDefinition Height="{StaticResource xBodyRowLarge}"/>
             </Grid.RowDefinitions>
             <Label Content="Name:" Target="{Binding ElementName=name_input}"
-                   Style="{StaticResource xxxLabel}"/>
+                   Style="{StaticResource klcLabelCentered}"/>
             <TextBox x:Name="name_input" Grid.Row="2"
-                     Style="{StaticResource KlaInputCompact}"
-                     AutomationProperties.Name="Example name"/>
+                     Style="{StaticResource KlaInputCompact}"/>
             <Button Grid.Row="4" Content="Apply" Click="apply_example"
                     Style="{StaticResource klcButtonDouble}" IsDefault="True"/>
         </Grid>

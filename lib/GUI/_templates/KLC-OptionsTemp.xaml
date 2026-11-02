@@ -18,12 +18,11 @@
             </Grid.RowDefinitions>
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Label
+                    <TextBlock
                         x:Name="options_prompt"
                         Margin="0,0,0,8"
-                        Content="Configure Sample Options"
-                        Style="{StaticResource klcLabelPrompt}"
-                        Target="{Binding ElementName=option_category}" />
+                        Style="{StaticResource klaPromptText}"
+                        Text="Configure Sample Options" />
                     <Border Style="{StaticResource KlaSection}">
                         <Grid x:Name="options_fields">
                             <Grid.ColumnDefinitions>
@@ -119,7 +118,6 @@
                             </Grid.ColumnDefinitions>
                             <TextBox
                                 x:Name="option_path"
-                                AutomationProperties.Name="Fictional output location"
                                 Style="{StaticResource xCompactReadOnlyField}" />
                             <Button
                                 Grid.Column="2"

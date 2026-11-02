@@ -47,6 +47,13 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    <!--  A section heading at prompt size and normal weight; a caption that names one input is klcLabelPrompt instead.  -->
+    <Style
+        x:Key="klaPromptText"
+        BasedOn="{StaticResource KlaSectionHeading}"
+        TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="Normal" />
+    </Style>
 
     <!--  Labels: [Enter Notes]  -->
     <Style
@@ -80,6 +87,45 @@
         x:Key="KlaIcon"
         BasedOn="{StaticResource KlaGuiIcon}"
         TargetType="ContentControl" />
+    <!--
+        Sized presenters. The number is the icon's size in window units, so it is written here rather than tokenised
+        (check_ui_scale exempts the klaIcon<size> styles); the stroke stays klcIconStroke and scales with the icon.
+    -->
+    <Style
+        x:Key="klaIcon12"
+        BasedOn="{StaticResource KlaGuiIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Height" Value="12" />
+    </Style>
+    <Style
+        x:Key="klaIcon16"
+        BasedOn="{StaticResource KlaGuiIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="16" />
+    </Style>
+    <Style
+        x:Key="klaIcon24"
+        BasedOn="{StaticResource KlaGuiIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style
+        x:Key="klaIcon32"
+        BasedOn="{StaticResource KlaGuiIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+    </Style>
+    <Style
+        x:Key="klaIcon48"
+        BasedOn="{StaticResource KlaGuiIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="48" />
+    </Style>
 
     <!--  Border: Section, banner and text  -->
     <Style
@@ -120,18 +166,8 @@
         <Setter Property="Width" Value="{StaticResource klcCloseWidth}" />
         <Setter Property="Height" Value="{StaticResource klcCloseHeight}" />
         <Setter Property="FontSize" Value="{StaticResource klcCloseFontSize}" />
-        <Setter Property="ContentTemplate">
-            <Setter.Value>
-                <DataTemplate>
-                    <!--  FIXED: Added HorizontalAlignment, VerticalAlignment, and TextAlignment  -->
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Text="{Binding}"
-                        TextAlignment="Center" />
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>
+        <!--  The default caption; a window or tool that sets Content itself replaces it.  -->
+        <Setter Property="Content" Value="{DynamicResource CloseLabel}" />
     </Style>
 
     <!--  TextBox: Inputs and readouts  -->
@@ -165,6 +201,23 @@
         <Setter Property="FontSize" Value="{StaticResource klcTextDialogFontSize}" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+    <!--
+        Tool output the user may copy (a message body, a path, a report): read-only text drawn like body text, selectable
+        with Ctrl+C and right-click Copy. The transparent hairline keeps the keyboard focus border visible.
+    -->
+    <Style
+        x:Key="klaReadout"
+        BasedOn="{StaticResource KlaFoundationInput}"
+        TargetType="TextBox">
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
     <Style
         x:Key="KlaMultilineReadout"
@@ -338,7 +391,6 @@
                                 VerticalAlignment="Center"
                                 Panel.ZIndex="1"
                                 AutomationProperties.Name="Close window"
-                                Content="{DynamicResource CloseLabel}"
                                 Style="{StaticResource klcCloseButton}" />
                         </Grid>
                         <Grid x:Name="klcShell_Footer" Grid.Row="2">
@@ -496,16 +548,6 @@
         <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
         <Setter Property="Padding" Value="{StaticResource KlaCommandPillInset}" />
         <Setter Property="Margin" Value="{StaticResource KlaCommandPillGap}" />
-        <Setter Property="ContentTemplate">
-            <Setter.Value>
-                <DataTemplate>
-                    <TextBlock
-                        Text="{Binding}"
-                        TextAlignment="Center"
-                        TextWrapping="Wrap" />
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="BorderBrush" Value="{StaticResource KlaDisabledFillBrush}" />
@@ -521,17 +563,11 @@
     <!--  x  tier: used only by windows that are not shared dialogs (tool windows, templates, the Gallery, compiled C# hosts).  -->
     <!--  ======================================================================  -->
 
-    <!--  x: text and labels  -->
+    <!--  x: text  -->
     <Style
-        x:Key="xPromptText"
-        BasedOn="{StaticResource KlaSectionHeading}"
-        TargetType="TextBlock">
-        <Setter Property="FontWeight" Value="Normal" />
-    </Style>
-    <Style
-        x:Key="xLabel"
-        BasedOn="{StaticResource klcFdnLabel}"
-        TargetType="Label" />
+        x:Key="xText"
+        BasedOn="{StaticResource klaFoundationTextBlock}"
+        TargetType="TextBlock" />
 
     <!--  x: status chips  -->
     <Style
@@ -746,13 +782,8 @@
 
     <!--  ======================================================================  -->
     <!--  xxx tier: no consumer anywhere (Python, compiled C#, Gallery, future). Candidates for deletion, except the plain aliases  -->
-    <!--  xxxText, xxxComboBoxItem, xxxDataGridHeader and xxxDataGridRow, which give their Foundation base its Components alias.  -->
-    <!--  xxxLabel duplicates xLabel.  -->
+    <!--  xxxLabel, xxxComboBoxItem, xxxDataGridHeader and xxxDataGridRow, which give their Foundation base its Components alias.  -->
     <!--  ======================================================================  -->
-    <Style
-        x:Key="xxxText"
-        BasedOn="{StaticResource klaFoundationTextBlock}"
-        TargetType="TextBlock" />
     <Style
         x:Key="xxxLabel"
         BasedOn="{StaticResource klcFdnLabel}"

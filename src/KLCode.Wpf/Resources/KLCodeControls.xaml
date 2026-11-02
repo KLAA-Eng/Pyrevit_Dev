@@ -14,7 +14,7 @@
     <Style x:Key="KlaListBoxStyle" TargetType="ListBox" BasedOn="{StaticResource KlaFoundationList}" />
     <Style x:Key="KlaListBoxItemStyle" TargetType="ListBoxItem" BasedOn="{StaticResource KlaFoundationListItem}" />
     <Style x:Key="KlaGroupBorderStyle" TargetType="Border" BasedOn="{StaticResource KlaSection}" />
-    <Style x:Key="KlaGroupCaptionStyle" TargetType="TextBlock" BasedOn="{StaticResource xPromptText}" />
+    <Style x:Key="KlaGroupCaptionStyle" TargetType="TextBlock" BasedOn="{StaticResource klaPromptText}" />
     <Style x:Key="KlaChipBorderStyle" TargetType="Border" BasedOn="{StaticResource xStatusChip}" />
     <Style x:Key="KlaInfoChipStyle" TargetType="Border" BasedOn="{StaticResource xStatusChip}">
         <Setter Property="BorderBrush" Value="{StaticResource klcInfo}" />

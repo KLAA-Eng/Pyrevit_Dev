@@ -133,7 +133,6 @@
     <sys:Double x:Key="klcIconStroke">2</sys:Double>
     <sys:Double x:Key="KlaCheckSize">16</sys:Double>
     <sys:Double x:Key="KlaCheckStroke">2</sys:Double>
-    <sys:Double x:Key="klcIconSizeMessage">32</sys:Double>
 
     <!--  Insets and padding  -->
     <!--

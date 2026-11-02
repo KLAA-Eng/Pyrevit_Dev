@@ -35,10 +35,8 @@
                         </Grid.ColumnDefinitions>
                         <ContentControl
                             x:Name="severity_icon"
-                            Width="{StaticResource klcIconSizeMessage}"
-                            Height="{StaticResource klcIconSizeMessage}"
                             VerticalAlignment="Top"
-                            Style="{StaticResource KlaIcon}"
+                            Style="{StaticResource klaIcon32}"
                             Visibility="Collapsed" />
                         <TextBlock
                             x:Name="instruction_text"

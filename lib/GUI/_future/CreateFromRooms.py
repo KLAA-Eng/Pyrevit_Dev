@@ -10,7 +10,7 @@ from pyrevit import forms # Needed for wpf import to work.
 
 # Custom Imports
 from GUI.forms         import my_WPF, ListItem
-from GUI.window_chrome import load_window
+from GUI.window_chrome import access_text, load_window
 from Snippets._convert import convert_internal_units
 
 #>>>>>>>>>> .NET IMPORTS
@@ -68,8 +68,8 @@ class CreateFromRooms(my_WPF):
     def update_UI(self):
         """Function to make updates to UI based on provided arguments."""
         # UPDATE GUI ELEMENTS
-        self.text_label.Content       = self.label
-        self.button_main.Content      = self.button_name
+        self.text_label.Content       = access_text(self.label)
+        self.button_main.Content      = access_text(self.button_name)
 
         self.items                    = self.generate_list_items()
         self.main_ListBox.ItemsSource = self.items

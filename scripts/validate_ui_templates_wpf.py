@@ -49,8 +49,10 @@ def validate_template_family():
                 assert not hasattr(window, 'option_toggle')
                 for field in (window.option_category, window.option_offset, window.option_path):
                     assert field.ActualHeight == token('KlaCompactFieldHeight'), (state, field.Name, field.ActualHeight)
+                # The options heading names a group (text); the output prompt names one field (a Label).
+                assert window.options_prompt.Style == window.Resources['klaPromptText']
+                assert window.output_prompt.Style == window.Resources['klcLabelPrompt']
                 for prompt in (window.options_prompt, window.output_prompt):
-                    assert prompt.Style == window.Resources['klcLabelPrompt']
                     assert prompt.FontSize == token('klcSectionTitleFontSize') and str(prompt.FontWeight) == 'Normal'
             if identity == 'template-options' and state == 'Disabled':
                 for widget in (window.option_category, window.scope_selected, window.option_include_existing):

@@ -13,6 +13,14 @@ COMPONENTS_XAML = os.path.join(os.path.dirname(__file__), 'Resources', 'KLCodeCo
 _DICTIONARIES = {}
 
 
+def access_text(text):
+    """Escape a tool-supplied Label or Button caption.
+
+    Both draw text as AccessText, which reads "_" as an Alt-shortcut marker and hides it; "__" shows one underscore.
+    """
+    return text.replace('_', '__') if text else text
+
+
 def shared_resources(xaml_path=COMPONENTS_XAML):
     """One parsed ResourceDictionary per process for the shared chain.
 

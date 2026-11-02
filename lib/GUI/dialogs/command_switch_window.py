@@ -27,7 +27,7 @@ def _window_type():
                                       CaptureMode, MouseEventHandler)
     from System.Windows.Interop import WindowInteropHelper
     from System.Windows.Threading import DispatcherPriority
-    from GUI.window_chrome import shared_resources
+    from GUI.window_chrome import access_text, shared_resources
     from GUI.window_metadata import WindowMetadata
 
     class CommandSwitchWindow(Window):
@@ -50,7 +50,7 @@ def _window_type():
             self.Resources.MergedDictionaries.Add(shared_resources())
             wpf.LoadComponent(self, os.path.join(os.path.dirname(__file__), 'CommandSwitchDialog.xaml'))
             self.Title = self.metadata.Title
-            self.prompt_label.Content = prompt
+            self.prompt_label.Content = access_text(prompt)
             if owner is not None:
                 if isinstance(owner, Window):
                     self.Owner = owner
@@ -72,7 +72,7 @@ def _window_type():
             for row in state.choices:
                 button = Button()
                 button.Style = self.FindResource('KlaCommandButton')
-                button.Content = row.Label
+                button.Content = access_text(row.Label)
                 button.Tag = row.Key
                 button.IsEnabled = row.CanSelect
                 button.MaxWidth = self.Width - 64

@@ -3,8 +3,9 @@
 Each check reads the XAML as XML; nothing is rendered. They guard the 2026-10-29 template
 correctness pass (orientation-aware scrollbars, layout-based Close centering, an indeterminate
 checkbox state, a non-reflowing link focus, body-first keyboard order and no stacked opacity) as
-the 2026-10-31 shell rework left it: klcCloseButton centres its caption with alignment alone and
-the shell names its parts klcShell_*, klcHeader_* and klcFooter_*.
+the 2026-10-31 shell rework left it: klcCloseButton takes its caption from its style and the
+Foundation button centres it with alignment alone, and the shell names its parts klcShell_*,
+klcHeader_* and klcFooter_*.
 """
 import os
 import re
@@ -56,14 +57,16 @@ class FoundationTemplateContracts(unittest.TestCase):
         # centres its caption in layout, so the token is the unused xxxCloseGlyphLift and nothing names it.
         self.assertNotIn('CloseGlyphLift', components)
         close = _style(_root('KLCodeComponents.xaml'), 'klcCloseButton')
-        text = next(close.iter(P + 'TextBlock'))
-        self.assertNotIn('Margin', text.attrib)
-        self.assertEqual(('Center', 'Center', 'Center'), (text.attrib.get('HorizontalAlignment'),
-                         text.attrib.get('VerticalAlignment'), text.attrib.get('TextAlignment')))
+        # The caption is the Foundation button's AccessText, centred by its alignment; Close adds no template of its own.
+        self.assertEqual([], list(close.iter(P + 'TextBlock')))
+        caption = next(s for s in _style(_root('KLCodeFoundation.xaml'), 'klcFdnButton').iter(P + 'Style')
+                       if s.attrib.get('TargetType') == 'AccessText')
+        caption_setters = {s.attrib.get('Property'): s.attrib.get('Value') for s in caption.findall(P + 'Setter')}
+        self.assertEqual({'TextWrapping': 'Wrap', 'TextAlignment': 'Center'}, caption_setters)
         sizes = {setter.attrib.get('Property'): setter.attrib.get('Value') for setter in close.findall(P + 'Setter')}
         self.assertEqual({'Width': '{StaticResource klcCloseWidth}', 'Height': '{StaticResource klcCloseHeight}',
-                          'FontSize': '{StaticResource klcCloseFontSize}'},
-                         {key: sizes.get(key) for key in ('Width', 'Height', 'FontSize')})
+                          'FontSize': '{StaticResource klcCloseFontSize}', 'Content': '{DynamicResource CloseLabel}'},
+                         {key: sizes.get(key) for key in ('Width', 'Height', 'FontSize', 'Content')})
 
     def test_checkbox_has_an_indeterminate_state(self):
         box = _style(_root('KLCodeFoundation.xaml'), 'KlaFoundationCheckBox')
@@ -96,7 +99,8 @@ class FoundationTemplateContracts(unittest.TestCase):
                           'klcFooter_version', 'klcFooter_prototype', 'klcFooter_outreach'}, names)
         close = next(e for e in shell.iter(P + 'Button') if e.attrib.get(X + 'Name') == 'klcHeader_close')
         self.assertEqual('{StaticResource klcCloseButton}', close.attrib.get('Style'))
-        self.assertEqual('{DynamicResource CloseLabel}', close.attrib.get('Content'))
+        # The caption is the klcCloseButton default; the shell does not set one.
+        self.assertIsNone(close.attrib.get('Content'))
 
     def test_disabled_states_use_the_disabled_brushes_without_stacking_opacity(self):
         for name in ('KLCodeFoundation.xaml', 'KLCodeComponents.xaml'):

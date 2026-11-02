@@ -23,8 +23,8 @@ foreground and turns gray when disabled. There are no fixed-color ImageSources
                 Content="{StaticResource kliconSearch}"/>
 ```
 
-The presenter uses 16-unit dimensions and a 24-unit source canvas, with a 1.5
-stroke. Foreground inherits from its parent control; disabled icons use the
+The presenter uses 16-unit dimensions and a 24-unit source canvas, with a 2-unit
+stroke; `klaIcon12` / `16` / `24` / `32` / `48` give the other sizes. Foreground inherits from its parent control; disabled icons use the
 shared `KlaDisabledTextBrush`. Decorative icons do not intercept clicks or focus.
 Do not create per-window copies or replace source SVGs with screenshots.
 See the [design-system usage examples](../../../docs/DESIGNSYSTEM.md#in-window-gui-icons)
@@ -65,7 +65,7 @@ Shared Message uses [Octagon Alert](https://lucide.dev/icons/octagon-alert) and
 [Check Check](https://lucide.dev/icons/check-check) through its own error/success
 roles. Since 2026-10-31 the error role also serves the compiled alert and the Startup Importer's blocking issues; Circle X is retired.
 Information and Warning retain Info and Triangle Alert. Message severity symbols
-render at 24 units in the severity color; Details uses 16-unit
+render at 32 units (`klaIcon32`) in the severity color; Details uses 16-unit
 [Right](https://lucide.dev/icons/chevron-right)/[Down](https://lucide.dev/icons/chevron-down)
 chevrons for collapsed/expanded state. All 19 roles retain the existing pinned
 source revision and license; the default presenter remains 16 units.
@@ -77,4 +77,4 @@ size, canvas and stroke. The [source SVG](https://github.com/lucide-icons/lucide
 comes from the existing pinned revision. It contains two paths, requires no
 transform or renderer changes, and is covered by the retained Lucide ISC notice.
 The original SVG keeps its upstream stroke attribute; generated WPF uses the
-existing 1.5-unit token pen rather than that attribute.
+existing 2-unit token pen rather than that attribute.

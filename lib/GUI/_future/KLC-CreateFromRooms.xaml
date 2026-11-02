@@ -40,7 +40,6 @@
             <ListBox
                 x:Name="main_ListBox"
                 Grid.Row="4"
-                AutomationProperties.Name="Available types"
                 SelectionMode="Single"
                 Style="{StaticResource KlaList}">
                 <ListBox.ItemTemplate>
@@ -54,11 +53,10 @@
                 </ListBox.ItemTemplate>
             </ListBox>
             <StackPanel x:Name="UI_stack_region_settings" Grid.Row="6">
-                <Label
+                <TextBlock
                     Margin="0,0,0,8"
-                    Content="Additional Settings:"
-                    Style="{StaticResource klcLabelPrompt}"
-                    Target="{Binding ElementName=UI_offset}" />
+                    Style="{StaticResource klaPromptText}"
+                    Text="Additional Settings:" />
                 <Border Style="{StaticResource KlaSection}">
                     <Grid HorizontalAlignment="Left">
                         <Grid.ColumnDefinitions>

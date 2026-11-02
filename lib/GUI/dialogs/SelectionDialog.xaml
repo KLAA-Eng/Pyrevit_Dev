@@ -80,7 +80,6 @@
             <ListBox
                 x:Name="items_list"
                 Grid.Row="4"
-                AutomationProperties.Name="Selectable items"
                 Style="{StaticResource KlaList}">
                 <ListBox.ItemContainerStyle>
                     <Style BasedOn="{StaticResource KlaDialogListItem}" TargetType="ListBoxItem" />

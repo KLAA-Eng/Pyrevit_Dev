@@ -40,7 +40,6 @@
             <ListBox
                 x:Name="main_ListBox"
                 Grid.Row="4"
-                AutomationProperties.Name="Available elements"
                 SelectionMode="Single"
                 Style="{StaticResource KlaList}">
                 <ListBox.ItemTemplate>

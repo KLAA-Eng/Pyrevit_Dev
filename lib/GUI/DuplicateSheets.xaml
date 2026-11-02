@@ -22,7 +22,7 @@
                 <RowDefinition Height="*" MinHeight="8" />
                 <RowDefinition Height="{StaticResource xBodyRowLarge}" />
             </Grid.RowDefinitions>
-            <Label Content="Naming" Style="{StaticResource klcLabelPrompt}" />
+            <TextBlock Style="{StaticResource klaPromptText}" Text="Naming" />
             <Border Grid.Row="2" Style="{StaticResource KlaSection}">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -33,10 +33,10 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
-                        <Label
+                        <TextBlock
                             Margin="0,0,0,8"
-                            Content="View Name"
-                            Style="{StaticResource xLabel}" />
+                            Style="{StaticResource xText}"
+                            Text="View Name" />
                         <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label
                                 Grid.Row="0"
@@ -85,10 +85,10 @@
                         </ItemsControl>
                     </StackPanel>
                     <StackPanel Grid.Column="2">
-                        <Label
+                        <TextBlock
                             Margin="0,0,0,8"
-                            Content="Sheet Number"
-                            Style="{StaticResource xLabel}" />
+                            Style="{StaticResource xText}"
+                            Text="Sheet Number" />
                         <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label
                                 Grid.Row="0"
@@ -137,10 +137,10 @@
                         </ItemsControl>
                     </StackPanel>
                     <StackPanel Grid.Column="4">
-                        <Label
+                        <TextBlock
                             Margin="0,0,0,8"
-                            Content="Sheet Name"
-                            Style="{StaticResource xLabel}" />
+                            Style="{StaticResource xText}"
+                            Text="Sheet Name" />
                         <ItemsControl Style="{StaticResource KlaFieldRows}">
                             <Label
                                 Grid.Row="0"
@@ -190,10 +190,10 @@
                     </StackPanel>
                 </Grid>
             </Border>
-            <Label
+            <TextBlock
                 Grid.Row="4"
-                Content="Include Elements"
-                Style="{StaticResource klcLabelPrompt}" />
+                Style="{StaticResource klaPromptText}"
+                Text="Include Elements" />
             <Border Grid.Row="6" Style="{StaticResource KlaSection}">
                 <UniformGrid Columns="6" Rows="2">
                     <CheckBox
@@ -276,7 +276,7 @@
                         <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <Label Content="Use Existing [True] / Duplicate [False]" Style="{StaticResource klcLabelPrompt}" />
+                    <TextBlock Style="{StaticResource klaPromptText}" Text="Use Existing [True] / Duplicate [False]" />
                     <Border Grid.Row="2" Style="{StaticResource KlaSection}">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                             <CheckBox
@@ -300,7 +300,7 @@
                         <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Label Content="View Duplicate Options" Style="{StaticResource klcLabelPrompt}" />
+                    <TextBlock Style="{StaticResource klaPromptText}" Text="View Duplicate Options" />
                     <Border Grid.Row="2" Style="{StaticResource KlaSection}">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                             <RadioButton

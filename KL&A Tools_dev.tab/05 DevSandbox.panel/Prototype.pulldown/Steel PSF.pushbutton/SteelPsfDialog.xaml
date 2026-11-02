@@ -10,7 +10,7 @@
                 <TextBox x:Name="textbox_filter" Grid.Column="2" TextChanged="text_filter_updated" Style="{StaticResource KlaFilter}" AutomationProperties.Name="Search stories"/>
             </Grid>
             <Label x:Name="text_label" Grid.Row="2" Content="Select Stories to Review:" Target="{Binding ElementName=main_ListBox}" Style="{StaticResource klcLabelPrompt}"/>
-            <ListBox x:Name="main_ListBox" Grid.Row="4" SelectionMode="Single" Style="{StaticResource KlaList}" AutomationProperties.Name="Stories to review">
+            <ListBox x:Name="main_ListBox" Grid.Row="4" SelectionMode="Single" Style="{StaticResource KlaList}">
                 <ListBox.ItemTemplate><DataTemplate>
                     <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}" Checked="UIe_ItemChecked" Style="{StaticResource KlaCheck}"/>
                 </DataTemplate></ListBox.ItemTemplate>
