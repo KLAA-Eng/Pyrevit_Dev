@@ -83,12 +83,12 @@ compiled WPF.
 
 | Resource key | Hex | Intended use |
 | --- | --- | --- |
-| `klcWindowColor` | `#1A252B` | Window/chrome surface, fields and lists |
+| `klcBackgroundColor` | `#1A252B` | Window/chrome surface, fields and lists |
 | `klcTextColor` | `#E5E4E2` | Body text, labels, ordinary icon stroke; footer hover |
 | `KlaMutedBrush` | `#B5C2BD` | Secondary captions |
 | `klcFooterLinkColor` | `#407058` | Prototype and Outreach footer links at rest |
 | `klcFooterVersionColor` | `#808080` | Centered caller-version footer text |
-| `klcTextWatermarkColor` | `#808080` | Placeholder text: the input watermark (Text entry, Command Switch and Selection search). The same gray as the footer version by owner decision; a test keeps them equal |
+| `klcTextColorWaterMark` | `#808080` | Placeholder text: the input watermark (Text entry, Command Switch and Selection search). The same gray as the footer version by owner decision; a test keeps them equal |
 | `KlaTextOnAccentBrush` | `#FFFFFF` | Text on accent-filled actions and selected segments |
 | `KlaAccentBrush` | `#286048` | Standard buttons, checked boxes and selected segments |
 | `KlaAccentHoverBrush` | `#407058` | Standard action/dropdown hover background |
@@ -145,7 +145,7 @@ aliases in Components (`KlaPanelBrush`, `KlaMutedTextBrush`, `KlaSubtleTextBrush
 brushes above, and the C# contract and smoke tests keep them gone. Some role
 brushes share a value by design and stay separate roles: `klcFooterLinkColor`
 and `KlaAccentHoverBrush`, `KlaAccentBrush` and `KlaBorderStrongBrush`,
-`klcFooterVersionColor`, `klcTextWatermarkColor` and `KlaDisabledTextBrush`. Change a role's value only for that role.
+`klcFooterVersionColor`, `klcTextColorWaterMark` and `KlaDisabledTextBrush`. Change a role's value only for that role.
 
 `Kla*Style` names in the [compiled adapter](../src/KLCode.Wpf/Resources/KLCodeControls.xaml)
 are compatibility styles based on the same shared controls. They do not define
@@ -169,7 +169,7 @@ new artwork keeps the same margin rather than Lucide's original whitespace. The
 SVG's own stroke width is not used. Use semantic resources instead of per-window
 file paths or copied geometry.
 
-The Foundation `KlaGuiIcon` presenter builds every icon: a Viewbox scales the
+The Foundation `klcFdnIcon` presenter builds every icon: a Viewbox scales the
 24-unit `KlaIconCanvas` to the presenter's Width and Height. `KlaIconCanvas` is
 the artwork's grid, not a size, and must stay 24 (the generator rejects any SVG
 whose viewBox is not `0 0 24 24`); a different value shifts and rescales every
@@ -179,9 +179,9 @@ grid units, so it scales with the icon: 1 pixel at 12, 1.33 at 16, 2 at 24,
 
 | Need | Choose | Behavior |
 | --- | --- | --- |
-| Any GUI icon, decorative or inside a button, toggle or stateful control | `klaIcon16` or `klaIcon32` + a `klicon<Role>` resource | The Foundation `KlaGuiIcon` presenter with that Width and Height written in the style; inherits foreground and takes `KlaDisabledTextBrush` when disabled. Filter and group icons are `klaIcon16`; the dialog severity icons are `klaIcon32` |
+| Any GUI icon, decorative or inside a button, toggle or stateful control | `klcIcon16` or `klcIcon32` + a `klicon<Role>` resource | The Foundation `klcFdnIcon` presenter with that Width and Height written in the style; inherits foreground and takes `KlaDisabledTextBrush` when disabled. Filter and group icons are `klcIcon16`; the dialog severity icons are `klcIcon32` |
 | Another size | `xxxIcon12`, `xxxIcon24` or `xxxIcon48` | The same presenter at that size; they wait in the xxx tier until a window uses one, and are renamed to its tier then |
-| The unsized alias | `xIcon` | The plain alias of `KlaGuiIcon` (16 by default); the tool, future, superseded and compiled windows still use it, new markup names a size |
+| The unsized alias | `xIcon` | The plain alias of `klcFdnIcon` (16 by default); the tool, future, superseded and compiled windows still use it, new markup names a size |
 
 Do not set Width or Height on an icon in a window; choose the sized presenter.
 Keep any fixed slot (a grid column, a command-link icon column) at least as wide
@@ -193,7 +193,7 @@ writes fixed-color ImageSources (2026-10-31). Use it inside an action:
 ```xml
 <Button Style="{StaticResource xxIconButton}"
         AutomationProperties.Name="Search">
-    <ContentControl Style="{StaticResource klaIcon16}"
+    <ContentControl Style="{StaticResource klcIcon16}"
                     Content="{StaticResource kliconSearch}"/>
 </Button>
 ```
@@ -203,10 +203,10 @@ For an icon/text action, let both children follow the button's foreground:
 ```xml
 <Button Style="{StaticResource xxIconTextButton}">
     <StackPanel Orientation="Horizontal">
-        <ContentControl Style="{StaticResource klaIcon16}"
+        <ContentControl Style="{StaticResource klcIcon16}"
                         Content="{StaticResource kliconGroup}"/>
         <TextBlock Text="Sheet Sets" VerticalAlignment="Center"
-                   Margin="{StaticResource KlaPairGap}"
+                   Margin="{StaticResource klcStackGapHoriz}"
                    Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
     </StackPanel>
 </Button>
@@ -219,14 +219,14 @@ field, such as the search mark before a filter box, uses the same presenter and
 takes the surrounding foreground:
 
 ```xml
-<ContentControl Style="{StaticResource klaIcon16}"
+<ContentControl Style="{StaticResource klcIcon16}"
                 Content="{StaticResource kliconSearch}"
                 VerticalAlignment="Center" AutomationProperties.Name="Search"/>
 ```
 
 Shared Message uses 32-unit severity icons: Lucide octagon-alert, triangle-alert,
 info and check-check for error, warning, information and success. Its 22-unit
-Segoe UI SemiBold heading (`klaMessageHeading`) and icon match the outline
+Segoe UI SemiBold heading (`klcTextBoxMessageHead`) and icon match the outline
 severity colour; the body is a muted 12-unit readout. The Details header is
 14-unit muted text with a 16-unit right/down chevron that reflects collapsed or
 expanded Details, and the details readout is muted too. This exception is local to Message; global semantic icon roles
@@ -297,11 +297,11 @@ windows; compiled consumers can also use their existing adapter aliases.
 
 | Style | Control | Dimensions | Use |
 | --- | --- | --- | --- |
-| `KlaButton` | Button | 104 x 28 | Standard action |
+| `klcButton` | Button | 104 x 28 | Standard action |
 | `klcButtonDouble` | Button | 216 x 36 | Main action; font size 16. Its grid row is `Auto`, never a fixed 32 |
-| `KlaButtonSecondary` | Button | 104 x 28 | Secondary action on component surface |
+| `klcButtonSec` | Button | 104 x 28 | Secondary action on component surface |
 | `xLinkButton` | Button | 104 x 28 | Text action, transparent at rest; Favorites/Recent/Clear Filters |
-| `xGhostButton` | Button | 104 x 28 | Outlined secondary action. Shared dialogs give Cancel the standard `KlaButton` |
+| `xGhostButton` | Button | 104 x 28 | Outlined secondary action. Shared dialogs give Cancel the standard `klcButton` |
 | `xxIconTextButton` | Button | 128 x 28 | Approved icon plus caption |
 | `xxIconButton` | Button | 28 x 28 | Icon-only action with an accessible name |
 | `klcCloseButton` | Button | 48 x 16 | Header Close; the shell supplies it, with the `CloseLabel` caption as its default |
@@ -311,11 +311,11 @@ windows; compiled consumers can also use their existing adapter aliases.
 | `KlaCommandLink` | Button | Full width, minimum height 40 | TaskDialog-style command link: arrow, 16 SemiBold label, optional description; Action Choice |
 | `KlaDetailsExpander` | Expander | 14-unit muted header; content 4 below | Details disclosure with a 16 right/down chevron in the Expander's muted foreground; its content is a `KlaDetailsReadout`. Message and Action Choice apply both bare |
 
-`KlaButton`, `klcButtonDouble` and `KlaButtonSecondary` are the button keys windows use; `klcFdnButton` is the Foundation base behind them.
+`klcButton`, `klcButtonDouble` and `klcButtonSec` are the button keys windows use; `klcFdnButton` is the Foundation base behind them.
 Every button variant, `xxToggle` included, inherits the `klcFdnButton`
 template. A variant changes its hover fill, disabled fill or corner radius
 by re-pointing `klcButtonHoverBrush`, `klcButtonDisabledBrush` or
-`klcButtonRadius` in its own `Style.Resources`, and its border through the
+`klcRadButton` in its own `Style.Resources`, and its border through the
 `BorderBrush` and `BorderThickness` setters; never by copying the template.
 **Button captions.** A caption is the button's `Content`, never a TextBlock the
 window places inside it. The `klcFdnButton` template draws a text caption as
@@ -346,19 +346,19 @@ silently shrink fonts or invent a per-window button size.
 | Style | Control | Use |
 | --- | --- | --- |
 | `KlaInput` | TextBox | Standard 32-high input |
-| `KlaInputCompact` | TextBox | Compact 24-high form input |
-| `KlaTextPromptInput` | TextBox | 36-high input, FontSize 24, centered Segoe UI Bold; opt-in Text prompt only |
-| `KlaFilter` | TextBox | 24-high search/filter; font size 14; the `Type to filter` watermark by default |
+| `KlaCompactFieldInput` | TextBox | Compact 24-high form input |
+| `klcTextBoxPrompt` | TextBox | 36-high input, FontSize 24, centered Segoe UI Bold; opt-in Text prompt only |
+| `klcTextBoxFilter` | TextBox | 24-high search/filter; font size 14; the `Type to filter` watermark by default |
 | `klaReadout` | TextBox | Tool output the user may copy, drawn like body text: read-only, transparent, wrapped, scrolls when bounded, Ctrl+C and right-click Copy; the Message body |
 | `xReadOnlyField` / `xCompactReadOnlyField` | TextBox | Read-only field, standard 32 or compact 24 high |
 | `KlaMultilineReadout` | TextBox | Wrapped read-only output, minimum height 64, bounded by the caller with scrolling |
 | `KlaDetailsReadout` | TextBox | `KlaMultilineReadout` at the 128 details height, muted, 4 below the header, text aligned with the dialog body; the content of every `KlaDetailsExpander` |
-| `KlaComboBox` / `KlaCompactComboBox` | ComboBox | Standard 32 or compact 24 high; minimum width 104; popup maximum height 260 |
+| `KlaComboBox` / `klcComboBoxFilter` | ComboBox | Standard 32 or compact 24 high; minimum width 104; popup maximum height 260 |
 | `xxxLabel` / `klcLabelCentered` | Label | Ordinary field caption (the plain alias) / vertically centered compact field caption |
-| `klcLabelPrompt` | Label | 16-unit, normal-weight prompt that names one input |
-| `KlaSectionHeading` / `klaPromptText` | TextBlock | Wrapped 16-unit SemiBold heading / the same at normal weight, for section headings |
-| `klaMessageHeading` | TextBlock | The 22-unit SemiBold severity heading beside a `klaIcon32`; the window colours it |
-| `klaFeedbackText` | TextBlock | The validation line: error colour, announced politely, collapsed while its Text is empty; code sets only Text |
+| `klcLabelSectionHeading` | Label | 16-unit, normal-weight prompt that names one input |
+| `klaSectionHeading` / `klaPromptText` | TextBlock | Wrapped 16-unit SemiBold heading / the same at normal weight, for section headings |
+| `klcTextBoxMessageHead` | TextBlock | The 22-unit SemiBold severity heading beside a `klcIcon32`; the window colours it |
+| `klcTextBoxFeedback` | TextBlock | The validation line: error colour, announced politely, collapsed while its Text is empty; code sets only Text |
 | `xText` | TextBlock | Plain body text (the TextBlock alias) |
 | `KlaInfoText` | TextBlock | Muted wrapped information |
 | `KlaCheck` | CheckBox | Checked/unchecked/indeterminate indicator with wrapped caption |
@@ -384,7 +384,7 @@ XAML and the tool's code can fill any of them.
 
 | Role | Control | Use for |
 | --- | --- | --- |
-| Display text | TextBlock | Headings, titles, section headings, prompts that name no single input, information lines and the validation line (`klaFeedbackText`). The shell's title and version are TextBlocks bound to `Tag.Title` / `Tag.VersionText` |
+| Display text | TextBlock | Headings, titles, section headings, prompts that name no single input, information lines and the validation line (`klcTextBoxFeedback`). The shell's title and version are TextBlocks bound to `Tag.Title` / `Tag.VersionText` |
 | Field caption | Label | Text that names exactly one focusable input, through `Target` |
 | User input | TextBox | Anything the user types |
 | Tool output | Read-only TextBox (`klaReadout`, `KlaMultilineReadout`, `KlaDetailsReadout`) | Text the user may copy: a message body, details, a path, a report |
@@ -418,17 +418,17 @@ rows with Ctrl+C natively.
 
 **Placeholder text.** A TextBox's watermark lives in the Foundation input
 template, not in a separate TextBlock. Its text is the TextBox's `Tag`; it shows
-while the box is empty, focused or not, in `klcTextWatermarkColor`, and in the
+while the box is empty, focused or not, in `klcTextColorWaterMark`, and in the
 box's own font, size, weight, padding and alignment, so it sits where typed text
 starts and follows any font a component sets. Without a `Tag` nothing shows. A
 component may give one with a `Tag` setter, and a window that sets `Tag`
 replaces it. `Tag` on a TextBox is reserved for this.
 
 ```xml
-<TextBox x:Name="search_text" Style="{StaticResource KlaInputCompact}" Tag="Type to filter"/>
+<TextBox x:Name="search_text" Style="{StaticResource KlaCompactFieldInput}" Tag="Type to filter"/>
 ```
 
-`KlaFilter` carries `Type to filter` itself, so a filter row needs no Tag;
+`klcTextBoxFilter` carries `Type to filter` itself, so a filter row needs no Tag;
 Selection's search takes it from the style. Text Entry supplies `[ENTER TEXT]`
 and Command Switch, whose search is a compact input, supplies `Type to filter`.
 
@@ -437,7 +437,7 @@ For a labeled compact field, the Label names its input:
 ```xml
 <Label Content="Prefix:" Target="{Binding ElementName=input_prefix}"
        Style="{StaticResource klcLabelCentered}"/>
-<TextBox x:Name="input_prefix" Style="{StaticResource KlaInputCompact}"/>
+<TextBox x:Name="input_prefix" Style="{StaticResource KlaCompactFieldInput}"/>
 ```
 
 These two elements belong in the caller's layout; the full naming composition
@@ -453,7 +453,7 @@ namescope and controller access.
 
 | Composition | Direct-item placement | Existing uses |
 | --- | --- | --- |
-| `KlaFieldRows` | Labels in column 0, inputs in column 1; four rows at 0/2/4/6, separated by 8-unit gaps | Duplicate Sheets and the superseded Find/Replace windows. Rename keeps a window-local copy with a 52 label column (`KlaRenameLabelColumn`); folding it back is under review |
+| `KlaFieldRows` | Labels in column 0, inputs in column 1; four rows at 0/2/4/6, separated by 8-unit gaps | Duplicate Sheets, KLC-Rename and the superseded Find/Replace windows |
 | `xFilteredCheckList` | Filter 0, prompt 2, expanding list 4, secondary content 6, main action 8 (`Auto`, so the 36-high main button fits) | Steel PSF, Create From Rooms and the superseded SelectFromDict |
 
 Naming columns are 60/240; each field row is 24 high. Wrap the naming group in
@@ -485,8 +485,8 @@ repeated control dimensions belong to shared roles/tokens.
 | Footer layers | The Prototype link fixed left and Outreach fixed right; the version spans the band with the same 110-unit side margins |
 | Footer content | Prototype/Outreach links green (`klcFooterLinkColor`), caller's pure version gray (`klcFooterVersionColor`); links turn white on hover/focus |
 | Body inset | 16 left, top and right, 8 above the footer: `klcBodyMargin` is `16,16,16,8` |
-| Typography | Body 12 (`klcBodyFontSize`); buttons 14 (`klcButtonFontSize`); title, section headings, prompts and the main action 16; severity heading 22; Text Entry field 24. Constant labels use Title Case |
-| Corners/borders | Buttons, sections and lists 8 (`KlaRadiusButton`), inputs 6 (`KlaRadiusControl`), command pills 12, floating panel 16, chips 4, check boxes 2; hairline 1 |
+| Typography | Body 12 (`klcFontSizeBody`); buttons 14 (`klcButtonFontSize`); title, section headings, prompts and the main action 16; severity heading 22; Text Entry field 24. Constant labels use Title Case |
+| Corners/borders | Buttons, sections and lists 8 (`klcRadButton`), inputs 8 (`klcRadTextBox`), command pills 12, floating panel 16, chips 4, check boxes 2; hairline 1 |
 | Checkbox list | Ordinary single-line rows measure 20 high with a 4-unit box/text gap; long captions wrap |
 | List selection | Native WPF ListBoxItem template retains its blue hover/selection; it is an intentional current exception to the green table styling |
 | Scrollbars | Shared vertical/horizontal templates; `KlaList` keeps its vertical bar visible, while `xDataGrid` and standalone Recall use Auto where specified |
@@ -512,22 +512,21 @@ control sizes require different resource types.
 
 | Resource | Type | Value / use |
 | --- | --- | --- |
-| `klcBodySpaceSmall`, `klcBodySpaceNormal`, `klcBodySpaceLarge` | GridLength | Spacer rows/columns: 4, 8 and 16 |
-| `klcChromeHeight`, `klcBodyRowNormal`, `xCompactRow` | GridLength | Rows of 24 (chrome band), 24 (compact naming row) and 28. A row holding the 36-high main button is `Auto` |
+| `klcBodySpaceSmall`, `klcBodySpaceNormal`, `klcBodySpaceLarge` | GridLength | Spacer rows/columns: 4, 8 and 12 |
+| `klcChromeHeight`, `klaBodyRowNormal`, `xCompactRow` | GridLength | Rows of 24 (chrome band), 24 (compact naming row) and 28. A row holding the 36-high main button is `Auto` |
 | `KlaCompactFieldLabelColumn`, `KlaCompactFieldInputColumn` | GridLength | Naming columns, 60 and 240 |
-| `KlaPairGap` | Thickness | `8,0,0,0`, on the second of two related horizontal controls |
+| `klcStackGapHoriz` | Thickness | `8,0,0,0`, on the second of two related horizontal controls |
 | `klcBodyMargin` | Thickness | `16,16,16,8`, shell body padding |
 | `KlaSectionPadding` | Thickness | 12, field-group inset |
 | `KlaCompactInset` | Thickness | `8,4`, compact component/cell padding |
-| `KlaTextBoxPadding` | Thickness | `5,0`, native TextBox padding; border and native text inset yield 8 units of rendered horizontal inset, matching ComboBox text |
+| `KlaTextBoxPadding`, `klcPadTextBoxInput` | Thickness | `8,0,0,4`, TextBox text padding; the Foundation TextBox uses `klcPadTextBoxInput` |
 | `KlaActionTopGap` | Thickness | `0,8,0,0`, the content-to-action gap where the action sits in a StackPanel (Rename) |
-| `KlaStackGapAbove`, `KlaStackGapBelow` | Thickness | `0,4,0,0` and `0,0,0,8`, on a stacked part that can collapse (Action Choice's optional sections, the details readout, a validation line) |
+| `klcStackGapVert`, `xKlaStackGapBelow` | Thickness | `0,8,0,0` and `0,0,0,8`, on a stacked part that can collapse (Action Choice's optional sections, the details readout, a validation line) |
 | `KlaIconTextGap` | Thickness | `0,0,4,0`, chevron or small icon before its text |
 | `KlaOpticalTextInset` | Thickness | `0,0,0,2`, deliberate optical lift for large text beside an input |
-| `KlaFloatingMargin`, `KlaWindowFloatingRad` | Thickness, CornerRadius | 16 and 16, the floating panel's transparent margin and corners |
+| `KlaMarginFloatingWindow`, `klcRadFloating` | Thickness, CornerRadius | 16 and 16, the floating panel's transparent margin and corners |
 | `KlaCommandLinkPadding`, `KlaCommandArrowInset`, `KlaCommandLinkIconColumn` | Thickness, Thickness, GridLength | 8, `0,4,8,0` and 24 inside a command link |
 | `KlaDetailsReadoutPadding` | Thickness | `10,8`, body-aligned readout text |
-| `KlaRenameLabelColumn` | GridLength | 52, the label column of Rename's local `KlaFieldRows` copy; under review |
 | `klcMessageHeaderFontSize`, `klcWindowPromptFontSize` | Double | 22 and 16: severity heading, command link and switch prompt |
 | `KlaDetailsHeight`, `KlaOptionMaxHeight`, `KlaCommandLinkMinHeight` | Double | 128 (`KlaDetailsReadout`), 80 and 40 |
 | `KlaControlHeight`, `klcButtonHeight`, `KlaCompactFieldHeight` | Double | Control heights of 32, 28 and 24 |
@@ -554,7 +553,7 @@ showing/dismissal semantics and Revit operations.
 | [Tokens](../lib/GUI/Resources/KLCodeTokens.xaml) | Every shared value: brand palette, state and component brushes, typed dimensions/fonts/insets/radii, and the chrome data (footer URIs and default English labels) |
 | [Generated GUI geometry](../lib/GUI/Resources/klIcons.xaml) | Generated leaf: icon geometry and the self-contained `klcLogo` template; defines no brushes |
 | [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Tokens and the generated geometry; one base style per control family (button, label, input, combo box, check box, radio button, switch, list, border, text, expander, data grid, splitter, link, window), the scrollbars and the icon presenter. Windows never use these keys; new bases take the `klaFoundation` prefix |
-| [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; gives every Foundation base at least one alias that changes nothing (`KlaButton`, `KlaInput`, `KlaComboBox`, `xIcon`, `klcWindow` and so on), plus the variants, the window shell, the Command Switch pills and implicit-style policy. Every window loads this file and uses only its keys |
+| [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; gives every Foundation base at least one alias that changes nothing (`klcButton`, `KlaInput`, `KlaComboBox`, `xIcon`, `klcWindow` and so on), plus the variants, the window shell, the Command Switch pills and implicit-style policy. Every window loads this file and uses only its keys |
 | [Compiled controls](../src/KLCode.Wpf/Resources/KLCodeControls.xaml) | Merges Components and supplies existing C# style names through BasedOn |
 | Window body XAML | Named controls, bindings, events and tool-specific arrangement |
 | Host/tool controller | Ownership, workflow, validation, lifetime and model/application actions |
@@ -675,7 +674,7 @@ what the user gives up, with the WCAG 2.1 criterion each touches:
 - AC-005 and GUI-39: Text entry shows neither the caller's prompt nor the
   window title on screen (the prompt is the input's accessible name; 2.4.6
   Headings and Labels, 3.3.2 Labels or Instructions). Message hides the title.
-- Placeholder gray: `klcTextWatermarkColor` #808080 is 3.96:1 on the window.
+- Placeholder gray: `klcTextColorWaterMark` #808080 is 3.96:1 on the window.
   That passes for the 24-unit bold Text watermark and is below 4.5:1 for the
   12-unit Command Switch and 14-unit Selection search watermarks (1.4.3). Owner decision, 2026-10-31.
 - Command Switch toggle pill: the KLWhite thumb on the #B5C2BD track is 1.45:1
@@ -757,15 +756,15 @@ immediate command links, with standard buttons below. It retains the caller
 chrome title but omits the standard footer; optional caller help replaces that
 content. Severity uses Message's icon roles. Details expands the bottom; a
 caller-defined checkbox returns its state without gating actions or persistence.
-KLC-Rename arranges one to three caller-defined property groups horizontally,
-each with Find/Replace and Prefix/Suffix. Optional case buttons are separate
-actions for their group; Rename validates and returns the entered rules. The
-dialog does not preview or perform model changes.
-It opens with neutral body focus and no field selected. Its compact label column
-and fitted section border remove excess gaps around the inputs; action gaps are 8.
-The initial window fits those sections at 346/668/990 units for one/two/three
-groups, with 16-unit horizontal outer insets and 12-unit header-to-label and
-action-to-footer gaps. Height fits current content and validation.
+KLC-Rename is spelled out in XAML from the Find/Replace Sheets window: two
+property groups side by side, each with Find/Replace and Prefix/Suffix, then one
+Uppercase/Lowercase pair and Rename. The Views and generic layouts collapse the
+second group. The case pair acts on the one field that allows case; Rename
+validates and returns the entered rules. The dialog does not preview or perform
+model changes.
+It opens with neutral body focus and no field selected. It is 384 wide for one
+group and 712 for two, the Find/Replace Views and Sheets widths; action gaps are
+8 and height fits current content and validation.
 
 The Message body is a `klaReadout`, so its text can be selected and copied; it
 and the details are bounded and scroll. Initial Message height fits content;
@@ -779,7 +778,7 @@ the line the typed text will take, and shows whenever the field is empty, focuse
 with neutral body focus and a blank center chrome title, retaining caller
 Window.Title metadata and Close. The caller prompt remains an accessible name.
 Its compact height fits input/error. Its only visible
-action is the same 104 x 28 `KlaButton` OK used by Message; both separate
+action is the same 104 x 28 `klcButton` OK used by Message; both separate
 content and action with an 8-unit `klcBodySpaceNormal` spacer row. Close/Escape
 still cancels. Shared selectors open at 432 x 576, retaining the established
 Selection geometry after retirement of the duplicate template.
@@ -806,7 +805,7 @@ Text, Command Switch and KLC-Rename. Variant labels are searchable and a
 dropdown beside State selects the variant; each family remembers its variant and
 state for the session. Selection offers Sheets, Revisions, Open Documents, List
 Single and List Multiple; Command Switch offers Commands only and Commands with
-toggles; KLC-Rename offers Single field, Two fields and Multiple fields. Both
+toggles; KLC-Rename offers Views, Sheets and Generic. Both
 Message variants, Without Details and With Details, offer Normal, Empty, Warning,
 Error, Success, Disabled and Long content; With Details retains diagnostics in
 Empty. The other shared variants and two reference templates offer five
@@ -831,13 +830,13 @@ nothing else needs it.
 - Separate fixed parts with token spacer rows or columns (`klcBodySpaceSmall`,
   `klcBodySpaceNormal`, `klcBodySpaceLarge`), not margins, so the gaps are
   visible in the grid. A margin belongs only on a part that can collapse, where
-  it collapses with the part (`KlaStackGapAbove` on an optional section).
-- A filter row is `Auto` / `klcBodySpaceNormal` / `*`: a `klaIcon16` search
-  icon, the gap, then `KlaFilter`.
-- Actions are centred: a secondary pair (`KlaButtonSecondary`, the second with
-  `KlaPairGap`) above the double-width main action, in `Auto` rows. Action
+  it collapses with the part (`klcStackGapVert` on an optional section).
+- A filter row is `Auto` / `klcBodySpaceNormal` / `*`: a `klcIcon16` search
+  icon, the gap, then `klcTextBoxFilter`.
+- Actions are centred: a secondary pair (`klcButtonSec`, the second with
+  `klcStackGapHoriz`) above the double-width main action, in `Auto` rows. Action
   Choice's right-aligned buttons are the TaskDialog convention and stay.
-- The validation line is a `klaFeedbackText`; code sets its Text and nothing else.
+- The validation line is a `klcTextBoxFeedback`; code sets its Text and nothing else.
 - Tool-supplied text follows the TextBlock / Label / TextBox rules above.
 
 The following body illustrates the loading contract; the handler is supplied by
@@ -852,7 +851,7 @@ the Python example below.
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}"/>
-                <RowDefinition Height="{StaticResource klcBodyRowNormal}"/>
+                <RowDefinition Height="{StaticResource klaBodyRowNormal}"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}"/>
                 <RowDefinition Height="Auto"/>
@@ -860,7 +859,7 @@ the Python example below.
             <Label Content="Name:" Target="{Binding ElementName=name_input}"
                    Style="{StaticResource klcLabelCentered}"/>
             <TextBox x:Name="name_input" Grid.Row="2"
-                     Style="{StaticResource KlaInputCompact}"/>
+                     Style="{StaticResource KlaCompactFieldInput}"/>
             <Button Grid.Row="5" Content="Apply" Click="apply_example"
                     Style="{StaticResource klcButtonDouble}" IsDefault="True"/>
         </Grid>

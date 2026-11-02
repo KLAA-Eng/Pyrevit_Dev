@@ -30,8 +30,10 @@ class RenameState(object):
     """Edit cloned groups and return requests without applying any model changes."""
     def __init__(self, fields):
         self.fields = [field.clone() for field in fields]
-        if not 1 <= len(self.fields) <= 3:
-            raise ValueError('Rename requires one to three fields.')
+        if not 1 <= len(self.fields) <= 2:
+            raise ValueError('Rename requires one or two fields.')
+        if sum(1 for field in self.fields if field.AllowCase) > 1:
+            raise ValueError('Rename allows case actions on one field only.')
         keys = [field.Key for field in self.fields]
         try:
             valid_keys = None not in keys and len(set(keys)) == len(keys)
@@ -40,6 +42,11 @@ class RenameState(object):
         if not valid_keys:
             raise ValueError('Rename field keys must be unique, hashable and non-null.')
         self._by_key = dict((field.Key, field) for field in self.fields)
+
+    @property
+    def case_field(self):
+        """The one field the shared Uppercase/Lowercase pair acts on, or None."""
+        return next((field for field in self.fields if field.AllowCase), None)
 
     def rename_result(self):
         if not any(field.Find or field.Replace or field.Prefix or field.Suffix for field in self.fields):
@@ -59,3 +66,13 @@ class RenameState(object):
         if operation not in ('upper', 'lower') or field is None or not field.AllowCase:
             raise ValueError('Choose an available field and case action.')
         return DialogResult('accept', {'operation': operation, 'field': key})
+
+
+def view_fields():
+    """The Views layout: one View Name group."""
+    return [RenameField('name', 'View Name')]
+
+
+def sheet_fields():
+    """The Sheets layout: Sheet Number (no case actions) beside Sheet Name."""
+    return [RenameField('number', 'Sheet Number', allow_case=False), RenameField('name', 'Sheet Name')]

@@ -1,15 +1,19 @@
+<!--  Window: Need preview for height  -->
 <Window
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Select Items"
     Width="432"
-    Height="512"
     MinWidth="432"
     MinHeight="420"
+    MaxWidth="512"
+    MaxHeight="620"
     ResizeMode="CanResizeWithGrip"
     Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
+    <!--  ContentControl: Good  -->
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
+        <!--  Grid: What are the additional properties for?  -->
         <Grid
             x:Name="window_body"
             FocusVisualStyle="{x:Null}"
@@ -22,60 +26,64 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition x:Name="secondary_gap" Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <!--  StackPanel: Need to work on icons and inputs  -->
+            <!--  StackPanel: Fdn TextBox and ComboBox need work  -->
             <StackPanel>
+                <!--  Grid: Good  -->
                 <Grid x:Name="search_row">
-                    <!--  Grid.ColDefinitions: Good  -->
+                    <!--  Grid.ColumnDefinitions: Good  -->
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
+                    <!--  ContentControl: Good  -->
                     <ContentControl
                         x:Name="search_icon"
                         VerticalAlignment="Center"
                         Content="{StaticResource kliconSearch}"
-                        Style="{StaticResource klaIcon16}" />
+                        Style="{StaticResource klcIcon16}" />
+                    <!--  TextBox: Good  -->
                     <TextBox
                         x:Name="filter_text"
                         Grid.Column="2"
                         AutomationProperties.Name="Search items"
-                        Style="{StaticResource KlaFilter}"
+                        Style="{StaticResource klcTextBoxFilter}"
                         TextChanged="filter_changed" />
                 </Grid>
-                <Grid x:Name="group_row" Margin="{StaticResource KlaStackGapAbove}">
-                    <!--  Grid.ColDefinitions: Good  -->
+                <!--  Grid: Good  -->
+                <Grid x:Name="group_row" Margin="{StaticResource klcStackGapVert}">
+                    <!--  Grid.ColumnDefinitions: Good  -->
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
+                    <!--  ContentControl: Good  -->
                     <ContentControl
                         x:Name="group_icon"
                         VerticalAlignment="Center"
                         Content="{StaticResource kliconGroup}"
-                        Style="{StaticResource klaIcon16}" />
+                        Style="{StaticResource klcIcon16}" />
+                    <!--  ComboBox: Good  -->
                     <ComboBox
                         x:Name="group_filter"
                         Grid.Column="2"
                         AutomationProperties.Name="Item group"
                         DisplayMemberPath="Label"
                         SelectionChanged="filter_changed"
-                        Style="{StaticResource KlaCompactComboBox}" />
+                        Style="{StaticResource klcComboBoxFilter}" />
                 </Grid>
             </StackPanel>
-            <!--  Label: Is label the right tool? Fix spacing and gaps  -->
+            <!--  Label: Good  -->
             <Label
                 x:Name="prompt_label"
                 Grid.Row="2"
-                Style="{StaticResource klcLabelPrompt}"
+                Style="{StaticResource klcLabelSectionHeading}"
                 Target="{Binding ElementName=items_list}" />
-            <!--  ListBox: Need to do a list clean  -->
+            <!--  ListBox: Need Preview  -->
             <ListBox
                 x:Name="items_list"
                 Grid.Row="4"
@@ -95,31 +103,41 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <!--  StackPanel: Is the text blocl necessary  -->
+            <!--  TextBox: Good - Remove Placeholder Text  -->
+            <TextBlock
+                x:Name="validation_text"
+                Grid.Row="5"
+                Margin="{StaticResource klcStackGapVert}"
+                Style="{StaticResource klcTextBoxFeedback}" />
+            <!--  StackPanel: Good  -->
+            <!--  The validation line and batch actions carry their own gap, so it collapses with them.  -->
             <StackPanel Grid.Row="6">
-                <TextBlock x:Name="validation_text" Style="{StaticResource klaFeedbackText}" />
+                <!--  StackPanel: Good  -->
                 <StackPanel
                     x:Name="batch_actions"
+                    Margin="{StaticResource klcStackGapVert}"
                     HorizontalAlignment="Center"
                     Orientation="Horizontal">
+                    <!--  Button: Good  -->
                     <Button
                         Click="check_all"
                         Content="Select All"
-                        Style="{StaticResource KlaButtonSecondary}" />
+                        Style="{StaticResource klcButtonSec}" />
+                    <!--  Button: Good  -->
                     <Button
-                        Margin="{StaticResource KlaPairGap}"
+                        Margin="{StaticResource klcStackGapHoriz}"
                         Click="check_none"
                         Content="Select None"
-                        Style="{StaticResource KlaButtonSecondary}" />
+                        Style="{StaticResource klcButtonSec}" />
                 </StackPanel>
+                <!--  Button: Good  -->
+                <Button
+                    x:Name="accept_button"
+                    Margin="{StaticResource klcStackGapVert}"
+                    Click="accept_selection"
+                    Content="Select"
+                    Style="{StaticResource klcButtonDouble}" />
             </StackPanel>
-            <!--  Button: include this in the button stackpanel?  -->
-            <Button
-                x:Name="accept_button"
-                Grid.Row="8"
-                Click="accept_selection"
-                Content="Select"
-                Style="{StaticResource klcButtonDouble}" />
         </Grid>
     </ContentControl>
 </Window>

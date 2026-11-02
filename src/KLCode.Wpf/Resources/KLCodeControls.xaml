@@ -9,7 +9,7 @@
     <Style x:Key="KlaLinkButtonStyle" TargetType="Button" BasedOn="{StaticResource xLinkButton}" />
     <Style x:Key="KlaSegmentButtonStyle" TargetType="RadioButton" BasedOn="{StaticResource xSegmentButton}" />
     <Style x:Key="KlaTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource KlaCompactFieldInput}" />
-    <Style x:Key="KlaComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource KlaCompactComboBox}" />
+    <Style x:Key="KlaComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource klcComboBoxFilter}" />
     <Style x:Key="KlaCheckBoxStyle" TargetType="CheckBox" BasedOn="{StaticResource KlaFoundationCheckBox}" />
     <Style x:Key="KlaListBoxStyle" TargetType="ListBox" BasedOn="{StaticResource KlaFoundationList}" />
     <Style x:Key="KlaListBoxItemStyle" TargetType="ListBoxItem" BasedOn="{StaticResource KlaFoundationListItem}" />

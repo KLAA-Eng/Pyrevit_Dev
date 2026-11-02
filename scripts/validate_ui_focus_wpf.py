@@ -13,8 +13,8 @@ from GUI.window_chrome import shared_resources
 def validate_keyboard_focus_resources():
     host = Window()
     host.Resources.MergedDictionaries.Add(shared_resources())
-    roles = [(Button, name) for name in ('KlaButton', 'klcButtonDouble',
-             'KlaButtonSecondary', 'xLinkButton', 'xGhostButton',
+    roles = [(Button, name) for name in ('klcButton', 'klcButtonDouble',
+             'klcButtonSec', 'xLinkButton', 'xGhostButton',
              'xxIconButton', 'xxIconTextButton', 'xxxButtonClose', 'KlaCommandButton')]
     roles += [(CheckBox, 'KlaCheck'), (CheckBox, 'KlaDialogCheck'),
               (RadioButton, 'xRadioButton'), (RadioButton, 'xSegmentButton'),

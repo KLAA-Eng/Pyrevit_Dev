@@ -28,14 +28,14 @@
                     x:Name="textbox_filter"
                     Grid.Column="2"
                     AutomationProperties.Name="Filter available types"
-                    Style="{StaticResource KlaFilter}"
+                    Style="{StaticResource klcTextBoxFilter}"
                     TextChanged="text_filter_updated" />
             </Grid>
             <Label
                 x:Name="text_label"
                 Grid.Row="2"
                 Content="Select Type:"
-                Style="{StaticResource klcLabelPrompt}"
+                Style="{StaticResource klcLabelSectionHeading}"
                 Target="{Binding ElementName=main_ListBox}" />
             <ListBox
                 x:Name="main_ListBox"

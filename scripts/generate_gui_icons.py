@@ -4,7 +4,7 @@ Writes one deterministic file, ``lib/GUI/Resources/klIcons.xaml``: a leaf
 resource dictionary that defines no brushes. It holds
 
 * one ``klicon<Role>`` GeometryGroup per role in ``ROLES``, drawn by the
-  foundation's ``KlaGuiIcon`` presenter; and
+  foundation's ``klcFdnIcon`` presenter; and
 * the KLCode logo from ``lib/_logos/klcLogo.svg``, as one self-contained
   ``klcLogo`` DataTemplate: the slash and letter outlines with the SVG group's
   scale and offset, on a canvas the size of the view box. The template's
@@ -174,7 +174,7 @@ def role_parts():
     """Read every role's SVG and translate its primitives.
 
     A few Lucide parts are marked ``fill="currentColor"``, such as the dot in
-    ``tags.svg``. ``KlaGuiIcon`` only strokes geometry, so those parts draw as
+    ``tags.svg``. ``klcFdnIcon`` only strokes geometry, so those parts draw as
     small outlines rather than filled shapes.
 
     Returns:

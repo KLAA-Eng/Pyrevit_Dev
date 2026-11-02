@@ -24,7 +24,7 @@ loads these resources before the body and wires common chrome.
 The body owns layout and declared events; the controller owns data and actions.
 Approved icons and attribution live in the [GUI icon catalog](../../_icons/gui/README.md).
 
-`KlaFieldRows` retains the four-row naming composition used by KLC-Rename.
+`KlaFieldRows` is the four-row naming composition KLC-Rename and the Find/Replace tools share.
 `xFilteredCheckList` provides filter, prompt, expanding list and action rows.
 Both accept direct named items with `Grid.Row`/`Grid.Column` assignments.
 
@@ -38,7 +38,7 @@ reference action opens external links, modifies a model or accesses sample files
 Both templates offer Normal, Empty, Error, Disabled and Long content. Close stays
 available when the body is disabled. Options validates category and finite offset;
 its 24-high category/offset/path fields use the compact component roles. Its
-section heading is `klaPromptText`; Output Location is a `klcLabelPrompt` Label
+section heading is `klaPromptText`; Output Location is a `klcLabelSectionHeading` Label
 because it names the path field; Scope is plain text because it heads two radio
 buttons. The offset unit remains beside its input. Include Existing uses the
 standard self-labelled checkbox. Both templates separate fixed parts with token

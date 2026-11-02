@@ -50,7 +50,7 @@ class GuiIconTests(unittest.TestCase):
         self.assertEqual([], list(shell.iter(P + 'DrawingImage')), 'no generated ImageSources')
         self.assertEqual([], [node for node in shell.iter(P + 'Pen') if node.attrib.get(X + 'Key') == 'KlaGuiIconPen'])
         self.assertNotIn('generated-icons', foundation)
-        self.assertIn('KlaGuiIcon', {node.attrib.get(X + 'Key') for node in shell.iter(P + 'Style')})
+        self.assertIn('klcFdnIcon', {node.attrib.get(X + 'Key') for node in shell.iter(P + 'Style')})
         merged = [node.attrib.get('Source') for node in shell.iter(P + 'ResourceDictionary')]
         self.assertIn('klIcons.xaml', merged, 'the foundation merges the generated icons')
         tokens = ET.parse(ROOT / 'lib' / 'GUI' / 'Resources' / 'KLCodeTokens.xaml').getroot()

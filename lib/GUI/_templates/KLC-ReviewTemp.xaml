@@ -12,7 +12,7 @@
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
-                <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
@@ -30,12 +30,12 @@
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search"
                     Content="{StaticResource kliconSearch}"
-                    Style="{StaticResource klaIcon16}" />
+                    Style="{StaticResource klcIcon16}" />
                 <TextBox
                     x:Name="review_search"
                     Grid.Column="2"
                     AutomationProperties.Name="Search sample review items"
-                    Style="{StaticResource KlaFilter}"
+                    Style="{StaticResource klcTextBoxFilter}"
                     TextChanged="review_filter_changed" />
             </Grid>
             <Grid Grid.Row="2">
@@ -105,7 +105,7 @@
                         </Grid.RowDefinitions>
                         <Label
                             Content="Selected Item"
-                            Style="{StaticResource klcLabelPrompt}"
+                            Style="{StaticResource klcLabelSectionHeading}"
                             Target="{Binding ElementName=review_detail}" />
                         <TextBox
                             x:Name="review_detail"
@@ -130,7 +130,7 @@
                 <Button
                     Click="review_check_all"
                     Content="Check All"
-                    Style="{StaticResource KlaButtonSecondary}" />
+                    Style="{StaticResource klcButtonSec}" />
                 <Button
                     x:Name="primary_action"
                     Grid.Row="2"

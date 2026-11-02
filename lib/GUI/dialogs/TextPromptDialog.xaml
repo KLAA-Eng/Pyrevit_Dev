@@ -1,11 +1,14 @@
+<!--  Window: Good - Revisit Shell w/o Footer  -->
 <Window
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Enter Text"
-    Width="480"
+    Width="432"
     Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
+    <!--  ContentControl: Good  -->
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
+        <!--  Grid: Good - What Are "FocusVisualStyle" "Focusable" "KeyboardNavigation.IsTabStop"?  -->
         <Grid
             x:Name="window_body"
             FocusVisualStyle="{x:Null}"
@@ -14,29 +17,30 @@
             <!--  Grid.RowDefinitions: Good  -->
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <!--  StackPanel: Needs Cleaning. Need to Work on foundation for text inputs.   -->
-            <StackPanel x:Name="prompt_fields" Grid.Row="0">
-                <TextBox
-                    x:Name="input_text"
-                    AutomationProperties.Name="Text value"
-                    Style="{StaticResource KlaTextPromptInput}"
-                    Tag="[ENTER TEXT]"
-                    TextChanged="text_changed" />
-                <TextBlock
-                    x:Name="validation_text"
-                    Margin="{StaticResource KlaStackGapAbove}"
-                    Style="{StaticResource klaFeedbackText}" />
-            </StackPanel>
+            <!--  TextBox: Good  -->
+            <TextBox
+                x:Name="input_text"
+                AutomationProperties.Name="Text value"
+                Style="{StaticResource klcTextBoxPrompt}"
+                TextChanged="text_changed" />
+            <!--  TextBlock: Good - Remove Placekolder Text  -->
+            <TextBlock
+                x:Name="validation_text"
+                Grid.Row="2"
+                Style="{StaticResource klcTextBoxFeedback}" />
+            <!--  Button: Good - What Is "IsDefault"?  -->
             <Button
                 x:Name="accept_button"
-                Grid.Row="2"
+                Grid.Row="4"
                 Click="accept_text"
                 Content="OK"
                 IsDefault="True"
-                Style="{StaticResource KlaButton}" />
+                Style="{StaticResource klcButton}" />
         </Grid>
     </ContentControl>
 </Window>

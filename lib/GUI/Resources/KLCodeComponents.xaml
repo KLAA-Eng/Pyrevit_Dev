@@ -9,12 +9,11 @@
         The implicit TextBox / ComboBox / CheckBox styles apply in both hosts (Python and compiled C#).
     -->
 
-    <!--  Window: the plain alias, then the floating variant  -->
+    <!--  Window: [Enter Notes]  -->
     <Style
         x:Key="klcWindow"
         BasedOn="{StaticResource klcFdnWindow}"
         TargetType="Window" />
-    <!--  A frameless floating panel such as the Command Switch: the window is transparent and its panel draws the surface.  -->
     <Style
         x:Key="klcWindowFloating"
         BasedOn="{StaticResource klcFdnWindow}"
@@ -25,15 +24,15 @@
 
     <!--  TextBlock: klcFdnWindow already gives every TextBlock its font, body size and text colour, so text styles set only what differs.  -->
     <Style
-        x:Key="KlaSectionHeading"
-        BasedOn="{StaticResource klaFoundationTextBlock}"
+        x:Key="klaSectionHeading"
+        BasedOn="{StaticResource klcFdnTextBlock}"
         TargetType="TextBlock">
-        <Setter Property="FontSize" Value="{StaticResource klcSectionTitleFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeSectionHeading}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
     <Style
         x:Key="KlaInfoText"
-        BasedOn="{StaticResource klaFoundationTextBlock}"
+        BasedOn="{StaticResource klcFdnTextBlock}"
         TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
     </Style>
@@ -47,27 +46,28 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-    <!--  A section heading at prompt size and normal weight; a caption that names one input is klcLabelPrompt instead.  -->
+    <!--  A section heading at prompt size and normal weight; a caption that names one input is klcLabelSectionHeading instead.  -->
     <Style
         x:Key="klaPromptText"
-        BasedOn="{StaticResource KlaSectionHeading}"
+        BasedOn="{StaticResource klaSectionHeading}"
         TargetType="TextBlock">
         <Setter Property="FontWeight" Value="Normal" />
     </Style>
     <!--  The severity heading beside a 32 icon (Message, Action Choice); the window colours it per severity.  -->
     <Style
-        x:Key="klaMessageHeading"
-        BasedOn="{StaticResource KlaSectionHeading}"
+        x:Key="klcTextBoxMessageHead"
+        BasedOn="{StaticResource klcFdnTextBlock}"
         TargetType="TextBlock">
         <Setter Property="FontSize" Value="{StaticResource klcMessageHeaderFontSize}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
     <!--
         A validation line: error colour, announced politely, and collapsed while its Text is empty, so the window only
         sets Text. A caller that needs a different colour sets Foreground on the element.
     -->
     <Style
-        x:Key="klaFeedbackText"
-        BasedOn="{StaticResource klaFoundationTextBlock}"
+        x:Key="klcTextBoxFeedback"
+        BasedOn="{StaticResource klcFdnTextBlock}"
         TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource klcErrorColor}" />
         <Setter Property="AutomationProperties.LiveSetting" Value="Polite" />
@@ -86,10 +86,10 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     <Style
-        x:Key="klcLabelPrompt"
+        x:Key="klcLabelSectionHeading"
         BasedOn="{StaticResource klcFdnLabel}"
         TargetType="Label">
-        <Setter Property="FontSize" Value="{StaticResource klcSectionTitleFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeSectionHeading}" />
     </Style>
 
     <!--  Hyperlink: the plain alias, then the bold green footer link the shell applies  -->
@@ -106,20 +106,20 @@
     </Style>
 
     <!--
-        ContentControl (GUI icons): the sized presenters windows apply; KlaGuiIcon in Foundation draws them. The number is the
+        ContentControl (GUI icons): the sized presenters windows apply; klcFdnIcon in Foundation draws them. The number is the
         icon's size in window units, so it is written here rather than tokenised (check_ui_scale exempts the Icon<size> styles);
         the stroke stays klcIconStroke and scales with the icon. The 12, 24 and 48 sizes wait in the xxx tier until a window uses one.
     -->
     <Style
-        x:Key="klaIcon16"
-        BasedOn="{StaticResource KlaGuiIcon}"
+        x:Key="klcIcon16"
+        BasedOn="{StaticResource klcFdnIcon}"
         TargetType="ContentControl">
         <Setter Property="Width" Value="16" />
         <Setter Property="Height" Value="16" />
     </Style>
     <Style
-        x:Key="klaIcon32"
-        BasedOn="{StaticResource KlaGuiIcon}"
+        x:Key="klcIcon32"
+        BasedOn="{StaticResource klcFdnIcon}"
         TargetType="ContentControl">
         <Setter Property="Width" Value="32" />
         <Setter Property="Height" Value="32" />
@@ -139,7 +139,7 @@
 
     <!--  Button: the plain alias, the 216 x 36 main action, the surface-coloured secondary action and the shell's Close  -->
     <Style
-        x:Key="KlaButton"
+        x:Key="klcButton"
         BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button" />
     <Style
@@ -151,7 +151,7 @@
         <Setter Property="FontSize" Value="{StaticResource klcButtonFontSizeLarge}" />
     </Style>
     <Style
-        x:Key="KlaButtonSecondary"
+        x:Key="klcButtonSec"
         BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button">
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
@@ -171,36 +171,33 @@
     <!--  TextBox: Inputs and readouts  -->
     <Style
         x:Key="KlaInput"
-        BasedOn="{StaticResource KlaFoundationInput}"
+        BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox" />
     <Style
         x:Key="KlaCompactFieldInput"
-        BasedOn="{StaticResource KlaFoundationInput}"
+        BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
         <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}" />
     </Style>
     <Style
-        x:Key="KlaInputCompact"
-        BasedOn="{StaticResource KlaCompactFieldInput}"
-        TargetType="TextBox" />
-    <Style
-        x:Key="KlaFilter"
-        BasedOn="{StaticResource KlaFoundationInput}"
+        x:Key="klcTextBoxFilter"
+        BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
-        <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}" />
-        <Setter Property="FontSize" Value="{StaticResource klcGroupSearchFontSize}" />
+        <Setter Property="Height" Value="{StaticResource klcFilterHeight}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeFilter}" />
         <!--  Every filter shares the watermark; a window that needs another sets its own Tag.  -->
-        <Setter Property="Tag" Value="Type to filter" />
+        <Setter Property="Tag" Value="[Type to filter]" />
     </Style>
     <!--  Text Entry's single large, bold, centred field.  -->
     <Style
-        x:Key="KlaTextPromptInput"
-        BasedOn="{StaticResource KlaInput}"
+        x:Key="klcTextBoxPrompt"
+        BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
-        <Setter Property="Height" Value="{StaticResource KlaTextPromptInputHeight}" />
-        <Setter Property="FontSize" Value="{StaticResource klcTextDialogFontSize}" />
-        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Height" Value="{StaticResource klcTextBoxPromptHeight}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeInputPrompt}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="TextAlignment" Value="Center" />
+        <Setter Property="Tag" Value="[ENTER TEXT]" />
     </Style>
     <!--
         Tool output the user may copy (a message body, a path, a report): read-only text drawn like body text, selectable
@@ -208,7 +205,7 @@
     -->
     <Style
         x:Key="klaReadout"
-        BasedOn="{StaticResource KlaFoundationInput}"
+        BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
         <Setter Property="IsReadOnly" Value="True" />
         <Setter Property="Height" Value="Auto" />
@@ -222,7 +219,7 @@
     </Style>
     <Style
         x:Key="KlaMultilineReadout"
-        BasedOn="{StaticResource KlaFoundationInput}"
+        BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
         <Setter Property="Height" Value="Auto" />
         <Setter Property="MinHeight" Value="{StaticResource KlaReadoutMinHeight}" />
@@ -243,10 +240,11 @@
         BasedOn="{StaticResource klaFoundationComboBox}"
         TargetType="ComboBox" />
     <Style
-        x:Key="KlaCompactComboBox"
-        BasedOn="{StaticResource KlaComboBox}"
+        x:Key="klcComboBoxFilter"
+        BasedOn="{StaticResource klaFoundationComboBox}"
         TargetType="ComboBox">
-        <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeFilter}" />
+        <Setter Property="Height" Value="{StaticResource klcFilterHeight}" />
     </Style>
 
     <!--  CheckBox: the plain alias, then the dialog row that shows a label and a description  -->
@@ -310,13 +308,13 @@
                             <ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
                             <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
                             <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
                             <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
                         </Grid.RowDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
@@ -326,7 +324,7 @@
 
     <!--  Implicit styles: a bare TextBox, ComboBox or CheckBox in a shared-shell window takes the compact roles above  -->
     <Style BasedOn="{StaticResource KlaCompactFieldInput}" TargetType="TextBox" />
-    <Style BasedOn="{StaticResource KlaCompactComboBox}" TargetType="ComboBox" />
+    <Style BasedOn="{StaticResource klcComboBoxFilter}" TargetType="ComboBox" />
     <Style BasedOn="{StaticResource KlaCheck}" TargetType="CheckBox" />
 
     <!--  WindowShell: the header band (logo, title, Close), the inset body and the footer band (links, version) around every window body  -->
@@ -462,7 +460,7 @@
         BasedOn="{StaticResource KlaMultilineReadout}"
         TargetType="TextBox">
         <Setter Property="Height" Value="{StaticResource KlaDetailsHeight}" />
-        <Setter Property="Margin" Value="{StaticResource KlaStackGapAbove}" />
+        <Setter Property="Margin" Value="{StaticResource klcStackGapVert}" />
         <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
         <Setter Property="Padding" Value="{StaticResource KlaDetailsReadoutPadding}" />
     </Style>
@@ -479,7 +477,7 @@
         <Style.Resources>
             <StaticResource x:Key="klcButtonHoverBrush" ResourceKey="KlaComponentSurfaceBrush" />
             <SolidColorBrush x:Key="klcButtonDisabledBrush" Color="Transparent" />
-            <StaticResource x:Key="klcButtonRadius" ResourceKey="KlaRadiusControl" />
+            <StaticResource x:Key="klcRadButton" ResourceKey="klcRadTextBox" />
         </Style.Resources>
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Height" Value="Auto" />
@@ -487,7 +485,7 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <!--  Body size for the description; the label sets its own.  -->
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
@@ -504,10 +502,10 @@
                             Margin="{StaticResource KlaCommandArrowInset}"
                             VerticalAlignment="Top"
                             Content="{StaticResource KlaCommandArrowGeometry}"
-                            Style="{StaticResource KlaGuiIcon}" />
+                            Style="{StaticResource klcFdnIcon}" />
                         <StackPanel Grid.Column="1">
                             <TextBlock
-                                FontSize="{StaticResource klcSectionTitleFontSize}"
+                                FontSize="{StaticResource klcFontSizeSectionHeading}"
                                 FontWeight="SemiBold"
                                 Text="{Binding Label}"
                                 TextWrapping="Wrap" />
@@ -543,14 +541,14 @@
         BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button">
         <Style.Resources>
-            <StaticResource x:Key="klcButtonRadius" ResourceKey="KlaCommandPillRadius" />
+            <StaticResource x:Key="klcRadButton" ResourceKey="KlaCommandPillRadius" />
         </Style.Resources>
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Height" Value="Auto" />
         <Setter Property="MinHeight" Value="{StaticResource klcButtonHeight}" />
         <!--  Stretch: pills on one WrapPanel line share the tallest pill's height.  -->
         <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="BorderBrush" Value="{StaticResource KlaAccentBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
         <Setter Property="Padding" Value="{StaticResource KlaCommandPillInset}" />
@@ -573,13 +571,13 @@
     <!--  x: text  -->
     <Style
         x:Key="xText"
-        BasedOn="{StaticResource klaFoundationTextBlock}"
+        BasedOn="{StaticResource klcFdnTextBlock}"
         TargetType="TextBlock" />
 
-    <!--  x: icons. The unsized alias of KlaGuiIcon (16 by default); the shared dialogs name a size instead.  -->
+    <!--  x: icons. The unsized alias of klcFdnIcon (16 by default); the shared dialogs name a size instead.  -->
     <Style
         x:Key="xIcon"
-        BasedOn="{StaticResource KlaGuiIcon}"
+        BasedOn="{StaticResource klcFdnIcon}"
         TargetType="ContentControl" />
 
     <!--  x: status chips  -->
@@ -632,7 +630,7 @@
     <!--  The caption inside a status chip.  -->
     <Style
         x:Key="xStatusText"
-        BasedOn="{StaticResource klaFoundationTextBlock}"
+        BasedOn="{StaticResource klcFdnTextBlock}"
         TargetType="TextBlock" />
 
     <!--  x: surface buttons  -->
@@ -662,7 +660,7 @@
     <!--  x: read-only fields  -->
     <Style
         x:Key="xReadOnlyField"
-        BasedOn="{StaticResource KlaFoundationInput}"
+        BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
         <Setter Property="IsReadOnly" Value="True" />
         <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
@@ -727,7 +725,7 @@
                 <ItemsPanelTemplate>
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
                             <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
@@ -780,7 +778,7 @@
         x:Key="xxToggle"
         BasedOn="{StaticResource klcFdnButton}"
         TargetType="ToggleButton">
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
         <Style.Triggers>
@@ -811,21 +809,21 @@
     <!--  ======================================================================  -->
     <Style
         x:Key="xxxIcon12"
-        BasedOn="{StaticResource KlaGuiIcon}"
+        BasedOn="{StaticResource klcFdnIcon}"
         TargetType="ContentControl">
         <Setter Property="Width" Value="12" />
         <Setter Property="Height" Value="12" />
     </Style>
     <Style
         x:Key="xxxIcon24"
-        BasedOn="{StaticResource KlaGuiIcon}"
+        BasedOn="{StaticResource klcFdnIcon}"
         TargetType="ContentControl">
         <Setter Property="Width" Value="24" />
         <Setter Property="Height" Value="24" />
     </Style>
     <Style
         x:Key="xxxIcon48"
-        BasedOn="{StaticResource KlaGuiIcon}"
+        BasedOn="{StaticResource klcFdnIcon}"
         TargetType="ContentControl">
         <Setter Property="Width" Value="48" />
         <Setter Property="Height" Value="48" />

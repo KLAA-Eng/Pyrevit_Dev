@@ -22,7 +22,7 @@ from System.Windows.Controls.Primitives import ButtonBase
 from System.Windows.Input import Key
 from System.Windows.Threading import Dispatcher, DispatcherFrame, DispatcherPriority
 
-from GUI.dialogs import RenameField, create_rename
+from GUI.dialogs import RenameField, create_rename, sheet_fields, view_fields
 import GUI.dialogs as rename_dialogs
 
 
@@ -61,59 +61,57 @@ def validate_rename_dialogs():
     output = globals().get('output_directory', '')
     if output and not os.path.isdir(output):
         os.makedirs(output)
-    for count, width in ((1, 346), (2, 668), (3, 990)):
+    layouts = (('views', view_fields, 384), ('sheets', sheet_fields, 712),
+               ('generic', lambda: [RenameField('mark', 'Mark')], 384))
+    for layout, preset, width in layouts:
         for state in ('Normal', 'Empty', 'Error', 'Disabled', 'Long content'):
-            fields = [RenameField('field-{0}'.format(i), 'Naming Group {0}'.format(i + 1),
-                       find='A' if state != 'Empty' else '',
-                       prefix='Long literal prefix value ' * 8 if state == 'Long content' else '',
-                       allow_case=i != 1) for i in range(count)]
+            fields = preset()
+            for field in fields:
+                field.Find = 'A' if state != 'Empty' else ''
+                field.Prefix = 'Long literal prefix value ' * 8 if state == 'Long content' else ''
             window = create_rename('Rename Contract', fields, version='v0.1', navigate=lambda uri: None)
             assert callable(rename_dialogs.rename), 'The public modal helper must survive lazy adapter loading'
             window.window_body.IsEnabled = state != 'Disabled'
+            last = window.slots[-1][0]
             if state == 'Error':
-                window.field_controls[-1].find_text.Text = ''
-                window.field_controls[-1].replace_text.Text = 'Needs find text'
+                window.rule_input(last, 'find').Text = ''
+                window.rule_input(last, 'replace').Text = 'Needs find text'
                 rename_click(window.accept_button)
             rename_layout(window)
             assert window.Width == window.MinWidth == width
             assert window._kla_chrome.header.ActualHeight == window._kla_chrome.footer.ActualHeight == 24
             assert window.result.is_cancelled and window.result.value is None
             assert window.accept_button.IsDefault
-            assert window.rename_scroll.ScrollableWidth == 0
             assert window.window_body.IsEnabled == (state != 'Disabled')
             assert window.validation_text.Visibility == (Visibility.Visible if state == 'Error' else Visibility.Collapsed)
             assert window.Height == window.MinHeight
-            assert window.rename_scroll.ScrollableHeight == 0, 'The minimum height must fit inline feedback and Rename'
+            assert window.group_secondary.Visibility == (Visibility.Visible if len(fields) == 2 else Visibility.Collapsed)
+            assert window.case_actions.Visibility == Visibility.Visible, 'Every preset has one case field'
+            body = window._kla_chrome.body.Margin
+            header_bottom = window._kla_chrome.header.TranslatePoint(Point(0, window._kla_chrome.header.ActualHeight), window.Content).Y
             previous = None
-            for index, controls in enumerate(window.field_controls):
-                position = controls.container.TranslatePoint(Point(0, 0), window.Content)
-                assert controls.case_actions.Visibility == (Visibility.Collapsed if index == 1 else Visibility.Visible)
-                assert position.X >= 0 and position.X + controls.container.ActualWidth <= width
+            for slot, field in window.slots:
+                group = getattr(window, 'group_' + slot)
+                position = group.TranslatePoint(Point(0, 0), window.Content)
+                assert position.X >= 0 and position.X + group.ActualWidth <= width
                 if previous is not None:
                     assert position.Y == previous.Y and position.X > previous.X, 'Groups must remain horizontal'
                 previous = position
-                header_bottom = window._kla_chrome.header.TranslatePoint(Point(0, window._kla_chrome.header.ActualHeight), window.Content).Y
-                assert abs(controls.label.TranslatePoint(Point(0, 0), window.Content).Y - header_bottom - 12) < 0.1
+                assert window.heading(slot).Text == field.Label
+                assert abs(window.heading(slot).TranslatePoint(Point(0, 0), window.Content).Y - header_bottom - body.Top) < 0.1
                 for name in ('find', 'replace', 'prefix', 'suffix'):
-                    control = getattr(controls, name + '_text')
+                    control = window.rule_input(slot, name)
                     point = control.TranslatePoint(Point(0, 0), window.Content)
                     assert control.ActualWidth == 240 and control.ActualHeight == 24
-                    assert point.X + control.ActualWidth <= width - 16
-                    assert AutomationProperties.GetAutomationId(control) == 'rename_{0}_{1}'.format(index, name)
-                input_right = controls.find_text.TranslatePoint(Point(controls.find_text.ActualWidth, 0), controls.naming_group).X
-                assert abs(controls.naming_group.ActualWidth - input_right - 9) < 0.1, 'Section hugs the input with an 8-unit inset plus its border'
-                assert controls.find_text.TranslatePoint(Point(0, 0), controls.naming_group).X == 65, 'Compact labels use a 52-unit column'
-                if index == count - 1:
-                    group_right = controls.naming_group.TranslatePoint(Point(controls.naming_group.ActualWidth, 0), window.Content).X
-                    assert abs(window.Width - group_right - 16) < 0.1, 'No unused trailing column remains'
-                if controls.case_actions.Visibility == Visibility.Visible:
-                    gap = controls.lower_button.TranslatePoint(Point(0, 0), controls.case_actions).X - controls.upper_button.TranslatePoint(Point(controls.upper_button.ActualWidth, 0), controls.case_actions).X
-                    assert abs(gap - 8) < 0.1, 'Case actions use the standard 8-unit pair gap'
+                    assert point.X + control.ActualWidth <= width - body.Right
+                    assert AutomationProperties.GetName(control) == '{0} {1}'.format(field.Label, name)
+            gap = window.lower_button.TranslatePoint(Point(0, 0), window.case_actions).X - window.upper_button.TranslatePoint(Point(window.upper_button.ActualWidth, 0), window.case_actions).X
+            assert abs(gap - 8) < 0.1, 'Case actions use the standard 8-unit pair gap'
             footer_y = window._kla_chrome.footer.TranslatePoint(Point(0, 0), window.Content).Y
             button_bottom = window.accept_button.TranslatePoint(Point(0, window.accept_button.ActualHeight), window.Content).Y
-            assert abs(footer_y - button_bottom - 12) < 0.1, (count, state, window.Height, button_bottom, footer_y)
+            assert abs(footer_y - button_bottom - body.Bottom) < 0.1, (layout, state, window.Height, button_bottom, footer_y)
             if output:
-                rename_capture(window, os.path.join(output, 'rename-{0}-{1}.png'.format(count, state.lower().replace(' ', '-'))))
+                rename_capture(window, os.path.join(output, 'rename-{0}-{1}.png'.format(layout, state.lower().replace(' ', '-'))))
             window.Close()
 
     originals = [RenameField('number', 'Sheet Number', allow_case=False), RenameField('name', 'Sheet Name')]
@@ -121,15 +119,15 @@ def validate_rename_dialogs():
         RenameField('first', 'Very long caller supplied property name for a Revit family parameter'),
         RenameField('second', 'Second property', allow_case=False)])
     rename_layout(window)
-    assert window.field_controls[0].label.ActualHeight > 24, 'Long caller headings wrap within their section'
-    for controls in window.field_controls:
-        assert controls.container.ActualWidth == controls.naming_group.ActualWidth == 314
-        right = controls.naming_group.TranslatePoint(Point(controls.naming_group.ActualWidth, 0), window.Content).X
-        assert right <= window.Width - 16, 'Long headings cannot push later fields offscreen'
-    assert window.rename_scroll.ScrollableWidth == window.rename_scroll.ScrollableHeight == 0
+    assert window.heading_primary.ActualHeight > 24, 'Long caller headings wrap within their group'
+    for slot in ('primary', 'secondary'):
+        group = getattr(window, 'group_' + slot)
+        right = group.TranslatePoint(Point(group.ActualWidth, 0), window.Content).X
+        assert right <= window.Width - 16, 'Long headings cannot push the second group offscreen'
     window.Close()
     window = create_rename('No case actions', [RenameField('name', 'Name', allow_case=False)])
     rename_layout(window)
+    assert window.case_actions.Visibility == Visibility.Collapsed
     no_case_height = window.Height
     window.Close()
     window = create_rename('Case actions', [RenameField('name', 'Name')])
@@ -138,13 +136,13 @@ def validate_rename_dialogs():
     window.Close()
     window = create_rename('Rules', originals)
     baseline_height = window.MinHeight
-    window.field_controls[1].replace_text.Text = 'invalid without find'
+    window.input_secondary_replace.Text = 'invalid without find'
     rename_click(window.accept_button)
     assert window.result.is_cancelled and window.validation_text.Text.startswith('Sheet Name:')
     assert window.MinHeight > baseline_height
-    window.field_controls[1].find_text.Text = 'A'
+    window.input_secondary_find.Text = 'A'
     assert window.MinHeight == baseline_height, 'Clearing feedback must restore the fitted minimum without growth drift'
-    window.field_controls[1].prefix_text.Text = 'PRE-'
+    window.input_secondary_prefix.Text = 'PRE-'
     class EnterArgs(object):
         Key = Key.Enter
         Handled = False
@@ -158,7 +156,7 @@ def validate_rename_dialogs():
     window = create_rename('Accept click', [RenameField('name', 'Name')])
     rename_click(window.accept_button)
     assert window.result.is_cancelled and window.validation_text.Text == 'Enter at least one rename rule.'
-    window.field_controls[0].suffix_text.Text = '-A'
+    window.input_primary_suffix.Text = '-A'
     rename_click(window.accept_button)
     assert window.result.value['operation'] == 'rename'
     window = create_rename('Disabled actions', [RenameField('name', 'Name')])
@@ -167,14 +165,14 @@ def validate_rename_dialogs():
     window.key_down(window, event)
     assert event.Handled and window.result.is_cancelled
     rename_click(window.accept_button)
-    rename_click(window.field_controls[0].upper_button)
+    rename_click(window.upper_button)
     assert window.result.is_cancelled and window.result.value is None
     window.Close()
     for operation in ('upper', 'lower'):
         window = create_rename('Case', originals)
-        window.field_controls[0].replace_text.Text = 'invalid other group'
-        window.field_controls[1].replace_text.Text = 'invalid target group'
-        rename_click(getattr(window.field_controls[1], operation + '_button'))
+        window.input_primary_replace.Text = 'invalid other group'
+        window.input_secondary_replace.Text = 'invalid target group'
+        rename_click(getattr(window, operation + '_button'))
         assert window.result.value == {'operation': operation, 'field': 'name'}
         assert originals[1].Replace == ''
     for action in ('close', 'escape', 'native-close'):
@@ -191,7 +189,7 @@ def validate_rename_dialogs():
         else:
             window.Close()
         assert window.result.is_cancelled and window.result.value is None
-    print('Rename WPF: 15 horizontal layouts (1/2/3 groups x five states), widths, unclipped inputs, validation, request snapshots, Enter/click, separate case actions and cancellation passed.')
+    print('Rename WPF: 15 layouts (Views/Sheets/Generic x five states), widths, named unclipped inputs, validation, request snapshots, Enter/click, separate case actions and cancellation passed.')
 
 
 validate_rename_dialogs()

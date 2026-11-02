@@ -20,12 +20,11 @@ def _window_type():
     from System import Action, IntPtr
     from System.Windows import (Window, Visibility, Size, WindowStartupLocation,
                                 SystemParameters)
-    from System.Windows.Automation import AutomationProperties
-    from System.Windows.Controls import Button, ContextMenu
-    from System.Windows.Controls.Primitives import ToggleButton
+    from System.Windows.Controls import ContextMenu
     from System.Windows.Input import (Key, Mouse, MouseButton, MouseButtonState,
                                       CaptureMode, MouseEventHandler)
     from System.Windows.Interop import WindowInteropHelper
+    from System.Windows.Media import VisualTreeHelper
     from System.Windows.Threading import DispatcherPriority
     from GUI.window_chrome import access_text, shared_resources
     from GUI.window_metadata import WindowMetadata
@@ -57,33 +56,21 @@ def _window_type():
                 else:
                     WindowInteropHelper(self).Owner = owner if isinstance(owner, IntPtr) else IntPtr(owner)
                 self.WindowStartupLocation = WindowStartupLocation.CenterOwner
-            for row in state.switches:
-                toggle = ToggleButton()
-                toggle.Style = self.FindResource('KlaCommandToggle')
-                toggle.Content = row.Label
-                toggle.Tag = row.Key
-                toggle.IsChecked = row.IsChecked
-                toggle.IsEnabled = row.CanToggle
-                toggle.MaxWidth = self.Width - 64
-                AutomationProperties.SetName(toggle, row.Label)
-                toggle.Click += self.switch_clicked
-                self._toggle_buttons[row.Key] = toggle
-                self.toggles_panel.Children.Add(toggle)
-            for row in state.choices:
-                button = Button()
-                button.Style = self.FindResource('KlaCommandButton')
-                button.Content = access_text(row.Label)
-                button.Tag = row.Key
-                button.IsEnabled = row.CanSelect
-                button.MaxWidth = self.Width - 64
-                if row.Description:
-                    button.ToolTip = row.Description
-                AutomationProperties.SetName(button, row.Label)
-                AutomationProperties.SetHelpText(button, row.Description)
-                button.Click += self.command_clicked
-                self._command_buttons[row.Key] = button
-                self.commands_panel.Children.Add(button)
+            # The pills come from the XAML item templates, so the designer shows
+            # them from sample rows; only what a binding cannot do is set here.
+            self.toggles_panel.ItemsSource = state.switches
+            self.commands_panel.ItemsSource = state.choices
             self.toggles_panel.Visibility = Visibility.Visible if state.switches else Visibility.Collapsed
+            self.Content.Measure(Size(self.Width, self.MaxHeight))
+            self._toggle_buttons = self.generated(self.toggles_panel, state.switches)
+            self._command_buttons = self.generated(self.commands_panel, state.choices)
+            for row in state.choices:
+                button = self._command_buttons[row.Key]
+                button.Content = access_text(row.Label)
+                if not row.Description:
+                    button.ToolTip = None
+            for control in list(self._toggle_buttons.values()) + list(self._command_buttons.values()):
+                control.MaxWidth = self.Width - 64
             self._ready = True
             self.refresh()
             self.Loaded += self.loaded
@@ -173,13 +160,24 @@ def _window_type():
                 self._fit_scheduled = True
                 self.Dispatcher.BeginInvoke(DispatcherPriority.Loaded, Action(self.fit_height))
 
+        @staticmethod
+        def generated(panel, rows):
+            """The pill each row's item template built, by row Key; needs a measured panel."""
+            controls = {}
+            for index, row in enumerate(rows):
+                presenter = panel.ItemContainerGenerator.ContainerFromIndex(index)
+                presenter.ApplyTemplate()
+                controls[row.Key] = VisualTreeHelper.GetChild(presenter, 0)
+            return controls
+
         def command_panel_size_changed(self, sender, args):
             if not self._ready or not args.WidthChanged:
                 return
             # A pill may wrap its own label when it is longer than the panel.
             # Updating after arrangement also supports narrow offscreen QA renders.
             maximum = max(1, sender.ActualWidth - 8)
-            for control in sender.Children:
+            controls = self._toggle_buttons if sender == self.toggles_panel else self._command_buttons
+            for control in controls.values():
                 control.MaxWidth = maximum
             self.queue_fit()
 

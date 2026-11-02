@@ -22,7 +22,7 @@
                 <Border Grid.Column="0" BorderBrush="{StaticResource KlaBorderStrongBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
                     <StackPanel Orientation="Horizontal">
                         <RadioButton Content="{StaticResource FamiliesModeLabel}" IsChecked="True" GroupName="ContentMode" Style="{StaticResource KlaSegmentButtonStyle}" />
-                        <RadioButton Content="{StaticResource ViewsModeLabel}" IsEnabled="False" GroupName="ContentMode" Style="{StaticResource KlaSegmentButtonStyle}" Margin="{StaticResource KlaPairGap}" ToolTip="{StaticResource ViewsUnavailableLabel}" />
+                        <RadioButton Content="{StaticResource ViewsModeLabel}" IsEnabled="False" GroupName="ContentMode" Style="{StaticResource KlaSegmentButtonStyle}" Margin="{StaticResource klcStackGapHoriz}" ToolTip="{StaticResource ViewsUnavailableLabel}" />
                     </StackPanel>
                 </Border>
                 <Border Grid.Column="2" BorderBrush="{StaticResource klcBorderColor}" BorderThickness="1" CornerRadius="5">
@@ -38,7 +38,7 @@
                 <Border Grid.Column="4" BorderBrush="{StaticResource KlaBorderStrongBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
                     <StackPanel Orientation="Horizontal">
                         <RadioButton Content="{StaticResource ThisProjectLabel}" IsEnabled="False" GroupName="SearchScope" Style="{StaticResource KlaSegmentButtonStyle}" ToolTip="{StaticResource ProjectScopeUnavailableLabel}" />
-                        <RadioButton Content="{StaticResource LibraryLabel}" IsChecked="True" GroupName="SearchScope" Style="{StaticResource KlaSegmentButtonStyle}" Margin="{StaticResource KlaPairGap}" />
+                        <RadioButton Content="{StaticResource LibraryLabel}" IsChecked="True" GroupName="SearchScope" Style="{StaticResource KlaSegmentButtonStyle}" Margin="{StaticResource klcStackGapHoriz}" />
                     </StackPanel>
                 </Border>
                 <Border Grid.Column="6" BorderBrush="{StaticResource KlaBorderStrongBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
@@ -53,7 +53,7 @@
                                 </DataTemplate>
                             </RadioButton.ContentTemplate>
                         </RadioButton>
-                        <RadioButton x:Name="GridMode" Content="{StaticResource GridModeLabel}" GroupName="ViewMode" Style="{StaticResource KlaSegmentButtonStyle}" Checked="OnViewModeChanged" Margin="{StaticResource KlaPairGap}">
+                        <RadioButton x:Name="GridMode" Content="{StaticResource GridModeLabel}" GroupName="ViewMode" Style="{StaticResource KlaSegmentButtonStyle}" Checked="OnViewModeChanged" Margin="{StaticResource klcStackGapHoriz}">
                             <RadioButton.ContentTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">

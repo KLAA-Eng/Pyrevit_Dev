@@ -13,7 +13,7 @@
     <Window.Resources>
         <Style
             x:Key="ViewRangeTableHeader"
-            BasedOn="{StaticResource KlaSectionHeading}"
+            BasedOn="{StaticResource klaSectionHeading}"
             TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Center" />
@@ -139,7 +139,7 @@
                             ItemsSource="{Binding available_levels}"
                             SelectedValue="{Binding topplane_level_id, Mode=TwoWay}"
                             SelectedValuePath="IdValue"
-                            Style="{StaticResource KlaCompactComboBox}" />
+                            Style="{StaticResource klcComboBoxFilter}" />
 
                         <Rectangle
                             Grid.Row="2"
@@ -222,7 +222,7 @@
                             ItemsSource="{Binding available_levels}"
                             SelectedValue="{Binding bottomplane_level_id, Mode=TwoWay}"
                             SelectedValuePath="IdValue"
-                            Style="{StaticResource KlaCompactComboBox}" />
+                            Style="{StaticResource klcComboBoxFilter}" />
 
                         <Rectangle
                             Grid.Row="4"
@@ -267,7 +267,7 @@
                             ItemsSource="{Binding available_levels}"
                             SelectedValue="{Binding viewdepth_level_id, Mode=TwoWay}"
                             SelectedValuePath="IdValue"
-                            Style="{StaticResource KlaCompactComboBox}" />
+                            Style="{StaticResource klcComboBoxFilter}" />
                     </Grid>
                     <!--  The status line follows the view model's status_kind: success, warning (default) or error.  -->
                     <TextBlock
@@ -305,10 +305,10 @@
                     IsEnabled="{Binding can_modify_view}"
                     Style="{StaticResource klcButtonDouble}" />
                 <Button
-                    Margin="{StaticResource KlaPairGap}"
+                    Margin="{StaticResource klcStackGapHoriz}"
                     Click="reset_values_click"
                     Content="Reset"
-                    Style="{StaticResource KlaButtonSecondary}"
+                    Style="{StaticResource klcButtonSec}"
                     ToolTip="Reset to original values" />
             </StackPanel>
         </Grid>

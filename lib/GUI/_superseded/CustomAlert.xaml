@@ -34,7 +34,7 @@
                         <TextBlock
                             x:Name="alert_heading"
                             Grid.Column="2"
-                            Style="{StaticResource KlaSectionHeading}"
+                            Style="{StaticResource klaSectionHeading}"
                             Text="Information" />
                     </Grid>
                     <ScrollViewer

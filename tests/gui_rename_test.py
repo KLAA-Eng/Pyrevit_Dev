@@ -38,7 +38,7 @@ class RenameTests(unittest.TestCase):
     def test_all_rules_validate_before_rename_and_report_the_field(self):
         from GUI.dialogs.rename_models import RenameField, RenameState
         state = RenameState([RenameField('ok', 'Valid', prefix='A'),
-                             RenameField('bad', 'Sheet Number', replace='replacement')])
+                             RenameField('bad', 'Sheet Number', replace='replacement', allow_case=False)])
         with self.assertRaises(ValueError) as error:
             state.rename_result()
         self.assertEqual('Sheet Number: Enter Find text before using Replace.', str(error.exception))
@@ -48,11 +48,11 @@ class RenameTests(unittest.TestCase):
     def test_an_entirely_blank_rename_is_rejected(self):
         from GUI.dialogs import RenameField
         from GUI.dialogs.rename_models import RenameState
-        state = RenameState([RenameField('number', 'Number'), RenameField('name', 'Name')])
+        state = RenameState([RenameField('number', 'Number', allow_case=False), RenameField('name', 'Name')])
         with self.assertRaises(ValueError) as caught:
             state.rename_result()
         self.assertEqual('Enter at least one rename rule.', caught.exception.args[0])
-        state = RenameState([RenameField('number', 'Number'), RenameField('name', 'Name', suffix='-A')])
+        state = RenameState([RenameField('number', 'Number', allow_case=False), RenameField('name', 'Name', suffix='-A')])
         self.assertEqual('accept', state.rename_result().action)
 
     def test_case_actions_ignore_rule_text_and_only_target_the_requested_field(self):
@@ -75,17 +75,29 @@ class RenameTests(unittest.TestCase):
         self.assertEqual('[b a. A]', rename_value('A. a. A', rule['find'], rule['replace'],
                                                  rule['prefix'], rule['suffix']))
 
-    def test_one_to_three_unique_non_null_hashable_keys_are_required_before_wpf(self):
+    def test_one_or_two_unique_non_null_hashable_keys_are_required_before_wpf(self):
         from GUI.dialogs import RenameField, create_rename
         from GUI.dialogs.rename_models import RenameState
-        for rows in ([], [RenameField(str(i), 'Name') for i in range(4)],
+        for rows in ([], [RenameField(str(i), 'Name', allow_case=i == 0) for i in range(3)],
+                     [RenameField('a', 'First'), RenameField('b', 'Second')],
                      [RenameField('x', 'First'), RenameField('x', 'Second')],
                      [RenameField(None, 'Missing')], [RenameField([], 'Unhashable')]):
             with self.assertRaises(ValueError):
                 create_rename('Invalid configuration', rows)
-        for count in (1, 2, 3):
-            state = RenameState(RenameField(str(i), 'Same label') for i in range(count))
+        for count in (1, 2):
+            state = RenameState(RenameField(str(i), 'Same label', allow_case=i == 0) for i in range(count))
             self.assertEqual(count, len(state.fields))
+
+    def test_presets_match_the_view_and_sheet_layouts(self):
+        from GUI.dialogs import sheet_fields, view_fields
+        from GUI.dialogs.rename_models import RenameState
+        views = RenameState(view_fields())
+        self.assertEqual([('name', 'View Name')], [(f.Key, f.Label) for f in views.fields])
+        self.assertEqual('name', views.case_field.Key)
+        sheets = RenameState(sheet_fields())
+        self.assertEqual([('number', 'Sheet Number'), ('name', 'Sheet Name')],
+                         [(f.Key, f.Label) for f in sheets.fields])
+        self.assertEqual('name', sheets.case_field.Key)
 
 
 if __name__ == '__main__':

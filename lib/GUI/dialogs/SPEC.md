@@ -79,7 +79,7 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   Segoe UI Bold with KLCode colors. The center chrome title is blank, retaining
   caller Window.Title metadata and Close; remove footer and its
   reserved row. Input-or-validation/OK gaps are 8. The only
-  visible action is the same 104 x 28 `KlaButton` OK used by Message; no Cancel button.
+  visible action is the same 104 x 28 `klcButton` OK used by Message; no Cancel button.
   Both use the standard 8-unit content-to-action gap. Content-driven minimum height avoids
   extra blank space. Enter accepts valid text; title Close/Escape cancels.
 - AC-006: Existing shared palette, typography, controls and icons remain the
@@ -93,7 +93,7 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   persist per family for the session. Selection has Sheets, Revisions, Open
   Documents, List Single and List Multiple; Message has Without Details and With
   Details; Command Switch has Commands only and Commands with toggles; Rename
-  has Single field, Two fields and Multiple fields. Action Choice has Commands,
+  has Views, Sheets and Generic. Action Choice has Commands,
   Commands + Details, Commands + Checkbox, Full Content and Standard Buttons.
   All Action Choice and both Message variants offer
   Normal, Empty, Warning, Error, Success, Disabled and Long content; With Details
@@ -131,10 +131,11 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   white underline or focus-square override. No light-green frame surrounds a
   focused button or checkbox/label. Controls remain focusable/keyboard usable;
   input/dropdown field-focus styling and ordinary control borders stay unchanged.
-- AC-011: KLC-Rename accepts one to three caller-defined property groups laid
-  out horizontally. Each group has one Find/Replace pair and Prefix/Suffix;
-  optional Uppercase/Lowercase buttons act separately for that field and return
-  the operation and field. Rename validates and returns all entered rules;
+- AC-011: KLC-Rename accepts one or two property groups laid out horizontally,
+  spelled out in XAML (Views, Sheets or a generic caller's labels). Each group
+  has one Find/Replace pair and Prefix/Suffix; one shared Uppercase/Lowercase
+  pair acts on the single field that allows case and returns the operation and
+  that field. Rename validates and returns all entered rules;
   an entirely blank request stays open with "Enter at least one rename rule.".
   Enter activates it from the fields; a focused button keeps its own Enter. Invalid rules stay open with inline feedback. Close/Escape
   cancels. Case actions close without applying model changes. No live preview,

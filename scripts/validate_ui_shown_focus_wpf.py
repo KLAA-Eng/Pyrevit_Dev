@@ -52,9 +52,9 @@ def validate_shown_focus():
         window.Activate()
         settle_layout(window.Content)
         assert FocusManager.GetFocusedElement(window) == window.window_body
-        for controls in window.field_controls:
+        for slot, unused in window.slots:
             for name in ('find', 'replace', 'prefix', 'suffix'):
-                field = getattr(controls, name + '_text')
+                field = window.rule_input(slot, name)
                 assert not field.IsKeyboardFocusWithin and field.SelectionLength == 0
                 assert field.Text == ''
         if output_directory:
@@ -72,7 +72,7 @@ def validate_shown_focus():
         watermark = window.input_text.Template.FindName('Watermark', window.input_text)
         assert watermark.Visibility == Visibility.Visible
         assert window._kla_chrome.title.Visibility == Visibility.Collapsed
-        assert watermark.Foreground == window.FindResource('klcTextWatermarkColor')
+        assert watermark.Foreground == window.FindResource('klcTextColorWaterMark')
         window.input_text.Focus()
         settle_layout(window.Content)
         assert watermark.Visibility == Visibility.Visible, 'An empty field keeps its watermark while focused'

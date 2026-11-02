@@ -19,17 +19,17 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
 
 `KLCodeFoundation.xaml` merges the geometry and owns the presenter, bound to
 tokens (`klcIconSize`, `KlaIconCanvas`, `klcIconStroke`, `KlaDisabledTextBrush`).
-Windows apply it through the sized Components presenters, `klaIcon16` and `klaIcon32` (`xIcon` is the unsized alias the older windows still use). The presenter is the only way to draw a GUI icon: it follows its parent's
+Windows apply it through the sized Components presenters, `klcIcon16` and `klcIcon32` (`xIcon` is the unsized alias the older windows still use). The presenter is the only way to draw a GUI icon: it follows its parent's
 foreground and turns gray when disabled. There are no fixed-color ImageSources
 (removed 2026-10-31).
 
 ```xml
-<ContentControl Style="{StaticResource klaIcon16}"
+<ContentControl Style="{StaticResource klcIcon16}"
                 Content="{StaticResource kliconSearch}"/>
 ```
 
 The presenter uses 16-unit dimensions and a 24-unit source canvas, with a 2-unit
-stroke; `klaIcon32` is the severity size, and `xxxIcon12` / `24` / `48` wait in the xxx tier until a window uses one. Foreground inherits from its parent control; disabled icons use the
+stroke; `klcIcon32` is the severity size, and `xxxIcon12` / `24` / `48` wait in the xxx tier until a window uses one. Foreground inherits from its parent control; disabled icons use the
 shared `KlaDisabledTextBrush`. Decorative icons do not intercept clicks or focus.
 Do not create per-window copies or replace source SVGs with screenshots.
 See the [design-system usage examples](../../../docs/DESIGNSYSTEM.md#in-window-gui-icons)
@@ -70,7 +70,7 @@ Shared Message uses [Octagon Alert](https://lucide.dev/icons/octagon-alert) and
 [Check Check](https://lucide.dev/icons/check-check) through its own error/success
 roles. Since 2026-10-31 the error role also serves the compiled alert and the Startup Importer's blocking issues; Circle X is retired.
 Information and Warning retain Info and Triangle Alert. Message severity symbols
-render at 32 units (`klaIcon32`) in the severity color; Details uses 16-unit
+render at 32 units (`klcIcon32`) in the severity color; Details uses 16-unit
 [Right](https://lucide.dev/icons/chevron-right)/[Down](https://lucide.dev/icons/chevron-down)
 chevrons for collapsed/expanded state. All 19 roles retain the existing pinned
 source revision and license; the default presenter remains 16 units.

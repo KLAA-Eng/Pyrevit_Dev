@@ -1,16 +1,19 @@
+<!--  Window: Need preview for height/max width  -->
 <Window
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Message"
-    Width="560"
-    Height="300"
-    MinWidth="480"
+    Width="432"
+    Height="360"
+    MinWidth="432"
     MinHeight="240"
     MaxHeight="640"
     ResizeMode="CanResizeWithGrip"
     Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
+    <!--  ContentControl: Good  -->
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
+        <!--  Grid: Good  -->
         <Grid x:Name="window_body">
             <!--  Grid.RowDefinitions: Good  -->
             <Grid.RowDefinitions>
@@ -20,40 +23,48 @@
                 <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <!--  Border: Needs Fdn work  -->
+            <!--  Border: Needs Fdn Work - Remove Placeholders  -->
             <Border x:Name="message_banner" Style="{StaticResource KlaBanner}">
+                <!--  Grid: Fdn Work Needed - Remove Placeholders  -->
                 <Grid>
+                    <!--  Grid.RowDefinitions: Good  -->
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                        <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
+                    <!--  Grid: Good - Remove Placeholders  -->
                     <Grid>
+                        <!--  Grid.ColumnDefinitions: Good  -->
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
+                        <!--  ContentControl: Good - Remove Placeholder Content  -->
                         <ContentControl
                             x:Name="message_icon"
                             VerticalAlignment="Center"
-                            Style="{StaticResource klaIcon32}" />
+                            Content="{StaticResource kliconErrorAlert}"
+                            Style="{StaticResource klcIcon32}" />
+                        <!--  TextBlock: Good - Remove Placeholder Text  -->
                         <TextBlock
                             x:Name="message_heading"
-                            Grid.Column="1"
-                            Margin="{StaticResource KlaPairGap}"
-                            VerticalAlignment="Center"
-                            Style="{StaticResource klaMessageHeading}" />
+                            Grid.Column="2"
+                            VerticalAlignment="Bottom"
+                            Style="{StaticResource klcTextBoxMessageHead}" Margin="0,0,0,2" />
                     </Grid>
-                    <!--  A readout, so the message can be selected and copied; muted like the information text it replaced.  -->
+                    <!--  TextBox: Fdn Work Needed - Remove Placeholder Text  -->
                     <TextBox
                         x:Name="message_body"
                         Grid.Row="2"
                         AutomationProperties.Name="Message content"
                         Foreground="{StaticResource KlaMutedBrush}"
-                        Style="{StaticResource klaReadout}" />
+                        Style="{StaticResource klaReadout}"
+                        Text="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeddddddd" />
                 </Grid>
             </Border>
-            <!--  Expander: Need Fdn work  -->
+            <!--  Expander: Needs Fdn Work  -->
             <Expander
                 x:Name="message_expander"
                 Grid.Row="2"
@@ -65,18 +76,22 @@
                 Expanded="details_changed"
                 Header="Details"
                 Style="{StaticResource KlaDetailsExpander}">
+                <!--  TextBox: Needs Fdn Work - Remove Placeholder Text  -->
                 <TextBox
                     x:Name="message_details"
                     AutomationProperties.Name="Detailed message"
-                    Style="{StaticResource KlaDetailsReadout}" />
+                    Style="{StaticResource KlaDetailsReadout}"
+                    Text="jvkjhkjblbgvkvkjvjhvkjvhjbhiyvlvkjhbjhbjhvjhvhb,hbbmhbkhlkhvlhkkhblblhblkbbbnmn hnmb,nbkhbkhb,bnlkhvbmnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnbbbbbbbbbbbbbbbhkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkhvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvbbbbbb" />
             </Expander>
+            <!--  Button: Good - Remove Placeholder Text  -->
             <Button
                 x:Name="action_one"
                 Grid.Row="4"
                 HorizontalAlignment="Center"
                 Click="accept_message"
+                Content="zOKz"
                 IsDefault="True"
-                Style="{StaticResource KlaButton}" />
+                Style="{StaticResource klcButton}" />
         </Grid>
     </ContentControl>
 </Window>

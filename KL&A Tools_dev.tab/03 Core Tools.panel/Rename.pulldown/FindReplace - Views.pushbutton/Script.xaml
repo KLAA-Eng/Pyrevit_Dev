@@ -69,12 +69,12 @@
                         <Button
                             Click="button_uppercase"
                             Content="Uppercase"
-                            Style="{StaticResource KlaButtonSecondary}" />
+                            Style="{StaticResource klcButtonSec}" />
                         <Button
-                            Margin="{StaticResource KlaPairGap}"
+                            Margin="{StaticResource klcStackGapHoriz}"
                             Click="button_lowercase"
                             Content="Lowercase"
-                            Style="{StaticResource KlaButtonSecondary}" />
+                            Style="{StaticResource klcButtonSec}" />
                     </StackPanel>
                     <Button
                         x:Name="UI_main_button"

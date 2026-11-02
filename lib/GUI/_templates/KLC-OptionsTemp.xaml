@@ -41,7 +41,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                                <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
                                 <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
@@ -49,7 +49,7 @@
                                 <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
                                 <RowDefinition Height="{StaticResource xCompactRow}" />
                                 <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
-                                <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                                <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
                             </Grid.RowDefinitions>
                             <Label
                                 Content="Category"
@@ -58,7 +58,7 @@
                             <ComboBox
                                 x:Name="option_category"
                                 Grid.Column="1"
-                                Style="{StaticResource KlaCompactComboBox}" />
+                                Style="{StaticResource klcComboBoxFilter}" />
                             <!--  Scope names a group of two radio buttons, not one input, so it is text rather than a Label.  -->
                             <TextBlock
                                 Grid.Row="2"
@@ -116,7 +116,7 @@
                         x:Name="output_prompt"
                         Grid.Row="4"
                         Content="Output Location"
-                        Style="{StaticResource klcLabelPrompt}"
+                        Style="{StaticResource klcLabelSectionHeading}"
                         Target="{Binding ElementName=option_path}" />
                     <Border Grid.Row="6" Style="{StaticResource KlaSection}">
                         <Grid>
@@ -133,7 +133,7 @@
                                 AutomationProperties.Name="Choose a fictional sample location"
                                 Click="browse_sample"
                                 Content="Browse"
-                                Style="{StaticResource KlaButtonSecondary}" />
+                                Style="{StaticResource klcButtonSec}" />
                         </Grid>
                     </Border>
                     <Border Grid.Row="8" Style="{StaticResource KlaBanner}">

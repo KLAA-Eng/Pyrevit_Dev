@@ -144,7 +144,7 @@ def validate_shared_dialogs():
             if hasattr(window, 'toggles_panel'):
                 import GUI.dialogs as shared_api
                 assert callable(shared_api.command_switch), 'Lazy loading must preserve the public modal helper'
-                assert window.toggles_panel.Children.Count == (2 if identity == 'dialog-command-switch' else 0)
+                assert window.toggles_panel.Items.Count == (2 if identity == 'dialog-command-switch' else 0)
                 assert window.switch_panel.BorderThickness.Left == window.switch_panel.BorderThickness.Top == 0
                 assert window.prompt_label.FontSize == 16 and str(window.prompt_label.FontWeight) == 'SemiBold'
                 prompt_y = window.prompt_label.TranslatePoint(Point(0, window.prompt_label.ActualHeight / 2), window.Content).Y

@@ -7,9 +7,9 @@
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="16"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <ContentControl x:Name="filter_icon" Content="{StaticResource kliconSearch}" Style="{StaticResource xIcon}" AutomationProperties.Name="Search" VerticalAlignment="Center"/>
-                <TextBox x:Name="textbox_filter" Grid.Column="2" TextChanged="text_filter_updated" Style="{StaticResource KlaFilter}" AutomationProperties.Name="Search stories"/>
+                <TextBox x:Name="textbox_filter" Grid.Column="2" TextChanged="text_filter_updated" Style="{StaticResource klcTextBoxFilter}" AutomationProperties.Name="Search stories"/>
             </Grid>
-            <Label x:Name="text_label" Grid.Row="2" Content="Select Stories to Review:" Target="{Binding ElementName=main_ListBox}" Style="{StaticResource klcLabelPrompt}"/>
+            <Label x:Name="text_label" Grid.Row="2" Content="Select Stories to Review:" Target="{Binding ElementName=main_ListBox}" Style="{StaticResource klcLabelSectionHeading}"/>
             <ListBox x:Name="main_ListBox" Grid.Row="4" SelectionMode="Single" Style="{StaticResource KlaList}">
                 <ListBox.ItemTemplate><DataTemplate>
                     <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}" Checked="UIe_ItemChecked" Style="{StaticResource KlaCheck}"/>
@@ -17,12 +17,12 @@
             </ListBox>
             <StackPanel Grid.Row="6">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Select All" Click="button_select_all" Style="{StaticResource KlaButton}"/>
-                    <Button Content="Select None" Click="button_select_none" Style="{StaticResource KlaButton}" Margin="{StaticResource KlaPairGap}"/>
+                    <Button Content="Select All" Click="button_select_all" Style="{StaticResource klcButton}"/>
+                    <Button Content="Select None" Click="button_select_none" Style="{StaticResource klcButton}" Margin="{StaticResource klcStackGapHoriz}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
-                    <Button Content="Initialize CSV" Click="button_initialize_csv" Style="{StaticResource KlaButtonSecondary}"/>
-                    <Button Content="Append CSV" Click="button_append_csv" Style="{StaticResource KlaButtonSecondary}" Margin="{StaticResource KlaPairGap}"/>
+                    <Button Content="Initialize CSV" Click="button_initialize_csv" Style="{StaticResource klcButtonSec}"/>
+                    <Button Content="Append CSV" Click="button_append_csv" Style="{StaticResource klcButtonSec}" Margin="{StaticResource klcStackGapHoriz}"/>
                 </StackPanel>
             </StackPanel>
             <Button x:Name="button_main" Grid.Row="8" Content="Review Selected Stories" Click="button_select" Style="{StaticResource klcButtonDouble}"/>

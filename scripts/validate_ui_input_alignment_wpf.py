@@ -36,7 +36,7 @@ def validate_input_alignment():
         rename = create_rename('Input alignment', [RenameField('name', 'Name', find='Alpha')])
         windows.append(rename)
         input_layout(rename)
-        field = rename.field_controls[0].find_text
+        field = rename.input_primary_find
         assert abs(text_origin(field, field) - 8) < 0.1, 'Rename must share the corrected input inset'
         message = create_message('Action spacing', 'Message body.')
         prompt = create_text_prompt('Action spacing', 'Enter text.', default='Alpha')

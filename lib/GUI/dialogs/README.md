@@ -138,13 +138,13 @@ fits content up to 640. Manual width changes preserve chosen height. Details
 starts collapsed and expands the bottom after WPF applies its template, retaining
 the message viewport until capped. Collapse removes the added height. At the
 cap, message and read-only details scroll. Expanded minimum height protects the
-message/action area from being squeezed away. OK uses `KlaButton` (104 x 28),
+message/action area from being squeezed away. OK uses `klcButton` (104 x 28),
 with an 8-unit gap below the message or Details content.
 
 Text options are `default=''`, `required=False`, `validator=None`. The field is
 36 high, FontSize 24, centered Segoe UI Bold. No visible prompt header is shown;
 an empty field displays `[ENTER TEXT]` as the input template's watermark (the
-TextBox `Tag`) in `klcTextWatermarkColor` gray (#808080), the footer version gray, on the line typed text takes.
+TextBox `Tag`) in `klcTextColorWaterMark` gray (#808080), the footer version gray, on the line typed text takes.
 It stays while the empty field is focused and goes once text is typed.
 It is never returned as
 input. The caller prompt still labels the input for accessibility. Compact
@@ -152,7 +152,7 @@ height fits input/error. The center chrome title is blank; caller Window.Title
 and Close remain. `WindowChrome.hide_footer()`
 collapses only this template instance's footer row. It does not alter other shell instances.
 Input-or-validation/OK gaps are 8 units. OK uses the same
-104 x 28 `KlaButton` as Message and is the only visible
+104 x 28 `klcButton` as Message and is the only visible
 action; title Close or Escape cancels. Natural minimum height keeps these gaps
 instead of stretching blank space above the action.
 Required checks whitespace without changing the returned string. A pure, quick
@@ -266,13 +266,16 @@ The result is `{'command': key, 'switches': {key: bool}}`; caller commands never
 `RenameField(key, label, find='', replace='', prefix='', suffix='',
 allow_case=True)` describes a property group. `create_rename(title, fields,
 version=None, owner=None, navigate=None)` constructs the window; `rename(...)`
-shows it. One to three groups are arranged horizontally, with minimum widths
-346, 668 and 990 respectively, fitted to their sections with 16-unit horizontal
-outer insets. Height fits the actual content, with 12-unit header-to-label and
-action-to-footer gaps. Each has one Find/Replace pair and Prefix/Suffix.
-Optional Uppercase/Lowercase buttons are separate actions for their own field.
-Initial focus rests on the neutral body; no field is selected. Compact labels
-and fitted section borders keep the inputs close, with standard 8-unit action gaps.
+shows it. `view_fields()` (View Name) and `sheet_fields()` (Sheet Number beside
+Sheet Name) are the Views and Sheets layouts; a generic caller passes its own
+one or two fields. [RenameDialog.xaml](RenameDialog.xaml) spells out both groups
+in the Find/Replace tool layout; one field collapses the second group. The window
+is 384 wide for one group and 712 for two, the Find/Replace Views and Sheets
+widths, and its height fits the content. Each group has one Find/Replace pair
+and Prefix/Suffix. One shared Uppercase/Lowercase pair acts on the one field
+that allows case (Sheet Name in the Sheets layout) and is hidden when none does;
+at most one field may allow case. Initial focus rests on the neutral body; no
+field is selected.
 
 Rename validates and returns action `accept` with value `{'operation': 'rename',
 'fields': {key: {'find': ..., 'replace': ..., 'prefix': ..., 'suffix': ...}}}`.
@@ -291,7 +294,7 @@ Selection offers Sheets, Revisions, Open Documents, List Single and List Multipl
 Message offers Without Details and With Details, each with Normal, Empty, Warning,
 Error, Success, Disabled and Long content; With Details keeps diagnostics in
 Empty. Command Switch offers Commands only and Commands with toggles. KLC-Rename
-offers Single field, Two fields and Multiple fields (three groups). Other shared
+offers Views, Sheets and Generic. Other shared
 variants retain five standard states.
 The duplicate Message/Selection templates and Form are retired; Options and
 Review remain. Confirmation/Parameter previews remain removed. Action Choice has

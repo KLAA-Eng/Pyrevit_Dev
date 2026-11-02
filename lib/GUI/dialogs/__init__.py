@@ -1,7 +1,7 @@
 """Opt-in shared dialogs. Importing this package does not load WPF or Revit."""
 from .models import ActionChoice, DialogResult, SelectionGroup, SelectionItem
 from .switch_models import CommandSwitch
-from .rename_models import RenameField
+from .rename_models import RenameField, sheet_fields, view_fields
 
 
 def create_message(title, message, **options):

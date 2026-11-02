@@ -115,8 +115,8 @@ def validate_production_windows():
                         if control.Name.startswith(('input_', 'UI_view_', 'UI_sheet_')):
                             assert abs(control.ActualWidth - token('KlaCompactFieldInputColumn').Value) < 0.1, (identity, state, control.Name, 'naming field width', control.ActualWidth)
                         assert AutomationProperties.GetName(control), (identity, control.Name, 'unnamed field')
-                    if isinstance(control, Label) and control.Style == window.Resources['klcLabelPrompt']:
-                        assert control.FontSize == token('klcSectionTitleFontSize'), (identity, state, 'prompt')
+                    if isinstance(control, Label) and control.Style == window.Resources['klcLabelSectionHeading']:
+                        assert control.FontSize == token('klcFontSizeSectionHeading'), (identity, state, 'prompt')
 
                 if identity in FOOTER_ACTIONS:
                     action = getattr(window, FOOTER_ACTIONS[identity])
@@ -204,7 +204,7 @@ def validate_gui_icons():
     owner.Foreground = Brushes.Orange
     panel = WrapPanel()
     panel.ItemWidth, panel.ItemHeight = 140, 56
-    panel.Background = resources['klcWindowColor']
+    panel.Background = resources['klcBackgroundColor']
     owner.Content = panel
     presenters = []
     try:
@@ -254,7 +254,7 @@ def validate_scrollbars():
     viewer.HorizontalScrollBarVisibility = viewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible
     content = Border()
     content.Width, content.Height = 1200, 600
-    content.Background = owner.FindResource('klcWindowColor')
+    content.Background = owner.FindResource('klcBackgroundColor')
     viewer.Content, owner.Content = content, viewer
     try:
         viewer.Measure(Size(320, 160))

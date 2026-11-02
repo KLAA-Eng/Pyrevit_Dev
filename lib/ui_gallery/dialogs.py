@@ -5,7 +5,7 @@ from GUI.dialogs import (ActionChoice, CommandSwitch, SelectionItem, create_mess
                          create_list_single, create_list_multiple, create_sheet_selector,
                          create_revision_selector, create_document_selector,
                          create_choice, create_text_prompt, create_command_switch,
-                         RenameField, create_rename)
+                         RenameField, create_rename, sheet_fields, view_fields)
 from .dialog_data import ACTION_IDS
 from .scenarios import sample
 
@@ -37,6 +37,34 @@ def _selection_rows(identity):
             _item('detail1', 'Typical Detail', 'detail1', 'Steel framing', (sample('Structural'),)),
             _item('detail2', 'Typical Detail', 'detail2', 'Concrete foundation', (sample('Structural'),)),
             _item('blocked', 'Unavailable Example', None, 'Unavailable in this fictional workflow', enabled=False)]
+
+
+# Command Switch fake rows. The Gallery and the Visual Studio designer (its
+# Windows export and Samples.py) all show these: add, remove or edit a line.
+COMMAND_SWITCH_COMMANDS = (
+    # (key, label, description, enabled)
+    ('active', 'Use Active View', 'Continue with the current view.', True),
+    ('selected', 'Choose Views', 'Open a selection workflow in a future caller.', True),
+    ('unavailable', 'Unavailable Action', 'This action is disabled.', False),
+)
+COMMAND_SWITCH_SWITCHES = (
+    # (key, label, checked, enabled); only the "Commands with toggles" variant shows them.
+    ('details', 'Include Details', False, True),
+    ('preview', 'Preview Only', True, True),
+)
+
+
+def _command_switch_rows(identity, state='Normal'):
+    """(commands, switches) for a Command Switch variant and state."""
+    rows = [_action(key, label, description, enabled)
+            for key, label, description, enabled in COMMAND_SWITCH_COMMANDS]
+    if state == 'Long content':
+        rows += [_action('extra-' + str(index), 'Additional command ' + str(index) + ' - detailed context ' * 6,
+                         'Long explanation ' * 24) for index in range(30)]
+    switches = [CommandSwitch(key, sample(label), checked=checked, enabled=enabled)
+                for key, label, checked, enabled in COMMAND_SWITCH_SWITCHES]
+    return ([] if state == 'Empty' else rows,
+            switches if identity == 'dialog-command-switch' else [])
 
 
 def create_dialog(launcher, state):
@@ -96,23 +124,18 @@ def create_dialog(launcher, state):
             help_uri='https://example.com/klcode/action-choice' if identity == 'dialog-actions-full' else None,
             **options)
     elif identity in ('dialog-command-switch', 'dialog-command-switch-plain'):
-        rows = [_action('active', 'Use Active View', 'Continue with the current view.'),
-                _action('selected', 'Choose Views', 'Open a selection workflow in a future caller.'),
-                _action('unavailable', 'Unavailable Action', 'This action is disabled.', enabled=False)]
-        if is_long:
-            rows += [_action('extra-' + str(index), 'Additional command ' + str(index) + ' - detailed context ' * 6,
-                             'Long explanation ' * 24) for index in range(30)]
-        switches = [CommandSwitch('details', sample('Include Details')), CommandSwitch('preview', sample('Preview Only'), checked=True)]
-        window = create_command_switch(title, [] if state == 'Empty' else rows,
-                                        switches=switches if identity == 'dialog-command-switch' else (), **options)
-    elif identity in ('dialog-rename', 'dialog-rename-two', 'dialog-rename-three'):
-        count = {'dialog-rename': 1, 'dialog-rename-two': 2, 'dialog-rename-three': 3}[identity]
-        names = ['Name'] if count == 1 else ['Number', 'Name', 'Description'][:count]
-        fields = [RenameField('field-' + str(index), sample(label), find='' if state in ('Empty', 'Error') else sample('Existing'),
-                              replace=sample('Replacement') if state == 'Error' and index == 0 else
-                                      ('' if state == 'Empty' else sample('Updated')),
-                              prefix=sample('Review context ' * 12) if is_long else '', allow_case=label != 'Number')
-                  for index, label in enumerate(names)]
+        rows, switches = _command_switch_rows(identity, state)
+        window = create_command_switch(title, rows, switches=switches, **options)
+    elif identity in ('dialog-rename', 'dialog-rename-sheets', 'dialog-rename-generic'):
+        presets = {'dialog-rename': view_fields(), 'dialog-rename-sheets': sheet_fields(),
+                   'dialog-rename-generic': [RenameField('mark', 'Mark')]}
+        fields = presets[identity]
+        for index, field in enumerate(fields):
+            field.Label = sample(field.Label)
+            field.Find = '' if state in ('Empty', 'Error') else sample('Existing')
+            field.Replace = (sample('Replacement') if state == 'Error' and index == 0 else
+                             ('' if state == 'Empty' else sample('Updated')))
+            field.Prefix = sample('Review context ' * 12) if is_long else ''
         window = create_rename(title, fields, **options)
         if state == 'Error':
             window.accept_rename()

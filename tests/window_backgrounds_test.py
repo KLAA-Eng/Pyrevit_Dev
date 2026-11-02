@@ -100,12 +100,12 @@ class WindowBackgroundTests(unittest.TestCase):
         with open(xaml_path, 'r', encoding='utf-8') as xaml_file:
             xaml = xaml_file.read()
 
-        self.assertIn('Style="{StaticResource KlaCompactComboBox}"', xaml)
+        self.assertIn('Style="{StaticResource klcComboBoxFilter}"', xaml)
         with open(os.path.join(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeComponents.xaml'), encoding='utf-8') as stream:
             shared = stream.read()
-        self.assertIn('x:Key="KlaCompactComboBox"', shared)
-        self.assertIn('BasedOn="{StaticResource KlaComboBox}"', shared)
-        # The combo template is the Foundation base that KlaComboBox aliases.
+        self.assertIn('x:Key="klcComboBoxFilter"', shared)
+        # The filter combo bases directly on the Foundation combo template, as KlaComboBox does.
+        self.assertIn('BasedOn="{StaticResource klaFoundationComboBox}"', shared)
         with open(os.path.join(PROJECT_ROOT, 'lib/GUI/Resources/KLCodeFoundation.xaml'), encoding='utf-8') as stream:
             shared = stream.read()
         self.assertIn('ItemContainerStyle', shared)
@@ -159,7 +159,7 @@ class WindowBackgroundTests(unittest.TestCase):
 
             self.assertIn('Content="{StaticResource kliconSearch}"', xaml, relative_path)
             self.assertIn('Style="{StaticResource xIcon}"', xaml, relative_path)
-            self.assertIn('Style="{StaticResource KlaFilter}"', xaml,
+            self.assertIn('Style="{StaticResource klcTextBoxFilter}"', xaml,
                           relative_path)
             self.assertNotIn('search_16px_light.png', xaml, relative_path)
 

@@ -24,8 +24,8 @@ DIALOG_FILES = {
     'dialog-command-switch': 'CommandSwitchDialog.xaml',
     'dialog-command-switch-plain': 'CommandSwitchDialog.xaml',
     'dialog-rename': 'RenameDialog.xaml',
-    'dialog-rename-two': 'RenameDialog.xaml',
-    'dialog-rename-three': 'RenameDialog.xaml',
+    'dialog-rename-sheets': 'RenameDialog.xaml',
+    'dialog-rename-generic': 'RenameDialog.xaml',
 }
 DIALOG_FILES.update((identity, 'ActionChoiceDialog.xaml') for identity in ACTION_IDS)
 
@@ -43,6 +43,10 @@ DIALOG_FAMILIES = (
         ('dialog-command-switch-plain', 'Commands only'),
         ('dialog-command-switch', 'Commands with toggles'))),
     ('dialog-rename', 'KLC-Rename', (
-        ('dialog-rename', 'Single field'), ('dialog-rename-two', 'Two fields'),
-        ('dialog-rename-three', 'Multiple fields'))),
+        ('dialog-rename', 'Views'), ('dialog-rename-sheets', 'Sheets'),
+        ('dialog-rename-generic', 'Generic'))),
 )
+
+# Variants the Visual Studio designer previews instead of their family's first
+# variant (KLCode.WPF's export and Samples.py both read this).
+DESIGNER_VARIANTS = ('dialog-command-switch',)

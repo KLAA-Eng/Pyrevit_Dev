@@ -2,7 +2,7 @@
     <ResourceDictionary.MergedDictionaries>
         <!--  Every shared design value: palette, tokens and chrome data (footer destinations and default labels).  -->
         <ResourceDictionary Source="KLCodeTokens.xaml" />
-        <!--  Generated icon geometry and the klcLogo template; the KlaGuiIcon presenter below draws the icons.  -->
+        <!--  Generated icon geometry and the klcLogo template; the klcFdnIcon presenter below draws the icons.  -->
         <ResourceDictionary Source="klIcons.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
@@ -11,13 +11,13 @@
         keys; KLCodeComponents.xaml gives each one an alias that changes nothing, plus the variants.
     -->
 
-    <!--  Window: borderless and transparent on the charcoal surface; every TextBlock inherits its font, body size and colour. NoResize unless the window opts in with CanResizeWithGrip.  -->
+    <!--  Window: borderless and transparent on the charcoal surface; every TextBlock inherits its font, body size and colour.  -->
     <Style x:Key="klcFdnWindow" TargetType="Window">
-        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
-        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
+        <Setter Property="Foreground" Value="{StaticResource klcForegroundColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
-        <!--  Borderless: no non-client frame, so a resizable window must set ResizeMode="CanResizeWithGrip" (CanResize alone has no edge to grab).  -->
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
+        <!--  Borderless: resizable window must set ResizeMode="CanResizeWithGrip"  -->
         <Setter Property="WindowStyle" Value="None" />
         <Setter Property="AllowsTransparency" Value="True" />
         <Setter Property="ResizeMode" Value="NoResize" />
@@ -44,8 +44,8 @@
         </Setter>
     </Style>
     <Style TargetType="ScrollBar">
-        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
-        <Setter Property="BorderBrush" Value="{StaticResource klcWindowColor}" />
+        <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
+        <Setter Property="BorderBrush" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="Opacity" Value="0.9" />
         <Setter Property="Margin" Value="{StaticResource KlaScrollBarMargin}" />
         <Setter Property="Template">
@@ -80,15 +80,15 @@
     </Style>
 
     <!--  TextBlock: wraps; font, size and colour come from klcFdnWindow  -->
-    <Style x:Key="klaFoundationTextBlock" TargetType="TextBlock">
+    <Style x:Key="klcFdnTextBlock" TargetType="TextBlock">
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
     <!--  Label: a field caption drawn as wrapping AccessText with no padding; Target names the input and "_" marks its Alt key  -->
     <Style x:Key="klcFdnLabel" TargetType="Label">
-        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="Foreground" Value="{StaticResource klcForegroundColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <!--  Not a no-op: WPF's own Label style pads 5 on every side.  -->
         <Setter Property="Padding" Value="0" />
         <!--
@@ -119,9 +119,9 @@
     </Style>
 
     <!--  ContentControl (GUI icons): the one icon presenter; windows apply it through the klaIcon<size> styles in Components  -->
-    <!-- KlaGuiIcon presents a klicon<Role> geometry at klcIconSize on the KlaIconCanvas with the klcIconStroke pen,
+    <!-- klcFdnIcon presents a klicon<Role> geometry at klcIconSize on the KlaIconCanvas with the klcIconStroke pen,
          inheriting the control's foreground; disabled icons take KlaDisabledTextBrush. It is the only way to draw a GUI icon.-->
-    <Style x:Key="KlaGuiIcon" TargetType="ContentControl">
+    <Style x:Key="klcFdnIcon" TargetType="ContentControl">
         <Setter Property="Width" Value="{StaticResource klcIconSize}" />
         <Setter Property="Height" Value="{StaticResource klcIconSize}" />
         <Setter Property="Focusable" Value="False" />
@@ -159,10 +159,10 @@
 
     <!--  Border: bordered field group  -->
     <Style x:Key="klaFoundationBorder" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+        <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
-        <Setter Property="CornerRadius" Value="{StaticResource KlaRadiusButton}" />
+        <Setter Property="CornerRadius" Value="{StaticResource klcRadButton}" />
         <Setter Property="Padding" Value="{StaticResource KlaSectionPadding}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
@@ -177,7 +177,7 @@
         <Style.Resources>
             <StaticResource x:Key="klcButtonHoverBrush" ResourceKey="KlaAccentHoverBrush" />
             <StaticResource x:Key="klcButtonDisabledBrush" ResourceKey="KlaDisabledFillBrush" />
-            <StaticResource x:Key="klcButtonRadius" ResourceKey="KlaRadiusButton" />
+            <StaticResource x:Key="klcRadButton" ResourceKey="klcRadButton" />
         </Style.Resources>
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
@@ -201,7 +201,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{DynamicResource klcButtonRadius}">
+                        CornerRadius="{DynamicResource klcRadButton}">
                         <ContentPresenter
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -239,7 +239,7 @@
     <Style x:Key="klaFoundationSwitch" TargetType="ToggleButton">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
@@ -303,17 +303,18 @@
     </Style>
 
     <!--  TextBox: charcoal field with a hairline green border that turns white with focus; the Tag watermark shows while the text is empty  -->
-    <Style x:Key="KlaFoundationInput" TargetType="TextBox">
+    <Style x:Key="klcFdnTextBoxInput" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
-        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
-        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
+        <Setter Property="Foreground" Value="{StaticResource klcForegroundColor}" />
+        <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="CaretBrush" Value="{StaticResource klcTextColor}" />
         <Setter Property="BorderBrush" Value="{StaticResource klcBorderColor}" />
         <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
         <Setter Property="Height" Value="{StaticResource KlaControlHeight}" />
-        <Setter Property="Padding" Value="{StaticResource KlaTextBoxPadding}" />
+        <Setter Property="Padding" Value="{StaticResource klcPadTextBoxInput}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
@@ -322,7 +323,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{StaticResource KlaRadiusControl}">
+                        CornerRadius="{StaticResource klcRadTextBox}">
                         <Grid>
                             <!--  TextBoxView already applies Padding; a host margin doubles it.  -->
                             <ScrollViewer x:Name="PART_ContentHost" />
@@ -334,9 +335,9 @@
                             <Border Padding="{TemplateBinding Padding}" IsHitTestVisible="False">
                                 <TextBlock
                                     x:Name="Watermark"
-                                    Margin="{StaticResource klaWatermarkInset}"
+                                    Margin="0,0,0,0"
                                     VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    Foreground="{StaticResource klcTextWatermarkColor}"
+                                    Foreground="{StaticResource klcTextColorWaterMark}"
                                     Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
                                     TextAlignment="{TemplateBinding TextAlignment}"
                                     TextTrimming="CharacterEllipsis"
@@ -362,8 +363,8 @@
 
     <!--  ComboBoxItem & ComboBox: item first, then the box that applies it  -->
     <Style x:Key="klaFoundationComboBoxItem" TargetType="ComboBoxItem">
-        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
-        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+        <Setter Property="Foreground" Value="{StaticResource klcForegroundColor}" />
+        <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="Padding" Value="{StaticResource KlaCompactInset}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Template">
@@ -397,12 +398,12 @@
     </Style>
     <Style x:Key="klaFoundationComboBox" TargetType="ComboBox">
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="Height" Value="{StaticResource KlaControlHeight}" />
         <Setter Property="MinWidth" Value="{StaticResource klcButtonWidth}" />
         <Setter Property="MaxDropDownHeight" Value="{StaticResource KlaDropDownMaxHeight}" />
-        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
-        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+        <Setter Property="Foreground" Value="{StaticResource klcForegroundColor}" />
+        <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="BorderBrush" Value="{StaticResource klcBorderColor}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource klaFoundationComboBoxItem}" />
@@ -425,7 +426,7 @@
                                         Background="{TemplateBinding Background}"
                                         BorderBrush="{TemplateBinding BorderBrush}"
                                         BorderThickness="{StaticResource klcBorderHairline}"
-                                        CornerRadius="{StaticResource KlaRadiusControl}">
+                                        CornerRadius="{StaticResource klcRadTextBox}">
                                         <Path
                                             Margin="{StaticResource KlaComboArrowInset}"
                                             HorizontalAlignment="Right"
@@ -460,7 +461,7 @@
                             x:Name="ComboFocus"
                             BorderBrush="Transparent"
                             BorderThickness="{StaticResource klcBorderHairline}"
-                            CornerRadius="{StaticResource KlaRadiusControl}"
+                            CornerRadius="{StaticResource klcRadTextBox}"
                             IsHitTestVisible="False" />
                         <!--  The drop-down is at least as wide as the box.  -->
                         <Popup
@@ -472,7 +473,7 @@
                             <Border
                                 MinWidth="{TemplateBinding ActualWidth}"
                                 MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                                Background="{StaticResource klcWindowColor}"
+                                Background="{StaticResource klcBackgroundColor}"
                                 BorderBrush="{StaticResource klcBorderColor}"
                                 BorderThickness="{StaticResource klcBorderHairline}">
                                 <ScrollViewer
@@ -490,7 +491,6 @@
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-                            <Setter Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -502,7 +502,7 @@
     <Style x:Key="KlaFoundationCheckBox" TargetType="CheckBox">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="ContentTemplate">
             <Setter.Value>
@@ -525,7 +525,7 @@
                             Width="{StaticResource KlaCheckSize}"
                             Height="{StaticResource KlaCheckSize}"
                             VerticalAlignment="Center"
-                            Background="{StaticResource klcWindowColor}"
+                            Background="{StaticResource klcBackgroundColor}"
                             BorderBrush="{StaticResource klcBorderColor}"
                             BorderThickness="{StaticResource klcBorderHairline}"
                             CornerRadius="{StaticResource KlaRadiusCheck}">
@@ -583,7 +583,7 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="MinHeight" Value="{StaticResource klcButtonHeight}" />
         <Setter Property="ContentTemplate">
             <Setter.Value>
@@ -606,7 +606,7 @@
                             Width="{StaticResource KlaCheckSize}"
                             Height="{StaticResource KlaCheckSize}"
                             VerticalAlignment="Center"
-                            Background="{StaticResource klcWindowColor}"
+                            Background="{StaticResource klcBackgroundColor}"
                             BorderBrush="{StaticResource klcBorderColor}"
                             BorderThickness="{StaticResource klcBorderHairline}"
                             CornerRadius="{StaticResource xRadiusRadio}">
@@ -664,7 +664,7 @@
                                 VerticalContentAlignment="Center"
                                 Content="{StaticResource kliconChevRight}"
                                 Foreground="{TemplateBinding Foreground}"
-                                Style="{StaticResource KlaGuiIcon}" />
+                                Style="{StaticResource klcFdnIcon}" />
                             <ContentPresenter VerticalAlignment="Center" />
                         </StackPanel>
                     </Border>
@@ -711,10 +711,10 @@
         <!--  Keep the native WPF row template used by SelectFromDict, including its blue hover/selection.  -->
     </Style>
     <Style x:Key="KlaFoundationList" TargetType="ListBox">
-        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+        <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="Padding" Value="{StaticResource KlaListPadding}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource KlaFoundationListItem}" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Visible" />
@@ -727,7 +727,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{StaticResource KlaBorderStrongBrush}"
                         BorderThickness="{StaticResource klcBorderHairline}"
-                        CornerRadius="{StaticResource KlaRadiusButton}">
+                        CornerRadius="{StaticResource klcRadButton}">
                         <ScrollViewer
                             CanContentScroll="True"
                             Focusable="False"
@@ -746,7 +746,7 @@
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Padding" Value="{StaticResource xHeaderCellInset}" />
         <Style.Triggers>
@@ -790,7 +790,7 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="klaFoundationDataGridRow" TargetType="DataGridRow">
-        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+        <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
@@ -805,10 +805,10 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="klaFoundationDataGrid" TargetType="DataGrid">
-        <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+        <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
         <Setter Property="AutoGenerateColumns" Value="False" />

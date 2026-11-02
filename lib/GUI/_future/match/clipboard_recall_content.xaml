@@ -1,7 +1,7 @@
 <UserControl
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Background="{StaticResource klcWindowColor}">
+    Background="{StaticResource klcBackgroundColor}">
     <!--  Standalone Recall only. The docked panel retains clipboard_content.xaml.  -->
     <UserControl.Resources>
         <ContentControl
@@ -13,12 +13,12 @@
             Content="{StaticResource kliconFutureRegex}"
             Style="{StaticResource xIcon}" />
         <Style x:Key="RecallParameterList" TargetType="ListView">
-            <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
+            <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
             <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
             <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-            <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+            <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
         </Style>
@@ -32,7 +32,7 @@
             <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
             <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-            <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
+            <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
             <Setter Property="Padding" Value="4" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -73,7 +73,7 @@
                     Padding="8,0,28,0"
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search recalled parameters"
-                    Style="{StaticResource KlaFilter}"
+                    Style="{StaticResource klcTextBoxFilter}"
                     TextChanged="search_changed" />
                 <Button
                     x:Name="clrsearch_b"
@@ -98,16 +98,16 @@
                 Margin="0,0,8,0"
                 Click="check_all"
                 Content="{DynamicResource BtnCheckAll}"
-                Style="{StaticResource KlaButton}" />
+                Style="{StaticResource klcButton}" />
             <Button
                 Margin="0,0,8,0"
                 Click="uncheck_all"
                 Content="{DynamicResource BtnUncheckAll}"
-                Style="{StaticResource KlaButton}" />
+                Style="{StaticResource klcButton}" />
             <Button
                 Click="toggle_all"
                 Content="{DynamicResource BtnToggleAll}"
-                Style="{StaticResource KlaButton}" />
+                Style="{StaticResource klcButton}" />
         </StackPanel>
         <ListView
             x:Name="paramListView"

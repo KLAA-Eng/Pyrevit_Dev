@@ -7,7 +7,6 @@
     <!--
         Every shared design value: palette, typography, shape, rhythm, sizes, insets, columns and the window chrome data.
         Styles live in KLCodeFoundation.xaml and KLCodeComponents.xaml. Within each group the values run small to large.
-
         Prefix convention, by reach:
         Kla / klc / kla - reached by a shared dialog (lib/GUI/dialogs), directly or through a style
         x               - only non-dialog windows (tool windows, templates, the Gallery, compiled C#)
@@ -17,9 +16,10 @@
 
     <!--  Palette: brand roles (each value is a KL&A brand colour)  -->
     <!--  KLCharcoal: window, chrome, fields, lists  -->
-    <SolidColorBrush x:Key="klcWindowColor" Color="#1A252B" />
+    <SolidColorBrush x:Key="klcBackgroundColor" Color="#1A252B" />
     <!--  KLWhite: body text, labels, icons  -->
     <SolidColorBrush x:Key="klcTextColor" Color="#E5E4E2" />
+    <SolidColorBrush x:Key="klcForegroundColor" Color="#E5E4E2" />
     <!--  KLGreen: input and dropdown borders, wordmark slash, scrollbar thumb  -->
     <SolidColorBrush x:Key="klcBorderColor" Color="#33714F" />
     <!--  KLGreen-dark: sections, lists, grid lines  -->
@@ -35,7 +35,7 @@
     <!--  muted text: captions, secondary information, the Details header and readout  -->
     <SolidColorBrush x:Key="KlaMutedBrush" Color="#B5C2BD" />
     <!--  placeholder text (the input template's Tag watermark); the same gray as the footer version by owner decision, test-enforced  -->
-    <SolidColorBrush x:Key="klcTextWatermarkColor" Color="#808080" />
+    <SolidColorBrush x:Key="klcTextColorWaterMark" Color="#808080" />
 
     <!--  Palette: control states  -->
     <SolidColorBrush x:Key="KlaFocusBrush" Color="#E5E4E2" />
@@ -59,48 +59,48 @@
 
     <!--  Typography: the one family, then sizes smallest to largest  -->
     <FontFamily x:Key="klcFont">Segoe UI</FontFamily>
-    <sys:Double x:Key="klcBodyFontSize">12</sys:Double>
+    <sys:Double x:Key="klcFontSizeBody">12</sys:Double>
     <sys:Double x:Key="klcButtonFontSize">14</sys:Double>
-    <sys:Double x:Key="klcGroupSearchFontSize">14</sys:Double>
+    <sys:Double x:Key="klcFontSizeFilter">14</sys:Double>
     <sys:Double x:Key="klcDetailsFontSize">14</sys:Double>
     <sys:Double x:Key="klcFooterVersionFontSize">14</sys:Double>
     <sys:Double x:Key="klcButtonFontSizeLarge">16</sys:Double>
     <sys:Double x:Key="klcHeaderTitleFontSize">16</sys:Double>
-    <sys:Double x:Key="klcSectionTitleFontSize">16</sys:Double>
+    <sys:Double x:Key="klcFontSizeSectionHeading">16</sys:Double>
     <sys:Double x:Key="klcWindowPromptFontSize">16</sys:Double>
     <sys:Double x:Key="klcMessageHeaderFontSize">22</sys:Double>
-    <sys:Double x:Key="klcTextDialogFontSize">24</sys:Double>
+    <sys:Double x:Key="klcFontSizeInputPrompt">24</sys:Double>
 
     <!--  Shape: hairline and radii, tightest to roundest  -->
     <Thickness x:Key="klcBorderHairline">1</Thickness>
     <CornerRadius x:Key="KlaRadiusCheck">2</CornerRadius>
     <CornerRadius x:Key="klcScrollThumbRadius">4</CornerRadius>
-    <CornerRadius x:Key="KlaRadiusControl">6</CornerRadius>
+    <CornerRadius x:Key="klcRadTextBox">8</CornerRadius>
     <CornerRadius x:Key="KlaSwitchTrackRadius">6</CornerRadius>
-    <CornerRadius x:Key="KlaRadiusButton">8</CornerRadius>
+    <CornerRadius x:Key="klcRadButton">8</CornerRadius>
     <CornerRadius x:Key="KlaScrollBarRadius">10</CornerRadius>
     <CornerRadius x:Key="KlaCommandPillRadius">12</CornerRadius>
-    <CornerRadius x:Key="KlaWindowFloatingRad">16</CornerRadius>
+    <CornerRadius x:Key="klcRadFloating">16</CornerRadius>
 
     <!--  Rhythm: the 4 / 8 / 16 body spacing and the row heights. GridLength is required for row/column definitions; WPF does not coerce Double.  -->
     <GridLength x:Key="klcBodySpaceSmall">4</GridLength>
     <GridLength x:Key="klcBodySpaceNormal">8</GridLength>
-    <GridLength x:Key="klcBodySpaceLarge">16</GridLength>
+    <GridLength x:Key="klcBodySpaceLarge">12</GridLength>
     <GridLength x:Key="klcChromeHeight">24</GridLength>
-    <GridLength x:Key="klcBodyRowNormal">24</GridLength>
+    <GridLength x:Key="klaBodyRowNormal">24</GridLength>
 
     <!--  Rhythm: window margins  -->
     <Thickness x:Key="klcBodyMargin">16,16,16,8</Thickness>
     <Thickness x:Key="klcHeadFootMargin">4,0,4,0</Thickness>
-    <!-- Note to self: Consider merging with klcBodyMargin, would reduce footer to 20, and make the klcBodyMargin 16  -->
-    <Thickness x:Key="KlaFloatingMargin">16</Thickness>
+    <!--  Note to self: Consider merging with klcBodyMargin, would reduce footer to 20, and make the klcBodyMargin 16  -->
+    <Thickness x:Key="KlaMarginFloatingWindow">16</Thickness>
 
     <!--  Rhythm: gaps between parts. Spacer rows separate fixed parts; these margins sit on parts that can collapse or that stack in code.  -->
-    <Thickness x:Key="KlaStackGapAbove">0,4,0,0</Thickness>
+    <Thickness x:Key="klcStackGapVert">0,8,0,0</Thickness>
     <Thickness x:Key="KlaIconTextGap">0,0,4,0</Thickness>
-    <Thickness x:Key="KlaPairGap">8,0,0,0</Thickness>
+    <Thickness x:Key="klcStackGapHoriz">8,0,0,0</Thickness>
     <Thickness x:Key="KlaActionTopGap">0,8,0,0</Thickness>
-    <Thickness x:Key="KlaStackGapBelow">0,0,0,8</Thickness>
+    <Thickness x:Key="xKlaStackGapBelow">0,0,0,8</Thickness>
     <Thickness x:Key="KlaCommandPillGap">0,0,8,8</Thickness>
     <!--  Deliberate 2-unit optical lift for large single-line text beside an input.  -->
     <Thickness x:Key="KlaOpticalTextInset">0,0,0,2</Thickness>
@@ -109,15 +109,16 @@
 
     <!--  Control sizes: heights, then widths and limits  -->
     <sys:Double x:Key="KlaCompactFieldHeight">24</sys:Double>
+    <sys:Double x:Key="klcFilterHeight">24</sys:Double>
     <sys:Double x:Key="klcButtonHeight">28</sys:Double>
     <sys:Double x:Key="KlaControlHeight">32</sys:Double>
     <sys:Double x:Key="klcDoubleButtonHeight">36</sys:Double>
-    <sys:Double x:Key="KlaTextPromptInputHeight">36</sys:Double>
+    <sys:Double x:Key="klcTextBoxPromptHeight">36</sys:Double>
     <sys:Double x:Key="KlaCommandLinkMinHeight">40</sys:Double>
     <sys:Double x:Key="KlaReadoutMinHeight">64</sys:Double>
     <sys:Double x:Key="KlaOptionMaxHeight">80</sys:Double>
     <sys:Double x:Key="KlaDetailsHeight">128</sys:Double>
-    <sys:Double x:Key="KlaDropDownMaxHeight">260</sys:Double>
+    <sys:Double x:Key="KlaDropDownMaxHeight">240</sys:Double>
     <sys:Double x:Key="klcButtonWidth">104</sys:Double>
     <sys:Double x:Key="klcDoubleButtonWidth">216</sys:Double>
 
@@ -138,15 +139,17 @@
         Native TextBoxView adds two units and the border one: five yields
         the same eight-unit rendered text inset as ComboBox selection text.
     -->
-    <Thickness x:Key="KlaTextBoxPadding">5,0</Thickness>
+    <Thickness x:Key="KlaTextBoxPadding">8,0,0,4</Thickness>
+    <Thickness x:Key="klcPadTextBoxInput">8,0,0,4</Thickness>
     <!--  The native TextBoxView's two units, so the input watermark starts where typed text does.  -->
-    <Thickness x:Key="klaWatermarkInset">2,0</Thickness>
+    <Thickness x:Key="klaWatermarkInset">4,0,0,4</Thickness>
     <Thickness x:Key="KlaListPadding">1</Thickness>
     <Thickness x:Key="KlaItemPadding">4,1</Thickness>
     <Thickness x:Key="KlaCompactInset">8,4</Thickness>
     <Thickness x:Key="KlaReadoutPadding">8</Thickness>
     <!--  Ten plus the TextBoxView's two-unit inset and the hairline aligns readout text with the body at 13.  -->
     <Thickness x:Key="KlaDetailsReadoutPadding">10,8</Thickness>
+    <Thickness x:Key="KlaPadFloating">12</Thickness>
     <Thickness x:Key="KlaSectionPadding">12</Thickness>
     <Thickness x:Key="KlaComboTextInset">8,0,28,0</Thickness>
     <Thickness x:Key="KlaComboArrowInset">0,0,8,0</Thickness>
@@ -157,8 +160,6 @@
     <!--  Column widths  -->
     <GridLength x:Key="KlaCommandLinkIconColumn">24</GridLength>
     <GridLength x:Key="KlaSwitchToggleColumn">28</GridLength>
-    <!--  Rename's local copy of KlaFieldRows uses the narrower label column; folding it back is under review.  -->
-    <GridLength x:Key="KlaRenameLabelColumn">52</GridLength>
     <GridLength x:Key="KlaCompactFieldLabelColumn">60</GridLength>
     <GridLength x:Key="KlaActionColumn">104</GridLength>
     <GridLength x:Key="KlaCompactFieldInputColumn">240</GridLength>
@@ -178,7 +179,7 @@
     <system:Uri x:Key="klcOutreachUri">https://forms.microsoft.com/Pages/ResponsePage.aspx?id=Bfmd9K3MFkqVWdMqprbPvvfxx29Ur-NGhLTDKxuFAqVUMU1OMUpRWDRKUDBMNEFEMlQ2SEJJNFdCUi4u</system:Uri>
 
     <!--  ======================================================================  -->
-    <!--  x  tier: used only by windows that are not shared dialogs (tool windows, templates, the Gallery, compiled C# hosts).  -->
+    <!--  x   TIER: used by tool, template, & C# windows  -->
     <!--  ======================================================================  -->
     <!--  Family Studio's preview surface  -->
     <SolidColorBrush x:Key="xPreviewSurfaceBrush" Color="#10171B" />
@@ -191,13 +192,13 @@
     <sys:Double x:Key="xRadioDotSize">6</sys:Double>
 
     <!--  ======================================================================  -->
-    <!--  xx tier: used only by lib/GUI/_future windows, which no tool opens yet.  -->
+    <!--  xx   TIER: used by lib/GUI/_future windows  -->
     <!--  ======================================================================  -->
     <sys:Double x:Key="xxIconButtonWidth">28</sys:Double>
     <sys:Double x:Key="xxIconTextButtonWidth">128</sys:Double>
 
     <!--  ======================================================================  -->
-    <!--  xxx tier: no consumer anywhere (Python, compiled C#, Gallery, future). Candidates for deletion.  -->
+    <!--  xxx  TIER: no consumer  -->
     <!--  ======================================================================  -->
     <CornerRadius x:Key="xxxCloseRadius">8</CornerRadius>
     <CornerRadius x:Key="xxxWindowRad">8</CornerRadius>
@@ -209,5 +210,4 @@
     <GridLength x:Key="xxxHeaderSideColumn">136</GridLength>
     <Thickness x:Key="xxxCloseGlyphLift">0,0,0,0</Thickness>
     <sys:Double x:Key="xxxSwitchPromptMaxWidth">180</sys:Double>
-
 </ResourceDictionary>

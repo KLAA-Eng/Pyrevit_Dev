@@ -2,66 +2,165 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Rename"
-    Width="346"
-    MinWidth="346"
-    MaxHeight="640"
-    ResizeMode="CanResizeWithGrip"
+    Width="712"
+    MinWidth="384"
     Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
-    <Window.Resources>
-        <!--  Rename uses a tighter label column without changing tool form rows.  -->
-        <Style
-            x:Key="KlaRenameFieldRows"
-            BasedOn="{StaticResource KlaFieldRows}"
-            TargetType="ItemsControl">
-            <Setter Property="ItemsPanel">
-                <Setter.Value>
-                    <ItemsPanelTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="{StaticResource KlaRenameLabelColumn}" />
-                                <ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
-                                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                                <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
-                                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                                <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
-                                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                                <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
-                            </Grid.RowDefinitions>
-                        </Grid>
-                    </ItemsPanelTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid
             x:Name="window_body"
             FocusVisualStyle="{x:Null}"
             Focusable="True"
             KeyboardNavigation.IsTabStop="False">
-            <ScrollViewer
-                x:Name="rename_scroll"
-                HorizontalScrollBarVisibility="Disabled"
-                VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <Grid x:Name="fields_panel" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <!--  Equal cells skip a collapsed group, so one group fills the 384 window and two share 712.  -->
+            <UniformGrid x:Name="groups_panel" Rows="1">
+                <StackPanel x:Name="group_primary">
                     <TextBlock
-                        x:Name="validation_text"
-                        Margin="{StaticResource KlaStackGapAbove}"
-                        Style="{StaticResource klaFeedbackText}" />
-                    <Button
-                        x:Name="accept_button"
-                        Margin="{StaticResource KlaActionTopGap}"
-                        Click="accept_rename"
-                        Content="Rename"
-                        IsDefault="True"
-                        Style="{StaticResource klcButtonDouble}" />
+                        x:Name="heading_primary"
+                        Margin="0,0,0,8"
+                        Style="{StaticResource klaPromptText}"
+                        Text="Sheet Number"
+                        TextWrapping="Wrap" />
+                    <Border Style="{StaticResource KlaSection}">
+                        <ItemsControl Style="{StaticResource KlaFieldRows}">
+                            <Label
+                                Content="Find:"
+                                Style="{StaticResource klcLabelCentered}"
+                                Target="{Binding ElementName=input_primary_find}" />
+                            <TextBox
+                                x:Name="input_primary_find"
+                                Grid.Column="1"
+                                Style="{StaticResource KlaCompactFieldInput}"
+                                TextChanged="text_changed" />
+                            <Label
+                                Grid.Row="2"
+                                Content="Replace:"
+                                Style="{StaticResource klcLabelCentered}"
+                                Target="{Binding ElementName=input_primary_replace}" />
+                            <TextBox
+                                x:Name="input_primary_replace"
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                Style="{StaticResource KlaCompactFieldInput}"
+                                TextChanged="text_changed" />
+                            <Label
+                                Grid.Row="4"
+                                Content="Prefix:"
+                                Style="{StaticResource klcLabelCentered}"
+                                Target="{Binding ElementName=input_primary_prefix}" />
+                            <TextBox
+                                x:Name="input_primary_prefix"
+                                Grid.Row="4"
+                                Grid.Column="1"
+                                Style="{StaticResource KlaCompactFieldInput}"
+                                TextChanged="text_changed" />
+                            <Label
+                                Grid.Row="6"
+                                Content="Suffix:"
+                                Style="{StaticResource klcLabelCentered}"
+                                Target="{Binding ElementName=input_primary_suffix}" />
+                            <TextBox
+                                x:Name="input_primary_suffix"
+                                Grid.Row="6"
+                                Grid.Column="1"
+                                Style="{StaticResource KlaCompactFieldInput}"
+                                TextChanged="text_changed" />
+                        </ItemsControl>
+                    </Border>
                 </StackPanel>
-            </ScrollViewer>
+                <StackPanel x:Name="group_secondary" Margin="{StaticResource klcStackGapHoriz}">
+                    <TextBlock
+                        x:Name="heading_secondary"
+                        Margin="0,0,0,8"
+                        Style="{StaticResource klaPromptText}"
+                        Text="Sheet Name"
+                        TextWrapping="Wrap" />
+                    <Border Style="{StaticResource KlaSection}">
+                        <ItemsControl Style="{StaticResource KlaFieldRows}">
+                            <Label
+                                Content="Find:"
+                                Style="{StaticResource klcLabelCentered}"
+                                Target="{Binding ElementName=input_secondary_find}" />
+                            <TextBox
+                                x:Name="input_secondary_find"
+                                Grid.Column="1"
+                                Style="{StaticResource KlaCompactFieldInput}"
+                                TextChanged="text_changed" />
+                            <Label
+                                Grid.Row="2"
+                                Content="Replace:"
+                                Style="{StaticResource klcLabelCentered}"
+                                Target="{Binding ElementName=input_secondary_replace}" />
+                            <TextBox
+                                x:Name="input_secondary_replace"
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                Style="{StaticResource KlaCompactFieldInput}"
+                                TextChanged="text_changed" />
+                            <Label
+                                Grid.Row="4"
+                                Content="Prefix:"
+                                Style="{StaticResource klcLabelCentered}"
+                                Target="{Binding ElementName=input_secondary_prefix}" />
+                            <TextBox
+                                x:Name="input_secondary_prefix"
+                                Grid.Row="4"
+                                Grid.Column="1"
+                                Style="{StaticResource KlaCompactFieldInput}"
+                                TextChanged="text_changed" />
+                            <Label
+                                Grid.Row="6"
+                                Content="Suffix:"
+                                Style="{StaticResource klcLabelCentered}"
+                                Target="{Binding ElementName=input_secondary_suffix}" />
+                            <TextBox
+                                x:Name="input_secondary_suffix"
+                                Grid.Row="6"
+                                Grid.Column="1"
+                                Style="{StaticResource KlaCompactFieldInput}"
+                                TextChanged="text_changed" />
+                        </ItemsControl>
+                    </Border>
+                </StackPanel>
+            </UniformGrid>
+            <StackPanel
+                x:Name="case_actions"
+                Grid.Row="1"
+                Margin="{StaticResource KlaActionTopGap}"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal">
+                <Button
+                    x:Name="upper_button"
+                    Click="case_upper"
+                    Content="Uppercase"
+                    Style="{StaticResource klcButtonSec}" />
+                <Button
+                    x:Name="lower_button"
+                    Margin="{StaticResource klcStackGapHoriz}"
+                    Click="case_lower"
+                    Content="Lowercase"
+                    Style="{StaticResource klcButtonSec}" />
+            </StackPanel>
+            <TextBlock
+                x:Name="validation_text"
+                Grid.Row="2"
+                Margin="{StaticResource klcStackGapVert}"
+                Style="{StaticResource klcTextBoxFeedback}"
+                TextWrapping="Wrap" />
+            <Button
+                x:Name="accept_button"
+                Grid.Row="4"
+                Click="accept_rename"
+                Content="Rename"
+                IsDefault="True"
+                Style="{StaticResource klcButtonDouble}" />
         </Grid>
     </ContentControl>
 </Window>

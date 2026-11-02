@@ -53,7 +53,7 @@ def _window_types():
             self.finish('cancel')
 
         def feedback(self, text):
-            # klaFeedbackText collapses itself while Text is empty.
+            # klcTextBoxFeedback collapses itself while Text is empty.
             self.validation_text.Text = text or ''
 
     class MessageWindow(DialogWindow):
@@ -156,13 +156,6 @@ def _window_types():
             self.items_list.ItemsSource = self.state.visible_items
             self._ready = True
 
-        def feedback(self, text):
-            from System.Windows import GridLength, Thickness
-
-            DialogWindow.feedback(self, text)
-            self.batch_actions.Margin = self.FindResource('KlaStackGapAbove') if text else Thickness(0)
-            self.secondary_gap.Height = self.FindResource('klcBodySpaceNormal') if text or self.state.multiple else GridLength(0)
-
         def update_checks(self, parent=None):
             # Pull changed checks into realized controls without rebuilding the list:
             # Space/Tab retain keyboard focus and scrolling stays where the user left it.
@@ -232,12 +225,12 @@ def _window_types():
                 return
             inset = self.FindResource('klcBodyMargin')
             bounds = Size(max(1, self.Width - inset.Left - inset.Right), float('inf'))
-            self.prompt_fields.Measure(bounds)
-            self.accept_button.Measure(bounds)
-            # The gap above the button is a grid row, not a margin, so DesiredSize does not include it.
+            for control in (self.input_text, self.validation_text, self.accept_button):
+                control.Measure(bounds)
+            # The two gaps are grid rows, not margins, so DesiredSize does not include them.
             desired = (self.FindResource('klcChromeHeight').Value + inset.Top + inset.Bottom
-                       + self.prompt_fields.DesiredSize.Height + self.FindResource('klcBodySpaceNormal').Value
-                       + self.accept_button.DesiredSize.Height)
+                       + self.input_text.DesiredSize.Height + self.validation_text.DesiredSize.Height
+                       + 2 * self.FindResource('klcBodySpaceSmall').Value + self.accept_button.DesiredSize.Height)
             minimum = min(self.MaxHeight, ceil(desired))
             self.MinHeight = minimum
             # Follow the content until the user resizes with the grip; a resized

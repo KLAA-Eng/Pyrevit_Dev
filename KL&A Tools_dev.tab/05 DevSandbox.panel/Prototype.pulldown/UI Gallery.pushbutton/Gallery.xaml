@@ -10,11 +10,11 @@
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="180"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="190"/></Grid.ColumnDefinitions>
                 <Label Content="_Search" Target="{Binding ElementName=FilterBox}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
-                <TextBox x:Name="FilterBox" Grid.Column="1" Style="{StaticResource KlaFilter}" TextChanged="filter_changed" AutomationProperties.Name="Search windows and calling tools"/>
+                <TextBox x:Name="FilterBox" Grid.Column="1" Style="{StaticResource klcTextBoxFilter}" TextChanged="filter_changed" AutomationProperties.Name="Search windows and calling tools"/>
                 <Label Grid.Column="3" Content="_Origin" Target="{Binding ElementName=OriginFilter}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
-                <ComboBox x:Name="OriginFilter" Grid.Column="4" Style="{StaticResource KlaCompactComboBox}" SelectionChanged="origin_changed" AutomationProperties.Name="Window origin"/>
+                <ComboBox x:Name="OriginFilter" Grid.Column="4" Style="{StaticResource klcComboBoxFilter}" SelectionChanged="origin_changed" AutomationProperties.Name="Window origin"/>
                 <Label Grid.Column="6" Content="_Preview" Target="{Binding ElementName=PreviewFilter}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
-                <ComboBox x:Name="PreviewFilter" Grid.Column="7" Style="{StaticResource KlaCompactComboBox}" SelectionChanged="preview_changed" AutomationProperties.Name="Preview availability"/>
+                <ComboBox x:Name="PreviewFilter" Grid.Column="7" Style="{StaticResource klcComboBoxFilter}" SelectionChanged="preview_changed" AutomationProperties.Name="Preview availability"/>
             </Grid>
             <DataGrid x:Name="EntriesGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" SelectionChanged="selection_changed"
                       Style="{StaticResource xDataGrid}" ScrollViewer.HorizontalScrollBarVisibility="Auto" AutomationProperties.Name="Standalone window catalog">
@@ -73,10 +73,10 @@
             <Grid Grid.Row="5" Margin="0,8,0,0">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="180"/><ColumnDefinition Width="8"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="140"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <Label Content="_Variant" Target="{Binding ElementName=VariantSelector}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
-                <ComboBox x:Name="VariantSelector" Grid.Column="1" Style="{StaticResource KlaCompactComboBox}" DisplayMemberPath="Label" SelectionChanged="preview_choice_changed" AutomationProperties.Name="Preview variant"/>
+                <ComboBox x:Name="VariantSelector" Grid.Column="1" Style="{StaticResource klcComboBoxFilter}" DisplayMemberPath="Label" SelectionChanged="preview_choice_changed" AutomationProperties.Name="Preview variant"/>
                 <Label Grid.Column="3" Content="Preview _state" Target="{Binding ElementName=StateSelector}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
-                <ComboBox x:Name="StateSelector" Grid.Column="4" Style="{StaticResource KlaCompactComboBox}" SelectionChanged="preview_choice_changed" AutomationProperties.Name="Preview state"/>
-                <Button x:Name="LaunchButton" Grid.Column="6" Content="_Open preview" Click="launch_selected" Style="{StaticResource KlaButton}"/>
+                <ComboBox x:Name="StateSelector" Grid.Column="4" Style="{StaticResource klcComboBoxFilter}" SelectionChanged="preview_choice_changed" AutomationProperties.Name="Preview state"/>
+                <Button x:Name="LaunchButton" Grid.Column="6" Content="_Open preview" Click="launch_selected" Style="{StaticResource klcButton}"/>
                 <TextBlock x:Name="LastResult" Grid.Column="7" Margin="12,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{StaticResource KlaMutedBrush}"/>
             </Grid>
         </Grid>
