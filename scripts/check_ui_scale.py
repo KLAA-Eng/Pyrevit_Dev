@@ -4,7 +4,7 @@
 
 Strict files (the shared foundation dictionaries) may not carry numeric layout literals at all: every
 size, gap, radius and border weight is a typed token in KLCodeTokens.xaml. The one exception is the
-sized icon presenters (klaIcon12 ... klaIcon48): their Width/Height is the size the key names, so it
+sized icon presenters (klaIcon16, klaIcon32 and the xxxIcon sizes waiting for a consumer): their Width/Height is the size the key names, so it
 is written in the style (owner decision, 2026-11-01). Consumer windows are
 reported: any Margin / Padding component that is not on the 4 / 8 / 12 / 16 / 24 spacing scale (or 0)
 is listed with its file and line, so the drift is visible without failing the build until the owner
@@ -29,7 +29,7 @@ SPACING = ('Margin', 'Padding')
 NUMBER = r'-?[0-9]+(?:\.[0-9]+)?'
 ATTR = re.compile(r'\b(%s)="(%s(?:,%s){0,3})"' % ('|'.join(LAYOUT), NUMBER, NUMBER))
 SETTER = re.compile(r'Property="(%s)"\s+Value="(%s(?:,%s){0,3})"' % ('|'.join(LAYOUT), NUMBER, NUMBER))
-SIZED_ICON = re.compile(r'<Style\b[^>]*x:Key="klaIcon[0-9]+".*?</Style>', re.S)
+SIZED_ICON = re.compile(r'<Style\b[^>]*x:Key="(?:kla|x{1,3})Icon[0-9]+".*?</Style>', re.S)
 
 
 def literals(text):
@@ -41,7 +41,7 @@ def literals(text):
 
 
 def sized_icon_lines(text):
-    """Line numbers inside a klaIcon<size> style, whose Width/Height literals are allowed."""
+    """Line numbers inside a sized Icon<size> style (any tier prefix), whose Width/Height literals are allowed."""
     lines = set()
     for match in SIZED_ICON.finditer(text):
         first = text.count('\n', 0, match.start()) + 1

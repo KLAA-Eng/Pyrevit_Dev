@@ -4,7 +4,6 @@
     Title="Choose Action"
     Width="560"
     MinWidth="480"
-    MinHeight="0"
     MaxHeight="640"
     ResizeMode="CanResizeWithGrip"
     Style="{StaticResource klcWindow}"
@@ -35,15 +34,15 @@
                         </Grid.ColumnDefinitions>
                         <ContentControl
                             x:Name="severity_icon"
-                            VerticalAlignment="Top"
+                            VerticalAlignment="Center"
                             Style="{StaticResource klaIcon32}"
                             Visibility="Collapsed" />
+                        <!--  The pair gap is set in code when the icon shows, so a collapsed icon leaves no indent.  -->
                         <TextBlock
                             x:Name="instruction_text"
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            FontSize="{StaticResource klcMessageHeaderFontSize}"
-                            Style="{StaticResource KlaSectionHeading}" />
+                            Style="{StaticResource klaMessageHeading}" />
                     </Grid>
                     <TextBlock
                         x:Name="body_text"
@@ -71,17 +70,13 @@
                 Margin="{StaticResource KlaStackGapAbove}"
                 Collapsed="details_changed"
                 Expanded="details_changed"
-                Foreground="{StaticResource KlaMutedBrush}"
                 Header="Details"
-                IsExpanded="False"
                 Style="{StaticResource KlaDetailsExpander}"
                 Visibility="Collapsed">
                 <TextBox
                     x:Name="details_text"
-                    Height="{StaticResource KlaDetailsHeight}"
-                    Margin="{StaticResource KlaStackGapAbove}"
                     AutomationProperties.Name="Detailed action information"
-                    Style="{StaticResource KlaMultilineReadout}" />
+                    Style="{StaticResource KlaDetailsReadout}" />
             </Expander>
             <Grid
                 x:Name="buttons_panel"

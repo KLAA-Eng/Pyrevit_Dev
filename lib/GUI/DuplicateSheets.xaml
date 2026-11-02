@@ -20,7 +20,7 @@
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" MinHeight="8" />
-                <RowDefinition Height="{StaticResource xBodyRowLarge}" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <TextBlock Style="{StaticResource klaPromptText}" Text="Naming" />
             <Border Grid.Row="2" Style="{StaticResource KlaSection}">

@@ -18,19 +18,19 @@
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                <RowDefinition Height="{StaticResource xBodyRowLarge}" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="16" />
-                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <ContentControl
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search"
                     Content="{StaticResource kliconSearch}"
-                    Style="{StaticResource KlaIcon}" />
+                    Style="{StaticResource klaIcon16}" />
                 <TextBox
                     x:Name="review_search"
                     Grid.Column="2"
@@ -41,18 +41,13 @@
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MinWidth="320" />
-                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                     <ColumnDefinition Width="272" MinWidth="200" />
                 </Grid.ColumnDefinitions>
                 <DataGrid
                     x:Name="review_grid"
-                    AutoGenerateColumns="False"
                     AutomationProperties.Name="Sample review items"
-                    CanUserAddRows="False"
-                    CanUserDeleteRows="False"
                     SelectionChanged="review_selection_changed"
-                    SelectionMode="Single"
-                    SelectionUnit="FullRow"
                     Style="{StaticResource xDataGrid}">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Width="40" Header="Use">
@@ -81,19 +76,7 @@
                             Header="Status">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Border>
-                                        <Border.Style>
-                                            <Style BasedOn="{StaticResource xStatusReady}" TargetType="Border">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Status}" Value="Warning">
-                                                        <Setter Property="BorderBrush" Value="{StaticResource klcWarningColor}" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Status}" Value="Blocked">
-                                                        <Setter Property="BorderBrush" Value="{StaticResource klcErrorColor}" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
+                                    <Border Style="{StaticResource xStatusTagChip}" Tag="{Binding Status}">
                                         <TextBlock Style="{StaticResource xStatusText}" Text="{Binding Status}" />
                                     </Border>
                                 </DataTemplate>
@@ -110,10 +93,7 @@
                 </DataGrid>
                 <GridSplitter
                     Grid.Column="1"
-                    Width="4"
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Stretch"
-                    ResizeBehavior="PreviousAndNext"
                     ResizeDirection="Columns"
                     Style="{StaticResource xSplitter}" />
                 <Border Grid.Column="2" Style="{StaticResource KlaSection}">
@@ -138,18 +118,22 @@
                 <TextBlock
                     x:Name="review_summary"
                     AutomationProperties.LiveSetting="Polite"
-                    Style="{StaticResource KlaInfoText}"
-                    TextWrapping="Wrap" />
+                    Style="{StaticResource KlaInfoText}" />
             </Border>
+            <!--  Actions as in the Selection dialog: the secondary action centred above the main one.  -->
             <Grid Grid.Row="6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 <Button
-                    HorizontalAlignment="Left"
                     Click="review_check_all"
                     Content="Check All"
                     Style="{StaticResource KlaButtonSecondary}" />
                 <Button
                     x:Name="primary_action"
-                    HorizontalAlignment="Right"
+                    Grid.Row="2"
                     Click="apply_review"
                     Content="Apply Checked"
                     IsDefault="True"

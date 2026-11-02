@@ -9,4 +9,4 @@ class ListItem:
         self.element    = element
 
 
-from SelectFromDict import select_from_dict  # noqa: E402 — needs my_WPF and ListItem above
+from GUI._superseded.SelectFromDict import select_from_dict  # noqa: E402 — needs my_WPF and ListItem above

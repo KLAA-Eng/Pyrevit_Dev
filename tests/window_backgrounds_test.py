@@ -10,8 +10,8 @@ from xml.etree import ElementTree
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 WINDOW_XAML_PATHS = (
-    'lib/GUI/SelectFromDict.xaml',
-    'lib/GUI/CustomAlert.xaml',
+    'lib/GUI/_superseded/SelectFromDict.xaml',
+    'lib/GUI/_superseded/CustomAlert.xaml',
     'lib/GUI/_future/KLC-CreateFromRooms.xaml',
     'lib/GUI/_future/match/clipboard_window.xaml',
     TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
@@ -29,8 +29,8 @@ ALL_WINDOW_XAML_PATHS = WINDOW_XAML_PATHS + (
 # The static preview fixture deliberately retains its standalone test chrome.
 KL_A_TEMPLATE_WINDOW_XAML_PATHS = (
     TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/UI Gallery.pushbutton/Gallery.xaml',
-    'lib/GUI/SelectFromDict.xaml',
-    'lib/GUI/CustomAlert.xaml',
+    'lib/GUI/_superseded/SelectFromDict.xaml',
+    'lib/GUI/_superseded/CustomAlert.xaml',
     'lib/GUI/DuplicateSheets.xaml',
     'lib/GUI/_future/KLC-CreateFromRooms.xaml',
     'lib/GUI/_future/match/clipboard_window.xaml',
@@ -148,7 +148,7 @@ class WindowBackgroundTests(unittest.TestCase):
 
     def test_search_windows_use_the_template_icon_and_filter_shell(self):
         search_windows = (
-            'lib/GUI/SelectFromDict.xaml',
+            'lib/GUI/_superseded/SelectFromDict.xaml',
             'lib/GUI/_future/KLC-CreateFromRooms.xaml',
             TAB_NAME + '/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
         )
@@ -158,7 +158,7 @@ class WindowBackgroundTests(unittest.TestCase):
                 xaml = xaml_file.read()
 
             self.assertIn('Content="{StaticResource kliconSearch}"', xaml, relative_path)
-            self.assertIn('Style="{StaticResource KlaIcon}"', xaml, relative_path)
+            self.assertIn('Style="{StaticResource xIcon}"', xaml, relative_path)
             self.assertIn('Style="{StaticResource KlaFilter}"', xaml,
                           relative_path)
             self.assertNotIn('search_16px_light.png', xaml, relative_path)

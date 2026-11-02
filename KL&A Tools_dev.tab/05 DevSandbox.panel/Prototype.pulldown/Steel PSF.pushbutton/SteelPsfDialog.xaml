@@ -6,7 +6,7 @@
         <ItemsControl x:Name="window_body" Style="{StaticResource xFilteredCheckList}">
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="16"/><ColumnDefinition Width="8"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                <ContentControl x:Name="filter_icon" Content="{StaticResource kliconSearch}" Style="{StaticResource KlaIcon}" AutomationProperties.Name="Search" VerticalAlignment="Center"/>
+                <ContentControl x:Name="filter_icon" Content="{StaticResource kliconSearch}" Style="{StaticResource xIcon}" AutomationProperties.Name="Search" VerticalAlignment="Center"/>
                 <TextBox x:Name="textbox_filter" Grid.Column="2" TextChanged="text_filter_updated" Style="{StaticResource KlaFilter}" AutomationProperties.Name="Search stories"/>
             </Grid>
             <Label x:Name="text_label" Grid.Row="2" Content="Select Stories to Review:" Target="{Binding ElementName=main_ListBox}" Style="{StaticResource klcLabelPrompt}"/>

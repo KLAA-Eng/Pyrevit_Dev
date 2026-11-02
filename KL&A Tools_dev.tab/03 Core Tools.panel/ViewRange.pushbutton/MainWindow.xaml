@@ -26,6 +26,11 @@
             <Setter Property="TextAlignment" Value="Center" />
         </Style>
     </Window.Resources>
+    <!--
+        NOTE (2026-11-01): this body still uses literal rows, margins and a hand-built table; it needs a full layout rework
+        on the dialog pattern (token spacer rows, Reset above the main action). Only the status colours, the action row
+        height and the pair gap were corrected in this pass.
+    -->
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
@@ -33,7 +38,7 @@
                 <RowDefinition Height="8" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="8" />
-                <RowDefinition Height="32" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <ScrollViewer
                 x:Name="view_message_scroll"
@@ -264,16 +269,23 @@
                             SelectedValuePath="IdValue"
                             Style="{StaticResource KlaCompactComboBox}" />
                     </Grid>
+                    <!--  The status line follows the view model's status_kind: success, warning (default) or error.  -->
                     <TextBlock
                         x:Name="warning"
                         Margin="0,8,0,0"
                         AutomationProperties.LiveSetting="Polite"
-                        Foreground="{StaticResource klcWarningColor}"
                         Text="{Binding warning_message}"
                         TextWrapping="Wrap">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{StaticResource klcWarningColor}" />
                                 <Style.Triggers>
+                                    <DataTrigger Binding="{Binding status_kind}" Value="success">
+                                        <Setter Property="Foreground" Value="{StaticResource klcSuccessColor}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding status_kind}" Value="error">
+                                        <Setter Property="Foreground" Value="{StaticResource klcErrorColor}" />
+                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding warning_message}" Value="">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
@@ -288,12 +300,12 @@
                 HorizontalAlignment="Center"
                 Orientation="Horizontal">
                 <Button
-                    Margin="0,0,8,0"
                     Click="apply_changes_click"
                     Content="Apply Changes"
                     IsEnabled="{Binding can_modify_view}"
                     Style="{StaticResource klcButtonDouble}" />
                 <Button
+                    Margin="{StaticResource KlaPairGap}"
                     Click="reset_values_click"
                     Content="Reset"
                     Style="{StaticResource KlaButtonSecondary}"

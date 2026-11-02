@@ -4,7 +4,6 @@
     Title="Rename"
     Width="346"
     MinWidth="346"
-    MinHeight="0"
     MaxHeight="640"
     ResizeMode="CanResizeWithGrip"
     Style="{StaticResource klcWindow}"
@@ -53,14 +52,10 @@
                     <TextBlock
                         x:Name="validation_text"
                         Margin="{StaticResource KlaStackGapAbove}"
-                        AutomationProperties.LiveSetting="Polite"
-                        Foreground="{StaticResource klcErrorColor}"
-                        TextWrapping="Wrap"
-                        Visibility="Collapsed" />
+                        Style="{StaticResource klaFeedbackText}" />
                     <Button
                         x:Name="accept_button"
                         Margin="{StaticResource KlaActionTopGap}"
-                        AutomationProperties.Name="Rename"
                         Click="accept_rename"
                         Content="Rename"
                         IsDefault="True"

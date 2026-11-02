@@ -162,7 +162,7 @@ class CallerDiscoveryTests(unittest.TestCase):
 
     def test_real_repo_includes_indirect_sheet_picker_and_compiled_consumers(self):
         result = discover_callers(PROJECT_ROOT)
-        selection_titles = [row['title'] for row in result['lib/GUI/SelectFromDict.xaml']]
+        selection_titles = [row['title'] for row in result['lib/GUI/_superseded/SelectFromDict.xaml']]
         self.assertIn('Duplicate Sheets', selection_titles)
         self.assertIn('Carbon GWP Pull', selection_titles)
         compiled = result['src/KLCode.Wpf/Views/KlaAlertWindow.xaml']

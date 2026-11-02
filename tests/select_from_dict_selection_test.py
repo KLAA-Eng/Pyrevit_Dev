@@ -4,7 +4,7 @@ import unittest
 
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SOURCE_PATH = os.path.join(PROJECT_ROOT, 'lib', 'GUI', 'SelectFromDict.py')
+SOURCE_PATH = os.path.join(PROJECT_ROOT, 'lib', 'GUI', '_superseded', 'SelectFromDict.py')
 
 
 def _dialog_methods(source_path=SOURCE_PATH, class_name='SelectFromDict'):

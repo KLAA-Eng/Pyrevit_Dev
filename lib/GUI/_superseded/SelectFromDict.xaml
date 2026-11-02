@@ -23,7 +23,7 @@
                     VerticalAlignment="Center"
                     AutomationProperties.Name="Search"
                     Content="{StaticResource kliconSearch}"
-                    Style="{StaticResource KlaIcon}" />
+                    Style="{StaticResource xIcon}" />
                 <TextBox
                     x:Name="textbox_filter"
                     Grid.Column="2"

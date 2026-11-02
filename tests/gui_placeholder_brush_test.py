@@ -37,9 +37,14 @@ class PlaceholderBrushTests(unittest.TestCase):
                           for t in shown for s in t.iter(P + 'Setter')])
 
     def test_the_dialogs_supply_their_placeholders_and_draw_no_overlay(self):
+        # Selection's filter takes KlaFilter's default watermark instead of its own Tag.
+        components = parse('lib/GUI/Resources/KLCodeComponents.xaml')
+        filter_style = next(s for s in components.iter(P + 'Style') if s.attrib.get(X + 'Key') == 'KlaFilter')
+        self.assertIn(('Tag', 'Type to filter'),
+                      [(s.attrib.get('Property'), s.attrib.get('Value')) for s in filter_style.findall(P + 'Setter')])
         expected = {'TextPromptDialog.xaml': ('input_text', '[ENTER TEXT]'),
                     'CommandSwitchDialog.xaml': ('search_text', 'Type to filter'),
-                    'SelectionDialog.xaml': ('filter_text', 'Type to filter')}
+                    'SelectionDialog.xaml': ('filter_text', None)}
         for name, (box, text) in expected.items():
             root = parse('lib/GUI/dialogs/' + name)
             self.assertEqual(text, named(root, box).attrib.get('Tag'), name)

@@ -213,7 +213,7 @@ def validate_gui_icons():
             assert isinstance(geometry, Geometry) and not geometry.Bounds.IsEmpty, role
             block = StackPanel()
             icon = ContentControl()
-            icon.Style = resources['KlaIcon']
+            icon.Style = resources['xIcon']
             icon.Content = geometry
             block.Children.Add(icon)
             label = TextBlock()

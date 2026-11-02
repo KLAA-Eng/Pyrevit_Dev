@@ -7,11 +7,11 @@
         <ContentControl
             x:Key="filterIcon"
             Content="{StaticResource kliconFutureFilterList}"
-            Style="{StaticResource KlaIcon}" />
+            Style="{StaticResource xIcon}" />
         <ContentControl
             x:Key="regexIcon"
             Content="{StaticResource kliconFutureRegex}"
-            Style="{StaticResource KlaIcon}" />
+            Style="{StaticResource xIcon}" />
         <Style x:Key="RecallParameterList" TargetType="ListView">
             <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
             <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
@@ -86,7 +86,7 @@
                     Click="clear_search"
                     Style="{StaticResource xxIconButton}"
                     Visibility="Collapsed">
-                    <ContentControl Content="{StaticResource kliconFutureClearSearch}" Style="{StaticResource KlaIcon}" />
+                    <ContentControl Content="{StaticResource kliconFutureClearSearch}" Style="{StaticResource xIcon}" />
                 </Button>
             </Grid>
         </Grid>
@@ -169,7 +169,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconFutureTags}"
-                        Style="{StaticResource KlaIcon}" />
+                        Style="{StaticResource xIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -185,7 +185,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconFutureRead}"
-                        Style="{StaticResource KlaIcon}" />
+                        Style="{StaticResource xIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -201,7 +201,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconFutureFilterFunnel}"
-                        Style="{StaticResource KlaIcon}" />
+                        Style="{StaticResource xIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -224,7 +224,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconFuturePointer}"
-                        Style="{StaticResource KlaIcon}" />
+                        Style="{StaticResource xIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -242,7 +242,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconFutureRectSelect}"
-                        Style="{StaticResource KlaIcon}" />
+                        Style="{StaticResource xIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
@@ -259,7 +259,7 @@
                     <ContentControl
                         Margin="0,0,4,0"
                         Content="{StaticResource kliconSuccessAlert}"
-                        Style="{StaticResource KlaIcon}" />
+                        Style="{StaticResource xIcon}" />
                     <TextBlock
                         VerticalAlignment="Center"
                         Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"

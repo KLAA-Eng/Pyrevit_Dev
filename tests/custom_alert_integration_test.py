@@ -62,13 +62,13 @@ class CustomAlertPresentationTests(unittest.TestCase):
             controls(window)
             actions.append('legacy load')
         host = {
-            'WPF_Base': module(my_WPF=Window),
+            'GUI.WPF_Base': module(my_WPF=Window),
             'GUI.window_chrome': module(load_window=load, fit_window_height=fit),
             'System.Windows.Media': module(Brushes=module(Goldenrod='warning', MediumSeaGreen='information')),
             'System.Windows.Automation': module(AutomationProperties=module(SetName=lambda element, name: setattr(element, 'automation_name', name))),
             'wpf': module(LoadComponent=legacy_load),
         }
-        path = os.path.join(GUI_DIR, 'CustomAlert.py')
+        path = os.path.join(GUI_DIR, '_superseded', 'CustomAlert.py')
         spec = importlib.util.spec_from_file_location('custom_alert_adapter_under_test', path)
         adapter = importlib.util.module_from_spec(spec)
         with patch.dict(sys.modules, host):

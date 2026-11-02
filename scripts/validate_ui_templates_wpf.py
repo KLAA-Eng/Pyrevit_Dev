@@ -57,7 +57,7 @@ def validate_template_family():
             if identity == 'template-options' and state == 'Disabled':
                 for widget in (window.option_category, window.scope_selected, window.option_include_existing):
                     labels = [item for item in descendants(widget) if isinstance(item, TextBlock) and item.Text]
-                    assert labels and all(str(label.Foreground) == '#FFA6B0AD' for label in labels), (widget.Name, [(label.Text, str(label.Foreground)) for label in labels])
+                    assert labels and all(str(label.Foreground) == '#FF808080' for label in labels), (widget.Name, [(label.Text, str(label.Foreground)) for label in labels])
             if identity == 'template-review':
                 validate_review_cells(window)
             if hasattr(window, 'primary_action'):

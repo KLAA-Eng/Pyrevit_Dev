@@ -37,9 +37,12 @@ reference action opens external links, modifies a model or accesses sample files
 
 Both templates offer Normal, Empty, Error, Disabled and Long content. Close stays
 available when the body is disabled. Options validates category and finite offset;
-its 24-high category/offset/path fields use the compact component roles and its
-section prompts use `klcLabelPrompt`. The offset unit remains beside
-its input. Include Existing uses the standard self-labelled checkbox.
+its 24-high category/offset/path fields use the compact component roles. Its
+section heading is `klaPromptText`; Output Location is a `klcLabelPrompt` Label
+because it names the path field; Scope is plain text because it heads two radio
+buttons. The offset unit remains beside its input. Include Existing uses the
+standard self-labelled checkbox. Both templates separate fixed parts with token
+spacer rows and stack the secondary action above the main one, as the dialogs do.
 
 Review keeps selected detail separate from checked rows. Checks survive filtering;
 Check All affects visible eligible rows only. Apply Checked uses the complete

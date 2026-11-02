@@ -12,7 +12,7 @@
                         <ColumnDefinition Width="26" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <ContentControl Content="{StaticResource kliconErrorAlert}" Style="{StaticResource KlaIcon}" Foreground="{StaticResource klcErrorColor}" />
+                    <ContentControl Content="{StaticResource kliconErrorAlert}" Style="{StaticResource xIcon}" Foreground="{StaticResource klcErrorColor}" />
                     <TextBlock Grid.Column="1" Text="{StaticResource ResolveIssuesInstruction}" FontSize="12" TextWrapping="Wrap" />
                 </Grid>
             </Border>

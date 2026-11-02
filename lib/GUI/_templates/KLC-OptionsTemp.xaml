@@ -14,16 +14,27 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                <RowDefinition Height="{StaticResource xBodyRowLarge}" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                <StackPanel>
+                <!--  Fixed parts are separated by token spacer rows, as in the shared dialogs; nothing here carries a margin.  -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
                     <TextBlock
                         x:Name="options_prompt"
-                        Margin="0,0,0,8"
                         Style="{StaticResource klaPromptText}"
                         Text="Configure Sample Options" />
-                    <Border Style="{StaticResource KlaSection}">
+                    <Border Grid.Row="2" Style="{StaticResource KlaSection}">
                         <Grid x:Name="options_fields">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}" />
@@ -47,13 +58,13 @@
                             <ComboBox
                                 x:Name="option_category"
                                 Grid.Column="1"
-                                AutomationProperties.Name="Sample category"
                                 Style="{StaticResource KlaCompactComboBox}" />
-                            <Label
+                            <!--  Scope names a group of two radio buttons, not one input, so it is text rather than a Label.  -->
+                            <TextBlock
                                 Grid.Row="2"
-                                Content="Scope"
-                                Style="{StaticResource klcLabelCentered}"
-                                Target="{Binding ElementName=scope_selected}" />
+                                VerticalAlignment="Center"
+                                Style="{StaticResource xText}"
+                                Text="Scope" />
                             <RadioButton
                                 x:Name="scope_selected"
                                 Grid.Row="2"
@@ -75,7 +86,6 @@
                                 Grid.Column="1"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
-                                AutomationProperties.Name="Include existing items"
                                 Content="Include Existing"
                                 Style="{StaticResource KlaCheck}" />
                             <Label
@@ -92,7 +102,6 @@
                                 <TextBox
                                     x:Name="option_offset"
                                     HorizontalContentAlignment="Right"
-                                    AutomationProperties.Name="Sample offset in millimeters"
                                     Style="{StaticResource KlaCompactFieldInput}"
                                     Text="0" />
                                 <TextBlock
@@ -105,15 +114,15 @@
                     </Border>
                     <Label
                         x:Name="output_prompt"
-                        Margin="0,16,0,8"
+                        Grid.Row="4"
                         Content="Output Location"
                         Style="{StaticResource klcLabelPrompt}"
                         Target="{Binding ElementName=option_path}" />
-                    <Border Style="{StaticResource KlaSection}">
+                    <Border Grid.Row="6" Style="{StaticResource KlaSection}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                                 <ColumnDefinition Width="{StaticResource KlaActionColumn}" />
                             </Grid.ColumnDefinitions>
                             <TextBox
@@ -127,14 +136,13 @@
                                 Style="{StaticResource KlaButtonSecondary}" />
                         </Grid>
                     </Border>
-                    <Border Margin="0,16,0,0" Style="{StaticResource KlaBanner}">
+                    <Border Grid.Row="8" Style="{StaticResource KlaBanner}">
                         <TextBlock
                             x:Name="options_feedback"
                             AutomationProperties.LiveSetting="Polite"
-                            Style="{StaticResource KlaInfoText}"
-                            TextWrapping="Wrap" />
+                            Style="{StaticResource KlaInfoText}" />
                     </Border>
-                </StackPanel>
+                </Grid>
             </ScrollViewer>
             <Button
                 x:Name="primary_action"

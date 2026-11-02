@@ -5,7 +5,12 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
 2026-10-28. [source.json](source.json) pins the upstream revision and appearance;
 [LICENSE.lucide.txt](LICENSE.lucide.txt) retains the upstream attribution/notices.
 
-- `svg/` contains the original approved SVG sources.
+- `svg/` contains the approved SVG sources: the pinned Lucide artwork, which the owner rescaled on
+  2026-11-01 so each symbol fills the 24-unit canvas, leaving about one unit for the stroke, and a
+  16-unit icon reads at 16 units. Saved as plain Lucide-format SVG (the root attributes, then bare
+  `path` / `circle` / `rect` / `line` elements with no transforms); an Inkscape save adds groups,
+  transforms and editor metadata the generator rejects, so bake the transforms and strip the
+  metadata before regenerating.
 - [`lib/GUI/Resources/klIcons.xaml`](../../GUI/Resources/klIcons.xaml) is generated framework-native WPF geometry only — one
   `klicon<Role>` per role plus the KLCode logo as one self-contained `klcLogo` template — a leaf that defines no
   brushes. Windows need no SVG renderer or added runtime package.
@@ -14,17 +19,17 @@ The owner selected the Lucide family, mappings and lighter outline treatment on
 
 `KLCodeFoundation.xaml` merges the geometry and owns the presenter, bound to
 tokens (`klcIconSize`, `KlaIconCanvas`, `klcIconStroke`, `KlaDisabledTextBrush`).
-Windows apply it through the Components alias `KlaIcon`. The presenter is the only way to draw a GUI icon: it follows its parent's
+Windows apply it through the sized Components presenters, `klaIcon16` and `klaIcon32` (`xIcon` is the unsized alias the older windows still use). The presenter is the only way to draw a GUI icon: it follows its parent's
 foreground and turns gray when disabled. There are no fixed-color ImageSources
 (removed 2026-10-31).
 
 ```xml
-<ContentControl Style="{StaticResource KlaIcon}"
+<ContentControl Style="{StaticResource klaIcon16}"
                 Content="{StaticResource kliconSearch}"/>
 ```
 
 The presenter uses 16-unit dimensions and a 24-unit source canvas, with a 2-unit
-stroke; `klaIcon12` / `16` / `24` / `32` / `48` give the other sizes. Foreground inherits from its parent control; disabled icons use the
+stroke; `klaIcon32` is the severity size, and `xxxIcon12` / `24` / `48` wait in the xxx tier until a window uses one. Foreground inherits from its parent control; disabled icons use the
 shared `KlaDisabledTextBrush`. Decorative icons do not intercept clicks or focus.
 Do not create per-window copies or replace source SVGs with screenshots.
 See the [design-system usage examples](../../../docs/DESIGNSYSTEM.md#in-window-gui-icons)

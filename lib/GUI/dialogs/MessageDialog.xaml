@@ -25,30 +25,32 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <StackPanel Margin="{StaticResource KlaStackGapBelow}" Orientation="Horizontal">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
                         <ContentControl
                             x:Name="message_icon"
+                            VerticalAlignment="Center"
                             Style="{StaticResource klaIcon32}" />
                         <TextBlock
                             x:Name="message_heading"
+                            Grid.Column="1"
                             Margin="{StaticResource KlaPairGap}"
                             VerticalAlignment="Center"
-                            FontSize="{StaticResource klcMessageHeaderFontSize}"
-                            Style="{StaticResource KlaSectionHeading}" />
-                    </StackPanel>
-                    <ScrollViewer
-                        Grid.Row="1"
+                            Style="{StaticResource klaMessageHeading}" />
+                    </Grid>
+                    <!--  A readout, so the message can be selected and copied; muted like the information text it replaced.  -->
+                    <TextBox
+                        x:Name="message_body"
+                        Grid.Row="2"
                         AutomationProperties.Name="Message content"
-                        Focusable="True"
-                        HorizontalScrollBarVisibility="Disabled"
-                        VerticalScrollBarVisibility="Auto">
-                        <TextBlock
-                            x:Name="message_body"
-                            Style="{StaticResource KlaInfoText}"
-                            TextWrapping="Wrap" />
-                    </ScrollViewer>
+                        Foreground="{StaticResource KlaMutedBrush}"
+                        Style="{StaticResource klaReadout}" />
                 </Grid>
             </Border>
             <!--  Expander: Need Fdn work  -->
@@ -61,16 +63,11 @@
                 VerticalContentAlignment="Center"
                 Collapsed="details_changed"
                 Expanded="details_changed"
-                FontSize="{StaticResource klcDetailsFontSize}"
-                Foreground="{Binding Foreground, ElementName=message_body}"
                 Header="Details"
                 Style="{StaticResource KlaDetailsExpander}">
                 <TextBox
                     x:Name="message_details"
-                    Height="{StaticResource KlaDetailsHeight}"
-                    Margin="{StaticResource klaDetailTextMargin}"
                     AutomationProperties.Name="Detailed message"
-                    Foreground="{Binding Foreground, ElementName=message_body}"
                     Style="{StaticResource KlaDetailsReadout}" />
             </Expander>
             <Button

@@ -3,7 +3,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Enter Text"
     Width="480"
-    Height="Auto"
     Style="{StaticResource klcWindow}"
     WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
@@ -22,29 +21,22 @@
             <StackPanel x:Name="prompt_fields" Grid.Row="0">
                 <TextBox
                     x:Name="input_text"
-                    AcceptsReturn="False"
-                    AcceptsTab="False"
                     AutomationProperties.Name="Text value"
                     Style="{StaticResource KlaTextPromptInput}"
                     Tag="[ENTER TEXT]"
                     TextChanged="text_changed" />
-                <!--  TextBlock: is this textblock necessary   -->
                 <TextBlock
                     x:Name="validation_text"
                     Margin="{StaticResource KlaStackGapAbove}"
-                    AutomationProperties.LiveSetting="Polite"
-                    Foreground="{StaticResource klcErrorColor}"
-                    TextWrapping="Wrap"
-                    Visibility="Collapsed" />
+                    Style="{StaticResource klaFeedbackText}" />
             </StackPanel>
-            <!--  Grid.RowDefinitions: Good  -->
-            <Button 
-                    x:Name="accept_button" Grid.Row="2"
-                    Click="accept_text"
-                    Content="OK"
-                    IsDefault="True"
-                    Style="{StaticResource KlaButton}" >
-            </Button>
+            <Button
+                x:Name="accept_button"
+                Grid.Row="2"
+                Click="accept_text"
+                Content="OK"
+                IsDefault="True"
+                Style="{StaticResource KlaButton}" />
         </Grid>
     </ContentControl>
 </Window>

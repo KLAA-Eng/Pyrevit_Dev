@@ -9,7 +9,7 @@
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="48"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                 <Border x:Name="AlertIconBorder" Width="32" Height="32" Style="{StaticResource xStatusChip}" VerticalAlignment="Top">
-                    <ContentControl x:Name="AlertIcon" Style="{StaticResource KlaIcon}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <ContentControl x:Name="AlertIcon" Style="{StaticResource xIcon}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="8"/><RowDefinition Height="*"/></Grid.RowDefinitions>

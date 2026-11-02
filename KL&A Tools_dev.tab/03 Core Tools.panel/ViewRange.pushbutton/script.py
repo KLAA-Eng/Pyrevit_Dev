@@ -57,6 +57,7 @@ class UpdateViewRangeEventHandler(UI.IExternalEventHandler):
                 )
         except Exception as e:
             if hasattr(self.context, "view_model"):
+                self.context.view_model.status_kind = "error"
                 self.context.view_model.warning_message = (
                     "Error executing view range update: {}".format(str(e))
                 )
@@ -113,9 +114,11 @@ class Context(object):
 
     def update_view_range(self, new_values, new_levels=None):
         if not self.source_view or not isinstance(self.source_view, DB.ViewPlan):
+            self.view_model.status_kind = "warning"
             self.view_model.warning_message = "No valid plan view selected"
             return False
         if self.source_view.IsTemplate:
+            self.view_model.status_kind = "warning"
             self.view_model.warning_message = (
                 "Cannot modify view range - this is a view template"
             )
@@ -188,10 +191,12 @@ class Context(object):
                 # Apply the view range back to the view
                 self.source_view.SetViewRange(view_range)
                 self.context_changed()
+                self.view_model.status_kind = "success"
                 self.view_model.warning_message = "View range updated successfully"
                 return True
 
         except Exception as e:
+            self.view_model.status_kind = "error"
             self.view_model.warning_message = "Error updating view range: {}".format(
                 str(e)
             )
@@ -241,6 +246,7 @@ class Context(object):
                             title="Invalid Number Format",
                             warn_icon=True,
                         )
+                        self.view_model.status_kind = "warning"
                         self.view_model.warning_message = (
                             "Invalid number format: {}".format(offset_str)
                         )
@@ -294,6 +300,7 @@ class Context(object):
                         title="Invalid View Range",
                         warn_icon=True,
                     )
+                    self.view_model.status_kind = "warning"
                     self.view_model.warning_message = "{} must be >= {}".format(
                         higher_name, lower_name
                     )
@@ -302,6 +309,7 @@ class Context(object):
             return True
 
         except Exception as e:
+            self.view_model.status_kind = "error"
             self.view_model.warning_message = "Error validating view range: {}".format(
                 str(e)
             )
@@ -345,6 +353,7 @@ class Context(object):
             self._levels_populated = True
 
         except Exception as e:
+            self.view_model.status_kind = "error"
             self.view_model.warning_message = "Error loading levels: {}".format(str(e))
 
     def _set_current_level_selections(self, view_range):
@@ -396,6 +405,7 @@ class Context(object):
             self.view_model.viewdepth_level_id = stored_selections.get("viewdepth", INVALID_ID_VALUE)
 
         except Exception as e:
+            self.view_model.status_kind = "error"
             self.view_model.warning_message = (
                 "Error setting level selections: {}".format(str(e))
             )
@@ -585,6 +595,7 @@ class MainViewModel(forms.Reactive):
     def __init__(self):
         self._message = None
         self._warning_message = ""
+        self._status_kind = "warning"
         self._can_modify_view = False
 
         # Initialize level-related properties - use INTEGER values for WPF binding
@@ -621,6 +632,15 @@ class MainViewModel(forms.Reactive):
     @warning_message.setter
     def warning_message(self, value):
         self._warning_message = value
+
+    @forms.reactive
+    def status_kind(self):
+        # success, warning or error; the window colours the status line by it
+        return self._status_kind
+
+    @status_kind.setter
+    def status_kind(self, value):
+        self._status_kind = value
 
     @forms.reactive
     def can_modify_view(self):
@@ -797,6 +817,7 @@ class MainWindow(forms.WPFWindow):
 
             context.update_view_range(new_values, new_levels)
         except Exception as ex:
+            self.DataContext.status_kind = "error"
             self.DataContext.warning_message = "Error applying changes: {}".format(
                 str(ex)
             )
@@ -876,6 +897,7 @@ class MainWindow(forms.WPFWindow):
 
             self.DataContext.warning_message = ""
         except Exception as ex:
+            self.DataContext.status_kind = "error"
             self.DataContext.warning_message = "Error resetting values: {}".format(
                 str(ex)
             )

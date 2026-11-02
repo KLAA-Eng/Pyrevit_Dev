@@ -40,13 +40,12 @@
                         x:Name="search_icon"
                         VerticalAlignment="Center"
                         Content="{StaticResource kliconSearch}"
-                        Style="{StaticResource KlaIcon}" />
+                        Style="{StaticResource klaIcon16}" />
                     <TextBox
                         x:Name="filter_text"
                         Grid.Column="2"
                         AutomationProperties.Name="Search items"
                         Style="{StaticResource KlaFilter}"
-                        Tag="Type to filter"
                         TextChanged="filter_changed" />
                 </Grid>
                 <Grid x:Name="group_row" Margin="{StaticResource KlaStackGapAbove}">
@@ -60,7 +59,7 @@
                         x:Name="group_icon"
                         VerticalAlignment="Center"
                         Content="{StaticResource kliconGroup}"
-                        Style="{StaticResource KlaIcon}" />
+                        Style="{StaticResource klaIcon16}" />
                     <ComboBox
                         x:Name="group_filter"
                         Grid.Column="2"
@@ -74,7 +73,6 @@
             <Label
                 x:Name="prompt_label"
                 Grid.Row="2"
-                Content="xxTitle"
                 Style="{StaticResource klcLabelPrompt}"
                 Target="{Binding ElementName=items_list}" />
             <!--  ListBox: Need to do a list clean  -->
@@ -99,12 +97,7 @@
             </ListBox>
             <!--  StackPanel: Is the text blocl necessary  -->
             <StackPanel Grid.Row="6">
-                <TextBlock
-                    x:Name="validation_text"
-                    AutomationProperties.LiveSetting="Polite"
-                    Foreground="{StaticResource klcErrorColor}"
-                    TextWrapping="Wrap"
-                    Visibility="Collapsed" />
+                <TextBlock x:Name="validation_text" Style="{StaticResource klaFeedbackText}" />
                 <StackPanel
                     x:Name="batch_actions"
                     HorizontalAlignment="Center"

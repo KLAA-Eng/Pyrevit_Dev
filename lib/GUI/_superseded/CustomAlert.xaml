@@ -30,7 +30,7 @@
                             x:Name="alert_icon"
                             VerticalAlignment="Center"
                             Content="{StaticResource kliconInfoAlert}"
-                            Style="{StaticResource KlaIcon}" />
+                            Style="{StaticResource xIcon}" />
                         <TextBlock
                             x:Name="alert_heading"
                             Grid.Column="2"

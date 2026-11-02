@@ -41,7 +41,6 @@
                     x:Name="prompt_label"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    Content="xxSearch here:"
                     FontSize="{StaticResource klcWindowPromptFontSize}"
                     FontWeight="SemiBold"
                     Padding="{StaticResource KlaOpticalTextInset}"

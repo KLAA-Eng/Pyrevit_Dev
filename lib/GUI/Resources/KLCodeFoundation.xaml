@@ -11,7 +11,7 @@
         keys; KLCodeComponents.xaml gives each one an alias that changes nothing, plus the variants.
     -->
 
-    <!--  Window: [Enter Notes]  -->
+    <!--  Window: borderless and transparent on the charcoal surface; every TextBlock inherits its font, body size and colour. NoResize unless the window opts in with CanResizeWithGrip.  -->
     <Style x:Key="klcFdnWindow" TargetType="Window">
         <Setter Property="Background" Value="{StaticResource klcWindowColor}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
@@ -84,7 +84,7 @@
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
-    <!--  Label: [Enter Notes]  -->
+    <!--  Label: a field caption drawn as wrapping AccessText with no padding; Target names the input and "_" marks its Alt key  -->
     <Style x:Key="klcFdnLabel" TargetType="Label">
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
@@ -104,7 +104,7 @@
         </Setter>
     </Style>
 
-    <!--  HyperLink: [Enter Notes]  -->
+    <!--  Hyperlink: white on hover and keyboard focus; colour and weight at rest come from the variant  -->
     <!--  Footer links retain the original green and underline; hover/focus is supplied by the foundation link style.  -->
     <Style x:Key="klcFdnLink" TargetType="Hyperlink">
         <Style.Triggers>
@@ -118,7 +118,7 @@
         </Style.Triggers>
     </Style>
 
-    <!--  ContentControl (GUI icons): [Enter Notes]  -->
+    <!--  ContentControl (GUI icons): the one icon presenter; windows apply it through the klaIcon<size> styles in Components  -->
     <!-- KlaGuiIcon presents a klicon<Role> geometry at klcIconSize on the KlaIconCanvas with the klcIconStroke pen,
          inheriting the control's foreground; disabled icons take KlaDisabledTextBrush. It is the only way to draw a GUI icon.-->
     <Style x:Key="KlaGuiIcon" TargetType="ContentControl">
@@ -167,7 +167,7 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
 
-    <!--  ButtonBase: [Enter Notes]  -->
+    <!--  ButtonBase: the one template behind every button and toggle variant  -->
     <!--
         One template for every button variant, ToggleButton included (hence ButtonBase). A variant re-points the klcButton* keys in
         its own Style.Resources rather than copying the template: the state triggers read them by DynamicResource, which resolves
@@ -302,7 +302,7 @@
         </Setter>
     </Style>
 
-    <!--  TextBox: [Enter Notes]  -->
+    <!--  TextBox: charcoal field with a hairline green border that turns white with focus; the Tag watermark shows while the text is empty  -->
     <Style x:Key="KlaFoundationInput" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcBodyFontSize}" />
@@ -498,7 +498,7 @@
         </Setter>
     </Style>
 
-    <!--  CheckBox: [Enter Notes]  -->
+    <!--  CheckBox: a 16 box in the first column, a wrapping caption in the third; checked, indeterminate, hover, pressed and disabled fills  -->
     <Style x:Key="KlaFoundationCheckBox" TargetType="CheckBox">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />

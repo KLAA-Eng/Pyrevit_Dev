@@ -53,8 +53,8 @@ def _window_types():
             self.finish('cancel')
 
         def feedback(self, text):
+            # klaFeedbackText collapses itself while Text is empty.
             self.validation_text.Text = text or ''
-            self.validation_text.Visibility = Visibility.Visible if text else Visibility.Collapsed
 
     class MessageWindow(DialogWindow):
         def __init__(self, title, message, severity, details,

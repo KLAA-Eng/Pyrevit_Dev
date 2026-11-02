@@ -9,7 +9,7 @@
         The implicit TextBox / ComboBox / CheckBox styles apply in both hosts (Python and compiled C#).
     -->
 
-    <!--  Window: [Enter Notes]  -->
+    <!--  Window: the plain alias, then the floating variant  -->
     <Style
         x:Key="klcWindow"
         BasedOn="{StaticResource klcFdnWindow}"
@@ -54,8 +54,31 @@
         TargetType="TextBlock">
         <Setter Property="FontWeight" Value="Normal" />
     </Style>
+    <!--  The severity heading beside a 32 icon (Message, Action Choice); the window colours it per severity.  -->
+    <Style
+        x:Key="klaMessageHeading"
+        BasedOn="{StaticResource KlaSectionHeading}"
+        TargetType="TextBlock">
+        <Setter Property="FontSize" Value="{StaticResource klcMessageHeaderFontSize}" />
+    </Style>
+    <!--
+        A validation line: error colour, announced politely, and collapsed while its Text is empty, so the window only
+        sets Text. A caller that needs a different colour sets Foreground on the element.
+    -->
+    <Style
+        x:Key="klaFeedbackText"
+        BasedOn="{StaticResource klaFoundationTextBlock}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource klcErrorColor}" />
+        <Setter Property="AutomationProperties.LiveSetting" Value="Polite" />
+        <Style.Triggers>
+            <Trigger Property="Text" Value="">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 
-    <!--  Labels: [Enter Notes]  -->
+    <!--  Label: field captions on klcFdnLabel; centred beside a compact field, or the 16-unit prompt that names a list or field  -->
     <Style
         x:Key="klcLabelCentered"
         BasedOn="{StaticResource klcFdnLabel}"
@@ -69,7 +92,7 @@
         <Setter Property="FontSize" Value="{StaticResource klcSectionTitleFontSize}" />
     </Style>
 
-    <!--  HyperLink: [Enter Notes]  -->
+    <!--  Hyperlink: the plain alias, then the bold green footer link the shell applies  -->
     <Style
         x:Key="klcLink"
         BasedOn="{StaticResource klcFdnLink}"
@@ -82,22 +105,11 @@
         <Setter Property="Foreground" Value="{StaticResource klcFooterLinkColor}" />
     </Style>
 
-    <!--  ContentControl (GUI icons): the presenter windows apply; KlaGuiIcon in Foundation draws it.  -->
-    <Style
-        x:Key="KlaIcon"
-        BasedOn="{StaticResource KlaGuiIcon}"
-        TargetType="ContentControl" />
     <!--
-        Sized presenters. The number is the icon's size in window units, so it is written here rather than tokenised
-        (check_ui_scale exempts the klaIcon<size> styles); the stroke stays klcIconStroke and scales with the icon.
+        ContentControl (GUI icons): the sized presenters windows apply; KlaGuiIcon in Foundation draws them. The number is the
+        icon's size in window units, so it is written here rather than tokenised (check_ui_scale exempts the Icon<size> styles);
+        the stroke stays klcIconStroke and scales with the icon. The 12, 24 and 48 sizes wait in the xxx tier until a window uses one.
     -->
-    <Style
-        x:Key="klaIcon12"
-        BasedOn="{StaticResource KlaGuiIcon}"
-        TargetType="ContentControl">
-        <Setter Property="Width" Value="12" />
-        <Setter Property="Height" Value="12" />
-    </Style>
     <Style
         x:Key="klaIcon16"
         BasedOn="{StaticResource KlaGuiIcon}"
@@ -106,28 +118,14 @@
         <Setter Property="Height" Value="16" />
     </Style>
     <Style
-        x:Key="klaIcon24"
-        BasedOn="{StaticResource KlaGuiIcon}"
-        TargetType="ContentControl">
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Height" Value="24" />
-    </Style>
-    <Style
         x:Key="klaIcon32"
         BasedOn="{StaticResource KlaGuiIcon}"
         TargetType="ContentControl">
         <Setter Property="Width" Value="32" />
         <Setter Property="Height" Value="32" />
     </Style>
-    <Style
-        x:Key="klaIcon48"
-        BasedOn="{StaticResource KlaGuiIcon}"
-        TargetType="ContentControl">
-        <Setter Property="Width" Value="48" />
-        <Setter Property="Height" Value="48" />
-    </Style>
 
-    <!--  Border: Section, banner and text  -->
+    <!--  Border: the section group (the plain alias) and the information banner  -->
     <Style
         x:Key="KlaSection"
         BasedOn="{StaticResource klaFoundationBorder}"
@@ -139,7 +137,7 @@
         <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
     </Style>
 
-    <!--  Button: [Enter Notes]  -->
+    <!--  Button: the plain alias, the 216 x 36 main action, the surface-coloured secondary action and the shell's Close  -->
     <Style
         x:Key="KlaButton"
         BasedOn="{StaticResource klcFdnButton}"
@@ -191,6 +189,8 @@
         TargetType="TextBox">
         <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}" />
         <Setter Property="FontSize" Value="{StaticResource klcGroupSearchFontSize}" />
+        <!--  Every filter shares the watermark; a window that needs another sets its own Tag.  -->
+        <Setter Property="Tag" Value="Type to filter" />
     </Style>
     <!--  Text Entry's single large, bold, centred field.  -->
     <Style
@@ -216,6 +216,7 @@
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
@@ -248,7 +249,7 @@
         <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}" />
     </Style>
 
-    <!--  CheckBox: [Enter Notes]  -->
+    <!--  CheckBox: the plain alias, then the dialog row that shows a label and a description  -->
     <Style
         x:Key="KlaCheck"
         BasedOn="{StaticResource KlaFoundationCheckBox}"
@@ -270,7 +271,7 @@
         </Setter>
     </Style>
 
-    <!--  ListBoxItem & ListBox: [Enter Notes]  -->
+    <!--  ListBoxItem & ListBox: the plain aliases, with the dialog row that disables itself when CanSelect is false  -->
     <Style
         x:Key="KlaListItem"
         BasedOn="{StaticResource KlaFoundationListItem}"
@@ -293,7 +294,7 @@
         BasedOn="{StaticResource KlaFoundationList}"
         TargetType="ListBox" />
 
-    <!--  ItemsControl: [Enter Notes]  -->
+    <!--  ItemsControl: fixed row layouts; the direct items stay the window's named controls  -->
     <!--
         UIElement items remain their own containers. Names and event handlers
         stay in the window's namescope; only the repeated layout is shared.
@@ -328,7 +329,7 @@
     <Style BasedOn="{StaticResource KlaCompactComboBox}" TargetType="ComboBox" />
     <Style BasedOn="{StaticResource KlaCheck}" TargetType="CheckBox" />
 
-    <!--  WindowShell: [Enter Notes]  -->
+    <!--  WindowShell: the header band (logo, title, Close), the inset body and the footer band (links, version) around every window body  -->
     <!--  Tag carries the window metadata (Title, VersionText) the header and footer bind to; Content and DataContext stay workflow-owned.  -->
     <Style x:Key="klcWindowShell" TargetType="ContentControl">
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -447,16 +448,22 @@
     <!--  ======================================================================  -->
     <!--  Details Dialog Components  -->
     <!--  ======================================================================  -->
-    <!--  Details disclosure (Message, Action Choice)  -->
+    <!--  Details disclosure (Message, Action Choice): muted, details size, with the 16 chevron the Foundation toggle draws.  -->
     <Style
         x:Key="KlaDetailsExpander"
         BasedOn="{StaticResource klaFoundationExpander}"
-        TargetType="Expander" />
-    <!--  A multiline readout whose text aligns with the dialog body (Message Details); the input template comes from KlaFoundationInput.  -->
+        TargetType="Expander">
+        <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
+        <Setter Property="FontSize" Value="{StaticResource klcDetailsFontSize}" />
+    </Style>
+    <!--  The readout inside the expander: fixed height, muted like its header, text aligned with the dialog body.  -->
     <Style
         x:Key="KlaDetailsReadout"
         BasedOn="{StaticResource KlaMultilineReadout}"
         TargetType="TextBox">
+        <Setter Property="Height" Value="{StaticResource KlaDetailsHeight}" />
+        <Setter Property="Margin" Value="{StaticResource KlaStackGapAbove}" />
+        <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
         <Setter Property="Padding" Value="{StaticResource KlaDetailsReadoutPadding}" />
     </Style>
 
@@ -569,6 +576,12 @@
         BasedOn="{StaticResource klaFoundationTextBlock}"
         TargetType="TextBlock" />
 
+    <!--  x: icons. The unsized alias of KlaGuiIcon (16 by default); the shared dialogs name a size instead.  -->
+    <Style
+        x:Key="xIcon"
+        BasedOn="{StaticResource KlaGuiIcon}"
+        TargetType="ContentControl" />
+
     <!--  x: status chips  -->
     <Style
         x:Key="xStatusChip"
@@ -588,12 +601,6 @@
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
     <Style
-        x:Key="xStatusReady"
-        BasedOn="{StaticResource xStatusChip}"
-        TargetType="Border">
-        <Setter Property="BorderBrush" Value="{StaticResource klcSuccessColor}" />
-    </Style>
-    <Style
         x:Key="xStatusWarning"
         BasedOn="{StaticResource xStatusChip}"
         TargetType="Border">
@@ -604,6 +611,23 @@
         BasedOn="{StaticResource xStatusChip}"
         TargetType="Border">
         <Setter Property="BorderBrush" Value="{StaticResource klcErrorColor}" />
+    </Style>
+    <!--  A chip whose colour follows its Tag (Ready, Warning or Blocked), for a table cell that binds a status value.  -->
+    <Style
+        x:Key="xStatusTagChip"
+        BasedOn="{StaticResource xTableStatusChip}"
+        TargetType="Border">
+        <Style.Triggers>
+            <Trigger Property="Tag" Value="Ready">
+                <Setter Property="BorderBrush" Value="{StaticResource klcSuccessColor}" />
+            </Trigger>
+            <Trigger Property="Tag" Value="Warning">
+                <Setter Property="BorderBrush" Value="{StaticResource klcWarningColor}" />
+            </Trigger>
+            <Trigger Property="Tag" Value="Blocked">
+                <Setter Property="BorderBrush" Value="{StaticResource klcErrorColor}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
     <!--  The caption inside a status chip.  -->
     <Style
@@ -711,7 +735,7 @@
                             <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                            <RowDefinition Height="{StaticResource xBodyRowLarge}" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
@@ -782,8 +806,36 @@
 
     <!--  ======================================================================  -->
     <!--  xxx tier: no consumer anywhere (Python, compiled C#, Gallery, future). Candidates for deletion, except the plain aliases  -->
-    <!--  xxxLabel, xxxComboBoxItem, xxxDataGridHeader and xxxDataGridRow, which give their Foundation base its Components alias.  -->
+    <!--  xxxLabel, xxxComboBoxItem, xxxDataGridHeader and xxxDataGridRow, which give their Foundation base its Components alias,  -->
+    <!--  and the 12 / 24 / 48 icon sizes, which complete the sized-presenter scale.  -->
     <!--  ======================================================================  -->
+    <Style
+        x:Key="xxxIcon12"
+        BasedOn="{StaticResource KlaGuiIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Height" Value="12" />
+    </Style>
+    <Style
+        x:Key="xxxIcon24"
+        BasedOn="{StaticResource KlaGuiIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <Style
+        x:Key="xxxIcon48"
+        BasedOn="{StaticResource KlaGuiIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="48" />
+    </Style>
+    <Style
+        x:Key="xxxStatusReady"
+        BasedOn="{StaticResource xStatusChip}"
+        TargetType="Border">
+        <Setter Property="BorderBrush" Value="{StaticResource klcSuccessColor}" />
+    </Style>
     <Style
         x:Key="xxxLabel"
         BasedOn="{StaticResource klcFdnLabel}"

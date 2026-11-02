@@ -150,7 +150,6 @@ def _window_type():
 
         def feedback(self, text):
             self.validation_text.Text = text or ''
-            self.validation_text.Visibility = Visibility.Visible if text else Visibility.Collapsed
             self.fit_height()
 
         def text_changed(self, sender, args):
