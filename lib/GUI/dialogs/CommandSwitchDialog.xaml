@@ -47,20 +47,14 @@
                     Padding="{StaticResource KlaOpticalTextInset}"
                     Style="{StaticResource klcLabelPrompt}"
                     Target="{Binding ElementName=search_text}" />
-                <Grid Grid.Column="2" VerticalAlignment="Center">
-                    <TextBox
-                        x:Name="search_text"
-                        AutomationProperties.HelpText="Type to filter commands. Tab moves between controls. Escape clears the search, then closes."
-                        Style="{StaticResource KlaInputCompact}"
-                        TextChanged="filter_changed" />
-                    <TextBlock
-                        x:Name="search_hint"
-                        Margin="{StaticResource KlaItemPadding}"
-                        VerticalAlignment="Center"
-                        Foreground="{StaticResource klcTextWatermarkColor}"
-                        IsHitTestVisible="False"
-                        Text="Type to filter" />
-                </Grid>
+                <TextBox
+                    x:Name="search_text"
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    AutomationProperties.HelpText="Type to filter commands. Tab moves between controls. Escape clears the search, then closes."
+                    Style="{StaticResource KlaInputCompact}"
+                    Tag="Type to filter"
+                    TextChanged="filter_changed" />
             </Grid>
             <ScrollViewer
                 x:Name="commands_scroll"

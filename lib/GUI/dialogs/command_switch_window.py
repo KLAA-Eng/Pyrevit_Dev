@@ -189,7 +189,6 @@ def _window_type():
                 button.Visibility = Visibility.Visible if key in visible else Visibility.Collapsed
             self.empty_text.Text = 'No matching commands.' if self.state.choices else 'No commands available.'
             self.empty_text.Visibility = Visibility.Collapsed if visible else Visibility.Visible
-            self.search_hint.Visibility = Visibility.Collapsed if self.search_text.Text else Visibility.Visible
             self.fit_height()
 
         def filter_changed(self, sender, args):

@@ -140,6 +140,8 @@
         the same eight-unit rendered text inset as ComboBox selection text.
     -->
     <Thickness x:Key="KlaTextBoxPadding">5,0</Thickness>
+    <!--  The native TextBoxView's two units, so the input watermark starts where typed text does.  -->
+    <Thickness x:Key="klaWatermarkInset">2,0</Thickness>
     <Thickness x:Key="KlaListPadding">1</Thickness>
     <Thickness x:Key="KlaItemPadding">4,1</Thickness>
     <Thickness x:Key="KlaSectionPadding">12</Thickness>

@@ -77,7 +77,7 @@ compiled WPF.
 | `KlaMutedBrush` | `#B5C2BD` | Secondary captions |
 | `klcFooterLinkColor` | `#407058` | Prototype and Outreach footer links at rest |
 | `klcFooterVersionColor` | `#808080` | Centered caller-version footer text |
-| `klcTextWatermarkColor` | `#808080` | Placeholder text: the Text entry watermark and the Command Switch search hint. The same gray as the footer version by owner decision; a test keeps them equal |
+| `klcTextWatermarkColor` | `#808080` | Placeholder text: the input watermark (Text entry, Command Switch and Selection search). The same gray as the footer version by owner decision; a test keeps them equal |
 | `KlaTextOnAccentBrush` | `#FFFFFF` | Text on accent-filled actions and selected segments |
 | `KlaAccentBrush` | `#286048` | Standard buttons, checked boxes and selected segments |
 | `KlaAccentHoverBrush` | `#407058` | Standard action/dropdown hover background |
@@ -387,6 +387,21 @@ working. A list whose rows the user may copy gets a Copy command instead: Ctrl+C
 and a right-click Copy that copy the selected rows. `xDataGrid` copies its selected
 rows with Ctrl+C natively.
 
+**Placeholder text.** A TextBox's watermark lives in the Foundation input
+template, not in a separate TextBlock. Its text is the TextBox's `Tag`; it shows
+while the box is empty, focused or not, in `klcTextWatermarkColor`, and in the
+box's own font, size, weight, padding and alignment, so it sits where typed text
+starts and follows any font a component sets. There is no default: without a
+`Tag` nothing shows. A component may give one with a `Tag` setter, and a window
+that sets `Tag` replaces it. `Tag` on a TextBox is reserved for this.
+
+```xml
+<TextBox x:Name="search_text" Style="{StaticResource KlaInputCompact}" Tag="Type to filter"/>
+```
+
+The shared dialogs supply theirs: Text Entry `[ENTER TEXT]`, Command Switch and
+Selection `Type to filter`.
+
 For a labeled compact field, the Label names its input:
 
 ```xml
@@ -633,7 +648,7 @@ what the user gives up, with the WCAG 2.1 criterion each touches:
   Headings and Labels, 3.3.2 Labels or Instructions). Message hides the title.
 - Placeholder gray: `klcTextWatermarkColor` #808080 is 3.96:1 on the window.
   That passes for the 24-unit bold Text watermark and is below 4.5:1 for the
-  12-unit Command Switch hint (1.4.3). Owner decision, 2026-10-31.
+  12-unit Command Switch and 14-unit Selection search watermarks (1.4.3). Owner decision, 2026-10-31.
 - Command Switch toggle pill: the KLWhite thumb on the #B5C2BD track is 1.45:1
   and the checked #33714F track is 2.33:1 on the pill, under the 3:1 for control
   states (1.4.11). The thumb's side also shows the state. Owner kept the current
@@ -727,8 +742,8 @@ measurement grows the bottom and protects the message viewport until capped.
 Message leaves its center chrome title blank while retaining caller Window.Title
 metadata and Close. Text removes its footer row and visible prompt header and
 uses the larger Segoe UI Bold single-line field, with an empty-field `[ENTER TEXT]`
-watermark that is never input data. It uses footer version gray (#808080), centers
-vertically, and disappears whenever the input has keyboard focus. Text opens
+watermark that is never input data. It uses footer version gray (#808080), sits on
+the line the typed text will take, and shows whenever the field is empty, focused or not. Text opens
 with neutral body focus and a blank center chrome title, retaining caller
 Window.Title metadata and Close. The caller prompt remains an accessible name.
 Its compact height fits input/error. Its only visible

@@ -18,46 +18,16 @@
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <!--  StackPanel: Needs Cleaning. There should be a way to incorporate the water mark into the text box in the components page. Need to Work on foundation for text inputs.   -->
+            <!--  StackPanel: Needs Cleaning. Need to Work on foundation for text inputs.   -->
             <StackPanel x:Name="prompt_fields" Grid.Row="0">
-                <!--  Grid: Work on including the water mark into the textbox style   -->
-                <Grid>
-                    <TextBox
-                        x:Name="input_text"
-                        AcceptsReturn="False"
-                        AcceptsTab="False"
-                        AutomationProperties.Name="Text value"
-                        Style="{StaticResource KlaTextPromptInput}"
-                        TextChanged="text_changed" />
-                    <!--  Compact line height plus the optical inset centers the visible capital glyphs.  -->
-                    <TextBlock
-                        x:Name="input_placeholder"
-                        Margin="{StaticResource KlaOpticalTextInset}"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        FontSize="{StaticResource klcTextDialogFontSize}"
-                        FontWeight="Bold"
-                        Foreground="{StaticResource klcTextWatermarkColor}"
-                        IsHitTestVisible="False"
-                        LineHeight="24"
-                        LineStackingStrategy="BlockLineHeight"
-                        Text="[ENTER TEXT]">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding Text, ElementName=input_text}" Value="" />
-                                            <Condition Binding="{Binding IsKeyboardFocusWithin, ElementName=input_text}" Value="False" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </MultiDataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </Grid>
+                <TextBox
+                    x:Name="input_text"
+                    AcceptsReturn="False"
+                    AcceptsTab="False"
+                    AutomationProperties.Name="Text value"
+                    Style="{StaticResource KlaTextPromptInput}"
+                    Tag="[ENTER TEXT]"
+                    TextChanged="text_changed" />
                 <!--  TextBlock: is this textblock necessary   -->
                 <TextBlock
                     x:Name="validation_text"

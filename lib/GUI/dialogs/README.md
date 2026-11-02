@@ -143,8 +143,9 @@ with an 8-unit gap below the message or Details content.
 
 Text options are `default=''`, `required=False`, `validator=None`. The field is
 36 high, FontSize 24, centered Segoe UI Bold. No visible prompt header is shown;
-an empty, unfocused field displays `[ENTER TEXT]` as a vertically centered
-watermark in `klcTextWatermarkColor` gray (#808080), the footer version gray. Focusing the input hides it.
+an empty field displays `[ENTER TEXT]` as the input template's watermark (the
+TextBox `Tag`) in `klcTextWatermarkColor` gray (#808080), the footer version gray, on the line typed text takes.
+It stays while the empty field is focused and goes once text is typed.
 It is never returned as
 input. The caller prompt still labels the input for accessibility. Compact
 height fits input/error. The center chrome title is blank; caller Window.Title
@@ -308,7 +309,7 @@ The opt-in `-ShowFocusProbe` Windows run briefly opens owned fictional
 windows: UIA identifies the search field, initial Command Switch focus stays on
 the neutral panel, and programmatically focused buttons/checks retain their
 normal borders. Rename also opens with neutral body focus and no field selected.
-Text opens neutrally, with a blank center title and watermark focus/blur checks.
+Text opens neutrally, with a blank center title and watermark empty/typed checks.
 Action Choice fixtures verify default focus, Enter-only action activation,
 checkbox Space behavior and permitted/blocked cancellation.
 An additional owned Switch fixture checks capture, context-menu preservation,

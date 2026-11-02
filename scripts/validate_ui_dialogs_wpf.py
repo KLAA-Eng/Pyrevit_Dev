@@ -162,8 +162,9 @@ def validate_shared_dialogs():
                 assert len(buttons) == 1 and buttons[0] == window.accept_button
                 if state in ('Normal', 'Empty', 'Error'):
                     assert window.FindName('prompt_label') is None, 'Text Entry has no visible prompt header'
-                    assert window.input_placeholder.Text == '[ENTER TEXT]'
-                    assert window.input_placeholder.Visibility == (Visibility.Visible if not window.input_text.Text else Visibility.Collapsed)
+                    watermark = window.input_text.Template.FindName('Watermark', window.input_text)
+                    assert window.input_text.Tag == '[ENTER TEXT]' and watermark.Text == '[ENTER TEXT]'
+                    assert watermark.Visibility == (Visibility.Visible if not window.input_text.Text else Visibility.Collapsed)
                     last = window.validation_text if state == 'Error' else window.input_text
                     field_bottom = last.TranslatePoint(Point(0, last.ActualHeight), window.Content).Y
                     button_top = window.accept_button.TranslatePoint(Point(0, 0), window.Content).Y
@@ -310,21 +311,23 @@ def validate_shared_dialogs():
 
     window = create_text_prompt('Blank', 'Optional value')
     dialog_layout(window)
-    assert window.input_text.Text == '' and window.input_placeholder.Visibility == Visibility.Visible
-    watermark_ink = VisualTreeHelper.GetDrawing(window.input_placeholder).Bounds
-    watermark_y = window.input_placeholder.TranslatePoint(Point(0, watermark_ink.Y + watermark_ink.Height / 2), window.input_text).Y
-    assert abs(watermark_y - window.input_text.ActualHeight / 2) < 0.5, 'Watermark ink center: {}'.format(watermark_y)
+    watermark = window.input_text.Template.FindName('Watermark', window.input_text)
+    assert window.input_text.Text == '' and watermark.Visibility == Visibility.Visible
+    # The watermark is the input's own line: it sits where the typed text will.
+    watermark_y = watermark.TranslatePoint(Point(0, watermark.ActualHeight / 2), window.input_text).Y
     window.input_text.Text = 'Caller text'
     dialog_layout(window)
-    assert window.input_placeholder.Visibility == Visibility.Collapsed
+    typed = window.input_text.GetRectFromCharacterIndex(0)
+    assert abs(watermark_y - (typed.Top + typed.Height / 2)) < 0.5, 'Watermark line center: {} vs {}'.format(watermark_y, typed)
+    assert watermark.Visibility == Visibility.Collapsed
     window.input_text.Clear()
     dialog_layout(window)
-    assert window.input_placeholder.Visibility == Visibility.Visible
+    assert watermark.Visibility == Visibility.Visible
     click(window.accept_button)
     assert window.result.action == 'accept' and window.result.value == ''
     window = create_text_prompt('Initial value', 'Optional value', default='Caller initial value')
     dialog_layout(window)
-    assert window.input_placeholder.Visibility == Visibility.Collapsed
+    assert window.input_text.Template.FindName('Watermark', window.input_text).Visibility == Visibility.Collapsed
     click(window.accept_button)
     assert window.result.value == 'Caller initial value'
     window = create_text_prompt('Validated', 'Required value', required=True,

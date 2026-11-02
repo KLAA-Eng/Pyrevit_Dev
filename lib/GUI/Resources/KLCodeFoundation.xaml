@@ -323,10 +323,31 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{StaticResource KlaRadiusControl}">
-                        <!--  TextBoxView already applies Padding; a host margin doubles it.  -->
-                        <ScrollViewer x:Name="PART_ContentHost" />
+                        <Grid>
+                            <!--  TextBoxView already applies Padding; a host margin doubles it.  -->
+                            <ScrollViewer x:Name="PART_ContentHost" />
+                            <!--
+                                Watermark: the TextBox's Tag, shown while the box is empty, in the box's own font, size, weight and
+                                alignment so it sits where typed text starts. No Tag, no watermark. A component may give a default
+                                Tag; a window that sets Tag replaces it.
+                            -->
+                            <Border Padding="{TemplateBinding Padding}" IsHitTestVisible="False">
+                                <TextBlock
+                                    x:Name="Watermark"
+                                    Margin="{StaticResource klaWatermarkInset}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    Foreground="{StaticResource klcTextWatermarkColor}"
+                                    Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                    TextAlignment="{TemplateBinding TextAlignment}"
+                                    TextTrimming="CharacterEllipsis"
+                                    Visibility="Collapsed" />
+                            </Border>
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter TargetName="Watermark" Property="Visibility" Value="Visible" />
+                        </Trigger>
                         <Trigger Property="IsKeyboardFocusWithin" Value="True">
                             <Setter TargetName="InputBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}" />
                         </Trigger>

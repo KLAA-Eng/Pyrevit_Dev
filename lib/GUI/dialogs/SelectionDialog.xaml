@@ -46,6 +46,7 @@
                         Grid.Column="2"
                         AutomationProperties.Name="Search items"
                         Style="{StaticResource KlaFilter}"
+                        Tag="Type to filter"
                         TextChanged="filter_changed" />
                 </Grid>
                 <Grid x:Name="group_row" Margin="{StaticResource KlaStackGapAbove}">

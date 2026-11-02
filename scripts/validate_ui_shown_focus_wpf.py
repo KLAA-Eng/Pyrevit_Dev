@@ -15,6 +15,8 @@ def validate_shown_focus():
         peer = UIElementAutomationPeer.CreatePeerForElement(window.search_text)
         # The visible prompt Label names the search box; it carries no AutomationProperties.Name of its own.
         assert peer.GetName() == 'Choose a Command' and str(peer.GetAutomationControlType()) == 'Edit'
+        hint = window.search_text.Template.FindName('Watermark', window.search_text)
+        assert hint.Text == 'Type to filter' and hint.Visibility == Visibility.Visible
         assert FocusManager.GetFocusedElement(window) == window.window_body
         assert not window.search_text.IsKeyboardFocusWithin and window.search_text.SelectionLength == 0
         button = window._command_buttons['first']
@@ -67,23 +69,24 @@ def validate_shown_focus():
         settle_layout(window.Content)
         assert FocusManager.GetFocusedElement(window) == window.window_body
         assert not window.input_text.IsKeyboardFocusWithin and window.input_text.SelectionLength == 0
-        assert window.input_placeholder.Visibility == Visibility.Visible
+        watermark = window.input_text.Template.FindName('Watermark', window.input_text)
+        assert watermark.Visibility == Visibility.Visible
         assert window._kla_chrome.title.Visibility == Visibility.Collapsed
-        assert window.input_placeholder.Foreground == window.FindResource('klcTextWatermarkColor')
+        assert watermark.Foreground == window.FindResource('klcTextWatermarkColor')
         window.input_text.Focus()
         settle_layout(window.Content)
-        assert window.input_placeholder.Visibility == Visibility.Collapsed, 'Focus hides the empty watermark'
+        assert watermark.Visibility == Visibility.Visible, 'An empty field keeps its watermark while focused'
         window.input_text.Text = 'Caller text'
         window.input_text.SelectAll()
         window.window_body.Focus()
         settle_layout(window.Content)
-        assert window.input_placeholder.Visibility == Visibility.Collapsed, 'Nonempty text never shows the watermark'
+        assert watermark.Visibility == Visibility.Collapsed, 'Nonempty text never shows the watermark'
         window.input_text.Clear()
         settle_layout(window.Content)
-        assert window.input_placeholder.Visibility == Visibility.Visible, 'Empty unfocused field restores the watermark'
+        assert watermark.Visibility == Visibility.Visible, 'An emptied field restores the watermark'
         if output_directory:
             render_content(window, os.path.join(output_directory, 'text-entry-shown-neutral.png'), window.Width, window.Height)
-        print('Shown Text Entry: neutral initial focus, blank center title, gray watermark hidden on focus and restored on empty blur passed.')
+        print('Shown Text Entry: neutral initial focus, blank center title, gray watermark shown while empty, focused or not, and hidden by text passed.')
     finally:
         window.Close()
     print('Four owned fictional windows closed. No Revit, user documents or system-wide input injection used.')
