@@ -302,7 +302,7 @@ def validate_wordmark():
     svg = ElementTree.parse(os.path.join(repo_root, 'lib', '_logos', 'klcLogo.svg'))
     group = next(svg.iter('{http://www.w3.org/2000/svg}g'))
     a, b, c, d, e, f = [float(v) for v in group.attrib['transform'][7:-1].split(',')]
-    for source, role in zip(svg.iter('{http://www.w3.org/2000/svg}path'), ('klcBorderColor', 'klcTextColor')):
+    for source, role in zip(svg.iter('{http://www.w3.org/2000/svg}path'), ('klcColorGreen', 'klcTextColor')):
         path = Path()
         path.Data = Geometry.Parse(source.attrib['d'])
         path.Fill = owner.FindResource(role)

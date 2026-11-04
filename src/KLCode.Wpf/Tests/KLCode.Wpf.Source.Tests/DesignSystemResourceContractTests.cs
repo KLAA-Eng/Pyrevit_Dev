@@ -18,7 +18,7 @@ public sealed class DesignSystemResourceContractTests
         "KlaTextOnAccentBrush",
         "KlaAccentBrush",
         "KlaAccentHoverBrush",
-        "klcBorderColor",
+        "klcColorGreen",
         "KlaBorderStrongBrush",
     };
 

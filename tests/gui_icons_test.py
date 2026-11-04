@@ -37,7 +37,7 @@ class GuiIconTests(unittest.TestCase):
         self.assertEqual(len(icons.ROLES) + 1, len(dictionary), 'icon groups and the one klcLogo template')
         text = icons.generate_icons()
         self.assertNotIn('StaticResource', text, 'every resource is self-contained')
-        self.assertEqual({'klcBorderColor', 'klcTextColor'}, set(re.findall(r'\{DynamicResource ([^}]+)\}', text)))
+        self.assertEqual({'klcColorGreen', 'klcTextColor'}, set(re.findall(r'\{DynamicResource ([^}]+)\}', text)))
         self.assertEqual([], [node for node in dictionary.iter() if node.tag.endswith('Brush')], 'defines no brushes')
         self.assertFalse((ROOT / 'lib' / '_logos' / 'KLCodeWordmark.xaml').exists(), 'the logo lives in klIcons.xaml')
         self.assertFalse((icons.ASSETS / 'klIcons.xaml').exists(), 'klIcons.xaml lives in lib/GUI/Resources')
@@ -77,7 +77,7 @@ class GuiIconTests(unittest.TestCase):
         self.assertEqual(('1024', '146'), (canvas.attrib['Width'], canvas.attrib['Height']), 'the SVG view box')
         paths = canvas.findall(P + 'Path')
         self.assertEqual(svg_paths, [path.attrib['Data'] for path in paths], 'outlines keep the SVG coordinates')
-        self.assertEqual(['{DynamicResource klcBorderColor}', '{DynamicResource klcTextColor}'], [path.attrib['Fill'] for path in paths])
+        self.assertEqual(['{DynamicResource klcColorGreen}', '{DynamicResource klcTextColor}'], [path.attrib['Fill'] for path in paths])
         # The SVG group's scale and offset, unrounded, on each outline.
         self.assertEqual({'1.0666642,0,0,1.0681867,-34.133255,-69.02212'}, {path.attrib['RenderTransform'] for path in paths})
         self.assertNotIn('#33714F', icons.generate_icons())

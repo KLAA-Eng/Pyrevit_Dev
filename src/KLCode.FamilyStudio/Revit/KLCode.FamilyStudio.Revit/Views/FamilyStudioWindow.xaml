@@ -25,7 +25,7 @@
                         <RadioButton Content="{StaticResource ViewsModeLabel}" IsEnabled="False" GroupName="ContentMode" Style="{StaticResource KlaSegmentButtonStyle}" Margin="{StaticResource klcStackGapHoriz}" ToolTip="{StaticResource ViewsUnavailableLabel}" />
                     </StackPanel>
                 </Border>
-                <Border Grid.Column="2" BorderBrush="{StaticResource klcBorderColor}" BorderThickness="1" CornerRadius="5">
+                <Border Grid.Column="2" BorderBrush="{StaticResource klcColorGreen}" BorderThickness="1" CornerRadius="5">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="24" />

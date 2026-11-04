@@ -4,7 +4,7 @@
     </ResourceDictionary.MergedDictionaries>
     <Style x:Key="KlaWindowStyle" TargetType="Window" BasedOn="{StaticResource klcFdnWindow}" />
     <Style x:Key="KlaButtonStyle" TargetType="Button" BasedOn="{StaticResource klcFdnButton}" />
-    <Style x:Key="KlaCloseButtonStyle" TargetType="Button" BasedOn="{StaticResource klcCloseButton}" />
+    <Style x:Key="KlaCloseButtonStyle" TargetType="Button" BasedOn="{StaticResource klcButtonClose}" />
     <Style x:Key="KlaGhostButtonStyle" TargetType="Button" BasedOn="{StaticResource xGhostButton}" />
     <Style x:Key="KlaLinkButtonStyle" TargetType="Button" BasedOn="{StaticResource xLinkButton}" />
     <Style x:Key="KlaSegmentButtonStyle" TargetType="RadioButton" BasedOn="{StaticResource xSegmentButton}" />
