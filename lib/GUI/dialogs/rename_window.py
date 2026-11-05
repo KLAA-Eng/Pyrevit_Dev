@@ -10,8 +10,6 @@ _WINDOW_TYPE = None
 # RenameDialog.xaml spells out both groups; one field uses the primary group only.
 GROUPS = ('primary', 'secondary')
 RULES = ('find', 'replace', 'prefix', 'suffix')
-# The Find/Replace tool widths: Views for one group, Sheets for two.
-WIDTHS = {1: 384, 2: 712}
 
 
 def _window_type():
@@ -55,7 +53,6 @@ def _window_type():
                 self.group_secondary.Visibility = Visibility.Collapsed
             if state.case_field is None:
                 self.case_actions.Visibility = Visibility.Collapsed
-            self.Width = self.MinWidth = WIDTHS[len(self.slots)]
             self._ready = True
             self.fit_height()
             self.Loaded += self.focus_input

@@ -70,7 +70,8 @@ def fit_window_height(window):
     from math import ceil
     from System.Windows import Size
 
-    window.Content.Measure(Size(window.Width, float('inf')))
+    width = window.Width if window.Width == window.Width else float('inf')
+    window.Content.Measure(Size(width, float('inf')))
     height = max(window.MinHeight, min(window.MaxHeight, ceil(window.Content.DesiredSize.Height)))
     window.Height = height
     return height
