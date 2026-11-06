@@ -96,9 +96,13 @@ def _window_type():
                 self.commands_panel.Children.Add(button)
                 self.command_buttons[row.Key] = button
             self.commands_panel.Visibility = Visibility.Visible if state.choices else Visibility.Collapsed
-            # Four standard actions fit at the supported minimum width. Extra
-            # buttons use a right-aligned second row with the standard 8 gap.
-            columns = min(4, len(state.buttons))
+            # Fit whole standard buttons within the current body width.
+            inset = self._kla_chrome.body.Margin
+            available = max(1, self.Width - inset.Left - inset.Right)
+            action_width = self.FindResource('KlaActionColumn').Value
+            action_gap = self.FindResource('klcBodySpaceNormal').Value
+            capacity = max(1, int((available + action_gap) // (action_width + action_gap)))
+            columns = min(4, len(state.buttons), capacity)
             for index in range(columns):
                 column = ColumnDefinition()
                 column.Width = self.FindResource('KlaActionColumn')
@@ -107,7 +111,7 @@ def _window_type():
                     gap = ColumnDefinition()
                     gap.Width = self.FindResource('klcBodySpaceNormal')
                     self.buttons_panel.ColumnDefinitions.Add(gap)
-            rows = (len(state.buttons) + 3) // 4
+            rows = (len(state.buttons) + columns - 1) // columns if columns else 0
             for index in range(rows):
                 self.buttons_panel.RowDefinitions.Add(RowDefinition())
                 if index < rows - 1:
@@ -119,10 +123,10 @@ def _window_type():
                 button.Style = self.FindResource('klcButton')
                 button.Content = 'OK' if name == 'ok' else name.capitalize()
                 button.Tag = ('button', name)
-                row = index // 4
-                in_row = min(4, len(state.buttons) - row * 4)
+                row = index // columns
+                in_row = min(columns, len(state.buttons) - row * columns)
                 Grid.SetRow(button, row * 2)
-                Grid.SetColumn(button, (columns - in_row + index % 4) * 2)
+                Grid.SetColumn(button, (columns - in_row + index % columns) * 2)
                 button.Click += self.action_clicked
                 AutomationProperties.SetName(button, button.Content)
                 self.buttons_panel.Children.Add(button)
@@ -221,13 +225,6 @@ def _window_type():
             elif key == Key.F4 and args.Key == Key.System:
                 # Alt+F4 is a user dismissal, so it obeys the cancellation policy.
                 if not self.state.can_cancel:
-                    args.Handled = True
-            elif key == Key.Space:
-                # Preserve checkbox toggling and text scrolling, but never let
-                # WPF ButtonBase turn Space into a command or common-button Click.
-                focused = Keyboard.FocusedElement
-                details_toggle = self.details_expander.Template.FindName('DetailsToggle', self.details_expander)
-                if focused in list(self.command_buttons.values()) + list(self.common_buttons.values()) + [self._kla_chrome.close_button, details_toggle]:
                     args.Handled = True
             elif key == Key.Enter:
                 args.Handled = True
