@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Message"
     Width="432"
-    Height="360"
     MinWidth="432"
     MinHeight="240"
     MaxHeight="640"
@@ -18,14 +17,14 @@
             <!--  Grid.RowDefinitions: Good  -->
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
-                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <!--  Border: Needs Fdn Work - Remove Placeholders  -->
-            <Border x:Name="message_banner" Style="{StaticResource KlaBanner}">
-                <!--  Grid: Fdn Work Needed - Remove Placeholders  -->
+            <!--  Border: Good  -->
+            <Border x:Name="message_banner" Style="{StaticResource klcBorder}">
+                <!--  Grid: Good  -->
                 <Grid>
                     <!--  Grid.RowDefinitions: Good  -->
                     <Grid.RowDefinitions>
@@ -33,7 +32,7 @@
                         <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <!--  Grid: Good - Remove Placeholders  -->
+                    <!--  Grid: Good   -->
                     <Grid>
                         <!--  Grid.ColumnDefinitions: Good  -->
                         <Grid.ColumnDefinitions>
@@ -51,45 +50,42 @@
                         <TextBlock
                             x:Name="message_heading"
                             Grid.Column="2"
-                            VerticalAlignment="Bottom"
-                            Style="{StaticResource klcTextBoxMessageHead}" Margin="0,0,0,2" />
+                            Margin="0,0,0,1"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource klcTextBlockHeadMessage}" />
                     </Grid>
-                    <!--  TextBox: Fdn Work Needed - Remove Placeholder Text  -->
+                    <!--  TextBox: Good  -->
                     <TextBox
                         x:Name="message_body"
                         Grid.Row="2"
                         AutomationProperties.Name="Message content"
-                        Foreground="{StaticResource KlaMutedBrush}"
-                        Style="{StaticResource klaReadout}"
-                        Text="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeddddddd" />
+                        Style="{StaticResource klcTextBoxReadout}" />
                 </Grid>
             </Border>
             <!--  Expander: Needs Fdn Work  -->
             <Expander
                 x:Name="message_expander"
                 Grid.Row="2"
-                HorizontalAlignment="Left"
+                HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 HorizontalContentAlignment="Stretch"
                 VerticalContentAlignment="Center"
                 Collapsed="details_changed"
                 Expanded="details_changed"
                 Header="Details"
-                Style="{StaticResource KlaDetailsExpander}">
-                <!--  TextBox: Needs Fdn Work - Remove Placeholder Text  -->
+                Style="{StaticResource klcExpanderDetails}">
+                <!--  TextBox: Needs Fdn Work  -->
                 <TextBox
                     x:Name="message_details"
                     AutomationProperties.Name="Detailed message"
-                    Style="{StaticResource KlaDetailsReadout}"
-                    Text="jvkjhkjblbgvkvkjvjhvkjvhjbhiyvlvkjhbjhbjhvjhvhb,hbbmhbkhlkhvlhkkhblblhblkbbbnmn hnmb,nbkhbkhb,bnlkhvbmnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnbbbbbbbbbbbbbbbhkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkhvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvbbbbbb" />
+                    Style="{StaticResource klcTextBoxReadoutSmall}"/>
             </Expander>
-            <!--  Button: Good - Remove Placeholder Text  -->
+            <!--  Button: Good  -->
             <Button
                 x:Name="action_one"
                 Grid.Row="4"
                 HorizontalAlignment="Center"
                 Click="accept_message"
-                Content="zOKz"
                 IsDefault="True"
                 Style="{StaticResource klcButton}" />
         </Grid>

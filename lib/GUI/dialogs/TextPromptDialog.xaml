@@ -28,11 +28,11 @@
                 AutomationProperties.Name="Text value"
                 Style="{StaticResource klcTextBoxPrompt}"
                 TextChanged="text_changed" />
-            <!--  TextBlock: Good - Remove Placekolder Text  -->
+            <!--  TextBlock: Good  -->
             <TextBlock
                 x:Name="validation_text"
                 Grid.Row="2"
-                Style="{StaticResource klcTextBoxFeedback}" />
+                Style="{StaticResource klcTextBlockFeedback}" />
             <!--  Button: Good - What Is "IsDefault"?  -->
             <Button
                 x:Name="accept_button"

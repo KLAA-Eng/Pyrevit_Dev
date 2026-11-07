@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Command Switch"
     Width="480"
-    MinWidth="464"
+    MinWidth="480"
     MinHeight="120"
     MaxWidth="752"
     PreviewKeyDown="on_key_down"
@@ -17,11 +17,7 @@
     <!--  Border: Padding and Margin need review  -->
     <Border
         x:Name="switch_panel"
-        Margin="{StaticResource KlaMarginFloatingWindow}"
-        Padding="{StaticResource KlaPadFloating}"
-        Background="{StaticResource klcBackgroundColor}"
-        BorderThickness="0"
-        CornerRadius="{StaticResource klcRadFloating}">
+        Style="{StaticResource klcBorderFloating}">
         <!--  Grid: [EnterNotes]  -->
         <Grid
             x:Name="window_body"
@@ -34,7 +30,7 @@
                 <RowDefinition Height="{StaticResource klcBodySpaceLarge}" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <!--  Grid: [EnterNotes]  -->
+            <!--  Grid: Good  -->
             <Grid x:Name="drag_region">
                 <!--  Grid.ColumnDefinitions: [EnterNotes]  -->
                 <Grid.ColumnDefinitions>
@@ -48,9 +44,7 @@
                     Padding="{StaticResource KlaOpticalTextInset}"
                     VerticalAlignment="Center"
                     VerticalContentAlignment="Center"
-                    FontSize="{StaticResource klcWindowPromptFontSize}"
-                    FontWeight="SemiBold"
-                    Style="{StaticResource klcLabelSectionHeading}"
+                    Style="{StaticResource klcLabelHeading}"
                     Target="{Binding ElementName=search_text}" />
                 <!--  TextBox: [EnterNotes]  -->
                 <TextBox
@@ -58,55 +52,48 @@
                     Grid.Column="2"
                     VerticalAlignment="Center"
                     AutomationProperties.HelpText="Type to filter commands. Tab moves between controls. Escape clears the search, then closes."
-                    Style="{StaticResource KlaCompactFieldInput}"
-                    Tag="Type to filter"
+                    Style="{StaticResource klcTextBoxFilter}"
                     TextChanged="filter_changed" />
             </Grid>
-            <!--  ScrollViewer: [EnterNotes]  -->
-            <ScrollViewer
-                x:Name="commands_scroll"
-                Grid.Row="2"
-                Focusable="False"
-                HorizontalScrollBarVisibility="Disabled"
-                VerticalScrollBarVisibility="Auto">
-                <!--  StackPanel: [EnterNotes]  -->
-                <StackPanel>
-                    <!--  ItemsControl: one switch pill per SwitchState.switches row (Key, Label, IsChecked, CanToggle)  -->
-                    <ItemsControl
-                        x:Name="toggles_panel"
-                        Focusable="False"
-                        KeyboardNavigation.TabNavigation="Continue"
-                        SizeChanged="command_panel_size_changed">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <ToggleButton
-                                    AutomationProperties.Name="{Binding Label}"
-                                    Click="switch_clicked"
-                                    Content="{Binding Label}"
-                                    IsChecked="{Binding IsChecked, Mode=OneWay}"
-                                    IsEnabled="{Binding CanToggle}"
-                                    Style="{StaticResource KlaCommandToggle}"
-                                    Tag="{Binding Key}" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+            <!--  The switches, commands, and empty message size to their content.  -->
+            <StackPanel Grid.Row="2">
+                <!--  ItemsControl: one switch pill per SwitchState.switches row (Key, Label, IsChecked, CanToggle)  -->
+                <ItemsControl
+                    x:Name="toggles_panel"
+                    Margin="{StaticResource klcStackGapBelow}"
+                    Style="{StaticResource klcCommandPillItems}"
+                    Focusable="False"
+                    KeyboardNavigation.TabNavigation="Continue"
+                    SizeChanged="command_panel_size_changed">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ToggleButton
+                                AutomationProperties.Name="{Binding Label}"
+                                Click="switch_clicked"
+                                Content="{Binding Label}"
+                                IsChecked="{Binding IsChecked, Mode=OneWay}"
+                                IsEnabled="{Binding CanToggle}"
+                                Style="{StaticResource klcToggleCommand}"
+                                Tag="{Binding Key}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Grid>
                     <!--  ItemsControl: one command pill per SwitchState.choices row (Key, Label, Description, CanSelect)  -->
                     <ItemsControl
                         x:Name="commands_panel"
-                        Margin="{StaticResource klcStackGapVert}"
                         Focusable="False"
                         KeyboardNavigation.TabNavigation="Continue"
                         SizeChanged="command_panel_size_changed">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.Style>
+                            <Style TargetType="ItemsControl" BasedOn="{StaticResource klcCommandPillItems}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Visibility, ElementName=empty_text}" Value="Visible">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ItemsControl.Style>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button
@@ -115,7 +102,7 @@
                                     Click="command_clicked"
                                     Content="{Binding Label}"
                                     IsEnabled="{Binding CanSelect}"
-                                    Style="{StaticResource KlaCommandButton}"
+                                    Style="{StaticResource klcButtonCommand}"
                                     Tag="{Binding Key}"
                                     ToolTip="{Binding Description}" />
                             </DataTemplate>
@@ -124,12 +111,11 @@
                     <!--  TextBlock: [EnterNotes]  -->
                     <TextBlock
                         x:Name="empty_text"
-                        Margin="{StaticResource klcStackGapVert}"
-                        Style="{StaticResource KlaInfoText}"
+                        Style="{StaticResource klcTextBlockMuted}"
                         Text="No commands available."
                         Visibility="Collapsed" />
-                </StackPanel>
-            </ScrollViewer>
+                </Grid>
+            </StackPanel>
         </Grid>
     </Border>
 </Window>

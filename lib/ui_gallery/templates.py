@@ -55,7 +55,7 @@ def create_template(launcher, state, path):
             scope = 'Selected Items' if self.scope_selected.IsChecked else 'All Available Items'
             self.options_feedback.Text = error or sample('Sample options applied: {}; offset {} mm; include existing {}. No files or model changed.'.format(
                 scope, self.option_offset.Text, bool(self.option_include_existing.IsChecked)))
-            self.options_feedback.Foreground = self.Resources['klcErrorColor' if error else 'KlaMutedBrush']
+            self.options_feedback.Foreground = self.Resources['klcErrorColor' if error else 'klcTextColorMuted']
             self.preview_result = self.options_feedback.Text
 
         def _refresh_review(self):

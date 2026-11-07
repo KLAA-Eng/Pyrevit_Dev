@@ -9,11 +9,18 @@
         The implicit TextBox / ComboBox / CheckBox styles apply in both hosts (Python and compiled C#).
     -->
 
-    <!--  Window: [Enter Notes]  -->
+
+    <!--  ======================================================================  -->
+    <!--  Window: Good  -->
+    <!--  ======================================================================  -->
+
+    <!--  klcWindow: Good  -->
     <Style
         x:Key="klcWindow"
         BasedOn="{StaticResource klcFdnWindow}"
         TargetType="Window" />
+    <!--  klcWindowFloating: Good  -->
+    <!--  Only Used in CommandSwitchDialog  -->
     <Style
         x:Key="klcWindowFloating"
         BasedOn="{StaticResource klcFdnWindow}"
@@ -22,51 +29,47 @@
         <Setter Property="ShowInTaskbar" Value="False" />
     </Style>
 
-    <!--  TextBlock: klcFdnWindow already gives every TextBlock its font, body size and text colour, so text styles set only what differs.  -->
+
+    <!--  ======================================================================  -->
+    <!--  Floating palette surface; shadow values belong to this component.  -->
+    <Style x:Key="klcBorderFloating" TargetType="Border">
+        <Setter Property="Margin" Value="{StaticResource KlaMarginFloatingWindow}" />
+        <Setter Property="Padding" Value="{StaticResource klcPadFloating}" />
+        <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="{StaticResource klcRadFloating}" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="20" Opacity="0.12" ShadowDepth="0" Color="Black" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  TextBlock: Good  -->
+    <!--  ======================================================================  -->
+    <!--  klcFdnWindow Supplies FONT, SIZE and COLOR  -->
+
+    <!--  klcTextBlockHeading: Good  -->
     <Style
-        x:Key="klaSectionHeading"
+        x:Key="klcTextBlockHeading"
+        BasedOn="{StaticResource klcFdnTextBlock}"
+        TargetType="TextBlock" >
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeHeading}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+    </Style>
+    <!--  klcTextBlockHeadMessage: Good  -->
+    <!--  Window colors per severity  -->
+    <Style
+        x:Key="klcTextBlockHeadMessage"
         BasedOn="{StaticResource klcFdnTextBlock}"
         TargetType="TextBlock">
-        <Setter Property="FontSize" Value="{StaticResource klcFontSizeSectionHeading}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeMessage}" />
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
+    <!--  klcTextBlockFeedback: Good  -->
     <Style
-        x:Key="KlaInfoText"
-        BasedOn="{StaticResource klcFdnTextBlock}"
-        TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
-    </Style>
-    <Style
-        x:Key="KlaDialogDescription"
-        BasedOn="{StaticResource KlaInfoText}"
-        TargetType="TextBlock">
-        <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    <!--  A section heading at prompt size and normal weight; a caption that names one input is klcLabelSectionHeading instead.  -->
-    <Style
-        x:Key="klaPromptText"
-        BasedOn="{StaticResource klaSectionHeading}"
-        TargetType="TextBlock">
-        <Setter Property="FontWeight" Value="Normal" />
-    </Style>
-    <!--  The severity heading beside a 32 icon (Message, Action Choice); the window colours it per severity.  -->
-    <Style
-        x:Key="klcTextBoxMessageHead"
-        BasedOn="{StaticResource klcFdnTextBlock}"
-        TargetType="TextBlock">
-        <Setter Property="FontSize" Value="{StaticResource klcMessageHeaderFontSize}" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-    </Style>
-    <!--
-        A validation line: error colour, announced politely, and collapsed while its Text is empty, so the window only
-        sets Text. A caller that needs a different colour sets Foreground on the element.
-    -->
-    <Style
-        x:Key="klcTextBoxFeedback"
+        x:Key="klcTextBlockFeedback"
         BasedOn="{StaticResource klcFdnTextBlock}"
         TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource klcErrorColor}" />
@@ -77,134 +80,66 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-
-    <!--  Label: field captions on klcFdnLabel; centred beside a compact field, or the 16-unit prompt that names a list or field  -->
+    <!--  klcTextBlockMuted:Good  -->
     <Style
-        x:Key="klcLabelCentered"
-        BasedOn="{StaticResource klcFdnLabel}"
-        TargetType="Label">
-        <Setter Property="VerticalContentAlignment" Value="Center" />
+        x:Key="klcTextBlockMuted"
+        BasedOn="{StaticResource klcFdnTextBlock}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource klcTextColorMuted}" />
     </Style>
+    <!--  klcTextBlockMutedDisabled: Good  -->
     <Style
-        x:Key="klcLabelSectionHeading"
-        BasedOn="{StaticResource klcFdnLabel}"
-        TargetType="Label">
-        <Setter Property="FontSize" Value="{StaticResource klcFontSizeSectionHeading}" />
-    </Style>
-
-    <!--  Hyperlink: the plain alias, then the bold green footer link the shell applies  -->
-    <Style
-        x:Key="klcLink"
-        BasedOn="{StaticResource klcFdnLink}"
-        TargetType="Hyperlink" />
-    <Style
-        x:Key="klcLinkFooter"
-        BasedOn="{StaticResource klcFdnLink}"
-        TargetType="Hyperlink">
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Foreground" Value="{StaticResource klcFooterLinkColor}" />
+        x:Key="klcTextBlockMutedDisabled"
+        BasedOn="{StaticResource klcFdnTextBlock}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource klcTextColorMuted}" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
-    <!--
-        ContentControl (GUI icons): the sized presenters windows apply; klcFdnIcon in Foundation draws them. The number is the
-        icon's size in window units, so it is written here rather than tokenised (check_ui_scale exempts the Icon<size> styles);
-        the stroke stays klcIconStroke and scales with the icon. The 12, 24 and 48 sizes wait in the xxx tier until a window uses one.
-    -->
-    <Style
-        x:Key="klcIcon16"
-        BasedOn="{StaticResource klcFdnIcon}"
-        TargetType="ContentControl">
-        <Setter Property="Width" Value="16" />
-        <Setter Property="Height" Value="16" />
-    </Style>
-    <Style
-        x:Key="klcIcon32"
-        BasedOn="{StaticResource klcFdnIcon}"
-        TargetType="ContentControl">
-        <Setter Property="Width" Value="32" />
-        <Setter Property="Height" Value="32" />
-    </Style>
 
-    <!--  Border: the section group (the plain alias) and the information banner  -->
-    <Style
-        x:Key="KlaSection"
-        BasedOn="{StaticResource klaFoundationBorder}"
-        TargetType="Border" />
-    <Style
-        x:Key="KlaBanner"
-        BasedOn="{StaticResource KlaSection}"
-        TargetType="Border">
-        <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
-    </Style>
+    <!--  ======================================================================  -->
+    <!--  TextBox: Review Readouts  -->
+    <!--  ======================================================================  -->
 
-    <!--  Button: the plain alias, the 216 x 36 main action, the surface-coloured secondary action and the shell's Close  -->
+    <!--  klcTextBox: Good  -->
     <Style
-        x:Key="klcButton"
-        BasedOn="{StaticResource klcFdnButton}"
-        TargetType="Button" />
-    <Style
-        x:Key="klcButtonDouble"
-        BasedOn="{StaticResource klcFdnButton}"
-        TargetType="Button">
-        <Setter Property="Width" Value="{StaticResource klcDoubleButtonWidth}" />
-        <Setter Property="Height" Value="{StaticResource klcDoubleButtonHeight}" />
-        <Setter Property="FontSize" Value="{StaticResource klcButtonFontSizeLarge}" />
-    </Style>
-    <Style
-        x:Key="klcButtonSec"
-        BasedOn="{StaticResource klcFdnButton}"
-        TargetType="Button">
-        <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
-    </Style>
-    <Style
-        x:Key="klcCloseButton"
-        BasedOn="{StaticResource klcFdnButton}"
-        TargetType="Button">
-        <!--  Chrome is the deliberate compact exception to form control sizes.  -->
-        <Setter Property="Width" Value="{StaticResource klcCloseWidth}" />
-        <Setter Property="Height" Value="{StaticResource klcCloseHeight}" />
-        <Setter Property="FontSize" Value="{StaticResource klcCloseFontSize}" />
-        <!--  The default caption; a window or tool that sets Content itself replaces it.  -->
-        <Setter Property="Content" Value="{DynamicResource CloseLabel}" />
-    </Style>
-
-    <!--  TextBox: Inputs and readouts  -->
-    <Style
-        x:Key="KlaInput"
-        BasedOn="{StaticResource klcFdnTextBoxInput}"
-        TargetType="TextBox" />
-    <Style
-        x:Key="KlaCompactFieldInput"
+        x:Key="klcTextBox"
         BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
-        <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}" />
+        <Setter Property="Tag" Value="[ENTER TEXT]" />
     </Style>
+    <!--  klcTextBoxFilter: Good  -->
     <Style
         x:Key="klcTextBoxFilter"
         BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
-        <Setter Property="Height" Value="{StaticResource klcFilterHeight}" />
-        <Setter Property="FontSize" Value="{StaticResource klcFontSizeFilter}" />
-        <!--  Every filter shares the watermark; a window that needs another sets its own Tag.  -->
-        <Setter Property="Tag" Value="[Type to filter]" />
+        <Setter Property="Tag" Value="[TYPE TO FILTER]" />
     </Style>
-    <!--  Text Entry's single large, bold, centred field.  -->
+    <!--  klcTextBoxPrompt: Good  -->
+    <!--  Only used in TextPromptDialog  -->
     <Style
         x:Key="klcTextBoxPrompt"
         BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
         <Setter Property="Height" Value="{StaticResource klcTextBoxPromptHeight}" />
-        <Setter Property="FontSize" Value="{StaticResource klcFontSizeInputPrompt}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeTextPrompt}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="TextAlignment" Value="Center" />
         <Setter Property="Tag" Value="[ENTER TEXT]" />
     </Style>
+
+    <!--  klcTextBoxReadout[NeedsWork]:  Selectable read-only text  -->
+    <!--  Only used in MessageDialog  -->
     <!--
         Tool output the user may copy (a message body, a path, a report): read-only text drawn like body text, selectable
         with Ctrl+C and right-click Copy. The transparent hairline keeps the keyboard focus border visible.
     -->
     <Style
-        x:Key="klaReadout"
+        x:Key="klcTextBoxReadout"
         BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
         <Setter Property="IsReadOnly" Value="True" />
@@ -216,9 +151,11 @@
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
     </Style>
+    <!--  klcTextBoxReadoutSmall[NeedsWork]: Wrapping, scrollable, read-only multiline field.  -->
     <Style
-        x:Key="KlaMultilineReadout"
+        x:Key="klcTextBoxReadoutSmall"
         BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
         <Setter Property="Height" Value="Auto" />
@@ -229,32 +166,332 @@
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
         <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="Padding" Value="{StaticResource KlaReadoutPadding}" />
-        <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
+        <Setter Property="Padding" Value="{StaticResource klcSectionPadding}" />
+        <Setter Property="BorderBrush" Value="{StaticResource klcTextColorMuted}" />
     </Style>
 
+
+    <!--  ======================================================================  -->
+    <!--  Label: Review Label Centered and if vert alignment is necessary.  -->
+    <!--  ======================================================================  -->
+
+    <!--  klcLabelCentered[Review]: Field caption vertically centred beside its input.  -->
+    <Style
+        x:Key="klcLabelCentered"
+        BasedOn="{StaticResource klcFdnLabel}"
+        TargetType="Label">
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <!--  klcLabelHeading: Good  -->
+    <Style
+        x:Key="klcLabelHeading"
+        BasedOn="{StaticResource klcFdnLabel}"
+        TargetType="Label">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeHeading}" />
+    </Style>
+
+
+    <!--  ======================================================================  -->
+    <!--  Hyperlink: Review klcLink  -->
+    <!--  ======================================================================  -->
+
+    <!--  klcLink: Review use and color  -->
+    <!--  Only used in ActionChoiceDialog  -->
+    <Style
+        x:Key="klcLink"
+        BasedOn="{StaticResource klcFdnLink}"
+        TargetType="Hyperlink" >
+        <Setter Property="Foreground" Value="{StaticResource klcFooterLinkColor}" />
+    </Style>
+    <!--  klcLinkFooter: Good  -->
+    <Style
+        x:Key="klcLinkFooter"
+        BasedOn="{StaticResource klcFdnLink}"
+        TargetType="Hyperlink">
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Foreground" Value="{StaticResource klcFooterLinkColor}" />
+    </Style>
+
+
+    <!--  ======================================================================  -->
+    <!--  Icon: Good  -->
+    <!--  ======================================================================  -->
+    <!--
+        ContentControl (GUI icons): the sized presenters windows apply; klcFdnIcon in Foundation draws them. The number is the
+        icon's size in window units, so it is written here rather than tokenised (check_ui_scale exempts the Icon<size> styles);
+        the stroke stays klcIconStroke and scales with the icon.
+    -->
+
+    <!--  klcIcon12: Good  -->
+    <!--  Not currently used.  -->
+    <Style
+        x:Key="klcIcon12"
+        BasedOn="{StaticResource klcFdnIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Height" Value="12" />
+    </Style>
+    <!--  klcIcon16: Good  -->
+    <!--  Used by SelectionDialog and the KLC-ReviewTemp template.  -->
+    <Style
+        x:Key="klcIcon16"
+        BasedOn="{StaticResource klcFdnIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="16" />
+    </Style>
+    <!--  klcIcon24: Good  -->
+    <!--  Not currently used.  -->
+    <Style
+        x:Key="klcIcon24"
+        BasedOn="{StaticResource klcFdnIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+    </Style>
+    <!--  klcIcon32: Good  -->
+    <!--  Used by ActionChoiceDialog and MessageDialog.  -->
+    <Style
+        x:Key="klcIcon32"
+        BasedOn="{StaticResource klcFdnIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+    </Style>
+    <!--  klcIcon48: Good  -->
+    <!--  Not currently used.  -->
+    <Style
+        x:Key="klcIcon48"
+        BasedOn="{StaticResource klcFdnIcon}"
+        TargetType="ContentControl">
+        <Setter Property="Width" Value="48" />
+        <Setter Property="Height" Value="48" />
+    </Style>
+
+
+    <!--  ======================================================================  -->
+    <!--  Border: Good  -->
+    <!--  ======================================================================  -->
+
+    <!--  klcBorder: Good  -->
+    <Style
+        x:Key="klcBorder"
+        BasedOn="{StaticResource klcFdnBorder}"
+        TargetType="Border" />
+
+
+    <!--  ======================================================================  -->
+    <!--  Button: Good  -->
+    <!--  ======================================================================  -->
+
+    <!--  klcButton: Good  -->
+    <Style
+        x:Key="klcButton"
+        BasedOn="{StaticResource klcFdnButton}"
+        TargetType="Button" />
+    <!--  klcButtonDouble: Good  -->
+    <Style
+        x:Key="klcButtonDouble"
+        BasedOn="{StaticResource klcFdnButton}"
+        TargetType="Button">
+        <Setter Property="Width" Value="{StaticResource klcDoubleButtonWidth}" />
+        <Setter Property="Height" Value="{StaticResource klcDoubleButtonHeight}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeButtonLarge}" />
+    </Style>
+    <!--  klcButtonSec: Good  -->
+    <Style
+        x:Key="klcButtonSec"
+        BasedOn="{StaticResource klcFdnButton}"
+        TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <!--  Repo-native command arrow geometry, shared by the action link template below.  -->
+    <PathGeometry x:Key="KlaCommandArrowGeometry" Figures="M4,12 L20,12 M14,6 L20,12 L14,18" />
+    <!--  KlaCommandLink: Full-width action with an arrow, wrapping label and optional description.  -->
+    <!--  Only used in ActionChoiceDialog; shares the standard button template and state tokens.  -->
+    <Style x:Key="KlaCommandLink" BasedOn="{StaticResource klcFdnButton}" TargetType="Button">
+        <Style.Resources>
+            <SolidColorBrush x:Key="klcButtonHoverBrush" Color="{Binding Color, Source={StaticResource KlaComponentSurfaceBrush}}" />
+            <SolidColorBrush x:Key="klcButtonDisabledBrush" Color="Transparent" />
+            <Style x:Key="klcButtonBorderShape" TargetType="Border">
+                <Setter Property="CornerRadius" Value="{StaticResource klcRadTextBox}" />
+            </Style>
+        </Style.Resources>
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="MinHeight" Value="{StaticResource KlaCommandLinkMinHeight}" />
+        <Setter Property="Margin" Value="{StaticResource klcStackGapVertSmall}" />
+        <Setter Property="BorderBrush" Value="{StaticResource klcTextColorMuted}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
+        <Setter Property="Padding" Value="{StaticResource KlaCommandLinkPadding}" />
+        <Setter Property="AutomationProperties.Name" Value="{Binding Content.Label, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="AutomationProperties.HelpText" Value="{Binding Content.Description, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{StaticResource KlaCommandLinkIconColumn}" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ContentControl Margin="{StaticResource KlaCommandArrowInset}"
+                            VerticalAlignment="Top" Content="{StaticResource KlaCommandArrowGeometry}"
+                            Style="{StaticResource klcIcon16}" />
+                        <StackPanel Grid.Column="1">
+                            <TextBlock FontSize="{StaticResource klcFontSizeHeading}" FontWeight="SemiBold"
+                                Text="{Binding Label}" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Description}">
+                                <TextBlock.Style>
+                                    <Style BasedOn="{StaticResource klcTextBlockMutedDisabled}" TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Description}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Description}" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <!--  Primary actions stay green; secondary actions stay muted, including on hover.  -->
+        <Style.Triggers>
+            <Trigger Property="IsDefault" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource klcColorGreen}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderThickness" Value="2" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="BorderBrush" Value="Transparent" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <!--  klcButtonClose: Good  -->
+    <Style
+        x:Key="klcButtonClose"
+        BasedOn="{StaticResource klcFdnButton}"
+        TargetType="Button">
+        <!--  Chrome is the deliberate compact exception to form control sizes.  -->
+        <Setter Property="Width" Value="{StaticResource klcCloseWidth}" />
+        <Setter Property="Height" Value="{StaticResource klcCloseHeight}" />
+        <Setter Property="FontSize" Value="{StaticResource klcCloseFontSize}" />
+        <!--  The default caption; a window or tool that sets Content itself replaces it.  -->
+        <Setter Property="Content" Value="{DynamicResource CloseLabel}" />
+    </Style>
+    <!--  klcButtonCommand: Good  -->
+    <!--  Only used in CommandSwitchDialog  -->
+    <Style
+        x:Key="klcButtonCommand"
+        BasedOn="{StaticResource klcFdnButton}"
+        TargetType="Button">
+        <Style.Resources>
+            <Style x:Key="klcButtonBorderShape" TargetType="Border">
+                <Setter Property="CornerRadius" Value="{StaticResource KlaCommandPillRadius}" />
+            </Style>
+        </Style.Resources>
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Height" Value="{StaticResource klcButtonHeight}" />
+        <!--  Stretch: pills on one WrapPanel line share the tallest pill's height.  -->
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
+        <Setter Property="BorderBrush" Value="{StaticResource KlaAccentBrush}" />
+        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
+        <Setter Property="Padding" Value="{StaticResource klcCommandPillInset}" />
+
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="BorderBrush" Value="{StaticResource KlaDisabledFillBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+
+    <!--  ======================================================================  -->
+    <!--  ToggleButton: Good -->
+    <!--  ======================================================================  -->
+
+    <!--  Item containers own spacing; compensate once at the panel edge so
+          wrapped rows have a gap without adding trailing group whitespace.  -->
+    <Style x:Key="klcCommandPillItems" TargetType="ItemsControl">
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="ContentPresenter">
+                    <Setter Property="Margin" Value="{StaticResource KlaCommandPillGap}" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <WrapPanel Margin="{StaticResource klcCommandPillPanelInset}" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--  klcToggleCommand: Good  -->
+    <!--  Only used in CommandSwitchDialog  -->
+    <Style
+        x:Key="klcToggleCommand"
+        BasedOn="{StaticResource klcFdnSwitch}"
+        TargetType="ToggleButton" />
+
+
+    <!--  ======================================================================  -->
+    <!--  ComboBox: Standard and filter variants.  -->
+    <!--  ======================================================================  -->
     <!--  ComboBox: the alias of the Foundation base, then the compact variant  -->
+
+    <!--  KlaComboBox: Foundation combo box alias.  -->
     <Style
         x:Key="KlaComboBox"
         BasedOn="{StaticResource klaFoundationComboBox}"
         TargetType="ComboBox" />
+    <!--  klcComboBoxFilter: Compact combo box sized for filter controls.  -->
     <Style
         x:Key="klcComboBoxFilter"
         BasedOn="{StaticResource klaFoundationComboBox}"
         TargetType="ComboBox">
-        <Setter Property="FontSize" Value="{StaticResource klcFontSizeFilter}" />
-        <Setter Property="Height" Value="{StaticResource klcFilterHeight}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeTextBox}" />
+        <Setter Property="Height" Value="{StaticResource klcFieldHeightNormal}" />
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  CheckBox: Standard and selection variants.  -->
+    <!--  ======================================================================  -->
     <!--  CheckBox: the plain alias, then the dialog row that shows a label and a description  -->
+
+    <!--  klcCheckBox: Foundation check box alias.  -->
+    <Style
+        x:Key="klcCheckBox"
+        BasedOn="{StaticResource klcFdnCheckBox}"
+        TargetType="CheckBox" />
+    <!--  KlaCheck: Compatibility alias for klcCheckBox.  -->
     <Style
         x:Key="KlaCheck"
-        BasedOn="{StaticResource KlaFoundationCheckBox}"
+        BasedOn="{StaticResource klcCheckBox}"
         TargetType="CheckBox" />
+    <!--  klcCheckBoxSelection: SelectionDialog check box with a label and optional description.  -->
+    <!--  Only used in SelectionDialog  -->
     <Style
-        x:Key="KlaDialogCheck"
-        BasedOn="{StaticResource KlaCheck}"
+        x:Key="klcCheckBoxSelection"
+        BasedOn="{StaticResource klcFdnCheckBox}"
         TargetType="CheckBox">
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="ContentTemplate">
@@ -262,18 +499,37 @@
                 <DataTemplate>
                     <StackPanel>
                         <TextBlock Text="{Binding Label}" TextWrapping="Wrap" />
-                        <TextBlock Style="{StaticResource KlaDialogDescription}" Text="{Binding Description}" />
+                        <TextBlock
+                            x:Name="description"
+                            Style="{StaticResource klcTextBlockMutedDisabled}"
+                            Text="{Binding Description}" />
                     </StackPanel>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Description}" Value="{x:Null}">
+                            <Setter TargetName="description" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Description}" Value="">
+                            <Setter TargetName="description" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
                 </DataTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  ListBox: List items and container.  -->
+    <!--  ======================================================================  -->
     <!--  ListBoxItem & ListBox: the plain aliases, with the dialog row that disables itself when CanSelect is false  -->
+
+    <!--  KlaListItem: Foundation list item alias.  -->
+    <!--  Only used in SelectionDialog (through KlaDialogListItem)  -->
     <Style
         x:Key="KlaListItem"
         BasedOn="{StaticResource KlaFoundationListItem}"
         TargetType="ListBoxItem" />
+    <!--  KlaDialogListItem: Dialog list row disabled when CanSelect is false.  -->
+    <!--  Only used in SelectionDialog  -->
     <!--  Opt-in rows for the reusable dialogs; existing tool lists are unaffected.  -->
     <Style
         x:Key="KlaDialogListItem"
@@ -283,38 +539,44 @@
         <Setter Property="IsEnabled" Value="{Binding CanSelect}" />
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
+    <!--  KlaList: Foundation list box alias.  -->
     <Style
         x:Key="KlaList"
         BasedOn="{StaticResource KlaFoundationList}"
         TargetType="ListBox" />
 
+    <!--  ======================================================================  -->
+    <!--  ItemsControl: Shared field-row layout.  -->
+    <!--  ======================================================================  -->
     <!--  ItemsControl: fixed row layouts; the direct items stay the window's named controls  -->
     <!--
         UIElement items remain their own containers. Names and event handlers
         stay in the window's namescope; only the repeated layout is shared.
     -->
-    <Style x:Key="KlaFieldRows" TargetType="ItemsControl">
-        <Setter Property="HorizontalAlignment" Value="Left" />
+
+    <!--  klcRenameRows: Good  -->
+    <Style x:Key="klcRenameRows" TargetType="ItemsControl">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}" />
-                            <ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}" />
+                            <ColumnDefinition Width="{StaticResource klcRenameLabelColumn}" />
+                            <ColumnDefinition Width="{StaticResource klcRenameInputColumn}" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
                             <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                            <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
                             <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                            <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
                             <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
-                            <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
                         </Grid.RowDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
@@ -322,13 +584,25 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Implicit styles: Default compact controls in shared-shell windows.  -->
+    <!--  ======================================================================  -->
     <!--  Implicit styles: a bare TextBox, ComboBox or CheckBox in a shared-shell window takes the compact roles above  -->
-    <Style BasedOn="{StaticResource KlaCompactFieldInput}" TargetType="TextBox" />
-    <Style BasedOn="{StaticResource klcComboBoxFilter}" TargetType="ComboBox" />
-    <Style BasedOn="{StaticResource KlaCheck}" TargetType="CheckBox" />
 
+    <!--  Implicit TextBox: Applies the shared default style.  -->
+    <Style BasedOn="{StaticResource klcTextBox}" TargetType="TextBox" />
+    <!--  Implicit ComboBox: Applies the shared default style.  -->
+    <Style BasedOn="{StaticResource klcComboBoxFilter}" TargetType="ComboBox" />
+    <!--  Implicit CheckBox: Applies the shared default style.  -->
+    <Style BasedOn="{StaticResource klcCheckBox}" TargetType="CheckBox" />
+
+    <!--  ======================================================================  -->
+    <!--  WindowShell: Shared header, body and footer.  -->
+    <!--  ======================================================================  -->
     <!--  WindowShell: the header band (logo, title, Close), the inset body and the footer band (links, version) around every window body  -->
     <!--  Tag carries the window metadata (Title, VersionText) the header and footer bind to; Content and DataContext stay workflow-owned.  -->
+
+    <!--  klcWindowShell: Shared window header, body and footer shell.  -->
     <Style x:Key="klcWindowShell" TargetType="ContentControl">
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
@@ -364,7 +638,7 @@
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Panel.ZIndex="0"
-                                FontSize="{StaticResource klcHeaderTitleFontSize}"
+                                FontSize="{StaticResource klcFontSizeShellTitle}"
                                 Text="{Binding Tag.Title, RelativeSource={RelativeSource TemplatedParent}}"
                                 TextAlignment="Center"
                                 TextTrimming="CharacterEllipsis" />
@@ -390,7 +664,7 @@
                                 VerticalAlignment="Center"
                                 Panel.ZIndex="1"
                                 AutomationProperties.Name="Close window"
-                                Style="{StaticResource klcCloseButton}" />
+                                Style="{StaticResource klcButtonClose}" />
                         </Grid>
                         <Grid x:Name="klcShell_Footer" Grid.Row="2">
                             <!--
@@ -405,7 +679,7 @@
                                 VerticalAlignment="Center"
                                 Panel.ZIndex="0"
                                 AutomationProperties.Name="Tool version"
-                                FontSize="{StaticResource klcFooterVersionFontSize}"
+                                FontSize="{StaticResource klcFontSizeShellVersion}"
                                 Foreground="{StaticResource klcFooterVersionColor}"
                                 Text="{Binding Tag.VersionText, RelativeSource={RelativeSource TemplatedParent}}"
                                 TextAlignment="Center"
@@ -446,144 +720,66 @@
     <!--  ======================================================================  -->
     <!--  Details Dialog Components  -->
     <!--  ======================================================================  -->
+
+    <!--  klcExpanderDetails: Muted details disclosure used in message and action-choice dialogs.  -->
     <!--  Details disclosure (Message, Action Choice): muted, details size, with the 16 chevron the Foundation toggle draws.  -->
     <Style
-        x:Key="KlaDetailsExpander"
-        BasedOn="{StaticResource klaFoundationExpander}"
+        x:Key="klcExpanderDetails"
+        BasedOn="{StaticResource klcFdnExpander}"
         TargetType="Expander">
-        <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
-        <Setter Property="FontSize" Value="{StaticResource klcDetailsFontSize}" />
-    </Style>
-    <!--  The readout inside the expander: fixed height, muted like its header, text aligned with the dialog body.  -->
-    <Style
-        x:Key="KlaDetailsReadout"
-        BasedOn="{StaticResource KlaMultilineReadout}"
-        TargetType="TextBox">
-        <Setter Property="Height" Value="{StaticResource KlaDetailsHeight}" />
-        <Setter Property="Margin" Value="{StaticResource klcStackGapVert}" />
-        <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
-        <Setter Property="Padding" Value="{StaticResource KlaDetailsReadoutPadding}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColorMuted}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeDetails}" />
     </Style>
 
-    <!--  ======================================================================  -->
-    <!--  Action Choice Dialog Components  -->
-    <!--  ======================================================================  -->
-    <!--  TaskDialog-style command link (Action Choice). A simple repo-native arrow; no upstream TaskDialog code or asset.  -->
-    <PathGeometry x:Key="KlaCommandArrowGeometry" Figures="M4,12 L20,12 M14,6 L20,12 L14,18" />
-    <Style
-        x:Key="KlaCommandLink"
-        BasedOn="{StaticResource klcFdnButton}"
-        TargetType="Button">
-        <Style.Resources>
-            <StaticResource x:Key="klcButtonHoverBrush" ResourceKey="KlaComponentSurfaceBrush" />
-            <SolidColorBrush x:Key="klcButtonDisabledBrush" Color="Transparent" />
-            <StaticResource x:Key="klcRadButton" ResourceKey="klcRadTextBox" />
-        </Style.Resources>
-        <Setter Property="Width" Value="Auto" />
-        <Setter Property="Height" Value="Auto" />
-        <Setter Property="MinHeight" Value="{StaticResource KlaCommandLinkMinHeight}" />
-        <Setter Property="HorizontalAlignment" Value="Stretch" />
-        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <!--  Body size for the description; the label sets its own.  -->
-        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
-        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
-        <Setter Property="Padding" Value="{StaticResource KlaCommandLinkPadding}" />
-        <Setter Property="ContentTemplate">
-            <Setter.Value>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{StaticResource KlaCommandLinkIconColumn}" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <ContentControl
-                            Margin="{StaticResource KlaCommandArrowInset}"
-                            VerticalAlignment="Top"
-                            Content="{StaticResource KlaCommandArrowGeometry}"
-                            Style="{StaticResource klcFdnIcon}" />
-                        <StackPanel Grid.Column="1">
-                            <TextBlock
-                                FontSize="{StaticResource klcFontSizeSectionHeading}"
-                                FontWeight="SemiBold"
-                                Text="{Binding Label}"
-                                TextWrapping="Wrap" />
-                            <TextBlock Text="{Binding Description}">
-                                <TextBlock.Style>
-                                    <Style BasedOn="{StaticResource KlaDialogDescription}" TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Description}" Value="">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </StackPanel>
-                    </Grid>
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <!--  ======================================================================  -->
-    <!--  Command Switch Dialog Components  -->
-    <!--  ======================================================================  -->
-    <!--  Command Switch pills  -->
-    <Style
-        x:Key="KlaCommandButton"
-        BasedOn="{StaticResource klcFdnButton}"
-        TargetType="Button">
-        <Style.Resources>
-            <StaticResource x:Key="klcRadButton" ResourceKey="KlaCommandPillRadius" />
-        </Style.Resources>
-        <Setter Property="Width" Value="Auto" />
-        <Setter Property="Height" Value="Auto" />
-        <Setter Property="MinHeight" Value="{StaticResource klcButtonHeight}" />
-        <!--  Stretch: pills on one WrapPanel line share the tallest pill's height.  -->
-        <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
-        <Setter Property="BorderBrush" Value="{StaticResource KlaAccentBrush}" />
-        <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
-        <Setter Property="Padding" Value="{StaticResource KlaCommandPillInset}" />
-        <Setter Property="Margin" Value="{StaticResource KlaCommandPillGap}" />
-        <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="BorderBrush" Value="{StaticResource KlaDisabledFillBrush}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="KlaCommandToggle"
-        BasedOn="{StaticResource klaFoundationSwitch}"
-        TargetType="ToggleButton" />
 
     <!--  ======================================================================  -->
     <!--  x  tier: used only by windows that are not shared dialogs (tool windows, templates, the Gallery, compiled C# hosts).  -->
     <!--  ======================================================================  -->
 
+    <!--  ======================================================================  -->
+    <!--  Tool window message border.  -->
+    <!--  ======================================================================  -->
+    <!--  xBorderMessage: Message border with the component border colour.  -->
+    <Style
+        x:Key="xBorderMessage"
+        BasedOn="{StaticResource klcFdnBorder}"
+        TargetType="Border">
+        <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
+    </Style>
+
+    <!--  ======================================================================  -->
+    <!--  Tool window text.  -->
+    <!--  ======================================================================  -->
     <!--  x: text  -->
+
+    <!--  xText: Foundation text style alias for tool windows.  -->
     <Style
         x:Key="xText"
         BasedOn="{StaticResource klcFdnTextBlock}"
         TargetType="TextBlock" />
 
+    <!--  ======================================================================  -->
+    <!--  Tool window icons.  -->
+    <!--  ======================================================================  -->
     <!--  x: icons. The unsized alias of klcFdnIcon (16 by default); the shared dialogs name a size instead.  -->
+
+    <!--  xIcon: Unsized foundation icon presenter for tool windows.  -->
+    <!--  Only used in SteelPsfDialog  -->
     <Style
         x:Key="xIcon"
         BasedOn="{StaticResource klcFdnIcon}"
         TargetType="ContentControl" />
 
+    <!--  ======================================================================  -->
+    <!--  Tool window status chips.  -->
+    <!--  ======================================================================  -->
     <!--  x: status chips  -->
+
+    <!--  xStatusChip: Base bordered status chip.  -->
+    <!--  Only used in KLC-ReviewTemp (through derived styles)  -->
     <Style
         x:Key="xStatusChip"
-        BasedOn="{StaticResource klaFoundationBorder}"
+        BasedOn="{StaticResource klcFdnBorder}"
         TargetType="Border">
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
@@ -591,6 +787,8 @@
         <Setter Property="Padding" Value="{StaticResource KlaCompactInset}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
+    <!--  xTableStatusChip: Status chip centred in a table cell.  -->
+    <!--  Only used in KLC-ReviewTemp (through xStatusTagChip)  -->
     <Style
         x:Key="xTableStatusChip"
         BasedOn="{StaticResource xStatusChip}"
@@ -598,18 +796,22 @@
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
+    <!--  xStatusWarning: Status chip with a warning-coloured border.  -->
     <Style
         x:Key="xStatusWarning"
         BasedOn="{StaticResource xStatusChip}"
         TargetType="Border">
         <Setter Property="BorderBrush" Value="{StaticResource klcWarningColor}" />
     </Style>
+    <!--  xStatusError: Status chip with an error-coloured border.  -->
     <Style
         x:Key="xStatusError"
         BasedOn="{StaticResource xStatusChip}"
         TargetType="Border">
         <Setter Property="BorderBrush" Value="{StaticResource klcErrorColor}" />
     </Style>
+    <!--  xStatusTagChip: Table chip whose border colour follows its status Tag.  -->
+    <!--  Only used in KLC-ReviewTemp  -->
     <!--  A chip whose colour follows its Tag (Ready, Warning or Blocked), for a table cell that binds a status value.  -->
     <Style
         x:Key="xStatusTagChip"
@@ -627,29 +829,37 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    <!--  xStatusText: Text inside a status chip.  -->
+    <!--  Only used in KLC-ReviewTemp  -->
     <!--  The caption inside a status chip.  -->
     <Style
         x:Key="xStatusText"
         BasedOn="{StaticResource klcFdnTextBlock}"
         TargetType="TextBlock" />
 
+    <!--  ======================================================================  -->
+    <!--  Tool window surface buttons.  -->
+    <!--  ======================================================================  -->
     <!--  x: surface buttons  -->
     <!--
         Link: a text action on the surface (Clear filters, Favorites, Recent) — transparent at rest, surface on hover, the same
         role width and keyboard-only focus adorner as every button. Ghost: the same with a hairline border (Cancel beside a main action).
     -->
+
+    <!--  xLinkButton: Surface-level text action with a transparent background.  -->
     <Style
         x:Key="xLinkButton"
         BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button">
         <Style.Resources>
-            <StaticResource x:Key="klcButtonHoverBrush" ResourceKey="KlaComponentSurfaceBrush" />
+            <SolidColorBrush x:Key="klcButtonHoverBrush" Color="{Binding Color, Source={StaticResource KlaComponentSurfaceBrush}}" />
             <SolidColorBrush x:Key="klcButtonDisabledBrush" Color="Transparent" />
         </Style.Resources>
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
     </Style>
+    <!--  xGhostButton: Surface-level action with a visible border.  -->
     <Style
         x:Key="xGhostButton"
         BasedOn="{StaticResource xLinkButton}"
@@ -657,27 +867,41 @@
         <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Tool window read-only fields.  -->
+    <!--  ======================================================================  -->
     <!--  x: read-only fields  -->
+
+    <!--  xReadOnlyField: Muted read-only text field.  -->
+    <!--  Only used in KLC-OptionsTemp (through xCompactReadOnlyField)  -->
     <Style
         x:Key="xReadOnlyField"
         BasedOn="{StaticResource klcFdnTextBoxInput}"
         TargetType="TextBox">
         <Setter Property="IsReadOnly" Value="True" />
-        <Setter Property="Foreground" Value="{StaticResource KlaMutedBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColorMuted}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
+    <!--  xCompactReadOnlyField: Read-only field at the compact field height.  -->
+    <!--  Only used in KLC-OptionsTemp  -->
     <Style
         x:Key="xCompactReadOnlyField"
         BasedOn="{StaticResource xReadOnlyField}"
         TargetType="TextBox">
-        <Setter Property="Height" Value="{StaticResource KlaCompactFieldHeight}" />
+        <Setter Property="Height" Value="{StaticResource klcFieldHeightNormal}" />
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Tool window exclusive choices.  -->
+    <!--  ======================================================================  -->
     <!--  x: exclusive choices  -->
+
+    <!--  xRadioButton: Foundation radio button alias.  -->
     <Style
         x:Key="xRadioButton"
         BasedOn="{StaticResource klaFoundationRadioButton}"
         TargetType="RadioButton" />
+    <!--  xSegmentButton: Exclusive choice displayed as a pill segment.  -->
     <!--
         Segment: an exclusive choice drawn as a filled pill segment, not a radio circle (Family Studio's Families / Views,
         This Project / Library, List / Grid inside a KlaBorderStrongBrush pill).
@@ -710,7 +934,7 @@
                             <Setter Property="Foreground" Value="{StaticResource KlaTextOnAccentBrush}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -718,14 +942,20 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Tool window field layouts.  -->
+    <!--  ======================================================================  -->
     <!--  x: field layouts  -->
+
+    <!--  xFilteredCheckList: Fixed layout for a filter and check list.  -->
+    <!--  Only used in SteelPsfDialog  -->
     <Style x:Key="xFilteredCheckList" TargetType="ItemsControl">
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
                             <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
@@ -741,17 +971,27 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Tool window data grid.  -->
+    <!--  ======================================================================  -->
     <!--  x: data grid  -->
     <!--  Cell text follows the cell's foreground, so selected and disabled rows recolour it.  -->
+
+    <!--  xDataGridText: Cell text that inherits its cell's foreground and trims overflow.  -->
+    <!--  Only used in KLC-ReviewTemp  -->
     <Style x:Key="xDataGridText" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=DataGridCell}}" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
+    <!--  xDataGridCell: Foundation data grid cell alias.  -->
+    <!--  Only used in KLC-ReviewTemp (through xDataGridStatusCell)  -->
     <Style
         x:Key="xDataGridCell"
         BasedOn="{StaticResource klaFoundationDataGridCell}"
         TargetType="DataGridCell" />
+    <!--  xDataGridStatusCell: Data grid cell with centred content.  -->
+    <!--  Only used in KLC-ReviewTemp  -->
     <Style
         x:Key="xDataGridStatusCell"
         BasedOn="{StaticResource xDataGridCell}"
@@ -759,12 +999,19 @@
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
+    <!--  xDataGrid: Foundation data grid alias.  -->
     <Style
         x:Key="xDataGrid"
         BasedOn="{StaticResource klaFoundationDataGrid}"
         TargetType="DataGrid" />
 
+    <!--  ======================================================================  -->
+    <!--  Tool window splitter.  -->
+    <!--  ======================================================================  -->
     <!--  x: splitter  -->
+
+    <!--  xSplitter: Foundation grid splitter alias.  -->
+    <!--  Only used in KLC-ReviewTemp  -->
     <Style
         x:Key="xSplitter"
         BasedOn="{StaticResource klaFoundationGridSplitter}"
@@ -773,6 +1020,8 @@
     <!--  ======================================================================  -->
     <!--  xx tier: used only by lib/GUI/_future windows, which no tool opens yet.  -->
     <!--  ======================================================================  -->
+
+    <!--  xxToggle: Toggle button with an accent background when checked.  -->
     <!--  Checked fills the button's own Background, so the template's hover, pressed and disabled fills still take precedence over it.  -->
     <Style
         x:Key="xxToggle"
@@ -787,12 +1036,14 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    <!--  xxIconTextButton: Foundation button sized for an icon and text.  -->
     <Style
         x:Key="xxIconTextButton"
         BasedOn="{StaticResource klcFdnButton}"
         TargetType="Button">
         <Setter Property="Width" Value="{StaticResource xxIconTextButtonWidth}" />
     </Style>
+    <!--  xxIconButton: Compact button sized for an icon.  -->
     <Style
         x:Key="xxIconButton"
         BasedOn="{StaticResource klcFdnButton}"
@@ -804,52 +1055,37 @@
 
     <!--  ======================================================================  -->
     <!--  xxx tier: no consumer anywhere (Python, compiled C#, Gallery, future). Candidates for deletion, except the plain aliases  -->
-    <!--  xxxLabel, xxxComboBoxItem, xxxDataGridHeader and xxxDataGridRow, which give their Foundation base its Components alias,  -->
-    <!--  and the 12 / 24 / 48 icon sizes, which complete the sized-presenter scale.  -->
+    <!--  xxxLabel, xxxComboBoxItem, xxxDataGridHeader and xxxDataGridRow, which give their Foundation base its Components alias.  -->
     <!--  ======================================================================  -->
-    <Style
-        x:Key="xxxIcon12"
-        BasedOn="{StaticResource klcFdnIcon}"
-        TargetType="ContentControl">
-        <Setter Property="Width" Value="12" />
-        <Setter Property="Height" Value="12" />
-    </Style>
-    <Style
-        x:Key="xxxIcon24"
-        BasedOn="{StaticResource klcFdnIcon}"
-        TargetType="ContentControl">
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Height" Value="24" />
-    </Style>
-    <Style
-        x:Key="xxxIcon48"
-        BasedOn="{StaticResource klcFdnIcon}"
-        TargetType="ContentControl">
-        <Setter Property="Width" Value="48" />
-        <Setter Property="Height" Value="48" />
-    </Style>
+
+    <!--  xxxStatusReady: Status chip with a success-coloured border.  -->
     <Style
         x:Key="xxxStatusReady"
         BasedOn="{StaticResource xStatusChip}"
         TargetType="Border">
         <Setter Property="BorderBrush" Value="{StaticResource klcSuccessColor}" />
     </Style>
+    <!--  xxxLabel: Foundation label alias.  -->
     <Style
         x:Key="xxxLabel"
         BasedOn="{StaticResource klcFdnLabel}"
         TargetType="Label" />
+    <!--  xxxButtonClose: Close button alias.  -->
     <Style
         x:Key="xxxButtonClose"
-        BasedOn="{StaticResource klcCloseButton}"
+        BasedOn="{StaticResource klcButtonClose}"
         TargetType="Button" />
+    <!--  xxxComboBoxItem: Foundation combo box item alias.  -->
     <Style
         x:Key="xxxComboBoxItem"
         BasedOn="{StaticResource klaFoundationComboBoxItem}"
         TargetType="ComboBoxItem" />
+    <!--  xxxDataGridHeader: Foundation data grid header alias.  -->
     <Style
         x:Key="xxxDataGridHeader"
         BasedOn="{StaticResource klaFoundationDataGridHeader}"
         TargetType="DataGridColumnHeader" />
+    <!--  xxxDataGridRow: Foundation data grid row alias.  -->
     <Style
         x:Key="xxxDataGridRow"
         BasedOn="{StaticResource klaFoundationDataGridRow}"

@@ -11,10 +11,15 @@
         keys; KLCodeComponents.xaml gives each one an alias that changes nothing, plus the variants.
     -->
 
+    <!--  ======================================================================  -->
+    <!--  Window: Shared window appearance and text defaults.  -->
+    <!--  ======================================================================  -->
     <!--  Window: borderless and transparent on the charcoal surface; every TextBlock inherits its font, body size and colour.  -->
+
+    <!--  klcFdnWindow: Base window surface and inherited text properties.  -->
     <Style x:Key="klcFdnWindow" TargetType="Window">
         <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
-        <Setter Property="Foreground" Value="{StaticResource klcForegroundColor}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <!--  Borderless: resizable window must set ResizeMode="CanResizeWithGrip"  -->
@@ -25,7 +30,12 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  ScrollBar: Shared track and thumb templates.  -->
+    <!--  ======================================================================  -->
     <!--  ScrollBarThumb & ScrollBar: charcoal track, green thumb, both orientations  -->
+
+    <!--  ScrollBarThumb: Thumb template shared by the scrollbar orientations.  -->
     <Style x:Key="ScrollBarThumb" TargetType="{x:Type Thumb}">
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="IsTabStop" Value="false" />
@@ -36,13 +46,14 @@
                         x:Name="rectangle"
                         Width="{TemplateBinding Width}"
                         Height="{TemplateBinding Height}"
-                        Background="{StaticResource klcBorderColor}"
+                        Background="{StaticResource klcColorGreen}"
                         CornerRadius="{StaticResource klcScrollThumbRadius}"
                         SnapsToDevicePixels="True" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
+    <!--  ScrollBar: Implicit scrollbar template for vertical and horizontal tracks.  -->
     <Style TargetType="ScrollBar">
         <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="BorderBrush" Value="{StaticResource klcBackgroundColor}" />
@@ -79,14 +90,24 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  TextBlock: Shared text behaviour.  -->
+    <!--  ======================================================================  -->
     <!--  TextBlock: wraps; font, size and colour come from klcFdnWindow  -->
+
+    <!--  klcFdnTextBlock: Base wrapping text style.  -->
     <Style x:Key="klcFdnTextBlock" TargetType="TextBlock">
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Label: Field captions and access keys.  -->
+    <!--  ======================================================================  -->
     <!--  Label: a field caption drawn as wrapping AccessText with no padding; Target names the input and "_" marks its Alt key  -->
+
+    <!--  klcFdnLabel: Wrapping access-key label with no padding.  -->
     <Style x:Key="klcFdnLabel" TargetType="Label">
-        <Setter Property="Foreground" Value="{StaticResource klcForegroundColor}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <!--  Not a no-op: WPF's own Label style pads 5 on every side.  -->
@@ -104,8 +125,13 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Hyperlink: Shared link interaction states.  -->
+    <!--  ======================================================================  -->
     <!--  Hyperlink: white on hover and keyboard focus; colour and weight at rest come from the variant  -->
     <!--  Footer links retain the original green and underline; hover/focus is supplied by the foundation link style.  -->
+
+    <!--  klcFdnLink: Base hyperlink with hover and keyboard-focus states.  -->
     <Style x:Key="klcFdnLink" TargetType="Hyperlink">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
@@ -118,9 +144,14 @@
         </Style.Triggers>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Icon: Shared geometry presenter.  -->
+    <!--  ======================================================================  -->
     <!--  ContentControl (GUI icons): the one icon presenter; windows apply it through the klaIcon<size> styles in Components  -->
     <!-- klcFdnIcon presents a klicon<Role> geometry at klcIconSize on the KlaIconCanvas with the klcIconStroke pen,
-         inheriting the control's foreground; disabled icons take KlaDisabledTextBrush. It is the only way to draw a GUI icon.-->
+         inheriting the control's foreground; disabled icons take klcTextColorDisabled. It is the only way to draw a GUI icon.-->
+
+    <!--  klcFdnIcon: Icon presenter that draws a supplied geometry.  -->
     <Style x:Key="klcFdnIcon" TargetType="ContentControl">
         <Setter Property="Width" Value="{StaticResource klcIconSize}" />
         <Setter Property="Height" Value="{StaticResource klcIconSize}" />
@@ -152,36 +183,50 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Border: Shared field group border.  -->
+    <!--  ======================================================================  -->
     <!--  Border: bordered field group  -->
-    <Style x:Key="klaFoundationBorder" TargetType="Border">
+
+    <!--  klcFdnBorder: Base bordered field group.  -->
+    <Style x:Key="klcFdnBorder" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="BorderBrush" Value="{StaticResource KlaBorderStrongBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
         <Setter Property="CornerRadius" Value="{StaticResource klcRadButton}" />
-        <Setter Property="Padding" Value="{StaticResource KlaSectionPadding}" />
+        <Setter Property="Padding" Value="{StaticResource klcSectionPadding}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Button: Shared button and toggle template.  -->
+    <!--  ======================================================================  -->
     <!--  ButtonBase: the one template behind every button and toggle variant  -->
     <!--
         One template for every button variant, ToggleButton included (hence ButtonBase). A variant re-points the klcButton* keys in
         its own Style.Resources rather than copying the template: the state triggers read them by DynamicResource, which resolves
         through the variant's resources before these defaults. Border brush and thickness are ordinary setters.
     -->
+
+    <!--  klcFdnButton: Shared template for buttons and toggles.  -->
     <Style x:Key="klcFdnButton" TargetType="ButtonBase">
+        <!--  Typed resources work in both compiled BAML and loose Python XAML.
+              StaticResource aliases here lose their dictionary keys in compiled WPF.  -->
         <Style.Resources>
-            <StaticResource x:Key="klcButtonHoverBrush" ResourceKey="KlaAccentHoverBrush" />
-            <StaticResource x:Key="klcButtonDisabledBrush" ResourceKey="KlaDisabledFillBrush" />
-            <StaticResource x:Key="klcRadButton" ResourceKey="klcRadButton" />
+            <SolidColorBrush x:Key="klcButtonHoverBrush" Color="{Binding Color, Source={StaticResource KlaAccentHoverBrush}}" />
+            <SolidColorBrush x:Key="klcButtonDisabledBrush" Color="{Binding Color, Source={StaticResource KlaDisabledFillBrush}}" />
+            <Style x:Key="klcButtonBorderShape" TargetType="Border">
+                <Setter Property="CornerRadius" Value="{StaticResource klcRadButton}" />
+            </Style>
         </Style.Resources>
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcButtonFontSize}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeButton}" />
         <Setter Property="Width" Value="{StaticResource klcButtonWidth}" />
         <Setter Property="Height" Value="{StaticResource klcButtonHeight}" />
         <Setter Property="Background" Value="{StaticResource KlaAccentBrush}" />
@@ -201,7 +246,7 @@
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{DynamicResource klcRadButton}">
+                        Style="{DynamicResource klcButtonBorderShape}">
                         <ContentPresenter
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -227,7 +272,7 @@
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource klcButtonDisabledBrush}" />
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -235,8 +280,13 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Switch: Track and thumb toggle.  -->
+    <!--  ======================================================================  -->
     <!--  ToggleButton (switch): a track and thumb beside the caption (Command Switch)  -->
-    <Style x:Key="klaFoundationSwitch" TargetType="ToggleButton">
+
+    <!--  klcFoundationSwitch: Toggle switch with a track and sliding thumb.  -->
+    <Style x:Key="klcFdnSwitch" TargetType="ToggleButton">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
@@ -244,9 +294,9 @@
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource KlaComponentBorderBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
-        <Setter Property="Padding" Value="{StaticResource KlaCommandPillInset}" />
-        <Setter Property="Margin" Value="{StaticResource KlaCommandPillGap}" />
-        <Setter Property="MinHeight" Value="{StaticResource klcButtonHeight}" />
+        <Setter Property="Padding" Value="{StaticResource klcCommandPillInset}" />
+
+        <Setter Property="Height" Value="{StaticResource klcButtonHeight}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
@@ -258,27 +308,28 @@
                         CornerRadius="{StaticResource KlaCommandPillRadius}">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="{StaticResource KlaSwitchToggleColumn}" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Border
                                 x:Name="SwitchTrack"
-                                Width="{StaticResource KlaSwitchTrackWidth}"
-                                Height="{StaticResource KlaSwitchTrackHeight}"
+                                Width="{StaticResource klcSwitchTrackWidth}"
+                                Height="{StaticResource klcSwitchTrackHeight}"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
-                                Background="{StaticResource KlaMutedBrush}"
+                                Background="{StaticResource klcTextColorDisabled}"
                                 CornerRadius="{StaticResource KlaSwitchTrackRadius}">
                                 <Ellipse
                                     x:Name="SwitchThumb"
-                                    Width="{StaticResource KlaSwitchThumbSize}"
-                                    Height="{StaticResource KlaSwitchThumbSize}"
+                                    Width="{StaticResource klcSwitchThumbSize}"
+                                    Height="{StaticResource klcSwitchThumbSize}"
                                     HorizontalAlignment="Left"
                                     Fill="{StaticResource klcTextColor}" />
                             </Border>
                             <TextBlock
-                                Grid.Column="1"
-                                VerticalAlignment="Center"
+                                Grid.Column="2"
+                                VerticalAlignment="Center" Padding="{StaticResource klcSwitchCaptionInset}"
                                 Foreground="{TemplateBinding Foreground}"
                                 Text="{TemplateBinding Content}"
                                 TextWrapping="Wrap" />
@@ -286,15 +337,22 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource klcBorderColor}" />
+                            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource klcColorGreen}" />
                             <!--  Checked: the track turns green and the thumb slides right.  -->
                             <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Right" />
                         </Trigger>
+                        <Trigger Property="IsChecked" Value="False">
+                            <!--  UnChecked: the thumb slides left.  -->
+                            <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Left" />
+                        </Trigger>
                         <!--  No hover change on toggles (owner, 2026-10-31): the pill keeps its surface under the pointer.  -->
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
                             <Setter Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
-                            <Setter TargetName="SwitchThumb" Property="Fill" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter TargetName="SwitchThumb" Property="Fill" Value="{StaticResource klcTextColorDisabled}" />
+                            <Setter Property="BorderBrush" Value="{StaticResource KlaDisabledFillBrush}" />
+                            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
+                            <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Left" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -302,16 +360,21 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  TextBox: Shared input template.  -->
+    <!--  ======================================================================  -->
     <!--  TextBox: charcoal field with a hairline green border that turns white with focus; the Tag watermark shows while the text is empty  -->
+
+    <!--  klcFdnTextBoxInput: Text input template with focus border and watermark.  -->
     <Style x:Key="klcFdnTextBoxInput" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
-        <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
-        <Setter Property="Foreground" Value="{StaticResource klcForegroundColor}" />
+        <Setter Property="FontSize" Value="{StaticResource klcFontSizeTextBox}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="CaretBrush" Value="{StaticResource klcTextColor}" />
-        <Setter Property="BorderBrush" Value="{StaticResource klcBorderColor}" />
+        <Setter Property="BorderBrush" Value="{StaticResource klcColorGreen}" />
         <Setter Property="BorderThickness" Value="{StaticResource klcBorderHairline}" />
-        <Setter Property="Height" Value="{StaticResource KlaControlHeight}" />
+        <Setter Property="Height" Value="{StaticResource klcFieldHeightNormal}" />
         <Setter Property="Padding" Value="{StaticResource klcPadTextBoxInput}" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -353,7 +416,7 @@
                             <Setter TargetName="InputBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -361,9 +424,14 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  ComboBox: Drop-down items and control.  -->
+    <!--  ======================================================================  -->
     <!--  ComboBoxItem & ComboBox: item first, then the box that applies it  -->
+
+    <!--  klaFoundationComboBoxItem: Drop-down item appearance and interaction states.  -->
     <Style x:Key="klaFoundationComboBoxItem" TargetType="ComboBoxItem">
-        <Setter Property="Foreground" Value="{StaticResource klcForegroundColor}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="Padding" Value="{StaticResource KlaCompactInset}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -389,22 +457,23 @@
                             <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
+    <!--  klaFoundationComboBox: Combo box template using the foundation item style.  -->
     <Style x:Key="klaFoundationComboBox" TargetType="ComboBox">
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
         <Setter Property="Height" Value="{StaticResource KlaControlHeight}" />
         <Setter Property="MinWidth" Value="{StaticResource klcButtonWidth}" />
         <Setter Property="MaxDropDownHeight" Value="{StaticResource KlaDropDownMaxHeight}" />
-        <Setter Property="Foreground" Value="{StaticResource klcForegroundColor}" />
+        <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
-        <Setter Property="BorderBrush" Value="{StaticResource klcBorderColor}" />
+        <Setter Property="BorderBrush" Value="{StaticResource klcColorGreen}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource klaFoundationComboBoxItem}" />
         <Setter Property="Template">
@@ -474,7 +543,7 @@
                                 MinWidth="{TemplateBinding ActualWidth}"
                                 MaxHeight="{TemplateBinding MaxDropDownHeight}"
                                 Background="{StaticResource klcBackgroundColor}"
-                                BorderBrush="{StaticResource klcBorderColor}"
+                                BorderBrush="{StaticResource klcColorGreen}"
                                 BorderThickness="{StaticResource klcBorderHairline}">
                                 <ScrollViewer
                                     CanContentScroll="True"
@@ -490,7 +559,7 @@
                             <Setter TargetName="ComboFocus" Property="BorderBrush" Value="{StaticResource KlaFocusBrush}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -498,8 +567,13 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  CheckBox: Shared check box template.  -->
+    <!--  ======================================================================  -->
     <!--  CheckBox: a 16 box in the first column, a wrapping caption in the third; checked, indeterminate, hover, pressed and disabled fills  -->
-    <Style x:Key="KlaFoundationCheckBox" TargetType="CheckBox">
+
+    <!--  klcFdnCheckBox: Check box template with caption and interaction states.  -->
+    <Style x:Key="klcFdnCheckBox" TargetType="CheckBox">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="FontFamily" Value="{StaticResource klcFont}" />
         <Setter Property="FontSize" Value="{StaticResource klcFontSizeBody}" />
@@ -516,31 +590,31 @@
                 <ControlTemplate TargetType="CheckBox">
                     <Grid Background="Transparent">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{StaticResource klcBodySpaceLarge}" />
-                            <ColumnDefinition Width="{StaticResource klcBodySpaceSmall}" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Border
                             x:Name="CheckBorder"
-                            Width="{StaticResource KlaCheckSize}"
-                            Height="{StaticResource KlaCheckSize}"
+                            Width="{StaticResource klcCheckBoxSize}"
+                            Height="{StaticResource klcCheckBoxSize}"
                             VerticalAlignment="Center"
                             Background="{StaticResource klcBackgroundColor}"
-                            BorderBrush="{StaticResource klcBorderColor}"
+                            BorderBrush="{StaticResource klcColorGreen}"
                             BorderThickness="{StaticResource klcBorderHairline}"
-                            CornerRadius="{StaticResource KlaRadiusCheck}">
+                            CornerRadius="{StaticResource klcRadCheck}">
                             <Grid>
                                 <Path
                                     x:Name="CheckMark"
                                     Data="M 2,7 L 5,10 L 12,3"
                                     Stroke="{StaticResource klcTextColor}"
-                                    StrokeThickness="{StaticResource KlaCheckStroke}"
+                                    StrokeThickness="{StaticResource klcCheckStroke}"
                                     Visibility="Collapsed" />
                                 <Path
                                     x:Name="IndeterminateMark"
                                     Data="M 3,7 L 11,7"
                                     Stroke="{StaticResource klcTextColor}"
-                                    StrokeThickness="{StaticResource KlaCheckStroke}"
+                                    StrokeThickness="{StaticResource klcCheckStroke}"
                                     Visibility="Collapsed" />
                             </Grid>
                         </Border>
@@ -565,7 +639,7 @@
                             <Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource KlaPressedBrush}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
                             <Setter TargetName="CheckBorder" Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -574,11 +648,16 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  RadioButton: Shared exclusive-choice template.  -->
+    <!--  ======================================================================  -->
     <!--  RadioButton: a round box and a dot  -->
     <!--
-        Mirrors KlaFoundationCheckBox. RadioButton is not a CheckBox, so it cannot be BasedOn it; keep the column layout,
+        Mirrors klcFdnCheckBox. RadioButton is not a CheckBox, so it cannot be BasedOn it; keep the column layout,
         wrapping caption and state fills in step with the check box when either changes.
     -->
+
+    <!--  klaFoundationRadioButton: Radio button template with a circular selection indicator.  -->
     <Style x:Key="klaFoundationRadioButton" TargetType="RadioButton">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
@@ -603,11 +682,11 @@
                         </Grid.ColumnDefinitions>
                         <Border
                             x:Name="RadioBorder"
-                            Width="{StaticResource KlaCheckSize}"
-                            Height="{StaticResource KlaCheckSize}"
+                            Width="{StaticResource klcCheckBoxSize}"
+                            Height="{StaticResource klcCheckBoxSize}"
                             VerticalAlignment="Center"
                             Background="{StaticResource klcBackgroundColor}"
-                            BorderBrush="{StaticResource klcBorderColor}"
+                            BorderBrush="{StaticResource klcColorGreen}"
                             BorderThickness="{StaticResource klcBorderHairline}"
                             CornerRadius="{StaticResource xRadiusRadio}">
                             <Ellipse
@@ -634,7 +713,7 @@
                             <Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaPressedBrush}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
                             <Setter TargetName="RadioBorder" Property="Background" Value="{StaticResource KlaDisabledFillBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -643,12 +722,17 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  Expander: Details toggle and container.  -->
+    <!--  ======================================================================  -->
     <!--  Expander: details disclosure (Message, Action Choice)  -->
     <!--
         The toggle is the expander's header: a chevron that turns down when expanded, in the Expander's own foreground, with no
         focus visual and no native circle. Code and probes use the DetailsToggle, DetailsChevron and DetailsContent part names.
     -->
-    <Style x:Key="klaFoundationExpanderToggle" TargetType="ToggleButton">
+
+    <!--  klcFdnExpanderToggle: Toggle that draws the details disclosure chevron.  -->
+    <Style x:Key="klcFdnExpanderToggle" TargetType="ToggleButton">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Expander}}" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -673,14 +757,15 @@
                             <Setter TargetName="DetailsChevron" Property="Content" Value="{StaticResource kliconChevDown}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                            <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    <Style x:Key="klaFoundationExpander" TargetType="Expander">
+    <!--  klcFdnExpander: Expander template using the foundation disclosure toggle.  -->
+    <Style x:Key="klcFdnExpander" TargetType="Expander">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Expander">
@@ -690,7 +775,7 @@
                             AutomationProperties.Name="Details"
                             Content="{TemplateBinding Header}"
                             IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                            Style="{StaticResource klaFoundationExpanderToggle}" />
+                            Style="{StaticResource klcFdnExpanderToggle}" />
                         <ContentPresenter x:Name="DetailsContent" Visibility="Collapsed" />
                     </StackPanel>
                     <ControlTemplate.Triggers>
@@ -703,13 +788,19 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  ListBox: List items and container.  -->
+    <!--  ======================================================================  -->
     <!--  ListBoxItem & ListBox: item first, then the list that applies it  -->
+
+    <!--  KlaFoundationListItem: List item retaining the native WPF row template.  -->
     <Style x:Key="KlaFoundationListItem" TargetType="ListBoxItem">
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Padding" Value="{StaticResource KlaItemPadding}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <!--  Keep the native WPF row template used by SelectFromDict, including its blue hover/selection.  -->
     </Style>
+    <!--  KlaFoundationList: List box template and scrolling behaviour.  -->
     <Style x:Key="KlaFoundationList" TargetType="ListBox">
         <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
@@ -741,7 +832,12 @@
         </Setter>
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  DataGrid: Headers, cells, rows and grid.  -->
+    <!--  ======================================================================  -->
     <!--  DataGrid: header, cell and row first, then the read-only grid that applies them  -->
+
+    <!--  klaFoundationDataGridHeader: Data grid column header appearance.  -->
     <Style x:Key="klaFoundationDataGridHeader" TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{StaticResource KlaComponentSurfaceBrush}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
@@ -755,6 +851,7 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    <!--  klaFoundationDataGridCell: Data grid cell appearance and interaction states.  -->
     <Style x:Key="klaFoundationDataGridCell" TargetType="DataGridCell">
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
         <Setter Property="Background" Value="Transparent" />
@@ -785,10 +882,11 @@
                 <Setter Property="BorderBrush" Value="{StaticResource KlaFocusBrush}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
+    <!--  klaFoundationDataGridRow: Data grid row appearance and interaction states.  -->
     <Style x:Key="klaFoundationDataGridRow" TargetType="DataGridRow">
         <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
@@ -800,10 +898,11 @@
                 <Setter Property="Background" Value="{StaticResource KlaPressedBrush}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource KlaDisabledTextBrush}" />
+                <Setter Property="Foreground" Value="{StaticResource klcTextColorDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
+    <!--  klaFoundationDataGrid: Read-only data grid using the foundation header, cell and row styles.  -->
     <Style x:Key="klaFoundationDataGrid" TargetType="DataGrid">
         <Setter Property="Background" Value="{StaticResource klcBackgroundColor}" />
         <Setter Property="Foreground" Value="{StaticResource klcTextColor}" />
@@ -829,7 +928,12 @@
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
     </Style>
 
+    <!--  ======================================================================  -->
+    <!--  GridSplitter: Review-pane divider.  -->
+    <!--  ======================================================================  -->
     <!--  GridSplitter: review-pane divider  -->
+
+    <!--  klaFoundationGridSplitter: Review-pane divider and interaction states.  -->
     <Style x:Key="klaFoundationGridSplitter" TargetType="GridSplitter">
         <Setter Property="Background" Value="{StaticResource KlaComponentBorderBrush}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />

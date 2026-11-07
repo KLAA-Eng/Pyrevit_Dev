@@ -12,7 +12,7 @@
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
-                <RowDefinition Height="{StaticResource klaBodyRowNormal}" />
+                <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
@@ -96,7 +96,7 @@
                     HorizontalAlignment="Center"
                     ResizeDirection="Columns"
                     Style="{StaticResource xSplitter}" />
-                <Border Grid.Column="2" Style="{StaticResource KlaSection}">
+                <Border Grid.Column="2" Style="{StaticResource klcBorder}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -105,20 +105,20 @@
                         </Grid.RowDefinitions>
                         <Label
                             Content="Selected Item"
-                            Style="{StaticResource klcLabelSectionHeading}"
+                            Style="{StaticResource klcLabelHeading}"
                             Target="{Binding ElementName=review_detail}" />
                         <TextBox
                             x:Name="review_detail"
                             Grid.Row="2"
-                            Style="{StaticResource KlaMultilineReadout}" />
+                            Style="{StaticResource klcTextBoxReadoutSmall}" />
                     </Grid>
                 </Border>
             </Grid>
-            <Border Grid.Row="4" Style="{StaticResource KlaBanner}">
+            <Border Grid.Row="4" Style="{StaticResource xBorderMessage}">
                 <TextBlock
                     x:Name="review_summary"
                     AutomationProperties.LiveSetting="Polite"
-                    Style="{StaticResource KlaInfoText}" />
+                    Style="{StaticResource klcTextBlockMuted}" />
             </Border>
             <!--  Actions as in the Selection dialog: the secondary action centred above the main one.  -->
             <Grid Grid.Row="6">

@@ -35,7 +35,7 @@
                 x:Name="text_label"
                 Grid.Row="2"
                 Content="Select Type:"
-                Style="{StaticResource klcLabelSectionHeading}"
+                Style="{StaticResource klcLabelHeading}"
                 Target="{Binding ElementName=main_ListBox}" />
             <ListBox
                 x:Name="main_ListBox"
@@ -55,13 +55,13 @@
             <StackPanel x:Name="UI_stack_region_settings" Grid.Row="6">
                 <TextBlock
                     Margin="0,0,0,8"
-                    Style="{StaticResource klaPromptText}"
+                    Style="{StaticResource klcTextBlockHeading}"
                     Text="Additional Settings:" />
-                <Border Style="{StaticResource KlaSection}">
+                <Border Style="{StaticResource klcBorder}">
                     <Grid HorizontalAlignment="Left">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{StaticResource KlaCompactFieldLabelColumn}" />
-                            <ColumnDefinition Width="{StaticResource KlaCompactFieldInputColumn}" />
+                            <ColumnDefinition Width="{StaticResource klcRenameLabelColumn}" />
+                            <ColumnDefinition Width="{StaticResource klcRenameInputColumn}" />
                             <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
@@ -74,12 +74,12 @@
                             Grid.Column="1"
                             AutomationProperties.Name="Offset from level in centimeters"
                             PreviewTextInput="NumberValidationTextBox"
-                            Style="{StaticResource KlaCompactFieldInput}"
+                            Style="{StaticResource klcTextBox}"
                             Text="0" />
                         <TextBlock
                             Grid.Column="3"
                             VerticalAlignment="Center"
-                            Style="{StaticResource KlaInfoText}"
+                            Style="{StaticResource klcTextBlockMuted}"
                             Text="cm" />
                     </Grid>
                 </Border>

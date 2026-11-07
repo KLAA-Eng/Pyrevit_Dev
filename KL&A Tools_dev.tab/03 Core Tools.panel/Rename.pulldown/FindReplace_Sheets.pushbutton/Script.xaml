@@ -21,10 +21,10 @@
                         <StackPanel>
                             <TextBlock
                                 Margin="0,0,0,8"
-                                Style="{StaticResource klaPromptText}"
+                                Style="{StaticResource klcTextBlockHeading}"
                                 Text="Sheet Number" />
-                            <Border Style="{StaticResource KlaSection}">
-                                <ItemsControl Style="{StaticResource KlaFieldRows}">
+                            <Border Style="{StaticResource klcBorder}">
+                                <ItemsControl Style="{StaticResource klcRenameRows}">
                                     <Label
                                         Content="Find:"
                                         Style="{StaticResource klcLabelCentered}"
@@ -33,7 +33,7 @@
                                         x:Name="input_sheet_number_find"
                                         Grid.Column="1"
                                         AutomationProperties.Name="Find sheet number text"
-                                        Style="{StaticResource KlaCompactFieldInput}" />
+                                        Style="{StaticResource klcTextBox}" />
                                     <Label
                                         Grid.Row="2"
                                         Content="Replace:"
@@ -44,7 +44,7 @@
                                         Grid.Row="2"
                                         Grid.Column="1"
                                         AutomationProperties.Name="Replacement sheet number text"
-                                        Style="{StaticResource KlaCompactFieldInput}" />
+                                        Style="{StaticResource klcTextBox}" />
                                     <Label
                                         Grid.Row="4"
                                         Content="Prefix:"
@@ -55,7 +55,7 @@
                                         Grid.Row="4"
                                         Grid.Column="1"
                                         AutomationProperties.Name="Sheet number prefix"
-                                        Style="{StaticResource KlaCompactFieldInput}" />
+                                        Style="{StaticResource klcTextBox}" />
                                     <Label
                                         Grid.Row="6"
                                         Content="Suffix:"
@@ -66,17 +66,17 @@
                                         Grid.Row="6"
                                         Grid.Column="1"
                                         AutomationProperties.Name="Sheet number suffix"
-                                        Style="{StaticResource KlaCompactFieldInput}" />
+                                        Style="{StaticResource klcTextBox}" />
                                 </ItemsControl>
                             </Border>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
                             <TextBlock
                                 Margin="0,0,0,8"
-                                Style="{StaticResource klaPromptText}"
+                                Style="{StaticResource klcTextBlockHeading}"
                                 Text="Sheet Name" />
-                            <Border Style="{StaticResource KlaSection}">
-                                <ItemsControl Style="{StaticResource KlaFieldRows}">
+                            <Border Style="{StaticResource klcBorder}">
+                                <ItemsControl Style="{StaticResource klcRenameRows}">
                                     <Label
                                         Content="Find:"
                                         Style="{StaticResource klcLabelCentered}"
@@ -85,7 +85,7 @@
                                         x:Name="input_sheet_name_find"
                                         Grid.Column="1"
                                         AutomationProperties.Name="Find sheet name text"
-                                        Style="{StaticResource KlaCompactFieldInput}" />
+                                        Style="{StaticResource klcTextBox}" />
                                     <Label
                                         Grid.Row="2"
                                         Content="Replace:"
@@ -96,7 +96,7 @@
                                         Grid.Row="2"
                                         Grid.Column="1"
                                         AutomationProperties.Name="Replacement sheet name text"
-                                        Style="{StaticResource KlaCompactFieldInput}" />
+                                        Style="{StaticResource klcTextBox}" />
                                     <Label
                                         Grid.Row="4"
                                         Content="Prefix:"
@@ -107,7 +107,7 @@
                                         Grid.Row="4"
                                         Grid.Column="1"
                                         AutomationProperties.Name="Sheet name prefix"
-                                        Style="{StaticResource KlaCompactFieldInput}" />
+                                        Style="{StaticResource klcTextBox}" />
                                     <Label
                                         Grid.Row="6"
                                         Content="Suffix:"
@@ -118,7 +118,7 @@
                                         Grid.Row="6"
                                         Grid.Column="1"
                                         AutomationProperties.Name="Sheet name suffix"
-                                        Style="{StaticResource KlaCompactFieldInput}" />
+                                        Style="{StaticResource klcTextBox}" />
                                 </ItemsControl>
                             </Border>
                         </StackPanel>
@@ -146,18 +146,18 @@
                     <Border
                         x:Name="result_panel"
                         Margin="0,8,0,0"
-                        Style="{StaticResource KlaSection}"
+                        Style="{StaticResource klcBorder}"
                         Visibility="Collapsed">
                         <StackPanel>
                             <TextBlock
                                 x:Name="result_summary"
                                 Margin="0,0,0,8"
-                                Style="{StaticResource KlaInfoText}" />
+                                Style="{StaticResource klcTextBlockMuted}" />
                             <TextBox
                                 x:Name="result_details"
                                 Height="140"
                                 AutomationProperties.Name="Sheet rename results"
-                                Style="{StaticResource KlaMultilineReadout}" />
+                                Style="{StaticResource klcTextBoxReadoutSmall}" />
                         </StackPanel>
                     </Border>
                 </StackPanel>

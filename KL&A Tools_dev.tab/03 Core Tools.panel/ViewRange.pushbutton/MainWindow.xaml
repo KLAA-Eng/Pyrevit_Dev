@@ -4,7 +4,7 @@
     Title="View Range Editor"
     Width="760"
     MinWidth="760"
-    MinHeight="340"
+    MinHeight="380"
     MaxHeight="600"
     ResizeMode="CanResizeWithGrip"
     SizeToContent="Height"
@@ -13,31 +13,26 @@
     <Window.Resources>
         <Style
             x:Key="ViewRangeTableHeader"
-            BasedOn="{StaticResource klaSectionHeading}"
+            BasedOn="{StaticResource klcTextBlockHeading}"
             TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="TextAlignment" Value="Center" />
         </Style>
-        <Style x:Key="ViewRangeTableCell" TargetType="TextBlock">
+        <Style x:Key="ViewRangeTableCell" BasedOn="{StaticResource xText}" TargetType="TextBlock">
             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="TextAlignment" Value="Center" />
         </Style>
     </Window.Resources>
-    <!--
-        NOTE (2026-11-01): this body still uses literal rows, margins and a hand-built table; it needs a full layout rework
-        on the dialog pattern (token spacer rows, Reset above the main action). Only the status colours, the action row
-        height and the pair gap were corrected in this pass.
-    -->
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="8" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="8" />
+                <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <ScrollViewer
@@ -49,7 +44,7 @@
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">
                 <TextBlock
-                    Style="{StaticResource KlaInfoText}"
+                    Style="{StaticResource klcTextBlockMuted}"
                     Text="{Binding message}"
                     TextWrapping="Wrap" />
             </ScrollViewer>
@@ -58,46 +53,52 @@
                 HorizontalScrollBarVisibility="Disabled"
                 VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Grid x:Name="grid_main" HorizontalAlignment="Center">
+                    <Grid x:Name="grid_main" HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="20" />
                             <ColumnDefinition Width="110" />
-                            <ColumnDefinition Width="250" />
-                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
+                            <ColumnDefinition Width="104" />
+                            <ColumnDefinition Width="{StaticResource klcBodySpaceNormal}" />
                             <ColumnDefinition Width="180" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="32" />
-                            <RowDefinition Height="32" />
-                            <RowDefinition Height="32" />
-                            <RowDefinition Height="32" />
-                            <RowDefinition Height="32" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodySpaceNormal}" />
+                            <RowDefinition Height="{StaticResource klcBodyRowNormal}" />
                         </Grid.RowDefinitions>
-                        <Rectangle
+                        <Border
                             Grid.Row="0"
-                            Grid.ColumnSpan="5"
-                            Fill="{StaticResource KlaBorderStrongBrush}"
-                            RadiusX="5"
-                            RadiusY="5" />
+                            Grid.ColumnSpan="8"
+                            Background="{StaticResource KlaBorderStrongBrush}"
+                            CornerRadius="{StaticResource klcRadButton}" />
                         <TextBlock
                             Grid.Column="1"
                             Style="{StaticResource ViewRangeTableHeader}"
                             Text="Plane" />
                         <TextBlock
-                            Grid.Column="2"
+                            Grid.Column="3"
                             Style="{StaticResource ViewRangeTableHeader}"
                             Text="Elevation - ft" />
                         <TextBlock
-                            Grid.Column="3"
+                            Grid.Column="5"
                             Style="{StaticResource ViewRangeTableHeader}"
                             Text="Level Offset" />
                         <TextBlock
-                            Grid.Column="4"
+                            Grid.Column="7"
                             Style="{StaticResource ViewRangeTableHeader}"
                             Text="Level" />
 
                         <Rectangle
-                            Grid.Row="1"
+                            Grid.Row="2"
                             Width="5"
                             Height="20"
                             VerticalAlignment="Center"
@@ -105,34 +106,33 @@
                             RadiusX="3"
                             RadiusY="3" />
                         <TextBlock
-                            Grid.Row="1"
+                            Grid.Row="2"
                             Grid.Column="1"
                             Margin="4,0"
                             HorizontalAlignment="Left"
                             Style="{StaticResource ViewRangeTableCell}"
                             Text="Top Plane" />
                         <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="2"
+                            Grid.Row="2"
+                            Grid.Column="3"
                             Style="{StaticResource ViewRangeTableCell}"
                             Text="{Binding topplane_elevation}" />
                         <TextBox
                             x:Name="topplane_input"
-                            Grid.Row="1"
-                            Grid.Column="3"
-                            Width="104"
-                            HorizontalAlignment="Center"
+                            Grid.Row="2"
+                            Grid.Column="5"
+                            HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Right"
                             AutomationProperties.Name="Top plane level offset"
                             IsEnabled="{Binding can_modify_view}"
-                            Style="{StaticResource KlaCompactFieldInput}"
+                            Style="{StaticResource klcTextBox}"
                             Text="{Binding topplane_new_value, UpdateSourceTrigger=PropertyChanged}" />
                         <ComboBox
                             x:Name="topplane_level_combo"
-                            Grid.Row="1"
-                            Grid.Column="4"
-                            Width="170"
-                            HorizontalAlignment="Center"
+                            Grid.Row="2"
+                            Grid.Column="7"
+                            MinWidth="170"
+                            HorizontalAlignment="Stretch"
                             AutomationProperties.Name="Top plane level"
                             DisplayMemberPath="Name"
                             IsEnabled="{Binding can_modify_view}"
@@ -142,7 +142,7 @@
                             Style="{StaticResource klcComboBoxFilter}" />
 
                         <Rectangle
-                            Grid.Row="2"
+                            Grid.Row="4"
                             Width="5"
                             Height="20"
                             VerticalAlignment="Center"
@@ -150,37 +150,36 @@
                             RadiusX="3"
                             RadiusY="3" />
                         <TextBlock
-                            Grid.Row="2"
+                            Grid.Row="4"
                             Grid.Column="1"
                             Margin="4,0"
                             HorizontalAlignment="Left"
                             Style="{StaticResource ViewRangeTableCell}"
                             Text="Cut Plane" />
                         <TextBlock
-                            Grid.Row="2"
-                            Grid.Column="2"
+                            Grid.Row="4"
+                            Grid.Column="3"
                             Style="{StaticResource ViewRangeTableCell}"
                             Text="{Binding cutplane_elevation}" />
                         <TextBox
                             x:Name="cutplane_input"
-                            Grid.Row="2"
-                            Grid.Column="3"
-                            Width="104"
-                            HorizontalAlignment="Center"
+                            Grid.Row="4"
+                            Grid.Column="5"
+                            HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Right"
                             AutomationProperties.Name="Cut plane level offset"
                             IsEnabled="{Binding can_modify_view}"
-                            Style="{StaticResource KlaCompactFieldInput}"
+                            Style="{StaticResource klcTextBox}"
                             Text="{Binding cutplane_new_value, UpdateSourceTrigger=PropertyChanged}" />
                         <TextBlock
-                            Grid.Row="2"
-                            Grid.Column="4"
+                            Grid.Row="4"
+                            Grid.Column="7"
                             FontStyle="Italic"
                             Style="{StaticResource ViewRangeTableCell}"
                             Text="{Binding cutplane_level_name}" />
 
                         <Rectangle
-                            Grid.Row="3"
+                            Grid.Row="6"
                             Width="5"
                             Height="20"
                             VerticalAlignment="Center"
@@ -188,34 +187,33 @@
                             RadiusX="3"
                             RadiusY="3" />
                         <TextBlock
-                            Grid.Row="3"
+                            Grid.Row="6"
                             Grid.Column="1"
                             Margin="4,0"
                             HorizontalAlignment="Left"
                             Style="{StaticResource ViewRangeTableCell}"
                             Text="Bottom Plane" />
                         <TextBlock
-                            Grid.Row="3"
-                            Grid.Column="2"
+                            Grid.Row="6"
+                            Grid.Column="3"
                             Style="{StaticResource ViewRangeTableCell}"
                             Text="{Binding bottomplane_elevation}" />
                         <TextBox
                             x:Name="bottomplane_input"
-                            Grid.Row="3"
-                            Grid.Column="3"
-                            Width="104"
-                            HorizontalAlignment="Center"
+                            Grid.Row="6"
+                            Grid.Column="5"
+                            HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Right"
                             AutomationProperties.Name="Bottom plane level offset"
                             IsEnabled="{Binding can_modify_view}"
-                            Style="{StaticResource KlaCompactFieldInput}"
+                            Style="{StaticResource klcTextBox}"
                             Text="{Binding bottomplane_new_value, UpdateSourceTrigger=PropertyChanged}" />
                         <ComboBox
                             x:Name="bottomplane_level_combo"
-                            Grid.Row="3"
-                            Grid.Column="4"
-                            Width="170"
-                            HorizontalAlignment="Center"
+                            Grid.Row="6"
+                            Grid.Column="7"
+                            MinWidth="170"
+                            HorizontalAlignment="Stretch"
                             AutomationProperties.Name="Bottom plane level"
                             DisplayMemberPath="Name"
                             IsEnabled="{Binding can_modify_view}"
@@ -225,7 +223,7 @@
                             Style="{StaticResource klcComboBoxFilter}" />
 
                         <Rectangle
-                            Grid.Row="4"
+                            Grid.Row="8"
                             Width="5"
                             Height="20"
                             VerticalAlignment="Center"
@@ -233,34 +231,33 @@
                             RadiusX="3"
                             RadiusY="3" />
                         <TextBlock
-                            Grid.Row="4"
+                            Grid.Row="8"
                             Grid.Column="1"
                             Margin="4,0"
                             HorizontalAlignment="Left"
                             Style="{StaticResource ViewRangeTableCell}"
                             Text="View Depth" />
                         <TextBlock
-                            Grid.Row="4"
-                            Grid.Column="2"
+                            Grid.Row="8"
+                            Grid.Column="3"
                             Style="{StaticResource ViewRangeTableCell}"
                             Text="{Binding viewdepth_elevation}" />
                         <TextBox
                             x:Name="viewdepth_input"
-                            Grid.Row="4"
-                            Grid.Column="3"
-                            Width="104"
-                            HorizontalAlignment="Center"
+                            Grid.Row="8"
+                            Grid.Column="5"
+                            HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Right"
                             AutomationProperties.Name="View depth level offset"
                             IsEnabled="{Binding can_modify_view}"
-                            Style="{StaticResource KlaCompactFieldInput}"
+                            Style="{StaticResource klcTextBox}"
                             Text="{Binding viewdepth_new_value, UpdateSourceTrigger=PropertyChanged}" />
                         <ComboBox
                             x:Name="viewdepth_level_combo"
-                            Grid.Row="4"
-                            Grid.Column="4"
-                            Width="170"
-                            HorizontalAlignment="Center"
+                            Grid.Row="8"
+                            Grid.Column="7"
+                            MinWidth="170"
+                            HorizontalAlignment="Stretch"
                             AutomationProperties.Name="View depth level"
                             DisplayMemberPath="Name"
                             IsEnabled="{Binding can_modify_view}"
@@ -272,12 +269,12 @@
                     <!--  The status line follows the view model's status_kind: success, warning (default) or error.  -->
                     <TextBlock
                         x:Name="warning"
-                        Margin="0,8,0,0"
+                        Margin="{StaticResource klcStackGapVert}"
                         AutomationProperties.LiveSetting="Polite"
                         Text="{Binding warning_message}"
                         TextWrapping="Wrap">
                         <TextBlock.Style>
-                            <Style TargetType="TextBlock">
+                            <Style BasedOn="{StaticResource klcTextBlockFeedback}" TargetType="TextBlock">
                                 <Setter Property="Foreground" Value="{StaticResource klcWarningColor}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding status_kind}" Value="success">
@@ -295,22 +292,24 @@
                     </TextBlock>
                 </StackPanel>
             </ScrollViewer>
-            <StackPanel
-                Grid.Row="4"
-                HorizontalAlignment="Center"
-                Orientation="Horizontal">
+            <Grid Grid.Row="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 <Button
-                    Click="apply_changes_click"
-                    Content="Apply Changes"
-                    IsEnabled="{Binding can_modify_view}"
-                    Style="{StaticResource klcButtonDouble}" />
-                <Button
-                    Margin="{StaticResource klcStackGapHoriz}"
                     Click="reset_values_click"
                     Content="Reset"
                     Style="{StaticResource klcButtonSec}"
                     ToolTip="Reset to original values" />
-            </StackPanel>
+                <Button
+                    Grid.Row="2"
+                    Click="apply_changes_click"
+                    Content="Apply Changes"
+                    IsEnabled="{Binding can_modify_view}"
+                    Style="{StaticResource klcButtonDouble}" />
+            </Grid>
         </Grid>
     </ContentControl>
 </Window>

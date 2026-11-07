@@ -517,3 +517,38 @@ implementation of this confirmed scope.
 | GUI-43 | Review II behaviour batch | Implemented; host-free checks pass; Windows probes pending | Results, defaults, close policy, Rename, Gallery owner, status line, colon rule, Message default, placeholder token, lint scope and docs. [Evidence](../knowledge/reviews/design-system/2026-10-31-review-ii-decisions.md). |
 | GUI-44 | Shared dialog XAML cleanup | Implemented; source checks pass; Windows renders pending | Shared Details/readout/command-link styles in Components, typed tokens for dialog bodies, Command Switch dictionary strict, `KlaFloatingWindow`. No intended visual change. [Evidence](../knowledge/reviews/design-system/2026-10-31-dialog-xaml-cleanup.md). |
 | GUI-45 | Command Switch edge and toggle pill | Owner decided 2026-10-31; implemented; Windows render pending | No panel shadow or outline; toggle pills keep current colours with no hover fill; both recorded as accepted deviations. [Evidence](../knowledge/reviews/design-system/2026-10-31-review-ii-decisions.md). |
+
+## WPF baseline and production adoption — approved 2026-11-06
+
+The owner confirmed this sequence after grilling and authorized implementation
+with subagents. This section supersedes GUI-42's requirement to wait for GUI-08
+before migrating SelectFromDict; live Revit acceptance itself remains separate.
+
+1. Transfer the existing WPF workspace XAML into the extension first, including
+   its reviewed Components, Foundation, Tokens and icon dictionaries.
+2. Route `GUI.forms.select_from_dict` through the shared Selection dialog with
+   a compatibility adapter. Preserve existing caller inputs, defaults, custom
+   labels, filtered checks and list results. Caller refinements are deferred.
+3. Refine Duplicate Sheets and View Range using the standard dialog patterns,
+   preserving tool operations and modal/modeless lifecycles.
+4. Keep extension XAML and WPF working copies synchronized, using WPF XAML as
+   the presentation baseline. Designer-only attributes belong only in Views.
+
+After the initial transfer, any new styles belong in each window's resources.
+Further edits to shared Components, Foundation or Tokens require explicit owner
+confirmation. Reuse existing shared roles and typed tokens wherever suitable.
+Native dialogs, other caller migrations, compiled tool redesign, model-operation
+changes and caller refinements are outside this delivery.
+
+| ID | Delivery | Status | Acceptance / evidence |
+| --- | --- | --- | --- |
+| GUI-46 | Transfer current WPF baseline | Applied; build passes | Workspace Check validated 21 changed files; Apply saved timestamped originals in WPF Backups/20261106-223958-9687. Preview attributes removed; names/events preserved. |
+| GUI-47 | Shared selector compatibility adoption | Implemented; locally verified | Existing production call sites unchanged; 14 adapter tests pass, including four actual WPF modal cases. |
+| GUI-48 | Duplicate Sheets and View Range refinement | Implemented; locally verified | Window-local styles, shared tokens and components, retained callbacks/bindings; normal/minimum renders inspected and both XAML files synchronized. |
+| GUI-49 | Integration and acceptance evidence | Local verification complete; live Revit acceptance pending | [Evidence](../knowledge/reviews/design-system/2026-11-06-wpf-baseline-adoption.md): 159 Gallery states, shared-dialog setups, transfer protections, 17 C# contracts, both compiled-runtime smokes and independent review. All 43 tracked XAML sources synchronized. |
+
+The owner separately approved replacing the secondary-button literal border
+color on 2026-11-06. `klcButtonSec` now references the existing
+`KlaComponentBorderBrush` token with the same `#52675D` value; no new token or
+appearance change was needed. This is the only shared-resource follow-up after
+the initial baseline transfer.

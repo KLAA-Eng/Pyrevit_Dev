@@ -122,8 +122,8 @@ public partial class StartupSourcePickerWindow : Window
 
     private void ApplyValidationColors()
     {
-        ChecklistStatus.Foreground = (Brush)FindResource(_viewModel.IsChecklistValid ? "klcInfo" : "KlaMutedBrush");
-        SettingsStatus.Foreground = (Brush)FindResource(_viewModel.AreSettingsValid ? "klcInfo" : "KlaMutedBrush");
+        ChecklistStatus.Foreground = (Brush)FindResource(_viewModel.IsChecklistValid ? "klcInfo" : "klcTextColorMuted");
+        SettingsStatus.Foreground = (Brush)FindResource(_viewModel.AreSettingsValid ? "klcInfo" : "klcTextColorMuted");
     }
 
     private static string ShortHash(string hash)

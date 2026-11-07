@@ -31,7 +31,10 @@ The shared `lib/GUI/DuplicateSheets.xaml` body loads through
 title and `__version__`. The three naming columns use the compact field scheme;
 include-element checks, existing-element choices, duplicate radio choices and
 the centered main action retain their control contracts and defaults. The
-window is 1050 by 688 units to accommodate the shared 60/240-unit field columns.
+window starts at 1050 by 688 units to accommodate the shared field columns and
+can resize down to 1050 by 480. The body scrolls while the centered main action
+remains visible. Include-element choices use four columns; naming headings and
+checkbox sizing reuse shared roles/tokens through window-local styles.
 The adapter closes before invoking the existing duplicate callback; the caller
 still owns modal display and all Revit operations. Isolated rendering does not
 replace the live Revit validation described above.

@@ -6,7 +6,7 @@
         <Grid x:Name="window_body">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="40"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="200"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
             <TextBlock Text="Review actual window layouts with fictional data; text starting with ** is supplied by the Gallery, everything else comes from the window. Production tool commands are never run. Five compiled previews are deferred; docked panels and overlays are outside this Gallery."
-                       TextWrapping="Wrap" Margin="0,0,0,8" Foreground="{StaticResource KlaMutedBrush}"/>
+                       TextWrapping="Wrap" Margin="0,0,0,8" Foreground="{StaticResource klcTextColorMuted}"/>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="180"/><ColumnDefinition Width="12"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="190"/></Grid.ColumnDefinitions>
                 <Label Content="_Search" Target="{Binding ElementName=FilterBox}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
@@ -44,15 +44,15 @@
                     <DataGridTextColumn Header="Used by tools" Binding="{Binding UsedBy}" Width="*" MinWidth="180"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <TextBlock x:Name="CountText" Grid.Row="3" Foreground="{StaticResource KlaMutedBrush}" Margin="0,8"/>
-            <Border Grid.Row="4" Style="{StaticResource KlaSection}">
+            <TextBlock x:Name="CountText" Grid.Row="3" Foreground="{StaticResource klcTextColorMuted}" Margin="0,8"/>
+            <Border Grid.Row="4" Style="{StaticResource klcBorder}">
                 <Grid>
                     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="16"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                         <StackPanel>
                             <TextBlock x:Name="DetailTitle" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap"/>
                             <TextBlock x:Name="DetailDescription" TextWrapping="Wrap" Margin="0,8"/>
-                            <TextBlock x:Name="SourceText" TextWrapping="Wrap" Foreground="{StaticResource KlaMutedBrush}"/>
+                            <TextBlock x:Name="SourceText" TextWrapping="Wrap" Foreground="{StaticResource klcTextColorMuted}"/>
                             <TextBlock x:Name="AvailabilityText" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{StaticResource klcWarningColor}"/>
                         </StackPanel>
                     </ScrollViewer>
@@ -63,7 +63,7 @@
                             <ListBox.ItemTemplate><DataTemplate>
                                 <StackPanel Margin="0,4" ToolTip="{Binding Evidence}">
                                     <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding Path}" Foreground="{StaticResource KlaMutedBrush}" FontSize="11" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Path}" Foreground="{StaticResource klcTextColorMuted}" FontSize="11" TextWrapping="Wrap"/>
                                 </StackPanel>
                             </DataTemplate></ListBox.ItemTemplate>
                         </ListBox>
@@ -77,7 +77,7 @@
                 <Label Grid.Column="3" Content="Preview _state" Target="{Binding ElementName=StateSelector}" Foreground="{StaticResource klcTextColor}" VerticalAlignment="Center"/>
                 <ComboBox x:Name="StateSelector" Grid.Column="4" Style="{StaticResource klcComboBoxFilter}" SelectionChanged="preview_choice_changed" AutomationProperties.Name="Preview state"/>
                 <Button x:Name="LaunchButton" Grid.Column="6" Content="_Open preview" Click="launch_selected" Style="{StaticResource klcButton}"/>
-                <TextBlock x:Name="LastResult" Grid.Column="7" Margin="12,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{StaticResource KlaMutedBrush}"/>
+                <TextBlock x:Name="LastResult" Grid.Column="7" Margin="12,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{StaticResource klcTextColorMuted}"/>
             </Grid>
         </Grid>
     </ContentControl>

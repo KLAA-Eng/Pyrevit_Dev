@@ -26,7 +26,9 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="{StaticResource klcBodySpaceSmall}" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <!--  StackPanel: Fdn TextBox and ComboBox need work  -->
@@ -81,9 +83,9 @@
             <Label
                 x:Name="prompt_label"
                 Grid.Row="2"
-                Style="{StaticResource klcLabelSectionHeading}"
+                Style="{StaticResource klcLabelHeading}"
                 Target="{Binding ElementName=items_list}" />
-            <!--  ListBox: Need Preview  -->
+            <!--  ListBox: Review Preview  -->
             <ListBox
                 x:Name="items_list"
                 Grid.Row="4"
@@ -99,23 +101,21 @@
                             Content="{Binding}"
                             IsChecked="{Binding IsChecked, Mode=OneWay}"
                             IsEnabled="{Binding CanSelect}"
-                            Style="{StaticResource KlaDialogCheck}" />
+                            Style="{StaticResource klcCheckBoxSelection}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <!--  TextBox: Good - Remove Placeholder Text  -->
+            <!--  TextBox: Good  -->
             <TextBlock
                 x:Name="validation_text"
-                Grid.Row="5"
-                Margin="{StaticResource klcStackGapVert}"
-                Style="{StaticResource klcTextBoxFeedback}" />
+                Grid.Row="6"
+                Style="{StaticResource klcTextBlockFeedback}" />
             <!--  StackPanel: Good  -->
-            <!--  The validation line and batch actions carry their own gap, so it collapses with them.  -->
-            <StackPanel Grid.Row="6">
+            <StackPanel Grid.Row="8">
                 <!--  StackPanel: Good  -->
                 <StackPanel
                     x:Name="batch_actions"
-                    Margin="{StaticResource klcStackGapVert}"
+                    Margin="0,0,0,8"
                     HorizontalAlignment="Center"
                     Orientation="Horizontal">
                     <!--  Button: Good  -->
@@ -133,7 +133,6 @@
                 <!--  Button: Good  -->
                 <Button
                     x:Name="accept_button"
-                    Margin="{StaticResource klcStackGapVert}"
                     Click="accept_selection"
                     Content="Select"
                     Style="{StaticResource klcButtonDouble}" />

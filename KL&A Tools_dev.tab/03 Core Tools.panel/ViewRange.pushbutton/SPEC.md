@@ -30,9 +30,9 @@ The View Range window shows the four planes in a table headed **Plane**,
 **Elevation - ft**, **Level Offset**, and **Level**. These headings are static;
 the displayed elevation and offset values follow the model's length units.
 The window opts into `klcWindowShell`: its header and footer are both 24 units
-high, body padding is 16 horizontally and 8 vertically, and the centered footer
+high, body padding follows the shared token (16 at the top/sides, 8 below), and the centered footer
 receives the calling command's pure version. Typography is Segoe UI: shared
-14-unit section/table headings and 12-unit values/status text. The plane names
+16-unit section/table headings and 12-unit values/status text. The plane names
 remain left-aligned under their centered heading; other table content is
 centered by column, while numeric offsets remain right-aligned inside their
 24-high shared compact fields. Level selectors use the shared dark ComboBox
@@ -40,8 +40,11 @@ and item styles, including full-surface opening and disabled/focus states.
 
 The instruction area reserves at least 40 and at most 96 units, scrolling longer
 messages so instruction text remains reachable.
-Apply Changes and Reset remain a centered horizontal group with an 8-unit gap;
-Apply uses the shared 216 x 32 main role and Reset the 104 x 28 secondary role.
+Reset is centered above Apply Changes with a token-based gap;
+Apply and Reset reuse the shared main and secondary button roles.
+The table uses token-based rows and spacer columns, with flexible elevation
+width and stretched level selectors. Text alignment is defined in window-local
+styles based on shared components; no shared style additions are required.
 Empty warnings take no space. Table/warning content can scroll independently
 of the action group when the resizable, height-sized window reaches its limit.
 The four plane colors, length formatting, table headings and Revit operations

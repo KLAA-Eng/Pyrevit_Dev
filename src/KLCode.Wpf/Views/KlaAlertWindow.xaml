@@ -13,9 +13,9 @@
                 </Border>
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="8"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-                    <TextBlock x:Name="AlertHeading" Style="{StaticResource klaSectionHeading}"/>
+                    <TextBlock x:Name="AlertHeading" Style="{StaticResource klcTextBlockHeading}"/>
                     <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                        <TextBlock x:Name="AlertMessage" Style="{StaticResource KlaInfoText}"/>
+                        <TextBlock x:Name="AlertMessage" Style="{StaticResource klcTextBlockMuted}"/>
                     </ScrollViewer>
                 </Grid>
             </Grid>

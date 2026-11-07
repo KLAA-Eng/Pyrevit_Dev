@@ -1,13 +1,23 @@
 # Shared dialogs
 
 Opt-in Python WPF library, introduced on 2026-10-29. This contract owns the
-shared dialogs and the confirmed refinement; existing tools keep their calls.
+shared dialogs and the confirmed refinement. Existing tools keep their calls;
+`GUI.forms.select_from_dict` delegates to Selection through a compatibility
+adapter, as approved on 2026-11-06.
 The [consolidation plan](../../../docs/plans/custom-window-consolidation.md)
 owns implementation status. The [API guide](README.md) owns usage examples.
 
 - AC-001: Importing `GUI.dialogs` requires neither WPF nor an active document.
   Factory functions construct windows; `show_*`/selection/prompt helpers show
   them modally and return `DialogResult`. No automatic script exit occurs.
+- AC-001a: The legacy `GUI.forms.select_from_dict` entry point returns a list,
+  including in single mode; cancellation or an accepted empty selection returns
+  `[]`. It accepts dictionaries or lists, omits falsy keys and sorts by key.
+  Unlike the generic selector, it checks the first row when
+  `initial_checked_names=None`; an explicit empty collection checks none.
+  Caller title, version, prompt and button text remain supported. Hidden checks
+  survive filtering and batch checking affects visible rows only. The generic
+  dialog API and its unchecked default remain unchanged.
 - AC-002: Message is an OK-only notice with information/warning/error/success
   and optional collapsed Details. Both Message variants omit the shared footer
   and its reserved row; Close and OK remain. The center chrome title is blank;
@@ -153,6 +163,6 @@ replacements for pyRevit return types. Existing multi-button Message options
 are retired from this unused opt-in API; existing CustomAlert retains its API.
 
 Native file/folder/color pickers, progress and selection overlays, existing
-CustomAlert/SelectFromDict workflow migration and packaged compiled assemblies
+CustomAlert workflow migration, further caller refinements and packaged compiled assemblies
 are out of scope. The owner's subsequent presentation change removes the footer
 from both shared Message variants and legacy CustomAlert.

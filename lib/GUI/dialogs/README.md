@@ -1,5 +1,13 @@
 # Reusable shared dialogs
 
+Existing `from GUI.forms import select_from_dict` callers open the shared
+Selection window through `GUI.selection_compat`. Their signature and list
+return contract remain unchanged, including single selection and cancelled or
+empty results. The adapter retains sorted dictionary labels, caller button text
+and the legacy first checked row; pass `initial_checked_names=[]` for no initial
+checks. New code can use the explicit `GUI.dialogs` APIs below, whose defaults
+and `DialogResult` contract are unchanged.
+
 Opt-in Python/IronPython WPF dialogs using KLCode resources. Existing tools keep
 their current calls. The [SPEC](SPEC.md) owns behavior, the
 [design system](../../../docs/DESIGNSYSTEM.md) owns visual rules, and the

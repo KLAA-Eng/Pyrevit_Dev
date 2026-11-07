@@ -13,7 +13,7 @@
     WindowStartupLocation="CenterScreen">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
         <Grid x:Name="window_body">
-            <Border x:Name="alert_banner" Style="{StaticResource KlaBanner}">
+            <Border x:Name="alert_banner" Style="{StaticResource xBorderMessage}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -34,7 +34,7 @@
                         <TextBlock
                             x:Name="alert_heading"
                             Grid.Column="2"
-                            Style="{StaticResource klaSectionHeading}"
+                            Style="{StaticResource klcTextBlockHeading}"
                             Text="Information" />
                     </Grid>
                     <ScrollViewer
@@ -44,7 +44,7 @@
                         Focusable="True"
                         HorizontalScrollBarVisibility="Disabled"
                         VerticalScrollBarVisibility="Auto">
-                        <TextBlock x:Name="message_text" Style="{StaticResource KlaInfoText}" />
+                        <TextBlock x:Name="message_text" Style="{StaticResource klcTextBlockMuted}" />
                     </ScrollViewer>
                 </Grid>
             </Border>

@@ -14,14 +14,17 @@
         xxx             - no consumer; a deletion candidate
     -->
 
-    <!--  Palette: brand roles (each value is a KL&A brand colour)  -->
+    <!--  ======================================================================  -->
+    <!--  Palette: Shared colour roles.  -->
+    <!--  ======================================================================  -->
+    <!--  Brand roles: Each value is a KL&A brand colour.  -->
     <!--  KLCharcoal: window, chrome, fields, lists  -->
     <SolidColorBrush x:Key="klcBackgroundColor" Color="#1A252B" />
     <!--  KLWhite: body text, labels, icons  -->
     <SolidColorBrush x:Key="klcTextColor" Color="#E5E4E2" />
-    <SolidColorBrush x:Key="klcForegroundColor" Color="#E5E4E2" />
+
     <!--  KLGreen: input and dropdown borders, wordmark slash, scrollbar thumb  -->
-    <SolidColorBrush x:Key="klcBorderColor" Color="#33714F" />
+    <SolidColorBrush x:Key="klcColorGreen" Color="#33714F" />
     <!--  KLGreen-dark: sections, lists, grid lines  -->
     <SolidColorBrush x:Key="KlaBorderStrongBrush" Color="#286048" />
     <!--  KLGreen-dark: action and checked fills  -->
@@ -29,51 +32,56 @@
     <!--  KLGreen-secondary: hover fills  -->
     <SolidColorBrush x:Key="KlaAccentHoverBrush" Color="#407058" />
 
-    <!--  Palette: text roles  -->
+    <!--  Text roles  -->
     <!--  labels on accent fills  -->
     <SolidColorBrush x:Key="KlaTextOnAccentBrush" Color="White" />
     <!--  muted text: captions, secondary information, the Details header and readout  -->
-    <SolidColorBrush x:Key="KlaMutedBrush" Color="#B5C2BD" />
+    <SolidColorBrush x:Key="klcTextColorMuted" Color="#B5C2BD" />
     <!--  placeholder text (the input template's Tag watermark); the same gray as the footer version by owner decision, test-enforced  -->
     <SolidColorBrush x:Key="klcTextColorWaterMark" Color="#808080" />
 
-    <!--  Palette: control states  -->
+    <!--  Control states  -->
     <SolidColorBrush x:Key="KlaFocusBrush" Color="#E5E4E2" />
     <SolidColorBrush x:Key="KlaPressedBrush" Color="#204D3A" />
     <SolidColorBrush x:Key="KlaDisabledFillBrush" Color="#303C40" />
-    <SolidColorBrush x:Key="KlaDisabledTextBrush" Color="#808080" />
+    <SolidColorBrush x:Key="klcTextColorDisabled" Color="#808080" />
 
-    <!--  Palette: component surfaces (secondary buttons, grid headers, hover surfaces; banner, readout and splitter borders)  -->
+    <!--  Component surfaces: Secondary buttons, headers, hover surfaces and borders  -->
     <SolidColorBrush x:Key="KlaComponentSurfaceBrush" Color="#22303A" />
     <SolidColorBrush x:Key="KlaComponentBorderBrush" Color="#52675D" />
 
-    <!--  Palette: severity (message headings and borders, status chips)  -->
+    <!--  Severity: Message headings, borders and status chips  -->
     <SolidColorBrush x:Key="klcInfo" Color="#A3C3E8" />
     <SolidColorBrush x:Key="klcSuccessColor" Color="#91C8A6" />
     <SolidColorBrush x:Key="klcWarningColor" Color="#E8C66A" />
     <SolidColorBrush x:Key="klcErrorColor" Color="#E89E96" />
 
-    <!--  Palette: footer  -->
+    <!--  Footer colours  -->
     <SolidColorBrush x:Key="klcFooterLinkColor" Color="#407058" />
     <SolidColorBrush x:Key="klcFooterVersionColor" Color="#808080" />
 
-    <!--  Typography: the one family, then sizes smallest to largest  -->
+    <!--  ======================================================================  -->
+    <!--  Typography: Shared font family and sizes.  -->
+    <!--  ======================================================================  -->
+    <!--  Font family and sizes.  -->
     <FontFamily x:Key="klcFont">Segoe UI</FontFamily>
     <sys:Double x:Key="klcFontSizeBody">12</sys:Double>
-    <sys:Double x:Key="klcButtonFontSize">14</sys:Double>
-    <sys:Double x:Key="klcFontSizeFilter">14</sys:Double>
-    <sys:Double x:Key="klcDetailsFontSize">14</sys:Double>
-    <sys:Double x:Key="klcFooterVersionFontSize">14</sys:Double>
-    <sys:Double x:Key="klcButtonFontSizeLarge">16</sys:Double>
-    <sys:Double x:Key="klcHeaderTitleFontSize">16</sys:Double>
-    <sys:Double x:Key="klcFontSizeSectionHeading">16</sys:Double>
-    <sys:Double x:Key="klcWindowPromptFontSize">16</sys:Double>
-    <sys:Double x:Key="klcMessageHeaderFontSize">22</sys:Double>
-    <sys:Double x:Key="klcFontSizeInputPrompt">24</sys:Double>
+    <sys:Double x:Key="klcFontSizeButton">14</sys:Double>
+    <sys:Double x:Key="klcFontSizeTextBox">14</sys:Double>
+    <sys:Double x:Key="klcFontSizeDetails">14</sys:Double>
+    <sys:Double x:Key="klcFontSizeShellVersion">14</sys:Double>
+    <sys:Double x:Key="klcFontSizeButtonLarge">16</sys:Double>
+    <sys:Double x:Key="klcFontSizeShellTitle">16</sys:Double>
+    <sys:Double x:Key="klcFontSizeHeading">16</sys:Double>
+    <sys:Double x:Key="klcFontSizeMessage">22</sys:Double>
+    <sys:Double x:Key="klcFontSizeTextPrompt">24</sys:Double>
 
-    <!--  Shape: hairline and radii, tightest to roundest  -->
+    <!--  ======================================================================  -->
+    <!--  Shape: Border thickness and corner radii.  -->
+    <!--  ======================================================================  -->
+    <!--  Hairline and radii.  -->
     <Thickness x:Key="klcBorderHairline">1</Thickness>
-    <CornerRadius x:Key="KlaRadiusCheck">2</CornerRadius>
+    <CornerRadius x:Key="klcRadCheck">4</CornerRadius>
     <CornerRadius x:Key="klcScrollThumbRadius">4</CornerRadius>
     <CornerRadius x:Key="klcRadTextBox">8</CornerRadius>
     <CornerRadius x:Key="KlaSwitchTrackRadius">6</CornerRadius>
@@ -82,34 +90,44 @@
     <CornerRadius x:Key="KlaCommandPillRadius">12</CornerRadius>
     <CornerRadius x:Key="klcRadFloating">16</CornerRadius>
 
-    <!--  Rhythm: the 4 / 8 / 16 body spacing and the row heights. GridLength is required for row/column definitions; WPF does not coerce Double.  -->
+    <!--  ======================================================================  -->
+    <!--  Rhythm: Spacing, rows, margins and gaps.  -->
+    <!--  ======================================================================  -->
+    <!--  Body spacing and row heights. GridLength is required for row and column definitions.  -->
     <GridLength x:Key="klcBodySpaceSmall">4</GridLength>
     <GridLength x:Key="klcBodySpaceNormal">8</GridLength>
     <GridLength x:Key="klcBodySpaceLarge">12</GridLength>
     <GridLength x:Key="klcChromeHeight">24</GridLength>
-    <GridLength x:Key="klaBodyRowNormal">24</GridLength>
+    <GridLength x:Key="klcBodyRowNormal">24</GridLength>
 
-    <!--  Rhythm: window margins  -->
+    <!--  Window margins  -->
     <Thickness x:Key="klcBodyMargin">16,16,16,8</Thickness>
     <Thickness x:Key="klcHeadFootMargin">4,0,4,0</Thickness>
     <!--  Note to self: Consider merging with klcBodyMargin, would reduce footer to 20, and make the klcBodyMargin 16  -->
     <Thickness x:Key="KlaMarginFloatingWindow">16</Thickness>
 
-    <!--  Rhythm: gaps between parts. Spacer rows separate fixed parts; these margins sit on parts that can collapse or that stack in code.  -->
+    <!--  Gaps between parts: Margins for collapsible or code-stacked parts  -->
+    <Thickness x:Key="klcStackGapVertSmall">0,4,0,0</Thickness>
     <Thickness x:Key="klcStackGapVert">0,8,0,0</Thickness>
     <Thickness x:Key="KlaIconTextGap">0,0,4,0</Thickness>
     <Thickness x:Key="klcStackGapHoriz">8,0,0,0</Thickness>
     <Thickness x:Key="KlaActionTopGap">0,8,0,0</Thickness>
-    <Thickness x:Key="xKlaStackGapBelow">0,0,0,8</Thickness>
+    <Thickness x:Key="klcStackGapBelow">0,0,0,8</Thickness>
     <Thickness x:Key="KlaCommandPillGap">0,0,8,8</Thickness>
+    <!--  Cancel the trailing item gap at the wrapping panel boundary.  -->
+    <Thickness x:Key="klcCommandPillPanelInset">0,0,-8,-8</Thickness>
     <!--  Deliberate 2-unit optical lift for large single-line text beside an input.  -->
     <Thickness x:Key="KlaOpticalTextInset">0,0,0,2</Thickness>
+    <!--  Optical lift for the caption beside a switch track.  -->
+    <Thickness x:Key="klcSwitchCaptionInset">0,0,0,3</Thickness>
     <Thickness x:Key="KlaScrollThumbMargin">2</Thickness>
     <Thickness x:Key="KlaScrollBarMargin">3</Thickness>
 
-    <!--  Control sizes: heights, then widths and limits  -->
-    <sys:Double x:Key="KlaCompactFieldHeight">24</sys:Double>
-    <sys:Double x:Key="klcFilterHeight">24</sys:Double>
+    <!--  ======================================================================  -->
+    <!--  Control sizes: Dimensions and geometry.  -->
+    <!--  ======================================================================  -->
+    <!--  Heights, widths and limits.  -->
+    <sys:Double x:Key="klcFieldHeightNormal">24</sys:Double>
     <sys:Double x:Key="klcButtonHeight">28</sys:Double>
     <sys:Double x:Key="KlaControlHeight">32</sys:Double>
     <sys:Double x:Key="klcDoubleButtonHeight">36</sys:Double>
@@ -122,19 +140,21 @@
     <sys:Double x:Key="klcButtonWidth">104</sys:Double>
     <sys:Double x:Key="klcDoubleButtonWidth">216</sys:Double>
 
-    <!--  Control sizes: the switch pill's track and thumb  -->
-    <sys:Double x:Key="KlaSwitchThumbSize">12</sys:Double>
-    <sys:Double x:Key="KlaSwitchTrackHeight">12</sys:Double>
-    <sys:Double x:Key="KlaSwitchTrackWidth">24</sys:Double>
+    <!--  Switch track and thumb  -->
+    <sys:Double x:Key="klcSwitchThumbSize">12</sys:Double>
+    <sys:Double x:Key="klcSwitchTrackHeight">12</sys:Double>
+    <sys:Double x:Key="klcSwitchTrackWidth">24</sys:Double>
 
-    <!--  Control sizes: icon and check geometry. KlaIconCanvas is the artwork grid, not a size; it stays 24.  -->
+    <!--  Icon and check geometry: KlaIconCanvas is the 24-unit artwork grid  -->
     <sys:Double x:Key="klcIconSize">16</sys:Double>
     <sys:Double x:Key="KlaIconCanvas">24</sys:Double>
     <sys:Double x:Key="klcIconStroke">2</sys:Double>
-    <sys:Double x:Key="KlaCheckSize">16</sys:Double>
-    <sys:Double x:Key="KlaCheckStroke">2</sys:Double>
+    <sys:Double x:Key="klcCheckBoxSize">16</sys:Double>
+    <sys:Double x:Key="klcCheckStroke">2</sys:Double>
 
-    <!--  Insets and padding  -->
+    <!--  ======================================================================  -->
+    <!--  Insets and padding: Spacing inside controls.  -->
+    <!--  ======================================================================  -->
     <!--
         Native TextBoxView adds two units and the border one: five yields
         the same eight-unit rendered text inset as ComboBox selection text.
@@ -146,24 +166,29 @@
     <Thickness x:Key="KlaListPadding">1</Thickness>
     <Thickness x:Key="KlaItemPadding">4,1</Thickness>
     <Thickness x:Key="KlaCompactInset">8,4</Thickness>
-    <Thickness x:Key="KlaReadoutPadding">8</Thickness>
+    <Thickness x:Key="KlaReadoutPadding">12</Thickness>
     <!--  Ten plus the TextBoxView's two-unit inset and the hairline aligns readout text with the body at 13.  -->
     <Thickness x:Key="KlaDetailsReadoutPadding">10,8</Thickness>
-    <Thickness x:Key="KlaPadFloating">12</Thickness>
-    <Thickness x:Key="KlaSectionPadding">12</Thickness>
+    <Thickness x:Key="klcPadFloating">12</Thickness>
+    <Thickness x:Key="klcSectionPadding">12</Thickness>
     <Thickness x:Key="KlaComboTextInset">8,0,28,0</Thickness>
     <Thickness x:Key="KlaComboArrowInset">0,0,8,0</Thickness>
     <Thickness x:Key="KlaCommandLinkPadding">8</Thickness>
     <Thickness x:Key="KlaCommandArrowInset">0,4,8,0</Thickness>
-    <Thickness x:Key="KlaCommandPillInset">12,4</Thickness>
+    <Thickness x:Key="klcCommandPillInset">8,0,8,0</Thickness>
 
-    <!--  Column widths  -->
+    <!--  ======================================================================  -->
+    <!--  Column widths: Shared layout columns.  -->
+    <!--  ======================================================================  -->
     <GridLength x:Key="KlaCommandLinkIconColumn">24</GridLength>
     <GridLength x:Key="KlaSwitchToggleColumn">28</GridLength>
-    <GridLength x:Key="KlaCompactFieldLabelColumn">60</GridLength>
+    <GridLength x:Key="klcRenameLabelColumn">48</GridLength>
     <GridLength x:Key="KlaActionColumn">104</GridLength>
-    <GridLength x:Key="KlaCompactFieldInputColumn">240</GridLength>
+    <GridLength x:Key="klcRenameInputColumn">200</GridLength>
 
+    <!--  ======================================================================  -->
+    <!--  Window chrome: Header, footer and default label.  -->
+    <!--  ======================================================================  -->
     <!--
         Window chrome: logo and close geometry, the two footer destinations and the default (en_us) label. The shell reads
         the label with DynamicResource, so a dictionary merged after this one (the compiled Strings dictionary or a Python

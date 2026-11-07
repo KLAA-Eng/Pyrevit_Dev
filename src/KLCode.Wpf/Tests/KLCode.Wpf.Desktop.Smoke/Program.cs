@@ -121,9 +121,12 @@ internal static class Program
             if ((string)button.Content == "Close") continue;
             double buttonWidth = (double)window.FindResource("klcButtonWidth"), mainWidth = (double)window.FindResource("klcDoubleButtonWidth");
             double compactHeight = (double)window.FindResource("klcButtonHeight"), controlHeight = (double)window.FindResource("KlaControlHeight");
+            double mainHeight = (double)window.FindResource("klcDoubleButtonHeight");
             Require(button.ActualWidth == buttonWidth || button.ActualWidth == mainWidth,
                 identity + " button width: " + button.Content + " = " + button.ActualWidth);
-            Require(button.ActualHeight == compactHeight || button.ActualHeight == controlHeight,
+            Require(button.ActualWidth == mainWidth
+                    ? button.ActualHeight == mainHeight
+                    : button.ActualHeight == compactHeight || button.ActualHeight == controlHeight,
                 identity + " button height: " + button.Content + " = " + button.ActualHeight);
         }
         if (output is not null)
