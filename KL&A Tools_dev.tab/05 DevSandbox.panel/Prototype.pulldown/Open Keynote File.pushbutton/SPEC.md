@@ -53,3 +53,9 @@ issues instead of being opened.
 
 This is a command and must be validated inside the target
 Revit/pyRevit environment before promotion.
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

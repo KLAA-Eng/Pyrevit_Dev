@@ -288,3 +288,8 @@ The plan owns task status. The deferred compiled-preview task is separate from
 the current scope; docked panels and production GUI fixes require their own
 scope decisions. The historical design-system review remains evidence for
 production issues and is not superseded by this Gallery implementation.
+
+
+## Shared Rename tool previews — development (2026-11-08)
+
+Find/Replace Views and Sheets preview entries instantiate the shared Rename factory with the matching property groups. The two duplicate command-local Script.xaml files and old inline-result Gallery handlers are retired. Samples remain fictional and never execute production model commands. Native/pyRevit demonstration entries remain available as references.

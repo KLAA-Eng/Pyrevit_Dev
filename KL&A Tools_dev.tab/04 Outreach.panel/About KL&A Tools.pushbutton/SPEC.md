@@ -48,7 +48,7 @@ rules. The functional delivery history below remains unchanged.
 
 ## GUI and interaction
 
-Static UI/API references: forms.alert,
+Static UI/API references: tool_dialogs.alert,
 
 Use the command from its pyRevit button. Where it exposes a dialog or selection
 workflow, make the required selection and review the result before confirming.
@@ -82,3 +82,9 @@ into the first delivery; tab/panel moves, formatting, and metadata/documentation
 changes do not create additional milestones. Dates use `MM.DD.YYYY`; released
 rows use the main delivery date, and Unreleased rows use the latest meaningful
 development change date.
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

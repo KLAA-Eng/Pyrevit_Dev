@@ -2,6 +2,7 @@
 __title__ = 'Show View Range'
 __version__ = 'v1.1'
 
+from GUI import tool_dialogs
 from pyrevit import script, forms, revit, HOST_APP, DB, UI
 from pyrevit.revit import events
 from pyrevit.framework import Convert, List, Color, SolidColorBrush
@@ -238,7 +239,7 @@ class Context(object):
                             )
                             elevations[plane] = level_elevation + offset_value
                     except ValueError:
-                        forms.alert(
+                        tool_dialogs.alert(
                             "Invalid Input Format!\n\nThe value '{}' for {} is not a valid number.\n\n"
                             "Please enter a numeric value (e.g., 4.5, -2.0, 0)".format(
                                 offset_str, PLANES[plane][1]
@@ -287,7 +288,7 @@ class Context(object):
                     and lower_elev is not None
                     and higher_elev < lower_elev
                 ):
-                    forms.alert(
+                    tool_dialogs.alert(
                         "View Range Order Error!\n\n{} (offset: {:.2f}') must be greater than or equal to {} "
                         "(offset: {:.2f}').\n\nNote: These are offset values from the associated level.\n\n"
                         "Correct order (top to bottom):\n1. Top Clip Plane (highest offset)\n2. Cut Plane\n"

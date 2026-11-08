@@ -104,3 +104,9 @@ usage logger. Live acceptance remains required in Revit 2024, 2025, and 2026
 using the controlled cases and a representative project recorded in
 `docs/reviews/2026-10-08/beam-reaction-declutter-promotion.md`. The prototype
 stays in DevSandbox until the owner's review and the pre-move gate pass.
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged. The small action menu uses shared Action Choice command links; Cancel/Close/Escape performs no action.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

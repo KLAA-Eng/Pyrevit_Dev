@@ -1,4 +1,4 @@
-# FindReplace - Views
+﻿# FindReplace - Views
 
 | Field | Value |
 | --- | --- |
@@ -9,7 +9,7 @@
 | Status/origin | KL&A-maintained Core command promoted from an EFTools-derived DevSandbox prototype. |
 | Main delivery | 0.0.11 |
 | Path aliases | Core release layout: `KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton`; current `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton`; former prototype: `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton`, `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace - Views-proto.pushbutton` |
-| Version inputs | Core `bundle.yaml`, `script.py`, `Script.xaml`; former prototype bundle files; `lib/find_replace/workflow.py`, `lib/find_replace/revit_batch.py`, `lib/find_replace/window.py`; `lib/Snippets/_selection.py`; `lib/Renaming/BaseClass_FindReplace.py`; `lib/GUI/Resources/WPF_styles.xaml` |
+| Version inputs | Core `bundle.yaml`, `script.py`; `lib/find_replace/controller.py`, `planning.py`, `workflow.py`, `revit_batch.py`; `lib/GUI/dialogs/` Rename and Action Choice; `lib/Snippets/_selection.py` |
 
 ## Tool version history
 
@@ -36,23 +36,30 @@ or convert view names with direct Uppercase and Lowercase buttons.
 ## Behavior
 
 The command takes selected views from the Project Browser. With no eligible
-selection it offers individual non-template views in a picker with no rows
-checked initially. Element IDs are hidden; equal names are distinguished by
-view type and, when needed, a sequence number. A template is eligible when
-explicitly selected in the Project Browser. Sheet views are excluded.
+selection it offers individual non-template views through the shared picker
+with no rows initially checked. Element IDs are hidden; equal names are
+separated by view type and, when needed, sequence. Explicitly selected templates
+remain eligible; sheet views are excluded. Shared Rename uses one View Name
+group, including Uppercase/Lowercase actions.
 
-Actions apply immediately to the full selection's current names. Rename
-requires Find text when Replace is nonempty and keeps matching case-sensitive.
-Each rerun recomputes from current names, including repeated prefixes or
-suffixes. Case conversion changes view names only.
+Actions use the shared Rename request window and execute only after it closes.
+The request retains literal, case-sensitive Find/Replace, Prefix and Suffix;
+Replace requires Find, and an entirely blank rename request stays open with
+inline validation. Case actions ignore entered rules and change names only.
+There is no live before/after preview.
 
-Exact target failures skip that view; other valid views may still change. One
-parent Revit transaction gives the batch one Undo item, with a subtransaction
-for each view. The dialog closes quietly when the action succeeds. Rename with
-no changes stays open. Skipped or failed items expand an in-dialog result area
-with counts and reasons; controls remain available for a full rerun. Results
-for the same action are replaced on rerun while unresolved results from other
-actions remain visible.
+Exact requested targets are preserved; no collision suffix is invented. One
+parent Revit transaction gives each submitted batch one Undo item, with one
+subtransaction per element. Other valid elements may change when an item fails.
+A clean changed result finishes quietly. A no-op, partial result, or error opens
+the shared Action Choice result dialog with counts, expandable Details, Close,
+and Edit and Retry when unfinished targets remain. Retry reopens shared Rename
+with the entered rules retained and the same unfinished element identities.
+After partial success, committed and unchanged elements are excluded; prefixes
+or suffixes are never reapplied to earlier successes during that retry.
+Cancellation of either request or results ends the command without another run.
+A Project Browser refresh failure after committed changes is reported with
+Close only; it cannot cause those changes to be reapplied.
 
 ## Validation boundary
 
@@ -64,33 +71,25 @@ quiet success.
 
 ## Implementation inventory
 
-- Entry point: `script.py`
-- Selection and WPF: local `script.py` and `Script.xaml`, with `BaseRenaming` and shared WPF styles.
-- The command overrides `BaseRenaming.start` and loads its local XAML. The
-  removed legacy `RenameViews.xaml` is not a fallback or runtime dependency.
-- Planning, Revit transaction handling, and result presentation: `lib/find_replace/`.
+- Entry point: `script.py`, a thin selection and document adapter.
+- Requests: `GUI.dialogs` shared Rename, using `view_fields()` or `sheet_fields()`.
+- Exact target planning: `lib/find_replace/planning.py` and `workflow.py`.
+- Model transactions: `lib/find_replace/revit_batch.py`.
+- Request/result/retry sequence: `lib/find_replace/controller.py`.
+- Results: shared Action Choice; no command-local dialog implementation.
 - Bundled external assets: None.
 
 ## GUI and interaction
 
-The local body uses the shared `klcWindowShell`, loaded through
-`GUI.window_chrome.load_window` with the caller title and tool version. Header,
-footer, close/drag/navigation behavior, and control styles are shared rather
-than copied into the command. Compact naming rows have 60-unit labels,
-240-unit inputs, 24-unit height and 8-unit gaps. Uppercase/Lowercase retain
-their position above Rename, using 104 x 28 supporting actions and a 216 x 32
-main action. The 384 x 313 initial window accommodates these shared dimensions
-and the body's vertical scrollbar when results expand.
-
-The result panel remains collapsed initially and appears only for no-change
-Rename or unresolved items. Its details are read-only and scrollable; the body
-can scroll when expanded results exceed the available height. Existing outcome
-height changes, rerun policy, and quiet-success closure are unchanged. No
-preview or success popup is used. Live host acceptance remains pending.
-
+Shared Rename owns its one/two property-group layout, validation, keyboard,
+close behavior and existing design resources. The caller supplies its title and
+tool version. Valid requests close before model work; errors and unchanged
+outcomes use shared Action Choice with Details and an explicit Edit and Retry
+path. No command-local XAML is a runtime dependency. Shared component,
+foundation and token dictionaries are unchanged by this adoption.
 ## Current execution logic
 
-`script.py` builds exact target names, then `apply_batch` starts one transaction
+`planning.py` builds exact target names, then `apply_batch` starts one transaction
 and an individual subtransaction per changing view. It checks commit status
 and reports unexpected failures. The parent transaction is rolled back if its
 commit fails.
@@ -106,3 +105,13 @@ services except when a footer link is clicked.
 Promoted to the existing Core button on `dev`; the DevSandbox bundle was retired.
 The visual review is approved, and live Revit 2024, 2025, and 2026 acceptance
 remains pending before release.
+
+## Unreleased dialog adoption — 11.08.2026
+
+Shared Rename and Action Choice replace the command-local request/result UI.
+Retry targets only unfinished elements after partial success. Tool versions
+remain unchanged pending the next meaningful main delivery. Local behavioral
+and transaction-boundary tests support this change; live Revit acceptance
+remains pending.
+
+

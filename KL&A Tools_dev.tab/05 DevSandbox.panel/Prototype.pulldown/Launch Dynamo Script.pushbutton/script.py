@@ -2,6 +2,7 @@
 
 __title__ = "Launch Dynamo\n Script"
 __version__ = "v0.0"
+from GUI import tool_dialogs
 import os
 import clr
 
@@ -12,13 +13,13 @@ bundle_dir = os.path.dirname(__file__)
 dyn_path = os.path.join(bundle_dir, 'script.dyn')
 
 if not os.path.exists(dyn_path):
-    forms.alert('Could not find script.dyn:\n{}'.format(dyn_path), exitscript=True)
+    tool_dialogs.alert('Could not find script.dyn:\n{}'.format(dyn_path), exitscript=True)
 
 uiapp = HOST_APP.uiapp
 uidoc = uiapp.ActiveUIDocument
 
 if uidoc is None or uidoc.Document is None:
-    forms.alert('Open a Revit model or family first.', exitscript=True)
+    tool_dialogs.alert('Open a Revit model or family first.', exitscript=True)
 
 try:
     clr.AddReference('DynamoRevitDS')
@@ -43,4 +44,4 @@ cmd.JournalData = journal_data
 
 result = DynamoRevit().ExecuteCommand(cmd)
 
-forms.alert('Dynamo launch returned: {}'.format(result))
+tool_dialogs.alert('Dynamo launch returned: {}'.format(result))

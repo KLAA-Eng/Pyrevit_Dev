@@ -92,3 +92,9 @@ reported complete smoke passes on 10.22.2026, including read-only reopen,
 used the same smoke-script and shared-facade SHA-256 values matching the
 current `dev.ben-debug` files. This does not validate an analyst workbook or
 Carbon chart results.
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

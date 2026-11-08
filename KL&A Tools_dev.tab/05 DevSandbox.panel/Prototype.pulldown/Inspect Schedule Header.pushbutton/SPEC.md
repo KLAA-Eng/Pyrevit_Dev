@@ -64,3 +64,12 @@ instead of stopping the export.
 
 This inspector captures API-visible metadata. It should still be paired with a
 PDF or screenshot when visual matching matters.
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.
+
+
+The schedule selector continues using the select_from_dict compatibility entry point. If that path raises, recovery now uses the shared single-item selector and returns the original schedule object. Cancellation remains None; no legacy SelectFromList window is opened.

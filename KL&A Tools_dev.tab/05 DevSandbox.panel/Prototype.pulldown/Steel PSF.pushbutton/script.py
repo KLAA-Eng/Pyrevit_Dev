@@ -5,6 +5,7 @@ __title__ = "Steel PSF"
 __version__ = "v0.6"
 
 import datetime
+from GUI import tool_dialogs
 import os
 import sys
 import traceback
@@ -291,7 +292,7 @@ def _level_label(level):
 def _select_stories(doc):
     levels = list(DB.FilteredElementCollector(doc).OfClass(DB.Level).WhereElementIsNotElementType())
     if not levels:
-        forms.alert('No project levels were found in the active model.', title=COMMAND_TITLE,
+        tool_dialogs.alert('No project levels were found in the active model.', title=COMMAND_TITLE,
                     warn_icon=True)
         script.exit()
 
@@ -299,7 +300,7 @@ def _select_stories(doc):
     story_dialog = SteelPsfDialog(level_options)
     selected_levels = story_dialog.selected_items
     if not selected_levels:
-        forms.alert('Select at least one story.', title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('Select at least one story.', title=COMMAND_TITLE, warn_icon=True)
         script.exit()
     return selected_levels, story_dialog.export_mode
 
@@ -390,12 +391,12 @@ def _export_history_csv_and_workbook(output, result, steel_records, floor_record
     try:
         row_counts = write_history_export_set(folder, rows_by_key, export_mode)
     except HistoryCsvError as error:
-        forms.alert(str(error), title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert(str(error), title=COMMAND_TITLE, warn_icon=True)
         output.print_md('## CSV export stopped')
         output.print_md(str(error))
         return None
     except (IOError, OSError) as error:
-        forms.alert('Could not write CSV: {}'.format(error), title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('Could not write CSV: {}'.format(error), title=COMMAND_TITLE, warn_icon=True)
         output.print_md('## CSV export stopped')
         output.print_md('Could not write CSV: {}'.format(error))
         return None
@@ -644,7 +645,7 @@ def main():
         _export_history_csv_and_workbook(
             output, result, steel_records, area_records, steel_skips + floor_skips, metadata, export_mode)
     if not result['rows']:
-        forms.alert('No eligible steel or floor data was found for the selected stories.',
+        tool_dialogs.alert('No eligible steel or floor data was found for the selected stories.',
                     title=COMMAND_TITLE)
 
 

@@ -21,7 +21,7 @@ Validate this command against a representative Revit fixture, its empty or cance
 
 ## GUI and interaction
 
-Static UI/API references: forms.ProgressBar,forms.alert,forms.select_open_docs,forms.select_views,
+Static UI/API references: forms.ProgressBar,tool_dialogs.alert,forms.select_open_docs,forms.select_views,
 
 Use the command from its pyRevit button. Where it exposes a dialog or selection
 workflow, make the required selection and review the result before confirming.
@@ -57,3 +57,12 @@ environment before promotion or behavior changes.
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
 | `v1.0.pyRevit` | `0.0.0.beta` | 07.16.2026 | Unchanged pyRevit snapshot present in the first mainline delivery ledger. | `484924b`; import `5a385ee` |
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.
+
+
+Document and legend-view selectors use GUI.tool_selectors and shared Selection. Destination documents exclude the active/linked documents and retain family documents. Existing selected eligible legend views can be reused after shared confirmation; otherwise the filtered list opens. Cancellation, progress and copy transactions remain unchanged.

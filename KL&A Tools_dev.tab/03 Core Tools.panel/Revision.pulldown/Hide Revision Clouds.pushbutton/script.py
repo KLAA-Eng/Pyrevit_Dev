@@ -4,6 +4,7 @@ from __future__ import print_function
 __title__ = 'Hide/Unhide\nRevision Clouds'
 __version__ = 'v1.1'
 
+from GUI import tool_dialogs
 import clr
 
 from System.Collections.Generic import List
@@ -11,19 +12,13 @@ from pyrevit import DB, forms, revit, script
 from GUI.forms import select_from_dict
 
 clr.AddReference('System')
-from Autodesk.Revit.UI import (
-    TaskDialog,
-    TaskDialogCommandLinkId,
-    TaskDialogCommonButtons,
-    TaskDialogResult,
-)
 
 
 COMMAND_TITLE = __title__.replace('\n', ' ')
 
 
 def _stop(message):
-    forms.alert(message, title=COMMAND_TITLE, warn_icon=True)
+    tool_dialogs.alert(message, title=COMMAND_TITLE, warn_icon=True)
     script.exit()
 
 
@@ -72,20 +67,15 @@ def _view_label(view):
 
 
 def _ask_hide_or_unhide():
-    dialog = TaskDialog(COMMAND_TITLE)
-    dialog.TitleAutoPrefix = False
-    dialog.MainInstruction = 'Choose action'
-    dialog.MainContent = 'Select whether to hide or unhide revision clouds.'
-    dialog.AddCommandLink(
-        TaskDialogCommandLinkId.CommandLink1, 'Hide revision clouds')
-    dialog.AddCommandLink(
-        TaskDialogCommandLinkId.CommandLink2, 'Unhide revision clouds')
-    dialog.CommonButtons = TaskDialogCommonButtons.Cancel
-    result = dialog.Show()
+    result = tool_dialogs.choose(
+        ['Hide revision clouds', 'Unhide revision clouds'],
+        title=COMMAND_TITLE, prompt='Choose action',
+        content='Select whether to hide or unhide revision clouds.',
+        version=__version__)
 
-    if result == TaskDialogResult.CommandLink1:
+    if result == 'Hide revision clouds':
         return True, 'Hide', 'hidden'
-    if result == TaskDialogResult.CommandLink2:
+    if result == 'Unhide revision clouds':
         return False, 'Unhide', 'unhidden'
     return None, None, None
 
@@ -510,7 +500,7 @@ def main():
     hide_elements, action_label, action_word = \
         _ask_hide_or_unhide()
     if hide_elements is None:
-        forms.alert('Operation cancelled.', exitscript=True)
+        tool_dialogs.alert('Operation cancelled.', exitscript=True)
 
     doc = revit.doc
     revisions = _select_revisions(doc, action_label)

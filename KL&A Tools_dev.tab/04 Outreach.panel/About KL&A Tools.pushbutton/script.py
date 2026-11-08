@@ -2,6 +2,7 @@
 __title__ = "About\nKL&A Tools"
 __version__ = "v1.1"
 
+from GUI import tool_dialogs
 import os
 import sys
 
@@ -74,7 +75,7 @@ def main():
         "Revit Build: {0}".format(get_revit_build()),
     ]
 
-    forms.alert("\n".join(lines), title="About KL&A Tools")
+    tool_dialogs.alert("\n".join(lines), title="About KL&A Tools")
 
 
 if __name__ == "__main__":

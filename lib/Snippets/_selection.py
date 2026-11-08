@@ -3,6 +3,7 @@
 # ║║║║╠═╝║ ║╠╦╝ ║ ╚═╗
 # ╩╩ ╩╩  ╚═╝╩╚═ ╩ ╚═╝
 #==================================================
+from GUI import tool_dialogs
 import sys, clr
 import traceback
 
@@ -45,7 +46,7 @@ def get_selected_elements(uidoc = uidoc, exitscript=True):
     try:
         selected_elements = [doc.GetElement(e_id) for e_id in selection.GetElementIds()]
         if not selected_elements and exitscript:
-            forms.alert("No elements  were selected.\nPlease, try again.", exitscript=exitscript)
+            tool_dialogs.alert("No elements  were selected.\nPlease, try again.", exitscript=exitscript)
     except:
         return
 
@@ -85,7 +86,7 @@ def get_selected_rooms(uidoc=uidoc, exitscript = True):
 
     if not selected_rooms:
         error_msg = 'No Rooms were selected.\nPlease Try Again'
-        forms.alert(error_msg, title='Room Selection has Failed.', exitscript=exitscript)
+        tool_dialogs.alert(error_msg, title='Room Selection has Failed.', exitscript=exitscript)
 
     return selected_rooms
 
@@ -114,7 +115,7 @@ def get_selected_views(given_uidoc = uidoc, exit_if_none = False, title = 'Selec
 
     # EXIT IF STILL NONE SELECTED
     if not selected_views and exit_if_none:
-        forms.alert("No views were selected. Please try again.", exitscript=True)
+        tool_dialogs.alert("No views were selected. Please try again.", exitscript=True)
 
     return selected_views
 
@@ -143,7 +144,7 @@ def get_selected_sheets(given_uidoc = uidoc, exit_if_none = False, title='Select
 
     #>>>>>>>>>> EXIT IF STILL NONE SELECTED
     if not selected_sheets and exit_if_none:
-        forms.alert("No sheets were selected. Please try again.", exitscript=True)
+        tool_dialogs.alert("No sheets were selected. Please try again.", exitscript=True)
     return selected_sheets
 
 def get_selected_walls(uidoc, exitscript = True):
@@ -175,7 +176,7 @@ def get_selected_walls(uidoc, exitscript = True):
 
     if not selected_walls:
         error_msg = 'No Walls were selected.\nPlease Try Again'
-        forms.alert(error_msg, title='Wall Selection has Failed.', exitscript=exitscript)
+        tool_dialogs.alert(error_msg, title='Wall Selection has Failed.', exitscript=exitscript)
 
     return selected_walls
 
@@ -202,7 +203,7 @@ def select_title_block(given_uidoc = uidoc, exitscript = True, title = 'Select T
 
     # VERIFY SOMETHING IS SELECTED
     if not selected_title_block and exitscript:
-        forms.alert("No TitleBlock was selected. Please try again.", exitscript = exitscript)
+        tool_dialogs.alert("No TitleBlock was selected. Please try again.", exitscript = exitscript)
 
     return selected_title_block[0]
 
@@ -213,7 +214,7 @@ def select_region_type(given_uidoc = uidoc):
 
     #>>>>>>>>>> PROMT USER TO SELECT FilledRegion TYPE
     selection           = forms.SelectFromList.show(dict_filled_regions.keys(),title="Select FilledRegion Type", button_name='Select')
-    if not selection:     forms.alert("FilledRegion Type was not chosen. Please try again.", title='Select FilledRegion Type', exitscript=True)
+    if not selection:     tool_dialogs.alert("FilledRegion Type was not chosen. Please try again.", title='Select FilledRegion Type', exitscript=True)
     return dict_filled_regions[selection]
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GET FloorType
@@ -224,7 +225,7 @@ def select_floor_type(given_uidoc = uidoc):
 
     #>>>>>>>>>> PROMT USER TO SELECT FilledRegion TYPE
     selection           = forms.SelectFromList.show(dict_floor_types.keys(),title="Select Floor Type", button_name='Select')
-    if not selection:     forms.alert("Floor Type was not chosen. Please try again.", title='Select Floor Type', exitscript=True)
+    if not selection:     tool_dialogs.alert("Floor Type was not chosen. Please try again.", title='Select Floor Type', exitscript=True)
     return dict_floor_types[selection]
 
 
@@ -319,7 +320,7 @@ def pick_by_category(list_categories):
     #❌ Exitscript if nothing selected
     if not selected_elems and exit_if_none:
         error_msg = 'No Elements were selected.\nPlease Try Again'
-        forms.alert(error_msg, title='Selection has Failed.', exitscript=True)
+        tool_dialogs.alert(error_msg, title='Selection has Failed.', exitscript=True)
 
     return selected_elems
 
@@ -350,7 +351,7 @@ def pick_by_class(list_types, exit_if_none = True):
     #❌ Exitscript if nothing selected
     if not selected_elems and exit_if_none:
         error_msg = 'No Elements were selected.\nPlease Try Again'
-        forms.alert(error_msg, title='Selection has Failed.', exitscript=True)
+        tool_dialogs.alert(error_msg, title='Selection has Failed.', exitscript=True)
 
     return selected_elems
 

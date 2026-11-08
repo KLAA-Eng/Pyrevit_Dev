@@ -148,8 +148,9 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   that field. Rename validates and returns all entered rules;
   an entirely blank request stays open with "Enter at least one rename rule.".
   Enter activates it from the fields; a focused button keeps its own Enter. Invalid rules stay open with inline feedback. Close/Escape
-  cancels. Case actions close without applying model changes. No live preview,
-  Revit mutation or existing tool migration is part of this shared dialog.
+  cancels. Case actions close without applying model changes. The shared dialog
+  performs no live preview or Revit mutation. The Find/Replace command adapters
+  consume requests and own execution, result Details and safe edit/retry loops.
   Initial focus is neutral, with no field selected. Compact label/input spacing
   and fitted section/window bounds remove unused trailing space; action gaps are 8.
   Initial widths are 346/668/990 for one/two/three groups, with a 16-unit outer
@@ -162,7 +163,7 @@ document lifetime and any subsequent operations. These APIs are not drop-in
 replacements for pyRevit return types. Existing multi-button Message options
 are retired from this unused opt-in API; existing CustomAlert retains its API.
 
-Native file/folder/color pickers, progress and selection overlays, existing
-CustomAlert workflow migration, further caller refinements and packaged compiled assemblies
+Native file/folder/color pickers, progress and selection overlays, and
+packaged compiled assemblies
 are out of scope. The owner's subsequent presentation change removes the footer
 from both shared Message variants and legacy CustomAlert.

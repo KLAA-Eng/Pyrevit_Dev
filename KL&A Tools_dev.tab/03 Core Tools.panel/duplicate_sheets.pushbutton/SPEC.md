@@ -21,7 +21,7 @@ Validate this command against a representative Revit fixture, its empty or cance
 
 ## GUI and interaction
 
-Static UI/API references: WPFWindow,forms.WPFWindow,forms.alert,
+Static UI/API references: WPFWindow,forms.WPFWindow,tool_dialogs.alert,
 
 Use the command from its pyRevit button. Where it exposes a dialog or selection
 workflow, make the required selection and review the result before confirming.
@@ -70,3 +70,9 @@ environment before promotion or behavior changes.
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
 | `v1.0` | `0.0.6beta` | 09.15.2026 | KL&A adapted the duplicate-sheets UI base. | `300f8d4` |
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

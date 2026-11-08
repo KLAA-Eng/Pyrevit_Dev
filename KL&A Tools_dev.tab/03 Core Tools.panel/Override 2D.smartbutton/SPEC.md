@@ -21,7 +21,7 @@ Validate this command against a representative Revit fixture, its empty or cance
 
 ## GUI and interaction
 
-Static UI/API references: forms.WarningBar,forms.alert,script.get_output,
+Static UI/API references: forms.WarningBar,tool_dialogs.alert,script.get_output,
 
 Use the command from its pyRevit button. Where it exposes a dialog or selection
 workflow, make the required selection and review the result before confirming.
@@ -57,3 +57,9 @@ environment before promotion or behavior changes.
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
 | `v1.0` | `0.0.1.beta` | 08.13.2026 | KL&A replaced the local override builder with the shared graphics-override workflow. | `78b2aee` |
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

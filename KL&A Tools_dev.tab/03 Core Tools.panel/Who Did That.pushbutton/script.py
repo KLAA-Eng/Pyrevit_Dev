@@ -1,6 +1,7 @@
 __title__ = 'Who did that??'
 __version__ = 'v1.0.pyRevit'
 
+from GUI import tool_dialogs
 from pyrevit import revit, DB, UI
 from pyrevit import forms
 from pyrevit import script
@@ -27,19 +28,19 @@ def who_reloaded_keynotes():
                     editedByParam = \
                         ktable.Parameter[DB.BuiltInParameter.EDITED_BY]
                     if editedByParam and editedByParam.AsString() != '':
-                        forms.alert('Keynote table has been reloaded by:\n'
+                        tool_dialogs.alert('Keynote table has been reloaded by:\n'
                                     '{0}\nTable Id is: {1}'
                                     .format(editedByParam.AsString(),
                                             ktable.Id))
                     else:
-                        forms.alert('No one own the keynote table. '
+                        tool_dialogs.alert('No one own the keynote table. '
                                     'You can make changes and reload.\n'
                                     'Table Id is: {0}'.format(ktable.Id))
         except Exception as e:
-            forms.alert('Model is not saved yet. '
+            tool_dialogs.alert('Model is not saved yet. '
                         'Can not aquire keynote file location.')
     else:
-        forms.alert('Model is not workshared.')
+        tool_dialogs.alert('Model is not workshared.')
 
 
 def who_created_selection():
@@ -48,15 +49,15 @@ def who_created_selection():
         if selection and len(selection) == 1:
             eh = revit.query.get_history(selection.first)
 
-            forms.alert('Creator: {0}\n'
+            tool_dialogs.alert('Creator: {0}\n'
                         'Current Owner: {1}\n'
                         'Last Changed By: {2}'.format(eh.creator,
                                                       eh.owner,
                                                       eh.last_changed_by))
         else:
-            forms.alert('Exactly one element must be selected.')
+            tool_dialogs.alert('Exactly one element must be selected.')
     else:
-        forms.alert('Model is not workshared.')
+        tool_dialogs.alert('Model is not workshared.')
 
 
 def who_created_activeview():
@@ -67,7 +68,7 @@ def who_created_activeview():
         DB.WorksharingUtils.GetWorksharingTooltipInfo(revit.doc,
                                                       active_view.Id).Creator
 
-    forms.alert('{}\n{}\n{}'
+    tool_dialogs.alert('{}\n{}\n{}'
                 .format("Creator of the current view: " + view_name,
                         "with the id: " + view_id,
                         "is: " + view_creator))
@@ -78,7 +79,7 @@ options = {'Who Created Active View?': who_created_activeview,
            'Who Reloaded Keynotes Last?': who_reloaded_keynotes}
 
 selected_option = \
-    forms.CommandSwitchWindow.show(options.keys())
+    tool_dialogs.choose(options.keys(), title=__title__, version=__version__)
 
 if selected_option:
     options[selected_option]()

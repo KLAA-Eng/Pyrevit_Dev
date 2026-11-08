@@ -14,6 +14,20 @@ their current calls. The [SPEC](SPEC.md) owns behavior, the
 [consolidation plan](../../../docs/plans/custom-window-consolidation.md) owns
 delivery status.
 
+Active Python tools adopt these dialogs through `GUI.tool_dialogs` (legacy alert
+booleans, small action menus and text prompts), `GUI.tool_selectors` (read-only
+Revit collection and original-object results), and `GUI.selection_compat`
+(the existing `select_from_dict` contract). They use explicit imports and do not
+replace or patch pyRevit's global forms module. Native pickers, progress and
+selection overlays remain pyRevit-owned.
+
+The Find/Replace commands use `find_replace.controller` with `view_fields()` or
+`sheet_fields()`. The shared Rename window returns requests and never mutates a
+model. The command closes it before applying the existing batch transaction,
+then uses Action Choice for result Details and Edit and Retry. A partial retry
+targets only skipped/failed items; successful changes are not applied twice.
+The obsolete command-local naming XAML and inline-result controller are retired.
+
 ## APIs and results
 
 | Prepared-data factory (construct only) | Modal helper | Result on acceptance |

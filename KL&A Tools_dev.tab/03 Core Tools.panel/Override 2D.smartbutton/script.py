@@ -2,6 +2,7 @@ __title__ = 'Highlight 2D'
 __version__ = 'v1.0'
 
 from time import sleep
+from GUI import tool_dialogs
 from pyrevit import DB, script, revit
 from pyrevit import forms
 from pyrevit.framework import List
@@ -45,10 +46,10 @@ def override_projection_lines(elements_set):
                 active_view.SetElementOverrides(element.Id, src_style)
                 count += 1
         except Exception as e:
-            forms.alert('Error: {}'.format(e), exitscript=True)
+            tool_dialogs.alert('Error: {}'.format(e), exitscript=True)
         return str(count)
     else:
-        forms.alert('No 2D elements in view', exitscript=True)
+        tool_dialogs.alert('No 2D elements in view', exitscript=True)
         return str(count)
 
 

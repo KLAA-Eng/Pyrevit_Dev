@@ -57,3 +57,8 @@ environment before promotion or behavior changes.
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
 | `v1.0` | `0.0.7` | 09.28.2026 | KL&A adapted the revision terminology and workflow labels. | `2c4a3b2` |
+
+
+## Shared selectors — development (2026-11-08)
+
+The revision and sheet pickers use GUI.tool_selectors and shared Selection. Revisions start unchecked and issued revisions remain available. Placeholder sheets remain included. Cancellation/empty input stops without mutation. Existing transactions and revision update logic remain unchanged. This is planned development work; released version metadata stays unchanged until delivery.

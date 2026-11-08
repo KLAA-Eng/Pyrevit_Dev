@@ -8,6 +8,8 @@ import codecs
 import csv
 import datetime
 import json
+from GUI import tool_dialogs
+from GUI import tool_selectors
 import os
 import re
 import traceback
@@ -126,7 +128,7 @@ def _schedule_options(document):
 def _select_schedule(document):
     options = _schedule_options(document)
     if not options:
-        forms.alert('No schedules were found in the active model.', title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('No schedules were found in the active model.', title=COMMAND_TITLE, warn_icon=True)
         return None
     try:
         from GUI.forms import select_from_dict
@@ -139,11 +141,10 @@ def _select_schedule(document):
             SelectMultiple=False,
         )
     except Exception:
-        selected = forms.SelectFromList.show(
-            sorted(options.keys()),
+        selected = tool_selectors.select_named_item(
+            options,
             title=COMMAND_TITLE,
-            button_name='Inspect Schedule')
-        selected = options.get(selected)
+            button_name='Inspect Schedule', version=__version__)
     if isinstance(selected, list):
         return selected[0] if selected else None
     return selected
@@ -527,7 +528,7 @@ def main():
     if not folder:
         return
     if not os.path.isdir(folder):
-        forms.alert('Select an existing export folder.', title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('Select an existing export folder.', title=COMMAND_TITLE, warn_icon=True)
         return
 
     inspection = _inspection_record(document, schedule)
@@ -550,7 +551,7 @@ if __name__ == '__main__':
         output.print_md('```')
         output.print_md(traceback.format_exc())
         output.print_md('```')
-        forms.alert(
+        tool_dialogs.alert(
             'Inspect Schedule Header stopped with an error. Review the pyRevit output window for details.',
             title=COMMAND_TITLE,
             warn_icon=True)

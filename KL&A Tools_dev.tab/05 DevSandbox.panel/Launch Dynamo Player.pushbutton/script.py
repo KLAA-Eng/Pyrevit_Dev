@@ -2,6 +2,7 @@
 
 __title__ = "Launch\nDyn Player"
 __version__ = "v0.0"
+from GUI import tool_dialogs
 from pyrevit import HOST_APP, forms
 from Autodesk.Revit.UI import PostableCommand, RevitCommandId
 
@@ -23,7 +24,7 @@ uiapp = HOST_APP.uiapp
 command_id = _get_dynamo_player_command_id()
 
 if command_id is None:
-    forms.alert(
+    tool_dialogs.alert(
         'Dynamo Player is not available in this Revit installation.',
         title=COMMAND_TITLE,
         warn_icon=True,
@@ -31,7 +32,7 @@ if command_id is None:
     )
 
 if not uiapp.CanPostCommand(command_id):
-    forms.alert(
+    tool_dialogs.alert(
         'Dynamo Player cannot be started right now. Finish the active Revit command and try again.',
         title=COMMAND_TITLE,
         warn_icon=True,

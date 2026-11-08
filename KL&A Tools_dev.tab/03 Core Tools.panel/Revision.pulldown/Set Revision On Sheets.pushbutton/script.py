@@ -3,6 +3,7 @@ __version__ = 'v1.0'
 
 from pyrevit import revit, DB, EXEC_PARAMS
 from pyrevit import forms
+from GUI import tool_selectors
 
 # define a filterfunc to filter out issued revisions
 def filterfunc(rev):
@@ -10,12 +11,12 @@ def filterfunc(rev):
         return True
     return rev.Issued == False
 
-revisions = forms.select_revisions(button_name='Select Revisions',
+revisions = tool_selectors.select_revisions(revit.doc, title=__title__, version=__version__, button_name='Select Revisions',
                                    multiple=True,
                                    filterfunc=filterfunc)
 
 if revisions:
-    sheets = forms.select_sheets(button_name='Turn on Revisions',
+    sheets = tool_selectors.select_sheets(revit.doc, title=__title__, version=__version__, button_name='Turn on Revisions',
                                  include_placeholder=True)
     if sheets:
         with revit.Transaction('Manually Turn on Revisions'):

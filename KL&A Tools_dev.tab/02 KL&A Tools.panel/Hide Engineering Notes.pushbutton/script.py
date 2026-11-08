@@ -3,17 +3,12 @@
 __title__ = "Hide/Unhide\nEng Notes"
 __version__ = "v1.1"
 
+from GUI import tool_dialogs
 from pyrevit import revit, DB, forms, script
 import clr
 
 clr.AddReference("System")
 from System.Collections.Generic import List
-from Autodesk.Revit.UI import (
-    TaskDialog,
-    TaskDialogCommandLinkId,
-    TaskDialogCommonButtons,
-    TaskDialogResult
-)
 
 doc = revit.doc
 output = script.get_output()
@@ -414,18 +409,15 @@ def ask_hide_or_unhide():
         A tuple of ``(hide_elements, action_label, action_word)``. All values
         are ``None`` when the user cancels.
     """
-    dlg = TaskDialog("Hide Engineering Notes")
-    dlg.TitleAutoPrefix = False
-    dlg.MainInstruction = "Choose action"
-    dlg.MainContent = "Select whether to hide or unhide engineer notes."
-    dlg.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Hide engineer notes")
-    dlg.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Unhide engineer notes")
-    dlg.CommonButtons = TaskDialogCommonButtons.Cancel
-    result = dlg.Show()
+    result = tool_dialogs.choose(
+        ["Hide engineer notes", "Unhide engineer notes"],
+        title=__title__, prompt="Choose action",
+        content="Select whether to hide or unhide engineer notes.",
+        version=__version__)
 
-    if result == TaskDialogResult.CommandLink1:
+    if result == "Hide engineer notes":
         return True, "Hide", "hidden"
-    elif result == TaskDialogResult.CommandLink2:
+    elif result == "Unhide engineer notes":
         return False, "Unhide", "unhidden"
     else:
         return None, None, None
@@ -548,7 +540,7 @@ def print_diagnostics(diag, census, target_views, matching_notes,
 hide_elements, action_label, action_word = ask_hide_or_unhide()
 
 if hide_elements is None:
-    forms.alert("Operation cancelled.", exitscript=True)
+    tool_dialogs.alert("Operation cancelled.", exitscript=True)
 
 diag = {
     "sheets_total": 0,

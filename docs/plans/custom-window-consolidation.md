@@ -552,3 +552,31 @@ color on 2026-11-06. `klcButtonSec` now references the existing
 `KlaComponentBorderBrush` token with the same `#52675D` value; no new token or
 appearance change was needed. This is the only shared-resource follow-up after
 the initial baseline transfer.
+
+## Matching tool-dialog adoption — confirmed 2026-11-08
+
+The owner confirmed the following migration after grilling. This supersedes
+the earlier exclusion of other caller migrations and GUI-14's Find/Replace
+default-action work. The WPF workspace remains the presentation baseline.
+
+- Both Find/Replace commands use shared Rename. Rules/case requests close before
+  model execution; clean success finishes quietly. Unchanged/partial/failed
+  results use shared Action Choice with Details and Edit and Retry. Rules are
+  retained and partial retries exclude successful elements.
+- Matching active Python tools, including DevSandbox, adopt Message for OK
+  alerts, Action Choice for small menus/confirmations, Text Prompt for text,
+  Selection for lists/sheets/revisions/documents, and Command Switch where
+  search/toggle capabilities are needed. Existing model operations, defaults,
+  identities, cancellation and exit behavior remain caller-owned.
+- New styles remain local. Shared dictionaries are unchanged without a separate
+  owner decision. Native file/folder pickers, progress/selection overlays,
+  compiled add-ins, and Gallery's intentional built-in demonstrations remain
+  outside this scope. Dormant library surfaces are not activated or redesigned.
+
+| ID | Delivery | Status | Acceptance |
+| --- | --- | --- | --- |
+| GUI-50 | Shared Rename adoption | In progress | Thin Views/Sheets adapters, exact transaction behavior, retained rules and unresolved-only retry tests. |
+| GUI-51 | Matching alert/menu/text adoption | In progress | Explicit tool adapters; preserve Yes/No meanings, blank text, cancellation and exitscript. |
+| GUI-52 | Remaining shared selectors | In progress | Placeholder/issued filtering, current-selection shortcuts, document exclusions and schedule fallback identities retained. |
+| GUI-53 | Preview alignment and local verification | In progress | Tool previews use shared Rename; retire duplicate naming XAML, synchronize both repos and validate designer/F5 surfaces. |
+| GUI-54 | Live Revit acceptance | Pending | Model transactions, actual owner/focus, filters and retries in representative host fixtures; automated substitutes are not live proof. |

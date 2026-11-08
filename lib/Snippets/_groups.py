@@ -5,6 +5,7 @@
 # ╩╩ ╩╩  ╚═╝╩╚═ ╩  IMPORT
 #==================================================
 
+from GUI import tool_dialogs
 from Autodesk.Revit.DB import *
 from pyrevit import forms
 
@@ -44,7 +45,7 @@ def select_group_types(given_groups = None, uidoc = default_uidoc ,title='Select
 
     #>>>>>>>>>> EXIT IF NONE SELECTED
     if not selected_groups and exit_if_none:
-        forms.alert("No GroupTypes were selected. \nPlease try again.", exitscript=True)
+        tool_dialogs.alert("No GroupTypes were selected. \nPlease try again.", exitscript=True)
 
     return selected_groups
 
@@ -74,7 +75,7 @@ def select_attached_groups(list_of_groups, uidoc = default_uidoc, title="Select 
 
     # >>>>>>>>>> EXIT IF NONE SELECTED
     if not selected_a_groups and exit_if_none:
-        forms.alert("No AttachedGroups were selected. \nPlease try again.", exitscript=True)
+        tool_dialogs.alert("No AttachedGroups were selected. \nPlease try again.", exitscript=True)
 
     return selected_a_groups
 

@@ -4,6 +4,7 @@ from __future__ import print_function
 __title__ = "Create View\nDetail Folders"
 __version__ = "v0.0"
 
+from GUI import tool_dialogs
 import os
 import sys
 import traceback
@@ -99,7 +100,7 @@ def _view_type_options(document):
 def _select_view_types(document):
     options = _view_type_options(document)
     if not options:
-        forms.alert('No Detail or Drafting view types were found.', title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('No Detail or Drafting view types were found.', title=COMMAND_TITLE, warn_icon=True)
         return []
     return select_from_dict(
         options,
@@ -117,7 +118,7 @@ def _select_destination():
         return None
     normalized_path = os.path.abspath(path)
     if not os.path.isdir(normalized_path):
-        forms.alert('Select an existing destination folder.', title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('Select an existing destination folder.', title=COMMAND_TITLE, warn_icon=True)
         return None
     return normalized_path
 
@@ -161,12 +162,12 @@ def _existing_destination_paths(destination):
     try:
         return [os.path.join(destination, name) for name in os.listdir(destination)]
     except OSError:
-        forms.alert('Could not read the destination folder.', title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('Could not read the destination folder.', title=COMMAND_TITLE, warn_icon=True)
         return None
 
 
 def _show_preflight_errors(errors):
-    forms.alert('\n'.join(errors), title=COMMAND_TITLE, warn_icon=True)
+    tool_dialogs.alert('\n'.join(errors), title=COMMAND_TITLE, warn_icon=True)
 
 
 def _element_id_list(view_id):
@@ -272,7 +273,7 @@ def _report(output, selected_view_types, records, result, export_results):
 def main():
     document = revit.doc
     if not _has_supported_revit_version(document.Application):
-        forms.alert(
+        tool_dialogs.alert(
             'Revit {} or later is required for native PDF export.'.format(
                 MINIMUM_REVIT_VERSION),
             title=COMMAND_TITLE,
@@ -286,7 +287,7 @@ def main():
         return
     records = _matching_view_records(document, selected_view_types)
     if not records:
-        forms.alert('No individual Detail or Drafting views match the selected types.', title=COMMAND_TITLE)
+        tool_dialogs.alert('No individual Detail or Drafting views match the selected types.', title=COMMAND_TITLE)
         return
     existing_paths = _existing_destination_paths(destination)
     if existing_paths is None:
@@ -306,9 +307,9 @@ def main():
             export_results.append(_export_view_deliverables(document, item))
     _report(script.get_output(), selected_view_types, records, result, export_results)
     if result['errors']:
-        forms.alert('Folder creation stopped. Review the output for created folders.', title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('Folder creation stopped. Review the output for created folders.', title=COMMAND_TITLE, warn_icon=True)
     elif has_export_failures(export_results):
-        forms.alert('Some deliverables failed. Review the output for details.', title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('Some deliverables failed. Review the output for details.', title=COMMAND_TITLE, warn_icon=True)
 
 
 if __name__ == '__main__':
@@ -321,7 +322,7 @@ if __name__ == '__main__':
         output.print_md('```')
         output.print_md(traceback.format_exc())
         output.print_md('```')
-        forms.alert(
+        tool_dialogs.alert(
             'Create View Detail Folders stopped with an error. '
             'Review the pyRevit output window for details.',
             title=COMMAND_TITLE,

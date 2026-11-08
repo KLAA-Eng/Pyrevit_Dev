@@ -2,6 +2,7 @@
 
 __title__ = "Element\nTakeoff"
 __version__ = "v0.0"
+from GUI import tool_dialogs
 from pyrevit import revit, DB, forms, script
 from collections import defaultdict
 
@@ -80,7 +81,7 @@ with revit.ErrorSwallower():
         picked_refs = None
 
 if not picked_refs:
-    forms.alert(
+    tool_dialogs.alert(
         "No elements were selected.",
         title="Element Takeoff",
         warn_icon=True,
@@ -91,7 +92,7 @@ elements = [e for e in picked_refs if e is not None]
 
 count = len(elements)
 if count == 0:
-    forms.alert(
+    tool_dialogs.alert(
         "Could not resolve any elements from the selection.",
         title="Element Takeoff",
         warn_icon=True,

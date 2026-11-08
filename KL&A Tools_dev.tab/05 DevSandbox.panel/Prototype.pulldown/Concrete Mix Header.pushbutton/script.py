@@ -4,6 +4,7 @@ from __future__ import print_function
 __title__ = "Concrete Mix Header"
 __version__ = "v0.2"
 
+from GUI import tool_dialogs
 import os
 import sys
 import traceback
@@ -248,7 +249,7 @@ def _schedule_options(document):
 def _target_schedule(document):
     options = _schedule_options(document)
     if not options:
-        forms.alert('No schedules were found in the active model.', title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('No schedules were found in the active model.', title=COMMAND_TITLE, warn_icon=True)
         return None
     selected = select_from_dict(
         options,
@@ -517,7 +518,7 @@ def main():
     if not workbook_path:
         return
     if not os.path.isfile(workbook_path):
-        forms.alert('Workbook not found:\n{}'.format(workbook_path), title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('Workbook not found:\n{}'.format(workbook_path), title=COMMAND_TITLE, warn_icon=True)
         return
     schedule = _target_schedule(document)
     if schedule is None:
@@ -531,7 +532,7 @@ def main():
     reconciliation = _reconciliation_preview(schedule, grid)
     _print_reconciliation(output, reconciliation)
     if reconciliation['unknown_excel'] or reconciliation['duplicate_excel']:
-        forms.alert(
+        tool_dialogs.alert(
             'Excel has concrete mix rows that cannot be reconciled. Review the pyRevit output window.',
             title=COMMAND_TITLE,
             warn_icon=True)
@@ -539,14 +540,14 @@ def main():
 
     remove_missing = False
     if reconciliation['missing_from_excel']:
-        remove_missing = forms.alert(
+        remove_missing = tool_dialogs.alert(
             'Excel is missing {} current template row(s).\n\nDelete those paired schedule rows now?\n\nChoose No to keep them.'.format(
                 len(reconciliation['missing_from_excel'])),
             title=COMMAND_TITLE,
             ok=False,
             yes=True,
             no=True)
-    if not forms.alert(
+    if not tool_dialogs.alert(
             'Write mapped output of {} rows x {} columns into the schedule header?'.format(
                 len(grid), max([len(row) for row in grid] or [0])),
             title=COMMAND_TITLE,
@@ -585,7 +586,7 @@ if __name__ == '__main__':
         output.print_md('```')
         output.print_md(traceback.format_exc())
         output.print_md('```')
-        forms.alert(
+        tool_dialogs.alert(
             'Concrete Mix Header stopped with an error. Review the pyRevit output window for details.',
             title=COMMAND_TITLE,
             warn_icon=True)

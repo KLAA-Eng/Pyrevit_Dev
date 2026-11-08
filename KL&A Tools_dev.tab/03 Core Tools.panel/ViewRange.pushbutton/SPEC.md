@@ -21,7 +21,7 @@ Validate this command against a representative Revit fixture, its empty or cance
 
 ## GUI and interaction
 
-Static UI/API references: forms.Reactive,forms.WPFWindow,forms.alert,forms.reactive,script.get_output,
+Static UI/API references: forms.Reactive,forms.WPFWindow,tool_dialogs.alert,forms.reactive,script.get_output,
 
 Use the command from its pyRevit button. Where it exposes a dialog or selection
 workflow, make the required selection and review the result before confirming.
@@ -89,3 +89,9 @@ environment before promotion or behavior changes.
 | --- | --- | --- | --- | --- |
 | `v1.0` | `0.0.6beta` | 09.15.2026 | KL&A adapted the shared window and branding behavior. | `300f8d4` |
 | `v1.1` | `0.0.11` | 10.12.2026 | Refined table headings, text size, column alignment, message space, and vertical spacing for the View Range editor. | `70af2e1`, `d8c1d4f`; pending owner merge to main. |
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

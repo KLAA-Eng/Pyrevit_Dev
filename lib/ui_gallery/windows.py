@@ -12,7 +12,6 @@ import os
 from .template_data import TEMPLATE_FILES
 from .dialog_data import DIALOG_FILES, DIALOG_FAMILIES, MESSAGE_STATES, ACTION_IDS, ACTION_STATES
 from .variants import preview_launcher
-from find_replace.layout import results_height  # host-free constants shared with the production dialog
 
 from ui_gallery.scenarios import (PreviewItem, alert_message, filtered_items, naming_values,
                                   parse_offset, recall_items, rename_samples, sample,
@@ -28,8 +27,8 @@ SOURCES = {
     'kla-create-from-rooms': 'lib/GUI/_future/KLC-CreateFromRooms.xaml',
     'kla-custom-alert': 'lib/GUI/_superseded/CustomAlert.xaml',
     'kla-duplicate-sheets': 'lib/GUI/DuplicateSheets.xaml',
-    'kla-find-replace-views': 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace - Views.pushbutton/Script.xaml',
-    'kla-find-replace-sheets': 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton/Script.xaml',
+    'kla-find-replace-views': 'lib/GUI/dialogs/RenameDialog.xaml',
+    'kla-find-replace-sheets': 'lib/GUI/dialogs/RenameDialog.xaml',
     'kla-match-properties-recall': 'lib/GUI/_future/match/clipboard_window.xaml',
     'kla-select-from-dict': 'lib/GUI/_superseded/SelectFromDict.xaml',
     'kla-steel-psf': 'KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/Steel PSF.pushbutton/SteelPsfDialog.xaml',
@@ -40,6 +39,9 @@ SOURCES = {
 
 SOURCES.update((identity, 'lib/GUI/_templates/' + filename) for identity, filename in TEMPLATE_FILES.items())
 SOURCES.update((identity, 'lib/GUI/dialogs/' + filename) for identity, filename in DIALOG_FILES.items())
+
+TOOL_RENAME_DIALOGS = {'kla-find-replace-views': 'dialog-rename',
+                       'kla-find-replace-sheets': 'dialog-rename-sheets'}
 
 def source_path(extension_root, relative_path):
     """Resolve the stable tab alias without allowing paths outside the repo."""
@@ -80,6 +82,10 @@ def create_custom(extension_root, launcher, state='Normal'):
     if identifier in TEMPLATE_FILES:
         from .templates import create_template
         return create_template(launcher, state, path)
+    if identifier in TOOL_RENAME_DIALOGS:
+        from .dialogs import create_dialog
+        request = dict(launcher, id=TOOL_RENAME_DIALOGS[identifier])
+        return create_dialog(request, state)
     if identifier in DIALOG_FILES:
         from .dialogs import create_dialog
         return create_dialog(launcher, state)
@@ -100,7 +106,7 @@ def launch_custom(extension_root, launcher, state='Normal', owner=None):
         window.Owner = owner
         window.WindowStartupLocation = WindowStartupLocation.CenterOwner
     window.ShowDialog()
-    if launcher['id'] in DIALOG_FILES:
+    if launcher['id'] in DIALOG_FILES or launcher['id'] in TOOL_RENAME_DIALOGS:
         return 'Fictional dialog result: {}.'.format(window.result.action)
     return window.preview_result
 
@@ -302,14 +308,6 @@ def _window_type():
                 self.content_host.Content = PreviewRecallContent(self)
             elif self.preview_id == 'kla-view-range':
                 self.DataContext = ViewRangeData(self.preview_state)
-            if hasattr(self, 'result_panel'):
-                if self.preview_state == 'Error':
-                    self._show_result(sample('Sample: 1 skipped; 1 failed.'),
-                                      sample('A101: requested name already exists.\nA201: sample read-only item.'))
-                elif self.preview_state == 'Empty':
-                    self._show_result(sample('Sample: no items selected.'), '')
-                elif self.preview_state == 'Long content':
-                    self._show_result(sample('Sample: multiple items need attention.'), alert_message('Long content'))
 
         def _disable_body(self):
             if hasattr(self, 'window_body'):
@@ -331,16 +329,6 @@ def _window_type():
             forms.alert('Preview simulation only.\n\n' + message,
                         title='UI Gallery preview', warn_icon=error)
 
-        def _show_result(self, summary, details):
-            self.preview_result = summary + ('\n' + details if details else '')
-            if not hasattr(self, 'result_panel'):
-                self._feedback(self.preview_result, bool(details))
-                return
-            self.result_panel.Visibility = Visibility.Visible
-            self.result_summary.Text = sample(summary)
-            self.result_details.Text = sample(details)
-            self.result_details.Visibility = Visibility.Visible if details else Visibility.Collapsed
-            self.Height = results_height(1, bool(details))
 
         def button_close(self, sender, args):
             self.Close()
@@ -436,40 +424,6 @@ def _window_type():
                                'Included: {}\n\n{}'.format(len(details), self._duplicate_option,
                                                         ', '.join(options) or 'No optional content',
                                                         '\n'.join(details)), not details)
-            else:
-                self._rename('Rename')
-
-        def button_uppercase(self, sender, args):
-            self._rename('Uppercase')
-
-        def button_lowercase(self, sender, args):
-            self._rename('Lowercase')
-
-        def _rename(self, action):
-            prefix = 'input_sheet_name_' if hasattr(self, 'input_sheet_name_find') else 'input_'
-            values = [getattr(self, prefix + suffix).Text
-                      for suffix in ('find', 'replace', 'prefix', 'suffix')]
-            targets, error = rename_samples(self._sample_names, *values, action=action)
-            if error:
-                self._show_result('Sample validation failed.', error)
-                return
-            numbers = list(self._sample_numbers)
-            if hasattr(self, 'input_sheet_number_find') and action == 'Rename':
-                number_values = [getattr(self, 'input_sheet_number_' + suffix).Text
-                                 for suffix in ('find', 'replace', 'prefix', 'suffix')]
-                numbers, error = rename_samples(numbers, *number_values)
-                if error:
-                    self._show_result('Sample number validation failed.', error)
-                    return
-            changed = sum(1 for before, after in zip(self._sample_names, targets) if before != after)
-            if numbers != self._sample_numbers:
-                changed = len(targets)
-            self._sample_names = targets
-            self._sample_numbers = numbers
-            details = targets
-            if hasattr(self, 'input_sheet_number_find'):
-                details = ['{} - {}'.format(number, name) for number, name in zip(numbers, targets)]
-            self._show_result('Preview: {} fictional item(s) changed.'.format(changed), '\n'.join(details))
 
         def apply_changes_click(self, sender, args):
             data = self.DataContext

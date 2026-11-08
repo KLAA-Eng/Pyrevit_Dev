@@ -67,10 +67,10 @@ class UiGalleryLaunchersTests(unittest.TestCase):
         self.assertTrue(all('sample_data_label' in launcher for launcher in launchers))
         self.assertTrue(all(launcher['called_by'] for launcher in launchers))
         by_id = dict((launcher['id'], launcher) for launcher in launchers)
-        self.assertIn('/03 Core Tools.panel/Rename.pulldown/',
-                      by_id['kla-find-replace-views']['relative_path'])
-        self.assertIn('/03 Core Tools.panel/Rename.pulldown/',
-                      by_id['kla-find-replace-sheets']['relative_path'])
+        self.assertEqual('lib/GUI/dialogs/RenameDialog.xaml',
+                         by_id['kla-find-replace-views']['relative_path'])
+        self.assertEqual('lib/GUI/dialogs/RenameDialog.xaml',
+                         by_id['kla-find-replace-sheets']['relative_path'])
 
     def test_seeded_claim_only_applies_to_seeded_previews(self):
         launchers = gallery_launchers()

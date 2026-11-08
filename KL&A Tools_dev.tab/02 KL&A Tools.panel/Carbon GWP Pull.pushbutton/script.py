@@ -11,6 +11,7 @@ __version__ = 'v1.1'
 # Imports
 # ------------------------------------------------------------------
 
+from GUI import tool_dialogs
 import os
 import sys
 import time
@@ -210,7 +211,7 @@ def _select_schedules(document):
     """
     options = _schedule_options(document)
     if not options:
-        forms.alert('No schedules were found in the active model.', title=COMMAND_TITLE, warn_icon=True)
+        tool_dialogs.alert('No schedules were found in the active model.', title=COMMAND_TITLE, warn_icon=True)
         return None
     # Select source schedules. Pre-select the standard Carbon schedules when
     # their names exist in the active project.
@@ -232,7 +233,7 @@ def _select_schedules(document):
 
     # INVARIANT: The downstream workbook formulas require three schedule tabs.
     if len(selected) != 3:
-        forms.alert(
+        tool_dialogs.alert(
             'Select exactly three schedules. You selected {}.'.format(len(selected)),
             title=COMMAND_TITLE,
             warn_icon=True)
@@ -816,13 +817,13 @@ def _sync_to_central_sheet(document):
             matches.append(sheet)
     if len(matches) != 1:
         if not matches:
-            forms.alert(
+            tool_dialogs.alert(
                 'Sheet not found: {}. Create it outside this command, then run again.'.format(
                     TARGET_SHEET_NAME),
                 title=COMMAND_TITLE,
                 warn_icon=True)
         else:
-            forms.alert(
+            tool_dialogs.alert(
                 'Multiple sheets are named {}. Rename the duplicates before running again.'.format(
                     TARGET_SHEET_NAME),
                 title=COMMAND_TITLE,
@@ -991,7 +992,7 @@ def _show_material_accuracy_warning(material_accuracy_check,
                                     chart_update_completed=True):
     """Show a non-blocking material-accuracy warning after reporting results."""
     if material_accuracy_check['status'] == 'unavailable':
-        forms.alert(
+        tool_dialogs.alert(
             'The Material Accuracy check was not completed, please review the '
             'Material Breakdown table in Excel',
             title=COMMAND_TITLE,
@@ -1005,7 +1006,7 @@ def _show_material_accuracy_warning(material_accuracy_check,
             message = (
                 '{} #N/A result(s) were found in {}!{}. Review the pyRevit '
                 'report for affected cells.')
-        forms.alert(
+        tool_dialogs.alert(
             message.format(
                 len(material_accuracy_check['cells']),
                 material_accuracy_check['sheet'],
@@ -1028,7 +1029,7 @@ def main():
     if target_sheet is None:
         return
     if not _is_active_sheet(document, target_sheet):
-        forms.alert(
+        tool_dialogs.alert(
             'Open the {} sheet, then run {} again.'.format(TARGET_SHEET_NAME, COMMAND_TITLE),
             title=COMMAND_TITLE,
             warn_icon=True)
@@ -1053,14 +1054,14 @@ def main():
     if not post_processing_workbook:
         return
     if _same_workbook_path(export_workbook, post_processing_workbook):
-        forms.alert(
+        tool_dialogs.alert(
             'Select different workbooks for schedule export and post-processing. '
             'The export workbook will have its DYN Out worksheets replaced.',
             title=COMMAND_TITLE,
             warn_icon=True)
         return
     if not os.path.isfile(post_processing_workbook):
-        forms.alert('Post-processing workbook not found:\n{}'.format(post_processing_workbook),
+        tool_dialogs.alert('Post-processing workbook not found:\n{}'.format(post_processing_workbook),
                     title=COMMAND_TITLE, warn_icon=True)
         return
     # Export and refresh external data before a Revit transaction, keeping
@@ -1108,7 +1109,7 @@ def main():
             output, metadata, exports, chart_results, material_accuracy_check)
         _show_material_accuracy_warning(
             material_accuracy_check, chart_update_completed=False)
-        forms.alert(
+        tool_dialogs.alert(
             'No positive numeric values were found for {} on the Export worksheet. '
             'Review the pyRevit output for skipped rows.'.format(', '.join(missing_charts)),
             title=COMMAND_TITLE,
@@ -1117,7 +1118,7 @@ def main():
 
     oversized_charts = _chart_slice_limit_exceeded(chart_results)
     if oversized_charts:
-        forms.alert(
+        tool_dialogs.alert(
             '{} has more than {} material rows. Reduce or group the Export '
             'worksheet rows before rendering a readable chart.'.format(
                 ', '.join(oversized_charts), MAX_CHART_SLICE_COUNT),
@@ -1172,7 +1173,7 @@ if __name__ == '__main__':
         output.print_md('```')
         output.print_md(traceback.format_exc())
         output.print_md('```')
-        forms.alert(
+        tool_dialogs.alert(
             'Carbon GWP Pull stopped with an error. Review the pyRevit output window for details.',
             title=COMMAND_TITLE,
             warn_icon=True)

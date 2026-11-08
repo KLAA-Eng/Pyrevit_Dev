@@ -3,23 +3,27 @@
 __title__ = 'Copy legends\nto others documents'
 __version__ = 'v1.0.pyRevit'
 
+from GUI import tool_dialogs
 import sys
 from Autodesk.Revit.DB import Transaction, TransactionGroup
 from pyrevit import revit, DB, script, forms
+from GUI import tool_selectors
 from pyrevit.framework import List
 
-open_docs = forms.select_open_docs(title="Select Destination Documents")
+open_docs = tool_selectors.select_open_documents(revit.doc.Application, revit.doc,
+                                                title="Select Destination Documents", version=__version__)
 if not open_docs:
     sys.exit(0)
 
-legends = forms.select_views(
+legends = tool_selectors.select_views(revit.doc,
     title="Select Legend Views",
+    version=__version__,
     filterfunc=lambda x: x.ViewType == DB.ViewType.Legend,
     use_selection=True,
 )
 
 if not legends:
-    forms.alert("No Legend Views selected.")
+    tool_dialogs.alert("No Legend Views selected.")
     sys.exit(0)
 
 
@@ -74,7 +78,7 @@ with forms.ProgressBar(cancellable=True) as pb:
         # check for base legend to duplicate
         base_legend = revit.query.find_first_legend(doc=dest_doc)
         if not base_legend:
-            forms.alert(
+            tool_dialogs.alert(
                 "At least one Legend must exist in target document.\n"
                 "Skipping document: {}".format(dest_doc.Title)
             )
@@ -88,7 +92,7 @@ with forms.ProgressBar(cancellable=True) as pb:
         for src_legend in legends:
             if pb.cancelled:
                 tg.RollBack()
-                forms.alert("Operation cancelled.")
+                tool_dialogs.alert("Operation cancelled.")
                 sys.exit(0)
 
             legend_name = revit.query.get_name(src_legend)
@@ -205,10 +209,10 @@ if processed_docs:
             details.append("• {} (no base legend found)".format(doc_name))
 
     content = "\n".join(details)
-    forms.alert(msg=main_instruction, sub_msg=content)
+    tool_dialogs.alert(msg=main_instruction, sub_msg=content)
 
     if len(logger_messages):
         logger.warning(logger_messages.get_messages())
 
 else:
-    forms.alert("Copy operation failed.")
+    tool_dialogs.alert("Copy operation failed.")

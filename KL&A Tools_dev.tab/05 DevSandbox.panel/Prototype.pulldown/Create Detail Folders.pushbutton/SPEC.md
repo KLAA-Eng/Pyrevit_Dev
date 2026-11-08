@@ -85,7 +85,7 @@ before promotion.
 
 ## GUI and interaction
 
-Static UI/API references: forms.alert,forms.pick_folder,output.print_md,output.print_table,script.get_output,select_from_dict,
+Static UI/API references: tool_dialogs.alert,forms.pick_folder,output.print_md,output.print_table,script.get_output,select_from_dict,
 
 Use the command from its pyRevit button. Select the Detail and Drafting view
 types to package, choose an existing destination folder, then review the pyRevit
@@ -104,3 +104,9 @@ External filesystem effects: creates destination child folders and writes
 This is a command. The inventory above is statically derived
 from the current bundle and must be confirmed inside the target Revit/pyRevit
 environment before promotion or behavior changes.
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

@@ -19,7 +19,7 @@
 
 This command helps documentation teams hide or unhide KL&A engineering-note
 text without deleting it. Click the ribbon button, choose **Hide engineer
-notes** or **Unhide engineer notes** in the native Revit dialog, then review the
+notes** or **Unhide engineer notes** in the shared Action Choice dialog, then review the
 completion report in the pyRevit output window. Hold Shift while clicking for a
 detailed diagnostic report.
 Cancelling the dialog exits before a Revit transaction starts.
@@ -97,3 +97,9 @@ development change date.
 - Refactor the command entry point into `main()` only as part of that focused
   structural change.
 - Record live Revit acceptance for the broadened view-type support.
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged. Hide/Unhide uses shared Action Choice command links instead of the native TaskDialog; the action values and cancellation branches are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

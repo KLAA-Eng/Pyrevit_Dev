@@ -4,6 +4,7 @@ from __future__ import print_function
 __title__ = "Highlight\nChanged Elements"
 __version__ = "v0.1"
 
+from GUI import tool_dialogs
 import os
 import traceback
 
@@ -26,7 +27,7 @@ HIGHLIGHT_COLOR = DB.Color(255, 0, 0)
 
 
 def _stop(message):
-    forms.alert(message, title=COMMAND_TITLE, warn_icon=True)
+    tool_dialogs.alert(message, title=COMMAND_TITLE, warn_icon=True)
     script.exit()
 
 

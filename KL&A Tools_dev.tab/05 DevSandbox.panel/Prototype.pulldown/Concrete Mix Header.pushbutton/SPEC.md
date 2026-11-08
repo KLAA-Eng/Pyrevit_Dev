@@ -173,3 +173,9 @@ Live validation should verify that removing an element from Excel can delete the
 paired Revit header rows, and that adding the element back to Excel reinserts the
 paired rows in the correct template order. Merge behavior and exact formatting
 after Revit row insertion still need live Revit review.
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged. The two confirmations use Action Choice Yes/No buttons: No on missing rows retains those rows and continues; No on the final write confirmation aborts before modifying the schedule.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

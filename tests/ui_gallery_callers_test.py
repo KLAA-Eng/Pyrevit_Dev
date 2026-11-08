@@ -156,13 +156,26 @@ class CallerDiscoveryTests(unittest.TestCase):
         self.assertEqual(['Settings Tool'],
                          [row['title'] for row in result['pyrevit:ask_for_string']])
 
+    def test_lazy_shared_factory_is_attributed_through_tool_helper(self):
+        self.write('lib/GUI/dialogs/__init__.py',
+                   'def create_rename(title, fields):\n    return None\n'
+                   'def show_message(title, message):\n    return None\n')
+        self.write('lib/request.py',
+                   'from GUI import dialogs\n'
+                   'def run():\n    return dialogs.create_rename("Tool", [])\n')
+        self.tool('Rename', 'from request import run\nrun()\n')
+        result = discover_callers(self.root)
+        self.assertEqual(['Rename'], [row['title'] for row in
+                         result['lib/GUI/dialogs/RenameDialog.xaml']])
+        self.assertNotIn('lib/GUI/dialogs/MessageDialog.xaml', result)
+
     def test_callable_aliases_with_cycles_do_not_recurse_forever(self):
         self.tool('Aliases', 'a = b()\nb = a()\na.method()\n')
         self.assertEqual({}, discover_callers(self.root))
 
     def test_real_repo_includes_indirect_sheet_picker_and_compiled_consumers(self):
         result = discover_callers(PROJECT_ROOT)
-        selection_titles = [row['title'] for row in result['lib/GUI/_superseded/SelectFromDict.xaml']]
+        selection_titles = [row['title'] for row in result['lib/GUI/dialogs/SelectionDialog.xaml']]
         self.assertIn('Duplicate Sheets', selection_titles)
         self.assertIn('Carbon GWP Pull', selection_titles)
         compiled = result['src/KLCode.Wpf/Views/KlaAlertWindow.xaml']
@@ -171,10 +184,9 @@ class CallerDiscoveryTests(unittest.TestCase):
         native_titles = [row['title'] for row in result['native:OpenFileDialog']]
         self.assertIn('Family Studio', native_titles)
         self.assertIn('Startup Importer', native_titles)
-        for folder, title in (('FindReplace - Views.pushbutton', 'Find and Replace in Views'),
-                              ('FindReplace_Sheets.pushbutton', 'Find and Replace in Sheets')):
-            key = 'KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/' + folder + '/Script.xaml'
-            self.assertIn(title, [row['title'] for row in result[key]])
+        rename_titles = [row['title'] for row in result['lib/GUI/dialogs/RenameDialog.xaml']]
+        self.assertIn('Find and Replace in Views', rename_titles)
+        self.assertIn('Find and Replace in Sheets', rename_titles)
 
 
 if __name__ == '__main__':

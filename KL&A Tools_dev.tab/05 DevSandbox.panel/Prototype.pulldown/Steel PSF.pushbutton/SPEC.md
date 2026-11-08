@@ -64,7 +64,7 @@ read-only behavior before quantity results are relied upon.
 
 ## GUI and interaction
 
-Static UI/API references: forms.alert,forms.pick_folder,output.print_md,output.print_table,script.get_output,wpf.LoadComponent,
+Static UI/API references: tool_dialogs.alert,forms.pick_folder,output.print_md,output.print_table,script.get_output,wpf.LoadComponent,
 
 Use the command from its pyRevit button. Select stories in the branded dialog
 with the search box, `Select All`, and `Select None`. Click `Review Selected
@@ -138,3 +138,9 @@ environment before promotion or behavior changes.
 - Revisit a custom KLCode green-themed report window as a future UI item after
   the default pyRevit output workflow is validated and the desired table layout
   is specified.
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

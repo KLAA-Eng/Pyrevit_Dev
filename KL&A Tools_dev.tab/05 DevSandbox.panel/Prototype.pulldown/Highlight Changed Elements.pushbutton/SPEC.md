@@ -64,7 +64,7 @@ read-only close-without-save behavior before the prototype is promoted.
 
 ## GUI and interaction
 
-Static UI/API references: forms.alert,forms.pick_file,output.print_md,output.print_table,script.get_output,
+Static UI/API references: tool_dialogs.alert,forms.pick_file,output.print_md,output.print_table,script.get_output,
 
 Use the command from its pyRevit button. Where it exposes a dialog or selection
 workflow, make the required selection and review the result before confirming.
@@ -84,3 +84,9 @@ Detected mutation/external-effect patterns: .SetElementOverrides,revit.Transacti
 This is a command. The inventory above is statically derived
 from the current bundle and must be confirmed inside the target Revit/pyRevit
 environment before promotion or behavior changes.
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

@@ -22,6 +22,19 @@ _API_NAMES = set([
 ])
 _BUNDLE_SUFFIXES = ('.pushbutton', '.smartbutton', '.invokebutton')
 _XAML_NAMESPACE = 'http://schemas.microsoft.com/winfx/2006/xaml/presentation'
+# Public lazy factories cannot be inferred from a filename passed through their
+# controller closures. Record the established API contract at the resolved call.
+_SHARED_DIALOGS = {
+    'MessageDialog.xaml': ('create_message', 'show_message'),
+    'SelectionDialog.xaml': ('create_selection', 'select_items', 'create_list_single',
+        'create_list_multiple', 'create_sheet_selector', 'create_revision_selector',
+        'create_document_selector', 'select_one', 'select_many', 'select_sheets',
+        'select_revisions', 'select_open_documents'),
+    'RenameDialog.xaml': ('create_rename', 'rename'),
+    'TextPromptDialog.xaml': ('create_text_prompt', 'ask_text'),
+    'ActionChoiceDialog.xaml': ('create_choice', 'choose_action'),
+    'CommandSwitchDialog.xaml': ('create_command_switch', 'command_switch'),
+}
 try:
     _STRING_TYPES = (basestring,)
 except NameError:
@@ -312,6 +325,10 @@ class _Inventory(object):
                 constructor = False
                 if isinstance(resolved, tuple):
                     queue.append(resolved)
+                    if self.sources[resolved[0]].relative_path == 'lib/GUI/dialogs/__init__.py':
+                        for filename, functions in _SHARED_DIALOGS.items():
+                            if resolved[1] in functions:
+                                result.setdefault('lib/GUI/dialogs/' + filename, set()).add(source.relative_path)
                     target = self.sources[resolved[0]].scopes.get(resolved[1])
                     constructor = target is not None and isinstance(target.node, ast.ClassDef)
                 else:

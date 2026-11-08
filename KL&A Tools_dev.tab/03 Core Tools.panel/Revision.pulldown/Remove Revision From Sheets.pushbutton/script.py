@@ -3,19 +3,20 @@ __version__ = 'v1.0'
 
 from pyrevit import revit, DB
 from pyrevit import forms
+from GUI import tool_selectors
 from pyrevit import script
 
 
 logger = script.get_logger()
 
 
-revisions = forms.select_revisions(button_name='Select Revisions',
+revisions = tool_selectors.select_revisions(revit.doc, title=__title__, version=__version__, button_name='Select Revisions',
                                    multiple=True)
 
 logger.debug(revisions)
 
 if revisions:
-    sheets = forms.select_sheets(button_name='Turn off Revisions',
+    sheets = tool_selectors.select_sheets(revit.doc, title=__title__, version=__version__, button_name='Turn off Revisions',
                                  include_placeholder=True)
     if sheets:
         with revit.Transaction('Manually Turn off Revisions'):

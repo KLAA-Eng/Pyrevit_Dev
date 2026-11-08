@@ -2,6 +2,7 @@
 __title__ = "Suggestions/Bugs\nFeedback"
 __version__ = "v1.0"
 
+from GUI import tool_dialogs
 import os
 import urllib
 
@@ -65,15 +66,17 @@ def collect_context():
 
 
 def prompt_for_user_input():
-    report_type = forms.CommandSwitchWindow.show(
+    report_type = tool_dialogs.choose(
         ["Bug Report", "Suggestion", "General Feedback", "Cancel"],
-        message="What kind of feedback do you want to send?"
+        title=__title__,
+        prompt="What kind of feedback do you want to send?",
+        version=__version__,
     )
 
     if not report_type or report_type == "Cancel":
         script.exit()
 
-    subject = forms.ask_for_string(
+    subject = tool_dialogs.ask_text(
         default="",
         prompt="Add a short subject for the form subject line.",
         title="Feedback subject"
@@ -106,7 +109,7 @@ def build_form_url(payload):
 
 def main():
     if not has_form_configuration():
-        forms.alert(
+        tool_dialogs.alert(
             "Update FORM_BASE_URL and FIELD_MAP in this button script with the real Microsoft Forms prefilled link values before using it.",
             title="Suggestions Form Not Configured",
             warn_icon=True,

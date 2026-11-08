@@ -8,6 +8,7 @@ __version__ = 'v1.0'
 #====================================================================================================
 
 
+from GUI import tool_dialogs
 import os
 
 from Autodesk.Revit.DB import *
@@ -476,7 +477,7 @@ class MyWindow(DuplicateSheets):
         # CANCEL IF NO SHEETS SELECTED / Open a menu with all sheets in the project.
         if not selected_sheets:
             msg = "No Sheets were selected. \nPlease Try again."
-            pyrevit.forms.alert(msg, title=__title__, sub_msg=None, expanded=None, footer='', ok=True, warn_icon=True, exitscript=False)
+            tool_dialogs.alert(msg, title=__title__, sub_msg=None, expanded=None, footer='', ok=True, warn_icon=True, exitscript=False)
         return selected_sheets
 
 

@@ -4,6 +4,7 @@ from __future__ import print_function
 __title__ = "Open Keynote\nFile"
 __version__ = "v0.0"
 
+from GUI import tool_dialogs
 import os
 
 from pyrevit import DB, forms, revit, script
@@ -13,7 +14,7 @@ COMMAND_TITLE = 'Open Keynote File'
 
 
 def _stop(message):
-    forms.alert(message, title=COMMAND_TITLE, warn_icon=True)
+    tool_dialogs.alert(message, title=COMMAND_TITLE, warn_icon=True)
     script.exit()
 
 

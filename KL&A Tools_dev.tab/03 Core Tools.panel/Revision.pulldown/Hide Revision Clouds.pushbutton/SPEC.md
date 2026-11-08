@@ -65,3 +65,9 @@ replace live Revit acceptance.
 | --- | --- | --- | --- | --- |
 | `v1.0` | `0.0.7` | 09.28.2026 | Added the KL&A hide/unhide revision-cloud workflow. | `2c4a3b2` |
 | `v1.1` | `0.0.12` | 10.13.2026 | List each changed sheet and its added or removed revisions after Hide and Unhide. | `9b1ca77`, `9570018`; 0.0.12 delivery snapshot. |
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged. Hide/Unhide uses shared Action Choice command links instead of the native TaskDialog; the action values and cancellation branches are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

@@ -1,4 +1,4 @@
-# FindReplace_Sheets
+﻿# FindReplace_Sheets
 
 | Field | Value |
 | --- | --- |
@@ -9,7 +9,7 @@
 | Status/origin | KL&A-maintained Core command promoted from an EFTools-derived DevSandbox prototype. |
 | Main delivery | 0.0.11 |
 | Path aliases | Core release layout: `KL&A Tools.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton`; current `KL&A Tools_dev.tab/03 Core Tools.panel/Rename.pulldown/FindReplace_Sheets.pushbutton`; former prototype: `KL&A Tools.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton`, `KL&A Tools_dev.tab/05 DevSandbox.panel/Prototype.pulldown/FindReplace_Sheets-proto.pushbutton` |
-| Version inputs | Core `bundle.yaml`, `script.py`, `Script.xaml`; former prototype bundle files; `lib/find_replace/workflow.py`, `lib/find_replace/revit_batch.py`, `lib/find_replace/window.py`; `lib/Snippets/_selection.py`; `lib/GUI/Resources/WPF_styles.xaml` |
+| Version inputs | Core `bundle.yaml`, `script.py`; `lib/find_replace/controller.py`, `planning.py`, `workflow.py`, `revit_batch.py`; `lib/GUI/dialogs/` Rename and Action Choice; `lib/Snippets/_selection.py` |
 
 ## Tool version history
 
@@ -35,26 +35,31 @@ Prefix, and Suffix, or change sheet-title case directly.
 
 ## Behavior
 
-The command uses selected sheets from the Project Browser or offers a sheet
-picker with no rows checked initially. Its visible labels show sheet number and
-name, without element IDs. The existing SheetNumber and SheetName columns
-remain. Uppercase and Lowercase apply to sheet titles only; sheet numbers are
-unaffected.
+The command uses selected sheets from the Project Browser or offers a shared
+sheet picker with no rows initially checked. Labels show sheet number and name
+without element IDs. Shared Rename presents Sheet Number and Sheet Name groups;
+Uppercase/Lowercase affect Sheet Name only. Title and number changes are atomic
+per sheet. Initially occupied, swapped, and duplicate requested sheet numbers
+are skipped before the batch is applied.
 
-Actions apply immediately to the full selection's current values. Rename
-requires Find text when Replace is nonempty and keeps matching case-sensitive.
-Each rerun recomputes from current values, including repeated prefixes or
-suffixes. Requested sheet numbers that are already occupied, swapped with
-another selected sheet, or duplicated within the batch are skipped. No `*` or
-`_` fallback is added to a requested value.
+Actions use the shared Rename request window and execute only after it closes.
+The request retains literal, case-sensitive Find/Replace, Prefix and Suffix;
+Replace requires Find, and an entirely blank rename request stays open with
+inline validation. Case actions ignore entered rules and change names only.
+There is no live before/after preview.
 
-One parent Revit transaction gives the batch one Undo item. A subtransaction
-changes a sheet's title and number together or rolls both back if either fails.
-Other valid sheets may still change. The dialog closes quietly when the action
-succeeds. Rename with no changes stays open. Skipped or failed items expand an
-in-dialog result area with counts and reasons; controls remain available for a
-full rerun. Results for the same action are replaced on rerun while unresolved
-results from other actions remain visible.
+Exact requested targets are preserved; no collision suffix is invented. One
+parent Revit transaction gives each submitted batch one Undo item, with one
+subtransaction per element. Other valid elements may change when an item fails.
+A clean changed result finishes quietly. A no-op, partial result, or error opens
+the shared Action Choice result dialog with counts, expandable Details, Close,
+and Edit and Retry when unfinished targets remain. Retry reopens shared Rename
+with the entered rules retained and the same unfinished element identities.
+After partial success, committed and unchanged elements are excluded; prefixes
+or suffixes are never reapplied to earlier successes during that retry.
+Cancellation of either request or results ends the command without another run.
+A Project Browser refresh failure after committed changes is reported with
+Close only; it cannot cause those changes to be reapplied.
 
 ## Validation boundary
 
@@ -66,31 +71,25 @@ quiet success, and Project Browser display.
 
 ## Implementation inventory
 
-- Entry point: `script.py`
-- Selection and WPF: local `script.py` and `Script.xaml`, with `get_selected_sheets` and shared WPF styles.
-- Planning, Revit transaction handling, and result presentation: `lib/find_replace/`.
+- Entry point: `script.py`, a thin selection and document adapter.
+- Requests: `GUI.dialogs` shared Rename, using `view_fields()` or `sheet_fields()`.
+- Exact target planning: `lib/find_replace/planning.py` and `workflow.py`.
+- Model transactions: `lib/find_replace/revit_batch.py`.
+- Request/result/retry sequence: `lib/find_replace/controller.py`.
+- Results: shared Action Choice; no command-local dialog implementation.
 - Bundled external assets: None.
 
 ## GUI and interaction
 
-The local body uses the shared `klcWindowShell`, loaded through
-`GUI.window_chrome.load_window` with the caller title and `__version__`. Header,
-footer, close/drag/navigation behavior, and control styles are shared rather
-than copied into the command. Sheet Number and Sheet Name retain their two
-columns. Each compact naming row has a 60-unit label, 240-unit input,
-24-unit height and 8-unit gaps. Uppercase/Lowercase retain their position above
-Rename, using 104 x 28 supporting actions and a 216 x 32 main action. The
-712 x 313 initial window accommodates both shared naming groups.
-
-The result panel remains collapsed initially and appears only for no-change
-Rename or unresolved items. Its details are read-only and scrollable; the body
-can scroll when expanded results exceed the available height. Existing outcome
-height changes, rerun policy, and quiet-success closure are unchanged. No
-preview or success popup is used. Live host acceptance remains pending.
-
+Shared Rename owns its one/two property-group layout, validation, keyboard,
+close behavior and existing design resources. The caller supplies its title and
+tool version. Valid requests close before model work; errors and unchanged
+outcomes use shared Action Choice with Details and an explicit Edit and Retry
+path. No command-local XAML is a runtime dependency. Shared component,
+foundation and token dictionaries are unchanged by this adoption.
 ## Current execution logic
 
-`script.py` computes exact targets and rejects initially occupied or repeated
+`planning.py` computes exact targets and rejects initially occupied or repeated
 sheet-number targets. `apply_batch` uses a parent transaction with one
 subtransaction per changing sheet. It checks commit status and rolls back the
 parent on failure. The command attempts its Project Browser refresh only after
@@ -107,3 +106,13 @@ external services except when a footer link is clicked.
 Promoted to the existing Core button on `dev`; the DevSandbox bundle was retired.
 The visual review is approved, and live Revit 2024, 2025, and 2026 acceptance
 remains pending before release.
+
+## Unreleased dialog adoption — 11.08.2026
+
+Shared Rename and Action Choice replace the command-local request/result UI.
+Retry targets only unfinished elements after partial success. Tool versions
+remain unchanged pending the next meaningful main delivery. Local behavioral
+and transaction-boundary tests support this change; live Revit acceptance
+remains pending.
+
+

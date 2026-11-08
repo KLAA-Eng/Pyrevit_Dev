@@ -205,7 +205,7 @@ class GalleryWindowTests(unittest.TestCase):
             for identifier, relative in windows.SOURCES.items():
                 # The new reusable dialogs run in the real IronPython/WPF probe;
                 # this older control fake models the legacy Gallery adapters only.
-                if identifier in windows.DIALOG_FILES:
+                if identifier in windows.DIALOG_FILES or identifier in windows.TOOL_RENAME_DIALOGS:
                     continue
                 if not os.path.isfile(windows.source_path(ROOT, relative)):
                     continue
@@ -227,19 +227,18 @@ class GalleryWindowTests(unittest.TestCase):
             preview.button_initialize_csv(None, None)
             self.assertIn('No folder picker or file write', preview.preview_result)
 
-    def test_sheet_case_action_preserves_numbers_and_rename_validates_both_groups(self):
-        with patch.dict(sys.modules, host_modules([])):
-            preview = windows.create_custom(ROOT, {'id': 'kla-find-replace-sheets'})
-            original_numbers = list(preview._sample_numbers)
-            preview.button_uppercase(None, None)
-            self.assertEqual(original_numbers, preview._sample_numbers)
-            original_names = list(preview._sample_names)
-            preview.input_sheet_number_find.Text = ''
-            preview.input_sheet_number_replace.Text = 'invalid'
-            preview.button_run(None, None)
-            self.assertEqual(original_names, preview._sample_names)
-            self.assertEqual(original_numbers, preview._sample_numbers)
-            self.assertIn('validation failed', preview.result_summary.Text)
+    def test_find_replace_previews_use_the_shared_rename_factory(self):
+        from ui_gallery import dialogs
+        from ui_gallery.scenarios import STATES
+        sentinel = object()
+        for tool, family in windows.TOOL_RENAME_DIALOGS.items():
+            for state in STATES:
+                with patch.object(dialogs, 'create_dialog', return_value=sentinel) as factory:
+                    preview = windows.create_custom(ROOT, {'id': tool, 'title': 'Tool'}, state)
+                self.assertIs(sentinel, preview)
+                self.assertEqual(family, factory.call_args.args[0]['id'])
+                self.assertEqual('Tool', factory.call_args.args[0]['title'])
+                self.assertEqual(state, factory.call_args.args[1])
 
     def test_recall_retains_shell_and_uses_safe_real_content_adapter(self):
         alerts = []
@@ -267,8 +266,6 @@ class GalleryWindowTests(unittest.TestCase):
 
     def test_rename_family_states_seed_visible_empty_invalid_and_long_fields(self):
         groups = {
-            'kla-find-replace-views': 'input_',
-            'kla-find-replace-sheets': 'input_sheet_name_',
             'kla-duplicate-sheets': 'UI_sheet_name_',
         }
         with patch.dict(sys.modules, host_modules([])):

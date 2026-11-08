@@ -24,7 +24,7 @@ The window folders under `lib/GUI` mark each window's standing:
 | `_templates` | The Options and Review reference windows new tools start from | Yes; kept as clean as the dialogs |
 | `_superseded` | Windows a shared dialog now covers (Custom Alert, SelectFromDict) until their callers move; see its [README](../lib/GUI/_superseded/README.md) | Reference fixes only |
 | `_future` | Windows no tool opens yet | None until a tool adopts one |
-| Tool folders | The bespoke tool windows (Duplicate Sheets, View Range, Steel PSF, Find/Replace) | Follow the dialog layout; Find/Replace is superseded by Rename in place |
+| Tool folders | Bespoke tool windows such as Duplicate Sheets, View Range and Steel PSF | Follow the dialog layout; Find/Replace uses shared Rename |
 
 The current inventory has 24 standalone Window sources: nine Python windows (two
 superseded, two future), six shared dialogs, two reference templates, five
@@ -639,7 +639,7 @@ the deployed DLLs.
 | Interaction | Contract and current boundary |
 | --- | --- |
 | Tab | Body is declared before chrome to support body-first traversal, then Close and footer links. Initial focus and complete traversal still need live-host acceptance. |
-| Enter | Explicit `IsDefault="True"` identifies a default action. The visual primary style does not set it. Find/Replace Views, Find/Replace Sheets and Steel PSF currently omit it on their main actions. |
+| Enter | Explicit `IsDefault="True"` identifies a default action. The visual primary style does not set it. Find/Replace uses shared Rename's explicit field/default action handling; Steel PSF retains its existing boundary. |
 | Escape | Shared adapters request the Close policy. Python WPFWindow subclasses also retain the host handler described above. |
 | Cancel | Use an explicit caller cancellation policy; `IsCancel="True"` is a WPF dialog setting, not a substitute for validating modeless/custom-close behavior. |
 | Focus | Buttons/checks/radios/toggles explicitly set FocusVisualStyle to null: no green frame, white underline or focus-square override around the control/checkbox label. They remain keyboard operable. Inputs/dropdowns retain field-focus outlines; footer focus changes color without reflow. |
@@ -695,7 +695,11 @@ the owner's live Revit review complete.
 ## Reusable dialogs
 
 Use [GUI.dialogs](../lib/GUI/dialogs/README.md) for prepared-data dialogs.
-The six opt-in bodies do not migrate existing commands or their pyRevit calls.
+Active Python tools adopt matching bodies through explicit `GUI.tool_dialogs`,
+`GUI.tool_selectors` and `GUI.selection_compat` adapters. Find/Replace uses
+shared Rename with caller-owned execution, result Details and safe edit/retry.
+Native file/folder pickers, progress and selection overlays, compiled add-ins
+and Gallery's built-in demonstrations retain their existing UI.
 
 | Need | Modal API | Result |
 | --- | --- | --- |
@@ -722,8 +726,9 @@ bare WPF windows; modal helpers call ShowDialog and return `DialogResult`.
 Supply the owner and caller version. No import/factory infers or queries the
 current document. Specialized modal helpers explicitly call separate read-only
 collectors before showing UI. CustomAlert and SelectFromDict are superseded by
-Message and Selection: they keep their calling contracts from
-`lib/GUI/_superseded` until each caller moves, and receive no design work.
+Message and Selection. The `GUI.forms.select_from_dict` entry point uses shared
+Selection through its compatibility adapter. Legacy sources remain reference
+surfaces and receive no design work.
 
 Close/Cancel normally cancel; Action Choice distinguishes Close from Cancel.
 Selection requires Select, with Enter/double-click acceptance

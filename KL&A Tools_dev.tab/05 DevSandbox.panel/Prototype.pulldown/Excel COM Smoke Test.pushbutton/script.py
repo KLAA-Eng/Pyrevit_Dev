@@ -7,6 +7,7 @@ __version__ = "v0.2"
 
 import glob
 import hashlib
+from GUI import tool_dialogs
 import os
 import sys
 import tempfile
@@ -464,9 +465,9 @@ def main():
                            columns=['Operation', 'Status', 'Runtime type', 'Detail'])
         failures = len([row for row in results if row[1] == 'FAIL'])
         if failures:
-            forms.alert('{} operation(s) failed. This run retained its owned temp assets for diagnosis. Review the output table.'.format(failures), title=__title__, warn_icon=True)
+            tool_dialogs.alert('{} operation(s) failed. This run retained its owned temp assets for diagnosis. Review the output table.'.format(failures), title=__title__, warn_icon=True)
         else:
-            forms.alert('All Excel COM facade smoke operations passed.', title=__title__)
+            tool_dialogs.alert('All Excel COM facade smoke operations passed.', title=__title__)
 
 
 if __name__ == '__main__':

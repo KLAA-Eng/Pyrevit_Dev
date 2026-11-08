@@ -6,6 +6,7 @@ __version__ = "v0.1"
 
 import traceback
 
+from GUI import tool_dialogs
 from pyrevit import DB, forms, revit, script
 
 from GUI.forms import select_from_dict
@@ -39,7 +40,7 @@ REFERENCE_ANNOTATION_CATEGORIES = (
 
 
 def _stop(message):
-    forms.alert(message, title=COMMAND_TITLE, warn_icon=True)
+    tool_dialogs.alert(message, title=COMMAND_TITLE, warn_icon=True)
     script.exit()
 
 
@@ -82,9 +83,11 @@ def _eligible_plan_views(document):
 
 
 def _select_action():
-    choice = forms.CommandSwitchWindow.show(
+    choice = tool_dialogs.choose(
         [MOVE_ACTIVE_ACTION, MOVE_SHEETS_ACTION, CLEAR_ACTION, 'Cancel'],
-        message='Move reaction tags in the active view or on selected sheets, or clear red overrides?')
+        title=COMMAND_TITLE,
+        prompt='Move reaction tags in the active view or on selected sheets, or clear red overrides?',
+        version=__version__)
     if not choice or choice == 'Cancel':
         return None
     return choice
@@ -663,7 +666,7 @@ if __name__ == '__main__':
         output.print_md('```')
         output.print_md(traceback.format_exc())
         output.print_md('```')
-        forms.alert(
+        tool_dialogs.alert(
             'Beam Reaction Declutter stopped. Review the pyRevit output window for details.',
             title=COMMAND_TITLE,
             warn_icon=True)

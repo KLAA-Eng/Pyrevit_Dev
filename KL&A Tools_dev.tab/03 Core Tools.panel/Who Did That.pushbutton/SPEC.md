@@ -21,7 +21,7 @@ Validate this command against a representative Revit fixture, its empty or cance
 
 ## GUI and interaction
 
-Static UI/API references: forms.CommandSwitchWindow,forms.alert,
+Static UI/API references: tool_dialogs.choose,tool_dialogs.alert,
 
 Use the command from its pyRevit button. Where it exposes a dialog or selection
 workflow, make the required selection and review the result before confirming.
@@ -57,3 +57,9 @@ environment before promotion or behavior changes.
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
 | `v1.0.pyRevit` | `0.0.0.beta` | 07.16.2026 | Unchanged pyRevit snapshot present in the first mainline delivery ledger. | `484924b`; import `5a385ee` |
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged. The small action menu uses shared Action Choice command links; Cancel/Close/Escape performs no action.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.

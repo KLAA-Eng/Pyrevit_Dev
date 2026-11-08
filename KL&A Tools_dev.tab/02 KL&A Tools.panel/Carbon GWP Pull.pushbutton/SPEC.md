@@ -222,3 +222,9 @@ Disposable smoke passes are recorded above; Carbon workflow acceptance remains p
 - Improve the shared schedule-selector behavior and keyboard focus treatment in
   a separately tested shared-UI change.
 
+
+## Standard-dialog adoption — development (2026-11-08)
+
+OK notices use the shared Message dialog through `GUI.tool_dialogs.alert`. Existing message text, warning selection, acknowledgement, cancellation and early-stop behavior remain. Native file/folder pickers, progress, model operations and transaction boundaries are unchanged.
+
+This presentation change belongs to the next planned tool-version delivery; current released version metadata is retained until delivery. Local adapter tests do not establish live Revit ownership, focus, DPI, or model-effect acceptance.
