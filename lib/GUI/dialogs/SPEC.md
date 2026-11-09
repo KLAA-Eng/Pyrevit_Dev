@@ -153,17 +153,16 @@ owns implementation status. The [API guide](README.md) owns usage examples.
   consume requests and own execution, result Details and safe edit/retry loops.
   Initial focus is neutral, with no field selected. Compact label/input spacing
   and fitted section/window bounds remove unused trailing space; action gaps are 8.
-  Initial widths are 346/668/990 for one/two/three groups, with a 16-unit outer
-  horizontal inset. Header-to-label and action-to-footer gaps are 12; initial
+  Width fits the one or two visible property groups, with the shared outer
+  horizontal inset. Header-to-label and action-to-footer gaps follow the shared spacing; initial
   height fits the current controls and any validation, without a legacy floor.
 
 Prepared-row factories are host-independent; optional modal convenience helpers
 invoke collectors in a valid Revit API context before showing UI. Callers own
 document lifetime and any subsequent operations. These APIs are not drop-in
-replacements for pyRevit return types. Existing multi-button Message options
-are retired from this unused opt-in API; existing CustomAlert retains its API.
+replacements for pyRevit return types. Multi-button confirmations use Action
+Choice; Message is OK-only. Legacy CustomAlert retains its reference API.
 
-Native file/folder/color pickers, progress and selection overlays, and
-packaged compiled assemblies
-are out of scope. The owner's subsequent presentation change removes the footer
+Native file/folder/color pickers, progress and selection overlays, and packaged
+compiled assemblies are out of scope. The presentation change removes the footer
 from both shared Message variants and legacy CustomAlert.

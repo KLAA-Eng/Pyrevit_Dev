@@ -292,8 +292,8 @@ shows it. `view_fields()` (View Name) and `sheet_fields()` (Sheet Number beside
 Sheet Name) are the Views and Sheets layouts; a generic caller passes its own
 one or two fields. [RenameDialog.xaml](RenameDialog.xaml) spells out both groups
 in the Find/Replace tool layout; one field collapses the second group. The window
-is 384 wide for one group and 712 for two, the Find/Replace Views and Sheets
-widths, and its height fits the content. Each group has one Find/Replace pair
+fits its width to the one or two visible property groups, and its height fits
+the current content and validation. Each group has one Find/Replace pair
 and Prefix/Suffix. One shared Uppercase/Lowercase pair acts on the one field
 that allows case (Sheet Name in the Sheets layout) and is hidden when none does;
 at most one field may allow case. Initial focus rests on the neutral body; no

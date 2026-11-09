@@ -26,16 +26,19 @@ def load_command_module():
     pyrevit.revit = object()
     pyrevit.script = object()
     gui = types.ModuleType('GUI')
+    gui.tool_dialogs = types.ModuleType('GUI.tool_dialogs')
+    gui.tool_dialogs.alert = lambda *args, **kwargs: True
     gui_forms = types.ModuleType('GUI.forms')
     gui_forms.select_from_dict = lambda *args, **kwargs: []
 
     old_modules = {
         name: sys.modules.get(name)
-        for name in ('pyrevit', 'GUI', 'GUI.forms')
+        for name in ('pyrevit', 'GUI', 'GUI.forms', 'GUI.tool_dialogs')
     }
     sys.modules['pyrevit'] = pyrevit
     sys.modules['GUI'] = gui
     sys.modules['GUI.forms'] = gui_forms
+    sys.modules['GUI.tool_dialogs'] = gui.tool_dialogs
     library_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'lib')
     sys.path.insert(0, library_path)
     try:
@@ -573,7 +576,7 @@ class CarbonGwpCommandTests(unittest.TestCase):
     def test_material_accuracy_warning_confirms_chart_update_and_locations(self):
         command = load_command_module()
         fake_forms = FakeForms()
-        command.forms = fake_forms
+        command.tool_dialogs = fake_forms
 
         command._show_material_accuracy_warning({
             'status': 'completed',

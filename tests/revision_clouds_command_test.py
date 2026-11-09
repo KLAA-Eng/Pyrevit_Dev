@@ -32,6 +32,9 @@ def load_command_module():
     pyrevit.revit = object()
     pyrevit.script = object()
     gui = types.ModuleType('GUI')
+    gui.tool_dialogs = types.ModuleType('GUI.tool_dialogs')
+    gui.tool_dialogs.alert = lambda *args, **kwargs: True
+    gui.tool_dialogs.choose = lambda *args, **kwargs: None
     gui_forms = types.ModuleType('GUI.forms')
     gui_forms.select_from_dict = lambda *args, **kwargs: []
     system = types.ModuleType('System')
@@ -52,6 +55,7 @@ def load_command_module():
         'pyrevit': pyrevit,
         'GUI': gui,
         'GUI.forms': gui_forms,
+        'GUI.tool_dialogs': gui.tool_dialogs,
         'System': system,
         'System.Collections': collections,
         'System.Collections.Generic': generic,

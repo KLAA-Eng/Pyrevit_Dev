@@ -28,16 +28,20 @@ def load_command_module():
     pyrevit.revit = object()
     pyrevit.script = object()
     gui = types.ModuleType('GUI')
+    gui.tool_dialogs = types.ModuleType('GUI.tool_dialogs')
+    gui.tool_dialogs.alert = lambda *args, **kwargs: True
+    gui.tool_dialogs.choose = lambda *args, **kwargs: None
     gui_forms = types.ModuleType('GUI.forms')
     gui_forms.select_from_dict = lambda *args, **kwargs: []
 
     old_modules = {
         name: sys.modules.get(name)
-        for name in ('pyrevit', 'GUI', 'GUI.forms')
+        for name in ('pyrevit', 'GUI', 'GUI.forms', 'GUI.tool_dialogs')
     }
     sys.modules['pyrevit'] = pyrevit
     sys.modules['GUI'] = gui
     sys.modules['GUI.forms'] = gui_forms
+    sys.modules['GUI.tool_dialogs'] = gui.tool_dialogs
     library_path = os.path.join(PROJECT_ROOT, 'lib')
     sys.path.insert(0, library_path)
     try:
@@ -316,11 +320,11 @@ class BeamReactionDeclutterCommandTests(unittest.TestCase):
 
         self.assertEqual([], command._select_plan_views(object()))
 
-    def test_action_switch_has_both_move_scopes(self):
+    def test_action_choice_has_both_move_scopes(self):
         command = load_command_module()
         shown = []
-        command.forms = types.SimpleNamespace(CommandSwitchWindow=types.SimpleNamespace(
-            show=lambda choices, **kwargs: shown.extend(choices) or command.MOVE_ACTIVE_ACTION))
+        command.tool_dialogs = types.SimpleNamespace(
+            choose=lambda choices, **kwargs: shown.extend(choices) or command.MOVE_ACTIVE_ACTION)
 
         self.assertEqual(command.MOVE_ACTIVE_ACTION, command._select_action())
         self.assertEqual([

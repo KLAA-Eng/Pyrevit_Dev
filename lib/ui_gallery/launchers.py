@@ -375,8 +375,8 @@ def gallery_launchers():
     dialogs = [dict(id=identity, category='Shared dialog', title=title,
                     relative_path='lib/GUI/dialogs/' + DIALOG_FILES[choices[0][0]],
                     variants=[dict(id=key, label=label) for key, label in choices],
-                    called_by='UI Gallery opt-in dialog preview; no production callers migrated',
-                    description='Reusable custom dialog with fictional data and explicit results. Existing tools retain their current dialogs.',
+                    called_by='Shared dialog API; see the discovered tool callers',
+                    description='Shared production dialog with fictional preview data and explicit results. Tool callers are discovered from source.',
                     uses_seed_data=True, can_launch=True)
                for identity, title, choices in DIALOG_FAMILIES]
     return [_with_sample_data_label(launcher)

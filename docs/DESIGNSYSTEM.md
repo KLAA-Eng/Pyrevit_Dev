@@ -22,11 +22,11 @@ The window folders under `lib/GUI` mark each window's standing:
 | --- | --- | --- |
 | `dialogs` | The six shared dialogs and their adapters; the layout reference for every other window | Yes; they set the pattern |
 | `_templates` | The Options and Review reference windows new tools start from | Yes; kept as clean as the dialogs |
-| `_superseded` | Windows a shared dialog now covers (Custom Alert, SelectFromDict) until their callers move; see its [README](../lib/GUI/_superseded/README.md) | Reference fixes only |
+| `_superseded` | Legacy/reference windows now covered by Message and Selection; see its [README](../lib/GUI/_superseded/README.md) | Reference fixes only |
 | `_future` | Windows no tool opens yet | None until a tool adopts one |
 | Tool folders | Bespoke tool windows such as Duplicate Sheets, View Range and Steel PSF | Follow the dialog layout; Find/Replace uses shared Rename |
 
-The current inventory has 24 standalone Window sources: nine Python windows (two
+The current inventory has 22 standalone Window sources: seven Python windows (two
 superseded, two future), six shared dialogs, two reference templates, five
 compiled windows, Gallery and PreviewFixture.
 
@@ -767,9 +767,9 @@ Uppercase/Lowercase pair and Rename. The Views and generic layouts collapse the
 second group. The case pair acts on the one field that allows case; Rename
 validates and returns the entered rules. The dialog does not preview or perform
 model changes.
-It opens with neutral body focus and no field selected. It is 384 wide for one
-group and 712 for two, the Find/Replace Views and Sheets widths; action gaps are
-8 and height fits current content and validation.
+It opens with neutral body focus and no field selected. Width fits the one or
+two visible groups; spacing follows the shared tokens and height fits current
+content and validation.
 
 The Message body is a `klaReadout`, so its text can be selected and copied; it
 and the details are bounded and scroll. Initial Message height fits content;

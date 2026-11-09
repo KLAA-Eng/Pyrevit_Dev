@@ -22,13 +22,14 @@ STEEL_PSF_SCRIPT = os.path.join(
 
 
 class SteelPSFDefaultMessageTests(unittest.TestCase):
-    def test_steel_psf_uses_default_pyrevit_alerts_for_messages(self):
+    def test_steel_psf_uses_shared_dialog_adapter_for_messages(self):
         with open(STEEL_PSF_SCRIPT, 'r') as script_file:
             source = script_file.read()
 
         self.assertNotIn('from GUI.CustomAlert import show_alert', source)
         self.assertNotIn('from GUI.SteelPSFReport import show_steel_psf_report', source)
-        self.assertIn('forms.alert(', source)
+        self.assertIn('tool_dialogs.alert(', source)
+        self.assertNotIn('forms.alert(', source)
         self.assertIn('script.get_output()', source)
 
 
