@@ -37,7 +37,8 @@ class GalleryRegistryTests(unittest.TestCase):
             if row['id'] == 'dialog-command-switch':
                 self.assertNotIn('Error', row['states'], 'The switch has no status line to show an error')
             self.assertTrue(os.path.isfile(row['source_path']))
-            self.assertIn('Existing tools retain', row['description'])
+            self.assertIn('Tool callers', row['description'])
+            self.assertNotIn('no production callers migrated', row['called_by'])
 
     def test_shared_families_keep_all_variants_and_search_returns_family_once(self):
         rows = gallery_entries(ROOT, {})
