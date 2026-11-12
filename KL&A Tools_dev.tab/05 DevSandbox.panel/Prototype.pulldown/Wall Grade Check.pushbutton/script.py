@@ -52,7 +52,7 @@ from pdf_overlay.state import (
     overlay_paths,
     stem_from_image_name,
 )
-from wall_grade import pdf_grade
+from wall_grade import ghost, pdf_grade
 from wall_grade.profile import (
     CLOSE,
     LINE_OFFSET_FEET,
@@ -85,6 +85,7 @@ STYLES = {
     OVER: ('KLA Grade Review - Over Top', (220, 0, 0), 8),
 }
 TEXT_TYPE_NAME = 'KLA Grade Review'
+TOPO_CATEGORY_NAMES = ('OST_Toposolid', 'OST_Topography')
 TEXT_RGB = (220, 0, 0)
 NOTE_RISE_FEET = 0.5
 RAY_CLEARANCE_FEET = 500.0
@@ -210,7 +211,7 @@ def wall_tops(wall, path, view3d):
 
 def topo_intersector(view3d):
     categories = List[DB.BuiltInCategory]()
-    for name in ('OST_Toposolid', 'OST_Topography'):
+    for name in TOPO_CATEGORY_NAMES:
         category = getattr(DB.BuiltInCategory, name, None)
         if category is not None:
             categories.Add(category)
@@ -434,8 +435,109 @@ def draw_wall(doc, result, styles, text_type, view):
     return notes
 
 
+# -- Ghosted topography (active 3D view only) --------------------------------------------
+
+def _topo_categories(doc):
+    """Return [(name, Category)] for the topography categories in this Revit version."""
+    found = []
+    for name in TOPO_CATEGORY_NAMES:
+        built_in = getattr(DB.BuiltInCategory, name, None)
+        category = DB.Category.GetCategory(doc, built_in) if built_in is not None else None
+        if category is not None:
+            found.append((name, category))
+    return found
+
+
+def ghost_view(doc, view, state):
+    """Show topography see-through and halftone in view; record originals in state.
+
+    Returns a reason text when the view cannot be ghosted, else ''.
+    """
+    if not isinstance(view, DB.View3D) or view.IsTemplate:
+        return 'Topography is ghosted only in a 3D view; open the 3D view and run again to see it.'
+    key = ghost.doc_key(doc.PathName, doc.Title)
+    changed = False
+    for name, category in _topo_categories(doc):
+        if not view.IsCategoryOverridable(category.Id):
+            continue
+        overrides = view.GetCategoryOverrides(category.Id)
+        ghost.remember(state, key, view.UniqueId, name, overrides.Transparency,
+                       overrides.Halftone, view.GetCategoryHidden(category.Id))
+        overrides.SetSurfaceTransparency(ghost.GHOST_TRANSPARENCY)
+        overrides.SetHalftone(True)
+        view.SetCategoryOverrides(category.Id, overrides)
+        if view.CanCategoryBeHidden(category.Id):
+            view.SetCategoryHidden(category.Id, False)
+        changed = True
+    if not changed:
+        return 'Topography could not be ghosted in this view (its view template may control visibility).'
+    return ''
+
+
+def restore_views(doc, recorded):
+    """Put back the recorded topography settings; return the views restored."""
+    categories = dict(_topo_categories(doc))
+    restored = 0
+    for view_id, settings in recorded.items():
+        view = doc.GetElement(view_id)
+        if not isinstance(view, DB.View):
+            continue
+        for name, original in settings.items():
+            category = categories.get(name)
+            if category is None or not view.IsCategoryOverridable(category.Id):
+                continue
+            overrides = view.GetCategoryOverrides(category.Id)
+            overrides.SetSurfaceTransparency(int(original.get('transparency', 0)))
+            overrides.SetHalftone(bool(original.get('halftone', False)))
+            view.SetCategoryOverrides(category.Id, overrides)
+            if view.CanCategoryBeHidden(category.Id):
+                view.SetCategoryHidden(category.Id, bool(original.get('hidden', False)))
+        restored += 1
+    return restored
+
+
+def draw_strip(doc, result, view):
+    """Add a see-through grade strip outside the wall (PDF source); return it or None."""
+    path, points = result['path'], result['profile']
+    edge = [None if point['grade'] is None else
+            (station['line'].X, station['line'].Y, point['grade'])
+            for station, point in zip(path, points)]
+    normals = [(station['nx'], station['ny']) for station in path]
+    quads = ghost.strip_quads(edge, ghost.STRIP_WIDTH_FEET, normals)
+    if not quads:
+        return None
+    builder = DB.TessellatedShapeBuilder()
+    builder.OpenConnectedFaceSet(False)
+    for quad in quads:
+        corners = List[DB.XYZ]([DB.XYZ(*corner) for corner in quad])
+        builder.AddFace(DB.TessellatedFace(corners, DB.ElementId.InvalidElementId))
+    builder.CloseConnectedFaceSet()
+    builder.Target = DB.TessellatedShapeBuilderTarget.Mesh
+    builder.Fallback = DB.TessellatedShapeBuilderFallback.Salvage
+    builder.Build()
+    shape = DB.DirectShape.CreateElement(doc, DB.ElementId(DB.BuiltInCategory.OST_GenericModel))
+    shape.ApplicationId = ghost.STRIP_APP_ID
+    shape.ApplicationDataId = ghost.STRIP_DATA_ID
+    shape.SetShape(builder.GetBuildResult().GetGeometricalObjects())
+    shape.Name = 'Wall Grade Check - PDF grade'
+    if isinstance(view, DB.View3D):
+        overrides = DB.OverrideGraphicSettings()
+        overrides.SetSurfaceTransparency(ghost.STRIP_TRANSPARENCY)
+        overrides.SetHalftone(True)
+        view.SetElementOverrides(shape.Id, overrides)
+    return shape
+
+
+def _strip_ids(doc):
+    return [shape.Id for shape in DB.FilteredElementCollector(doc).OfClass(DB.DirectShape)
+            if shape.ApplicationId == ghost.STRIP_APP_ID and shape.ApplicationDataId == ghost.STRIP_DATA_ID]
+
+
 def clear_review(doc):
-    """Delete all review lines and notes; return the count deleted."""
+    """Delete review lines, notes, and grade strips, and un-ghost topography.
+
+    Returns (elements deleted, views restored).
+    """
     style_ids = _existing_style_ids(doc)
     ids = [curve.Id for curve in DB.FilteredElementCollector(doc).OfClass(DB.CurveElement)
            if curve.LineStyle is not None and curve.LineStyle.Id.ToString() in style_ids]
@@ -444,10 +546,18 @@ def clear_review(doc):
                         if DB.Element.Name.GetValue(text_type) == TEXT_TYPE_NAME)
     ids += [note.Id for note in DB.FilteredElementCollector(doc).OfClass(DB.TextNote)
             if note.GetTypeId().ToString() in text_type_ids]
-    if ids:
+    ids += _strip_ids(doc)
+    state_path = ghost.default_state_path()
+    state = ghost.load(state_path)
+    recorded = ghost.take(state, ghost.doc_key(doc.PathName, doc.Title))
+    restored = 0
+    if ids or recorded:
         with revit.Transaction('Wall Grade Check - Clear', doc=doc):
-            doc.Delete(List[DB.ElementId](ids))
-    return len(ids)
+            if ids:
+                doc.Delete(List[DB.ElementId](ids))
+            restored = restore_views(doc, recorded)
+        ghost.save(state_path, state)
+    return len(ids), restored
 
 
 # -- Workflow -----------------------------------------------------------------------------
@@ -531,8 +641,9 @@ def run():
 
     choice = ask_choice([SOURCE_REVIT, SOURCE_PDF, CLEAR], 'Wall Grade Check: choose an action.')
     if choice == CLEAR:
-        count = clear_review(doc)
-        forms.alert('Deleted {} review line(s) and note(s).'.format(count), title=COMMAND_TITLE)
+        count, restored = clear_review(doc)
+        forms.alert('Deleted {} review line(s), note(s), and grade strip(s); restored topography in '
+                    '{} view(s).'.format(count, restored), title=COMMAND_TITLE)
         return
 
     walls, skipped = collect_walls(uidoc)
@@ -583,18 +694,42 @@ def run():
         source_text = u'Grade from {} labels in {} (USGS; {} = USGS {:.2f})'.format(
             len(labels), os.path.basename(source.state['pdf_path']), level.Name, origin[1])
 
-    results = analyse(sampled, limit_feet, grade_source)
-    log('analysed {} wall(s)'.format(len(results)))
-
-    notes_note = ''
-    with revit.Transaction('Wall Grade Check - Draw', doc=doc):
-        styles = _line_styles(doc)
-        text_type = _text_type(doc) if notes_allowed(view) else None
-        notes = sum(draw_wall(doc, result, styles, text_type, view) for result in results)
+    notes_note = []
+    state_path = ghost.default_state_path()
+    ghost_state = ghost.load(state_path)
+    # One undo step: ghost first, so topography hidden in this 3D view is shown
+    # again before grade is read through it, then draw.
+    group = DB.TransactionGroup(doc, 'Wall Grade Check - Draw')
+    group.Start()
+    try:
+        with revit.Transaction('Wall Grade Check - Ghost Topography', doc=doc):
+            ghost_reason = ghost_view(doc, view, ghost_state)
+        results = analyse(sampled, limit_feet, grade_source)
+        log('analysed {} wall(s)'.format(len(results)))
+        with revit.Transaction('Wall Grade Check - Draw Lines', doc=doc):
+            styles = _line_styles(doc)
+            text_type = _text_type(doc) if notes_allowed(view) else None
+            notes = sum(draw_wall(doc, result, styles, text_type, view) for result in results)
+            strips = 0
+            if choice == SOURCE_PDF:
+                strips = sum(1 for result in results if draw_strip(doc, result, view) is not None)
+        group.Assimilate()
+    except BaseException:
+        if group.HasStarted() and not group.HasEnded():
+            group.RollBack()
+        raise
+    if not ghost_reason:
+        ghost.save(state_path, ghost_state)
+        notes_note.append('Topography is ghosted in this 3D view until **Clear review lines**.')
+    else:
+        notes_note.append(ghost_reason)
+    if strips:
+        notes_note.append('{} see-through PDF grade strip(s) {:g} ft wide show grade outside the walls '
+                          '(Generic Models; removed by Clear).'.format(strips, ghost.STRIP_WIDTH_FEET))
     if text_type is None and any(result['runs'] for result in results):
-        notes_note = ('Flag notes need a plan, section, or elevation view, or a locked 3D view. '
-                      'Flagged runs are still drawn in orange and red.')
-    report(output, results, skipped, source_text, limit_inches, notes_note)
+        notes_note.append('Flag notes need a plan, section, or elevation view, or a locked 3D view. '
+                          'Flagged runs are still drawn in orange and red.')
+    report(output, results, skipped, source_text, limit_inches, '  \n'.join(notes_note))
 
     flagged = [result['wall'].Id for result in results if result['runs']]
     if flagged:

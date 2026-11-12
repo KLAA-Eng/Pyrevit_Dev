@@ -38,15 +38,43 @@ topography or from a PDF grading plan.
    Level 1) and enter its USGS elevation, such as `5432.50` or `5432'-6"`.
    See USGS vertical placement below.
 5. The command samples each wall every foot along its location curve, plus
-   both ends, finds grade and top of wall at each station, draws the result
-   in one transaction (`Wall Grade Check - Draw`), and selects the flagged
-   walls.
+   both ends, finds grade and top of wall at each station, and draws the
+   grade as model lines on the exterior of the walls. In the active 3D view
+   it ghosts the topography in (see Ghosted topography). Ghosting and
+   drawing form one undo step (`Wall Grade Check - Draw`). Flagged walls are
+   selected.
 6. The pyRevit output window lists each wall (clickable id) with its type,
    length, minimum clearance, flagged runs (station range and worst value),
    stations with no grade, and notes.
 7. **Clear review lines** deletes every model line in the three review line
-   styles and every text note of the review text type, in all views, in one
-   transaction (`Wall Grade Check - Clear`).
+   styles, every text note of the review text type, and every PDF grade
+   strip, in all views, and restores the topography settings of every view
+   it ghosted in this model, in one transaction (`Wall Grade Check -
+   Clear`).
+
+### Ghosted topography
+
+- Only in the active view, and only when it is a non-template 3D view;
+  otherwise the report says to open the 3D view and run again.
+- For the Toposolid and Topography categories, the view's category overrides
+  are set to 70% surface transparency and halftone, and the categories are
+  unhidden. Category overrides also reach linked topography shown By Host
+  View. Ghosting runs before grade is read, so topography hidden in the
+  active 3D view is visible to the ray cast.
+- The original transparency, halftone, and hidden state of each category are
+  saved per model and view in
+  `%LOCALAPPDATA%\KLA Tools\Wall Grade Check\ghosted_views.json`, keeping
+  the first original when a view is ghosted again. Clear restores exactly
+  those three settings, so other overrides on the categories are untouched.
+  Because the record is local, Clear must run on the computer that ghosted
+  the view.
+- A view template that controls visibility blocks ghosting; the report says
+  so.
+- PDF source only: there may be no Revit topography to ghost, so a flat,
+  see-through grade strip 4 ft wide is added outside each wall at the PDF
+  grade (a Generic Models DirectShape tagged `KLA` / `WallGradeCheck`). In
+  the active 3D view it is 50% transparent and halftone. It shows in other
+  views too until Clear removes it.
 
 ### Wall geometry
 
@@ -68,7 +96,9 @@ topography or from a PDF grading plan.
   outside the exterior face. The highest hit wins.
 - Rays are cast in a non-template 3D view: the active view if it is one,
   else `{3D}` or the user's `{3D - name}`, else any 3D view. Elements hidden
-  in that view are not found, so check that topography is visible there.
+  in that view are not found. Run from the 3D view to be reviewed: ghosting
+  unhides the topography categories there first; in another ray view,
+  check that topography is visible.
 
 ### Grade from a PDF grading plan
 
@@ -147,8 +177,11 @@ topography or from a PDF grading plan.
   Grade Review` (duplicated from the default text type, red). Notes are added
   only in plan, ceiling, area, structural plan, section, elevation, and
   detail views, and locked 3D views; elsewhere the report says why.
-- Flagged walls are selected. Draw and Clear are each one undoable
-  transaction. Cancelling any prompt changes nothing.
+- Topography in the active 3D view is ghosted, and PDF grade strips are
+  added, as described under Ghosted topography.
+- Flagged walls are selected. Draw (a transaction group) and Clear are each
+  one undo step. Cancelling any prompt changes nothing; a failure while
+  drawing rolls the whole group back.
 - Sketch planes made for the lines stay in the model after Clear.
 - Unexpected failures write an error report (`WGC` code) and a log at
   `%LOCALAPPDATA%\KLA Tools\Wall Grade Check\wall_grade_check.log`.
@@ -171,14 +204,14 @@ topography or from a PDF grading plan.
 
 | Date | Extension release | Revit version | Scenario | Result | Evidence link or location |
 | --- | --- | --- | --- | --- | --- |
-| 11.12.2026 | `0.0.14-dev` | None (CPython) | `tests/wall_grade_test.py` (20 tests) | Pass | Local run on `dev.grade-check` |
+| 11.12.2026 | `0.0.14-dev` | None (CPython) | `tests/wall_grade_test.py` (24 tests) | Pass | Local run on `dev.grade-check` |
 
 `tests/wall_grade_test.py` covers stations, exterior offsets, clearance
 input, status classification (including the exact-clearance boundary),
 segments, flagged runs, no-data ranges, note text, PDF label parsing and
 prefix rules from a generated PDF, the elevation range filter, USGS
 elevation input parsing and conversion, projection onto straight and bent wall paths, and interpolation
-with hold and sparse-gap rules.
+with hold and sparse-gap rules, the ghost-view record (first original kept, save and load, per-model take), and PDF grade strip quads.
 
 Automated checks do not prove Revit ray casting, drawing, notes, or the user
 workflow; live acceptance is pending.
@@ -187,7 +220,7 @@ workflow; live acceptance is pending.
 
 | Version | Main delivery | Date | Meaningful change | Git evidence |
 | --- | --- | --- | --- | --- |
-| v0.0 | Unreleased | 11.12.2026 | First DevSandbox grade-along-wall review from Revit topography or a PDF grading plan, with clearance and over-top flags and a Clear action. | Pending commit on `dev.grade-check`; pending next main delivery. |
+| v0.0 | Unreleased | 11.12.2026 | First DevSandbox grade-along-wall review from Revit topography or a PDF grading plan (USGS tie), with clearance and over-top flags, ghosted topography in the active 3D view, and a Clear action that restores it. | Pending commit on `dev.grade-check`; pending next main delivery. |
 
 Versions reconstruct meaningful main-release deliveries. Intermediate dev work
 is grouped into its delivered snapshot; meaningful changes absent from current

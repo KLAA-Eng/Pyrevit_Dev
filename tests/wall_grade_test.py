@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import os
 import sys
+import tempfile
 import unittest
 
 
@@ -14,7 +15,7 @@ for path in (PROJECT_ROOT, TESTS_DIR):
 
 from lib.pdf_overlay.geometry import make_pose
 from lib.pdf_overlay.pdftext import read_page_text
-from lib.wall_grade import pdf_grade, profile
+from lib.wall_grade import ghost, pdf_grade, profile
 from lib.wall_grade.profile import CLOSE, NO_DATA, OK, OVER
 from pdf_overlay_members_test import build_pdf
 
@@ -189,6 +190,39 @@ class AlongWallTests(unittest.TestCase):
 
     def test_interpolate_without_samples(self):
         self.assertEqual(pdf_grade.interpolate([0.0, 1.0], []), [None, None])
+
+
+class GhostStateTests(unittest.TestCase):
+    def test_remember_keeps_first_original(self):
+        state = {}
+        key = ghost.doc_key(r'C:\Jobs\A.rvt', 'A')
+        ghost.remember(state, key, 'view-1', 'Toposolid', 0, False, True)
+        ghost.remember(state, key, 'view-1', 'Toposolid', 70, True, False)
+        self.assertEqual(state[key]['view-1']['Toposolid'],
+                         {'transparency': 0, 'halftone': False, 'hidden': True})
+        self.assertEqual(ghost.take(state, key), {'view-1': {'Toposolid': {
+            'transparency': 0, 'halftone': False, 'hidden': True}}})
+        self.assertEqual(ghost.take(state, key), {})
+
+    def test_doc_key_for_saved_and_unsaved(self):
+        self.assertEqual(ghost.doc_key(r' C:\Jobs\A.RVT ', 'A'), r'c:\jobs\a.rvt')
+        self.assertEqual(ghost.doc_key('', 'Project1'), 'untitled:Project1')
+
+    def test_save_and_load_round_trip(self):
+        folder = tempfile.mkdtemp()
+        path = os.path.join(folder, 'sub', 'ghost.json')
+        self.assertEqual(ghost.load(path), {})
+        ghost.save(path, {'k': {'v': {}}})
+        ghost.save(path, {'k': {'v': {'c': {'transparency': 5}}}})
+        self.assertEqual(ghost.load(path), {'k': {'v': {'c': {'transparency': 5}}}})
+
+    def test_strip_quads_skip_no_data(self):
+        edge = [(0.0, 0.0, 10.0), (1.0, 0.0, 10.5), None, (3.0, 0.0, 11.0), (4.0, 0.0, 11.0)]
+        normals = [(0.0, -1.0)] * 5
+        quads = ghost.strip_quads(edge, 4.0, normals)
+        self.assertEqual(len(quads), 2)
+        self.assertEqual(quads[0], [(0.0, 0.0, 10.0), (1.0, 0.0, 10.5),
+                                    (1.0, -4.0, 10.5), (0.0, -4.0, 10.0)])
 
 
 if __name__ == '__main__':
