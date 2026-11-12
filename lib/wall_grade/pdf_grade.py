@@ -142,12 +142,37 @@ def elevation_labels(page_text, pose, page_size, elevation_range=None):
     return labels
 
 
-def to_internal(value, origin_internal_z, origin_reported_z):
-    """Convert a PDF elevation to Revit internal Z using a base point.
+_FEET_INCHES = re.compile(
+    r"^([+-]?\d+(?:\.\d+)?)\s*'\s*-?\s*(?:(\d+(?:\.\d+)?)?\s*(?:(\d+)\s*/\s*(\d+))?\s*\"?)?$")
 
-    origin_reported_z is the elevation the chosen base point reports
-    (its shared elevation for the Survey Point, 0 for the Project Base
-    Point) and origin_internal_z is its internal Z.
+
+def parse_elevation(text):
+    """Return feet from '5432.50', '5432', or 5432'-6 1/2\"; None if unreadable."""
+    text = (text or '').strip()
+    if not text:
+        return None
+    try:
+        return float(text)
+    except ValueError:
+        pass
+    match = _FEET_INCHES.match(text)
+    if not match:
+        return None
+    inches = float(match.group(2) or 0.0)
+    if match.group(3):
+        if float(match.group(4)) == 0:
+            return None
+        inches += float(match.group(3)) / float(match.group(4))
+    sign = -1.0 if match.group(1).startswith('-') else 1.0
+    return sign * (abs(float(match.group(1))) + inches / 12.0)
+
+
+def to_internal(value, origin_internal_z, origin_reported_z):
+    """Convert a PDF (USGS) elevation to Revit internal Z.
+
+    The reference is one known pair: origin_internal_z is a Revit elevation
+    (a level's internal Z) and origin_reported_z is the USGS elevation the
+    drawings give for it.
     """
     return value - origin_reported_z + origin_internal_z
 

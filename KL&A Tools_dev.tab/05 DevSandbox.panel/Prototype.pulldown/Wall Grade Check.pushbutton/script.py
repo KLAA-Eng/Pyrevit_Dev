@@ -6,7 +6,9 @@ __version__ = "v0.0"
 
 import datetime
 import os
+import re
 import traceback
+from collections import OrderedDict
 
 LOG_PATH = os.path.join(os.environ.get('LOCALAPPDATA') or os.environ.get('TEMP') or '.',
                         'KLA Tools', 'Wall Grade Check', 'wall_grade_check.log')
@@ -61,6 +63,7 @@ from wall_grade.profile import (
     clamp_clearance,
     exterior_offset,
     flagged_runs,
+    format_feet_inches,
     format_inches,
     min_clearance,
     no_data_ranges,
@@ -74,8 +77,6 @@ COMMAND_TITLE = 'Wall Grade Check'
 SOURCE_REVIT = 'Grade from Revit topography'
 SOURCE_PDF = 'Grade from PDF grading plan'
 CLEAR = 'Clear review lines'
-DATUM_SURVEY = 'Survey Point'
-DATUM_PROJECT = 'Project Base Point'
 
 # Line styles (subcategories of Lines): name -> (RGB, projection line weight).
 STYLES = {
@@ -286,13 +287,64 @@ def find_pdf_sources(doc):
     return sources
 
 
-def datum_origin(doc, datum):
-    """Return (internal Z, reported elevation) of the chosen base point."""
-    if datum == DATUM_SURVEY:
-        point = DB.BasePoint.GetSurveyPoint(doc)
-        return point.Position.Z, point.SharedPosition.Z
-    point = DB.BasePoint.GetProjectBasePoint(doc)
-    return point.Position.Z, 0.0
+def _usgs_key(doc):
+    return 'usgs_' + re.sub(r'\W', '_', doc.Title or 'model')
+
+
+def _survey_usgs(doc, level):
+    """Return the level's elevation from the Survey Point, if the survey is set up."""
+    point = DB.BasePoint.GetSurveyPoint(doc)
+    value = level.ProjectElevation - point.Position.Z + point.SharedPosition.Z
+    return value if abs(value - level.ProjectElevation) > 1.0 else None
+
+
+def ask_usgs_reference(doc):
+    """Ask for a level and its USGS elevation; return (internal Z, USGS elevation).
+
+    The last answer is remembered per model; with none, a set-up Survey Point
+    supplies the starting value.
+    """
+    levels = sorted(DB.FilteredElementCollector(doc).OfClass(DB.Level),
+                    key=lambda level: level.ProjectElevation)
+    if not levels:
+        raise UserError('The model has no levels to tie the USGS elevations to.')
+    config = script.get_config()
+    saved_name, saved_value = '', ''
+    saved = config.get_option(_usgs_key(doc), '')
+    if saved and '|' in saved:
+        saved_name, saved_value = saved.rsplit('|', 1)
+    by_label = OrderedDict()
+    for level in levels:
+        by_label[u'{}  ({})'.format(level.Name, format_feet_inches(level.Elevation))] = level
+    level = None
+    if len(levels) == 1:
+        level = levels[0]
+    else:
+        ordered = sorted(by_label, key=lambda label: by_label[label].Name != saved_name)
+        picked = forms.SelectFromList.show(
+            ordered, title='Level to tie to USGS (e.g. T/SLAB or Level 1)', multiselect=False)
+        if not picked:
+            script.exit()
+        level = by_label[picked]
+    if level.Name == saved_name:
+        default = saved_value
+    else:
+        survey = _survey_usgs(doc, level)
+        default = '{:.2f}'.format(survey) if survey is not None else ''
+    while True:
+        text = forms.ask_for_string(
+            default=default, title=COMMAND_TITLE,
+            prompt=u'USGS elevation of {} (feet, e.g. 5432.50 or 5432\'-6"):'.format(level.Name))
+        if text is None:
+            script.exit()
+        usgs = pdf_grade.parse_elevation(text)
+        if usgs is not None:
+            break
+        forms.alert('Enter the elevation in feet, such as 5432.50 or 5432\'-6".', title=COMMAND_TITLE)
+        default = text
+    config.set_option(_usgs_key(doc), u'{}|{}'.format(level.Name, text.strip()))
+    script.save_config()
+    return level, (level.ProjectElevation, usgs)
 
 
 def pdf_grades(path, labels, origin):
@@ -519,9 +571,8 @@ def run():
             if not picked:
                 script.exit()
             source = by_label[picked]
-        datum = ask_choice([DATUM_SURVEY, DATUM_PROJECT], 'Elevations on the PDF are relative to:')
-        origin = datum_origin(doc, datum)
-        # Plausible grade range in the PDF's datum, from the walls' tops.
+        level, origin = ask_usgs_reference(doc)
+        # Plausible grade range in USGS, from the walls' tops.
         all_tops = [top for _, _, tops, _ in sampled for top in tops]
         low = pdf_grade.to_reported(min(all_tops) - RANGE_BELOW_FEET, *origin)
         high = pdf_grade.to_reported(max(all_tops) + RANGE_ABOVE_FEET, *origin)
@@ -529,8 +580,8 @@ def run():
 
         def grade_source(path, tops):
             return pdf_grades(path, labels, origin)
-        source_text = u'Grade from {} labels in {} (elevations relative to the {})'.format(
-            len(labels), os.path.basename(source.state['pdf_path']), datum)
+        source_text = u'Grade from {} labels in {} (USGS; {} = USGS {:.2f})'.format(
+            len(labels), os.path.basename(source.state['pdf_path']), level.Name, origin[1])
 
     results = analyse(sampled, limit_feet, grade_source)
     log('analysed {} wall(s)'.format(len(results)))

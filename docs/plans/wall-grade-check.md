@@ -24,7 +24,8 @@ The behavior contract is the command's
 | PDF grade source | Spot elevation and contour label **text** read from a PDF Overlay that is aligned in a plan view. Contour linework tracing is out of scope (backlog). |
 | Flags | Two levels: grade within the clearance of top of wall, and grade at or above top of wall. Clearance is user-editable, default 8" (IBC 2304.12.1.2); 6" for IRC work. Exactly the clearance passes. |
 | Walls checked | Selected walls; with nothing selected, all walls in the active view whose type Function is Foundation or Retaining. |
-| Prompts | pyRevit prompts in sequence (action, clearance, then PDF overlay and datum) instead of a custom dialog; the PDF search band is fixed at 10 ft. |
+| Prompts | pyRevit prompts in sequence (action, clearance, then PDF overlay, reference level, and its USGS elevation) instead of a custom dialog; the PDF search band is fixed at 10 ft. |
+| PDF vertical placement | The user ties USGS to the model by picking a reference level and entering its USGS elevation (11.12.2026, owner request); replaces the Survey Point / Project Base Point choice. |
 | Ray-casting view | An existing non-template 3D view; the command does not create one. |
 | Branch | `dev.grade-check` from `dev.pdf-overlay`, because the PDF source reuses `lib/pdf_overlay`. Its PR into `master-dev` follows the PDF Overlay PR. |
 
@@ -33,8 +34,8 @@ The behavior contract is the command's
 | ID | Task | Acceptance | Status |
 | --- | --- | --- | --- |
 | T1 | Bundle scaffold: `bundle.yaml`, `script.py`, adjacent `SPEC.md`, pulldown layout entry | Metadata check passes for the bundle | Implementation complete, locally verified (`scripts/check_tool_metadata.py`) |
-| T2 | `lib/wall_grade/profile.py`: stations, exterior offset, clearance input, classification, segments, flagged runs, no-data ranges, note text | `tests/wall_grade_test.py` | Implementation complete, locally verified (19 tests pass) |
-| T3 | `lib/wall_grade/pdf_grade.py`: label parsing and prefix rules, elevation range, projection onto wall paths, interpolation with hold and sparse gaps, datum conversion | `tests/wall_grade_test.py` | Implementation complete, locally verified |
+| T2 | `lib/wall_grade/profile.py`: stations, exterior offset, clearance input, classification, segments, flagged runs, no-data ranges, note text | `tests/wall_grade_test.py` | Implementation complete, locally verified (20 tests pass) |
+| T3 | `lib/wall_grade/pdf_grade.py`: label parsing and prefix rules, elevation range, projection onto wall paths, interpolation with hold and sparse gaps, USGS elevation input and conversion | `tests/wall_grade_test.py` | Implementation complete, locally verified |
 | T4 | Revit adapter: wall collection, exterior face sampling, top-of-wall and toposolid ray casting (host and links) | Live: grade matches a sloped toposolid within 1/2" | Implementation complete; live acceptance pending |
 | T5 | Drawing and Clear: line styles, model lines, text notes, report, flagged-wall selection, error report | Live: draw, Undo, and Clear in a locked 3D view and a section | Implementation complete; live acceptance pending |
 | T6 | PDF source wired to an aligned PDF Overlay | Live: grading-plan check matches hand-read spots within 1" | Implementation complete; live acceptance pending |
@@ -44,5 +45,3 @@ The behavior contract is the command's
 
 - Sample grading-plan PDFs to confirm the label formats (prefixes, contour
   label style, how existing grade is shown).
-- Which datum the civil PDFs use on KL&A projects (Survey Point offered
-  first).

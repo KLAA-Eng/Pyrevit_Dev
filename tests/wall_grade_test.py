@@ -129,6 +129,18 @@ class LabelParsingTests(unittest.TestCase):
         spot = [label for label in labels if label['value'] == 94.25][0]
         self.assertLess(spot['x'], 0)  # left half of the page
 
+    def test_parse_usgs_elevation(self):
+        self.assertEqual(pdf_grade.parse_elevation('5432.50'), 5432.5)
+        self.assertEqual(pdf_grade.parse_elevation(' 5432 '), 5432.0)
+        self.assertEqual(pdf_grade.parse_elevation("5432'-6\""), 5432.5)
+        self.assertAlmostEqual(pdf_grade.parse_elevation("5432'-6 1/2\""), 5432 + 6.5 / 12)
+        self.assertAlmostEqual(pdf_grade.parse_elevation("5432' 1/2\""), 5432 + 0.5 / 12)
+        self.assertEqual(pdf_grade.parse_elevation("5432'"), 5432.0)
+        self.assertAlmostEqual(pdf_grade.parse_elevation("-2'-6\""), -2.5)
+        self.assertIsNone(pdf_grade.parse_elevation(''))
+        self.assertIsNone(pdf_grade.parse_elevation('USGS'))
+        self.assertIsNone(pdf_grade.parse_elevation("5'-1/0\""))
+
     def test_datum_round_trip(self):
         z = pdf_grade.to_internal(94.25, origin_internal_z=-3.0, origin_reported_z=100.0)
         self.assertAlmostEqual(z, -8.75)

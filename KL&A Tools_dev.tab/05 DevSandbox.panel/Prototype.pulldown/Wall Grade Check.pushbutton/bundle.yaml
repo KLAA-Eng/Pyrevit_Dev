@@ -13,7 +13,7 @@ tooltip:
     - Select the walls to check, or select nothing to check the Foundation and Retaining walls in the active view. A locked 3D view, section, or plan shows the flag notes.
     - Run the command and choose Grade from Revit topography or Grade from PDF grading plan.
     - Enter the clearance in inches (8 by default; 6 for IRC work).
-    - PDF only: first import and align the grading plan with PDF Overlay in a plan view, then pick it and say whether its elevations are relative to the Survey Point or the Project Base Point.
+    - PDF only: first import and align the grading plan with PDF Overlay in a plan view, then pick it, pick a reference level (T/SLAB or Level 1), and enter that level's USGS elevation (5432.50 or 5432'-6") so the PDF's USGS grades land at the right height. The last value is remembered per model.
     - Blue lines are grade with enough clearance, orange is closer than the clearance, red is at or above the top of wall. Flagged walls are selected and listed in the report window.
     - Run again and choose Clear review lines to delete all review lines and notes. Undo also works.
     _____________________________________________________________________

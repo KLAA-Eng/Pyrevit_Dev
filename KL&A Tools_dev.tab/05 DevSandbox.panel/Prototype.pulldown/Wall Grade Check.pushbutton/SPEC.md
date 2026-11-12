@@ -33,8 +33,10 @@ topography or from a PDF grading plan.
    **Grade from PDF grading plan**, or **Clear review lines**.
 3. Enter the clearance in inches (default 8; values above 48 are capped and
    unreadable or non-positive entries use 8).
-4. PDF only: pick the overlay (when there is more than one) and the base
-   point its elevations are relative to (Survey Point or Project Base Point).
+4. PDF only: pick the overlay (when there is more than one), then set the
+   vertical placement in USGS: pick a reference level (for example T/SLAB or
+   Level 1) and enter its USGS elevation, such as `5432.50` or `5432'-6"`.
+   See USGS vertical placement below.
 5. The command samples each wall every foot along its location curve, plus
    both ends, finds grade and top of wall at each station, draws the result
    in one transaction (`Wall Grade Check - Draw`), and selects the flagged
@@ -86,7 +88,7 @@ topography or from a PDF grading plan.
     contour labels. Parenthesized numbers (existing grade on most sheets) are
     skipped.
   - Only numbers between 30 ft below the lowest top of wall and 10 ft above
-    the highest (in the PDF's datum) are kept, which drops sheet numbers,
+    the highest (converted to USGS) are kept, which drops sheet numbers,
     dimensions, and note numbers.
 - Labels within 10 ft outside the exterior face (and up to 6" inside it) and
   no more than 10 ft beyond either wall end are projected onto the wall.
@@ -95,9 +97,22 @@ topography or from a PDF grading plan.
   first label, after the last, and inside wider gaps, the nearer label's
   value is held for 5 ft; beyond that the station has no grade, nothing is
   drawn there, and the report lists the range.
-- Elevations convert to Revit with the chosen base point: Survey Point uses
-  its internal Z and shared elevation; Project Base Point uses its internal Z
-  and reports 0.
+
+#### USGS vertical placement
+
+- Grading-plan elevations are USGS. The user ties them to the model with one
+  known pair: a level and its USGS elevation (the "100'-0" = USGS ..." note
+  on the structural drawings). A PDF elevation then converts to Revit as
+  `level internal Z + (PDF value - level USGS)`, using `Level.ProjectElevation`.
+- Levels are listed by name with their displayed elevation; with one level
+  it is used without asking.
+- The elevation accepts decimal feet (`5432.50`) or feet and inches
+  (`5432'-6 1/2"`); anything else is asked again.
+- The last level and value are remembered per model (by document title) in
+  the pyRevit user config. With no saved value, a Survey Point that is set up
+  (shared elevation differs from internal by more than 1 ft) supplies the
+  starting value; otherwise the box starts empty.
+- The report states the tie used, for example `Level 1 = USGS 5432.50`.
 
 ### Flags
 
@@ -156,13 +171,13 @@ topography or from a PDF grading plan.
 
 | Date | Extension release | Revit version | Scenario | Result | Evidence link or location |
 | --- | --- | --- | --- | --- | --- |
-| 11.12.2026 | `0.0.14-dev` | None (CPython) | `tests/wall_grade_test.py` (19 tests) | Pass | Local run on `dev.grade-check` |
+| 11.12.2026 | `0.0.14-dev` | None (CPython) | `tests/wall_grade_test.py` (20 tests) | Pass | Local run on `dev.grade-check` |
 
 `tests/wall_grade_test.py` covers stations, exterior offsets, clearance
 input, status classification (including the exact-clearance boundary),
 segments, flagged runs, no-data ranges, note text, PDF label parsing and
-prefix rules from a generated PDF, the elevation range filter, datum
-conversion, projection onto straight and bent wall paths, and interpolation
+prefix rules from a generated PDF, the elevation range filter, USGS
+elevation input parsing and conversion, projection onto straight and bent wall paths, and interpolation
 with hold and sparse-gap rules.
 
 Automated checks do not prove Revit ray casting, drawing, notes, or the user
@@ -182,8 +197,7 @@ main are planned and explicitly Unreleased. Dates use MM.DD.YYYY.
 
 - Live Revit acceptance (2024–2026) with a sloped toposolid, a linked civil
   toposolid, an arc wall, and a grading-plan PDF.
-- Confirm label prefixes, existing-grade style, and datum with KL&A grading
-  plans.
+- Confirm label prefixes and existing-grade style with KL&A grading plans.
 - Trace contour linework from the PDF for a denser profile.
 - Show grade on both faces (retaining walls with fill on either side), and a
   per-wall flip of the exterior side.
