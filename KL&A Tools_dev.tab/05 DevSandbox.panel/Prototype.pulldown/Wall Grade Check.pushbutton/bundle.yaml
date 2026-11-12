@@ -1,0 +1,23 @@
+title:
+  en_us: "Wall Grade Check"
+tooltip:
+  en_us: |-
+    Version: v0.0
+    Date: 11.12.2026
+    Status: Unreleased
+    _____________________________________________________________________
+    Description:
+    Prototype: draws finished grade along the outside face of foundation walls for engineering review, and flags runs where grade is closer than a set clearance (default 8") to the top of wall, or at or above it. Grade comes from Revit topography (Toposolids or Topography, including linked models) or from the spot elevation and contour labels of a PDF grading plan aligned with PDF Overlay. Adds model lines and text notes in KLA Grade Review styles; Clear review lines removes them.
+    _____________________________________________________________________
+    How-to:
+    - Select the walls to check, or select nothing to check the Foundation and Retaining walls in the active view. A locked 3D view, section, or plan shows the flag notes.
+    - Run the command and choose Grade from Revit topography or Grade from PDF grading plan.
+    - Enter the clearance in inches (8 by default; 6 for IRC work).
+    - PDF only: first import and align the grading plan with PDF Overlay in a plan view, then pick it and say whether its elevations are relative to the Survey Point or the Project Base Point.
+    - Blue lines are grade with enough clearance, orange is closer than the clearance, red is at or above the top of wall. Flagged walls are selected and listed in the report window.
+    - Run again and choose Clear review lines to delete all review lines and notes. Undo also works.
+    _____________________________________________________________________
+    Last update:
+    - [11.12.2026] - v0.0 (Unreleased): First DevSandbox grade-along-wall review from Revit topography or a PDF grading plan, with clearance and over-top flags.
+author: KL&A
+min_revit_version: 2023
