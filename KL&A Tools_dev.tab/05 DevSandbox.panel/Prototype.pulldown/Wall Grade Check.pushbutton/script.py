@@ -86,6 +86,10 @@ STYLES = {
 }
 TEXT_TYPE_NAME = 'KLA Grade Review'
 TOPO_CATEGORY_NAMES = ('OST_Toposolid', 'OST_Topography')
+# Shown (unhidden) in the review view: the review lines, the walls, the PDF
+# grade strips, and the flag notes.
+SHOWN_CATEGORY_KEYS = (('OST_Lines', 'OST_Walls', 'OST_GenericModel', 'OST_TextNotes')
+                       + tuple('OST_Lines|' + name for name, _, _ in STYLES.values()))
 TEXT_RGB = (220, 0, 0)
 NOTE_RISE_FEET = 0.5
 RAY_CLEARANCE_FEET = 500.0
@@ -435,55 +439,90 @@ def draw_wall(doc, result, styles, text_type, view):
     return notes
 
 
-# -- Ghosted topography (active 3D view only) --------------------------------------------
+# -- Review display in the active 3D view --------------------------------------------------
 
-def _topo_categories(doc):
-    """Return [(name, Category)] for the topography categories in this Revit version."""
-    found = []
-    for name in TOPO_CATEGORY_NAMES:
-        built_in = getattr(DB.BuiltInCategory, name, None)
-        category = DB.Category.GetCategory(doc, built_in) if built_in is not None else None
-        if category is not None:
-            found.append((name, category))
-    return found
+def _category(doc, key):
+    """Return the Category for a record key (built-in name, optional |subcategory)."""
+    name, subcategory = ghost.split_category_key(key)
+    built_in = getattr(DB.BuiltInCategory, name, None)
+    category = DB.Category.GetCategory(doc, built_in) if built_in is not None else None
+    if category is not None and subcategory:
+        category = next((sub for sub in category.SubCategories if sub.Name == subcategory), None)
+    return category
 
 
-def ghost_view(doc, view, state):
-    """Show topography see-through and halftone in view; record originals in state.
-
-    Returns a reason text when the view cannot be ghosted, else ''.
-    """
-    if not isinstance(view, DB.View3D) or view.IsTemplate:
-        return 'Topography is ghosted only in a 3D view; open the 3D view and run again to see it.'
-    key = ghost.doc_key(doc.PathName, doc.Title)
-    changed = False
-    for name, category in _topo_categories(doc):
-        if not view.IsCategoryOverridable(category.Id):
-            continue
-        overrides = view.GetCategoryOverrides(category.Id)
-        ghost.remember(state, key, view.UniqueId, name, overrides.Transparency,
-                       overrides.Halftone, view.GetCategoryHidden(category.Id))
+def _remember_and_show(view, state, key, name, category, ghosted):
+    """Record a category's settings, then unhide it (and ghost it when asked)."""
+    overrides = view.GetCategoryOverrides(category.Id)
+    ghost.remember(state, key, view.UniqueId, name, overrides.Transparency,
+                   overrides.Halftone, view.GetCategoryHidden(category.Id))
+    if ghosted:
         overrides.SetSurfaceTransparency(ghost.GHOST_TRANSPARENCY)
         overrides.SetHalftone(True)
         view.SetCategoryOverrides(category.Id, overrides)
-        if view.CanCategoryBeHidden(category.Id):
-            view.SetCategoryHidden(category.Id, False)
-        changed = True
-    if not changed:
-        return 'Topography could not be ghosted in this view (its view template may control visibility).'
-    return ''
+    if view.CanCategoryBeHidden(category.Id):
+        view.SetCategoryHidden(category.Id, False)
+
+
+def prepare_view(doc, view, state):
+    """Set up the active 3D view for review; return (mode, notes, reason).
+
+    Turns on Temporary View Properties (with the view's own settings) when it
+    can, so every change here is undone by turning the mode off. Then the
+    topography is ghosted, the review lines, walls, grade strips, and notes
+    are shown, and a hidden-line or wireframe view is shaded so see-through
+    surfaces render. mode is None and reason says why when the view is not a
+    3D view or nothing could be changed.
+    """
+    if not isinstance(view, DB.View3D) or view.IsTemplate:
+        return None, [], ('The review display is set up only in a 3D view; open the 3D view and '
+                          'run again to see the ghosted topography.')
+    key = ghost.doc_key(doc.PathName, doc.Title)
+    notes = []
+    if (not view.IsTemporaryViewPropertiesModeEnabled() and view.CanEnableTemporaryViewPropertiesMode()
+            and view.EnableTemporaryViewPropertiesMode(view.Id)):
+        mode = ghost.set_mode(state, key, view.UniqueId, ghost.MODE_TEMPORARY)
+    else:
+        mode = ghost.set_mode(state, key, view.UniqueId, ghost.MODE_RECORDED)
+    ghosted = 0
+    for name in TOPO_CATEGORY_NAMES + SHOWN_CATEGORY_KEYS:
+        category = _category(doc, name)
+        if category is None or not view.IsCategoryOverridable(category.Id):
+            continue
+        topo = name in TOPO_CATEGORY_NAMES
+        _remember_and_show(view, state, key, name, category, topo)
+        ghosted += 1 if topo else 0
+    if not ghosted:
+        return mode, notes, ('Topography could not be ghosted in this view '
+                             '(its view template may control visibility).')
+    if mode == ghost.MODE_TEMPORARY:
+        if view.DisplayStyle in (DB.DisplayStyle.HLR, DB.DisplayStyle.Wireframe):
+            view.DisplayStyle = DB.DisplayStyle.ShadingWithEdges
+            notes.append('The view is shown Shaded while reviewing so the ghosted topography renders.')
+        notes.insert(0, 'This 3D view is in **Temporary View Properties** for the review; '
+                        '**Clear review lines** (or Restore View Properties) returns it to normal.')
+    else:
+        notes.insert(0, 'Temporary View Properties could not be turned on here, so the topography '
+                        'and review categories were changed directly; **Clear review lines** restores them.')
+    return mode, notes, ''
 
 
 def restore_views(doc, recorded):
-    """Put back the recorded topography settings; return the views restored."""
-    categories = dict(_topo_categories(doc))
+    """Return recorded views to normal; return the number of views restored."""
     restored = 0
-    for view_id, settings in recorded.items():
+    for view_id, record in recorded.items():
         view = doc.GetElement(view_id)
         if not isinstance(view, DB.View):
             continue
-        for name, original in settings.items():
-            category = categories.get(name)
+        if (record.get('mode') == ghost.MODE_TEMPORARY and view.IsTemporaryViewPropertiesModeEnabled()
+                and view.GetTemporaryViewPropertiesId() == view.Id):
+            view.DisableTemporaryViewMode(DB.TemporaryViewMode.TemporaryViewProperties)
+            restored += 1
+            continue
+        # Recorded mode, or the temporary mode was already turned off by hand:
+        # put back the recorded settings (a no-op when they already match).
+        for name, original in record.get('categories', {}).items():
+            category = _category(doc, name)
             if category is None or not view.IsCategoryOverridable(category.Id):
                 continue
             overrides = view.GetCategoryOverrides(category.Id)
@@ -697,17 +736,17 @@ def run():
     notes_note = []
     state_path = ghost.default_state_path()
     ghost_state = ghost.load(state_path)
-    # One undo step: ghost first, so topography hidden in this 3D view is shown
-    # again before grade is read through it, then draw.
+    # One undo step: set up the review display first, so topography hidden in
+    # this 3D view is shown again before grade is read through it, then draw.
     group = DB.TransactionGroup(doc, 'Wall Grade Check - Draw')
     group.Start()
     try:
-        with revit.Transaction('Wall Grade Check - Ghost Topography', doc=doc):
-            ghost_reason = ghost_view(doc, view, ghost_state)
+        with revit.Transaction('Wall Grade Check - Review Display', doc=doc):
+            styles = _line_styles(doc)
+            mode, view_notes, view_reason = prepare_view(doc, view, ghost_state)
         results = analyse(sampled, limit_feet, grade_source)
         log('analysed {} wall(s)'.format(len(results)))
         with revit.Transaction('Wall Grade Check - Draw Lines', doc=doc):
-            styles = _line_styles(doc)
             text_type = _text_type(doc) if notes_allowed(view) else None
             notes = sum(draw_wall(doc, result, styles, text_type, view) for result in results)
             strips = 0
@@ -718,11 +757,11 @@ def run():
         if group.HasStarted() and not group.HasEnded():
             group.RollBack()
         raise
-    if not ghost_reason:
+    if mode is not None:
         ghost.save(state_path, ghost_state)
-        notes_note.append('Topography is ghosted in this 3D view until **Clear review lines**.')
-    else:
-        notes_note.append(ghost_reason)
+    notes_note.extend(view_notes)
+    if view_reason:
+        notes_note.append(view_reason)
     if strips:
         notes_note.append('{} see-through PDF grade strip(s) {:g} ft wide show grade outside the walls '
                           '(Generic Models; removed by Clear).'.format(strips, ghost.STRIP_WIDTH_FEET))

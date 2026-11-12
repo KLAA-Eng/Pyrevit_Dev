@@ -26,7 +26,7 @@ The behavior contract is the command's
 | Walls checked | Selected walls; with nothing selected, all walls in the active view whose type Function is Foundation or Retaining. |
 | Prompts | pyRevit prompts in sequence (action, clearance, then PDF overlay, reference level, and its USGS elevation) instead of a custom dialog; the PDF search band is fixed at 10 ft. |
 | PDF vertical placement | The user ties USGS to the model by picking a reference level and entering its USGS elevation (11.12.2026, owner request); replaces the Survey Point / Project Base Point choice. |
-| Ghosted topography | In the active 3D view, topography categories are set see-through and halftone (and unhidden) until Clear restores the recorded originals; with a PDF source a see-through 4 ft grade strip is added outside each wall (11.12.2026, owner request). |
+| Review display | The active 3D view goes into Temporary View Properties (the view's own settings); topography is ghosted, review lines, walls, strips, and notes are unhidden, and Hidden Line becomes Shaded. Clear ends the mode; when the mode cannot be used, changes are recorded and restored instead (11.12.2026, owner request); with a PDF source a see-through 4 ft grade strip is added outside each wall (11.12.2026, owner request). |
 | Ray-casting view | An existing non-template 3D view; the command does not create one. |
 | Branch | `dev.grade-check` from `dev.pdf-overlay`, because the PDF source reuses `lib/pdf_overlay`. Its PR into `master-dev` follows the PDF Overlay PR. |
 
@@ -35,12 +35,12 @@ The behavior contract is the command's
 | ID | Task | Acceptance | Status |
 | --- | --- | --- | --- |
 | T1 | Bundle scaffold: `bundle.yaml`, `script.py`, adjacent `SPEC.md`, pulldown layout entry | Metadata check passes for the bundle | Implementation complete, locally verified (`scripts/check_tool_metadata.py`) |
-| T2 | `lib/wall_grade/profile.py`: stations, exterior offset, clearance input, classification, segments, flagged runs, no-data ranges, note text | `tests/wall_grade_test.py` | Implementation complete, locally verified (24 tests pass) |
+| T2 | `lib/wall_grade/profile.py`: stations, exterior offset, clearance input, classification, segments, flagged runs, no-data ranges, note text | `tests/wall_grade_test.py` | Implementation complete, locally verified (26 tests pass) |
 | T3 | `lib/wall_grade/pdf_grade.py`: label parsing and prefix rules, elevation range, projection onto wall paths, interpolation with hold and sparse gaps, USGS elevation input and conversion | `tests/wall_grade_test.py` | Implementation complete, locally verified |
 | T4 | Revit adapter: wall collection, exterior face sampling, top-of-wall and toposolid ray casting (host and links) | Live: grade matches a sloped toposolid within 1/2" | Implementation complete; live acceptance pending |
 | T5 | Drawing and Clear: line styles, model lines, text notes, report, flagged-wall selection, error report | Live: draw, Undo, and Clear in a locked 3D view and a section | Implementation complete; live acceptance pending |
 | T6 | PDF source wired to an aligned PDF Overlay | Live: grading-plan check matches hand-read spots within 1" | Implementation complete; live acceptance pending |
-| T8 | Ghosted topography and PDF grade strip in the active 3D view; Clear restores the view (`lib/wall_grade/ghost.py`) | Unit tests; live: ghost, Undo, and Clear restore a 3D view with and without a view template | Implementation complete, record and strip helpers locally verified; live acceptance pending |
+| T8 | Review display in Temporary View Properties, ghosted topography, and PDF grade strip in the active 3D view; Clear ends it (`lib/wall_grade/ghost.py`) | Unit tests; live: setup, Undo, Clear, and Restore View Properties on a 3D view with and without a view template, and one already in temporary view properties | Implementation complete, record and strip helpers locally verified; live acceptance pending |
 | T7 | Validation evidence and review record in SPEC; PR to `master-dev` after PDF Overlay merges | Evidence table filled with live results | Pending |
 
 ## Open questions for the owner

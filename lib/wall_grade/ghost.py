@@ -1,19 +1,28 @@
 # -*- coding: utf-8 -*-
-"""Remember the view settings changed to ghost topography, so Clear can restore them.
+"""Remember how a review view was set up, so Clear can put it back.
 
-The state is a dict saved as JSON on this computer:
+The review display is applied in Revit's Temporary View Properties mode when
+the tool can turn it on (MODE_TEMPORARY): Clear then just turns the mode off.
+When it cannot (the user already had the mode on, or the view does not allow
+it), the changed category settings are recorded (MODE_RECORDED) and Clear
+restores them. The state is a dict saved as JSON on this computer:
 
-    {doc_key: {view_unique_id: {category_name: {'transparency': int,
-                                                'halftone': bool,
-                                                'hidden': bool}}}}
+    {doc_key: {view_unique_id: {'mode': MODE_TEMPORARY | MODE_RECORDED,
+                                'categories': {category_key: {
+                                    'transparency': int,
+                                    'halftone': bool,
+                                    'hidden': bool}}}}}
 
-Only the first original per view and category is kept, so ghosting the same
+Only the first record per view and category is kept, so setting up the same
 view twice still restores the user's own settings.
 """
 
 import json
 import os
 
+
+MODE_TEMPORARY = 'temporary'
+MODE_RECORDED = 'recorded'
 
 GHOST_TRANSPARENCY = 70
 STRIP_TRANSPARENCY = 50
@@ -33,10 +42,33 @@ def doc_key(path_name, title):
     return (path_name or '').strip().lower() or u'untitled:' + (title or '')
 
 
+def category_key(built_in_name, subcategory=''):
+    """Return the record key for a category or one of its subcategories."""
+    return built_in_name + ('|' + subcategory if subcategory else '')
+
+
+def split_category_key(key):
+    """Return (built-in name, subcategory name or '') for a record key."""
+    name, _, subcategory = key.partition('|')
+    return name, subcategory
+
+
+def _view(state, key, view_id):
+    view = state.setdefault(key, {}).setdefault(view_id, {})
+    view.setdefault('categories', {})
+    return view
+
+
+def set_mode(state, key, view_id, mode):
+    """Record how the view was set up, unless a mode is already recorded."""
+    view = _view(state, key, view_id)
+    view.setdefault('mode', mode)
+    return view['mode']
+
+
 def remember(state, key, view_id, category, transparency, halftone, hidden):
     """Record a category's original view settings unless already recorded."""
-    views = state.setdefault(key, {})
-    categories = views.setdefault(view_id, {})
+    categories = _view(state, key, view_id)['categories']
     if category not in categories:
         categories[category] = {
             'transparency': int(transparency),

@@ -198,11 +198,25 @@ class GhostStateTests(unittest.TestCase):
         key = ghost.doc_key(r'C:\Jobs\A.rvt', 'A')
         ghost.remember(state, key, 'view-1', 'Toposolid', 0, False, True)
         ghost.remember(state, key, 'view-1', 'Toposolid', 70, True, False)
-        self.assertEqual(state[key]['view-1']['Toposolid'],
+        self.assertEqual(state[key]['view-1']['categories']['Toposolid'],
                          {'transparency': 0, 'halftone': False, 'hidden': True})
-        self.assertEqual(ghost.take(state, key), {'view-1': {'Toposolid': {
-            'transparency': 0, 'halftone': False, 'hidden': True}}})
+        self.assertEqual(ghost.take(state, key), {'view-1': {'categories': {'Toposolid': {
+            'transparency': 0, 'halftone': False, 'hidden': True}}}})
         self.assertEqual(ghost.take(state, key), {})
+
+    def test_first_mode_is_kept(self):
+        state = {}
+        self.assertEqual(ghost.set_mode(state, 'doc', 'view-1', ghost.MODE_TEMPORARY),
+                         ghost.MODE_TEMPORARY)
+        # A second run while the temporary mode is still on must not forget it.
+        self.assertEqual(ghost.set_mode(state, 'doc', 'view-1', ghost.MODE_RECORDED),
+                         ghost.MODE_TEMPORARY)
+
+    def test_category_keys(self):
+        self.assertEqual(ghost.category_key('OST_Lines', 'KLA Grade Review'), 'OST_Lines|KLA Grade Review')
+        self.assertEqual(ghost.split_category_key('OST_Lines|KLA Grade Review'),
+                         ('OST_Lines', 'KLA Grade Review'))
+        self.assertEqual(ghost.split_category_key('OST_Toposolid'), ('OST_Toposolid', ''))
 
     def test_doc_key_for_saved_and_unsaved(self):
         self.assertEqual(ghost.doc_key(r' C:\Jobs\A.RVT ', 'A'), r'c:\jobs\a.rvt')
