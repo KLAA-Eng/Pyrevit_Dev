@@ -1,133 +1,172 @@
 # KLCode Design System
 
-This is the working reference for KLCode colors, artwork, WPF components and
-window construction. Use it to choose a resource, understand its appearance and
-assemble a window. The linked XAML files own executable values and templates;
-this guide explains their intended use and the shared design rules.
+This guide describes the GUI implementation in the extension as reviewed on
+2026-11-17. Use it to select a dialog, assemble a window, choose shared resources
+and understand the host boundaries. Resource names and values below follow the
+current source, including the WPF baseline adopted in November.
 
-Every window body sits in `klcWindowShell`: the five framed shared dialogs, the
-two reference templates, the Gallery, the Python tool windows and the five
-compiled window classes. PreviewFixture retains its standalone test chrome.
-Native/pyRevit dialogs and Recall's docked panel have separate host
-presentation; the standalone Recall body uses the shared system. The sixth
-shared dialog is the floating Command Switch, which uses the shared colours and
-styles with its own compact layout: no outline, no shadow, and toggle pills that
-keep their surface on hover. Message, Text, Action Choice and the superseded
-Custom Alert omit the standard footer and its row by design; Message and Text
-also blank the centre title and keep Close.
+Executable styles and values belong to the [resource dictionaries](../lib/GUI/Resources/).
+The [shared-dialog SPEC](../lib/GUI/dialogs/SPEC.md) owns dialog requirements;
+the [API guide](../lib/GUI/dialogs/README.md) owns detailed arguments and examples.
+Where an older guide or review differs from current markup, inspect the source
+before reusing its key names or dimensions. Dated reviews describe their own
+baselines, not a second implementation standard.
 
-The window folders under `lib/GUI` mark each window's standing:
+The [consolidation plan](plans/custom-window-consolidation.md) owns tasks,
+authorization and live acceptance. This document does not declare those tasks
+complete. [Review records](knowledge/reviews/design-system/README.md) preserve
+design decisions and verification evidence.
 
-| Folder | Holds | Design work |
-| --- | --- | --- |
-| `dialogs` | The six shared dialogs and their adapters; the layout reference for every other window | Yes; they set the pattern |
-| `_templates` | The Options and Review reference windows new tools start from | Yes; kept as clean as the dialogs |
-| `_superseded` | Legacy/reference windows now covered by Message and Selection; see its [README](../lib/GUI/_superseded/README.md) | Reference fixes only |
-| `_future` | Windows no tool opens yet | None until a tool adopts one |
-| Tool folders | Bespoke tool windows such as Duplicate Sheets, View Range and Steel PSF | Follow the dialog layout; Find/Replace uses shared Rename |
-
-The current inventory has 22 standalone Window sources: seven Python windows (two
-superseded, two future), six shared dialogs, two reference templates, five
-compiled windows, Gallery and PreviewFixture.
-
+- [System scope and choosing a window](#system-scope-and-choosing-a-window)
+- [Architecture and resource ownership](#architecture-and-resource-ownership)
 - [Master design colors](#master-design-colors)
 - [GUI colors and resource keys](#gui-colors-and-resource-keys)
-- [Icons: GUI and ribbon](#icons)
-- [GUI components and style selection](#gui-components-and-style-selection)
 - [Window geometry and spacing](#window-geometry-and-spacing)
-- [Architecture and resource ownership](#architecture-and-resource-ownership)
-- [Host and keyboard contracts](#host-and-keyboard-contracts)
+- [GUI components and style selection](#gui-components-and-style-selection)
+- [Icons](#icons)
 - [Reusable dialogs](#reusable-dialogs)
+- [Host and keyboard contracts](#host-and-keyboard-contracts)
 - [Creating a window](#creating-a-window)
+- [WPF Studio and Gallery](#wpf-studio-and-gallery)
 - [Validation](#validation)
 
-The [consolidation plan](plans/custom-window-consolidation.md) owns tasks and
-acceptance status. The [template guide](../lib/GUI/_templates/README.md) owns
-the two reference implementations: Options and Review. Form is retired. The actual shared
-Message and Selection dialogs are their own canonical references. Dated checks and renders live in
-[design-system reviews](knowledge/reviews/design-system/README.md), including
-the [Windows verification and Revit checklist](knowledge/reviews/design-system/2026-10-29-gui-architecture-windows.md).
-The [archived long form](knowledge/reviews/design-system/2026-10-29-designsystem-archive.md)
-preserves earlier implementations; use this guide for current instructions.
+## System scope and choosing a window
+
+The shared system covers Python WPF dialogs and bespoke windows, reference
+templates, UI Gallery and compiled WPF source. Most standalone bodies use
+`klcWindow` and `klcWindowShell`. Command Switch uses the floating styles instead
+of the shell. PreviewFixture is a tooling exception with its own test chrome.
+Native Revit/Windows dialogs, pyRevit's own demonstrations and docked panels
+retain their host presentation.
+
+| Location or entry point | Purpose and current use |
+| --- | --- |
+| [GUI.dialogs](../lib/GUI/dialogs/) | Six reusable families: Message, Selection, Text Entry, Action Choice, Command Switch and Rename; the primary layout references |
+| [GUI.tool_dialogs](../lib/GUI/tool_dialogs.py) | Tool-facing notices, confirmations, small menus and text prompts, with compatibility return values |
+| [GUI.tool_selectors](../lib/GUI/tool_selectors.py) | Tool-facing sheet, revision, document, view and named-item selection with explicit model inputs |
+| [GUI.selection_compat](../lib/GUI/selection_compat.py) | Implementation behind `GUI.forms.select_from_dict`; retains its legacy defaults and list result |
+| [GUI/_templates](../lib/GUI/_templates/README.md) | Options and Review compositions for more complex windows |
+| Tool XAML | Bespoke workflows such as Duplicate Sheets, View Range and Steel PSF; use shared roles with local layout/styles |
+| [GUI/_superseded](../lib/GUI/_superseded/) | Legacy CustomAlert and SelectFromDict surfaces retained for reference/Gallery/tests; active compatibility calls now use shared Selection |
+| [GUI/_future](../lib/GUI/_future/README.md) | Dormant Create From Rooms and Match/Recall surfaces; Gallery previews do not imply production adoption |
+| [src](../src/) | Compiled alert, Family Studio and Startup Importer windows using the same linked resources |
+
+Both Find/Replace commands now use shared Rename. Their duplicate naming XAML
+and inline-result controller were retired. Rules are collected before model
+execution; unchanged, partial or failed outcomes use Action Choice with Details
+and Edit and Retry. Rules survive retry, and successful elements are excluded
+from partial retries. Clean success finishes quietly. See the
+[adoption record](knowledge/reviews/design-system/2026-11-09-shared-dialog-adoption.md)
+for the delivered scope and evidence.
+
+Prefer an existing dialog when its result and interaction match the workflow.
+Use Options or Review for a richer composition, or retain a bespoke window
+when it owns a distinct workflow or modeless lifetime. Native file/folder
+pickers and progress/selection overlays remain separate facilities.
+
+## Architecture and resource ownership
+
+### How the code fits together
+
+| Source | Responsibility |
+| --- | --- |
+| [KLCodeTokens.xaml](../lib/GUI/Resources/KLCodeTokens.xaml) | Palette, font sizes, typed dimensions, spacing, radii, footer destinations and default Close label |
+| [klIcons.xaml](../lib/GUI/Resources/klIcons.xaml) | Generated geometry and the self-contained `klcLogo` template; no palette brushes |
+| [KLCodeFoundation.xaml](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Tokens and icons; base control templates, inherited window text, scrollbars and icon presenter |
+| [KLCodeComponents.xaml](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; public role styles, variants, implicit controls, shared shell and repeated layouts |
+| [window_chrome.py](../lib/GUI/window_chrome.py) | Loads resources/body, attaches metadata, Close/Escape, header drag and footer navigation |
+| [window_metadata.py](../lib/GUI/window_metadata.py) | Caller title and pure tool-version formatting |
+| [KLCodeControls.xaml](../src/KLCode.Wpf/Resources/KLCodeControls.xaml) | Compiled compatibility styles over the same resource chain |
+| Window body | Named controls, bindings, declared events and workflow arrangement |
+| Controller / host adapter | Data, validation, ownership, showing/closing, persistence and model operations |
+
+New bodies consume Components styles rather than Foundation implementation keys.
+Existing compiled aliases may base directly on Foundation. The shared shell's
+`Tag` is reserved for `WindowMetadata`; its `Content` and workflow `DataContext`
+remain caller-owned. A TextBox's `Tag` has a different role: watermark text.
+
+The Python resource cache belongs to the loaded module/engine. Windows using
+that module merge the same dictionary instance; do not mutate it for one tool
+or assume every pyRevit engine shares it. Put tool data, strings and new local
+styles in the window's resources.
+
+The November baseline establishes WPF Studio XAML as the presentation baseline.
+Further edits to shared Components, Foundation or Tokens require the separate
+owner decision recorded in the [plan](plans/custom-window-consolidation.md).
+Reuse existing roles and keep new styles local unless that shared change has
+been authorized.
+
+### Key prefixes mark reach
+
+The dictionaries organize keys by consumption, not by alternate themes:
+
+| Prefix | Intended reach |
+| --- | --- |
+| `klc`, `kla`, `Kla` | Shared-dialog resources or their dependencies |
+| `x` | Other windows: tools, templates, Gallery or compiled hosts |
+| `xx` | Dormant `_future` consumers |
+| `xxx` | No consumer; deletion candidates |
+
+These are maintenance conventions, not a guarantee that every key has already
+been renamed to match its current reach. For example, all five sized icon
+presenters currently use `klcIcon<size>`, including unused sizes. Generated
+geometry keeps `klicon<Role>` names; dormant artwork uses `kliconFuture<Role>`.
+Use the actual key in source rather than deriving one from the convention.
 
 ## Master design colors
 
-Brand names describe the visual palette. In a WPF window, select a resource by
-its role rather than copying a hex value. Ribbon PNG exports use the brand
-colors directly. KLOrange is a ribbon/prototype convention; the shared GUI
-palette does not define an orange brush.
+Brand names identify the visual palette. WPF markup selects semantic brush
+resources; ribbon PNGs use the brand colors directly.
 
-| Color name | Hex | Current use |
+| Color | Hex | Use |
 | --- | --- | --- |
-| KLCharcoal | `#1A252B` | Window, chrome, input and list backgrounds; dark ribbon artwork variant |
-| KLGreen | `#33714F` | Input borders, wordmark slash, scrollbar thumbs; green ribbon artwork |
-| KLGreen-dark | `#286048` | Standard action fills, checked fills, section/list/grid borders |
-| KLGreen-secondary | `#407058` | Standard action/dropdown hover fills and footer links |
-| KLWhite | `#E5E4E2` | Body text, ordinary icons, wordmark letters; light ribbon artwork variant |
-| White | `#FFFFFF` | Text on accent-filled buttons and selected segments |
-| Muted text | `#B5C2BD` | Captions and secondary information |
-| Gray | `#808080` | Footer version text, the input watermark and disabled control text |
-| KLOrange | `#FF8000` | Orange ribbon artwork and default DevSandbox prototype icon |
-
-The footer restores its original green links and gray version text through
-dedicated roles. Other muted GUI text uses `#B5C2BD` (`KlaMutedBrush`).
-Use the footer roles for footer text.
+| KLCharcoal | `#1A252B` | Window, chrome, fields and lists; dark ribbon variant |
+| KLGreen | `#33714F` | Input borders, logo slash, scrollbar thumbs; green ribbon variant |
+| KLGreen-dark | `#286048` | Actions, checked fills, section/list borders and grid lines |
+| KLGreen-secondary | `#407058` | Action/dropdown hover and footer links |
+| KLWhite | `#E5E4E2` | Body text, ordinary icons and logo letters; light ribbon variant |
+| White | `#FFFFFF` | Text on accent-filled controls |
+| Muted | `#B5C2BD` | Secondary information |
+| Gray | `#808080` | Version, watermarks and disabled text |
+| KLOrange | `#FF8000` | Ribbon/prototype artwork; no shared GUI orange brush |
 
 ## GUI colors and resource keys
 
-### Palette brushes
+All brushes below are defined in Tokens. Equal colors retain separate roles so
+a future role change does not accidentally recolor unrelated components.
 
-[KLCodeTokens.xaml](../lib/GUI/Resources/KLCodeTokens.xaml) owns these
-brushes, in its Palette section. The same dictionary is used by Python and
-compiled WPF.
-
-| Resource key | Hex | Intended use |
+| Resource | Value | Role |
 | --- | --- | --- |
-| `klcBackgroundColor` | `#1A252B` | Window/chrome surface, fields and lists |
-| `klcTextColor` | `#E5E4E2` | Body text, labels, ordinary icon stroke; footer hover |
-| `KlaMutedBrush` | `#B5C2BD` | Secondary captions |
-| `klcFooterLinkColor` | `#407058` | Prototype and Outreach footer links at rest |
-| `klcFooterVersionColor` | `#808080` | Centered caller-version footer text |
-| `klcTextColorWaterMark` | `#808080` | Placeholder text: the input watermark (Text entry, Command Switch and Selection search). The same gray as the footer version by owner decision; a test keeps them equal |
-| `KlaTextOnAccentBrush` | `#FFFFFF` | Text on accent-filled actions and selected segments |
-| `KlaAccentBrush` | `#286048` | Standard buttons, checked boxes and selected segments |
-| `KlaAccentHoverBrush` | `#407058` | Standard action/dropdown hover background |
-| `klcBorderColor` | `#33714F` | Input/dropdown outlines, wordmark slash, scrollbar thumbs |
-| `KlaBorderStrongBrush` | `#286048` | Section/list outlines, grid lines and segment groups |
+| `klcBackgroundColor` | `#1A252B` | Window, field and list surface |
+| `klcTextColor` | `#E5E4E2` | Main text, inherited icon stroke and footer hover |
+| `klcColorGreen` | `#33714F` | Input outline, logo slash, scroll thumb and checked switch track |
+| `KlaBorderStrongBrush` | `#286048` | Section/list borders and grid lines |
+| `KlaAccentBrush` | `#286048` | Standard action and checked/selected fills |
+| `KlaAccentHoverBrush` | `#407058` | Action/dropdown hover |
+| `KlaTextOnAccentBrush` | `White` | Text on accent fills |
+| `klcTextColorMuted` | `#B5C2BD` | Secondary captions and Details |
+| `klcTextColorWaterMark` | `#808080` | Empty-field watermark |
+| `klcTextColorDisabled` | `#808080` | Disabled text and icons; unchecked switch track |
+| `KlaFocusBrush` | `#E5E4E2` | Field/dropdown focus and focused table-cell border |
+| `KlaPressedBrush` | `#204D3A` | Pressed controls and selected table cells |
+| `KlaDisabledFillBrush` | `#303C40` | Disabled control fill |
+| `KlaComponentSurfaceBrush` | `#22303A` | Secondary controls, grid headers and hover surfaces |
+| `KlaComponentBorderBrush` | `#52675D` | Secondary-control/readout borders and splitter |
+| `klcInfo` | `#A3C3E8` | Information severity |
+| `klcSuccessColor` | `#91C8A6` | Success/Ready severity |
+| `klcWarningColor` | `#E8C66A` | Warning severity |
+| `klcErrorColor` | `#E89E96` | Error/Blocked severity and validation |
+| `klcFooterLinkColor` | `#407058` | Footer links at rest |
+| `klcFooterVersionColor` | `#808080` | Caller-version footer |
+| `xPreviewSurfaceBrush` | `#10171B` | Family Studio preview surface |
 
-### State and component brushes
+Retired names such as `klcBorderColor`, `KlaMutedBrush` and
+`KlaDisabledTextBrush` are not current brush keys. There is no compatibility
+palette to restore. Compiled `Kla*Style` keys are style adapters, not another
+palette.
 
-[KLCodeTokens.xaml](../lib/GUI/Resources/KLCodeTokens.xaml) also owns these
-semantic brushes. Choose the role appropriate to the state or
-component, even when two roles currently have the same color.
-
-| Resource key | Hex | Intended use |
-| --- | --- | --- |
-| `KlaFocusBrush` | `#E5E4E2` | Input/dropdown focus border and link focus text; no button underline |
-| `KlaPressedBrush` | `#204D3A` | Pressed buttons/options and selected table cells |
-| `KlaDisabledFillBrush` | `#303C40` | Disabled action/dropdown fill |
-| `KlaDisabledTextBrush` | `#808080` | Disabled control text and foreground-aware icons (merged with the footer gray by owner decision, 2026-11-01) |
-| `KlaComponentSurfaceBrush` | `#22303A` | Secondary actions, grid headers and hover surfaces |
-| `KlaComponentBorderBrush` | `#52675D` | Banner/readout borders and splitter |
-| `KlaMutedBrush` | `#B5C2BD` | Component information text, read-only field text, the Details header and readout |
-| `klcInfo` | `#A3C3E8` | Information borders/chips |
-| `klcSuccessColor` | `#91C8A6` | Ready/success borders/chips |
-| `klcWarningColor` | `#E8C66A` | Warning borders/chips |
-| `klcErrorColor` | `#E89E96` | Error/blocked borders/chips |
-| `xPreviewSurfaceBrush` | `#10171B` | Compiled Family Studio preview surface |
-
-Pair status colors with words such as Ready, Warning or Blocked. Message
-severity uses heading wording and a border; body/heading text remains readable.
-Disabled controls use explicit brushes rather than stacked opacity reductions.
-
-```xml
-<Border Style="{StaticResource xStatusWarning}">
-    <TextBlock Text="Warning" Style="{StaticResource xStatusText}"/>
-</Border>
-```
-
-A table cell that binds a status value uses `xStatusTagChip`, whose colour follows
-its `Tag` (Ready, Warning or Blocked):
+Pair severity colors with words. Message colors its heading, symbol and border;
+its body remains ordinary text. Review chips keep Ready/Warning/Blocked labels:
 
 ```xml
 <Border Style="{StaticResource xStatusTagChip}" Tag="{Binding Status}">
@@ -135,739 +174,504 @@ its `Tag` (Ready, Warning or Blocked):
 </Border>
 ```
 
-### Compatibility keys
+## Window geometry and spacing
 
-There are no brush aliases. The palette's 2019 aliases (`header_background`,
-`text_white`, `text_gray`, `text_green`, `border_green`, `border_green_dark`,
-`button_fg_normal`, `button_bg_normal`, `button_bg_hover`) and the compiled-host
-aliases in Components (`KlaPanelBrush`, `KlaMutedTextBrush`, `KlaSubtleTextBrush`,
-`KlaBlockingBrush`) were removed on 2026-10-31; every window names the role
-brushes above, and the C# contract and smoke tests keep them gone. Some role
-brushes share a value by design and stay separate roles: `klcFooterLinkColor`
-and `KlaAccentHoverBrush`, `KlaAccentBrush` and `KlaBorderStrongBrush`,
-`klcFooterVersionColor`, `klcTextColorWaterMark` and `KlaDisabledTextBrush`. Change a role's value only for that role.
+WPF dimensions are device-independent units (1/96 inch), not export pixels.
+At 150% Windows scaling, 16 units occupy 24 physical pixels. Window bounds
+belong to each body; reusable dimensions belong to typed shared resources.
 
-`Kla*Style` names in the [compiled adapter](../src/KLCode.Wpf/Resources/KLCodeControls.xaml)
-are compatibility styles based on the same shared controls. They do not define
-a second palette or set of control templates.
+### Custom window foundation
+
+| Part | Current implementation |
+| --- | --- |
+| Base window | Segoe UI 12, charcoal, `WindowStyle=None`, transparency enabled, layout rounding and pixel snapping; `NoResize` by default |
+| Shell | `klcWindowShell` on the named `window_shell` ContentControl |
+| Header/footer | `klcChromeHeight`: 24 each |
+| Header | Left logo, centered title, right Close; title has symmetric 110-unit margins and character ellipsis, without a tooltip |
+| Logo | `klcLogoWidth` / `klcLogoHeight`: 98 x 14 |
+| Close | `klcButtonClose`: 48 x 16, font 12, default `CloseLabel` caption |
+| Chrome edge inset | `klcHeadFootMargin`: `4,0,4,0` |
+| Footer | Prototype left, caller version centered, Outreach right; version font 14 and symmetric 110-unit margins |
+| Body margin | `klcBodyMargin`: `16,16,16,8` |
+| Resizing | Set `CanResizeWithGrip` explicitly where needed; establish minimum bounds and overflow behavior |
+
+Message, Text Entry and Action Choice collapse the footer and its reserved row.
+Message and Text Entry also hide the center title while retaining `Window.Title`
+and Close. Selection, Rename, reference templates and bespoke tool windows
+retain the shell footer. Command Switch has no shell, header or footer.
+
+`klcWindowFloating` is transparent and has no taskbar entry. Its
+`klcBorderFloating` surface has a 16-unit outer margin, 12-unit padding,
+16-unit corners and no border. The current style **does include a subtle black
+shadow**: blur 20, opacity 0.12, depth 0. Earlier no-shadow review notes describe
+the previous baseline.
+
+### Typography and shape
+
+| Role | Token / current value |
+| --- | --- |
+| Body | `klcFontSizeBody`: 12 |
+| Ordinary buttons, input, Details, footer version | `klcFontSizeButton`, `klcFontSizeTextBox`, `klcFontSizeDetails`, `klcFontSizeShellVersion`: 14 |
+| Main action, shell title, heading | `klcFontSizeButtonLarge`, `klcFontSizeShellTitle`, `klcFontSizeHeading`: 16 |
+| Message severity heading | `klcFontSizeMessage`: 22, SemiBold |
+| Text Entry | `klcFontSizeTextPrompt`: 24, SemiBold, centered |
+| Border | `klcBorderHairline`: Thickness 1 |
+| Corners | Check 4; input/button 8; switch track 6; command pill 12; floating panel 16; status chip 4 |
+
+Use Title Case for constant captions. Choose wrapping based on the role:
+`klcTextBlockHeading` is explicitly non-wrapping; long headings need a deliberate
+local variant or layout, not an assumption that every heading wraps.
+
+### Typed spacing resources
+
+The general spacing scale is 4 / 8 / 12 / 16 / 24. Match the resource's WPF type
+to the target property; a GridLength is not a Thickness or Double.
+
+| Resource | Type | Value / purpose |
+| --- | --- | --- |
+| `klcBodySpaceSmall`, `klcBodySpaceNormal`, `klcBodySpaceLarge` | GridLength | 4 / 8 / 12 spacer rows or columns |
+| `klcBodyRowNormal`, `klcChromeHeight` | GridLength | 24 compact row / chrome band |
+| `klcRenameLabelColumn`, `klcRenameInputColumn` | GridLength | 48 / 200 naming columns |
+| `klcStackGapVertSmall`, `klcStackGapVert` | Thickness | `0,4,0,0` / `0,8,0,0` above stacked or collapsible content |
+| `klcStackGapBelow`, `klcStackGapHoriz` | Thickness | `0,0,0,8` / `8,0,0,0` |
+| `KlaActionTopGap` | Thickness | `0,8,0,0` above a stacked action |
+| `KlaIconTextGap` | Thickness | `0,0,4,0` after a small icon |
+| `klcSectionPadding` | Thickness | 12 inside a field group |
+| `KlaCompactInset` | Thickness | `8,4` component/cell inset |
+| `klcPadTextBoxInput` | Thickness | `8,0,0,4` input text padding; native TextBoxView applies it |
+| `KlaCommandLinkPadding`, `KlaCommandArrowInset` | Thickness | 8 / `0,4,8,0` inside command links |
+| `KlaCommandPillGap`, `klcCommandPillPanelInset` | Thickness | `0,0,8,8` item gap / `0,0,-8,-8` trailing-gap compensation |
+| `KlaOpticalTextInset`, `klcSwitchCaptionInset` | Thickness | `0,0,0,2` / `0,0,0,3` optical text adjustments |
+| `xHeaderCellInset` | Thickness | `8,6` grid header inset |
+
+Use `Auto` for rows holding actions or collapsible validation. A 36-high main
+action must not sit in a fixed 24- or 32-high row. Keep long content bounded
+and preserve access to actions at minimum size. Layout recipes and special
+optical insets do not justify inventing arbitrary per-window spacing.
+
+## GUI components and style selection
+
+### Actions and choices
+
+| Components style | Control | Current dimensions / role |
+| --- | --- | --- |
+| `klcButton` | Button | 104 x 28, font 14; standard action |
+| `klcButtonDouble` | Button | 216 x 36, font 16; primary action |
+| `klcButtonSec` | Button | 104 x 28; component fill and hairline component border |
+| `klcButtonClose` | Button | Compact shell Close |
+| `KlaCommandLink` | Button | Full width, minimum height 40; arrow, wrapping label and optional description |
+| `klcButtonCommand` | Button | Auto width, height 28, font 12; immediate Command Switch pill |
+| `klcToggleCommand` | ToggleButton | Height 28, font 12; track/thumb plus caption, no hover fill change |
+| `xLinkButton`, `xGhostButton` | Button | 104 x 28; transparent text action / outlined variant |
+| `xRadioButton`, `xSegmentButton` | RadioButton | Exclusive circular choices / 28-high segments |
+| `xxToggle` | ToggleButton | 104 x 28 option for dormant windows |
+| `xxIconButton`, `xxIconTextButton` | Button | 28 x 28 / 128 x 28 dormant icon actions |
+
+Button variants reuse the Foundation button template. Its local resource hooks
+are `klcButtonHoverBrush`, `klcButtonDisabledBrush` and
+`klcButtonBorderShape`; variants may also set border properties. Do not copy
+the control template merely to change a surface or radius.
+
+Text captions go in `Content`, not a nested TextBlock. The template renders
+string content as wrapping, centered AccessText. A tool-supplied caption goes
+through `GUI.window_chrome.access_text` so literal underscores survive. A
+window-owned caption can deliberately declare an access key. Shared default
+captions belong in string resources; an explicit Content value overrides the
+style default.
+
+Fixed action widths are roles, not a promise that every translated caption
+fits. Inspect long/localized captions; small menus use auto-width command pills
+or wrapping command links. Preserve workflow action placement when migrating.
+The primary visual style does not imply `IsDefault=True`.
+
+### Fields, text and collections
+
+| Components style | Control | Current role |
+| --- | --- | --- |
+| `klcTextBox` | TextBox | Standard 24-high input, font 14, default `[ENTER TEXT]` watermark |
+| `klcTextBoxFilter` | TextBox | Same input with `[TYPE TO FILTER]` watermark |
+| `klcTextBoxPrompt` | TextBox | 36-high Text Entry field, font 24 SemiBold, centered |
+| `klcTextBoxReadout` | TextBox | Auto-height read-only wrapping body; transparent, selectable and scrollable |
+| `klcTextBoxReadoutSmall` | TextBox | Read-only wrapping multiline output, font 12, minimum height 64, section padding and muted border |
+| `klcTextBlockHeading`, `klcTextBlockHeadMessage` | TextBlock | 16 SemiBold no-wrap heading / 22 SemiBold severity heading |
+| `klcTextBlockFeedback` | TextBlock | Error-colored validation, polite live announcement, collapsed when Text is empty |
+| `klcTextBlockMuted`, `klcTextBlockMutedDisabled` | TextBlock | Secondary information / disabled-aware variant |
+| `klcLabelCentered`, `klcLabelHeading` | Label | Centered field caption / 16 SemiBold input heading |
+| `KlaComboBox`, `klcComboBoxFilter` | ComboBox | 32-high base alias / 24-high filter, popup maximum 240 |
+| `klcCheckBox`, `KlaCheck` | CheckBox | Shared check style / compatibility alias |
+| `klcCheckBoxSelection` | CheckBox | Selection row label and optional description |
+| `KlaList`, `KlaDialogListItem` | ListBox / ListBoxItem | Checked-list host / row disabled when `CanSelect=False` |
+| `klcBorder`, `xBorderMessage` | Border | Shared field-group surface / component-border variant |
+| `klcExpanderDetails` | Expander | Muted 14-unit Details heading with right/down chevron |
+| `klcLink`, `klcLinkFooter` | Hyperlink | Green help link / bold footer link |
+| `xReadOnlyField`, `xCompactReadOnlyField` | TextBox | Muted read-only field; both currently use 24-high input geometry |
+| `xDataGrid`, `xDataGridStatusCell`, `xDataGridText` | Table parts | Read-only review grid, centered status cell, foreground-aware text |
+| `xStatusChip`, `xStatusWarning`, `xStatusError` | Border | Neutral/warning/error chips; `xStatusText` supplies caption style |
+| `xTableStatusChip`, `xStatusTagChip` | Border | Centered table chip / color selected by Ready, Warning or Blocked Tag |
+| `xSplitter` | GridSplitter | Review divider, minimum size and keyboard increment 4 |
+
+Bare TextBox, ComboBox and CheckBox controls take the shared implicit styles.
+Other controls require explicit styles. Prefer explicit keys in new bodies so
+their role is visible. The grid is read-only; editable tables require a separate
+interaction design. Native ListBoxItem hover/selection remains a blue WPF
+exception; highlighting and checking are distinct states.
+
+### Choosing TextBlock, Label or TextBox
+
+Use TextBlock for headings and display-only information. Use Label with
+`Target` when a caption names one focusable control. Use TextBox for input and
+a read-only TextBox for output the user may need to copy.
+
+A targeted Label supplies the input's accessible name and optional Alt access
+key. Avoid overriding that name on the input unless repeated captions need
+context, such as Rename's Sheet Name find versus Sheet Number find. Group
+headings name several controls and use TextBlock. Icon-only actions and inputs
+without a Label need an explicit accessible name.
+
+```xml
+<Label Content="Prefix:" Target="{Binding ElementName=input_prefix}"
+       Style="{StaticResource klcLabelCentered}"/>
+<TextBox x:Name="input_prefix" Style="{StaticResource klcTextBox}" Tag=""/>
+```
+
+TextBox `Tag` is watermark content. The Foundation template shows it whenever
+Text is empty, including while focused; it is never input data. A local Tag
+overrides the role's default. Do not add a separate watermark TextBlock or an
+extra content-host margin: TextBoxView already applies Padding.
+
+Keep list rows as list items/checks. Putting focusable read-only TextBoxes in
+every row changes click and keyboard behavior. If row copying is needed,
+provide a deliberate Copy interaction; the read-only DataGrid already supports
+native Ctrl+C for selected rows.
+
+### Shared body compositions
+
+`klcRenameRows` places direct named items in 48/200 columns, with 24-high rows
+at indices 0/2/4/6 and 8-unit gaps. `xFilteredCheckList` provides filter,
+prompt, expanding list, secondary content and main action at rows 0/2/4/6/8.
+Its action row is Auto. These ItemsControl layouts preserve direct controls in
+the window's namescope; they do not own workflow validation or selection logic.
+
+The [Options and Review templates](../lib/GUI/_templates/README.md) demonstrate
+rich layouts and fictional controllers. Review separates selected detail from
+checked rows, preserves hidden checks, applies Check All only to visible
+eligible rows and prevents blocked rows from being checked. Form and separate
+Message/Selection templates are retired. Use the actual dialog bodies instead.
 
 ## Icons
 
 ### In-window GUI icons
 
-Use the approved semantic roles in the **[GUI icon catalog](../lib/_icons/gui/README.md)**.
-That catalog owns the complete 22-role key table, from Search and Group to
-Information, Warning, Error and Success. Original SVGs, the pinned revision in
-[source.json](../lib/_icons/gui/source.json), and
-[license notices](../lib/_icons/gui/LICENSE.lucide.txt) stay together.
+The [GUI icon catalog](../lib/_icons/gui/README.md),
+[source manifest](../lib/_icons/gui/source.json), SVGs and
+[Lucide license](../lib/_icons/gui/LICENSE.lucide.txt) preserve provenance.
+The generated dictionary currently contains these 19 semantic geometries:
 
-Ordinary GUI icons render at 16 WPF units (1/96 inch: pixels at 100% Windows
-scaling, 24 pixels at 150%). Every icon is drawn on Lucide's 24-unit grid with a
-2-unit stroke (`klcIconStroke`). Since 2026-11-01 each symbol fills that grid,
-leaving about one unit for the stroke, so an icon's size is its visible size;
-new artwork keeps the same margin rather than Lucide's original whitespace. The
-SVG's own stroke width is not used. Use semantic resources instead of per-window
-file paths or copied geometry.
+| Use | Geometry key |
+| --- | --- |
+| Search / grouping | `kliconSearch`, `kliconGroup` (Layers-2) |
+| Information / warning | `kliconInfoAlert`, `kliconWarnAlert` |
+| Error / success | `kliconErrorAlert` (Octagon Alert), `kliconSuccessAlert` (Check Check) |
+| Details collapsed / expanded | `kliconChevRight`, `kliconChevDown` |
+| Family Studio list / grid / favorite | `kliconList`, `kliconGrid`, `kliconFav` |
+| Dormant filter / regex / clear | `kliconFutureFilterList`, `kliconFutureRegex`, `kliconFutureClearSearch` |
+| Dormant element / view-filter actions | `kliconFutureTags`, `kliconFutureRead`, `kliconFutureFilterFunnel` |
+| Dormant pick / rectangle selection | `kliconFuturePointer`, `kliconFutureRectSelect` |
 
-The Foundation `klcFdnIcon` presenter builds every icon: a Viewbox scales the
-24-unit `KlaIconCanvas` to the presenter's Width and Height. `KlaIconCanvas` is
-the artwork's grid, not a size, and must stay 24 (the generator rejects any SVG
-whose viewBox is not `0 0 24 24`); a different value shifts and rescales every
-icon. Size an icon only by choosing a sized presenter below. The stroke is in
-grid units, so it scales with the icon: 1 pixel at 12, 1.33 at 16, 2 at 24,
-2.67 at 32 and 4 at 48. The 12, 24 and 48 sizes map the grid onto whole pixels.
-
-| Need | Choose | Behavior |
-| --- | --- | --- |
-| Any GUI icon, decorative or inside a button, toggle or stateful control | `klcIcon16` or `klcIcon32` + a `klicon<Role>` resource | The Foundation `klcFdnIcon` presenter with that Width and Height written in the style; inherits foreground and takes `KlaDisabledTextBrush` when disabled. Filter and group icons are `klcIcon16`; the dialog severity icons are `klcIcon32` |
-| Another size | `xxxIcon12`, `xxxIcon24` or `xxxIcon48` | The same presenter at that size; they wait in the xxx tier until a window uses one, and are renamed to its tier then |
-| The unsized alias | `xIcon` | The plain alias of `klcFdnIcon` (16 by default); the tool, future, superseded and compiled windows still use it, new markup names a size |
-
-Do not set Width or Height on an icon in a window; choose the sized presenter.
-Keep any fixed slot (a grid column, a command-link icon column) at least as wide
-as the icon in it.
-
-This presenter is the only way to draw a GUI icon; the generator no longer
-writes fixed-color ImageSources (2026-10-31). Use it inside an action:
-
-```xml
-<Button Style="{StaticResource xxIconButton}"
-        AutomationProperties.Name="Search">
-    <ContentControl Style="{StaticResource klcIcon16}"
-                    Content="{StaticResource kliconSearch}"/>
-</Button>
-```
-
-For an icon/text action, let both children follow the button's foreground:
-
-```xml
-<Button Style="{StaticResource xxIconTextButton}">
-    <StackPanel Orientation="Horizontal">
-        <ContentControl Style="{StaticResource klcIcon16}"
-                        Content="{StaticResource kliconGroup}"/>
-        <TextBlock Text="Sheet Sets" VerticalAlignment="Center"
-                   Margin="{StaticResource klcStackGapHoriz}"
-                   Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
-    </StackPanel>
-</Button>
-```
-
-Avoid a local `Foreground` on the presenter when its disabled style should
-choose the color. Decorative presenters do not take focus or intercept clicks;
-the containing action needs an accessible name. A decorative icon beside a
-field, such as the search mark before a filter box, uses the same presenter and
-takes the surrounding foreground:
+Use a sized Components presenter: `klcIcon12`, `klcIcon16`, `klcIcon24`,
+`klcIcon32` or `klcIcon48`. Shared search/group/Details use 16; severity uses 32.
+`xIcon` remains an unsized compatibility presenter. New markup chooses the
+size style instead of setting Width/Height on each icon.
 
 ```xml
 <ContentControl Style="{StaticResource klcIcon16}"
-                Content="{StaticResource kliconSearch}"
-                VerticalAlignment="Center" AutomationProperties.Name="Search"/>
+                Content="{StaticResource kliconSearch}"/>
 ```
 
-Shared Message uses 32-unit severity icons: Lucide octagon-alert, triangle-alert,
-info and check-check for error, warning, information and success. Its 22-unit
-Segoe UI SemiBold heading (`klcTextBoxMessageHead`) and icon match the outline
-severity colour; the body is a muted 12-unit readout. The Details header is
-14-unit muted text with a 16-unit right/down chevron that reflects collapsed or
-expanded Details, and the details readout is muted too. This exception is local to Message; global semantic icon roles
-remain unchanged. Status chips keep their words
-and borders. Larger Browse, Reset, Copy and Open Folder actions remain text-only.
-An icon does not change the tool's behavior or classification.
+The presenter inherits foreground and uses `klcTextColorDisabled` when disabled.
+Avoid local foreground on stateful action icons unless intentionally overriding
+that behavior. Decorative icons neither take focus nor intercept clicks. Name
+their containing action; let an icon/text action's caption follow its button's
+foreground.
 
-### Generating artwork and the KLCode logo
+Artwork uses a 24-unit canvas (`KlaIconCanvas`) with a 2-unit grid stroke
+(`klcIconStroke`). Stroke scales with presenter size: about 1.33 units at 16,
+2.67 at 32. The owner-adjusted SVG geometry fills this canvas with a small
+stroke margin; the manifest's historical 1.5 source-stroke note is not the
+current WPF pen width. The generator requires a `0 0 24 24` viewBox and simple
+supported SVG elements. Bake transforms and remove editor metadata before
+regeneration.
 
-[generate_gui_icons.py](../scripts/generate_gui_icons.py) generates one file,
-[klIcons.xaml](../lib/GUI/Resources/klIcons.xaml): the geometry-only `klicon<Role>`
-icon resources and the KLCode logo from [klcLogo.svg](../lib/_logos/klcLogo.svg)
-as one self-contained `klcLogo` DataTemplate: both outlines with the SVG's own
-coordinates and its group transform, on a 1024 x 146 canvas (the view box).
+### Logo and generated resources
 
-Edit attributed SVG sources and the generator's role mappings, then run
-`python -B scripts/generate_gui_icons.py`. Use `--check` to detect stale outputs.
-Do not hand-edit generated XAML, and keep XAML formatters (XAML Styler and the
-like) off it: the generator's contract is byte equality, so a formatting pass over
-`klIcons.xaml` fails `--check` and the `gui_icons` tests. When formatting the
-hand-written resources, pass the formatter an explicit file list that leaves the
-generated file out, then run `--check`
-to confirm. `scripts/release_check.py` runs the check.
-The generated `klcLogo` template draws it: an unsized Viewbox that fills the
-header's `klcLogoWidth` x `klcLogoHeight` slot (128 x 18), the SVG's own transform,
-and fills that reference `klcBorderColor` / `klcTextColor` dynamically, since
-`klIcons.xaml` does not load the palette. Resize the logo through the two tokens.
-No runtime SVG renderer is required.
+[generate_gui_icons.py](../scripts/generate_gui_icons.py) emits geometry plus
+the `klcLogo` DataTemplate from [klcLogo.svg](../lib/_logos/klcLogo.svg).
+The logo retains its 1024 x 146 source canvas/transform and uses dynamic green
+and text brushes. The shell sizes it through the 98 x 14 logo tokens. No runtime
+SVG renderer or fixed-color icon ImageSource is required.
+
+Edit source SVGs/mappings, run the generator, and check its output:
+
+```powershell
+python -B scripts/generate_gui_icons.py
+python -B scripts/generate_gui_icons.py --check
+```
+
+Do not hand-edit or run a formatter over generated `klIcons.xaml`; generation
+checks require byte equality. Format handwritten resources with an explicit
+file list that excludes it. Retain attribution when replacing artwork.
 
 ### Ribbon assets
 
-Ribbon artwork uses transparent-background PNGs in [lib/_icons](../lib/_icons/).
-Keep a single foreground color unless the command needs additional detail.
-Lucide's simple outline shapes are the established visual reference; the
-in-window catalog's pinned sources and generation pipeline remain separate
-from ribbon PNG exports.
+Ribbon artwork lives under [lib/_icons/ribbon](../lib/_icons/ribbon/), with
+transparent exports in `png/` and editable sources in `svg/`.
+Use a single foreground color unless more detail is necessary. Reusable names
+follow `<icon-name>_<size>px_<color>.png`; suffixes are `orange` (`#FF8000`),
+`green` (`#33714F`), `light` (`#E5E4E2`) and `dark` (`#1A252B`). Export sizes
+are 16, 24 and 32 pixels for controls, with additional 96-pixel PNG exports.
+Existing editable SVG sources use 128-pixel names. New DevSandbox prototypes start with
+[drill_32px_orange.png](../lib/_icons/ribbon/png/drill_32px_orange.png).
+Preserve established bundle icon metadata and source assets.
 
-Name reusable PNG assets `<icon-name>_<size>px_<color>.png`, for example
-`drill_32px_orange.png`.
+## Reusable dialogs
 
-| Filename suffix | Brand color | Hex |
+### Direct API and results
+
+`GUI.dialogs` imports without WPF or Revit. Factories lazily construct unshown
+bare WPF windows; modal helpers call ShowDialog and return `DialogResult`.
+Use the host UI thread. Supply caller title/version and a shown WPF owner or
+native handle. Direct factories do not infer Revit ownership or an active model.
+
+| Family | Factory | Modal helper / accepted result |
 | --- | --- | --- |
-| `_orange.png` | KLOrange | `#FF8000` |
-| `_green.png` | KLGreen | `#33714F` |
-| `_light.png` | KLWhite | `#E5E4E2` |
-| `_dark.png` | KLCharcoal | `#1A252B` |
+| Message | `create_message` | `show_message`: action `ok`, value None |
+| Selection | `create_selection`, `create_list_single`, `create_list_multiple` | `select_items`, `select_one`, `select_many`: action `accept`, original payload or list |
+| Sheet/revision/document selection | `create_sheet_selector`, `create_revision_selector`, `create_document_selector` | `select_sheets`, `select_revisions`, `select_open_documents`: collect read-only rows, then select |
+| Text Entry | `create_text_prompt` | `ask_text`: action `accept`, raw text |
+| Action Choice | `create_choice` | `choose_action`: action/key/checkbox snapshot |
+| Command Switch | `create_command_switch` | `command_switch`: action `accept`, command key and switch states |
+| Rename | `create_rename` | `rename`: action `accept`, rename rules or case request |
 
-| Export size | Intended use |
-| --- | --- |
-| 16 x 16 px | Small/stacked ribbon controls |
-| 24 x 24 px | Medium controls |
-| 32 x 32 px | Normal command icons |
-| 96 x 96 px | Reusable source/export maximum |
+Inspect `result.action` and `result.value` explicitly. Accepted blank text,
+empty optional selection and a selected None payload can be valid outcomes.
+Ordinary unaccepted closure returns `cancel` with None. Action Choice preserves
+distinct `accept`, `cancel` and `close` outcomes; `is_cancelled` covers its last
+two outcomes. No direct API exits the script, runs commands, persists settings
+or changes a model.
 
-New DevSandbox prototypes start with
-[drill_32px_orange.png](../lib/_icons/drill_32px_orange.png). Keep prototype-only
-exceptions local to the bundle until promotion. Preserve the established
-pyRevit bundle layout and icon metadata; a GUI migration does not authorize a
-ribbon redesign or replacement of source assets.
+```python
+from GUI.dialogs import SelectionItem, select_many
 
-## GUI components and style selection
-
-[KLCodeComponents.xaml](../lib/GUI/Resources/KLCodeComponents.xaml) is the shared
-loader entry point. The following keys are available to both Python and compiled
-windows; compiled consumers can also use their existing adapter aliases.
-
-### Actions and choices
-
-| Style | Control | Dimensions | Use |
-| --- | --- | --- | --- |
-| `klcButton` | Button | 104 x 28 | Standard action |
-| `klcButtonDouble` | Button | 216 x 36 | Main action; font size 16. Its grid row is `Auto`, never a fixed 32 |
-| `klcButtonSec` | Button | 104 x 28 | Secondary action on component surface |
-| `xLinkButton` | Button | 104 x 28 | Text action, transparent at rest; Favorites/Recent/Clear Filters |
-| `xGhostButton` | Button | 104 x 28 | Outlined secondary action. Shared dialogs give Cancel the standard `klcButton` |
-| `xxIconTextButton` | Button | 128 x 28 | Approved icon plus caption |
-| `xxIconButton` | Button | 28 x 28 | Icon-only action with an accessible name |
-| `klcCloseButton` | Button | 48 x 16 | Header Close; the shell supplies it, with the `CloseLabel` caption as its default |
-| `xRadioButton` | RadioButton | Minimum height 28 | Exclusive choices with circular indicators |
-| `xSegmentButton` | RadioButton | Height 28; width fits content | Exclusive toolbar segments inside a bordered group |
-| `xxToggle` | ToggleButton | 104 x 28 | Persistent on/off option |
-| `KlaCommandLink` | Button | Full width, minimum height 40 | TaskDialog-style command link: arrow, 16 SemiBold label, optional description; Action Choice |
-| `KlaDetailsExpander` | Expander | 14-unit muted header; content 4 below | Details disclosure with a 16 right/down chevron in the Expander's muted foreground; its content is a `KlaDetailsReadout`. Message and Action Choice apply both bare |
-
-`klcButton`, `klcButtonDouble` and `klcButtonSec` are the button keys windows use; `klcFdnButton` is the Foundation base behind them.
-Every button variant, `xxToggle` included, inherits the `klcFdnButton`
-template. A variant changes its hover fill, disabled fill or corner radius
-by re-pointing `klcButtonHoverBrush`, `klcButtonDisabledBrush` or
-`klcRadButton` in its own `Style.Resources`, and its border through the
-`BorderBrush` and `BorderThickness` setters; never by copying the template.
-**Button captions.** A caption is the button's `Content`, never a TextBlock the
-window places inside it. The `klcFdnButton` template draws a text caption as
-AccessText that wraps and centres, so every variant lays text out the same way;
-icon content (a StackPanel with a sized icon presenter) is drawn as given. Three sources:
-
-- A caption every window shares is a string resource the style sets as its
-  default, as `klcCloseButton` does: `<Setter Property="Content" Value="{DynamicResource CloseLabel}"/>`.
-  A value set on the button, `Content="…"` in XAML or `button.Content = …` in
-  code, replaces the default; `ClearValue(ContentControl.ContentProperty)`
-  restores it. A style's default caption is text only; an element cannot be
-  shared between buttons.
-- A caption one window owns is literal in its XAML (`Content="Select All"`).
-- A caption the tool supplies is set in code through `GUI.window_chrome.access_text`,
-  which escapes `_` as `__`; AccessText otherwise reads `_` as an Alt shortcut and hides it.
-  A tool caption can be any length, so give it a style with automatic width and
-  wrapping (`KlaCommandButton`, `KlaCommandLink`) rather than a fixed 104-wide role.
-
-The caption is also the button's accessible name; set
-`AutomationProperties.Name` only when the caption alone is unclear.
-
-Preserve workflow action placement when migrating a window. If a localized
-caption cannot fit its role, review a shared variant and render it; do not
-silently shrink fonts or invent a per-window button size.
-
-### Fields, text and collections
-
-| Style | Control | Use |
-| --- | --- | --- |
-| `KlaInput` | TextBox | Standard 32-high input |
-| `KlaCompactFieldInput` | TextBox | Compact 24-high form input |
-| `klcTextBoxPrompt` | TextBox | 36-high input, FontSize 24, centered Segoe UI Bold; opt-in Text prompt only |
-| `klcTextBoxFilter` | TextBox | 24-high search/filter; font size 14; the `Type to filter` watermark by default |
-| `klaReadout` | TextBox | Tool output the user may copy, drawn like body text: read-only, transparent, wrapped, scrolls when bounded, Ctrl+C and right-click Copy; the Message body |
-| `xReadOnlyField` / `xCompactReadOnlyField` | TextBox | Read-only field, standard 32 or compact 24 high |
-| `KlaMultilineReadout` | TextBox | Wrapped read-only output, minimum height 64, bounded by the caller with scrolling |
-| `KlaDetailsReadout` | TextBox | `KlaMultilineReadout` at the 128 details height, muted, 4 below the header, text aligned with the dialog body; the content of every `KlaDetailsExpander` |
-| `KlaComboBox` / `klcComboBoxFilter` | ComboBox | Standard 32 or compact 24 high; minimum width 104; popup maximum height 260 |
-| `xxxLabel` / `klcLabelCentered` | Label | Ordinary field caption (the plain alias) / vertically centered compact field caption |
-| `klcLabelSectionHeading` | Label | 16-unit, normal-weight prompt that names one input |
-| `klaSectionHeading` / `klaPromptText` | TextBlock | Wrapped 16-unit SemiBold heading / the same at normal weight, for section headings |
-| `klcTextBoxMessageHead` | TextBlock | The 22-unit SemiBold severity heading beside a `klcIcon32`; the window colours it |
-| `klcTextBoxFeedback` | TextBlock | The validation line: error colour, announced politely, collapsed while its Text is empty; code sets only Text |
-| `xText` | TextBlock | Plain body text (the TextBlock alias) |
-| `KlaInfoText` | TextBlock | Muted wrapped information |
-| `KlaCheck` | CheckBox | Checked/unchecked/indeterminate indicator with wrapped caption |
-| `KlaList` / `KlaListItem` | ListBox / ListBoxItem | Checked-list host and native WPF row behavior |
-| `xDataGrid` | DataGrid | Shared read-only review table with shared header, row and cell styles |
-| `xDataGridStatusCell` | DataGridCell | Centered status content |
-| `KlaSection` / `KlaBanner` | Border | Bordered field group / information banner |
-| `xStatusChip`, `xStatusWarning`, `xStatusError` | Border | Neutral/warning/error chip; use `xStatusText` for its caption. `xxxStatusReady` waits for a consumer |
-| `xTableStatusChip` / `xStatusTagChip` | Border | A chip centred in a table cell / the same coloured by its `Tag` (Ready, Warning, Blocked) |
-| `xSplitter` | GridSplitter | Review-pane divider; minimum size and keyboard increment 4 |
-| `klcLink` / `klcLinkFooter` | Hyperlink | Footer-like link styling / the bold green shell footer link; the caller/adapter owns navigation |
-
-A bare TextBox or ComboBox takes the compact 24-high implicit style. A bare
-CheckBox takes the shared checkbox style. Other controls require an explicit
-style. Prefer explicit keys in new bodies so the intended role is visible.
-The named `xDataGrid` is read-only; an editable table needs a deliberate
-workflow design rather than an assumption that this style supplies editing.
-
-### Choosing TextBlock, Label or TextBox
-
-Choose the control by what the text does, not by who supplies it; the window's
-XAML and the tool's code can fill any of them.
-
-| Role | Control | Use for |
-| --- | --- | --- |
-| Display text | TextBlock | Headings, titles, section headings, prompts that name no single input, information lines and the validation line (`klcTextBoxFeedback`). The shell's title and version are TextBlocks bound to `Tag.Title` / `Tag.VersionText` |
-| Field caption | Label | Text that names exactly one focusable input, through `Target` |
-| User input | TextBox | Anything the user types |
-| Tool output | Read-only TextBox (`klaReadout`, `KlaMultilineReadout`, `KlaDetailsReadout`) | Text the user may copy: a message body, details, a path, a report |
-
-A TextBlock cannot be selected or copied; when the user may want the text, it is a readout.
-Button captions follow the button rules above.
-
-**Labels.** A Label is a caption tied to its `Target`: screen readers name the
-input by the Label's text, and an underscore in the caption (`_Find`) becomes the
-Alt shortcut that focuses it. Use one only when the text names one focusable
-input; a heading over a group, or a prompt whose input already has its own field
-caption, is a TextBlock (`klaPromptText`). Rules:
-
-- The Label is the input's name: do not also set `AutomationProperties.Name` on
-  the target, which would override it. Keep an explicit name only when the visible
-  caption is ambiguous on its own, such as Rename's repeated Find / Replace captions,
-  which are named per field ("Sheet Name find").
-- `klcFdnLabel` draws its caption as wrapping AccessText with no padding, so a
-  Label's content is text only.
-- A caption over a group of radio buttons names no single input, so it is text
-  (`xText` in a field column, `klaPromptText` over a section), as the Options
-  template's Scope shows.
-- A caption the tool supplies goes through `GUI.window_chrome.access_text`, as
-  for buttons.
-
-**Lists and tables.** List rows stay CheckBoxes and list items; a TextBox inside a
-row takes the click, focus and Tab stop, so checking, selecting and arrow keys stop
-working. A list whose rows the user may copy gets a Copy command instead: Ctrl+C
-and a right-click Copy that copy the selected rows. `xDataGrid` copies its selected
-rows with Ctrl+C natively.
-
-**Placeholder text.** A TextBox's watermark lives in the Foundation input
-template, not in a separate TextBlock. Its text is the TextBox's `Tag`; it shows
-while the box is empty, focused or not, in `klcTextColorWaterMark`, and in the
-box's own font, size, weight, padding and alignment, so it sits where typed text
-starts and follows any font a component sets. Without a `Tag` nothing shows. A
-component may give one with a `Tag` setter, and a window that sets `Tag`
-replaces it. `Tag` on a TextBox is reserved for this.
-
-```xml
-<TextBox x:Name="search_text" Style="{StaticResource KlaCompactFieldInput}" Tag="Type to filter"/>
+rows = [SelectionItem('first', 'Typical Detail', first_payload),
+        SelectionItem('second', 'Typical Detail', second_payload)]
+result = select_many(__title__, rows, version=__version__, owner=owner_handle)
+if result.action == 'accept':
+    selected_payloads = result.value
 ```
 
-`klcTextBoxFilter` carries `Type to filter` itself, so a filter row needs no Tag;
-Selection's search takes it from the style. Text Entry supplies `[ENTER TEXT]`
-and Command Switch, whose search is a compact input, supplies `Type to filter`.
+### Family behavior
 
-For a labeled compact field, the Label names its input:
+**Message** is an OK-only severity notice with optional collapsed Details.
+The body and details are selectable read-only text. The initial width is 432,
+minimum height 240 and maximum height 640. It fits initial content; subsequent
+width changes preserve manual height. Details growth is measured after the
+template transition and reversed on collapse, protecting content until capped.
 
-```xml
-<Label Content="Prefix:" Target="{Binding ElementName=input_prefix}"
-       Style="{StaticResource klcLabelCentered}"/>
-<TextBox x:Name="input_prefix" Style="{StaticResource KlaCompactFieldInput}"/>
-```
+**Selection** uses stable unique keys, allows duplicate labels, clones check
+state and retains original payload identity and order. Search matches labels
+and descriptions; group and search filters intersect. Hidden checks survive;
+All/None affects visible eligible rows only. Single mode enforces exclusive
+checking and hides batch actions. Highlighting is not checking. Generic rows
+start unchecked unless explicitly supplied otherwise. Select is explicit;
+list/filter Enter and double-click do not accept. Search and optional Group
+are 24 high, preceded by 16-unit icons. Width starts at 432 and is bounded
+432–512; height is bounded 420–620 in current XAML. Do not assume the retired
+template's fixed 576 initial height.
 
-These two elements belong in the caller's layout; the full naming composition
-below supplies their aligned columns and rows.
+Read-only [collectors](../lib/GUI/dialogs/collectors.py) run in valid Revit API
+context before the dialog opens. Direct sheet collection excludes placeholders
+by default and groups saved sheet sets over shared row identities. Revisions
+include issued and unissued rows unless filtered. Document collection excludes
+linked and active documents by default and requires an explicit active-document
+argument unless active inclusion is requested. Prepared-data factories do no
+model query. Callers own document lifetime and later operations.
 
-### Shared body compositions
+**Text Entry** has a 432-wide content-fitting layout with a 36-high, 24-unit
+SemiBold input. `[ENTER TEXT]` is a watermark, never returned input. Its prompt
+is the input's accessible name; neither prompt nor center title is visible.
+OK validates required/optional caller rules and returns raw text. Editing clears
+feedback; validators return an error string or None. Programming exceptions
+propagate. Current rows use 4-unit spacers around validation/action content.
 
-`KlaFieldRows` and `xFilteredCheckList` are fixed layout recipes implemented
-as ItemsControl styles with Grid ItemsPanels. Their direct items remain the
-window's named controls. Keep event handlers, bindings and item templates in
-the window body; placing them inside a new ControlTemplate would change their
-namescope and controller access.
+**Action Choice** presents up to four immediate command links, optional body,
+severity, Details, checkbox and help, plus selected standard buttons. Width
+starts at 420 with minimum 248; height fits up to 640. Empty optional sections
+reserve no content. Standard buttons are OK, Yes, No, Retry, Cancel and Close.
+Default focus follows the configured action with enabled-action fallback;
+unknown defaults fail at construction. Enter activates actions. The current
+controller leaves Space to WPF, so it activates focused buttons and toggles
+the checkbox or Details toggle. Values are snapshots with `kind`, `key` and `checked`.
+No is an accepted button result, not cancellation. An explicit Cancel always
+permits dismissal. With cancellation disabled, chrome Close is hidden and
+Escape/Alt+F4 are blocked; code/owner/system closure still returns `close`.
 
-| Composition | Direct-item placement | Existing uses |
-| --- | --- | --- |
-| `KlaFieldRows` | Labels in column 0, inputs in column 1; four rows at 0/2/4/6, separated by 8-unit gaps | Duplicate Sheets, KLC-Rename and the superseded Find/Replace windows |
-| `xFilteredCheckList` | Filter 0, prompt 2, expanding list 4, secondary content 6, main action 8 (`Auto`, so the 36-high main button fits) | Steel PSF, Create From Rooms and the superseded SelectFromDict |
+**Command Switch** is a floating panel starting at width 480, with maximum
+width 752 in XAML. Commands are immediate wrapping pills; optional toggle
+pills remain visible during filtering. It has no corner Close, Continue action,
+navigation footer or status line. Typing enters search; Escape clears search
+before cancelling. Outside click/deactivation cancels, including over the
+disabled modal owner. A drag past the system threshold moves the panel without
+activating a control. Blank clicks inside stay open. Context-menu capture is
+handled separately. Its controller fits content height; the current body has
+no scrolling wrapper or finite MaxHeight declaration, so do not promise the
+older 500-unit scroll cap. Result value is `{'command': key, 'switches': {...}}`.
 
-Naming columns are 60/240; each field row is 24 high. Wrap the naming group in
-`KlaSection` for its 12-unit inset. Secondary checklist content may contain
-several action/settings rows, as Steel PSF does. These recipes share layout,
-not selection, filtering, validation or confirmation behavior.
+**Rename** accepts one or two `RenameField` groups. `view_fields()` supplies
+View Name; `sheet_fields()` supplies Sheet Number and Sheet Name. The layout
+fits visible groups using `klcRenameRows`. At most one field supports the
+shared Uppercase/Lowercase pair. Rename returns an operation plus entered rules;
+case actions return `upper` or `lower` and a field key. An entirely blank rule
+request remains open with inline feedback. The dialog does no preview or model
+mutation. Find/Replace controllers own transactions and safe retry afterward.
 
-The [two reference templates](../lib/GUI/_templates/README.md) provide Options
-and Review examples. Form is retired. For selection and message composition, use the
-actual shared [Selection](../lib/GUI/dialogs/SelectionDialog.xaml) and
-[Message](../lib/GUI/dialogs/MessageDialog.xaml) bodies with their
-[API guide](../lib/GUI/dialogs/README.md). The separate Selection/Message
-templates were retired; use Gallery's fictional shared-dialog states to inspect
-their current implementations without invoking production operations.
+### Tool-facing compatibility boundaries
 
-## Window geometry and spacing
+Use the direct API for a new workflow that can inspect explicit results. Existing
+tools use these adapters to preserve their established calling contracts:
 
-All WPF dimensions below are device-independent units. Ribbon export sizes are
-pixels. Tool-specific window bounds and minimum sizes belong to the window;
-repeated control dimensions belong to shared roles/tokens.
-
-| Part | Rule / resource |
+| Adapter | Contract that differs from the direct API |
 | --- | --- |
-| Window | Segoe UI 12; charcoal background; borderless transparent style |
-| Header/footer | Each 24 high, `klcChromeHeight` |
-| Header layers | The logo is fixed left and Close fixed right at the `klcHeadFootMargin` inset; the title spans the band with 110-unit side margins so it truncates before reaching them |
-| Header artwork/title | 98 x 14 `klcLogo` (`klcLogoWidth` / `klcLogoHeight`); centred 16-unit title (`klcHeaderTitleFontSize`), ellipsis without tooltip |
-| Header Close | 48 x 16 `klcCloseButton`, font size 12; the caption centres in layout |
-| Footer layers | The Prototype link fixed left and Outreach fixed right; the version spans the band with the same 110-unit side margins |
-| Footer content | Prototype/Outreach links green (`klcFooterLinkColor`), caller's pure version gray (`klcFooterVersionColor`); links turn white on hover/focus |
-| Body inset | 16 left, top and right, 8 above the footer: `klcBodyMargin` is `16,16,16,8` |
-| Typography | Body 12 (`klcFontSizeBody`); buttons 14 (`klcButtonFontSize`); title, section headings, prompts and the main action 16; severity heading 22; Text Entry field 24. Constant labels use Title Case |
-| Corners/borders | Buttons, sections and lists 8 (`klcRadButton`), inputs 8 (`klcRadTextBox`), command pills 12, floating panel 16, chips 4, check boxes 2; hairline 1 |
-| Checkbox list | Ordinary single-line rows measure 20 high with a 4-unit box/text gap; long captions wrap |
-| List selection | Native WPF ListBoxItem template retains its blue hover/selection; it is an intentional current exception to the green table styling |
-| Scrollbars | Shared vertical/horizontal templates; `KlaList` keeps its vertical bar visible, while `xDataGrid` and standalone Recall use Auto where specified |
-| Grid spacing | Header padding 8,6 (`xHeaderCellInset`); cell padding 8,4 (`KlaCompactInset`) |
+| `GUI.tool_dialogs.alert` | OK-only notices use Message; multi-button prompts use Action Choice. Returns a Boolean; OK/Yes/Retry are positive. `exitscript` preserves the legacy exit policy |
+| `GUI.tool_dialogs.choose` | Returns original action text or None. An explicit Cancel menu row becomes the Cancel button |
+| `GUI.tool_dialogs.ask_text` | Returns accepted text, including `''`, or None on cancel |
+| `GUI.tool_selectors` | Requires explicit documents/application where relevant; returns original objects or lists, with None on cancel. Defaults ownership lazily to Revit |
+| `GUI.forms.select_from_dict` | Delegates through `selection_compat`; returns a list even in single mode, and `[]` on cancel/empty acceptance |
 
-The [current Python footer render](knowledge/reviews/design-system/2026-10-29-footer-color-evidence/selection.png)
-and [compiled footer render](knowledge/reviews/design-system/2026-10-29-footer-color-evidence/compiled-source-picker.png)
-show the owner-requested original green links and gray version text.
+`selection_compat` sorts truthy keys, deduplicates list inputs, preserves caller
+captions and checks the first row when `initial_checked_names=None`. An explicit
+empty initial collection checks none. This first-row default does not apply to
+the direct Selection API. Its current signature has no owner argument and does
+not supply one to the factory; do not infer Revit ownership from other adapters.
 
-Use `klcWindow` for the window, or
-`klcWindowFloating` for a frameless floating panel with a transparent window
-and no taskbar entry, and
-`klcWindowShell` for the named `window_shell` ContentControl. The shell supplies
-the header/footer and body inset. Do not copy chrome into a new body.
-The foundation defaults to NoResize; a resizable borderless window explicitly
-uses `ResizeMode="CanResizeWithGrip"` and needs minimum-size/overflow review.
-
-### Typed spacing resources
-
-The spacing scale is 4 / 8 / 12 / 16 / 24. That scale does not imply a
-`KlaGridSpace` resource exists for every value. WPF rows/columns, margins and
-control sizes require different resource types.
-
-| Resource | Type | Value / use |
-| --- | --- | --- |
-| `klcBodySpaceSmall`, `klcBodySpaceNormal`, `klcBodySpaceLarge` | GridLength | Spacer rows/columns: 4, 8 and 12 |
-| `klcChromeHeight`, `klaBodyRowNormal`, `xCompactRow` | GridLength | Rows of 24 (chrome band), 24 (compact naming row) and 28. A row holding the 36-high main button is `Auto` |
-| `KlaCompactFieldLabelColumn`, `KlaCompactFieldInputColumn` | GridLength | Naming columns, 60 and 240 |
-| `klcStackGapHoriz` | Thickness | `8,0,0,0`, on the second of two related horizontal controls |
-| `klcBodyMargin` | Thickness | `16,16,16,8`, shell body padding |
-| `KlaSectionPadding` | Thickness | 12, field-group inset |
-| `KlaCompactInset` | Thickness | `8,4`, compact component/cell padding |
-| `KlaTextBoxPadding`, `klcPadTextBoxInput` | Thickness | `8,0,0,4`, TextBox text padding; the Foundation TextBox uses `klcPadTextBoxInput` |
-| `KlaActionTopGap` | Thickness | `0,8,0,0`, the content-to-action gap where the action sits in a StackPanel (Rename) |
-| `klcStackGapVert`, `xKlaStackGapBelow` | Thickness | `0,8,0,0` and `0,0,0,8`, on a stacked part that can collapse (Action Choice's optional sections, the details readout, a validation line) |
-| `KlaIconTextGap` | Thickness | `0,0,4,0`, chevron or small icon before its text |
-| `KlaOpticalTextInset` | Thickness | `0,0,0,2`, deliberate optical lift for large text beside an input |
-| `KlaMarginFloatingWindow`, `klcRadFloating` | Thickness, CornerRadius | 16 and 16, the floating panel's transparent margin and corners |
-| `KlaCommandLinkPadding`, `KlaCommandArrowInset`, `KlaCommandLinkIconColumn` | Thickness, Thickness, GridLength | 8, `0,4,8,0` and 24 inside a command link |
-| `KlaDetailsReadoutPadding` | Thickness | `10,8`, body-aligned readout text |
-| `klcMessageHeaderFontSize`, `klcWindowPromptFontSize` | Double | 22 and 16: severity heading, command link and switch prompt |
-| `KlaDetailsHeight`, `KlaOptionMaxHeight`, `KlaCommandLinkMinHeight` | Double | 128 (`KlaDetailsReadout`), 80 and 40 |
-| `KlaControlHeight`, `klcButtonHeight`, `KlaCompactFieldHeight` | Double | Control heights of 32, 28 and 24 |
-
-`KlaGridSpace12` and `KlaGridSpace24` are not currently defined. If a new shared
-layout needs one, add a correctly typed token and verify its consumers. Do not
-pass a Thickness to a RowDefinition or assume a Double resource substitutes for
-a GridLength. Keep Foundation and Components free of numeric layout literals
-(`check_ui_scale.STRICT`); the sized `Icon<size>` styles are the one allowed
-exception, and the shell's 110-unit title and version margins are a known
-literal the strict test still reports. The shared dialog bodies use tokens for
-everything but their window sizes; consumer Margin/Padding drift is reported
-separately by the scale checker. Changing a token still needs review against
-these design rules, even when all controls continue to match the token.
-
-## Architecture and resource ownership
-
-XAML resources define values, appearance and reusable layout. Python/C# adapters
-load the resources and connect common chrome. Each tool owns its data, workflow,
-showing/dismissal semantics and Revit operations.
-
-| Source | Responsibility / dependencies |
-| --- | --- |
-| [Tokens](../lib/GUI/Resources/KLCodeTokens.xaml) | Every shared value: brand palette, state and component brushes, typed dimensions/fonts/insets/radii, and the chrome data (footer URIs and default English labels) |
-| [Generated GUI geometry](../lib/GUI/Resources/klIcons.xaml) | Generated leaf: icon geometry and the self-contained `klcLogo` template; defines no brushes |
-| [Foundation](../lib/GUI/Resources/KLCodeFoundation.xaml) | Merges Tokens and the generated geometry; one base style per control family (button, label, input, combo box, check box, radio button, switch, list, border, text, expander, data grid, splitter, link, window), the scrollbars and the icon presenter. Windows never use these keys; new bases take the `klaFoundation` prefix |
-| [Components](../lib/GUI/Resources/KLCodeComponents.xaml) | Merges Foundation; gives every Foundation base at least one alias that changes nothing (`klcButton`, `KlaInput`, `KlaComboBox`, `xIcon`, `klcWindow` and so on), plus the variants, the window shell, the Command Switch pills and implicit-style policy. Every window loads this file and uses only its keys |
-| [Compiled controls](../src/KLCode.Wpf/Resources/KLCodeControls.xaml) | Merges Components and supplies existing C# style names through BasedOn |
-| Window body XAML | Named controls, bindings, events and tool-specific arrangement |
-| Host/tool controller | Ownership, workflow, validation, lifetime and model/application actions |
-
-KLCodeTokens owns every concrete brand, state and component color. Foundation
-and Components reference those brushes; templates also use Transparent
-for intentionally empty fills/borders. Generated geometry supplies artwork.
-The resource graph follows the dependencies above, rather than a rule that each
-file merges the immediately preceding row. Compiled projects link the canonical
-files as WPF Pages; they do not copy them into a separate theme implementation.
-
-### Key prefixes mark reach
-
-A key keeps its `Kla` / `klc` name while a shared dialog in `lib/GUI/dialogs`
-uses it, directly or through a style. Keys that only other windows use (tool
-windows, templates, the Gallery, compiled C# hosts) replace the prefix with
-`x` (`xDataGrid`, `xStatusChip`); keys only `lib/GUI/_future` uses take `xx`
-(`xxToggle`, `xxIconButton`); keys with no consumer at all take `xxx` and are
-deletion candidates. Tokens and Components list the shared tier first, grouped
-by kind or control family, then the `x`, `xx` and `xxx` tiers. The generated
-`klIcons.xaml` keeps `klicon<Role>` names; its `Future` role prefix is the `xx`
-mark there. When a shared dialog adopts a prefixed key, rename it back.
+Tool sheet selection includes placeholders by its legacy default and keeps
+sheet-number ordering. Revision filtering remains caller-owned. View selection
+can offer the existing current-selection confirmation before opening the full
+list. These defaults must not be copied indiscriminately to direct collectors.
+No upstream pyRevit module is patched.
 
 ## Host and keyboard contracts
 
 ### Python and pyRevit
 
-[load_window](../lib/GUI/window_chrome.py) accepts
-`(window, xaml_path, title, version=None, navigate=None, close_handler=None)`.
-It merges Components before loading body XAML. It uses the window's callable
-`load_xaml` when present, otherwise `wpf.LoadComponent`. It does not show the
-window, replace its DataContext or perform a model operation.
+`load_window(window, xaml_path, title, version=None, navigate=None,
+close_handler=None)` merges Components before loading the body. It calls the
+window's `load_xaml` if present, otherwise `wpf.LoadComponent`. It attaches
+chrome without showing the window or replacing DataContext.
 
-The resource cache belongs to the loaded Python module/engine; do not assume
-all pyRevit engines in a Revit process share one instance. Within that module,
-windows merge the same dictionary instance. Treat shared resources as shared
-presentation, and keep tool-specific data/strings in the window's own scope.
+Pass the command's `__title__` and pure `__version__` (for example `v1.3`).
+Missing/invalid version metadata leaves the version field empty; no extension
+version is inferred. `WindowMetadata` and its shared
+[test vectors](../lib/GUI/window_metadata_vectors.json) own formatting.
 
-Supply the caller's `__title__` and pure `__version__`, such as `v1.3`. A missing
-or invalid version leaves the center footer empty. The loader does not infer
-the extension version. [WindowMetadata](../lib/GUI/window_metadata.py) carries
-identity only; [shared test vectors](../lib/GUI/window_metadata_vectors.json)
-cover its formatting rules in both languages. The shell reserves its Tag for
-this metadata; body Content/DataContext remain caller-owned.
+Header Close calls the supplied handler or `window.Close()`. Escape follows
+that policy unless a dialog replaces the route. Header drag calls DragMove.
+Footer navigation uses the OS unless `navigate(uri)` is supplied; Gallery
+simulates it. `fit_window_height` measures within the caller's MinHeight and
+MaxHeight. `window._kla_chrome.hide_footer()` collapses only that instance's
+footer and row.
 
-Close calls the optional caller close handler or `window.Close()`. Header drag
-and footer navigation are connected by the adapter. A Gallery presenter passes
-`navigate(uri)` to simulate navigation; an ordinary caller uses OS navigation.
-`fit_window_height(window)` is an optional measurement helper: it clamps the
-content height to the caller's MinHeight/MaxHeight and does not show the window.
-`window._kla_chrome.hide_footer()` collapses that shell instance's footer and
-its row. Message, Text, Action Choice and the superseded Custom Alert use it;
-the reference templates and the tool windows retain their footers.
+Retained `pyrevit.forms.WPFWindow` subclasses have an additional boundary:
+`load_window` invokes the host loader without overriding its Escape/ownership
+defaults. The pyRevit Escape handler can close the window before a custom
+Close policy runs. Shared dialogs use bare WPF Window classes and do not inherit
+that competing handler. Check installed pyRevit behavior and the actual host
+when working on retained custom windows; local handler simulation is not host
+acceptance.
 
-Installed pyRevit `6.5.3.26176+2017` exposes
-`load_xaml(self, xaml_source, literal_string=False, handle_esc=True, set_owner=True)`.
-The current adapter's positional call retains host initialization and ownership,
-and also retains pyRevit's Escape handler. This is a known boundary: the host
-handler can close a WPFWindow before the shared adapter's caller close policy
-runs. A simulated installed-handler order reproduced that sequence. Do not
-claim identical custom-cancel behavior across bare WPF and pyRevit subclasses
-until the adapter contract is corrected and checked in the host.
+### Compiled WPF windows
 
-### Compiled WPF
+[ThemeBootstrapper.Apply](../src/KLCode.Wpf/ThemeBootstrapper.cs) loads shared
+controls then common locale strings before InitializeComponent. ApplyToolStrings
+adds the tool dictionary afterward. [WindowChrome.Attach](../src/KLCode.Wpf/WindowChrome.cs)
+binds the shell to caller identity and optional close policy. Compiled projects
+link canonical shared XAML as WPF Pages; controllers retain their own services,
+DataContext and modal/modeless lifetime.
 
-[ThemeBootstrapper.Apply](../src/KLCode.Wpf/ThemeBootstrapper.cs) merges shared
-controls followed by common locale strings before InitializeComponent.
-Tool-specific strings are merged through ApplyToolStrings.
-[WindowChrome.Attach](../src/KLCode.Wpf/WindowChrome.cs) connects the named shell
-parts with the caller's title/version and optional close callback. The C#
-controller retains its DataContext, model services and modal/modeless lifetime.
+The common locale catalog currently falls back to English. The shell's Close
+caption is a DynamicResource; Prototype and Outreach captions are currently
+literal Runs in the shared shell. Do not promise locale-dictionary overrides
+for those two captions or translations for every tool based on dormant Recall
+locale files.
 
-The shell reads Close/Prototype/Outreach labels through DynamicResource; a later
-locale dictionary can override them. The common adapter currently ships English
-as its available fallback. Recall's English/German/Korean body-caption checks
-do not establish those translations for every tool. Footer destinations are
-typed Uri resources in Chrome data. Packaged add-ins must be rebuilt for their
-target runtime to consume changed linked XAML; source smoke tests do not update
-the deployed DLLs.
+Shared source adoption does not replace deployed plugin DLLs. Rebuild and verify
+the matching target/host to consume linked-resource changes. Desktop smoke tests
+with fake ports establish source construction, not deployed Revit behavior.
 
 ### Keyboard and accessibility
 
-| Interaction | Contract and current boundary |
-| --- | --- |
-| Tab | Body is declared before chrome to support body-first traversal, then Close and footer links. Initial focus and complete traversal still need live-host acceptance. |
-| Enter | Explicit `IsDefault="True"` identifies a default action. The visual primary style does not set it. Find/Replace uses shared Rename's explicit field/default action handling; Steel PSF retains its existing boundary. |
-| Escape | Shared adapters request the Close policy. Python WPFWindow subclasses also retain the host handler described above. |
-| Cancel | Use an explicit caller cancellation policy; `IsCancel="True"` is a WPF dialog setting, not a substitute for validating modeless/custom-close behavior. |
-| Focus | Buttons/checks/radios/toggles explicitly set FocusVisualStyle to null: no green frame, white underline or focus-square override around the control/checkbox label. They remain keyboard operable. Inputs/dropdowns retain field-focus outlines; footer focus changes color without reflow. |
-| Disabled body | Disable the body so header Close remains usable. Use semantic disabled brushes; verify both text and interactive icons. |
-| Names and labels | An input named by a Label (`Target`) takes its name from it and sets no `AutomationProperties.Name`; an input with no Label, and any action whose caption is unclear, gets one. Name the containing action when its icon is decorative. |
-| Long content | Bound and scroll long text/lists, retain readable labels and check minimum sizes, DPI/work-area placement and keyboard reachability in Revit. |
+Shell content is declared before chrome for body-first traversal, then Close
+and links. Text, Selection, Rename and Command Switch use neutral body
+focus where specified by their controllers; Action Choice focuses its default.
+Inputs retain focus borders. Buttons, checks, radios, toggles and Details
+toggles suppress focus adorners but remain keyboard operable.
 
-Each shared dialog routes the same keys differently. The table is the current
-source behavior, so an inconsistency is visible here before it reaches a user:
+| Family | Enter | Space | Escape / Close |
+| --- | --- | --- | --- |
+| Message | OK | Focused button | Cancel |
+| Selection | No accept from list/filter; focused buttons, ComboBox and links retain Enter | Focused checkbox/button | Cancel |
+| Text Entry | Validate and accept | Focused button; otherwise ordinary input | Cancel |
+| Action Choice | Focused action/Details/help or default action | Normal WPF activation of focused buttons, checkbox and Details | Escape cancels if permitted; Close returns distinct `close` |
+| Command Switch | Focused command, or sole enabled match while search is focused; toggle Enter never chooses a command | Focused toggle/command | Clear search, then cancel; outside dismissal cancels |
+| Rename | Submit from fields; focused case/action button keeps its action | Focused button or ordinary field input | Cancel |
 
-| Dialog | Enter | Space | Escape | Close (X) | `IsDefault` |
-| --- | --- | --- | --- | --- | --- |
-| Message | OK | Activates the focused button | Cancel (chrome policy) | Cancel | XAML on OK |
-| Selection | Ignored from the list and filter; a focused button, the group dropdown and footer links keep it | Toggles the focused checkbox; activates a focused button | Cancel | Cancel | None (Select has no default) |
-| Text entry | OK | Activates the focused button | Cancel | Cancel | XAML on OK |
-| Action Choice | Activates the focused action, Close, Details or help; otherwise the default action | Checkbox only; suppressed on every button (owner decision AC-004) | Cancel | `close`: distinct from `cancel` but also `is_cancelled`; a close from code, the owner or Revit always proceeds | Code (`default_button`) |
-| Command Switch | The focused pill, or the sole visible match while the search has focus | Toggles a focused toggle; activates a focused pill | Clears the search, then cancels | No chrome; an outside click or deactivation cancels | None |
-| KLC-Rename | Submits from the fields; a focused button keeps its own Enter (Uppercase/Lowercase act) | Activates the focused button | Cancel | Cancel | XAML on OK |
+Set explicit default/cancel semantics rather than deriving them from styling.
+Disable the body, not the whole shell, when Close must remain available. Check
+disabled text and icons, long captions, minimum sizes, keyboard reachability,
+work-area placement and DPI in the host.
 
-Accepted deviations. These are owner decisions recorded in the consolidation
-plan and the shared SPEC; they are listed here so a reader of the contract knows
-what the user gives up, with the WCAG 2.1 criterion each touches:
+Retain these owner-selected accessibility deviations when maintaining the
+current baseline; they are not a claim of full accessibility compliance:
 
-- GUI-29: no focus indicator on buttons, checks, radios, toggles, pills, command
-  links and Details toggles (2.4.7 Focus Visible). Fields keep their outline.
-- GUI-15: footer link #407058 and version #808080 on the charcoal window, 2.74:1
-  and 3.96:1 (1.4.3 Contrast, minimum 4.5:1 for small text). Four shared
-  dialogs hide the footer; Selection, Rename and the tool windows keep it.
-- AC-004: Space does nothing on Action Choice buttons, command links, Close and
-  the Details toggle; only Enter activates them (platform convention; not a
-  WCAG failure while Enter works, but a deviation from WPF and TaskDialog).
-- AC-005 and GUI-39: Text entry shows neither the caller's prompt nor the
-  window title on screen (the prompt is the input's accessible name; 2.4.6
-  Headings and Labels, 3.3.2 Labels or Instructions). Message hides the title.
-- Placeholder gray: `klcTextColorWaterMark` #808080 is 3.96:1 on the window.
-  That passes for the 24-unit bold Text watermark and is below 4.5:1 for the
-  12-unit Command Switch and 14-unit Selection search watermarks (1.4.3). Owner decision, 2026-10-31.
-- Command Switch toggle pill: the KLWhite thumb on the #B5C2BD track is 1.45:1
-  and the checked #33714F track is 2.33:1 on the pill, under the 3:1 for control
-  states (1.4.11). The thumb's side also shows the state. Owner kept the current
-  colours on 2026-10-31 and removed the hover fill instead.
-- Command Switch panel edge: no outline and no shadow, so on a dark Revit
-  surround the charcoal panel is separated only by its own fill. Owner decision,
-  2026-10-31.
-- Disabled controls are signalled by #808080 text (3.96:1 since the 2026-11-01
-  token merge; #A6B0AD, 7.0:1, before it) and their disabled automation state;
-  WCAG exempts inactive components from contrast, and the text change is not the
-  only cue to assistive technology (1.4.1, 1.4.3).
+- Buttons/checks/radios/toggles/command links/Details have no visible keyboard
+  focus indicator (Focus Visible). Field outlines remain.
+- Footer links are about 2.74:1 and version/watermark gray about 3.96:1 against
+  charcoal. Small text can fall below the usual 4.5:1 text-contrast threshold.
+- Text Entry's visible title and prompt are absent; its accessible name carries
+  the prompt. Message also omits the center title.
+- Command Switch tracks use gray/green and thumb position. Checked green against
+  the pill surface is about 2.33:1, below a 3:1 control-state contrast threshold.
+  Evaluate the actual current gray track rather than the older muted-track value.
+- Disabled controls use gray plus disabled automation state; inactive components
+  are exempt from the ordinary contrast requirement.
 
-These are source contracts and known implementation limits. They do not mark
-the owner's live Revit review complete.
-
-## Reusable dialogs
-
-Use [GUI.dialogs](../lib/GUI/dialogs/README.md) for prepared-data dialogs.
-Active Python tools adopt matching bodies through explicit `GUI.tool_dialogs`,
-`GUI.tool_selectors` and `GUI.selection_compat` adapters. Find/Replace uses
-shared Rename with caller-owned execution, result Details and safe edit/retry.
-Native file/folder pickers, progress and selection overlays, compiled add-ins
-and Gallery's built-in demonstrations retain their existing UI.
-
-| Need | Modal API | Result |
-| --- | --- | --- |
-| Message notice and optional details | `show_message(title, message, ...)` | `ok` or `cancel` action |
-| Grouped searchable single/multiple selection | `select_items(title, items, ...)` | `accept` with original payload(s), or `cancel` |
-| Sheets, revisions, open documents | `select_sheets`, `select_revisions`, `select_open_documents` | Read-only collection followed by selection; explicit document/context required |
-| Floating Command Switch | `command_switch(title, choices, switches=..., ...)` | `accept` with command key/switch states, or `cancel` |
-| Rename property rules | `rename(title, fields, ...)` | Accepted rules or a separate case action, or `cancel` |
-| TaskDialog-style Action Choice | `choose_action(title, choices, ...)` | Immediate command/button key and checkbox state; distinct `accept`/`cancel`/`close` |
-| Text with optional validation | `ask_text(title, prompt, ...)` | `accept` with raw text, including blank, or `cancel` |
-
-```python
-from GUI.dialogs import SelectionItem, select_items
-
-rows = [SelectionItem('first', 'Example', first_payload),
-        SelectionItem('second', 'Example', second_payload)]
-result = select_items(__title__, rows, version=__version__, owner=owner_handle)
-if result.action == 'accept':
-    selected_payloads = result.value
-```
-
-Importing the package is host-free. Factories lazily load WPF and return unshown
-bare WPF windows; modal helpers call ShowDialog and return `DialogResult`.
-Supply the owner and caller version. No import/factory infers or queries the
-current document. Specialized modal helpers explicitly call separate read-only
-collectors before showing UI. CustomAlert and SelectFromDict are superseded by
-Message and Selection. The `GUI.forms.select_from_dict` entry point uses shared
-Selection through its compatibility adapter. Legacy sources remain reference
-surfaces and receive no design work.
-
-Close/Cancel normally cancel; Action Choice distinguishes Close from Cancel.
-Selection requires Select, with Enter/double-click acceptance
-disabled in both checkbox modes. Text Enter validates/accepts; Message Enter
-acknowledges OK. Action Choice uses Enter-only action activation, with caller
-default or first enabled action; Space only toggles its checkbox. Command
-Switch Enter chooses a focused command or sole enabled search match while search
-is focused; Escape clears search before cancelling. Other dialogs Escape cancel.
-Action Choice may explicitly disable cancellation when Cancel is absent; the
-X, Escape and Alt+F4 then do nothing, but a close from code, the owner or Revit
-still ends the dialog with `close`. These bare windows do not inherit
-pyRevit WPFWindow's competing Escape handler. The earlier host boundary and
-missing defaults in existing tools remain separate. Actual keyboard, owner/modal
-lifetime and DPI still require live acceptance.
-
-Selection uses stable keys for duplicate labels, clones checks, preserves input
-order and hidden checks, and excludes disabled rows. All/None affects visible
-eligible rows only. Single selection enforces exclusive checking; highlighting
-alone does not check a row. No first row is checked implicitly. Text preserves
-raw input; required/validator failures remain inline. Validators return an error
-string or None. Inspect result.action explicitly: accepted blank and Cancel
-are different outcomes.
-
-Bodies reuse the shared shell, buttons/fields/lists, status brushes, icon
-geometry and green/gray footer roles. Opt-in `KlaDialogCheck` presents a label
-and description using the existing checkbox template; `KlaDialogDescription`
-handles secondary/disabled text; `KlaDialogListItem` disables unavailable rows.
-Action Choice uses a large instruction, smaller body and up to four arrow-led
-immediate command links, with standard buttons below. It retains the caller
-chrome title but omits the standard footer; optional caller help replaces that
-content. Severity uses Message's icon roles. Details expands the bottom; a
-caller-defined checkbox returns its state without gating actions or persistence.
-KLC-Rename is spelled out in XAML from the Find/Replace Sheets window: two
-property groups side by side, each with Find/Replace and Prefix/Suffix, then one
-Uppercase/Lowercase pair and Rename. The Views and generic layouts collapse the
-second group. The case pair acts on the one field that allows case; Rename
-validates and returns the entered rules. The dialog does not preview or perform
-model changes.
-It opens with neutral body focus and no field selected. Width fits the one or
-two visible groups; spacing follows the shared tokens and height fits current
-content and validation.
-
-The Message body is a `klaReadout`, so its text can be selected and copied; it
-and the details are bounded and scroll. Initial Message height fits content;
-manual width changes no longer force a new height. Deferred Details measurement
-grows the bottom and protects the message viewport until capped. Message leaves
-its centre chrome title blank while retaining caller Window.Title metadata and
-Close. Text removes its footer row and visible prompt header and
-uses the larger Segoe UI Bold single-line field, with an empty-field `[ENTER TEXT]`
-watermark that is never input data. It uses footer version gray (#808080), sits on
-the line the typed text will take, and shows whenever the field is empty, focused or not. Text opens
-with neutral body focus and a blank center chrome title, retaining caller
-Window.Title metadata and Close. The caller prompt remains an accessible name.
-Its compact height fits input/error. Its only visible
-action is the same 104 x 28 `klcButton` OK used by Message; both separate
-content and action with an 8-unit `klcBodySpaceNormal` spacer row. Close/Escape
-still cancels. Shared selectors open at 432 x 576, retaining the established
-Selection geometry after retirement of the duplicate template.
-Search sits above optional Group; both fields are 24 high and align after their
-16-unit Search/Layers-2 icons plus an 8-unit gap. Actual Search/Rename text starts
-8 units inside the border, matching Group text. The foundation lets TextBoxView
-apply padding once; `KlaTextBoxPadding` compensates its native inset instead of
-adding a second content-host margin. Selectors open with neutral body focus;
-Search is not focused or selected automatically. Template section gaps and a
-centered gray Select All/None pair above green Select replace the former action
-row; Close/Escape cancels. The selected/visible summary below selector lists is
-removed; inline validation stays, with no empty summary gap. Command Switch is a
-compact, fixed-width, content-height floating panel without header/footer. Its
-outer panel has no outline; its 16-unit SemiBold prompt centers beside search. Its
-buttons choose immediately and toggles remain visible during filtering. It has
-no corner x and starts with neutral panel focus rather than selected search;
-typing or Tab can enter search. Escape clears search then cancels; blank panel
-clicks leave it open. Dragging beyond the system threshold moves it from any
-surface without activating controls; outside clicks cancel, including over a
-disabled modal owner.
-
-Gallery presents one row per shared family: Message, Selection, Action choice,
-Text, Command Switch and KLC-Rename. Variant labels are searchable and a
-dropdown beside State selects the variant; each family remembers its variant and
-state for the session. Selection offers Sheets, Revisions, Open Documents, List
-Single and List Multiple; Command Switch offers Commands only and Commands with
-toggles; KLC-Rename offers Views, Sheets and Generic. Both
-Message variants, Without Details and With Details, offer Normal, Empty, Warning,
-Error, Success, Disabled and Long content; With Details retains diagnostics in
-Empty. The other shared variants and two reference templates offer five
-states, except Action Choice's Commands, Commands + Details, Commands + Checkbox,
-Full Content and Standard Buttons variants, which each offer the same seven
-states as Message. Gallery has 39 entries. The collectors are never called by Gallery. See
-[API examples](../lib/GUI/dialogs/README.md) and
-[refinement verification](knowledge/reviews/design-system/2026-10-29-dialog-refinement.md).
+Historical decisions are in the plan and shared SPEC. Current source changes,
+including the floating shadow, gray switch track and ordinary Action Choice
+Space activation, supersede older descriptions. The shared SPEC/API guide still
+describe Enter-only Action Choice activation; that text has not caught up with
+`choice_window.py` and Studio's routed-Space checks. This guide records the
+current implementation without changing that separate contract. Physical input,
+Narrator, host ownership and DPI remain separate acceptance evidence.
 
 ## Creating a window
 
-Start from the [reference templates](../lib/GUI/_templates/README.md). Keep
-`window_shell` as a ContentControl using `klcWindowShell`; put only workflow
-content inside it. A window names its controls, wires its events and chooses
-component keys; it does not restate what a component already sets, and it adds
-no font, colour, size or template of its own. Not everything is a component: a
-one-off text style local to the window (View Range's table cells) is fine when
-nothing else needs it.
-
-**Body layout, as the shared dialogs do it.**
-
-- Separate fixed parts with token spacer rows or columns (`klcBodySpaceSmall`,
-  `klcBodySpaceNormal`, `klcBodySpaceLarge`), not margins, so the gaps are
-  visible in the grid. A margin belongs only on a part that can collapse, where
-  it collapses with the part (`klcStackGapVert` on an optional section).
-- A filter row is `Auto` / `klcBodySpaceNormal` / `*`: a `klcIcon16` search
-  icon, the gap, then `klcTextBoxFilter`.
-- Actions are centred: a secondary pair (`klcButtonSec`, the second with
-  `klcStackGapHoriz`) above the double-width main action, in `Auto` rows. Action
-  Choice's right-aligned buttons are the TaskDialog convention and stay.
-- The validation line is a `klcTextBoxFeedback`; code sets its Text and nothing else.
-- Tool-supplied text follows the TextBlock / Label / TextBox rules above.
-
-The following body illustrates the loading contract; the handler is supplied by
-the Python example below.
+First read the command's adjacent SPEC and choose a matching shared dialog.
+When a bespoke body is needed, load Components before XAML and use the shared
+shell. Keep named controls/events in the body and deterministic logic in `lib/`.
 
 ```xml
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Width="360" Height="240" Style="{StaticResource klcWindow}">
+        Width="432" SizeToContent="Height"
+        Style="{StaticResource klcWindow}">
     <ContentControl x:Name="window_shell" Style="{StaticResource klcWindowShell}">
-        <Grid x:Name="window_body">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="{StaticResource klcBodySpaceNormal}"/>
-                <RowDefinition Height="{StaticResource klaBodyRowNormal}"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="{StaticResource klcBodySpaceNormal}"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <StackPanel>
             <Label Content="Name:" Target="{Binding ElementName=name_input}"
                    Style="{StaticResource klcLabelCentered}"/>
-            <TextBox x:Name="name_input" Grid.Row="2"
-                     Style="{StaticResource KlaCompactFieldInput}"/>
-            <Button Grid.Row="5" Content="Apply" Click="apply_example"
-                    Style="{StaticResource klcButtonDouble}" IsDefault="True"/>
-        </Grid>
+            <TextBox x:Name="name_input" Style="{StaticResource klcTextBox}"/>
+            <Button Content="Apply" Click="apply_example" IsDefault="True"
+                    Margin="{StaticResource KlaActionTopGap}"
+                    Style="{StaticResource klcButtonDouble}"/>
+        </StackPanel>
     </ContentControl>
 </Window>
 ```
@@ -875,79 +679,121 @@ the Python example below.
 ```python
 from pyrevit import forms  # Initializes the installed WPF support.
 from System.Windows import Window
+from System.Windows.Interop import WindowInteropHelper
 from GUI.window_chrome import load_window
 
 class ExampleWindow(Window):
-    def __init__(self, body_path, title, version):
+    def __init__(self, body_path, title, version, owner_handle):
         self.result = None
         load_window(self, body_path, title, version)
+        WindowInteropHelper(self).Owner = owner_handle
 
     def apply_example(self, sender, args):
         self.result = self.name_input.Text
         self.Close()
 
-# body_path is the example XAML path; identity comes from the command.
-window = ExampleWindow(body_path, __title__, __version__)
+# body_path and a native System.IntPtr owner_handle come from the caller.
+window = ExampleWindow(body_path, __title__, __version__, owner_handle)
 window.ShowDialog()
-# The caller decides what to do with window.result.
+# The caller validates/uses window.result and owns subsequent model operations.
 ```
 
-For a compiled window, merge ThemeBootstrapper resources before
-InitializeComponent, then call
-`WindowChrome.Attach(this, window_shell, title, version)`. Follow an existing
-compiled view for tool strings and service injection.
+For a modeless workflow, preserve its ExternalEvent, subscription and cleanup
+contracts; do not run model operations directly from arbitrary WPF events. For
+compiled bodies, apply resources before InitializeComponent and attach chrome
+afterward using the existing compiled adapter pattern.
 
-1. Read the command's adjacent SPEC and preserve workflow/lifetime contracts.
-2. Choose explicit shared roles, typed spacing and a suitable reference body.
-3. Keep named workflow controls and handlers in the window's namescope.
-4. Supply identity, accessible labels and explicit default/cancel semantics.
-5. Add an allowlisted Gallery adapter and fictional states where appropriate;
-   source discovery alone must not grant execution permission. Five compiled
-   Gallery entries remain deferred under the separate Gallery plan.
-6. Update the command SPEC and run the relevant checks below. Actual Revit
-   operations remain the controller's responsibility and need host evidence.
+Supply identity, accessible labels, validation and explicit dismissal behavior.
+Add fictional Gallery coverage through an allowlisted adapter where appropriate;
+source discovery alone does not permit executing a production controller.
+Materially changed tool behavior also requires its adjacent SPEC update.
+
+## WPF Studio and Gallery
+
+The sibling `.dev.KLCodeWPF` workspace is the Windows XAML editing and preview
+environment. Its README owns the complete workflow. Open `KLCodeWPF.sln` in
+Visual Studio, build x64, then use the designer or F5 preview picker. Views are
+editable working copies; generated handlers and preview attributes belong only
+to the workspace. Designer samples and interactive previews use fictional data,
+not an Autodesk model.
+
+1. Save edits in Studio. Run Check before Apply.
+2. Apply validates the batch, detects concurrent source edits, protects existing
+   names/events, strips preview attributes and backs up originals.
+3. After extension-side changes, Refresh imports source. It refuses to overwrite
+   unapplied preview edits. Reopen the solution when inventory changes.
+4. Build and verify after synchronization. Never copy preview attributes or
+   generated C# scaffolding into production XAML.
+
+The six shared families have named JSONC setups under DesignerSamples. The
+designer's active setup and F5's chosen setup are separate selections. Gallery
+retains its own fixtures. Message, Selection and Rename previews instantiate
+actual shared factories/controllers; their actions remain simulations.
+
+UI Gallery groups shared families with Variant beside State. Selection has
+Sheets, Revisions, Open Documents, List Single and List Multiple. Message has
+With/Without Details; Rename has Views, Sheets and Generic; Command Switch has
+Commands only and Commands with toggles. Action Choice covers command, Details,
+checkbox, full-content and standard-button combinations. Options and Review
+remain template entries. Family variants expose empty, error/severity, disabled
+and long-content fixtures as applicable. Compiled Gallery previews remain a
+separate deferred capability; source smoke/designer surfaces are different proof.
 
 ## Validation
 
-| Tier | What it establishes | Limits |
+For a documentation edit, verify links, key names, values and examples against
+current source and inspect `git diff`. Runtime changes require the relevant
+behavior/layout evidence. Do not rerun every historical probe merely because
+it exists: several still encode retired resource names or dimensions.
+
+| Check | Establishes | Does not establish |
 | --- | --- | --- |
-| CPython source/unit tests | Metadata, adapter boundaries with fakes, resource/caller contracts, deterministic fixtures and generated artwork | No rendered WPF or Revit behavior; the caller scanner does not prove every dynamic route |
-| Icon generation check | Generated resources match the attributed source/generator | Does not establish interactive state or visual suitability by itself |
-| UI scale checker | Numeric-layout discipline in Foundation/Components; advisory off-scale consumer Margin/Padding values | The sized `Icon<size>` styles are exempt and the shell's 110 title margins are a known literal; it is not a complete UI/accessibility or token-value approval check |
-| IronPython/WPF probes | Real XAML/bindings/layout, fictional state interactions, overflow, icon presentation, scrollbar geometry and wordmark pixels | Windows are constructed/rendered without live Revit ownership, pointer/keyboard/DPI or production operations |
-| C# source tests | Resource and packaging-source contracts | Cannot establish runtime loading; the Windows smoke checks are a separate tier |
-| C# desktop smoke, net48 and net8.0-windows | Actual compiled window construction/rendering against fictional providers | No deployed Revit DLL acceptance, real load/import/database actions or live keyboard review |
-| Live Revit | Ownership, focus, drag, default/cancel behavior, DPI/work area, accessibility and real workflows | Record exact host/version and outcomes under GUI-08; owner review remains pending |
+| Focused CPython tests | Deterministic models, metadata, compatibility and fake-host boundaries | Rendered WPF or real model effects |
+| Icon generator `--check` | Generated output matches source and generator | Visual/interactive suitability |
+| `check_ui_scale.py` | Numeric-layout policy and reported consumer spacing | Approved token values, complete UI consistency or accessibility |
+| Studio Build / Verify | Current presentation baseline, designer/runtime construction and fictional Gallery states | Revit ownership, physical input or model operations |
+| Studio adapter/modal probes | Real WPF results and interactions using fictional objects | Real transaction/host recovery |
+| C# source tests and desktop smoke | Packaging/source contracts and construction with fake ports | Deployed DLL and matching-Revit acceptance |
+| Live Revit review | Actual ownership, focus, drag, DPI, model workflows and lifecycle | Other untested hosts/models |
 
-Many geometry probes read expected dimensions from the same tokens used by the
-controls. That verifies consistent consumption, but a token edit must also be
-checked against the approved dimensions in this guide and inspected in renders.
-Do not interpret a green source/probe suite as complete design acceptance.
+Some layout probes derive expectations from the same tokens as the controls.
+They prove consistent consumption, not that an edited token still matches the
+intended design. Inspect renders and independent dimensions after a value change.
 
-Run the applicable commands from the repository root:
+Useful repository commands (choose the checks relevant to the change):
 
 ```powershell
 python -B scripts/generate_gui_icons.py --check
 python -B scripts/check_ui_scale.py
-python -B -m unittest discover -s tests -p "*test.py"
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/validate_ui_gallery_wpf.ps1 -OutputDirectory <tmp>
+python -B -m unittest discover -s tests -p "gui_selection_compat_test.py"
+python -B -m unittest discover -s tests -p "gui_tool_selectors_test.py"
+python -B -m unittest discover -s tests -p "find_replace*test.py"
 dotnet test src/KLCode.Wpf/Tests/KLCode.Wpf.Source.Tests --no-restore
-dotnet run --project src/KLCode.Wpf/Tests/KLCode.Wpf.Desktop.Smoke --framework net48 --no-restore -- <tmp>
-dotnet run --project src/KLCode.Wpf/Tests/KLCode.Wpf.Desktop.Smoke --framework net8.0-windows --no-restore -- <tmp>
 ```
 
-Add `-ShowFocusProbe` to the WPF command to briefly show and close four owned
-fictional windows. It checks neutral Command Switch initial focus through UIA
-and verifies retained programmatic button/checkbox focus without an adorner,
-neutral Rename fields, and Text Entry's initial focus and watermark transitions.
-Additional owned Action Choice fixtures check default focus, routed keyboard
-activation and cancellation; the Switch fixture checks pointer capture policy.
-No Revit session or user document is used. Default probe execution stays offscreen.
+The scale checker currently flags shared literals such as the shell's 110-unit
+margins; its strict policy should not be described as a clean baseline without
+running it. `_future` is excluded from consumer reporting. Sized icon presenter
+dimensions are an explicit exception.
 
-Replace `<tmp>` with a writable evidence directory. The probes default to the
-installed IronPython engine location and the .NET commands require restored
-dependencies. Run focused checks for ordinary changes and broaden them when
-shared resources or host behavior change. The
-[latest Windows record](knowledge/reviews/design-system/2026-10-29-gui-architecture-windows.md)
-contains measured results, representative renders and the owner's host checklist;
-the [active plan](plans/custom-window-consolidation.md) remains the task authority.
+In the sibling Studio workspace, use `Workspace.ps1 Build` / `Verify`,
+`Test-SelectionAdapter.ps1 -Wpf`, `Test-ToolDialogs.ps1 -Wpf` and
+`Test-FindReplaceDialog.ps1` for the current adoption baseline.
+`Test-DialogSamples.ps1` checks designer/interactive setups and
+`Test-Sync.ps1` checks transfer protections. Use the workspace README for exact
+invocation and evidence destinations. Shared-resource compiled regressions also
+use the desktop smoke project targeting net48 and net8.0-windows with installed
+dependencies.
+
+The repository's `validate_ui_gallery_wpf.ps1` and specialized WPF scripts are
+additional probes. Inspect their assertions against the current baseline before
+using them as evidence. Optional shown-window focus probes establish bounded
+fictional-window behavior, not physical Revit keyboard/pointer routing.
+
+The [November 6 baseline record](knowledge/reviews/design-system/2026-11-06-wpf-baseline-adoption.md)
+and [November 9 adoption record](knowledge/reviews/design-system/2026-11-09-shared-dialog-adoption.md)
+document the latest delivered local checks. GUI-08 and GUI-54 in the owning plan
+retain live acceptance: representative model transactions/retries, revision
+filters, View Range ExternalEvent/close cleanup, Duplicate Sheets operations,
+actual owner/focus and DPI. Record host/version and observed outcomes there;
+local test success does not close those tasks.
